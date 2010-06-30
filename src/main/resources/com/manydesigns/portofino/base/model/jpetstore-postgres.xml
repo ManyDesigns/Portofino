@@ -15,15 +15,15 @@
                             <column name="catid"
                                     columnType="VARCHAR"
                                     length="10"
-                                    nallable="false"/>
+                                    nullable="false"/>
                             <column name="name"
                                     columnType="VARCHAR"
                                     length="80"
-                                    nallable="true"/>
+                                    nullable="true"/>
                             <column name="descn"
                                     columnType="VARCHAR"
                                     length="255"
-                                    nallable="true"/>
+                                    nullable="true"/>
                         </columns>
                         <primaryKey name="pk_category">
                             <column name="catid"/>
@@ -34,19 +34,19 @@
                             <column name="productid"
                                     columnType="VARCHAR"
                                     length="10"
-                                    nallable="false"/>
+                                    nullable="false"/>
                             <column name="category"
                                     columnType="VARCHAR"
                                     length="10"
-                                    nallable="false"/>
+                                    nullable="false"/>
                             <column name="name"
                                     columnType="VARCHAR"
                                     length="80"
-                                    nallable="true"/>
+                                    nullable="true"/>
                             <column name="descn"
                                     columnType="VARCHAR"
                                     length="255"
-                                    nallable="true"/>
+                                    nullable="true"/>
                         </columns>
                         <primaryKey name="pk_category">
                             <column name="catid"/>

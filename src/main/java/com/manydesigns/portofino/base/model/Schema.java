@@ -49,9 +49,14 @@ public class Schema {
     protected final List<Table> tables;
 
 
+
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
+
+    public Schema() {
+        this.tables = new ArrayList<Table>();
+    }
 
     public Schema(String schemaName) {
         this.schemaName = schemaName;

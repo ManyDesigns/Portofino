@@ -61,6 +61,9 @@ public class Column {
     // Constructors
     //--------------------------------------------------------------------------
 
+    public Column() {
+    }
+
     public Column(String schemaName, String tableName, String columnName,
                   String columnType, boolean nullable, int length,
                   int precision, int scale) {

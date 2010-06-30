@@ -54,6 +54,10 @@ public class Database {
     // Constructors
     //--------------------------------------------------------------------------
 
+    public Database() {
+        this.schemas = new ArrayList<Schema>();
+    }
+
     public Database(String name, Connection connection) {
         this.name = name;
         this.connection = connection;

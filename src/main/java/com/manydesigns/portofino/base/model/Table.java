@@ -56,12 +56,17 @@ public class Table {
     // Constructors
     //--------------------------------------------------------------------------
 
+    public Table() {
+        this.columns = new ArrayList<Column>();
+        this.relationships = new ArrayList<Relationship>();
+    }
+
     public Table(String schemaName, String tableName) {
         this.schemaName = schemaName;
         this.tableName = tableName;
         this.columns = new ArrayList<Column>();
         this.relationships = new ArrayList<Relationship>();
-    }
+     }
 
     //--------------------------------------------------------------------------
     // Getters/setter
