@@ -27,50 +27,49 @@
  *
  */
 
-package com.manydesigns.portofino.base.model;
+package com.manydesigns.portofino.base.reflection;
+
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.portofino.base.model.Table;
+import com.manydesigns.portofino.base.model.Column;
 
 import java.util.List;
-import java.util.ArrayList;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Schema {
+public class TableAccessor implements ClassAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
-    // Fields
-    //--------------------------------------------------------------------------
+    private final Table table;
 
-    protected String schemaName;
-    protected final List<Table> tables;
-
-
-    //--------------------------------------------------------------------------
-    // Constructors
-    //--------------------------------------------------------------------------
-
-    public Schema(String schemaName) {
-        this.schemaName = schemaName;
-        this.tables = new ArrayList<Table>();
+    public TableAccessor(Table table) {
+        this.table = table;
     }
 
-    //--------------------------------------------------------------------------
-    // Getters/setter
-    //--------------------------------------------------------------------------
+    public PropertyAccessor getProperty(String fieldName) throws NoSuchFieldException {
+        for (Column current : table.getColumns()) {
+            if (current.getColumnName().equals(fieldName)) {
+                return new ColumnAccessor(current);
+            }
+        }
 
-    public String getSchemaName() {
-        return schemaName;
+        throw new NoSuchFieldException(fieldName);
     }
 
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
-    }
-
-    public List<Table> getTables() {
-        return tables;
+    public PropertyAccessor[] getProperties() {
+        List<Column> columns = table.getColumns();
+        ColumnAccessor[] result =
+                new ColumnAccessor[columns.size()];
+        int i = 0;
+        for (Column current : columns) {
+            result[i] = new ColumnAccessor(current);
+            i++;
+        }
+        return result;
     }
 }

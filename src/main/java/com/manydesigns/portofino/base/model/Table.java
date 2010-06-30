@@ -42,12 +42,14 @@ public class Table {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //--------------------------------------------------------------------------
-    // Attributes
+    // Fields
     //--------------------------------------------------------------------------
 
     protected String schemaName;
     protected String tableName;
-    protected final List<Schema> columns;
+    protected final List<Column> columns;
+    protected final List<Relationship> relationships;
+    protected PrimaryKey primaryKey;
 
 
     //--------------------------------------------------------------------------
@@ -57,7 +59,8 @@ public class Table {
     public Table(String schemaName, String tableName) {
         this.schemaName = schemaName;
         this.tableName = tableName;
-        this.columns = new ArrayList<Schema>();
+        this.columns = new ArrayList<Column>();
+        this.relationships = new ArrayList<Relationship>();
     }
 
     //--------------------------------------------------------------------------
@@ -80,7 +83,19 @@ public class Table {
         this.tableName = tableName;
     }
 
-    public List<Schema> getColumns() {
+    public List<Column> getColumns() {
         return columns;
+    }
+
+    public List<Relationship> getRelationships() {
+        return relationships;
+    }
+
+    public PrimaryKey getPrimaryKey() {
+        return primaryKey;
+    }
+
+    public void setPrimaryKey(PrimaryKey primaryKey) {
+        this.primaryKey = primaryKey;
     }
 }

@@ -27,50 +27,55 @@
  *
  */
 
-package com.manydesigns.portofino.base.model;
+package com.manydesigns.portofino.base.reflection;
 
-import java.util.List;
-import java.util.ArrayList;
+import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.portofino.base.model.Column;
+
+import java.lang.reflect.Modifier;
+import java.lang.annotation.Annotation;
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Schema {
+public class ColumnAccessor implements PropertyAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
-    // Fields
-    //--------------------------------------------------------------------------
+    protected final Column column;
 
-    protected String schemaName;
-    protected final List<Table> tables;
-
-
-    //--------------------------------------------------------------------------
-    // Constructors
-    //--------------------------------------------------------------------------
-
-    public Schema(String schemaName) {
-        this.schemaName = schemaName;
-        this.tables = new ArrayList<Table>();
+    public ColumnAccessor(Column column) {
+        this.column = column;
     }
 
-    //--------------------------------------------------------------------------
-    // Getters/setter
-    //--------------------------------------------------------------------------
-
-    public String getSchemaName() {
-        return schemaName;
+    public String getName() {
+        return column.getColumnName();
     }
 
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
+    public int getModifiers() {
+        return Modifier.PUBLIC;
     }
 
-    public List<Table> getTables() {
-        return tables;
+    public boolean isAnnotationPresent(Class<? extends Annotation> clazz) {
+        return false;
+    }
+
+    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+        return null;
+    }
+
+    public Object get(Object obj) throws IllegalAccessException {
+        return ((Map)obj).get(column.getColumnName());
+    }
+
+    public void set(Object obj, Object value) throws IllegalAccessException {
+        ((Map)obj).put(column.getColumnName(), value);
+    }
+
+    public boolean isAssignableTo(Class clazz) {
+        return false;
     }
 }

@@ -37,7 +37,7 @@ import java.util.ArrayList;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Schema {
+public class Relationship {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -45,32 +45,53 @@ public class Schema {
     // Fields
     //--------------------------------------------------------------------------
 
-    protected String schemaName;
-    protected final List<Table> tables;
+    protected String name;
+    protected String onUpdate;
+    protected String onDelete;
+    protected final List<Reference>references;
 
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
-    public Schema(String schemaName) {
-        this.schemaName = schemaName;
-        this.tables = new ArrayList<Table>();
+    public Relationship(String name, String onUpdate, String onDelete) {
+        this.name = name;
+        this.onUpdate = onUpdate;
+        this.onDelete = onDelete;
+        references = new ArrayList<Reference>();
     }
+
 
     //--------------------------------------------------------------------------
     // Getters/setter
     //--------------------------------------------------------------------------
 
-    public String getSchemaName() {
-        return schemaName;
+    public String getName() {
+        return name;
     }
 
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public List<Table> getTables() {
-        return tables;
+    public String getOnUpdate() {
+        return onUpdate;
+    }
+
+    public void setOnUpdate(String onUpdate) {
+        this.onUpdate = onUpdate;
+    }
+
+    public String getOnDelete() {
+        return onDelete;
+    }
+
+    public void setOnDelete(String onDelete) {
+        this.onDelete = onDelete;
+    }
+
+    public List<Reference> getReferences() {
+        return references;
     }
 }

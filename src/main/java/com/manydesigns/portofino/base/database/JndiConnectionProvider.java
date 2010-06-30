@@ -27,17 +27,20 @@
  *
  */
 
-package com.manydesigns.portofino.base.model;
+package com.manydesigns.portofino.base.database;
 
-import java.util.List;
-import java.util.ArrayList;
+import javax.sql.DataSource;
+import javax.naming.NamingException;
+import javax.naming.InitialContext;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Schema {
+public class JndiConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -45,32 +48,25 @@ public class Schema {
     // Fields
     //--------------------------------------------------------------------------
 
-    protected String schemaName;
-    protected final List<Table> tables;
+    private final DataSource ds;
 
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
-    public Schema(String schemaName) {
-        this.schemaName = schemaName;
-        this.tables = new ArrayList<Table>();
+    public JndiConnectionProvider(String databaseJndiName)
+            throws NamingException {
+        InitialContext ic = new InitialContext();
+        ds = (DataSource) ic.lookup(databaseJndiName);
     }
 
     //--------------------------------------------------------------------------
-    // Getters/setter
+    // Implementation of ConnectionProvider
     //--------------------------------------------------------------------------
 
-    public String getSchemaName() {
-        return schemaName;
+    public Connection getConnection() throws SQLException {
+        return ds.getConnection();
     }
 
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
-    }
-
-    public List<Table> getTables() {
-        return tables;
-    }
 }

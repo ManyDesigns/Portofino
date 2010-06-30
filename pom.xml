@@ -10,6 +10,7 @@
     <name>manydesigns-portofino</name>
     <url>http://www.manydesigns.com/</url>
     <properties>
+        <elements.version>3.1.0</elements.version>
         <servlet.api.version>2.4</servlet.api.version>
         <jsp.api.version>2.1</jsp.api.version>
         <struts.version>2.1.6</struts.version>
@@ -17,6 +18,57 @@
         <commons.collections.version>3.2</commons.collections.version>
         <jasperreports.version>3.5.0</jasperreports.version>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>elements</artifactId>
+            <version>${elements.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>elements-struts2</artifactId>
+            <version>${elements.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons.lang.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>${servlet.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.struts</groupId>
+            <artifactId>struts2-core</artifactId>
+            <version>${struts.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>

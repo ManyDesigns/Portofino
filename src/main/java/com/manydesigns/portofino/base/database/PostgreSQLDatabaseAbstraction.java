@@ -27,50 +27,47 @@
  *
  */
 
-package com.manydesigns.portofino.base.model;
+package com.manydesigns.portofino.base.database;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Schema {
+public class PostgreSQLDatabaseAbstraction extends CommonDatabaseAbstraction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-
-    //--------------------------------------------------------------------------
-    // Fields
-    //--------------------------------------------------------------------------
-
-    protected String schemaName;
-    protected final List<Table> tables;
-
+    
+    private static final String DRIVER_CLASS_NAME = "org.postgresql.Driver";
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
-    public Schema(String schemaName) {
-        this.schemaName = schemaName;
-        this.tables = new ArrayList<Table>();
+    public PostgreSQLDatabaseAbstraction(ConnectionProvider connectionProvider)
+            throws SQLException {
+        super(connectionProvider);
     }
 
     //--------------------------------------------------------------------------
-    // Getters/setter
+    // Implementation of DatabaseAbstraction
     //--------------------------------------------------------------------------
 
-    public String getSchemaName() {
-        return schemaName;
+    public Connection getConnection(String host, int port, String dbName,
+            String login, String password) throws SQLException {
+        return DriverManager.getConnection(
+                MessageFormat.format(
+                        "jdbc:postgresql://{0}:{1}/{2}",
+                        host, port, dbName),
+                login, password);
     }
 
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
-    }
-
-    public List<Table> getTables() {
-        return tables;
+    public String getDriverClassName() {
+        return DRIVER_CLASS_NAME;
     }
 }

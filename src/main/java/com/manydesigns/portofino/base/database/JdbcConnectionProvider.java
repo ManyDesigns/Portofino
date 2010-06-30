@@ -27,17 +27,18 @@
  *
  */
 
-package com.manydesigns.portofino.base.model;
+package com.manydesigns.portofino.base.database;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.DriverManager;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Schema {
+public class JdbcConnectionProvider implements ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -45,32 +46,32 @@ public class Schema {
     // Fields
     //--------------------------------------------------------------------------
 
-    protected String schemaName;
-    protected final List<Table> tables;
+    private final String jdbcConnectionURL;
+    private final String jdbcUsername;
+    private final String jdbcPassword;
 
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
-    public Schema(String schemaName) {
-        this.schemaName = schemaName;
-        this.tables = new ArrayList<Table>();
+    public JdbcConnectionProvider(String jdbcDriverClass, String jdbcConnectionURL,
+                                 String jdbcUsername, String jdbcPassword)
+            throws ClassNotFoundException {
+        Class.forName(jdbcDriverClass);
+        this.jdbcConnectionURL = jdbcConnectionURL;
+        this.jdbcUsername = jdbcUsername;
+        this.jdbcPassword = jdbcPassword;
     }
+
 
     //--------------------------------------------------------------------------
-    // Getters/setter
+    // Implementation of ConnectionProvider
     //--------------------------------------------------------------------------
 
-    public String getSchemaName() {
-        return schemaName;
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(jdbcConnectionURL,
+                jdbcUsername, jdbcPassword);
     }
 
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
-    }
-
-    public List<Table> getTables() {
-        return tables;
-    }
 }

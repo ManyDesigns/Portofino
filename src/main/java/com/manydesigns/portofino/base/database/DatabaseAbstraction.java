@@ -27,50 +27,48 @@
  *
  */
 
-package com.manydesigns.portofino.base.model;
+package com.manydesigns.portofino.base.database;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Schema {
+public interface DatabaseAbstraction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
-    // Fields
-    //--------------------------------------------------------------------------
+    public String getDatabaseProductName();
 
-    protected String schemaName;
-    protected final List<Table> tables;
+    public String getDatabaseProductVersion();
 
+    public Integer getDatabaseMajorVersion();
 
-    //--------------------------------------------------------------------------
-    // Constructors
-    //--------------------------------------------------------------------------
+    public Integer getDatabaseMinorVersion();
 
-    public Schema(String schemaName) {
-        this.schemaName = schemaName;
-        this.tables = new ArrayList<Table>();
-    }
+    public String getDatabaseMajorMinorVersion();
 
-    //--------------------------------------------------------------------------
-    // Getters/setter
-    //--------------------------------------------------------------------------
+    public String getDriverName();
 
-    public String getSchemaName() {
-        return schemaName;
-    }
+    public String getDriverVersion();
 
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
-    }
+    public Integer getDriverMajorVersion();
 
-    public List<Table> getTables() {
-        return tables;
-    }
+    public Integer getDriverMinorVersion();
+
+    public String getDriverMajorMinorVersion();
+
+    public Integer getJDBCMajorVersion();
+
+    public Integer getJDBCMinorVersion();
+
+    public String getJDBCMajorMinorVersion();
+
+    public String getDriverClassName();
+
+    public Connection getConnection(String host, int port, String dbName,
+            String login, String password)  throws SQLException;
 }

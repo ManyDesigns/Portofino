@@ -27,50 +27,19 @@
  *
  */
 
-package com.manydesigns.portofino.base.model;
+package com.manydesigns.portofino.base.database;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Schema {
+public interface ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
-    // Fields
-    //--------------------------------------------------------------------------
-
-    protected String schemaName;
-    protected final List<Table> tables;
-
-
-    //--------------------------------------------------------------------------
-    // Constructors
-    //--------------------------------------------------------------------------
-
-    public Schema(String schemaName) {
-        this.schemaName = schemaName;
-        this.tables = new ArrayList<Table>();
-    }
-
-    //--------------------------------------------------------------------------
-    // Getters/setter
-    //--------------------------------------------------------------------------
-
-    public String getSchemaName() {
-        return schemaName;
-    }
-
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
-    }
-
-    public List<Table> getTables() {
-        return tables;
-    }
+    public Connection getConnection() throws SQLException;
 }

@@ -29,15 +29,12 @@
 
 package com.manydesigns.portofino.base.model;
 
-import java.util.List;
-import java.util.ArrayList;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Schema {
+public class Reference {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -45,32 +42,37 @@ public class Schema {
     // Fields
     //--------------------------------------------------------------------------
 
-    protected String schemaName;
-    protected final List<Table> tables;
+    protected Column fromColumn;
+    protected Column toColumn;
 
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
-    public Schema(String schemaName) {
-        this.schemaName = schemaName;
-        this.tables = new ArrayList<Table>();
+    public Reference(Column fromColumn, Column toColumn) {
+        this.fromColumn = fromColumn;
+        this.toColumn = toColumn;
     }
+
 
     //--------------------------------------------------------------------------
     // Getters/setter
     //--------------------------------------------------------------------------
 
-    public String getSchemaName() {
-        return schemaName;
+    public Column getFromColumn() {
+        return fromColumn;
     }
 
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
+    public void setFromColumn(Column fromColumn) {
+        this.fromColumn = fromColumn;
     }
 
-    public List<Table> getTables() {
-        return tables;
+    public Column getToColumn() {
+        return toColumn;
+    }
+
+    public void setToColumn(Column toColumn) {
+        this.toColumn = toColumn;
     }
 }

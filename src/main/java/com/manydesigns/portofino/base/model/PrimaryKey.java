@@ -37,7 +37,7 @@ import java.util.ArrayList;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Schema {
+public class PrimaryKey {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -45,32 +45,32 @@ public class Schema {
     // Fields
     //--------------------------------------------------------------------------
 
-    protected String schemaName;
-    protected final List<Table> tables;
+    protected String name;
+    protected final List<Column> columns;
 
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
-    public Schema(String schemaName) {
-        this.schemaName = schemaName;
-        this.tables = new ArrayList<Table>();
+    public PrimaryKey(String name) {
+        this.name = name;
+        this.columns = new ArrayList<Column>();
     }
 
     //--------------------------------------------------------------------------
     // Getters/setter
     //--------------------------------------------------------------------------
 
-    public String getSchemaName() {
-        return schemaName;
+    public String getName() {
+        return name;
     }
 
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public List<Table> getTables() {
-        return tables;
+    public List<Column> getColumns() {
+        return columns;
     }
 }

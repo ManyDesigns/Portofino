@@ -39,7 +39,7 @@ public class Column {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //--------------------------------------------------------------------------
-    // Attributes
+    // Fields: physical (jdbc)
     //--------------------------------------------------------------------------
 
     protected String schemaName;
@@ -51,6 +51,11 @@ public class Column {
     protected int precision;
     protected int scale;
 
+    //--------------------------------------------------------------------------
+    // Fields: logical (Java)
+    //--------------------------------------------------------------------------
+
+    protected Class javaType;
 
     //--------------------------------------------------------------------------
     // Constructors
@@ -135,5 +140,13 @@ public class Column {
 
     public void setScale(int scale) {
         this.scale = scale;
+    }
+
+    public Class getJavaType() {
+        return javaType;
+    }
+
+    public void setJavaType(Class javaType) {
+        this.javaType = javaType;
     }
 }
