@@ -1,0 +1,10 @@
+^profiles.xml
+^target
+^out/
+syntax: glob
+*.DS_Store
+*.iml
+*.ipr
+*.iws
+*~
+*.bak

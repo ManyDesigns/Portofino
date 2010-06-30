@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datamodel>
+    <database name="jpetstore">
+        <connection
+                type="jdbc"
+                driver="org.postgresql.Driver"
+                url="jdbc:postgresql://127.0.0.1:5432/jpetstore"
+                username="manydesigns"
+                password="manydesigns"/>
+        <schemas>
+            <schema name="default">
+                <tables>
+                    <table name="category">
+                        <columns>
+                            <column name="catid"
+                                    columnType="VARCHAR"
+                                    length="10"
+                                    nallable="false"/>
+                            <column name="name"
+                                    columnType="VARCHAR"
+                                    length="80"
+                                    nallable="true"/>
+                            <column name="descn"
+                                    columnType="VARCHAR"
+                                    length="255"
+                                    nallable="true"/>
+                        </columns>
+                        <primaryKey name="pk_category">
+                            <column name="catid"/>
+                        </primaryKey>
+                    </table>
+                    <table name="product">
+                        <columns>
+                            <column name="productid"
+                                    columnType="VARCHAR"
+                                    length="10"
+                                    nallable="false"/>
+                            <column name="category"
+                                    columnType="VARCHAR"
+                                    length="10"
+                                    nallable="false"/>
+                            <column name="name"
+                                    columnType="VARCHAR"
+                                    length="80"
+                                    nallable="true"/>
+                            <column name="descn"
+                                    columnType="VARCHAR"
+                                    length="255"
+                                    nallable="true"/>
+                        </columns>
+                        <primaryKey name="pk_category">
+                            <column name="catid"/>
+                        </primaryKey>
+                        <relationships>
+                            <relationship name="fk_product_1"
+                                          toSchema="default"
+                                          toTable="category"
+                                          onUpdate="NO ACTION"
+                                          onDelete="NO ACTION">
+                                <reference fromColumn="category"
+                                           toColumn="catid"/>
+                            </relationship>
+                        </relationships>
+                    </table>
+                </tables>
+            </schema>
+        </schemas>
+    </database>
+</datamodel>
