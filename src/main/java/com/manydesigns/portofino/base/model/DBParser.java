@@ -46,8 +46,8 @@ import java.io.*;
 
 
 public class DBParser {
-    public void parse(String fileName) {
-
+    public DataModel parse(String fileName) {
+        DataModel dataModel = new DataModel();
         try {
             XMLInputFactory inputFactory = XMLInputFactory.newInstance();
             InputStream input = DBParser.class.getResourceAsStream(fileName);
@@ -75,7 +75,7 @@ public class DBParser {
                     System.out.println("-Namespace URI:" + xmlStreamReader.getNamespaceURI());
 
                     if (lName.equalsIgnoreCase("database")) {
-                        currentDataBase = manageDb(xmlStreamReader);
+                        currentDataBase = manageDb(dataModel, xmlStreamReader);
                         continue;
                     }
 
@@ -116,6 +116,7 @@ public class DBParser {
             System.out.println("XMLStreamException" + e.getMessage());
         }
 
+        return dataModel;
 
     }
 
@@ -143,7 +144,7 @@ public class DBParser {
                 //conn.setUsername(attValue);
                 continue;
             }
-            if (attName.equalsIgnoreCase("password")) {
+            if (attName.equals("password")) {
                 //conn.setPassword(attValue);
                 continue;
             }
@@ -161,7 +162,7 @@ public class DBParser {
             attName = xmlStreamReader.getAttributeLocalName(i);
             attValue = xmlStreamReader.getAttributeValue(i);
 
-            if (attName.equalsIgnoreCase("name")) {
+            if (attName.equals("name")) {
                 table.setTableName(attValue);
                 continue;
             }
@@ -184,27 +185,27 @@ public class DBParser {
             attName = xmlStreamReader.getAttributeLocalName(i);
             attValue = xmlStreamReader.getAttributeValue(i);
 
-            if (attName.equalsIgnoreCase("name")) {
+            if (attName.equals("name")) {
                 col.setTableName(attValue);
                 continue;
             }
-            if (attName.equalsIgnoreCase("columnType")) {
+            if (attName.equals("columnType")) {
                 col.setColumnType(attValue);
                 continue;
             }
-            if (attName.equalsIgnoreCase("length")) {
+            if (attName.equals("length")) {
                 col.setLength(Integer.parseInt(attValue));
                 continue;
             }
-            if (attName.equalsIgnoreCase("nullable")) {
+            if (attName.equals("nullable")) {
                 col.setNullable(Boolean.parseBoolean(attValue));
                 continue;
             }
-            if (attName.equalsIgnoreCase("precision")) {
+            if (attName.equals("precision")) {
                 col.setPrecision(Integer.parseInt(attValue));
                 continue;
             }
-            if (attName.equalsIgnoreCase("scale")) {
+            if (attName.equals("scale")) {
                 col.setScale(Integer.parseInt(attValue));
                 continue;
             }
@@ -224,7 +225,7 @@ public class DBParser {
             attName = xmlStreamReader.getAttributeLocalName(i);
             attValue = xmlStreamReader.getAttributeValue(i);
 
-            if (attName.equalsIgnoreCase("name")) {
+            if (attName.equals("name")) {
                 schema.setSchemaName(attValue);
             }
         }
@@ -232,7 +233,7 @@ public class DBParser {
         return schema;
     }
 
-    private Database manageDb(XMLStreamReader xmlStreamReader) {
+    private Database manageDb(DataModel dataModel, XMLStreamReader xmlStreamReader) {
         Database db = new Database();
         String attName;
         String attValue;
@@ -240,10 +241,11 @@ public class DBParser {
             attName = xmlStreamReader.getAttributeLocalName(i);
             attValue = xmlStreamReader.getAttributeValue(i);
 
-            if (attName.equalsIgnoreCase("name")) {
+            if (attName.equals("name")) {
                 db.setName(attValue);
             }
         }
+        dataModel.getDatabases().add(db);
         return db;
     }
 
