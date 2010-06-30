@@ -29,6 +29,9 @@
 
 package com.manydesigns.portofino.base.model;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -38,4 +41,48 @@ public class Schema {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //--------------------------------------------------------------------------
+    // Attributes
+    //--------------------------------------------------------------------------
+
+    protected String schemaName;
+    protected final List<Schema> tables;
+    protected final List<Schema> sequences;
+    protected final List<Schema> views;
+
+
+    //--------------------------------------------------------------------------
+    // Constructors
+    //--------------------------------------------------------------------------
+
+    public Schema(String schemaName) {
+        this.schemaName = schemaName;
+        this.tables = new ArrayList<Schema>();
+        this.sequences = new ArrayList<Schema>();
+        this.views = new ArrayList<Schema>();
+    }
+
+    //--------------------------------------------------------------------------
+    // Getters/setter
+    //--------------------------------------------------------------------------
+
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
+    }
+
+    public List<Schema> getTables() {
+        return tables;
+    }
+
+    public List<Schema> getSequences() {
+        return sequences;
+    }
+
+    public List<Schema> getViews() {
+        return views;
+    }
 }

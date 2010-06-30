@@ -38,4 +38,102 @@ public class Column {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //--------------------------------------------------------------------------
+    // Attributes
+    //--------------------------------------------------------------------------
+
+    protected String schemaName;
+    protected String tableName;
+    protected String columnName;
+    protected String columnType;
+    protected boolean nullable;
+    protected int length;
+    protected int precision;
+    protected int scale;
+
+
+    //--------------------------------------------------------------------------
+    // Constructors
+    //--------------------------------------------------------------------------
+
+    public Column(String schemaName, String tableName, String columnName,
+                  String columnType, boolean nullable, int length,
+                  int precision, int scale) {
+        this.schemaName = schemaName;
+        this.tableName = tableName;
+        this.columnName = columnName;
+        this.columnType = columnType;
+        this.nullable = nullable;
+        this.length = length;
+        this.precision = precision;
+        this.scale = scale;
+    }
+
+    //--------------------------------------------------------------------------
+    // Getters/setter
+    //--------------------------------------------------------------------------
+
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public String getColumnName() {
+        return columnName;
+    }
+
+    public void setColumnName(String columnName) {
+        this.columnName = columnName;
+    }
+
+    public String getColumnType() {
+        return columnType;
+    }
+
+    public void setColumnType(String columnType) {
+        this.columnType = columnType;
+    }
+
+    public boolean isNullable() {
+        return nullable;
+    }
+
+    public void setNullable(boolean nullable) {
+        this.nullable = nullable;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(int length) {
+        this.length = length;
+    }
+
+    public int getPrecision() {
+        return precision;
+    }
+
+    public void setPrecision(int precision) {
+        this.precision = precision;
+    }
+
+    public int getScale() {
+        return scale;
+    }
+
+    public void setScale(int scale) {
+        this.scale = scale;
+    }
 }

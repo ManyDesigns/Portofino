@@ -29,6 +29,9 @@
 
 package com.manydesigns.portofino.base.model;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -38,4 +41,46 @@ public class Database {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //--------------------------------------------------------------------------
+    // Attributes
+    //--------------------------------------------------------------------------
+
+    protected String name;
+    protected Connection connection;
+    protected final List<Schema> schemas;
+
+
+    //--------------------------------------------------------------------------
+    // Constructors
+    //--------------------------------------------------------------------------
+
+    public Database(String name, Connection connection) {
+        this.name = name;
+        this.connection = connection;
+        this.schemas = new ArrayList<Schema>();
+    }
+
+    //--------------------------------------------------------------------------
+    // Getters/setter
+    //--------------------------------------------------------------------------
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
+
+    public List<Schema> getSchemas() {
+        return schemas;
+    }
 }

@@ -29,6 +29,9 @@
 
 package com.manydesigns.portofino.base.model;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -38,4 +41,46 @@ public class Table {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //--------------------------------------------------------------------------
+    // Attributes
+    //--------------------------------------------------------------------------
+
+    protected String schemaName;
+    protected String tableName;
+    protected final List<Schema> columns;
+
+
+    //--------------------------------------------------------------------------
+    // Constructors
+    //--------------------------------------------------------------------------
+
+    public Table(String schemaName, String tableName) {
+        this.schemaName = schemaName;
+        this.tableName = tableName;
+        this.columns = new ArrayList<Schema>();
+    }
+
+    //--------------------------------------------------------------------------
+    // Getters/setter
+    //--------------------------------------------------------------------------
+
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public List<Schema> getColumns() {
+        return columns;
+    }
 }
