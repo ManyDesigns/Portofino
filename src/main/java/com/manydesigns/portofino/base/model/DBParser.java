@@ -50,7 +50,8 @@ public class DBParser {
         DataModel dataModel = new DataModel();
         try {
             XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-            InputStream input = DBParser.class.getResourceAsStream(fileName);
+            ClassLoader cl = this.getClass().getClassLoader();
+            InputStream input = cl.getResourceAsStream(fileName);
             XMLStreamReader xmlStreamReader = inputFactory.createXMLStreamReader(input);
 
             Database currentDataBase = null;
@@ -249,9 +250,4 @@ public class DBParser {
         return db;
     }
 
-    public static void main(String[] argv) {
-
-        new DBParser().parse("jpetstore-postgres.xml");
-
-    }
 }
