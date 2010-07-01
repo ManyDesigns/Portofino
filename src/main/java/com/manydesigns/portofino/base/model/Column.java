@@ -152,4 +152,23 @@ public class Column {
     public void setJavaType(Class javaType) {
         this.javaType = javaType;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Column column = (Column) o;
+
+        if (columnName != null ? !columnName.equals(column.columnName) : column.columnName != null)
+            return false;
+        if (schemaName != null ? !schemaName.equals(column.schemaName) : column.schemaName != null)
+            return false;
+        if (tableName != null ? !tableName.equals(column.tableName) : column.tableName != null)
+            return false;
+
+        return true;
+    }
+
+
 }

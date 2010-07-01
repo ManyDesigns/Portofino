@@ -44,7 +44,8 @@ public class PrimaryKey {
     //--------------------------------------------------------------------------
     // Fields
     //--------------------------------------------------------------------------
-
+    protected String schemaName;
+    protected String tableName;
     protected String name;
     protected final List<Column> columns;
 
@@ -55,6 +56,10 @@ public class PrimaryKey {
 
     public PrimaryKey(String name) {
         this.name = name;
+        this.columns = new ArrayList<Column>();
+    }
+
+    public PrimaryKey() {
         this.columns = new ArrayList<Column>();
     }
 
@@ -72,5 +77,21 @@ public class PrimaryKey {
 
     public List<Column> getColumns() {
         return columns;
+    }
+
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 }

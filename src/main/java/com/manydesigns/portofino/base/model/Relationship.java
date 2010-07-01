@@ -44,10 +44,13 @@ public class Relationship {
     //--------------------------------------------------------------------------
     // Fields
     //--------------------------------------------------------------------------
+    protected String schemaName;
+    protected String tableName;
 
     protected String name;
     protected String onUpdate;
     protected String onDelete;
+
     protected final List<Reference>references;
 
 
@@ -59,6 +62,10 @@ public class Relationship {
         this.name = name;
         this.onUpdate = onUpdate;
         this.onDelete = onDelete;
+        references = new ArrayList<Reference>();
+    }
+
+    public Relationship() {
         references = new ArrayList<Reference>();
     }
 
@@ -93,5 +100,21 @@ public class Relationship {
 
     public List<Reference> getReferences() {
         return references;
+    }
+
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 }
