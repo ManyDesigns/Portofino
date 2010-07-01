@@ -49,7 +49,7 @@
                                     nullable="true"/>
                         </columns>
                         <primaryKey name="pk_category">
-                            <column name="catid"/>
+                            <column name="productid"/>
                         </primaryKey>
                         <relationships>
                             <relationship name="fk_product_1"

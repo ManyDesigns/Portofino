@@ -28,14 +28,7 @@
  */
 package com.manydesigns.portofino.base.model;
 
-/**
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Angelo    Lupo       - angelo.lupo@manydesigns.com
- * @author Paolo     Predonzani - paolo.predonzani@manydesigns.com
- */
-
 import org.apache.commons.lang.StringUtils;
-
 import javax.xml.stream.*;
 import javax.xml.stream.XMLInputFactory;
 import java.io.*;
@@ -43,8 +36,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.text.MessageFormat;
 
-
+/**
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Angelo    Lupo       - angelo.lupo@manydesigns.com
+ * @author Paolo     Predonzani - paolo.predonzani@manydesigns.com
+ */
 public class DBParser {
+    private static final String DATAMODEL = "datamodel";
+    private static final String DATABASE = "database";
+    private static final String CONNECTION = "connection";
+    private static final String SCHEMA = "schema";
+    private static final String SCHEMAS = SCHEMA + "s";
+    private static final String TABLE = "table";
+    private static final String TABLES = TABLE + "s";
+    private static final String COLUMN = "column";
+    private static final String COLUMNS = COLUMN + "s";
+    private static final String PRIMARY_KEY = "primaryKey";
+    private static final String RELATIONSHIP = "relationship";
+    private static final String RELATIONSHIPS = RELATIONSHIP + "s";
+    private static final String REFERENCE = "reference";
 
 
     public DataModel parse(String fileName) throws Exception {
@@ -60,25 +70,22 @@ public class DBParser {
     private void doStartDocument(XMLStreamReader xmlStreamReader,
                                  DataModel dataModel) throws Exception {
         int event = -1;
-        String lName = null;
         while (xmlStreamReader.hasNext()) {
             if (event == XMLStreamConstants.END_ELEMENT
-                    && xmlStreamReader.getLocalName().equals("datamodel")) {
+                    && xmlStreamReader.getLocalName().equals(DATAMODEL)) {
                 break;
             }
             event = next(xmlStreamReader);
 
             if (event == XMLStreamConstants.START_ELEMENT
-                    && xmlStreamReader.getLocalName().equals("datamodel")) {
+                    && xmlStreamReader.getLocalName().equals(DATAMODEL)) {
                 doDataModel(xmlStreamReader, dataModel);
             }
         }
-        int i=0;
     }
 
     private void doDataModel(XMLStreamReader xmlStreamReader, DataModel dataModel) throws Exception {
-        String lName = xmlStreamReader.getLocalName();
-        doDataBase(xmlStreamReader, dataModel);
+         doDataBase(xmlStreamReader, dataModel);
     }
 
     private void doDataBase(XMLStreamReader xmlStreamReader, DataModel dataModel) throws Exception {
@@ -89,12 +96,12 @@ public class DBParser {
 
 
         while (xmlStreamReader.hasNext()) {
-            if (event == XMLStreamConstants.END_ELEMENT && "database".equals(lName)) {
+            if (event == XMLStreamConstants.END_ELEMENT && DATABASE.equals(lName)) {
                 break;
             }
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
-            if (event == XMLStreamConstants.START_ELEMENT && lName.equals("database")) {
+            if (event == XMLStreamConstants.START_ELEMENT && lName.equals(DATABASE)) {
                 dbpresent = true;
                 dbopen++;
                 Database db = new Database();
@@ -107,22 +114,22 @@ public class DBParser {
                 if (attName.equals("name")) {
                     db.setName(attValue);
                 } else {
-                    throw new Exception("TAG database, attr name non presente");
+                    throw new Exception("TAG " + DATABASE + ", attr name non presente");
                 }
                 dataModel.getDatabases().add(db);
                 doConnection(xmlStreamReader, db);
-                doSchemas(xmlStreamReader, db);
+                doSchemas(xmlStreamReader, dataModel, db);
             }
 
-            if (event == XMLStreamConstants.END_ELEMENT && lName.equals("database")) {
+            if (event == XMLStreamConstants.END_ELEMENT && lName.equals(DATABASE)) {
                 dbopen--;
             }
         }
         if (!dbpresent) {
-            throw new Exception("TAG database non presente");
+            throw new Exception("TAG " + DATABASE + " non presente");
         }
         if (dbopen != 0) {
-            throw new Exception("TAG database non chiuso");
+            throw new Exception("TAG " + DATABASE + " non chiuso");
         }
 
     }
@@ -131,9 +138,9 @@ public class DBParser {
         Connection conn = new Connection();
         int event = next(xmlStreamReader);
         String lName = xmlStreamReader.getLocalName();
-        if (event == XMLStreamConstants.START_ELEMENT && lName.equals("connection")) {
+        if (event == XMLStreamConstants.START_ELEMENT && lName.equals(CONNECTION)) {
             String attName;
-            String attValue;
+            //String attValue;
             List<String> expectedValList = new ArrayList<String>();
             expectedValList.add("type");
             expectedValList.add("driver");
@@ -142,7 +149,7 @@ public class DBParser {
             expectedValList.add("password");
             for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
                 attName = xmlStreamReader.getAttributeLocalName(i);
-                attValue = xmlStreamReader.getAttributeValue(i);
+                //attValue = xmlStreamReader.getAttributeValue(i);
 
                 if (attName.equals("type")) {
                     expectedValList.remove(attName);
@@ -167,7 +174,7 @@ public class DBParser {
                 if (attName.equals("password")) {
                     expectedValList.remove(attName);
                     //conn.setPassword(attValue);
-                    continue;
+
                 }
             }
 
@@ -181,9 +188,9 @@ public class DBParser {
             if (xmlStreamReader.hasNext()) {
                 event = next(xmlStreamReader);
                 lName = xmlStreamReader.getLocalName();
-                if (event == XMLStreamConstants.END_ELEMENT && lName.equals("connection")) {
+                if (event == XMLStreamConstants.END_ELEMENT && lName.equals(CONNECTION)) {
                 } else {
-                    throw new Exception("TAG connection non chiuso");
+                    throw new Exception("TAG " + CONNECTION + " non chiuso");
                 }
             }
         } else {
@@ -191,7 +198,7 @@ public class DBParser {
         }
     }
 
-    private void doSchemas(XMLStreamReader xmlStreamReader, Database db) throws Exception {
+    private void doSchemas(XMLStreamReader xmlStreamReader, DataModel dm, Database db) throws Exception {
         int event=-1;
         String lName=null;
         int schemaOpen = 0;
@@ -199,19 +206,19 @@ public class DBParser {
         if (xmlStreamReader.hasNext()) {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
-            if (event == XMLStreamConstants.START_ELEMENT && lName.equals("schemas")) {
+            if (event == XMLStreamConstants.START_ELEMENT && lName.equals(SCHEMAS)) {
             } else {
-                throw new Exception("TAG schemas non presente");
+                throw new Exception("TAG " + SCHEMA + "s non presente");
             }
         }
         while (xmlStreamReader.hasNext()) {
-            if (event == XMLStreamConstants.END_ELEMENT && "schema".equals(lName)) {
+            if (event == XMLStreamConstants.END_ELEMENT && SCHEMA.equals(lName)) {
                 schemaOpen--;
                 break;
             }
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
-            if (event == XMLStreamConstants.START_ELEMENT && lName.equals("schema")) {
+            if (event == XMLStreamConstants.START_ELEMENT && lName.equals(SCHEMA)) {
                 schemaPresent = true;
                 schemaOpen++;
                 Schema schema = new Schema();
@@ -221,32 +228,32 @@ public class DBParser {
                 if (attName.equals("name")) {
                     schema.setSchemaName(attValue);
                 } else {
-                    throw new Exception("TAG schema, ATTR Name non presente");
+                    throw new Exception("TAG " + SCHEMA + ", ATTR Name non presente");
                 }
                 db.getSchemas().add(schema);
-                doTables(xmlStreamReader, schema);
+                doTables(xmlStreamReader, dm, schema);
             }
 
 
         }
         if (!schemaPresent) {
-            throw new Exception("TAG schema non presente");
+            throw new Exception("TAG " + SCHEMA + " non presente");
         }
         if (schemaOpen != 0) {
-            throw new Exception("TAG schema non chiuso");
+            throw new Exception("TAG " + SCHEMA + " non chiuso");
         }
 
         if (xmlStreamReader.hasNext()) {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
-            if (event == XMLStreamConstants.END_ELEMENT && lName.equals("schemas")) {
+            if (event == XMLStreamConstants.END_ELEMENT && lName.equals(SCHEMAS)) {
             } else {
-                throw new Exception("TAG schemas non chiuso");
+                throw new Exception("TAG " + SCHEMA + "s non chiuso");
             }
         }
     }
 
-    private void doTables(XMLStreamReader xmlStreamReader, Schema schema) throws Exception {
+    private void doTables(XMLStreamReader xmlStreamReader, DataModel dm, Schema schema) throws Exception {
         int event;
         String lName;
         int tableOpen = 0;
@@ -254,25 +261,25 @@ public class DBParser {
         if (xmlStreamReader.hasNext()) {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
-            if (event == XMLStreamConstants.START_ELEMENT && lName.equals("tables")) {
+            if (event == XMLStreamConstants.START_ELEMENT && lName.equals(TABLES)) {
             } else {
-                throw new Exception("TAG tables non presente");
+                throw new Exception("TAG " + TABLES + " non presente");
             }
         }
         while (xmlStreamReader.hasNext()) {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
-            if (event == XMLStreamConstants.END_ELEMENT && lName.equals("tables")) {
-                //todo controllo su table open
+            if (event == XMLStreamConstants.END_ELEMENT && lName.equals(TABLES)) {
+
                 return;
             }
-            if (event == XMLStreamConstants.END_ELEMENT && lName.equals("table")) {
+            if (event == XMLStreamConstants.END_ELEMENT && lName.equals(TABLE)) {
                 tableOpen--;
-                event = next(xmlStreamReader);
-                lName = xmlStreamReader.getLocalName();
+                next(xmlStreamReader);
+                xmlStreamReader.getLocalName();
                 break;
             }
-            if (event == XMLStreamConstants.START_ELEMENT && lName.equals("table")) {
+            if (event == XMLStreamConstants.START_ELEMENT && lName.equals(TABLE)) {
                 tablePresent = true;
                 tableOpen++;
                 Table table = new Table();
@@ -283,12 +290,12 @@ public class DBParser {
                 if (attName.equals("name")) {
                     table.setTableName(attValue);
                 } else {
-                    throw new Exception("TAG schema, ATTR Name non presente");
+                    throw new Exception("TAG " + SCHEMA + ", ATTR Name non presente");
                 }
                 schema.getTables().add(table);
                 doColumns(xmlStreamReader, table);
                 doPrimaryKey(xmlStreamReader, table);
-                doRelationship(xmlStreamReader, table);
+                doRelationship(xmlStreamReader, dm, table);
             }
         }
     }
@@ -301,25 +308,25 @@ public class DBParser {
         if (xmlStreamReader.hasNext()) {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
-            if (event == XMLStreamConstants.START_ELEMENT && lName.equals("columns")) {
+            if (event == XMLStreamConstants.START_ELEMENT && lName.equals(COLUMNS)) {
             } else {
-                throw new Exception("TAG columns non presente");
+                throw new Exception("TAG " + COLUMNS + " non presente");
             }
         }
         while (xmlStreamReader.hasNext()) {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
-            if (event == XMLStreamConstants.END_ELEMENT && lName.equals("columns")) {
+            if (event == XMLStreamConstants.END_ELEMENT && lName.equals(COLUMNS)) {
                 return;
             }
-            if (event == XMLStreamConstants.START_ELEMENT && lName.equals("column")) {
+            if (event == XMLStreamConstants.START_ELEMENT && lName.equals(COLUMN)) {
                 columnOpen++;
                 Column col = new Column();
                 col.setTableName(table.getTableName());
                 col.setSchemaName(table.getSchemaName());
                 List<String> expectedValList = new ArrayList<String>();
                 expectedValList.add("name");
-                expectedValList.add("columnType");
+                expectedValList.add(COLUMN + "Type");
                 for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
                     String attName = xmlStreamReader.getAttributeLocalName(i);
                     String attValue = xmlStreamReader.getAttributeValue(i);
@@ -329,7 +336,7 @@ public class DBParser {
                         expectedValList.remove(attName);
                         continue;
                     }
-                    if (attName.equals("columnType")) {
+                    if (attName.equals(COLUMN + "Type")) {
                         col.setColumnType(attValue);
                         expectedValList.remove(attName);
                         continue;
@@ -342,13 +349,10 @@ public class DBParser {
                         col.setNullable(Boolean.parseBoolean(attValue));
                         continue;
                     }
-                    if (attName.equals("precision")) {
-                        col.setPrecision(Integer.parseInt(attValue));
-                        continue;
-                    }
+                   
                     if (attName.equals("scale")) {
                         col.setScale(Integer.parseInt(attValue));
-                        continue;
+
                     }
                 }
 
@@ -362,21 +366,21 @@ public class DBParser {
 
             }
 
-            if (event == XMLStreamConstants.END_ELEMENT && lName.equals("column")) {
+            if (event == XMLStreamConstants.END_ELEMENT && lName.equals(COLUMN)) {
                 columnOpen--;
             }
         }
 
         if (columnOpen != 0) {
-            throw new Exception("TAG column non chiuso");
+            throw new Exception("TAG " + COLUMN + " non chiuso");
         }
 
         if (xmlStreamReader.hasNext()) {
             event = xmlStreamReader.next();
             lName = xmlStreamReader.getLocalName();
-            if (event == XMLStreamConstants.END_ELEMENT && lName.equals("schemas")) {
+            if (event == XMLStreamConstants.END_ELEMENT && lName.equals(SCHEMAS)) {
             } else {
-                throw new Exception("TAG columns non chiuso");
+                throw new Exception("TAG " + COLUMNS + " non chiuso");
             }
         }
     }
@@ -385,7 +389,7 @@ public class DBParser {
         PrimaryKey pk = new PrimaryKey();
         int event = next(xmlStreamReader);
         String lName = xmlStreamReader.getLocalName();
-        if (event == XMLStreamConstants.START_ELEMENT && lName.equals("primaryKey")) {
+        if (event == XMLStreamConstants.START_ELEMENT && lName.equals(PRIMARY_KEY)) {
             String attName;
             String attValue;
             attName = xmlStreamReader.getAttributeLocalName(0);
@@ -393,39 +397,37 @@ public class DBParser {
             if (attName.equals("name")) {
                 pk.setName(attValue);
             } else {
-                throw new Exception("TAG Primary Key, ATTR primaryKey non presente");
+                throw new Exception("TAG Primary Key, ATTR " + PRIMARY_KEY + " non presente");
             }
             do {
                 event = next(xmlStreamReader);
-                lName = xmlStreamReader.getLocalName();
-                attName = xmlStreamReader.getAttributeLocalName(0);
+                xmlStreamReader.getLocalName();
                 attValue = xmlStreamReader.getAttributeValue(0);
                 pk.getColumns().add(getColumn(table, attValue));
                 event = next(xmlStreamReader);
                 lName = xmlStreamReader.getLocalName();
-                if (event != XMLStreamConstants.END_ELEMENT && !lName.equals("column")) {
-                    throw new Exception("TAG column in Primary Key non chiuso");
+                if (event != XMLStreamConstants.END_ELEMENT && !lName.equals(COLUMN)) {
+                    throw new Exception("TAG " + COLUMN + " in Primary Key non chiuso");
                 }
 
             }
-            while (lName.equals("column") && event == XMLStreamConstants.START_ELEMENT);
+            while (lName.equals(COLUMN) && event == XMLStreamConstants.START_ELEMENT);
             table.setPrimaryKey(pk);
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
-            if (event != XMLStreamConstants.END_ELEMENT && !lName.equals("primaryKey")) {
+            if (event != XMLStreamConstants.END_ELEMENT && !lName.equals(PRIMARY_KEY)) {
                 throw new Exception("TAG Primary Key non chiuso");
             }
         }
     }
 
-    private void doRelationship(XMLStreamReader xmlStreamReader, Table table) throws Exception {
-        PrimaryKey pk = new PrimaryKey();
+    private void doRelationship(XMLStreamReader xmlStreamReader, DataModel dm, Table table) throws Exception {
         int event;
         String lName;
         if (xmlStreamReader.hasNext()) {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
-            if (event == XMLStreamConstants.START_ELEMENT && lName.equals("relationships")) {
+            if (event == XMLStreamConstants.START_ELEMENT && lName.equals(RELATIONSHIPS)) {
             } else {
                 return;
             }
@@ -436,24 +438,26 @@ public class DBParser {
         if (xmlStreamReader.hasNext()) {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
-            if (event == XMLStreamConstants.START_ELEMENT && lName.equals("relationship")) {
+            if (event == XMLStreamConstants.START_ELEMENT && lName.equals(RELATIONSHIP)) {
             } else {
-                throw new Exception("Tag relationship missing");
+                throw new Exception("Tag " + RELATIONSHIP + " missing");
             }
         }
+        String schemaName=null, tableName=null;
         for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
             String attName = xmlStreamReader.getAttributeLocalName(i);
             String attValue = xmlStreamReader.getAttributeValue(i);
+
             if (attName.equals("name")) {
-                rel.setTableName(attValue);
+                rel.setName(attValue);
                 continue;
             }
             if (attName.equals("toSchema")) {
-                rel.setSchemaName(attValue);
+                schemaName = attValue;
                 continue;
             }
             if (attName.equals("toTable")) {
-                rel.setTableName(attValue);
+                tableName = attValue;
                 continue;
             }
             if (attName.equals("onUpdate")) {
@@ -462,15 +466,15 @@ public class DBParser {
             }
             if (attName.equals("onDelete")) {
                 rel.setOnDelete(attValue);
-                continue;
+
             }
 
         }
-
+        rel.setTable(getTable(dm, schemaName, tableName));
         if (xmlStreamReader.hasNext()) {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
-            if (event == XMLStreamConstants.START_ELEMENT && lName.equals("reference")) {
+            if (event == XMLStreamConstants.START_ELEMENT && lName.equals(REFERENCE)) {
                 String fromCol = null, toCol = null;
                 for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
                     String attName = xmlStreamReader.getAttributeLocalName(i);
@@ -481,16 +485,16 @@ public class DBParser {
                     }
                     if (attName.equals("toColumn")) {
                         toCol = attValue;
-                        continue;
+
                     }
                 }
 
-                Reference ref = new Reference(getColumn(table, fromCol), getColumn(table, toCol));
+                Reference ref = new Reference(getColumn(table, fromCol), getColumn(rel.getTable(), toCol));
                 rel.getReferences().add(ref);
                 if (xmlStreamReader.hasNext()) {
                     event = next(xmlStreamReader);
                     lName = xmlStreamReader.getLocalName();
-                    if (event == XMLStreamConstants.END_ELEMENT && lName.equals("reference")) {
+                    if (event == XMLStreamConstants.END_ELEMENT && lName.equals(REFERENCE)) {
                     } else {
                         throw new Exception("TAG Reference non chiuso");
                     }
@@ -501,7 +505,7 @@ public class DBParser {
         if (xmlStreamReader.hasNext()) {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
-            if (event == XMLStreamConstants.END_ELEMENT && lName.equals("relationship")) {
+            if (event == XMLStreamConstants.END_ELEMENT && lName.equals(RELATIONSHIP)) {
             } else {
                 throw new Exception("TAG Relationship non chiuso");
             }
@@ -511,7 +515,7 @@ public class DBParser {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
 
-            if (event == XMLStreamConstants.END_ELEMENT && lName.equals("relationships")) {
+            if (event == XMLStreamConstants.END_ELEMENT && lName.equals(RELATIONSHIPS)) {
             } else {
                 throw new Exception("TAG Relationships non chiuso");
             }
@@ -519,10 +523,27 @@ public class DBParser {
 
     }
 
+    private Table getTable(DataModel dm, String schemaName, String tableName) throws Exception {
+        for (Database db : dm.getDatabases()) {
+            for (Schema schema : db.getSchemas()) {
+                if (schemaName.equals(schema.getSchemaName())){
+                    for (Table tb : schema.getTables()) {
+                        if(tableName.equals(tb.getTableName()))
+                            return tb;
+                    }
+                }
+            }
+
+        }
+        throw new Exception("Tabella non presente");
+
+    }
+
     private Column getColumn(Table table, String attValue) throws Exception {
         for (Column col : table.getColumns()) {
-            if (col.getColumnName().equals(attValue)) ;
-            return col;
+            if (col.getColumnName().equals(attValue)) {
+                return col;
+            }
         }
         throw new Exception("Colonna non presente");
     }

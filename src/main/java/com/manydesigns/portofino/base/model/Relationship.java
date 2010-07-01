@@ -44,9 +44,7 @@ public class Relationship {
     //--------------------------------------------------------------------------
     // Fields
     //--------------------------------------------------------------------------
-    protected String schemaName;
-    protected String tableName;
-
+    protected Table table;
     protected String name;
     protected String onUpdate;
     protected String onDelete;
@@ -102,19 +100,11 @@ public class Relationship {
         return references;
     }
 
-    public String getSchemaName() {
-        return schemaName;
+    public Table getTable() {
+        return table;
     }
 
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
+    public void setTable(Table table) {
+        this.table = table;
     }
 }

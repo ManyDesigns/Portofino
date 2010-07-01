@@ -48,7 +48,6 @@ public class Column {
     protected String columnType;
     protected boolean nullable;
     protected int length;
-    protected int precision;
     protected int scale;
 
     //--------------------------------------------------------------------------
@@ -66,14 +65,14 @@ public class Column {
 
     public Column(String schemaName, String tableName, String columnName,
                   String columnType, boolean nullable, int length,
-                  int precision, int scale) {
+                   int scale) {
         this.schemaName = schemaName;
         this.tableName = tableName;
         this.columnName = columnName;
         this.columnType = columnType;
         this.nullable = nullable;
         this.length = length;
-        this.precision = precision;
+
         this.scale = scale;
     }
 
@@ -127,14 +126,6 @@ public class Column {
 
     public void setLength(int length) {
         this.length = length;
-    }
-
-    public int getPrecision() {
-        return precision;
-    }
-
-    public void setPrecision(int precision) {
-        this.precision = precision;
     }
 
     public int getScale() {

@@ -50,8 +50,13 @@ public class DBParserTest extends TestCase {
     }
 
     public void testParseJpetStorePostgresql() {
-        dataModel = parser.parse(
-                "databases/jpetstore/postgresql/jpetstore-postgres.xml");
+        try {
+            dataModel = parser.parse(
+                    "databases/jpetstore/postgresql/jpetstore-postgres.xml");
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
 
         assertNotNull(dataModel);
 
@@ -112,14 +117,13 @@ public class DBParserTest extends TestCase {
 
     private void checkColumn(Column column, String schemaName, String tableName,
                              String columnName, String columnType,
-                             boolean nullable, int precision, int scale) {
+                             boolean nullable, int length, int scale) {
         assertEquals(schemaName, column.getSchemaName());
         assertEquals(tableName, column.getTableName());
         assertEquals(columnName, column.getColumnName());
         assertEquals(columnType, column.getColumnType());
         assertEquals(nullable, column.isNullable());
-        assertEquals(precision, column.getLength());
-        assertEquals(precision, column.getPrecision());
+        assertEquals(length, column.getLength());
         assertEquals(scale, column.getScale());
     }
 
