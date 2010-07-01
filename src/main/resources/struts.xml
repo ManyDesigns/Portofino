@@ -1,0 +1,35 @@
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <constant name="struts.i18n" value="ISO-8859-1" />
+    <constant name="struts.i18n.encoding" value="ISO-8859-1" />
+    <constant name="struts.enable.SlashesInActionNames" value="true"/>
+    <constant name="struts.mapper.alwaysSelectFullNamespace" value="false"/>
+    <constant name="struts.ognl.allowStaticMethodAccess" value="true"/>
+
+    <package name="portofino" extends="struts-default" namespace="/">
+        <global-results>
+            <result name="unauthorized" type="httpheader">
+                <param name="error">410</param>
+                <param name="errorMessage">${errorMessage}</param>
+            </result>
+            <result name="400" type="httpheader">
+                <param name="error">400</param>
+                <param name="errorMessage">${errorMessage}</param>
+            </result>
+            <result name="403" type="httpheader">
+                <param name="error">403</param>
+                <param name="errorMessage">${errorMessage}</param>
+            </result>
+            <result name="500" type="httpheader">
+                <param name="error">500</param>
+                <param name="errorMessage">${errorMessage}</param>
+            </result>
+        </global-results>
+
+        <action name="ServletContextInfo" class="com.manydesigns.portofino.actions.ServletContextInfoAction">
+            <result name="success">/WEB-INF/jsp/servletContextInfo.jsp</result>
+        </action>
+    </package>
+</struts>

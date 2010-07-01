@@ -72,6 +72,18 @@
             <version>${struts.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.15</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>apache-log4j-extras</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- stuff for testing -->
         <dependency>
             <groupId>junit</groupId>
@@ -218,7 +230,9 @@
                 <version>2.4.3</version>
                 <configuration>
                     <skipTests>false</skipTests>
+                    <!--
                     <workingDirectory>${basedir}/../portofino-war</workingDirectory>
+                    -->
                 </configuration>
             </plugin>
         </plugins>
