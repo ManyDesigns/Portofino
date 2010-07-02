@@ -39,10 +39,17 @@
                 <param name="errorMessage">${errorMessage}</param>
             </result>
         </global-results>
+        <action name="Homepage" class="com.manydesigns.portofino.actions.Homepage">
+            <result name="success">/homepage.jsp</result>
+        </action>
+        <action name="*/Search" class="com.manydesigns.portofino.actions.Search">
+            <param name="className">{1}</param>
+            <result name="success">/search.jsp</result>
+        </action>
     </package>
 
     <package name="portofino-upstairs" extends="struts-default" namespace="/upstairs">
-        <action name="ServerInfo" class="com.manydesigns.portofino.actions.ServerInfoAction">
+        <action name="ServerInfo" class="com.manydesigns.portofino.actions.upstaits.ServerInfoAction">
             <result name="success">/upstairs/serverInfo.jsp</result>
         </action>
     </package>

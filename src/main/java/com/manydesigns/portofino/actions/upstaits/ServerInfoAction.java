@@ -27,45 +27,36 @@
  *
  */
 
-package com.manydesigns.portofino.base.context;
+package com.manydesigns.portofino.actions.upstaits;
 
-import com.manydesigns.portofino.base.model.*;
+import com.manydesigns.portofino.base.context.ServerInfo;
+import com.manydesigns.portofino.methods.PortofinoServletContextListener;
+import com.opensymphony.xwork2.ActionSupport;
+import org.apache.struts2.util.ServletContextAware;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.servlet.ServletContext;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class MDContext {
+public class ServerInfoAction extends ActionSupport
+        implements ServletContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public DataModel dataModel;
-
-    public MDContext() {
+    @Override
+    public String execute() {
+        serverInfo = (ServerInfo)servletContext.getAttribute(
+                PortofinoServletContextListener.SERVLET_CONTEXT_INFO_ATTRIBUTE);
+        return SUCCESS;
     }
 
-    public void loadXmlModelAsResource(String resource) {
-        DBParser parser = new DBParser();
-        try {
-            dataModel = parser.parse(resource);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    public ServletContext servletContext;
+    public ServerInfo serverInfo;
 
-    public List<Table> getAllTables() {
-        List<Table> result = new ArrayList<Table>();
-        for (Database database : dataModel.getDatabases()) {
-            for (Schema schema : database.getSchemas()) {
-                for (Table table : schema.getTables()) {
-                    result.add(table);
-                }
-            }
-        }
-        return result;
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
     }
 }

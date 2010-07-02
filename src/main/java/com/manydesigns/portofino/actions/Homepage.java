@@ -27,45 +27,28 @@
  *
  */
 
-package com.manydesigns.portofino.base.context;
+package com.manydesigns.portofino.actions;
 
-import com.manydesigns.portofino.base.model.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.manydesigns.portofino.base.context.MDContext;
+import com.manydesigns.portofino.interceptors.MDContextAware;
+import com.opensymphony.xwork2.ActionSupport;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class MDContext {
+public class Homepage extends ActionSupport implements MDContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public DataModel dataModel;
+    public MDContext context;
 
-    public MDContext() {
+    public void setContext(MDContext context) {
+        this.context = context;
     }
 
-    public void loadXmlModelAsResource(String resource) {
-        DBParser parser = new DBParser();
-        try {
-            dataModel = parser.parse(resource);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public List<Table> getAllTables() {
-        List<Table> result = new ArrayList<Table>();
-        for (Database database : dataModel.getDatabases()) {
-            for (Schema schema : database.getSchemas()) {
-                for (Table table : schema.getTables()) {
-                    result.add(table);
-                }
-            }
-        }
-        return result;
+    public String execute() {
+        return SUCCESS;
     }
 }

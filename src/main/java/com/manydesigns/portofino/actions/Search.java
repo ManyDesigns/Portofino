@@ -29,34 +29,30 @@
 
 package com.manydesigns.portofino.actions;
 
-import com.manydesigns.portofino.base.context.ServerInfo;
-import com.manydesigns.portofino.methods.PortofinoServletContextListener;
+import com.manydesigns.portofino.base.context.MDContext;
+import com.manydesigns.portofino.interceptors.MDContextAware;
 import com.opensymphony.xwork2.ActionSupport;
-import org.apache.struts2.util.ServletContextAware;
-
-import javax.servlet.ServletContext;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ServerInfoAction extends ActionSupport
-        implements ServletContextAware {
+public class Search extends ActionSupport implements MDContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    @Override
+    public MDContext context;
+
+    public void setContext(MDContext context) {
+        this.context = context;
+    }
+
+    
+    public String className;
+
     public String execute() {
-        serverInfo = (ServerInfo)servletContext.getAttribute(
-                PortofinoServletContextListener.SERVLET_CONTEXT_INFO_ATTRIBUTE);
         return SUCCESS;
     }
 
-    public ServletContext servletContext;
-    public ServerInfo serverInfo;
-
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
 }

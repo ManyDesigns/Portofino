@@ -21,6 +21,7 @@ public class PortofinoServletContextListener implements ServletContextListener {
 
     public static final String PORTOFINO_VERSION = "4.0.0-SNAPSHOT";
 
+    public static final String MODEL_LOCATION = "portofino-model.xml";
 
     public static final String SERVLET_CONTEXT_INFO_ATTRIBUTE =
             "servletContextInfo";
@@ -70,6 +71,7 @@ public class PortofinoServletContextListener implements ServletContextListener {
                     "registering on servlet context...");
             // create and register the container first, without exceptions
             mdContext = new MDContext();
+            mdContext.loadXmlModelAsResource(MODEL_LOCATION);
             servletContext.setAttribute(MDCONTEXT_ATTRIBUTE, mdContext);
         }
 

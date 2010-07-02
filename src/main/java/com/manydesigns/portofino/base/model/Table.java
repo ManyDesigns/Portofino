@@ -29,8 +29,9 @@
 
 package com.manydesigns.portofino.base.model;
 
-import java.util.List;
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -102,5 +103,9 @@ public class Table {
 
     public void setPrimaryKey(PrimaryKey primaryKey) {
         this.primaryKey = primaryKey;
+    }
+
+    public String getQualifiedName() {
+        return MessageFormat.format("{0}.{1}", schemaName, tableName);
     }
 }
