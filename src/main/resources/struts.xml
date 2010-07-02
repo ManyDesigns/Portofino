@@ -9,6 +9,18 @@
     <constant name="struts.ognl.allowStaticMethodAccess" value="true"/>
 
     <package name="portofino" extends="struts-default" namespace="/">
+        <interceptors>
+            <interceptor name="elements-struts2"
+                         class="com.manydesigns.elements.struts2.ElementsInterceptor" />
+            <interceptor name="portofino"
+                         class="com.manydesigns.portofino.interceptors.PortofinoInterceptor" />
+            <interceptor-stack name="mdstack">
+                <interceptor-ref name="defaultStack" />
+                <interceptor-ref name="elements-struts2" />
+                <interceptor-ref name="portofino" />
+            </interceptor-stack>
+        </interceptors>
+        <default-interceptor-ref name="mdstack"/>
         <global-results>
             <result name="unauthorized" type="httpheader">
                 <param name="error">410</param>
@@ -27,9 +39,11 @@
                 <param name="errorMessage">${errorMessage}</param>
             </result>
         </global-results>
+    </package>
 
-        <action name="ServletContextInfo" class="com.manydesigns.portofino.actions.ServletContextInfoAction">
-            <result name="success">/WEB-INF/jsp/servletContextInfo.jsp</result>
+    <package name="portofino-upstairs" extends="struts-default" namespace="/upstairs">
+        <action name="ServerInfo" class="com.manydesigns.portofino.actions.ServerInfoAction">
+            <result name="success">/upstairs/serverInfo.jsp</result>
         </action>
     </package>
 </struts>

@@ -1,0 +1,20 @@
+div#hd {
+    height: 3em;
+    color: white;
+    background-color: #166bbf;
+}
+
+div#ft {
+    color: white;
+    background-color: #166bbf;
+}
+
+
+div#sidebar {
+    color: black;
+    background-color: #ffe;
+}
+
+div#sidebar div {
+    padding: .5em;
+}

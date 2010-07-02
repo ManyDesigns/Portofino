@@ -1,15 +1,14 @@
 package com.manydesigns.portofino.methods;
 
+import com.manydesigns.portofino.base.context.MDContext;
+import com.manydesigns.portofino.base.context.ServerInfo;
 import org.apache.commons.lang.time.StopWatch;
-import org.apache.log4j.Logger;
 import org.apache.log4j.LogMF;
+import org.apache.log4j.Logger;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.servlet.ServletContext;
-
-import com.manydesigns.portofino.base.context.MDContext;
-import com.manydesigns.portofino.base.context.ServletContextInfo;
 
 
 public class PortofinoServletContextListener implements ServletContextListener {
@@ -30,7 +29,7 @@ public class PortofinoServletContextListener implements ServletContextListener {
 
     protected final Logger logger;
     protected ServletContext servletContext;
-    protected ServletContextInfo servletContextInfo;
+    protected ServerInfo serverInfo;
     protected MDContext mdContext;
 
     /**
@@ -49,17 +48,20 @@ public class PortofinoServletContextListener implements ServletContextListener {
         stopWatch.start();
 
         servletContext = servletContextEvent.getServletContext();
-        servletContextInfo = new ServletContextInfo(servletContext);
+        serverInfo = new ServerInfo(servletContext);
+        
+        servletContext.setAttribute(SERVLET_CONTEXT_INFO_ATTRIBUTE,
+                serverInfo);
 
         boolean success = true;
 
         // check servlet API version
-        if (servletContextInfo.getServletApiMajor() < 2 ||
-                (servletContextInfo.getServletApiMajor() == 2 &&
-                        servletContextInfo.getServletApiMinor() < 3)) {
+        if (serverInfo.getServletApiMajor() < 2 ||
+                (serverInfo.getServletApiMajor() == 2 &&
+                        serverInfo.getServletApiMinor() < 3)) {
             LogMF.fatal(logger,
                     "Servlet API version must be >= 2.3. Found: {0}.",
-                    new String[] {servletContextInfo.getServletApiVersion()});
+                    new String[] {serverInfo.getServletApiVersion()});
             success = false;
         }
 
