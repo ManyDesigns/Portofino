@@ -31,6 +31,7 @@ package com.manydesigns.portofino.base.model;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,9 +46,9 @@ public class Schema {
     // Fields
     //--------------------------------------------------------------------------
 
+    protected String databaseName;
     protected String schemaName;
     protected final List<Table> tables;
-
 
 
     //--------------------------------------------------------------------------
@@ -58,7 +59,8 @@ public class Schema {
         this.tables = new ArrayList<Table>();
     }
 
-    public Schema(String schemaName) {
+    public Schema(String databaseName, String schemaName) {
+        this.databaseName = databaseName;
         this.schemaName = schemaName;
         this.tables = new ArrayList<Table>();
     }
@@ -66,6 +68,14 @@ public class Schema {
     //--------------------------------------------------------------------------
     // Getters/setter
     //--------------------------------------------------------------------------
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
 
     public String getSchemaName() {
         return schemaName;
@@ -78,4 +88,10 @@ public class Schema {
     public List<Table> getTables() {
         return tables;
     }
+
+
+    public String getQualifiedName() {
+        return MessageFormat.format("{0}.{1}", databaseName, schemaName);
+    }
+
 }

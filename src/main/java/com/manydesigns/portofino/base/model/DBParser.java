@@ -112,7 +112,7 @@ public class DBParser {
                 attValue = xmlStreamReader.getAttributeValue(0);
 
                 if (attName.equals("name")) {
-                    db.setName(attValue);
+                    db.setDatabaseName(attValue);
                 } else {
                     throw new Exception("TAG " + DATABASE + ", attr name non presente");
                 }
@@ -222,6 +222,7 @@ public class DBParser {
                 schemaPresent = true;
                 schemaOpen++;
                 Schema schema = new Schema();
+                schema.setDatabaseName(db.getDatabaseName());
                 String attName = xmlStreamReader.getAttributeLocalName(0);
                 String attValue = xmlStreamReader.getAttributeValue(0);
 
@@ -283,6 +284,7 @@ public class DBParser {
                 tablePresent = true;
                 tableOpen++;
                 Table table = new Table();
+                table.setDatabaseName(schema.getDatabaseName());
                 table.setSchemaName(schema.getSchemaName());
                 String attName = xmlStreamReader.getAttributeLocalName(0);
                 String attValue = xmlStreamReader.getAttributeValue(0);
@@ -322,8 +324,9 @@ public class DBParser {
             if (event == XMLStreamConstants.START_ELEMENT && lName.equals(COLUMN)) {
                 columnOpen++;
                 Column col = new Column();
-                col.setTableName(table.getTableName());
+                col.setDatabaseName(table.getDatabaseName());
                 col.setSchemaName(table.getSchemaName());
+                col.setTableName(table.getTableName());
                 List<String> expectedValList = new ArrayList<String>();
                 expectedValList.add("name");
                 expectedValList.add(COLUMN + "Type");

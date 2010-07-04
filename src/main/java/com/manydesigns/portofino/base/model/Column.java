@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.base.model;
 
+import java.text.MessageFormat;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -42,6 +44,7 @@ public class Column {
     // Fields: physical (jdbc)
     //--------------------------------------------------------------------------
 
+    protected String databaseName;
     protected String schemaName;
     protected String tableName;
     protected String columnName;
@@ -63,9 +66,11 @@ public class Column {
     public Column() {
     }
 
-    public Column(String schemaName, String tableName, String columnName,
+    public Column(String databaseName, String schemaName,
+                  String tableName, String columnName,
                   String columnType, boolean nullable, int length,
                    int scale) {
+        this.databaseName = databaseName;
         this.schemaName = schemaName;
         this.tableName = tableName;
         this.columnName = columnName;
@@ -79,6 +84,14 @@ public class Column {
     //--------------------------------------------------------------------------
     // Getters/setter
     //--------------------------------------------------------------------------
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
 
     public String getSchemaName() {
         return schemaName;
@@ -142,6 +155,12 @@ public class Column {
 
     public void setJavaType(Class javaType) {
         this.javaType = javaType;
+    }
+
+
+    public String getQualifiedName() {
+        return MessageFormat.format("{0}.{1}.{2}.{3}",
+                databaseName, schemaName, tableName, columnName);
     }
 
     @Override

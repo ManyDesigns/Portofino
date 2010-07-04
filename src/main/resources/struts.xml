@@ -43,7 +43,7 @@
             <result name="success">/homepage.jsp</result>
         </action>
         <action name="*/Search" class="com.manydesigns.portofino.actions.Search">
-            <param name="className">{1}</param>
+            <param name="qualifiedTableName">{1}</param>
             <result name="success">/search.jsp</result>
         </action>
     </package>

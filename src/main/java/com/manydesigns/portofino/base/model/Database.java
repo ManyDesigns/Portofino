@@ -45,7 +45,7 @@ public class Database {
     // Fields
     //--------------------------------------------------------------------------
 
-    protected String name;
+    protected String databaseName;
     protected Connection connection;
     protected final List<Schema> schemas;
 
@@ -58,8 +58,8 @@ public class Database {
         this.schemas = new ArrayList<Schema>();
     }
 
-    public Database(String name, Connection connection) {
-        this.name = name;
+    public Database(String databaseName, Connection connection) {
+        this.databaseName = databaseName;
         this.connection = connection;
         this.schemas = new ArrayList<Schema>();
     }
@@ -68,12 +68,12 @@ public class Database {
     // Getters/setter
     //--------------------------------------------------------------------------
 
-    public String getName() {
-        return name;
+    public String getDatabaseName() {
+        return databaseName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
     }
 
     public Connection getConnection() {

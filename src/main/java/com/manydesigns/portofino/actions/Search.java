@@ -30,6 +30,8 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.portofino.base.context.MDContext;
+import com.manydesigns.portofino.base.context.DatabaseObjectNotFoundException;
+import com.manydesigns.portofino.base.model.Table;
 import com.manydesigns.portofino.interceptors.MDContextAware;
 import com.opensymphony.xwork2.ActionSupport;
 
@@ -49,9 +51,11 @@ public class Search extends ActionSupport implements MDContextAware {
     }
 
     
-    public String className;
+    public String qualifiedTableName;
+    public Table table;
 
-    public String execute() {
+    public String execute() throws DatabaseObjectNotFoundException {
+        table = context.findTableByQualifiedName(qualifiedTableName);
         return SUCCESS;
     }
 

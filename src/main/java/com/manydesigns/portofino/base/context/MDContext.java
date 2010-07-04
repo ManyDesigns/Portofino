@@ -43,10 +43,22 @@ public class MDContext {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
+
     public DataModel dataModel;
+
+    //--------------------------------------------------------------------------
+    // Constructors
+    //--------------------------------------------------------------------------
 
     public MDContext() {
     }
+
+    //--------------------------------------------------------------------------
+    // Model loading
+    //--------------------------------------------------------------------------
 
     public void loadXmlModelAsResource(String resource) {
         DBParser parser = new DBParser();
@@ -56,6 +68,10 @@ public class MDContext {
             e.printStackTrace();
         }
     }
+
+    //--------------------------------------------------------------------------
+    // Model access
+    //--------------------------------------------------------------------------
 
     public List<Table> getAllTables() {
         List<Table> result = new ArrayList<Table>();
@@ -68,4 +84,57 @@ public class MDContext {
         }
         return result;
     }
+
+    public Database findDatabaseByName(String databaseName)
+            throws DatabaseObjectNotFoundException {
+        for (Database database : dataModel.getDatabases()) {
+            if (database.getDatabaseName().equals(databaseName)) {
+                return database;
+            }
+        }
+        throw new DatabaseObjectNotFoundException(databaseName);
+    }
+
+    public Schema findSchemaByQualifiedName(String qualifiedSchemaName)
+            throws DatabaseObjectNotFoundException {
+        int lastDot = qualifiedSchemaName.lastIndexOf(".");
+        String databaseName = qualifiedSchemaName.substring(0, lastDot);
+        String schemaName = qualifiedSchemaName.substring(lastDot + 1);
+        Database database = findDatabaseByName(databaseName);
+        for (Schema schema : database.getSchemas()) {
+            if (schema.getSchemaName().equals(schemaName)) {
+                return schema;
+            }
+        }
+        throw new DatabaseObjectNotFoundException(qualifiedSchemaName);
+    }
+
+    public Table findTableByQualifiedName(String qualifiedTableName)
+            throws DatabaseObjectNotFoundException {
+        int lastDot = qualifiedTableName.lastIndexOf(".");
+        String qualifiedSchemaName = qualifiedTableName.substring(0, lastDot);
+        String tableName = qualifiedTableName.substring(lastDot + 1);
+        Schema schema = findSchemaByQualifiedName(qualifiedSchemaName);
+        for (Table table : schema.getTables()) {
+            if (table.getTableName().equals(tableName)) {
+                return table;
+            }
+        }
+        throw new DatabaseObjectNotFoundException(qualifiedTableName);
+    }
+
+    public Column findColumnByQualifiedName(String qualifiedColumnName)
+            throws DatabaseObjectNotFoundException {
+        int lastDot = qualifiedColumnName.lastIndexOf(".");
+        String qualifiedTableName = qualifiedColumnName.substring(0, lastDot);
+        String columnName = qualifiedColumnName.substring(lastDot + 1);
+        Table table = findTableByQualifiedName(qualifiedTableName);
+        for (Column column : table.getColumns()) {
+            if (column.getColumnName().equals(columnName)) {
+                return column;
+            }
+        }
+        throw new DatabaseObjectNotFoundException(qualifiedColumnName);
+    }
+
 }

@@ -64,7 +64,7 @@ public class DBParserTest extends TestCase {
         assertEquals(1, databases.size());
 
         Database database = databases.get(0);
-        assertEquals("jpetstore", database.getName());
+        assertEquals("jpetstore", database.getDatabaseName());
 
         Connection connection = database.getConnection();
         assertNotNull(connection);
@@ -73,24 +73,29 @@ public class DBParserTest extends TestCase {
         assertEquals(1, schemas.size());
 
         Schema schema = schemas.get(0);
+        assertEquals("jpetstore", schema.getDatabaseName());
         assertEquals("default", schema.getSchemaName());
+        assertEquals("jpetstore.default", schema.getQualifiedName());
 
         List<Table> tables = schema.getTables();
         assertEquals(2, tables.size());
 
         // tabella 0
         Table table0 = tables.get(0);
-        checkTable(table0, "default", "category");
+        checkTable(table0, "jpetstore", "default", "category");
 
         List<Column> columns0 = table0.getColumns();
         assertEquals(3, columns0.size());
 
         checkColumn(columns0.get(0),
-                "default", "category", "catid", "VARCHAR", false, 10, 0);
+                "jpetstore", "default", "category", "catid",
+                "VARCHAR", false, 10, 0);
         checkColumn(columns0.get(1),
-                "default", "category", "name", "VARCHAR", true, 80, 0);
+                "jpetstore", "default", "category", "name",
+                "VARCHAR", true, 80, 0);
         checkColumn(columns0.get(2),
-                "default", "category", "descn", "VARCHAR", true, 255, 0);
+                "jpetstore", "default", "category", "descn",
+                "VARCHAR", true, 255, 0);
 
         PrimaryKey primaryKey0 = table0.getPrimaryKey();
         assertEquals("pk_category", primaryKey0.getName());
@@ -100,24 +105,41 @@ public class DBParserTest extends TestCase {
 
         // tabella 1
         Table table1 = tables.get(1);
-        checkTable(table1, "default", "product");
+        checkTable(table1, "jpetstore", "default", "product");
 
         List<Column> columns1 = table1.getColumns();
         assertEquals(4, columns1.size());
 
         checkColumn(columns1.get(0),
-                "default", "product", "productid", "VARCHAR", false, 10, 0);
+                "jpetstore", "default", "product", "productid",
+                "VARCHAR", false, 10, 0);
         checkColumn(columns1.get(1),
-                "default", "product", "category", "VARCHAR", false, 10, 0);
+                "jpetstore", "default", "product", "category",
+                "VARCHAR", false, 10, 0);
         checkColumn(columns1.get(2),
-                "default", "product", "name", "VARCHAR", true, 80, 0);
+                "jpetstore", "default", "product", "name",
+                "VARCHAR", true, 80, 0);
         checkColumn(columns1.get(3),
-                "default", "product", "descn", "VARCHAR", true, 255, 0);
+                "jpetstore", "default", "product", "descn",
+                "VARCHAR", true, 255, 0);
     }
 
-    private void checkColumn(Column column, String schemaName, String tableName,
+    public void testFindTableByQualifiedName() {
+        try {
+            dataModel = parser.parse(
+                    "databases/jpetstore/postgresql/jpetstore-postgres.xml");
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+
+    }
+
+    private void checkColumn(Column column, String databaseName,
+                             String schemaName, String tableName,
                              String columnName, String columnType,
                              boolean nullable, int length, int scale) {
+        assertEquals(databaseName, column.getDatabaseName());
         assertEquals(schemaName, column.getSchemaName());
         assertEquals(tableName, column.getTableName());
         assertEquals(columnName, column.getColumnName());
@@ -125,10 +147,16 @@ public class DBParserTest extends TestCase {
         assertEquals(nullable, column.isNullable());
         assertEquals(length, column.getLength());
         assertEquals(scale, column.getScale());
+        assertEquals(databaseName + "." + schemaName + "." +
+                tableName + "." + columnName, column.getQualifiedName());
     }
 
-    private void checkTable(Table table, String schemaName, String tableName) {
+    private void checkTable(Table table, String databaseName,
+                            String schemaName, String tableName) {
+        assertEquals(databaseName, table.getDatabaseName());
         assertEquals(schemaName, table.getSchemaName());
         assertEquals(tableName, table.getTableName());
+        assertEquals(databaseName + "." + schemaName + "." +
+                tableName, table.getQualifiedName());
     }
 }

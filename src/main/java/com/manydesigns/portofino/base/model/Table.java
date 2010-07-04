@@ -46,6 +46,7 @@ public class Table {
     // Fields
     //--------------------------------------------------------------------------
 
+    protected String databaseName;
     protected String schemaName;
     protected String tableName;
     protected final List<Column> columns;
@@ -62,7 +63,8 @@ public class Table {
         this.relationships = new ArrayList<Relationship>();
     }
 
-    public Table(String schemaName, String tableName) {
+    public Table(String databaseName, String schemaName, String tableName) {
+        this.databaseName = databaseName;
         this.schemaName = schemaName;
         this.tableName = tableName;
         this.columns = new ArrayList<Column>();
@@ -72,6 +74,14 @@ public class Table {
     //--------------------------------------------------------------------------
     // Getters/setter
     //--------------------------------------------------------------------------
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
 
     public String getSchemaName() {
         return schemaName;
@@ -106,6 +116,7 @@ public class Table {
     }
 
     public String getQualifiedName() {
-        return MessageFormat.format("{0}.{1}", schemaName, tableName);
+        return MessageFormat.format("{0}.{1}.{2}",
+                databaseName, schemaName, tableName);
     }
 }

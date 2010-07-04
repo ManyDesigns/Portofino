@@ -44,6 +44,10 @@ public class ServerInfo {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
+
     protected final Logger logger;
 
     protected final ServletContext servletContext;
