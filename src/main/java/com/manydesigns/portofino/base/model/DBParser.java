@@ -459,6 +459,7 @@ public class DBParser {
 
 
         Relationship rel = new Relationship();
+        table.getRelationships().add(rel);
         if (xmlStreamReader.hasNext()) {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();

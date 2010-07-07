@@ -81,7 +81,7 @@ public class HibernateTest extends TestCase {
         assertEquals("prodotti", sizePrd, 16);
         Map prd0 = resultProd.get(0);
         assertEquals("FI-SW-01", prd0.get("productid") );
-        assertEquals("FISH", prd0.get("category"));
+        assertEquals("FISH", ((Map) prd0.get("fk_product_1")).get("catid"));
         assertEquals("Angelfish", prd0.get("name"));
     }
 

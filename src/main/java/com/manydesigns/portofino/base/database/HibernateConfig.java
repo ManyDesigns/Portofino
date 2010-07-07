@@ -37,8 +37,7 @@ import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PrimaryKey;
 import org.hibernate.mapping.Table;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 import java.util.Map;
 
@@ -76,7 +75,7 @@ public class HibernateConfig {
                 for (Schema schema : database.getSchemas()) {
                     for (com.manydesigns.portofino.base.model.Table aTable :
                             schema.getTables()) {
-                        RootClass clazz = createTableMapping(aTable);
+                        RootClass clazz = createTableMapping(result, aTable);
                         result.createMappings().addClass(clazz);
                     }
                 }
@@ -92,7 +91,7 @@ public class HibernateConfig {
         }
     }
 
-    protected RootClass createTableMapping(
+    protected RootClass createTableMapping(Configuration conf,
             com.manydesigns.portofino.base.model.Table aTable) {
 
 
@@ -116,19 +115,22 @@ public class HibernateConfig {
                 columnPKList);
 
         //Foreign keys
-        final List<com.manydesigns.portofino.base.model.Column> columnsinFKList
-                = new ArrayList<com.manydesigns.portofino.base.model.Column>();
 
-        for (Relationship rel : aTable.getRelationships())
+
+       for (Relationship rel : aTable.getRelationships())
         {
+            List<com.manydesigns.portofino.base.model.Column> columnsinFKList
+                = new ArrayList<com.manydesigns.portofino.base.model.Column>();
             for (Reference ref : rel.getReferences()){
                 columnsinFKList.add(ref.getFromColumn());
             }
+            columnList.removeAll(columnsinFKList);
+            createFKReference(conf, clazz, tab, rel, columnsinFKList);
         }
 
         //Other columns
         columnList.removeAll(columnPKList);
-        columnList.removeAll(columnsinFKList);
+
 
         for (com.manydesigns.portofino.base.model.Column column
                 : columnList) {
@@ -187,15 +189,36 @@ public class HibernateConfig {
         clazz.setIdentifierMapper(component);
     }
 
-    protected void createFKReference(String pkName, RootClass clazz,
+    protected void createFKReference(Configuration config, RootClass clazz,
                         Table tab,
-                        Relationship relationship) {
-        Component component = new Component(clazz);
-        component.setDynamic(true);
-        //tab.createForeignKey(relationship)
+                        Relationship relationship,
+                        List<com.manydesigns.portofino.base.model.Column> cols) {
+        Property prop = new Property();
+        prop.setName(relationship.getName());
+
+
+        ManyToOne m2o = new ManyToOne(tab);
+        m2o.createForeignKey();
+
+
+        final HashMap<String, PersistentClass> persistentClasses = new HashMap<String, PersistentClass>();
+        persistentClasses.put(relationship.getTable().getQualifiedName(),
+                config.getClassMapping(relationship.getTable().getQualifiedName()));
+        m2o.setReferencedEntityName(relationship.getTable().getQualifiedName());
+        m2o.createPropertyRefConstraints(persistentClasses);
+        for(com.manydesigns.portofino.base.model.Column column : cols){
+            Property colProp = new Property();
+            Column col = new Column();
+            col.setName(column.getColumnName());
+         
+
+            //tab.addColumn(col);
+            m2o.addColumn(col);
+
+        }
+        prop.setValue(m2o);
+        clazz.addProperty(prop);
     }
-
-
 
     public Map<String, SessionFactory> build(DataModel model) {
         buildSessionFactory(model);
