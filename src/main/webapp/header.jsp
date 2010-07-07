@@ -13,8 +13,6 @@
     <link rel="stylesheet" type="text/css"
           href="<s:url value="/yui-2.8.1/build/base/base-min.css"/>"/>
     <link rel="stylesheet" type="text/css"
-          href="<s:url value="/yui-2.8.1/build/base/base-min.css"/>"/>
-    <link rel="stylesheet" type="text/css"
           href="<s:url value="/portofino.css"/>"/>
     <script type="text/javascript"
             src="<s:url value="/yui-2.8.1/build/yuiloader-dom-event/yuiloader-dom-event.js"/>"></script>

@@ -14,8 +14,10 @@
         <servlet.api.version>2.4</servlet.api.version>
         <jsp.api.version>2.1</jsp.api.version>
         <struts.version>2.1.6</struts.version>
+        <hibernate.version>3.5.1-Final</hibernate.version>
         <commons.lang.version>2.4</commons.lang.version>
         <commons.collections.version>3.2</commons.collections.version>
+        <log4j.version>1.2.14</log4j.version>
         <jasperreports.version>3.5.0</jasperreports.version>
     </properties>
     <dependencies>
@@ -75,13 +77,25 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
+            <version>${log4j.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>apache-log4j-extras</artifactId>
             <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.5.8</version>
             <scope>compile</scope>
         </dependency>
         <!-- stuff for testing -->
@@ -189,17 +203,6 @@
             <groupId>dumbster</groupId>
             <artifactId>dumbster</artifactId>
             <version>1.6</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>3.5.1-Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.8</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

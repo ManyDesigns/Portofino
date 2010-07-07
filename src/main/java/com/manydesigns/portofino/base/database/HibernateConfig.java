@@ -29,20 +29,18 @@
 package com.manydesigns.portofino.base.database;
 
 
+import com.manydesigns.portofino.base.model.Connection;
+import com.manydesigns.portofino.base.model.DataModel;
+import com.manydesigns.portofino.base.model.Database;
+import com.manydesigns.portofino.base.model.Schema;
 import org.hibernate.SessionFactory;
-import org.hibernate.Hibernate;
-import org.hibernate.mapping.*;
-import org.hibernate.mapping.Column;
-import org.hibernate.mapping.Table;
-import org.hibernate.mapping.PrimaryKey;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.mapping.*;
 
-import java.util.*;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.sql.Types;
-
-import com.manydesigns.portofino.base.model.*;
+import java.util.Map;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -55,8 +53,6 @@ public class HibernateConfig {
 
     private static void buildSessionFactory(DataModel model) {
         try {
-
-
             for (Database database : model.getDatabases()) {
                 Configuration result = new Configuration().setProperty("default_entity_mode", "dynamic-map");
 
