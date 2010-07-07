@@ -73,7 +73,8 @@ public class MDContext {
         DBParser parser = new DBParser();
         try {
             dataModel = parser.parse(resource);
-            sessionFactories = HibernateConfig.getSessionFactory(dataModel);
+            HibernateConfig builder = new HibernateConfig();
+            sessionFactories = builder.build(dataModel);
         } catch (Exception e) {
             e.printStackTrace();
         }

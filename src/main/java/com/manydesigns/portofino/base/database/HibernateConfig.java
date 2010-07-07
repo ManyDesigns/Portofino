@@ -29,13 +29,13 @@
 package com.manydesigns.portofino.base.database;
 
 
-import com.manydesigns.portofino.base.model.Connection;
-import com.manydesigns.portofino.base.model.DataModel;
-import com.manydesigns.portofino.base.model.Database;
-import com.manydesigns.portofino.base.model.Schema;
+import com.manydesigns.portofino.base.model.*;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.*;
+import org.hibernate.mapping.Column;
+import org.hibernate.mapping.PrimaryKey;
+import org.hibernate.mapping.Table;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,10 +49,10 @@ import java.util.Map;
  */
 public class HibernateConfig {
 
-    private static final Map<String, SessionFactory> sessionFactories =
+    protected final Map<String, SessionFactory> sessionFactories =
             new HashMap<String, SessionFactory>();
 
-    private static void buildSessionFactory(DataModel model) {
+    protected void buildSessionFactory(DataModel model) {
         try {
             for (Database database : model.getDatabases()) {
                 Configuration result = new Configuration()
@@ -72,8 +72,6 @@ public class HibernateConfig {
                   .setProperty("hibernate.show_sql", "true")
                   .setProperty("hibernate.dialect",
                         "org.hibernate.dialect.PostgreSQLDialect");
-               
-
 
                 for (Schema schema : database.getSchemas()) {
                     for (com.manydesigns.portofino.base.model.Table aTable :
@@ -82,13 +80,9 @@ public class HibernateConfig {
                         result.createMappings().addClass(clazz);
                     }
                 }
-
-
                 sessionFactories.put(database.getDatabaseName(),
                         result.buildSessionFactory());
             }
-
-
         }
         catch (Throwable ex) {
             // Make sure you log the exception, as it might be swallowed
@@ -98,7 +92,7 @@ public class HibernateConfig {
         }
     }
 
-    private static RootClass createTableMapping(
+    protected RootClass createTableMapping(
             com.manydesigns.portofino.base.model.Table aTable) {
 
 
@@ -113,38 +107,38 @@ public class HibernateConfig {
         final List<com.manydesigns.portofino.base.model.Column> columnList =
                 new ArrayList<com.manydesigns.portofino.base.model.Column>();
         columnList.addAll(aTable.getColumns());
-        final List<com.manydesigns.portofino.base.model.Column> columnPKList
+
+        //Primary keys
+        List<com.manydesigns.portofino.base.model.Column> columnPKList
                 = aTable.getPrimaryKey().getColumns();
 
+        createPKColumn(aTable.getPrimaryKey().getName(), clazz, tab,
+                columnPKList);
+
+        //Foreign keys
+        final List<com.manydesigns.portofino.base.model.Column> columnsinFKList
+                = new ArrayList<com.manydesigns.portofino.base.model.Column>();
+
+        for (Relationship rel : aTable.getRelationships())
+        {
+            for (Reference ref : rel.getReferences()){
+                columnsinFKList.add(ref.getFromColumn());
+            }
+        }
+
+        //Other columns
         columnList.removeAll(columnPKList);
+        columnList.removeAll(columnsinFKList);
 
         for (com.manydesigns.portofino.base.model.Column column
                 : columnList) {
             createColumn(clazz, tab, column);
         }
 
-
-        createPKColumn(aTable.getPrimaryKey().getName(), clazz, tab,
-                columnPKList);
-
-        /*
-        tab.addColumn(col);
-        Column col2 = new Column();
-        col2.setName("codistat");
-        col2.setSqlTypeCode(Types.VARCHAR);
-        tab.addColumn(col2);
-        Property propId = new Property();
-        propId.setName("codistat");
-        SimpleValue valueId = new SimpleValue();
-        valueId.setTypeName(Hibernate.STRING.getName());
-        valueId.addColumn(col2);
-        propId.setValue(valueId);
-        clazz.setIdentifierProperty(propId);
-        */
         return clazz;
     }
 
-    private static void createColumn(RootClass clazz,
+    protected void createColumn(RootClass clazz,
                         Table tab,
                         com.manydesigns.portofino.base.model.Column column) {
         Column col = new Column();
@@ -164,7 +158,7 @@ public class HibernateConfig {
         clazz.addProperty(prop);
     }
 
-    private static void createPKColumn(String pkName, RootClass clazz,
+    protected void createPKColumn(String pkName, RootClass clazz,
                         Table tab,
                         List<com.manydesigns.portofino.base.model.Column> columnPKList) {
         Component component = new Component(clazz);
@@ -186,13 +180,24 @@ public class HibernateConfig {
             tab.getPrimaryKey().addColumn(col);
             tab.addColumn(col);
             prop.setValue(value);
+            clazz.addProperty(prop);
             component.addProperty(prop);
-
         }
         clazz.setIdentifier(component);
+        clazz.setIdentifierMapper(component);
     }
 
-    public static Map<String, SessionFactory> getSessionFactory(DataModel model) {
+    protected void createFKReference(String pkName, RootClass clazz,
+                        Table tab,
+                        Relationship relationship) {
+        Component component = new Component(clazz);
+        component.setDynamic(true);
+        //tab.createForeignKey(relationship)
+    }
+
+
+
+    public Map<String, SessionFactory> build(DataModel model) {
         buildSessionFactory(model);
         return sessionFactories;
     }
