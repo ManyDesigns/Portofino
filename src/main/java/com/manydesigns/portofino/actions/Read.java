@@ -31,11 +31,13 @@ package com.manydesigns.portofino.actions;
 
 import com.manydesigns.portofino.base.context.MDContext;
 import com.manydesigns.portofino.base.context.ModelObjectNotFoundException;
+import com.manydesigns.portofino.base.model.Column;
 import com.manydesigns.portofino.base.model.Table;
 import com.manydesigns.portofino.interceptors.MDContextAware;
 import com.opensymphony.xwork2.ActionSupport;
+import org.apache.commons.lang.StringUtils;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /*
@@ -43,7 +45,7 @@ import java.util.Map;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Search extends ActionSupport implements MDContextAware {
+public class Read extends ActionSupport implements MDContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -53,14 +55,29 @@ public class Search extends ActionSupport implements MDContextAware {
         this.context = context;
     }
 
-    
+
     public String qualifiedTableName;
     public Table table;
-    public List<Map<String, Object>> objects;
+    public HashMap<String, Object> pkMap;
+    public String pk;
+    public Map<String, Object> object;
+
 
     public String execute() throws ModelObjectNotFoundException {
         table = context.findTableByQualifiedName(qualifiedTableName);
-        objects = context.getAllObjects(qualifiedTableName);
+
+        String[] pkList = StringUtils.split(pk,",");
+
+        int i = 0;
+        pkMap = new HashMap<String, Object>();
+
+        for(Column column : table.getPrimaryKey().getColumns() ) {
+            pkMap.put(column.getColumnName(), pkList[i]);
+            i++;
+        }
+
+        object = context.getObjectByPk(qualifiedTableName, pkMap);
+
 
         return SUCCESS;
     }

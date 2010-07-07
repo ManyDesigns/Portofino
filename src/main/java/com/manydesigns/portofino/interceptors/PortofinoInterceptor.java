@@ -61,15 +61,26 @@ public class PortofinoInterceptor implements Interceptor {
         ServletContext servletContext =
                 (ServletContext)context.get(StrutsStatics.SERVLET_CONTEXT);
 
-        //Check if config container is present.
-        MDContext configContainer =
-                (MDContext)servletContext.getAttribute(
-                        PortofinoServletContextListener.MDCONTEXT_ATTRIBUTE);
+        String result;
         if (action instanceof MDContextAware) {
             setHeaders(res);
-            ((MDContextAware)action).setContext(configContainer);
+
+            MDContext mdContext =
+                    (MDContext)servletContext.getAttribute(
+                            PortofinoServletContextListener.MDCONTEXT_ATTRIBUTE);
+            ((MDContextAware)action).setContext(mdContext);
+
+            try {
+                mdContext.openSession();
+                result = invocation.invoke();
+            } finally {
+                mdContext.closeSession();
+            }
+        } else {
+            result = invocation.invoke();
         }
-        return invocation.invoke();
+
+        return result;
     }
 
     private void setHeaders(HttpServletResponse response) {

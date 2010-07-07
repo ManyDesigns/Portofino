@@ -46,6 +46,10 @@
             <param name="qualifiedTableName">{1}</param>
             <result name="success">/search.jsp</result>
         </action>
+        <action name="*/Read" class="com.manydesigns.portofino.actions.Read">
+            <param name="qualifiedTableName">{1}</param>
+            <result name="success">/read.jsp</result>
+        </action>
     </package>
 
     <package name="portofino-upstairs" extends="struts-default" namespace="/upstairs">

@@ -27,15 +27,11 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.methods;
 
-import com.manydesigns.portofino.base.context.MDContext;
-import com.manydesigns.portofino.base.context.ModelObjectNotFoundException;
+import com.manydesigns.portofino.base.model.Column;
 import com.manydesigns.portofino.base.model.Table;
-import com.manydesigns.portofino.interceptors.MDContextAware;
-import com.opensymphony.xwork2.ActionSupport;
 
-import java.util.List;
 import java.util.Map;
 
 /*
@@ -43,26 +39,24 @@ import java.util.Map;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Search extends ActionSupport implements MDContextAware {
+public class LinkHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public MDContext context;
+    public static String getPk(Table table, Map<String, Object> object) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("pk=");
 
-    public void setContext(MDContext context) {
-        this.context = context;
+        boolean first = true;
+        for (Column column : table.getPrimaryKey().getColumns()) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(",");
+            }
+            
+            sb.append(object.get(column.getColumnName()));
+        }
+        return sb.toString();
     }
-
-    
-    public String qualifiedTableName;
-    public Table table;
-    public List<Map<String, Object>> objects;
-
-    public String execute() throws ModelObjectNotFoundException {
-        table = context.findTableByQualifiedName(qualifiedTableName);
-        objects = context.getAllObjects(qualifiedTableName);
-
-        return SUCCESS;
-    }
-
 }
