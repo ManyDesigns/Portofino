@@ -31,7 +31,6 @@ package com.manydesigns.portofino.base.model;
 import com.manydesigns.portofino.base.database.HibernateConfig;
 import junit.framework.TestCase;
 import org.hibernate.Session;
-
 import java.util.List;
 import java.util.Map;
 
@@ -85,8 +84,6 @@ public class HibernateTest extends TestCase {
 
             int sizePrd = resultProd.size();
             assertEquals("prodotti", sizePrd, 16);
-
-
             Map prd0 = resultProd.get(0);
             //assertEquals("AV-CB-01", prd0.get("productId") );
             assertEquals("FISH", prd0.get("category") );

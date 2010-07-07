@@ -36,7 +36,6 @@ import com.manydesigns.portofino.base.model.Schema;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,34 +48,43 @@ import java.util.Map;
  */
 public class HibernateConfig {
 
-    private static final Map<String, SessionFactory> sessionFactories = new HashMap<String, SessionFactory>();
+    private static final Map<String, SessionFactory> sessionFactories =
+            new HashMap<String, SessionFactory>();
 
     private static void buildSessionFactory(DataModel model) {
         try {
             for (Database database : model.getDatabases()) {
-                Configuration result = new Configuration().setProperty("default_entity_mode", "dynamic-map");
+                Configuration result = new Configuration()
+                        .setProperty("default_entity_mode", "dynamic-map");
 
                 Connection connection = database.getConnection();
-                result.setProperty("hibernate.connection.url", connection.getConnectionUrl());
-                result.setProperty("hibernate.connection.driver_class", connection.getDriverClass());
-                result.setProperty("hibernate.connection.username", connection.getUsername());
-                result.setProperty("hibernate.connection.password", connection.getPassword());
-                result.setProperty("hibernate.current_session_context_class",
-                        "org.hibernate.context.ThreadLocalSessionContext");
-                result.setProperty("hibernate.show_sql", "true");
-                result.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+                result.setProperty("hibernate.connection.url",
+                   connection.getConnectionUrl())
+                  .setProperty("hibernate.connection.driver_class",
+                   connection.getDriverClass())
+                  .setProperty("hibernate.connection.username",
+                          connection.getUsername())
+                  .setProperty("hibernate.connection.password",
+                        connection.getPassword())
+                  .setProperty("hibernate.current_session_context_class",
+                        "org.hibernate.context.ThreadLocalSessionContext")
+                  .setProperty("hibernate.show_sql", "true")
+                  .setProperty("hibernate.dialect",
+                        "org.hibernate.dialect.PostgreSQLDialect");
                
 
 
                 for (Schema schema : database.getSchemas()) {
-                    for (com.manydesigns.portofino.base.model.Table aTable : schema.getTables()) {
+                    for (com.manydesigns.portofino.base.model.Table aTable :
+                            schema.getTables()) {
                         RootClass clazz = createTableMapping(aTable);
                         result.createMappings().addClass(clazz);
                     }
                 }
 
 
-                sessionFactories.put(database.getDatabaseName(), result.buildSessionFactory());
+                sessionFactories.put(database.getDatabaseName(),
+                        result.buildSessionFactory());
             }
 
 
@@ -115,7 +123,8 @@ public class HibernateConfig {
         }
 
 
-        createPKColumn(aTable.getPrimaryKey().getName(), clazz, tab, columnPKList);
+        createPKColumn(aTable.getPrimaryKey().getName(), clazz, tab,
+                columnPKList);
 
         /*
         tab.addColumn(col);
@@ -135,7 +144,8 @@ public class HibernateConfig {
     }
 
     private static void createColumn(RootClass clazz,
-                                     Table tab, com.manydesigns.portofino.base.model.Column column) {
+                        Table tab,
+                        com.manydesigns.portofino.base.model.Column column) {
         Column col = new Column();
         col.setName(column.getColumnName());
         col.setSqlTypeCode(DbUtil.getSQLType(column.getColumnType()));
@@ -154,7 +164,8 @@ public class HibernateConfig {
     }
 
     private static void createPKColumn(String pkName, RootClass clazz,
-                                       Table tab, List<com.manydesigns.portofino.base.model.Column> columnPKList) {
+                        Table tab,
+                        List<com.manydesigns.portofino.base.model.Column> columnPKList) {
         Component component = new Component(clazz);
         component.setDynamic(true);
         final PrimaryKey primaryKey = new PrimaryKey();
