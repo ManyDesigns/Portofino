@@ -28,9 +28,9 @@
  */
 package com.manydesigns.portofino.base.model;
 
-import com.manydesigns.portofino.base.database.HibernateConfig;
+import com.manydesigns.portofino.base.context.MDContext;
 import junit.framework.TestCase;
-import org.hibernate.Session;
+
 import java.util.List;
 import java.util.Map;
 
@@ -40,62 +40,49 @@ import java.util.Map;
  * @author Paolo     Predonzani - paolo.predonzani@manydesigns.com
  */
 public class HibernateTest extends TestCase {
-    DataModel dataModel;
-    DBParser parser;
+    MDContext context;
 
     public void setUp() {
-        parser = new DBParser();
+        context = new MDContext();
+        context.loadXmlModelAsResource(
+                "databases/jpetstore/postgresql/jpetstore-postgres.xml");
+        context.openSession();
     }
 
 
     public void tearDown() {
-
+        context.closeSession();
     }
 
     public void testPersona() {
-        try {
-            dataModel = parser.parse(
-                    "databases/jpetstore/postgresql/jpetstore-postgres.xml");
+        List<Map<String, Object>> resultCat =
+                context.getAllObjects("jpetstore.public.category");
+
+        int sizeCat = resultCat.size();
+        assertEquals("categorie", sizeCat, 5);
 
 
-            Session session = HibernateConfig.getSessionFactory(dataModel)
-                    .get("jpetstore").getCurrentSession();
-            session.beginTransaction();
-            List<Map> resultCat =
-                    (List<Map>) session.createQuery("from category ").list();
+        Map categoria0 = resultCat.get(0);
+        assertEquals("jpetstore.public.category", categoria0.get("$type$"));
+        assertEquals("Fish", categoria0.get("name"));
+        Map categoria1 = resultCat.get(1);
+        assertEquals("Dogs", categoria1.get("name"));
+        Map categoria2 = resultCat.get(2);
+        assertEquals("Reptiles", categoria2.get("name"));
+        Map categoria3 = resultCat.get(3);
+        assertEquals("Cats", categoria3.get("name"));
+        Map categoria4 = resultCat.get(4);
+        assertEquals("Birds", categoria4.get("name"));
 
-            int sizeCat = resultCat.size();
-            assertEquals("categorie", sizeCat, 5);
+        List<Map<String, Object>> resultProd =
+                context.getAllObjects("jpetstore.public.product");
 
-
-            Map categoria0 = resultCat.get(0);
-            assertEquals("Fish", categoria0.get("name") );
-            Map categoria1 = resultCat.get(1);
-            assertEquals( "Dogs", categoria1.get("name"));
-            Map categoria2 = resultCat.get(2);
-            assertEquals("Reptiles", categoria2.get("name") );
-            Map categoria3 = resultCat.get(3);
-            assertEquals("Cats", categoria3.get("name") );
-            Map categoria4 = resultCat.get(4);
-            assertEquals("Birds",categoria4.get("name"));
-
-            List<Map> resultProd =
-                    (List<Map>) session.createQuery("from product ").list();
-
-            int sizePrd = resultProd.size();
-            assertEquals("prodotti", sizePrd, 16);
-            Map prd0 = resultProd.get(0);
-            //assertEquals("AV-CB-01", prd0.get("productId") );
-            assertEquals("FISH", prd0.get("category") );
-            assertEquals("Angelfish", prd0.get("name") );
-
-
-
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
+        int sizePrd = resultProd.size();
+        assertEquals("prodotti", sizePrd, 16);
+        Map prd0 = resultProd.get(0);
+        //assertEquals("AV-CB-01", prd0.get("productId") );
+        assertEquals("FISH", prd0.get("category"));
+        assertEquals("Angelfish", prd0.get("name"));
     }
 
 }

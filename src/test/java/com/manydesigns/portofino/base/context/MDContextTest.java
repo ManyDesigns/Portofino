@@ -1,7 +1,10 @@
 package com.manydesigns.portofino.base.context;
 
+import com.manydesigns.portofino.base.model.Column;
+import com.manydesigns.portofino.base.model.Database;
+import com.manydesigns.portofino.base.model.Schema;
+import com.manydesigns.portofino.base.model.Table;
 import junit.framework.TestCase;
-import com.manydesigns.portofino.base.model.*;
 
 /**
  * File created on Jul 4, 2010 at 8:45:44 PM
@@ -24,7 +27,7 @@ public class MDContextTest extends TestCase {
         Database database = null;
         try {
             database = context.findDatabaseByName(qualifiedName);
-        } catch (DatabaseObjectNotFoundException e) {
+        } catch (ModelObjectNotFoundException e) {
             e.printStackTrace();
             fail();
         }
@@ -34,7 +37,7 @@ public class MDContextTest extends TestCase {
         try {
             context.findDatabaseByName(dummyName);
             fail("Must throw exception.");
-        } catch (DatabaseObjectNotFoundException e) {
+        } catch (ModelObjectNotFoundException e) {
             assertEquals(dummyName, e.getMessage());
         }
     }
@@ -44,7 +47,7 @@ public class MDContextTest extends TestCase {
         Schema schema = null;
         try {
             schema = context.findSchemaByQualifiedName(qualifiedName);
-        } catch (DatabaseObjectNotFoundException e) {
+        } catch (ModelObjectNotFoundException e) {
             e.printStackTrace();
             fail();
         }
@@ -54,7 +57,7 @@ public class MDContextTest extends TestCase {
         try {
             context.findSchemaByQualifiedName(dummyName);
             fail("Must throw exception.");
-        } catch (DatabaseObjectNotFoundException e) {
+        } catch (ModelObjectNotFoundException e) {
             assertEquals(dummyName, e.getMessage());
         }
     }
@@ -64,7 +67,7 @@ public class MDContextTest extends TestCase {
         Table table = null;
         try {
             table = context.findTableByQualifiedName(qualifiedName);
-        } catch (DatabaseObjectNotFoundException e) {
+        } catch (ModelObjectNotFoundException e) {
             e.printStackTrace();
             fail();
         }
@@ -74,7 +77,7 @@ public class MDContextTest extends TestCase {
         try {
             context.findTableByQualifiedName(dummyName);
             fail("Must throw exception.");
-        } catch (DatabaseObjectNotFoundException e) {
+        } catch (ModelObjectNotFoundException e) {
             assertEquals(dummyName, e.getMessage());
         }
     }
@@ -84,7 +87,7 @@ public class MDContextTest extends TestCase {
         Column column = null;
         try {
             column = context.findColumnByQualifiedName(qualifiedName);
-        } catch (DatabaseObjectNotFoundException e) {
+        } catch (ModelObjectNotFoundException e) {
             e.printStackTrace();
             fail();
         }
@@ -94,7 +97,7 @@ public class MDContextTest extends TestCase {
         try {
             context.findColumnByQualifiedName(dummyName);
             fail("Must throw exception.");
-        } catch (DatabaseObjectNotFoundException e) {
+        } catch (ModelObjectNotFoundException e) {
             assertEquals(dummyName, e.getMessage());
         }
     }

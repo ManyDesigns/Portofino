@@ -29,10 +29,16 @@
 
 package com.manydesigns.portofino.base.context;
 
+import com.manydesigns.portofino.base.database.HibernateConfig;
 import com.manydesigns.portofino.base.model.*;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -47,13 +53,16 @@ public class MDContext {
     // Fields
     //--------------------------------------------------------------------------
 
-    public DataModel dataModel;
+    protected DataModel dataModel;
+    protected Map<String, SessionFactory> sessionFactories;
+    protected final ThreadLocal<Map<String, Session>> threadSessions;
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
     public MDContext() {
+        threadSessions = new ThreadLocal<Map<String, Session>>();
     }
 
     //--------------------------------------------------------------------------
@@ -64,6 +73,7 @@ public class MDContext {
         DBParser parser = new DBParser();
         try {
             dataModel = parser.parse(resource);
+            sessionFactories = HibernateConfig.getSessionFactory(dataModel);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -86,17 +96,17 @@ public class MDContext {
     }
 
     public Database findDatabaseByName(String databaseName)
-            throws DatabaseObjectNotFoundException {
+            throws ModelObjectNotFoundException {
         for (Database database : dataModel.getDatabases()) {
             if (database.getDatabaseName().equals(databaseName)) {
                 return database;
             }
         }
-        throw new DatabaseObjectNotFoundException(databaseName);
+        throw new ModelObjectNotFoundException(databaseName);
     }
 
     public Schema findSchemaByQualifiedName(String qualifiedSchemaName)
-            throws DatabaseObjectNotFoundException {
+            throws ModelObjectNotFoundException {
         int lastDot = qualifiedSchemaName.lastIndexOf(".");
         String databaseName = qualifiedSchemaName.substring(0, lastDot);
         String schemaName = qualifiedSchemaName.substring(lastDot + 1);
@@ -106,11 +116,11 @@ public class MDContext {
                 return schema;
             }
         }
-        throw new DatabaseObjectNotFoundException(qualifiedSchemaName);
+        throw new ModelObjectNotFoundException(qualifiedSchemaName);
     }
 
     public Table findTableByQualifiedName(String qualifiedTableName)
-            throws DatabaseObjectNotFoundException {
+            throws ModelObjectNotFoundException {
         int lastDot = qualifiedTableName.lastIndexOf(".");
         String qualifiedSchemaName = qualifiedTableName.substring(0, lastDot);
         String tableName = qualifiedTableName.substring(lastDot + 1);
@@ -120,11 +130,11 @@ public class MDContext {
                 return table;
             }
         }
-        throw new DatabaseObjectNotFoundException(qualifiedTableName);
+        throw new ModelObjectNotFoundException(qualifiedTableName);
     }
 
     public Column findColumnByQualifiedName(String qualifiedColumnName)
-            throws DatabaseObjectNotFoundException {
+            throws ModelObjectNotFoundException {
         int lastDot = qualifiedColumnName.lastIndexOf(".");
         String qualifiedTableName = qualifiedColumnName.substring(0, lastDot);
         String columnName = qualifiedColumnName.substring(lastDot + 1);
@@ -134,8 +144,81 @@ public class MDContext {
                 return column;
             }
         }
-        throw new DatabaseObjectNotFoundException(qualifiedColumnName);
+        throw new ModelObjectNotFoundException(qualifiedColumnName);
     }
 
+    //--------------------------------------------------------------------------
+    // Persistance
+    //--------------------------------------------------------------------------
+
+    public Map<String, Object> getObjectByPk(String qualifiedTableName,
+                                             Object... pk) {
+        return null;
+    }
     
+    public Map<String, Object> getObjectByPk(String qualifiedTableName,
+                                             HashMap<String, Object> pk) {
+        Table table;
+        try {
+            table = findTableByQualifiedName(qualifiedTableName);
+        } catch (ModelObjectNotFoundException e) {
+            throw new Error(e);
+        }
+        String databaseName = table.getDatabaseName();
+        Session session = threadSessions.get().get(databaseName);
+
+        return (Map<String, Object>)session.load(qualifiedTableName, pk);
+    }
+
+
+    public List<Map<String, Object>> getAllObjects(String qualifiedTableName) {
+        Table table;
+        try {
+            table = findTableByQualifiedName(qualifiedTableName);
+        } catch (ModelObjectNotFoundException e) {
+            throw new Error(e);
+        }
+        String databaseName = table.getDatabaseName();
+        Session session = threadSessions.get().get(databaseName);
+
+        return (List<Map<String, Object>>)session.createQuery(
+                            "from " + qualifiedTableName).list();
+    }
+
+    // lasciare per ultima
+    public List<Map<String, Object>> getObjects(String qualifiedTableName,
+                                                Criteria criteria) {
+        return null;
+    }
+
+    public void saveObject(Map<String, Object> pk) {
+
+    }
+
+    public void deleteObject(Map<String, Object> pk) {
+
+    }
+
+    public void openSession() {
+        Map<String, Session> sessions = new HashMap<String, Session>();
+
+        for (Map.Entry<String, SessionFactory> current : sessionFactories.entrySet()) {
+            String databaseName = current.getKey();
+            SessionFactory sessionFactory = current.getValue();
+            Session session = sessionFactory.openSession();
+            sessions.put(databaseName, session);
+        }
+        threadSessions.set(sessions);
+    }
+
+
+    public void closeSession() {
+        Map<String, Session> sessions = threadSessions.get();
+
+        for (Session current : sessions.values()) {
+            current.close();
+        }
+
+        threadSessions.set(null);
+    }
 }

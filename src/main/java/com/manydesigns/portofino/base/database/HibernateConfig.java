@@ -36,6 +36,7 @@ import com.manydesigns.portofino.base.model.Schema;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -102,7 +103,7 @@ public class HibernateConfig {
 
 
         RootClass clazz = new RootClass();
-        clazz.setEntityName(aTable.getTableName());
+        clazz.setEntityName(aTable.getQualifiedName());
 
         Table tab = new Table();
         tab.setName(aTable.getTableName());
