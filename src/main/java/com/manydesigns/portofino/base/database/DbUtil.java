@@ -29,9 +29,13 @@
 
 package com.manydesigns.portofino.base.database;
 
+import org.hibernate.Hibernate;
+import org.hibernate.type.NullableType;
+
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Connection;
+import java.sql.Types;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -89,6 +93,107 @@ public class DbUtil {
         } catch (Exception ignore) {
             /*IGNORE*/
         }
+    }
+
+    public static int getSQLType(String type) {
+        if ("VARCHAR".equalsIgnoreCase(type)){
+            return Types.VARCHAR;
+        }
+        if ("BIT".equalsIgnoreCase(type)){
+            return Types.BIT;
+        }
+        if ("BLOB".equalsIgnoreCase(type)){
+            return Types.BLOB;
+        }
+        if ("BOOLEAN".equalsIgnoreCase(type)){
+            return Types.BOOLEAN;
+        }
+        if ("CHAR".equalsIgnoreCase(type)){
+            return Types.CHAR;
+        }
+        if ("CLOB".equalsIgnoreCase(type)){
+            return Types.CLOB;
+        }
+        if ("DATE".equalsIgnoreCase(type)){
+            return Types.DATE;
+        }
+        if ("DECIMAL".equalsIgnoreCase(type)){
+            return Types.DECIMAL;
+        }
+        if ("DOUBLE".equalsIgnoreCase(type)){
+            return Types.DOUBLE;
+        }
+        if ("FLOAT".equalsIgnoreCase(type)){
+            return Types.FLOAT;
+        }
+        if ("INTEGER".equalsIgnoreCase(type)){
+            return Types.INTEGER;
+        }
+        if ("NUMERIC".equalsIgnoreCase(type)){
+            return Types.NUMERIC;
+        }
+        if ("SMALLINT".equalsIgnoreCase(type)){
+            return Types.SMALLINT;
+        }
+        if ("TIME".equalsIgnoreCase(type)){
+            return Types.TIME;
+        }
+        if ("TIMESTAMP".equalsIgnoreCase(type)){
+            return Types.TIMESTAMP;
+        }
+
+        return 0;
+    }
+
+
+    public static org.hibernate.type.Type getHibernateType(String type) {
+        if ("VARCHAR".equalsIgnoreCase(type)){
+            return Hibernate.STRING;
+        }
+        if ("BIT".equalsIgnoreCase(type)){
+            return Hibernate.BYTE;
+        }
+        if ("BOOLEAN".equalsIgnoreCase(type)){
+            return Hibernate.BOOLEAN;
+        }
+        if ("CHAR".equalsIgnoreCase(type)){
+            return Hibernate.CHARACTER;
+        }
+        if ("CLOB".equalsIgnoreCase(type)){
+            return Hibernate.CLOB;
+        }
+        if ("BLOB".equalsIgnoreCase(type)){
+            return Hibernate.BLOB;
+        }
+        if ("DATE".equalsIgnoreCase(type)){
+            return Hibernate.DATE;
+        }
+        if ("DECIMAL".equalsIgnoreCase(type)){
+            return Hibernate.BIG_DECIMAL;
+        }
+        if ("DOUBLE".equalsIgnoreCase(type)){
+            return Hibernate.DOUBLE;
+        }
+        if ("FLOAT".equalsIgnoreCase(type)){
+            return Hibernate.FLOAT;
+        }
+        if ("INTEGER".equalsIgnoreCase(type)){
+            return Hibernate.INTEGER;
+        }
+        if ("NUMERIC".equalsIgnoreCase(type)){
+            return Hibernate.FLOAT;
+        }
+        if ("SMALLINT".equalsIgnoreCase(type)){
+            return Hibernate.INTEGER;
+        }
+        if ("TIME".equalsIgnoreCase(type)){
+            return Hibernate.TIME;
+        }
+        if ("TIMESTAMP".equalsIgnoreCase(type)){
+            return Hibernate.TIMESTAMP;
+        }
+
+        return null;
     }
 
 }

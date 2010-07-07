@@ -74,27 +74,27 @@ public class DBParserTest extends TestCase {
 
         Schema schema = schemas.get(0);
         assertEquals("jpetstore", schema.getDatabaseName());
-        assertEquals("default", schema.getSchemaName());
-        assertEquals("jpetstore.default", schema.getQualifiedName());
+        assertEquals("public", schema.getSchemaName());
+        assertEquals("jpetstore.public", schema.getQualifiedName());
 
         List<Table> tables = schema.getTables();
         assertEquals(2, tables.size());
 
         // tabella 0
         Table table0 = tables.get(0);
-        checkTable(table0, "jpetstore", "default", "category");
+        checkTable(table0, "jpetstore", "public", "category");
 
         List<Column> columns0 = table0.getColumns();
         assertEquals(3, columns0.size());
 
         checkColumn(columns0.get(0),
-                "jpetstore", "default", "category", "catid",
+                "jpetstore", "public", "category", "catid",
                 "VARCHAR", false, 10, 0);
         checkColumn(columns0.get(1),
-                "jpetstore", "default", "category", "name",
+                "jpetstore", "public", "category", "name",
                 "VARCHAR", true, 80, 0);
         checkColumn(columns0.get(2),
-                "jpetstore", "default", "category", "descn",
+                "jpetstore", "public", "category", "descn",
                 "VARCHAR", true, 255, 0);
 
         PrimaryKey primaryKey0 = table0.getPrimaryKey();
@@ -105,22 +105,22 @@ public class DBParserTest extends TestCase {
 
         // tabella 1
         Table table1 = tables.get(1);
-        checkTable(table1, "jpetstore", "default", "product");
+        checkTable(table1, "jpetstore", "public", "product");
 
         List<Column> columns1 = table1.getColumns();
         assertEquals(4, columns1.size());
 
         checkColumn(columns1.get(0),
-                "jpetstore", "default", "product", "productid",
+                "jpetstore", "public", "product", "productid",
                 "VARCHAR", false, 10, 0);
         checkColumn(columns1.get(1),
-                "jpetstore", "default", "product", "category",
+                "jpetstore", "public", "product", "category",
                 "VARCHAR", false, 10, 0);
         checkColumn(columns1.get(2),
-                "jpetstore", "default", "product", "name",
+                "jpetstore", "public", "product", "name",
                 "VARCHAR", true, 80, 0);
         checkColumn(columns1.get(3),
-                "jpetstore", "default", "product", "descn",
+                "jpetstore", "public", "product", "descn",
                 "VARCHAR", true, 255, 0);
     }
 

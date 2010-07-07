@@ -46,14 +46,14 @@ public class DBParser {
     private static final String DATABASE = "database";
     private static final String CONNECTION = "connection";
     private static final String SCHEMA = "schema";
-    private static final String SCHEMAS = SCHEMA + "s";
+    private static final String SCHEMAS = "schemas";
     private static final String TABLE = "table";
-    private static final String TABLES = TABLE + "s";
+    private static final String TABLES = "tables";
     private static final String COLUMN = "column";
-    private static final String COLUMNS = COLUMN + "s";
+    private static final String COLUMNS = "columns";
     private static final String PRIMARY_KEY = "primaryKey";
     private static final String RELATIONSHIP = "relationship";
-    private static final String RELATIONSHIPS = RELATIONSHIP + "s";
+    private static final String RELATIONSHIPS = "relationships";
     private static final String REFERENCE = "reference";
 
 
@@ -140,7 +140,7 @@ public class DBParser {
         String lName = xmlStreamReader.getLocalName();
         if (event == XMLStreamConstants.START_ELEMENT && lName.equals(CONNECTION)) {
             String attName;
-            //String attValue;
+            String attValue;
             List<String> expectedValList = new ArrayList<String>();
             expectedValList.add("type");
             expectedValList.add("driver");
@@ -149,31 +149,31 @@ public class DBParser {
             expectedValList.add("password");
             for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
                 attName = xmlStreamReader.getAttributeLocalName(i);
-                //attValue = xmlStreamReader.getAttributeValue(i);
+                attValue = xmlStreamReader.getAttributeValue(i);
 
                 if (attName.equals("type")) {
                     expectedValList.remove(attName);
-                    //conn.setType(attValue);
+                    conn.setType(attValue);
                     continue;
                 }
                 if (attName.equals("driver")) {
                     expectedValList.remove(attName);
-                    //conn.setDriver(attValue);
+                    conn.setDriverClass(attValue);
                     continue;
                 }
                 if (attName.equals("url")) {
                     expectedValList.remove(attName);
-                    //conn.setUrl(attValue);
+                    conn.setConnectionUrl(attValue);
                     continue;
                 }
                 if (attName.equals("username")) {
                     expectedValList.remove(attName);
-                    //conn.setUsername(attValue);
+                    conn.setUsername(attValue);
                     continue;
                 }
                 if (attName.equals("password")) {
                     expectedValList.remove(attName);
-                    //conn.setPassword(attValue);
+                    conn.setPassword(attValue);
 
                 }
             }
@@ -189,6 +189,7 @@ public class DBParser {
                 event = next(xmlStreamReader);
                 lName = xmlStreamReader.getLocalName();
                 if (event == XMLStreamConstants.END_ELEMENT && lName.equals(CONNECTION)) {
+                    ;
                 } else {
                     throw new Exception("TAG " + CONNECTION + " non chiuso");
                 }
@@ -382,6 +383,7 @@ public class DBParser {
             event = xmlStreamReader.next();
             lName = xmlStreamReader.getLocalName();
             if (event == XMLStreamConstants.END_ELEMENT && lName.equals(SCHEMAS)) {
+                ;
             } else {
                 throw new Exception("TAG " + COLUMNS + " non chiuso");
             }
@@ -498,6 +500,7 @@ public class DBParser {
                     event = next(xmlStreamReader);
                     lName = xmlStreamReader.getLocalName();
                     if (event == XMLStreamConstants.END_ELEMENT && lName.equals(REFERENCE)) {
+                        ;
                     } else {
                         throw new Exception("TAG Reference non chiuso");
                     }
@@ -509,6 +512,7 @@ public class DBParser {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
             if (event == XMLStreamConstants.END_ELEMENT && lName.equals(RELATIONSHIP)) {
+                ;
             } else {
                 throw new Exception("TAG Relationship non chiuso");
             }
@@ -519,6 +523,7 @@ public class DBParser {
             lName = xmlStreamReader.getLocalName();
 
             if (event == XMLStreamConstants.END_ELEMENT && lName.equals(RELATIONSHIPS)) {
+                ;
             } else {
                 throw new Exception("TAG Relationships non chiuso");
             }
