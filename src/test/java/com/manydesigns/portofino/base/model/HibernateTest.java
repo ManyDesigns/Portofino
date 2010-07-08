@@ -33,6 +33,7 @@ import junit.framework.TestCase;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -54,7 +55,7 @@ public class HibernateTest extends TestCase {
         context.closeSession();
     }
 
-    public void testPersona() {
+    public void testReadCategorieProdotti() {
         List<Map<String, Object>> resultCat =
                 context.getAllObjects("jpetstore.public.category");
 
@@ -85,6 +86,14 @@ public class HibernateTest extends TestCase {
         assertEquals("Angelfish", prd0.get("name"));
     }
 
+    public void testSaveCategoria() {
+        context.openSession();
+        Map<String, Object> worms = new HashMap<String, Object>();
+        worms.put("$type$", "jpetstore.public.category");
+        worms.put("name", "worms");
+        worms.put("descn", "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\"> Worms</font>");
+        context.saveObject(worms);
+    }
 }
 
 

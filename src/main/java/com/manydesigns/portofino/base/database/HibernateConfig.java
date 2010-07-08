@@ -59,18 +59,17 @@ public class HibernateConfig {
 
                 Connection connection = database.getConnection();
                 result.setProperty("hibernate.connection.url",
-                   connection.getConnectionUrl())
-                  .setProperty("hibernate.connection.driver_class",
-                   connection.getDriverClass())
-                  .setProperty("hibernate.connection.username",
-                          connection.getUsername())
-                  .setProperty("hibernate.connection.password",
-                        connection.getPassword())
-                  .setProperty("hibernate.current_session_context_class",
-                        "org.hibernate.context.ThreadLocalSessionContext")
-                  .setProperty("hibernate.show_sql", "true")
-                  .setProperty("hibernate.dialect",
-                        "org.hibernate.dialect.PostgreSQLDialect");
+                        connection.getConnectionUrl())
+                        .setProperty("hibernate.connection.driver_class",
+                                connection.getDriverClass())
+                        .setProperty("hibernate.connection.username",
+                                connection.getUsername())
+                        .setProperty("hibernate.connection.password",
+                                connection.getPassword())
+                        .setProperty("hibernate.current_session_context_class",
+                                "org.hibernate.context.ThreadLocalSessionContext")
+                        .setProperty("hibernate.show_sql", "true");
+
 
                 for (Schema schema : database.getSchemas()) {
                     for (com.manydesigns.portofino.base.model.Table aTable :
@@ -92,7 +91,7 @@ public class HibernateConfig {
     }
 
     protected RootClass createTableMapping(Configuration conf,
-            com.manydesigns.portofino.base.model.Table aTable) {
+                         com.manydesigns.portofino.base.model.Table aTable) {
 
 
         RootClass clazz = new RootClass();
@@ -115,13 +114,10 @@ public class HibernateConfig {
                 columnPKList);
 
         //Foreign keys
-
-
-       for (Relationship rel : aTable.getRelationships())
-        {
+        for (Relationship rel : aTable.getRelationships()) {
             List<com.manydesigns.portofino.base.model.Column> columnsinFKList
-                = new ArrayList<com.manydesigns.portofino.base.model.Column>();
-            for (Reference ref : rel.getReferences()){
+                    = new ArrayList<com.manydesigns.portofino.base.model.Column>();
+            for (Reference ref : rel.getReferences()) {
                 columnsinFKList.add(ref.getFromColumn());
             }
             columnList.removeAll(columnsinFKList);
@@ -141,8 +137,8 @@ public class HibernateConfig {
     }
 
     protected void createColumn(RootClass clazz,
-                        Table tab,
-                        com.manydesigns.portofino.base.model.Column column) {
+                                Table tab,
+                                com.manydesigns.portofino.base.model.Column column) {
         Column col = new Column();
         col.setName(column.getColumnName());
         col.setSqlTypeCode(DbUtil.getSQLType(column.getColumnType()));
@@ -161,8 +157,8 @@ public class HibernateConfig {
     }
 
     protected void createPKColumn(String pkName, RootClass clazz,
-                        Table tab,
-                        List<com.manydesigns.portofino.base.model.Column> columnPKList) {
+                                  Table tab,
+                                  List<com.manydesigns.portofino.base.model.Column> columnPKList) {
         Component component = new Component(clazz);
         component.setDynamic(true);
         final PrimaryKey primaryKey = new PrimaryKey();
@@ -190,9 +186,9 @@ public class HibernateConfig {
     }
 
     protected void createFKReference(Configuration config, RootClass clazz,
-                        Table tab,
-                        Relationship relationship,
-                        List<com.manydesigns.portofino.base.model.Column> cols) {
+                                     Table tab,
+                                     Relationship relationship,
+                                     List<com.manydesigns.portofino.base.model.Column> cols) {
         Property prop = new Property();
         prop.setName(relationship.getName());
 
@@ -201,20 +197,16 @@ public class HibernateConfig {
         m2o.createForeignKey();
 
 
-        final HashMap<String, PersistentClass> persistentClasses = new HashMap<String, PersistentClass>();
+        final HashMap<String, PersistentClass> persistentClasses =
+                new HashMap<String, PersistentClass>();
         persistentClasses.put(relationship.getTable().getQualifiedName(),
                 config.getClassMapping(relationship.getTable().getQualifiedName()));
         m2o.setReferencedEntityName(relationship.getTable().getQualifiedName());
         m2o.createPropertyRefConstraints(persistentClasses);
-        for(com.manydesigns.portofino.base.model.Column column : cols){
-            Property colProp = new Property();
+        for (com.manydesigns.portofino.base.model.Column column : cols) {
             Column col = new Column();
             col.setName(column.getColumnName());
-         
-
-            //tab.addColumn(col);
             m2o.addColumn(col);
-
         }
         prop.setValue(m2o);
         clazz.addProperty(prop);

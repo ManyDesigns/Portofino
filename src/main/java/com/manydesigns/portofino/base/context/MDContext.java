@@ -192,8 +192,18 @@ public class MDContext {
         return null;
     }
 
-    public void saveObject(Map<String, Object> pk) {
-
+    public void saveObject(Map<String, Object> obj) {
+        Table table;
+        try {
+            table = findTableByQualifiedName((String) obj.get("$type$"));
+        } catch (ModelObjectNotFoundException e) {
+            throw new Error(e);
+        }
+        String databaseName = table.getDatabaseName();
+                Session session = threadSessions.get().get(databaseName);
+        session.beginTransaction();
+        session.save(obj);
+        session.getTransaction().commit();
     }
 
     public void deleteObject(Map<String, Object> pk) {
