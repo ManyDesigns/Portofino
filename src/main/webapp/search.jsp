@@ -15,7 +15,9 @@
     </thead>
     <s:iterator value="objects" var="object">
     <tr>
-        <s:url var="readUrl" namespace="/" action="%{table.qualifiedName}/Read?%{@com.manydesigns.portofino.methods.LinkHelper@getPk(table, #object)}"/>
+        <s:url var="readUrl" namespace="/" action="%{table.qualifiedName}/Read">
+            <s:param name="pk" value="@com.manydesigns.portofino.methods.LinkHelper@getPk(table, #object)"/>
+        </s:url>
         <s:iterator var="column" value="table.primaryKey.columns">
             <td><s:a href="%{readUrl}">
                 <s:property value="#object[#column.columnName]"/>

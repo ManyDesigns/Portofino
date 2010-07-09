@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -190,7 +190,7 @@ public class HibernateConfig {
                                      Relationship relationship,
                                      List<com.manydesigns.portofino.base.model.Column> cols) {
         Property prop = new Property();
-        prop.setName(relationship.getName());
+        prop.setName(relationship.getRelationshipName());
 
 
         ManyToOne m2o = new ManyToOne(tab);

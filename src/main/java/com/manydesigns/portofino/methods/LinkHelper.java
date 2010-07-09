@@ -45,7 +45,6 @@ public class LinkHelper {
 
     public static String getPk(Table table, Map<String, Object> object) {
         StringBuilder sb = new StringBuilder();
-        sb.append("pk=");
 
         boolean first = true;
         for (Column column : table.getPrimaryKey().getColumns()) {

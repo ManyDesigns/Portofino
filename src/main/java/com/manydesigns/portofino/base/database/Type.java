@@ -27,84 +27,99 @@
  *
  */
 
-package com.manydesigns.portofino.base.model;
-
-import java.util.List;
-import java.util.ArrayList;
+package com.manydesigns.portofino.base.database;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Relationship {
+public class Type {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //--------------------------------------------------------------------------
     // Fields
     //--------------------------------------------------------------------------
-    protected Table table;
-    protected String relationshipName;
-    protected String onUpdate;
-    protected String onDelete;
 
-    protected final List<Reference>references;
-
+    protected final String typeName;
+    protected final int dataType;
+    protected final int maximumPrecision;
+    protected final String literalPrefix;
+    protected final String literalSuffix;
+    protected final boolean nullable;
+    protected final boolean caseSensitive;
+    protected final boolean searchable;
+    protected final boolean autoincrement;
+    protected final short minimumScale;
+    protected final short maximumScale;
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
-    public Relationship(String relationshipName, String onUpdate, String onDelete) {
-        this.relationshipName = relationshipName;
-        this.onUpdate = onUpdate;
-        this.onDelete = onDelete;
-        references = new ArrayList<Reference>();
+    public Type(String typeName, int dataType, int maximumPrecision,
+                String literalPrefix, String literalSuffix,
+                boolean nullable, boolean caseSensitive, boolean searchable,
+                boolean autoincrement, short minimumScale, short maximumScale) {
+        this.typeName = typeName;
+        this.dataType = dataType;
+        this.maximumPrecision = maximumPrecision;
+        this.literalPrefix = literalPrefix;
+        this.literalSuffix = literalSuffix;
+        this.nullable = nullable;
+        this.caseSensitive = caseSensitive;
+        this.searchable = searchable;
+        this.autoincrement = autoincrement;
+        this.minimumScale = minimumScale;
+        this.maximumScale = maximumScale;
     }
-
-    public Relationship() {
-        references = new ArrayList<Reference>();
-    }
-
 
     //--------------------------------------------------------------------------
     // Getters/setter
     //--------------------------------------------------------------------------
 
-    public String getRelationshipName() {
-        return relationshipName;
+    public String getTypeName() {
+        return typeName;
     }
 
-    public void setRelationshipName(String relationshipName) {
-        this.relationshipName = relationshipName;
+    public int getDataType() {
+        return dataType;
     }
 
-    public String getOnUpdate() {
-        return onUpdate;
+    public int getMaximumPrecision() {
+        return maximumPrecision;
     }
 
-    public void setOnUpdate(String onUpdate) {
-        this.onUpdate = onUpdate;
+    public String getLiteralPrefix() {
+        return literalPrefix;
     }
 
-    public String getOnDelete() {
-        return onDelete;
+    public String getLiteralSuffix() {
+        return literalSuffix;
     }
 
-    public void setOnDelete(String onDelete) {
-        this.onDelete = onDelete;
+    public boolean isNullable() {
+        return nullable;
     }
 
-    public List<Reference> getReferences() {
-        return references;
+    public boolean isCaseSensitive() {
+        return caseSensitive;
     }
 
-    public Table getTable() {
-        return table;
+    public boolean isSearchable() {
+        return searchable;
     }
 
-    public void setTable(Table table) {
-        this.table = table;
+    public boolean isAutoincrement() {
+        return autoincrement;
+    }
+
+    public short getMinimumScale() {
+        return minimumScale;
+    }
+
+    public short getMaximumScale() {
+        return maximumScale;
     }
 }
