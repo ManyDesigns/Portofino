@@ -34,6 +34,7 @@ import com.manydesigns.portofino.base.model.*;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -148,6 +149,17 @@ public class MDContext {
         throw new ModelObjectNotFoundException(qualifiedColumnName);
     }
 
+    public Relationship findOneToManyRelationship(Table table,
+                                                  String relationshipName)
+            throws ModelObjectNotFoundException {
+        for (Relationship relationship : table.getOneToManyRelationships()) {
+            if (relationship.getRelationshipName().equals(relationshipName)) {
+                return relationship;
+            }
+        }
+        throw new ModelObjectNotFoundException(relationshipName);
+    }
+
     //--------------------------------------------------------------------------
     // Persistance
     //--------------------------------------------------------------------------
@@ -231,5 +243,32 @@ public class MDContext {
         }
 
         threadSessions.set(null);
+    }
+
+    public List<Map<String, Object>> getRelatedObjects(
+            Map<String, Object> obj, String oneToManyRelationshipName) {
+        String qualifiedTableName = (String)obj.get("$type$");
+        Table table;
+        Relationship relationship;
+        try {
+            table = findTableByQualifiedName(qualifiedTableName);
+            relationship =
+                    findOneToManyRelationship(table, oneToManyRelationshipName);
+        } catch (ModelObjectNotFoundException e) {
+            throw new Error(e);
+        }
+        Table fromTable =
+                relationship.getFromTable();
+        Session session =
+                threadSessions.get().get(fromTable.getDatabaseName());
+        Criteria criteria =
+                session.createCriteria(fromTable.getQualifiedName());
+        for (Reference reference : relationship.getReferences()) {
+            Column fromColumn = reference.getFromColumn();
+            Column toColumn = reference.getToColumn();
+            criteria.add(Restrictions.eq(fromColumn.getColumnName(),
+                    obj.get(toColumn.getColumnName())));
+        }
+        return (List<Map<String, Object>>)criteria.list();
     }
 }

@@ -50,7 +50,8 @@ public class Table {
     protected String schemaName;
     protected String tableName;
     protected final List<Column> columns;
-    protected final List<Relationship> relationships;
+    protected final List<Relationship> manyToOneRelationships;
+    protected final List<Relationship> oneToManyRelationships;
     protected PrimaryKey primaryKey;
 
 
@@ -59,8 +60,7 @@ public class Table {
     //--------------------------------------------------------------------------
 
     public Table() {
-        this.columns = new ArrayList<Column>();
-        this.relationships = new ArrayList<Relationship>();
+        this(null, null, null);
     }
 
     public Table(String databaseName, String schemaName, String tableName) {
@@ -68,7 +68,8 @@ public class Table {
         this.schemaName = schemaName;
         this.tableName = tableName;
         this.columns = new ArrayList<Column>();
-        this.relationships = new ArrayList<Relationship>();
+        this.manyToOneRelationships = new ArrayList<Relationship>();
+        this.oneToManyRelationships = new ArrayList<Relationship>();
      }
 
     //--------------------------------------------------------------------------
@@ -103,8 +104,12 @@ public class Table {
         return columns;
     }
 
-    public List<Relationship> getRelationships() {
-        return relationships;
+    public List<Relationship> getManyToOneRelationships() {
+        return manyToOneRelationships;
+    }
+
+    public List<Relationship> getOneToManyRelationships() {
+        return oneToManyRelationships;
     }
 
     public PrimaryKey getPrimaryKey() {

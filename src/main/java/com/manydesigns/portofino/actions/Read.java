@@ -32,12 +32,15 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.portofino.base.context.MDContext;
 import com.manydesigns.portofino.base.context.ModelObjectNotFoundException;
 import com.manydesigns.portofino.base.model.Column;
+import com.manydesigns.portofino.base.model.Relationship;
 import com.manydesigns.portofino.base.model.Table;
 import com.manydesigns.portofino.interceptors.MDContextAware;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -61,6 +64,7 @@ public class Read extends ActionSupport implements MDContextAware {
     public HashMap<String, Object> pkMap;
     public String pk;
     public Map<String, Object> object;
+    public List<RelatedObjects> relatedObjectsList;
 
 
     public String execute() throws ModelObjectNotFoundException {
@@ -78,6 +82,15 @@ public class Read extends ActionSupport implements MDContextAware {
 
         object = context.getObjectByPk(qualifiedTableName, pkMap);
 
+        relatedObjectsList = new ArrayList<RelatedObjects>();
+        for (Relationship relationship : table.getOneToManyRelationships()) {
+            List<Map<String, Object>> objs =
+                    context.getRelatedObjects(object,
+                            relationship.getRelationshipName());
+            RelatedObjects relatedObjects =
+                    new RelatedObjects(relationship, objs);
+            relatedObjectsList.add(relatedObjects);
+        }
 
         return SUCCESS;
     }

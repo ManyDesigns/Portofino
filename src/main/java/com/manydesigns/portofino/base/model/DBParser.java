@@ -29,12 +29,14 @@
 package com.manydesigns.portofino.base.model;
 
 import org.apache.commons.lang.StringUtils;
-import javax.xml.stream.*;
+
 import javax.xml.stream.XMLInputFactory;
-import java.io.*;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamReader;
+import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.text.MessageFormat;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -459,7 +461,6 @@ public class DBParser {
 
 
         Relationship rel = new Relationship();
-        table.getRelationships().add(rel);
         if (xmlStreamReader.hasNext()) {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
@@ -469,7 +470,7 @@ public class DBParser {
                 throw new Exception("Tag " + RELATIONSHIP + " missing");
             }
         }
-        String schemaName=null, tableName=null;
+        String toSchemaName=null, toTableName=null;
         for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
             String attName = xmlStreamReader.getAttributeLocalName(i);
             String attValue = xmlStreamReader.getAttributeValue(i);
@@ -479,11 +480,11 @@ public class DBParser {
                 continue;
             }
             if (attName.equals("toSchema")) {
-                schemaName = attValue;
+                toSchemaName = attValue;
                 continue;
             }
             if (attName.equals("toTable")) {
-                tableName = attValue;
+                toTableName = attValue;
                 continue;
             }
             if (attName.equals("onUpdate")) {
@@ -496,7 +497,16 @@ public class DBParser {
             }
 
         }
-        rel.setTable(getTable(dm, schemaName, tableName));
+
+        // from (many) side
+        rel.setFromTable(table);
+        table.getManyToOneRelationships().add(rel);
+
+        // to (one) side
+        Table toTable = getTable(dm, toSchemaName, toTableName);
+        rel.setToTable(toTable);
+        toTable.getOneToManyRelationships().add(rel);
+
         if (xmlStreamReader.hasNext()) {
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
@@ -517,7 +527,7 @@ public class DBParser {
                 }
 
                 Reference ref = new Reference(getColumn(table, fromCol),
-                        getColumn(rel.getTable(), toCol));
+                        getColumn(rel.getToTable(), toCol));
                 rel.getReferences().add(ref);
                 if (xmlStreamReader.hasNext()) {
                     event = next(xmlStreamReader);

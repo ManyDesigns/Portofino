@@ -29,8 +29,8 @@
 
 package com.manydesigns.portofino.base.model;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -44,7 +44,8 @@ public class Relationship {
     //--------------------------------------------------------------------------
     // Fields
     //--------------------------------------------------------------------------
-    protected Table table;
+    protected Table fromTable;
+    protected Table toTable;
     protected String relationshipName;
     protected String onUpdate;
     protected String onDelete;
@@ -64,7 +65,7 @@ public class Relationship {
     }
 
     public Relationship() {
-        references = new ArrayList<Reference>();
+        this(null, null, null);
     }
 
 
@@ -100,11 +101,19 @@ public class Relationship {
         return references;
     }
 
-    public Table getTable() {
-        return table;
+    public Table getToTable() {
+        return toTable;
     }
 
-    public void setTable(Table table) {
-        this.table = table;
+    public void setToTable(Table toTable) {
+        this.toTable = toTable;
+    }
+
+    public Table getFromTable() {
+        return fromTable;
+    }
+
+    public void setFromTable(Table fromTable) {
+        this.fromTable = fromTable;
     }
 }
