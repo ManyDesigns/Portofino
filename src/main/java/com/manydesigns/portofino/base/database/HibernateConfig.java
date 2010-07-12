@@ -36,6 +36,8 @@ import org.hibernate.mapping.*;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PrimaryKey;
 import org.hibernate.mapping.Table;
+import org.hibernate.mapping.Set;
+import org.hibernate.mapping.Collection;
 
 import java.util.*;
 import java.util.List;
@@ -78,6 +80,15 @@ public class HibernateConfig {
                         result.createMappings().addClass(clazz);
                     }
                 }
+
+               /* for (Schema schema : database.getSchemas()) {
+                    for (com.manydesigns.portofino.base.model.Table aTable :
+                            schema.getTables()) {
+                        for (Relationship rel: aTable.getRelationships()) {
+                            createO2M(result, aTable, rel);
+                        }
+                    }
+                }  */
                 sessionFactories.put(database.getDatabaseName(),
                         result.buildSessionFactory());
             }
@@ -113,7 +124,7 @@ public class HibernateConfig {
         createPKColumn(aTable.getPrimaryKey().getName(), clazz, tab,
                 columnPKList);
 
-        //Foreign keys
+        //Foreign keys RIMOSSO
         for (Relationship rel : aTable.getRelationships()) {
             List<com.manydesigns.portofino.base.model.Column> columnsinFKList
                     = new ArrayList<com.manydesigns.portofino.base.model.Column>();
@@ -189,14 +200,9 @@ public class HibernateConfig {
                                      Table tab,
                                      Relationship relationship,
                                      List<com.manydesigns.portofino.base.model.Column> cols) {
-        Property prop = new Property();
-        prop.setName(relationship.getName());
-
 
         ManyToOne m2o = new ManyToOne(tab);
         m2o.createForeignKey();
-
-
         final HashMap<String, PersistentClass> persistentClasses =
                 new HashMap<String, PersistentClass>();
         persistentClasses.put(relationship.getTable().getQualifiedName(),
@@ -208,12 +214,44 @@ public class HibernateConfig {
             col.setName(column.getColumnName());
             m2o.addColumn(col);
         }
+
+        Property prop = new Property();
+        prop.setName(relationship.getName());
         prop.setValue(m2o);
         clazz.addProperty(prop);
+        /* Cambia punto di vista    */
+        PersistentClass clazzOne = config.getClassMapping(relationship.getTable()
+                .getQualifiedName());
+        Set set = new Set(clazzOne);
+        //set.setRole(clazz.getEntityName()+"."+relationship.getName());
+        set.setRole(null);
+        
+        set.setCollectionTable(clazzOne.getTable());
+        set.setKey(m2o);
+        Property propO2M = new Property();
+        propO2M.setName(relationship.getName());
+        propO2M.setValue(set);
+        clazzOne.addProperty(propO2M);
+
     }
 
-    public Map<String, SessionFactory> build(DataModel model) {
+    protected void createO2M(
+            Configuration config, com.manydesigns.portofino.base.model.Table table,
+            Relationship relationship) {
+        PersistentClass clazzOne = config.getClassMapping(table.getQualifiedName());
+        PersistentClass clazzMany = config.getClassMapping(relationship.getTable()
+                .getQualifiedName());
+        Set set = new Set(clazzMany);
+        //set.setTypeName(relationship.getTable().getQualifiedName());
+        set.setCollectionTable(clazzMany.getTable());
+        Property prop = new Property();
+        prop.setName(relationship.getName());
+        prop.setValue(set);
+        clazzOne.addProperty(prop);
+   }
+
+   public Map<String, SessionFactory> build(DataModel model) {
         buildSessionFactory(model);
         return sessionFactories;
-    }
+   }
 }

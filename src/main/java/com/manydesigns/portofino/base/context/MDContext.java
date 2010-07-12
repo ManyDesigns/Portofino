@@ -202,7 +202,7 @@ public class MDContext {
         String databaseName = table.getDatabaseName();
                 Session session = threadSessions.get().get(databaseName);
         session.beginTransaction();
-        session.save(obj);
+//        session.save(obj);
         session.getTransaction().commit();
     }
 
