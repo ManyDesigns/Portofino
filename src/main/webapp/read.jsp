@@ -19,4 +19,8 @@
 
 </table>
 
+<s:iterator var="rel" value="table.relationships">
+    <h2><s:property value="#rel.relationshipName"/></h2>
+</s:iterator>
+
 <s:include value="/footer.jsp"/>

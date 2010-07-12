@@ -71,4 +71,8 @@ public interface DatabaseAbstraction {
 
     public Connection getConnection(String host, int port, String dbName,
             String login, String password)  throws SQLException;
+
+    public Type[] getTypes();
+
+    public Type getTypeByName(String typeName);
 }

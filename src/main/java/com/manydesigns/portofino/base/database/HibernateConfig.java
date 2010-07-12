@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -201,6 +201,7 @@ public class HibernateConfig {
                                      Relationship relationship,
                                      List<com.manydesigns.portofino.base.model.Column> cols) {
 
+
         ManyToOne m2o = new ManyToOne(tab);
         m2o.createForeignKey();
         final HashMap<String, PersistentClass> persistentClasses =
@@ -216,7 +217,7 @@ public class HibernateConfig {
         }
 
         Property prop = new Property();
-        prop.setName(relationship.getName());
+        prop.setName(relationship.getRelationshipName());
         prop.setValue(m2o);
         clazz.addProperty(prop);
         /* Cambia punto di vista    */
@@ -229,7 +230,7 @@ public class HibernateConfig {
         set.setCollectionTable(clazzOne.getTable());
         set.setKey(m2o);
         Property propO2M = new Property();
-        propO2M.setName(relationship.getName());
+        propO2M.setName(relationship.getRelationshipName());
         propO2M.setValue(set);
         clazzOne.addProperty(propO2M);
 
@@ -245,7 +246,7 @@ public class HibernateConfig {
         //set.setTypeName(relationship.getTable().getQualifiedName());
         set.setCollectionTable(clazzMany.getTable());
         Property prop = new Property();
-        prop.setName(relationship.getName());
+        prop.setName(relationship.getRelationshipName());
         prop.setValue(set);
         clazzOne.addProperty(prop);
    }

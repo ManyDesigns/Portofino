@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -475,7 +475,7 @@ public class DBParser {
             String attValue = xmlStreamReader.getAttributeValue(i);
 
             if (attName.equals("name")) {
-                rel.setName(attValue);
+                rel.setRelationshipName(attValue);
                 continue;
             }
             if (attName.equals("toSchema")) {

@@ -32,7 +32,10 @@ package com.manydesigns.portofino.base.database;
 import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.text.MessageFormat;
+import java.util.List;
+import java.util.ArrayList;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -46,8 +49,6 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
     //--------------------------------------------------------------------------
     // Fields
     //--------------------------------------------------------------------------
-
-    private final ConnectionProvider connectionProvider;
 
     private final String databaseProductName;
     private final String databaseProductVersion;
@@ -65,6 +66,7 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
     private final Integer JDBCMinorVersion;
     private final String JDBCMajorMinorVersion;
 
+    private final Type[] types;
 
     //--------------------------------------------------------------------------
     // Constructors
@@ -72,9 +74,8 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
 
     public CommonDatabaseAbstraction(ConnectionProvider connectionProvider)
             throws SQLException {
-        this.connectionProvider = connectionProvider;
-
         Connection conn = null;
+        ResultSet typeRs = null;
         try {
             conn = connectionProvider.getConnection();
 
@@ -119,14 +120,37 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
             this.JDBCMajorVersion = tmpMajorVersion;
             this.JDBCMinorVersion = tmpMinorVersion;
             this.JDBCMajorMinorVersion = tmpMajorMinorVersion;
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception e) {
-                    /*IGNORE*/
-                }
+
+            // extract supported types
+            List<Type> typeList = new ArrayList<Type>();
+            typeRs = metadata.getTypeInfo();
+            while (typeRs.next()) {
+                String typeName = typeRs.getString("TYPE_NAME");
+                int dataType = typeRs.getInt("DATA_TYPE");
+                int maximumPrecision = typeRs.getInt("PRECISION");
+                String literalPrefix = typeRs.getString("LITERAL_PREFIX");
+                String literalSuffix = typeRs.getString("LITERAL_SUFFIX");
+                boolean nullable =
+                        (typeRs.getShort("NULLABLE") ==
+                                DatabaseMetaData.typeNullable);
+                boolean caseSensitive = typeRs.getBoolean("CASE_SENSITIVE");
+                boolean searchable =
+                        (typeRs.getShort("SEARCHABLE") ==
+                                DatabaseMetaData.typeSearchable);
+                boolean autoincrement = typeRs.getBoolean("AUTO_INCREMENT");
+                short minimumScale = typeRs.getShort("MINIMUM_SCALE");
+                short maximumScale = typeRs.getShort("MAXIMUM_SCALE");
+
+                Type type = new Type(typeName, dataType, maximumPrecision,
+                        literalPrefix, literalSuffix, nullable, caseSensitive,
+                        searchable, autoincrement, minimumScale, maximumScale);
+                typeList.add(type);
             }
+            types = new Type[typeList.size()];
+            typeList.toArray(types);
+        } finally {
+            DbUtil.closeResultSetAndStatement(typeRs);
+            DbUtil.closeConnection(conn);
         }
     }
 
@@ -184,5 +208,18 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
 
     public String getJDBCMajorMinorVersion() {
         return JDBCMajorMinorVersion;
+    }
+
+    public Type[] getTypes() {
+        return types.clone();
+    }
+
+    public Type getTypeByName(String typeName) {
+        for (Type current : types) {
+            if (current.getTypeName().equals(typeName)) {
+                return current;
+            }
+        }
+        throw new Error(typeName);
     }
 }
