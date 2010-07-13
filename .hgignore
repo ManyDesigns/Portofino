@@ -1,6 +1,14 @@
 ^profiles.xml
 ^target
+^portofino-war/target
+^elements/target
+^elements-struts2/target
+^elements-extras/target
 ^out/
+^portofino-war/derby.log
+portofino-test/WEB-INF
+portofino-test/nb-configuration.xml
+portofino-test/nbactions.xml
 syntax: glob
 *.DS_Store
 *.iml
