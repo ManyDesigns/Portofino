@@ -29,11 +29,17 @@
 
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.composites.ClassTableFormBuilder;
+import com.manydesigns.elements.composites.TableForm;
+import com.manydesigns.elements.forms.ClassFormBuilder;
+import com.manydesigns.elements.forms.Form;
 import com.manydesigns.portofino.base.context.MDContext;
 import com.manydesigns.portofino.base.context.ModelObjectNotFoundException;
 import com.manydesigns.portofino.base.model.Column;
 import com.manydesigns.portofino.base.model.Relationship;
 import com.manydesigns.portofino.base.model.Table;
+import com.manydesigns.portofino.base.reflection.TableAccessor;
 import com.manydesigns.portofino.interceptors.MDContextAware;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang.StringUtils;
@@ -60,11 +66,13 @@ public class Read extends ActionSupport implements MDContextAware {
 
 
     public String qualifiedTableName;
+    public String pk;
     public Table table;
     public HashMap<String, Object> pkMap;
-    public String pk;
+
     public Map<String, Object> object;
-    public List<RelatedObjects> relatedObjectsList;
+    public Form form;
+    public List<RelatedTableForm> relatedTableFormList;
 
 
     public String execute() throws ModelObjectNotFoundException {
@@ -81,18 +89,36 @@ public class Read extends ActionSupport implements MDContextAware {
         }
 
         object = context.getObjectByPk(qualifiedTableName, pkMap);
+        ClassFormBuilder formBuilder =
+                new ClassFormBuilder(new TableAccessor(table));
+        form = formBuilder.build();
+        form.setMode(Mode.VIEW);
+        form.readFromObject(object);
 
-        relatedObjectsList = new ArrayList<RelatedObjects>();
+        relatedTableFormList = new ArrayList<RelatedTableForm>();
         for (Relationship relationship : table.getOneToManyRelationships()) {
-            List<Map<String, Object>> objs =
-                    context.getRelatedObjects(object,
-                            relationship.getRelationshipName());
-            RelatedObjects relatedObjects =
-                    new RelatedObjects(relationship, objs);
-            relatedObjectsList.add(relatedObjects);
+            setupRelatedTableForm(relationship);
         }
 
         return SUCCESS;
+    }
+
+    public void setupRelatedTableForm(Relationship relationship) {
+        List<Map<String, Object>> relatedObjects =
+                context.getRelatedObjects(object,
+                        relationship.getRelationshipName());
+
+        Table relatedTable = relationship.getFromTable();
+        ClassTableFormBuilder tableFormBuilder =
+                new ClassTableFormBuilder(new TableAccessor(relatedTable));
+        tableFormBuilder.configNRows(relatedObjects.size());
+        TableForm tableForm = tableFormBuilder.build();
+        tableForm.setMode(Mode.VIEW);
+        tableForm.readFromObject(relatedObjects);
+
+        RelatedTableForm relatedTableForm =
+                new RelatedTableForm(relationship, tableForm, relatedObjects);
+        relatedTableFormList.add(relatedTableForm);
     }
 
 }

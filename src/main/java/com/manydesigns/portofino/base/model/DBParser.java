@@ -58,6 +58,11 @@ public class DBParser {
     private static final String RELATIONSHIPS = "relationships";
     private static final String REFERENCE = "reference";
 
+    protected ClassLoader classLoader;
+
+    public DBParser() {
+        classLoader = this.getClass().getClassLoader();
+    }
 
     public DataModel parse(String fileName) throws Exception {
         DataModel dataModel = new DataModel();
@@ -356,6 +361,12 @@ public class DBParser {
                     }
                     if (attName.equals(COLUMN + "Type")) {
                         col.setColumnType(attValue);
+                        expectedValList.remove(attName);
+                        continue;
+                    }
+                    if (attName.equals("javaType")) {
+                        Class javaTypeClass = classLoader.loadClass(attValue);
+                        col.setJavaType(javaTypeClass);
                         expectedValList.remove(attName);
                         continue;
                     }

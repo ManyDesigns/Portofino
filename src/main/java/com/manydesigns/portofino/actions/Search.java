@@ -29,9 +29,13 @@
 
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.composites.ClassTableFormBuilder;
+import com.manydesigns.elements.composites.TableForm;
 import com.manydesigns.portofino.base.context.MDContext;
 import com.manydesigns.portofino.base.context.ModelObjectNotFoundException;
 import com.manydesigns.portofino.base.model.Table;
+import com.manydesigns.portofino.base.reflection.TableAccessor;
 import com.manydesigns.portofino.interceptors.MDContextAware;
 import com.opensymphony.xwork2.ActionSupport;
 
@@ -57,10 +61,18 @@ public class Search extends ActionSupport implements MDContextAware {
     public String qualifiedTableName;
     public Table table;
     public List<Map<String, Object>> objects;
+    public TableForm tableForm;
 
     public String execute() throws ModelObjectNotFoundException {
         table = context.findTableByQualifiedName(qualifiedTableName);
         objects = context.getAllObjects(qualifiedTableName);
+
+        ClassTableFormBuilder tableFormBuilder =
+                new ClassTableFormBuilder(new TableAccessor(table));
+        tableFormBuilder.configNRows(objects.size());
+        tableForm = tableFormBuilder.build();
+        tableForm.setMode(Mode.VIEW);
+        tableForm.readFromObject(objects);
 
         return SUCCESS;
     }

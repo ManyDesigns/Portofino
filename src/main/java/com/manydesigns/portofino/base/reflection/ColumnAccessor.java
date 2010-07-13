@@ -32,8 +32,8 @@ package com.manydesigns.portofino.base.reflection;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.base.model.Column;
 
-import java.lang.reflect.Modifier;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 
 /*
@@ -76,6 +76,6 @@ public class ColumnAccessor implements PropertyAccessor {
     }
 
     public boolean isAssignableTo(Class clazz) {
-        return false;
+        return clazz.isAssignableFrom(column.getJavaType());
     }
 }

@@ -14,14 +14,17 @@
                         <columns>
                             <column name="catid"
                                     columnType="VARCHAR"
+                                    javaType="java.lang.String"
                                     length="10"
                                     nullable="false"/>
                             <column name="name"
                                     columnType="VARCHAR"
+                                    javaType="java.lang.String"
                                     length="80"
                                     nullable="true"/>
                             <column name="descn"
                                     columnType="VARCHAR"
+                                    javaType="java.lang.String"
                                     length="255"
                                     nullable="true"/>
                         </columns>
@@ -33,18 +36,22 @@
                         <columns>
                             <column name="productid"
                                     columnType="VARCHAR"
+                                    javaType="java.lang.String"
                                     length="10"
                                     nullable="false"/>
                             <column name="category"
                                     columnType="VARCHAR"
+                                    javaType="java.lang.String"
                                     length="10"
                                     nullable="false"/>
                             <column name="name"
                                     columnType="VARCHAR"
+                                    javaType="java.lang.String"
                                     length="80"
                                     nullable="true"/>
                             <column name="descn"
                                     columnType="VARCHAR"
+                                    javaType="java.lang.String"
                                     length="255"
                                     nullable="true"/>
                         </columns>
