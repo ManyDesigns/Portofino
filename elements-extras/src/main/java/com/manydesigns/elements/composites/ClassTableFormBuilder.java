@@ -32,6 +32,7 @@ package com.manydesigns.elements.composites;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Field;
 import com.manydesigns.elements.FieldHelper;
+import com.manydesigns.elements.hyperlinks.HyperlinkGenerator;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -40,6 +41,8 @@ import org.apache.commons.lang.StringUtils;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -55,6 +58,7 @@ public class ClassTableFormBuilder {
     private final ClassAccessor classAccessor;
 
     protected List<PropertyAccessor> propertyAccessors;
+    protected Map<String, HyperlinkGenerator> hyperlinkGenerators;
     protected String prefix;
     protected int nRows = DEFAULT_N_ROWS;
 
@@ -64,6 +68,7 @@ public class ClassTableFormBuilder {
 
     public ClassTableFormBuilder(ClassAccessor classAccessor) {
         this.classAccessor = classAccessor;
+        hyperlinkGenerators = new HashMap<String, HyperlinkGenerator>();
     }
 
     public ClassTableFormBuilder configFields(String... fieldNames) {
@@ -109,6 +114,12 @@ public class ClassTableFormBuilder {
         }
     }
 
+    public ClassTableFormBuilder configHyperlinkGenerator(
+            String fieldName, HyperlinkGenerator hyperlinkGenerator) {
+        hyperlinkGenerators.put(fieldName, hyperlinkGenerator);
+        return this;
+    }
+
     public TableForm build() {
         TableForm tableForm = new TableForm(nRows);
         FieldHelper fieldHelper = ElementsThreadLocals.getFieldHelper();
@@ -128,6 +139,9 @@ public class ClassTableFormBuilder {
                     new TableFormColumn(propertyAccessor, nRows);
             tableForm.add(column);
 
+            HyperlinkGenerator hyperlinkGenerator =
+                    hyperlinkGenerators.get(propertyAccessor.getName());
+
             for (int i = 0; i < nRows; i++) {
                 Field field = fieldHelper.tryToInstantiate(
                         classAccessor, propertyAccessor, rowPrefix[i]);
@@ -137,6 +151,8 @@ public class ClassTableFormBuilder {
                             propertyAccessor.getName());
                 }
                 column.add(field);
+
+                field.setHyperlinkGenerator(hyperlinkGenerator);
             }
         }
 

@@ -31,6 +31,7 @@ package com.manydesigns.elements.hyperlinks;
 
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.Util;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -106,7 +107,9 @@ public class ExpressionHyperlinkGenerator implements HyperlinkGenerator {
     }
 
     public String generateHref(Object obj) {
-        return runExpression(obj, hrefPropertyAccessors, parsedHrefExpression);
+        return Util.getAbsoluteLink(
+                runExpression(obj,
+                        hrefPropertyAccessors, parsedHrefExpression));
     }
 
     public String generateAlt(Object obj) {

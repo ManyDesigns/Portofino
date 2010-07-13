@@ -36,6 +36,7 @@ import com.manydesigns.elements.composites.TableForm;
 import com.manydesigns.portofino.base.context.MDContext;
 import com.manydesigns.portofino.base.context.ModelObjectNotFoundException;
 import com.manydesigns.portofino.base.model.Table;
+import com.manydesigns.portofino.base.model.Column;
 import com.manydesigns.portofino.base.reflection.TableAccessor;
 import com.manydesigns.portofino.interceptors.MDContextAware;
 import com.opensymphony.xwork2.ActionSupport;
@@ -69,16 +70,45 @@ public class Search extends ActionSupport implements MDContextAware {
         objects = context.getAllObjects(qualifiedTableName);
 
         TableAccessor accessor = new TableAccessor(table);
+
+        String readLinkExpression = getReadLinkExpression();
         ExpressionHyperlinkGenerator generator =
-                new ExpressionHyperlinkGenerator(accessor, "dummy-href", "dummy-alt");
+                new ExpressionHyperlinkGenerator(
+                        accessor, readLinkExpression, "dummy-alt");
+
         ClassTableFormBuilder tableFormBuilder =
                 new ClassTableFormBuilder(accessor)
                         .configNRows(objects.size());
+
+        // ogni colonna chiave primaria sarà clickabile
+        for (Column column : table.getPrimaryKey().getColumns()) {
+            tableFormBuilder.configHyperlinkGenerator(
+                    column.getColumnName(), generator);
+        }
+
         tableForm = tableFormBuilder.build();
         tableForm.setMode(Mode.VIEW);
         tableForm.readFromObject(objects);
 
         return SUCCESS;
+    }
+
+    private String getReadLinkExpression() {
+        StringBuilder sb = new StringBuilder("/");
+        sb.append(table.getQualifiedName());
+        sb.append("/Read.action?pk=");
+        boolean first = true;
+        for (Column column : table.getPrimaryKey().getColumns()) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(",");
+            }
+            sb.append("{");
+            sb.append(column.getColumnName());
+            sb.append("}");
+        }
+        return sb.toString();
     }
 
 }
