@@ -60,7 +60,7 @@ public class HibernateTest extends TestCase {
                 context.getAllObjects("jpetstore.public.category");
 
         int sizeCat = resultCat.size();
-        assertEquals("categorie", sizeCat, 5);
+        assertEquals("categorie", sizeCat, 6);
 
 
         Map categoria0 = resultCat.get(0);
@@ -89,9 +89,24 @@ public class HibernateTest extends TestCase {
         context.openSession();
         Map<String, Object> worms = new HashMap<String, Object>();
         worms.put("$type$", "jpetstore.public.category");
+        worms.put("catid", "VERMI");
         worms.put("name", "worms");
-        worms.put("descn", "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\"> Worms</font>");
-        context.saveObject(worms);
+        worms.put("descn",
+          "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
+                  "Worms</font>");
+        context.saveOrUpdateObject(worms);
+    }
+
+    public void testDeleteCategoria() {
+        context.openSession();
+        Map<String, Object> worms = new HashMap<String, Object>();
+        worms.put("$type$", "jpetstore.public.category");
+        worms.put("catid", "VERMI");
+        worms.put("name", "worms");
+        worms.put("descn",
+          "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
+                  "Worms</font>");
+        context.deleteObject(worms);
     }
 }
 

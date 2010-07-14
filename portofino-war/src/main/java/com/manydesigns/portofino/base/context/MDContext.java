@@ -204,6 +204,20 @@ public class MDContext {
         return null;
     }
 
+    public void saveOrUpdateObject(Map<String, Object> obj) {
+        Table table;
+        try {
+            table = findTableByQualifiedName((String) obj.get("$type$"));
+        } catch (ModelObjectNotFoundException e) {
+            throw new Error(e);
+        }
+        String databaseName = table.getDatabaseName();
+                Session session = threadSessions.get().get(databaseName);
+        session.beginTransaction();
+        session.saveOrUpdate((String) obj.get("$type$"), obj);
+        session.getTransaction().commit();
+    }
+
     public void saveObject(Map<String, Object> obj) {
         Table table;
         try {
@@ -214,11 +228,36 @@ public class MDContext {
         String databaseName = table.getDatabaseName();
                 Session session = threadSessions.get().get(databaseName);
         session.beginTransaction();
-//        session.save(obj);
+        session.save((String) obj.get("$type$"), obj);
         session.getTransaction().commit();
     }
 
-    public void deleteObject(Map<String, Object> pk) {
+    public void updateObject(Map<String, Object> obj) {
+        Table table;
+        try {
+            table = findTableByQualifiedName((String) obj.get("$type$"));
+        } catch (ModelObjectNotFoundException e) {
+            throw new Error(e);
+        }
+        String databaseName = table.getDatabaseName();
+                Session session = threadSessions.get().get(databaseName);
+        session.beginTransaction();
+        session.update((String) obj.get("$type$"), obj);
+        session.getTransaction().commit();
+    }
+
+    public void deleteObject(Map<String, Object> obj) {
+        Table table;
+        try {
+            table = findTableByQualifiedName((String) obj.get("$type$"));
+        } catch (ModelObjectNotFoundException e) {
+            throw new Error(e);
+        }
+        String databaseName = table.getDatabaseName();
+                Session session = threadSessions.get().get(databaseName);
+        session.beginTransaction();
+        session.delete((String) obj.get("$type$"), obj);
+        session.getTransaction().commit();
 
     }
 
@@ -247,6 +286,10 @@ public class MDContext {
 
     public List<Map<String, Object>> getRelatedObjects(
             Map<String, Object> obj, String oneToManyRelationshipName) {
+        if (obj.get(oneToManyRelationshipName) instanceof List){
+            return (List<Map<String, Object>>)
+                    obj.get(oneToManyRelationshipName);
+        }
         String qualifiedTableName = (String)obj.get("$type$");
         Table table;
         Relationship relationship;
