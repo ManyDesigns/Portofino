@@ -18,3 +18,41 @@ div#sidebar {
 div#sidebar div {
     padding: .5em;
 }
+
+div.buttons-bar {
+    background-color: #ee7;
+    border: 1px dashed gray;
+    margin: 2px 0;
+    padding: 4px;
+}
+
+ul.errorMessages {
+    border: 1px dotted #c00;
+    padding: 10px 3px;
+    margin: 0 0 10px 0;
+    background-color: #fff8f0;
+    font-weight: normal;
+    font-style: italic;
+    list-style-type: none;
+}
+
+ul.warningMessages {
+    border: 1px dotted #880;
+    padding: 10px 3px;
+    margin: 0 0 10px 0;
+    background-color: #fffff0;
+    font-weight: normal;
+    font-style: italic;
+    list-style-type: none;
+}
+
+ul.infoMessages {
+    border: 1px dotted #0a0;
+    padding: 10px 3px;
+    margin: 0 0 10px 0;
+    background-color: #f0fff0;
+    font-weight: normal;
+    font-style: italic;
+    list-style-type: none;
+}
+

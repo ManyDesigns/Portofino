@@ -42,13 +42,27 @@
         <action name="Homepage" class="com.manydesigns.portofino.actions.Homepage">
             <result name="success">/homepage.jsp</result>
         </action>
-        <action name="*/Search" class="com.manydesigns.portofino.actions.Search">
+        <action name="*/Table" class="com.manydesigns.portofino.actions.TableAction">
             <param name="qualifiedTableName">{1}</param>
-            <result name="success">/search.jsp</result>
+            <result name="search">/search.jsp</result>
         </action>
-        <action name="*/Read" class="com.manydesigns.portofino.actions.Read">
+        <action name="*/*/Table" class="com.manydesigns.portofino.actions.TableAction">
             <param name="qualifiedTableName">{1}</param>
-            <result name="success">/read.jsp</result>
+            <param name="pk">{2}</param>
+            <result name="read">/read.jsp</result>
+            <result name="edit">/edit.jsp</result>
+            <result name="update" type="redirectAction">
+                <param name="actionName">%{qualifiedTableName}/%{pk}/Table</param>
+                <param name="namespace">/</param>
+            </result>
+            <result name="cancel" type="redirectAction">
+                <param name="actionName">%{qualifiedTableName}/%{pk}/Table</param>
+                <param name="namespace">/</param>
+            </result>
+            <result name="delete" type="redirectAction">
+                <param name="actionName">%{qualifiedTableName}/Table</param>
+                <param name="namespace">/</param>
+            </result>
         </action>
     </package>
 

@@ -8,7 +8,7 @@
                 <h2>Tables:</h2>
                 <ul>
                     <s:iterator value="context.allTables">
-                        <li><a href="<s:url namespace="/" action="%{qualifiedName}/Search"></s:url>"><s:property value="qualifiedName"/></a></li>
+                        <li><a href="<s:url namespace="/" action="%{qualifiedName}/Table"></s:url>"><s:property value="qualifiedName"/></a></li>
                     </s:iterator>
                 </ul>
                 <hr/>

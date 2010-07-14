@@ -26,3 +26,4 @@
     <div id="bd">
         <div id="yui-main">
             <div class="yui-b">
+                <mdes:sessionMessages/>
