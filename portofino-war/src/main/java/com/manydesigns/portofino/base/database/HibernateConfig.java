@@ -32,13 +32,14 @@ package com.manydesigns.portofino.base.database;
 import com.manydesigns.portofino.base.model.*;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Mappings;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.*;
 import org.hibernate.mapping.PrimaryKey;
 import org.hibernate.mapping.Table;
+import org.hibernate.mapping.Set;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 import java.util.Map;
 
@@ -55,11 +56,11 @@ public class HibernateConfig {
     protected void buildSessionFactory(DataModel model) {
         try {
             for (Database database : model.getDatabases()) {
-                Configuration result = new Configuration()
+                Configuration configuration = new Configuration()
                         .setProperty("default_entity_mode", "dynamic-map");
 
                 Connection connection = database.getConnection();
-                result.setProperty("hibernate.connection.url",
+                configuration.setProperty("hibernate.connection.url",
                         connection.getConnectionUrl())
                         .setProperty("hibernate.connection.driver_class",
                                 connection.getDriverClass())
@@ -71,25 +72,26 @@ public class HibernateConfig {
                                 "org.hibernate.context.ThreadLocalSessionContext")
                         .setProperty("hibernate.show_sql", "true");
 
-
+                Mappings mappings = configuration.createMappings();
                 for (Schema schema : database.getSchemas()) {
                     for (com.manydesigns.portofino.base.model.Table aTable :
                             schema.getTables()) {
-                        RootClass clazz = createTableMapping(result, aTable);
-                        result.createMappings().addClass(clazz);
+                        RootClass clazz = createTableMapping(configuration, aTable);
+                        mappings.addClass(clazz);
+
                     }
                 }
 
-               /* for (Schema schema : database.getSchemas()) {
+               for (Schema schema : database.getSchemas()) {
                     for (com.manydesigns.portofino.base.model.Table aTable :
                             schema.getTables()) {
-                        for (Relationship rel: aTable.getRelationships()) {
-                            createO2M(result, aTable, rel);
+                        for (Relationship rel: aTable.getOneToManyRelationships()) {
+                            createO2M(configuration, mappings, rel);
                         }
                     }
-                }  */
+                }
                 sessionFactories.put(database.getDatabaseName(),
-                        result.buildSessionFactory());
+                        configuration.buildSessionFactory());
             }
         }
         catch (Throwable ex) {
@@ -120,23 +122,10 @@ public class HibernateConfig {
         List<com.manydesigns.portofino.base.model.Column> columnPKList
                 = aTable.getPrimaryKey().getColumns();
 
-        createPKColumn(aTable.getPrimaryKey().getName(), clazz, tab,
+        createPKColumn(aTable, aTable.getPrimaryKey().getName(), clazz, tab,
                 columnPKList);
         //Other columns
         columnList.removeAll(columnPKList);
-
-
-        /*Foreign keys RIMOSSO
-        for (Relationship rel : aTable.getManyToOneRelationships()) {
-            List<com.manydesigns.portofino.base.model.Column> columnsinFKList
-                    = new ArrayList<com.manydesigns.portofino.base.model.Column>();
-            for (Reference ref : rel.getReferences()) {
-                columnsinFKList.add(ref.getFromColumn());
-            }
-            columnList.removeAll(columnsinFKList);
-            createFKReference(conf, clazz, tab, rel, columnsinFKList);
-        }*/
-
 
         for (com.manydesigns.portofino.base.model.Column column
                 : columnList) {
@@ -166,11 +155,18 @@ public class HibernateConfig {
         clazz.addProperty(prop);
     }
 
-    protected void createPKColumn(String pkName, RootClass clazz,
+    protected void createPKColumn(com.manydesigns.portofino.base.model.Table mdTable,
+                                  String pkName, RootClass clazz,
                                   Table tab,
                                   List<com.manydesigns.portofino.base.model.Column> columnPKList) {
+        clazz.setEmbeddedIdentifier(true);
         Component component = new Component(clazz);
         component.setDynamic(true);
+        component.setRoleName(mdTable.getQualifiedName()+".id");
+        component.setEmbedded(true);
+        component.setNodeName(mdTable.getTableName());
+        component.setKey(true);
+        component.setNullValue("undefined");
         final PrimaryKey primaryKey = new PrimaryKey();
         primaryKey.setName(pkName);
         tab.setPrimaryKey(primaryKey);
@@ -188,6 +184,7 @@ public class HibernateConfig {
             tab.getPrimaryKey().addColumn(col);
             tab.addColumn(col);
             prop.setValue(value);
+            prop.setNodeName(column.getColumnName());
             clazz.addProperty(prop);
             component.addProperty(prop);
         }
@@ -219,31 +216,60 @@ public class HibernateConfig {
         prop.setName(relationship.getRelationshipName());
         prop.setValue(m2o);
         clazz.addProperty(prop);
-        /* Cambia punto di vista
-        PersistentClass clazzOne = config.getClassMapping(relationship.getTable()
-                .getQualifiedName());
-        Set set = new Set(clazzOne);
-        //set.setRole(clazz.getEntityName()+"."+relationship.getName());
-        set.setRole(null);
-        
-        set.setCollectionTable(clazzOne.getTable());
-        set.setKey(m2o);
-        Property propO2M = new Property();
-        propO2M.setName(relationship.getRelationshipName());
-        propO2M.setValue(set);
-        clazzOne.addProperty(propO2M);*/
 
     }
 
     protected void createO2M(
-            Configuration config, com.manydesigns.portofino.base.model.Table table,
+            Configuration config,
+            Mappings mappings,
             Relationship relationship) {
-        PersistentClass clazzOne = config.getClassMapping(table.getQualifiedName());
-        PersistentClass clazzMany = config.getClassMapping(relationship.getToTable()
-                .getQualifiedName());
-        Set set = new Set(clazzMany);
-        //set.setTypeName(relationship.getTable().getQualifiedName());
+        com.manydesigns.portofino.base.model.Table manyTable
+                = relationship.getFromTable();
+        com.manydesigns.portofino.base.model.Table oneTable
+                = relationship.getToTable();
+
+
+        PersistentClass clazzOne = config.getClassMapping(oneTable.getQualifiedName());
+        PersistentClass clazzMany = config.getClassMapping(manyTable.getQualifiedName());
+
+        Bag set = new Bag(clazzOne);
+        set.setLazy(true);
+        set.setRole(manyTable.getQualifiedName()+"."+relationship.getRelationshipName());
+        set.setNodeName(relationship.getRelationshipName());
         set.setCollectionTable(clazzMany.getTable());
+        OneToMany oneToMany = new OneToMany( set.getOwner() );
+        set.setElement( oneToMany );
+        oneToMany.setReferencedEntityName(manyTable.getQualifiedName() );
+        oneToMany.setAssociatedClass(clazzMany);
+        set.setSorted(false);
+
+        //Riferimenti alle colonne
+        Component component = new Component(set);
+        DependantValue dv = new DependantValue(clazzMany.getTable(), component);
+
+        component.setDynamic(true);
+        component.setEmbedded(true);
+        for (Reference ref:  relationship.getReferences() ){
+            String colToName = ref.getToColumn().getColumnName();
+            String colFromName = ref.getFromColumn().getColumnName();
+            Iterator it = clazzMany.getTable().getColumnIterator();
+            while (it.hasNext())
+            {
+                Column col = (Column) it.next();
+                if (col.getName().equals(colFromName)){
+                    dv.addColumn(col);
+                    break;
+                }
+            }
+            Property refProp = clazzOne.getProperty(colToName);
+            component.addProperty(refProp);
+        }
+
+        set.setKey(dv);
+
+        mappings.addCollection(set);
+
+        //giusto
         Property prop = new Property();
         prop.setName(relationship.getRelationshipName());
         prop.setValue(set);
