@@ -27,6 +27,8 @@ public class PortofinoServletContextListener implements ServletContextListener {
 
     public static final String SERVLET_CONTEXT_INFO_ATTRIBUTE =
             "servletContextInfo";
+    public static final String PORTOFINO_VERSION_ATTRIBUTE =
+            "portofinoVersion";
     public static final String MDCONTEXT_ATTRIBUTE =
             "mdContext";
 
@@ -50,11 +52,14 @@ public class PortofinoServletContextListener implements ServletContextListener {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
+
         servletContext = servletContextEvent.getServletContext();
         serverInfo = new ServerInfo(servletContext);
         
         servletContext.setAttribute(SERVLET_CONTEXT_INFO_ATTRIBUTE,
                 serverInfo);
+        servletContext.setAttribute(PORTOFINO_VERSION_ATTRIBUTE,
+                PORTOFINO_VERSION);
 
         boolean success = true;
 

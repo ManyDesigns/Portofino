@@ -16,7 +16,8 @@
             </div>
         </div>
     </div>
-    <div id="ft">Downstairs footer</div>
+    <div id="ft">Powered by <a href="http://www.manydesigns.com/">ManyDesigns Portofino</a>
+        <s:property value="#application.portofinoVersion"/></div>
 </div>
 <script type="text/javascript">
 YAHOO.example.fixSideBar();

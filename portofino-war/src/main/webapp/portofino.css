@@ -1,12 +1,18 @@
 div#hd {
-    height: 3em;
+    padding: .5em;
+    height: 2em;
     color: white;
     background-color: #166bbf;
 }
 
 div#ft {
+    padding: .5em;
     color: white;
     background-color: #166bbf;
+}
+
+div#hd a, div#ft a {
+    color: white;
 }
 
 
