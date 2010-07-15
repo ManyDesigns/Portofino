@@ -64,12 +64,15 @@ public class TableAction extends ActionSupport
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public final static String SEARCH = "search";
+    public final static String RETURN_TO_SEARCH = "returnToSearch";
     public final static String READ = "read";
     public final static String CREATE = "create";
+    public final static String SAVE = "save";
     public final static String EDIT = "edit";
     public final static String UPDATE = "update";
     public final static String DELETE = "delete";
-    public final static String CANCEL = "cancel";
+    public final static String CANCEL_CREATE = "cancelCreate";
+    public final static String CANCEL_EDIT = "cancelEdit";
 
     //--------------------------------------------------------------------------
     // MDContextAware implementation
@@ -149,7 +152,7 @@ public class TableAction extends ActionSupport
         tableAccessor = new TableAccessor(table);
     }
 
-    public void parsePk() {
+    public void parsePkString() {
         String[] pkList = StringUtils.split(pk,",");
 
         int i = 0;
@@ -159,6 +162,20 @@ public class TableAction extends ActionSupport
             pkMap.put(column.getColumnName(), pkList[i]);
             i++;
         }
+    }
+
+    public String generatePkString(Map<String, Object> map) {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for(Column column : table.getPrimaryKey().getColumns() ) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(",");
+            }
+            sb.append(map.get(column.getColumnName()));
+        }
+        return sb.toString();
     }
 
     //--------------------------------------------------------------------------
@@ -193,7 +210,7 @@ public class TableAction extends ActionSupport
     public String getReadLinkExpression() {
         StringBuilder sb = new StringBuilder("/");
         sb.append(table.getQualifiedName());
-        sb.append("/");
+        sb.append("/Table.action?pk=");
         boolean first = true;
         for (Column column : table.getPrimaryKey().getColumns()) {
             if (first) {
@@ -205,7 +222,6 @@ public class TableAction extends ActionSupport
             sb.append(column.getColumnName());
             sb.append("}");
         }
-        sb.append("/Table.action");
         return sb.toString();
     }
 
@@ -213,8 +229,17 @@ public class TableAction extends ActionSupport
     // Read
     //--------------------------------------------------------------------------
 
+    public String returnToSearch() throws ModelObjectNotFoundException {
+        setupTable();
+        return RETURN_TO_SEARCH;
+    }
+
+    //--------------------------------------------------------------------------
+    // Read
+    //--------------------------------------------------------------------------
+
     public String read() {
-        parsePk();
+        parsePkString();
 
         object = context.getObjectByPk(qualifiedTableName, pkMap);
         ClassFormBuilder formBuilder =
@@ -250,20 +275,46 @@ public class TableAction extends ActionSupport
     }
 
     //--------------------------------------------------------------------------
-    // Create
+    // Create/Save
     //--------------------------------------------------------------------------
 
-    public String create() {
+    public String create() throws ModelObjectNotFoundException {
+        setupTable();
+
+        ClassFormBuilder formBuilder = new ClassFormBuilder(tableAccessor);
+        form = formBuilder.build();
+        form.setMode(Mode.EDIT);
+
         return CREATE;
     }
 
+    public String save() throws ModelObjectNotFoundException {
+        setupTable();
+
+        ClassFormBuilder formBuilder = new ClassFormBuilder(tableAccessor);
+        form = formBuilder.build();
+        form.readFromRequest(req);
+        if (form.validate()) {
+            object = new HashMap<String, Object>();
+            object.put("$type$", table.getQualifiedName());
+            form.writeToObject(object);
+            context.saveObject(object);
+            pk = generatePkString(object);
+            SessionMessages.addInfoMessage("SAVE avvenuto con successo");
+            return SAVE;
+        } else {
+            form.setMode(Mode.EDIT);
+            return CREATE;
+        }
+    }
+
     //--------------------------------------------------------------------------
-    // Edit
+    // Edit/Update
     //--------------------------------------------------------------------------
 
     public String edit() throws ModelObjectNotFoundException {
         setupTable();
-        parsePk();
+        parsePkString();
         object = context.getObjectByPk(qualifiedTableName, pkMap);
 
         ClassFormBuilder formBuilder = new ClassFormBuilder(tableAccessor);
@@ -274,13 +325,9 @@ public class TableAction extends ActionSupport
         return EDIT;
     }
 
-    //--------------------------------------------------------------------------
-    // Update
-    //--------------------------------------------------------------------------
-
     public String update() throws ModelObjectNotFoundException {
         setupTable();
-        parsePk();
+        parsePkString();
         
         ClassFormBuilder formBuilder = new ClassFormBuilder(tableAccessor);
         form = formBuilder.build();
@@ -310,7 +357,11 @@ public class TableAction extends ActionSupport
     // Cancel
     //--------------------------------------------------------------------------
 
-    public String cancel() {
-        return CANCEL;
+    public String cancelCreate() {
+        return CANCEL_CREATE;
+    }
+
+    public String cancelEdit() {
+        return CANCEL_EDIT;
     }
 }

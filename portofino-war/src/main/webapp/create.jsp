@@ -4,10 +4,10 @@
 <%@taglib prefix="mdes" uri="/manydesigns-elements-struts2" %>
 <s:include value="/header.jsp"/>
 <s:form method="post">
-    <s:include value="/editButtonsBar.jsp"/>
-    <h1>Edit: <s:property value="table.qualifiedName"/></h1>
+    <s:include value="/createButtonsBar.jsp"/>
+    <h1>Create: <s:property value="table.qualifiedName"/></h1>
     <mdes:write value="form"/>
     <s:hidden name="pk" value="%{pk}"/>
-    <s:include value="/editButtonsBar.jsp"/>
+    <s:include value="/createButtonsBar.jsp"/>
 </s:form>
 <s:include value="/footer.jsp"/>

@@ -45,18 +45,30 @@
         <action name="*/Table" class="com.manydesigns.portofino.actions.TableAction">
             <param name="qualifiedTableName">{1}</param>
             <result name="search">/search.jsp</result>
-        </action>
-        <action name="*/*/Table" class="com.manydesigns.portofino.actions.TableAction">
-            <param name="qualifiedTableName">{1}</param>
-            <param name="pk">{2}</param>
             <result name="read">/read.jsp</result>
+            <result name="create">/create.jsp</result>
+            <result name="save" type="redirectAction">
+                <param name="actionName">%{qualifiedTableName}/Table</param>
+                <param name="namespace">/</param>
+                <param name="pk">%{pk}</param>
+            </result>
             <result name="edit">/edit.jsp</result>
             <result name="update" type="redirectAction">
-                <param name="actionName">%{qualifiedTableName}/%{pk}/Table</param>
+                <param name="actionName">%{qualifiedTableName}/Table</param>
+                <param name="namespace">/</param>
+                <param name="pk">%{pk}</param>
+            </result>
+            <result name="cancelCreate" type="redirectAction">
+                <param name="actionName">%{qualifiedTableName}/Table</param>
                 <param name="namespace">/</param>
             </result>
-            <result name="cancel" type="redirectAction">
-                <param name="actionName">%{qualifiedTableName}/%{pk}/Table</param>
+            <result name="cancelEdit" type="redirectAction">
+                <param name="actionName">%{qualifiedTableName}/Table</param>
+                <param name="namespace">/</param>
+                <param name="pk">%{pk}</param>
+            </result>
+            <result name="returnToSearch" type="redirectAction">
+                <param name="actionName">%{qualifiedTableName}/Table</param>
                 <param name="namespace">/</param>
             </result>
             <result name="delete" type="redirectAction">

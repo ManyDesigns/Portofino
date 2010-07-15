@@ -4,10 +4,9 @@
 <%@taglib prefix="mdes" uri="/manydesigns-elements-struts2" %>
 <s:include value="/header.jsp"/>
 <s:form method="post">
-    <div class="buttons-bar">
-        <s:submit method="create" value="Create" theme="simple"/>
-    </div>
+    <s:include value="/searchButtonsBar.jsp"/>
     <h1>Search: <s:property value="table.qualifiedName"/></h1>
     <mdes:write value="tableForm"/>
+    <s:include value="/searchButtonsBar.jsp"/>
 </s:form>
 <s:include value="/footer.jsp"/>
