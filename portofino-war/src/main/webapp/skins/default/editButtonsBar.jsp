@@ -2,6 +2,6 @@
          pageEncoding="ISO-8859-1" %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <div class="buttons-bar">
-    <s:submit method="save" value="Save" theme="simple"/>
-    <s:submit method="cancelCreate" value="Cancel" theme="simple"/>
+    <s:submit method="update" value="Update"/>
+    <s:submit method="cancelEdit" value="Cancel"/>
 </div>

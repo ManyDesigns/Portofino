@@ -7,6 +7,7 @@
     <constant name="struts.enable.SlashesInActionNames" value="true"/>
     <constant name="struts.mapper.alwaysSelectFullNamespace" value="false"/>
     <constant name="struts.ognl.allowStaticMethodAccess" value="true"/>
+    <constant name="struts.ui.theme" value="simple"/>
 
     <package name="portofino" extends="struts-default" namespace="/">
         <interceptors>
@@ -40,19 +41,20 @@
             </result>
         </global-results>
         <action name="Homepage" class="com.manydesigns.portofino.actions.Homepage">
-            <result name="success">/homepage.jsp</result>
+            <result name="success">/skins/%{skin}/homepage.jsp</result>
         </action>
         <action name="*/Table" class="com.manydesigns.portofino.actions.TableAction">
+            <param name="skin">default</param>
             <param name="qualifiedTableName">{1}</param>
-            <result name="search">/search.jsp</result>
-            <result name="read">/read.jsp</result>
-            <result name="create">/create.jsp</result>
+            <result name="search">/skins/%{skin}/search.jsp</result>
+            <result name="read">/skins/%{skin}/read.jsp</result>
+            <result name="create">/skins/%{skin}/create.jsp</result>
             <result name="save" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/Table</param>
                 <param name="namespace">/</param>
                 <param name="pk">%{pk}</param>
             </result>
-            <result name="edit">/edit.jsp</result>
+            <result name="edit">/skins/%{skin}/edit.jsp</result>
             <result name="update" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/Table</param>
                 <param name="namespace">/</param>

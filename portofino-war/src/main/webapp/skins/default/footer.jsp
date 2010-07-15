@@ -12,7 +12,7 @@
                     </s:iterator>
                 </ul>
                 <hr/>
-                <a href="<s:url value="/upstairs/"/>">Go upstairs</a>
+                <a href="<s:url value="/upstairs"/>">Go upstairs</a>
             </div>
         </div>
     </div>

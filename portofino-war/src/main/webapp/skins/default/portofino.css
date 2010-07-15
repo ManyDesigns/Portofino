@@ -27,38 +27,36 @@ div#sidebar div {
 
 div.buttons-bar {
     background-color: #eef;
-    border: 1px dashed gray;
-    margin: 2px 0;
-    padding: 4px;
+    border-top: 1px solid gray;
+    border-bottom: 1px solid gray;
+    margin: 0.5em 0;
+    padding: 0.5em;
+}
+
+ul.errorMessages, ul.warningMessages, ul.infoMessages {
+    padding: 0.5em;
+    margin: 0.5em 0;
+    font-weight: normal;
+    font-style: italic;
+    list-style-type: none;
+}
+
+ul.errorMessages li, ul.warningMessages li, ul.infoMessages li {
+    list-style-type: none;
 }
 
 ul.errorMessages {
-    border: 1px dotted #c00;
-    padding: 10px 3px;
-    margin: 0 0 10px 0;
+    border: 1px dashed #c00;
     background-color: #fff8f0;
-    font-weight: normal;
-    font-style: italic;
-    list-style-type: none;
 }
 
 ul.warningMessages {
-    border: 1px dotted #880;
-    padding: 10px 3px;
-    margin: 0 0 10px 0;
+    border: 1px dashed #880;
     background-color: #fffff0;
-    font-weight: normal;
-    font-style: italic;
-    list-style-type: none;
 }
 
 ul.infoMessages {
-    border: 1px dotted #0a0;
-    padding: 10px 3px;
-    margin: 0 0 10px 0;
+    border: 1px dashed #0a0;
     background-color: #f0fff0;
-    font-weight: normal;
-    font-style: italic;
-    list-style-type: none;
 }
 

@@ -44,6 +44,8 @@ public class Homepage extends ActionSupport implements MDContextAware {
 
     public MDContext context;
 
+    public String skin = "default";
+
     public void setContext(MDContext context) {
         this.context = context;
     }

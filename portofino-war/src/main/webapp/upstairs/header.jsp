@@ -13,11 +13,11 @@
     <link rel="stylesheet" type="text/css"
           href="<s:url value="/yui-2.8.1/build/base/base-min.css"/>"/>
     <link rel="stylesheet" type="text/css"
-          href="<s:url value="/portofino.css"/>"/>
+          href="<s:url value="/skins/default/portofino.css"/>"/>
     <script type="text/javascript"
             src="<s:url value="/yui-2.8.1/build/yuiloader-dom-event/yuiloader-dom-event.js"/>"></script>
     <script type="text/javascript"
-            src="<s:url value="/portofino.js"/>"></script>
+            src="<s:url value="/skins/default/portofino.js"/>"></script>
     <title><s:property value="pageTitle"/></title>
 </head>
 <body>

@@ -127,6 +127,7 @@ public class TableAction extends ActionSupport
     public TableForm tableForm;
     public Form form;
     public List<RelatedTableForm> relatedTableFormList;
+    public String skin;
 
 
     //--------------------------------------------------------------------------
