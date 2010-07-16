@@ -81,8 +81,8 @@
     </package>
 
     <package name="portofino-upstairs" extends="struts-default" namespace="/upstairs">
-        <action name="ServerInfo" class="com.manydesigns.portofino.actions.upstaits.ServerInfoAction">
-            <result name="success">/upstairs/serverInfo.jsp</result>
+        <action name="ServerInfo">
+            <result>/upstairs/serverInfo.jsp</result>
         </action>
     </package>
 </struts>
