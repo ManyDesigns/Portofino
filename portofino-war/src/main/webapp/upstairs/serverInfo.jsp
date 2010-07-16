@@ -54,6 +54,22 @@
         <td>user.region:</td>
         <td><s:property value="serverInfo.userRegion"/></td>
     </tr>
+    <tr>
+        <td>Free memory:</td>
+        <td><s:property value="serverInfo.freeMemory"/></td>
+    </tr>
+    <tr>
+        <td>Total memory:</td>
+        <td><s:property value="serverInfo.totalMemory"/></td>
+    </tr>
+    <tr>
+        <td>Max memory:</td>
+        <td><s:property value="serverInfo.maxMemory"/></td>
+    </tr>
+    <tr>
+        <td>Available processors:</td>
+        <td><s:property value="serverInfo.availableProcessors"/></td>
+    </tr>
     </tbody>
 </table>
 <s:include value="/upstairs/footer.jsp"/>

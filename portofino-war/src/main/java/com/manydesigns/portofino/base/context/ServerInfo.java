@@ -68,9 +68,11 @@ public class ServerInfo {
     protected final String userLanguage;
     protected final String userRegion;
 
+    protected final Runtime runTime;
+
     public ServerInfo(ServletContext servletContext) {
         logger = Logger.getLogger(ServerInfo.class);
-        
+
         this.servletContext = servletContext;
 
         realPath = servletContext.getRealPath("/");
@@ -111,6 +113,8 @@ public class ServerInfo {
 
         userRegion = System.getProperty("user.region");
         LogMF.info(logger, "user.region: {0}", userRegion);
+
+        runTime = Runtime.getRuntime();        
     }
 
 
@@ -173,4 +177,21 @@ public class ServerInfo {
     public String getUserRegion() {
         return userRegion;
     }
+
+    public long getFreeMemory() {
+        return runTime.freeMemory();
+    }
+
+    public long getTotalMemory() {
+        return runTime.totalMemory();
+    }
+
+    public long getMaxMemory() {
+        return runTime.maxMemory();
+    }
+
+    public int getAvailableProcessors() {
+        return runTime.availableProcessors();
+    }
+
 }
