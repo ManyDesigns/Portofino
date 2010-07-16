@@ -60,3 +60,6 @@ ul.infoMessages {
     background-color: #f0fff0;
 }
 
+div#responseTime {
+    float: right;
+}

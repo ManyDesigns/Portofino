@@ -34,9 +34,11 @@ import com.manydesigns.portofino.methods.PortofinoServletContextListener;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.struts2.StrutsStatics;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /*
@@ -48,18 +50,27 @@ public class PortofinoInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    public final static String STOP_WATCH_ATTRIBUTE =
+            "stopWatch";
 
     public void destroy() {}
 
     public void init() {}
 
     public String intercept(ActionInvocation invocation) throws Exception {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
         Object action = invocation.getAction();
         ActionContext context = invocation.getInvocationContext();
+        HttpServletRequest req =
+                (HttpServletRequest)context.get(StrutsStatics.HTTP_REQUEST);
         HttpServletResponse res =
                 (HttpServletResponse)context.get(StrutsStatics.HTTP_RESPONSE);
         ServletContext servletContext =
                 (ServletContext)context.get(StrutsStatics.SERVLET_CONTEXT);
+
+        req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
 
         String result;
         if (action instanceof MDContextAware) {
@@ -79,6 +90,8 @@ public class PortofinoInterceptor implements Interceptor {
         } else {
             result = invocation.invoke();
         }
+
+        stopWatch.stop();
 
         return result;
     }
