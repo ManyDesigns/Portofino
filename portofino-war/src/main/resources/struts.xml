@@ -9,7 +9,7 @@
     <constant name="struts.ognl.allowStaticMethodAccess" value="true"/>
     <constant name="struts.ui.theme" value="simple"/>
 
-    <package name="portofino" extends="struts-default" namespace="/">
+    <package name="portofino-default" extends="struts-default" abstract="true">
         <interceptors>
             <interceptor name="elements-struts2"
                          class="com.manydesigns.elements.struts2.ElementsInterceptor" />
@@ -40,10 +40,14 @@
                 <param name="errorMessage">${errorMessage}</param>
             </result>
         </global-results>
+    </package>
+
+    <package name="portofino" extends="portofino-default" namespace="/">
         <action name="Homepage" class="com.manydesigns.portofino.actions.Homepage">
             <result name="success">/skins/%{skin}/homepage.jsp</result>
         </action>
-        <action name="*/Table" class="com.manydesigns.portofino.actions.TableAction">
+        <action name="*/Table"
+                class="com.manydesigns.portofino.actions.TableAction">
             <param name="skin">default</param>
             <param name="qualifiedTableName">{1}</param>
             <result name="search">/skins/%{skin}/search.jsp</result>
@@ -80,9 +84,10 @@
         </action>
     </package>
 
-    <package name="portofino-upstairs" extends="struts-default" namespace="/upstairs">
-        <action name="ServerInfo">
-            <result>/upstairs/serverInfo.jsp</result>
+    <package name="portofino-upstairs" extends="portofino-default" namespace="/upstairs">
+        <action name="ServerInfo"
+                class="com.manydesigns.portofino.actions.upstaits.ServerInfoAction">
+            <result name="success">/upstairs/serverInfo.jsp</result>
         </action>
     </package>
 </struts>

@@ -182,6 +182,10 @@ public class ServerInfo {
         return runTime.freeMemory();
     }
 
+    public long getUsedMemory() {
+        return getTotalMemory() - getFreeMemory();
+    }
+
     public long getTotalMemory() {
         return runTime.totalMemory();
     }
