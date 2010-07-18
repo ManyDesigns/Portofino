@@ -2,13 +2,13 @@ package com.manydesigns.portofino.methods;
 
 import com.manydesigns.portofino.base.context.MDContext;
 import com.manydesigns.portofino.base.context.ServerInfo;
+import com.manydesigns.portofino.logging.LogUtil;
 import org.apache.commons.lang.time.StopWatch;
-import org.apache.log4j.LogMF;
-import org.apache.log4j.Logger;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import java.util.logging.Logger;
 
 
 public class PortofinoServletContextListener implements ServletContextListener {
@@ -41,11 +41,11 @@ public class PortofinoServletContextListener implements ServletContextListener {
      * Creates a new instance of PortofinoServletContextListener
      */
     public PortofinoServletContextListener() {
-        logger = Logger.getLogger(PortofinoServletContextListener.class);
+        logger = Logger.getLogger(getClass().getName());
     }
 
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        LogMF.info(logger, "\n" + SEPARATOR +
+        LogUtil.info(logger, "\n" + SEPARATOR +
                 "\n--- ManyDesigns Portofino {0} starting..." +
                 "\n" + SEPARATOR, PORTOFINO_VERSION);
 
@@ -67,9 +67,9 @@ public class PortofinoServletContextListener implements ServletContextListener {
         if (serverInfo.getServletApiMajor() < 2 ||
                 (serverInfo.getServletApiMajor() == 2 &&
                         serverInfo.getServletApiMinor() < 3)) {
-            LogMF.fatal(logger,
+            LogUtil.severe(logger,
                     "Servlet API version must be >= 2.3. Found: {0}.",
-                    new String[] {serverInfo.getServletApiVersion()});
+                    serverInfo.getServletApiVersion());
             success = false;
         }
 
@@ -84,11 +84,11 @@ public class PortofinoServletContextListener implements ServletContextListener {
 
         stopWatch.stop();
         if (success) {
-            LogMF.info(logger,
+            LogUtil.info(logger,
                     "ManyDesigns Portofino successfully started in {0} ms.",
                     stopWatch.getTime());
         } else {
-            logger.fatal("Failed to start ManyDesigns Portofino.");
+            logger.severe("Failed to start ManyDesigns Portofino.");
         }
     }
 

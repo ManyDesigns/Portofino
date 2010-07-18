@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -58,11 +59,14 @@ public class MDContext {
     protected Map<String, SessionFactory> sessionFactories;
     protected final ThreadLocal<Map<String, Session>> threadSessions;
 
+    protected final Logger logger;
+
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
     public MDContext() {
+        logger = Logger.getLogger(getClass().getName());
         threadSessions = new ThreadLocal<Map<String, Session>>();
     }
 
@@ -71,14 +75,23 @@ public class MDContext {
     //--------------------------------------------------------------------------
 
     public void loadXmlModelAsResource(String resource) {
+        logger.entering("com.manydesigns.portofino.base.context.MDContext",
+                "loadXmlModelAsResource",
+                resource);
+
         DBParser parser = new DBParser();
         try {
             dataModel = parser.parse(resource);
             HibernateConfig builder = new HibernateConfig();
             sessionFactories = builder.build(dataModel);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.throwing("com.manydesigns.portofino.base.context.MDContext",
+                    "loadXmlModelAsResource",
+                    e);
         }
+
+        logger.exiting("com.manydesigns.portofino.base.context.MDContext",
+                "loadXmlModelAsResource");
     }
 
     //--------------------------------------------------------------------------

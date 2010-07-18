@@ -29,11 +29,11 @@
 
 package com.manydesigns.portofino.base.context;
 
-import org.apache.log4j.LogMF;
-import org.apache.log4j.Logger;
+import com.manydesigns.portofino.logging.LogUtil;
 
 import javax.servlet.ServletContext;
 import java.text.MessageFormat;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -71,48 +71,48 @@ public class ServerInfo {
     protected final Runtime runTime;
 
     public ServerInfo(ServletContext servletContext) {
-        logger = Logger.getLogger(ServerInfo.class);
+        logger = Logger.getLogger(getClass().getName());
 
         this.servletContext = servletContext;
 
         realPath = servletContext.getRealPath("/");
-        LogMF.info(logger, "Real path: {0}", realPath);
+        LogUtil.info(logger, "Real path: {0}", realPath);
 
         servletContextName = servletContext.getServletContextName();
-        LogMF.info(logger, "Servlet context name: {0}", servletContextName);
+        LogUtil.info(logger, "Servlet context name: {0}", servletContextName);
 
         serverInfo = servletContext.getServerInfo();
-        LogMF.info(logger, "Server info: {0}", serverInfo);
+        LogUtil.info(logger, "Server info: {0}", serverInfo);
 
         servletApiMajor = servletContext.getMajorVersion();
         servletApiMinor = servletContext.getMinorVersion();
         servletApiVersion = MessageFormat.format("{0}.{1}",
                         servletApiMajor, servletApiMinor);
-        LogMF.info(logger, "Servlet API version: {0}", servletApiVersion);
+        LogUtil.info(logger, "Servlet API version: {0}", servletApiVersion);
 
         javaRuntimeName = System.getProperty("java.runtime.name");
-        LogMF.info(logger, "java.runtime.name: {0}", javaRuntimeName);
+        LogUtil.info(logger, "java.runtime.name: {0}", javaRuntimeName);
 
         javaRuntimeVersion = System.getProperty("java.runtime.version");
-        LogMF.info(logger, "java.runtime.version: {0}", javaRuntimeVersion);
+        LogUtil.info(logger, "java.runtime.version: {0}", javaRuntimeVersion);
 
         javaVmName = System.getProperty("java.vm.name");
-        LogMF.info(logger, "java.vm.name: {0}", javaVmName);
+        LogUtil.info(logger, "java.vm.name: {0}", javaVmName);
 
         javaVmVersion = System.getProperty("java.vm.version");
-        LogMF.info(logger, "java.vm.version: {0}", javaVmVersion);
+        LogUtil.info(logger, "java.vm.version: {0}", javaVmVersion);
 
         javaVmVendor = System.getProperty("java.vm.vendor");
-        LogMF.info(logger, "java.vm.vendor: {0}", javaVmVendor);
+        LogUtil.info(logger, "java.vm.vendor: {0}", javaVmVendor);
 
         osName = System.getProperty("os.name");
-        LogMF.info(logger, "os.name: {0}", osName);
+        LogUtil.info(logger, "os.name: {0}", osName);
 
         userLanguage = System.getProperty("user.language");
-        LogMF.info(logger, "user.language: {0}", userLanguage);
+        LogUtil.info(logger, "user.language: {0}", userLanguage);
 
         userRegion = System.getProperty("user.region");
-        LogMF.info(logger, "user.region: {0}", userRegion);
+        LogUtil.info(logger, "user.region: {0}", userRegion);
 
         runTime = Runtime.getRuntime();        
     }

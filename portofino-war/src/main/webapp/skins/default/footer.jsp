@@ -16,7 +16,7 @@
             </div>
         </div>
     </div>
-    <div id="ft"><div id="responseTime">Response time: <s:property value="#request.stopWatch.time"/> ms</div>
+    <div id="ft"><div id="responseTime">Page response time: <s:property value="#request.stopWatch.time"/> ms</div>
         Powered by <a href="http://www.manydesigns.com/">ManyDesigns Portofino</a>
         <s:property value="#application.portofinoVersion"/>
     </div>
