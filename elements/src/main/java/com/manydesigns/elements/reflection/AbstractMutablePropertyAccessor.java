@@ -30,6 +30,7 @@
 package com.manydesigns.elements.reflection;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,18 +39,23 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public abstract class AbstractPropertyAccessor implements PropertyAccessor {
+public abstract class AbstractMutablePropertyAccessor
+        implements PropertyAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     protected String name;
     protected int modifiers;
-    protected final List<Class<? extends Annotation>> annotations;
+    protected final List<Annotation> annotations;
 
-    public AbstractPropertyAccessor(String name, int modifiers) {
+    public AbstractMutablePropertyAccessor(String name) {
+        this(name, Modifier.PUBLIC);
+    }
+
+    public AbstractMutablePropertyAccessor(String name, int modifiers) {
         this.name = name;
         this.modifiers = modifiers;
-        annotations = new ArrayList<Class<? extends Annotation>>();
+        annotations = new ArrayList<Annotation>();
     }
 
     public String getName() {
@@ -68,13 +74,13 @@ public abstract class AbstractPropertyAccessor implements PropertyAccessor {
         this.modifiers = modifiers;
     }
 
-    public List<Class<? extends Annotation>> getAnnotations() {
+    public List<Annotation> getAnnotations() {
         return annotations;
     }
 
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-        for (Class<? extends Annotation> current : annotations) {
-            if (annotationClass.isAssignableFrom(current)) {
+        for (Annotation current : annotations) {
+            if (annotationClass.isAssignableFrom(current.getClass())) {
                 return true;
             }
         }
@@ -82,9 +88,9 @@ public abstract class AbstractPropertyAccessor implements PropertyAccessor {
     }
 
     public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-        for (Class<? extends Annotation> current : annotations) {
-            if (annotationClass.isAssignableFrom(current)) {
-                return null; //(T) current;
+        for (Annotation current : annotations) {
+            if (annotationClass.isAssignableFrom(current.getClass())) {
+                return (T) current;
             }
         }
         return null;

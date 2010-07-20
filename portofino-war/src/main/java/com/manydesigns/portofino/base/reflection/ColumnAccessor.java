@@ -30,6 +30,9 @@
 package com.manydesigns.portofino.base.reflection;
 
 import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.elements.annotations.RequiredImpl;
+import com.manydesigns.elements.annotations.Immutable;
+import com.manydesigns.elements.annotations.ImmutableImpl;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.base.model.Column;
 
@@ -46,13 +49,38 @@ public class ColumnAccessor implements PropertyAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
+
     protected final Column column;
-    protected final boolean inPk;
+    protected final Required requiredAnnotation;
+    protected final Immutable immutableAnnotation;
+
+
+    //--------------------------------------------------------------------------
+    // Constructors
+    //--------------------------------------------------------------------------
 
     public ColumnAccessor(Column column, boolean inPk) {
         this.column = column;
-        this.inPk = inPk;
+
+        if (inPk) {
+            immutableAnnotation = new ImmutableImpl();
+        } else {
+            immutableAnnotation = null;
+        }
+
+        if (column.isNullable()) {
+            requiredAnnotation = null;
+        } else {
+            requiredAnnotation = new RequiredImpl();
+        }
     }
+
+    //--------------------------------------------------------------------------
+    // PropertyAccessor implementation
+    //--------------------------------------------------------------------------
 
     public String getName() {
         return column.getColumnName();
@@ -63,13 +91,16 @@ public class ColumnAccessor implements PropertyAccessor {
     }
 
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-        if (annotationClass == Required.class) {
-            return !column.isNullable();
-        }
-        return false;
+        return getAnnotation(annotationClass) != null;
     }
 
+    @SuppressWarnings({"unchecked"})
     public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+        if (annotationClass == Required.class) {
+            return (T) requiredAnnotation;
+        } else if (annotationClass == Immutable.class) {
+            return (T) immutableAnnotation;
+        }
         return null;
     }
 
@@ -77,11 +108,20 @@ public class ColumnAccessor implements PropertyAccessor {
         return ((Map)obj).get(column.getColumnName());
     }
 
+    @SuppressWarnings({"unchecked"})
     public void set(Object obj, Object value) throws IllegalAccessException {
         ((Map)obj).put(column.getColumnName(), value);
     }
 
     public boolean isAssignableTo(Class clazz) {
         return clazz.isAssignableFrom(column.getJavaType());
+    }
+
+    //--------------------------------------------------------------------------
+    // Getters/setters
+    //--------------------------------------------------------------------------
+
+    public Column getColumn() {
+        return column;
     }
 }

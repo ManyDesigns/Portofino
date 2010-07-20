@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -85,9 +86,7 @@ public class MDContext {
             HibernateConfig builder = new HibernateConfig();
             sessionFactories = builder.build(dataModel);
         } catch (Exception e) {
-            logger.throwing("com.manydesigns.portofino.base.context.MDContext",
-                    "loadXmlModelAsResource",
-                    e);
+            logger.log(Level.SEVERE, "loadXmlModelAsResource", e);
         }
 
         logger.exiting("com.manydesigns.portofino.base.context.MDContext",
@@ -193,6 +192,7 @@ public class MDContext {
         String databaseName = table.getDatabaseName();
         Session session = threadSessions.get().get(databaseName);
 
+        //noinspection unchecked
         return (Map<String, Object>)session.load(qualifiedTableName, pk);
     }
 
@@ -207,6 +207,7 @@ public class MDContext {
         String databaseName = table.getDatabaseName();
         Session session = threadSessions.get().get(databaseName);
 
+        //noinspection unchecked
         return (List<Map<String, Object>>)session.createQuery(
                             "from " + qualifiedTableName).list();
     }
@@ -214,7 +215,7 @@ public class MDContext {
     // lasciare per ultima
     public List<Map<String, Object>> getObjects(String qualifiedTableName,
                                                 Criteria criteria) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     public void saveOrUpdateObject(Map<String, Object> obj) {
