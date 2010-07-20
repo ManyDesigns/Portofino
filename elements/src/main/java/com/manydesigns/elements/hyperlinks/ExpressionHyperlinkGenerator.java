@@ -29,15 +29,15 @@
 
 package com.manydesigns.elements.hyperlinks;
 
-import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.Util;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.List;
-import java.util.ArrayList;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -116,9 +116,12 @@ public class ExpressionHyperlinkGenerator implements HyperlinkGenerator {
         return runExpression(obj, altPropertyAccessors, parsedAltExpression);
     }
 
-    private String runExpression(Object obj,
+    protected String runExpression(Object obj,
                                  List<PropertyAccessor> propertyAccessors,
                                  String parsedExpression) {
+        if (obj == null) {
+            return null;
+        }
         try {
             Object[] args = new Object[propertyAccessors.size()];
             for (int i = 0; i < args.length; i++) {

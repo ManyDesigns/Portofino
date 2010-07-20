@@ -30,7 +30,6 @@
 package com.manydesigns.elements;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import com.manydesigns.elements.hyperlinks.HyperlinkGenerator;
 
 import java.util.List;
 
@@ -69,8 +68,13 @@ public interface Field extends Element {
     String getHelp();
     void setHelp(String help);
 
-    HyperlinkGenerator getHyperlinkGenerator();
-    void setHyperlinkGenerator(HyperlinkGenerator hyperlinkGenerator);
-
     List<String> getErrors();
+
+
+    public String getHref();
+    public void setHref(String href);
+
+    public String getAlt();
+    public void setAlt(String alt);
+
 }

@@ -40,9 +40,9 @@ import org.apache.commons.lang.StringUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -141,6 +141,7 @@ public class ClassTableFormBuilder {
 
             HyperlinkGenerator hyperlinkGenerator =
                     hyperlinkGenerators.get(propertyAccessor.getName());
+            column.setHyperlinkGenerator(hyperlinkGenerator);
 
             for (int i = 0; i < nRows; i++) {
                 Field field = fieldHelper.tryToInstantiate(
@@ -151,8 +152,6 @@ public class ClassTableFormBuilder {
                             propertyAccessor.getName());
                 }
                 column.add(field);
-
-                field.setHyperlinkGenerator(hyperlinkGenerator);
             }
         }
 

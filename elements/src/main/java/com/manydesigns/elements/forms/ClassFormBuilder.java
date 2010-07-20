@@ -32,14 +32,15 @@ package com.manydesigns.elements.forms;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Field;
 import com.manydesigns.elements.FieldHelper;
-import com.manydesigns.elements.hyperlinks.HyperlinkGenerator;
 import com.manydesigns.elements.annotations.FieldSet;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -56,7 +57,6 @@ public class ClassFormBuilder {
 
     protected List<ArrayList<PropertyAccessor>> groupedPropertyAccessors;
     protected List<String> fieldSetNames;
-    protected Map<String, HyperlinkGenerator> hyperlinkGenerators;
     protected String prefix;
     protected int nColumns = DEFAULT_N_COLUMNS;
 
@@ -66,7 +66,6 @@ public class ClassFormBuilder {
 
     public ClassFormBuilder(ClassAccessor classAccessor) {
         this.classAccessor = classAccessor;
-        hyperlinkGenerators = new HashMap<String, HyperlinkGenerator>();
     }
 
     public ClassFormBuilder configFields(String... fieldNames) {
@@ -145,12 +144,6 @@ public class ClassFormBuilder {
         return this;
     }
 
-    public ClassFormBuilder configHyperlinkGenerator(
-            String fieldName, HyperlinkGenerator hyperlinkGenerator) {
-        hyperlinkGenerators.put(fieldName, hyperlinkGenerator);
-        return this;
-    }
-
     public Form build() {
         Form form = new Form();
         FieldHelper fieldHelper = ElementsThreadLocals.getFieldHelper();
@@ -180,10 +173,6 @@ public class ClassFormBuilder {
                     continue;
                 }
                 fieldSet.add(field);
-
-                HyperlinkGenerator hyperlinkGenerator =
-                        hyperlinkGenerators.get(propertyAccessor.getName());
-                field.setHyperlinkGenerator(hyperlinkGenerator);
             }
         }
         return form;

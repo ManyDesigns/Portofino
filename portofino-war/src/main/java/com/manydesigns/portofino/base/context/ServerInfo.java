@@ -32,7 +32,9 @@ package com.manydesigns.portofino.base.context;
 import com.manydesigns.portofino.logging.LogUtil;
 
 import javax.servlet.ServletContext;
+import java.lang.reflect.Method;
 import java.text.MessageFormat;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /*
@@ -53,6 +55,7 @@ public class ServerInfo {
     protected final ServletContext servletContext;
 
     protected final String realPath;
+    protected final String contextPath;
     protected final String servletContextName;
     protected final String serverInfo;
     protected final int servletApiMajor;
@@ -90,6 +93,19 @@ public class ServerInfo {
                         servletApiMajor, servletApiMinor);
         LogUtil.info(logger, "Servlet API version: {0}", servletApiVersion);
 
+        String tmp = null;
+        if (servletApiMajor >= 2 && servletApiMinor >= 5) {
+            try {
+                Method method =
+                        servletContext.getClass().getMethod("getContextPath");
+                tmp = (String)method.invoke(servletContext);
+            } catch (Throwable e) {
+                logger.log(Level.SEVERE, "Uncaught exception", e);
+            }
+        }
+        contextPath = tmp;
+        LogUtil.info(logger, "Context path: {0}", contextPath);
+
         javaRuntimeName = System.getProperty("java.runtime.name");
         LogUtil.info(logger, "java.runtime.name: {0}", javaRuntimeName);
 
@@ -124,6 +140,10 @@ public class ServerInfo {
 
     public String getRealPath() {
         return realPath;
+    }
+
+    public String getContextPath() {
+        return contextPath;
     }
 
     public String getServletContextName() {

@@ -33,15 +33,14 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Field;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.Util;
-import com.manydesigns.elements.hyperlinks.HyperlinkGenerator;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -60,7 +59,6 @@ public abstract class AbstractField implements Field {
     protected String label;
     protected String href;
     protected String alt;
-    protected HyperlinkGenerator hyperlinkGenerator;
 
     protected boolean required = false;
     protected boolean forceNewRow = false;
@@ -223,14 +221,6 @@ public abstract class AbstractField implements Field {
     }
 
     public void readFromObject(Object obj) {
-        if (obj == null) {
-            return;
-        }
-        if (hyperlinkGenerator == null) {
-            return;
-        }
-        href = hyperlinkGenerator.generateHref(obj);
-        alt = hyperlinkGenerator.generateAlt(obj);
     }
 
     //--------------------------------------------------------------------------
@@ -313,11 +303,19 @@ public abstract class AbstractField implements Field {
         this.colSpan = colSpan;
     }
 
-    public HyperlinkGenerator getHyperlinkGenerator() {
-        return hyperlinkGenerator;
+    public String getHref() {
+        return href;
     }
 
-    public void setHyperlinkGenerator(HyperlinkGenerator hyperlinkGenerator) {
-        this.hyperlinkGenerator = hyperlinkGenerator;
+    public void setHref(String href) {
+        this.href = href;
+    }
+
+    public String getAlt() {
+        return alt;
+    }
+
+    public void setAlt(String alt) {
+        this.alt = alt;
     }
 }

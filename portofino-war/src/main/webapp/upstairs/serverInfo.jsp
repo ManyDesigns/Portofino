@@ -11,6 +11,10 @@
         <td><s:property value="serverInfo.realPath"/></td>
     </tr>
     <tr>
+        <td>Context path:</td>
+        <td><s:property value="serverInfo.contextPath"/></td>
+    </tr>
+    <tr>
         <td>Servlet context name:</td>
         <td><s:property value="serverInfo.servletContextName"/></td>
     </tr>

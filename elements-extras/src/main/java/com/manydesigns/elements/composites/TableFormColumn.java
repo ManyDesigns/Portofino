@@ -34,6 +34,7 @@ import com.manydesigns.elements.Field;
 import com.manydesigns.elements.Util;
 import com.manydesigns.elements.annotations.Id;
 import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.hyperlinks.HyperlinkGenerator;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
@@ -53,6 +54,7 @@ public class TableFormColumn extends AbstractCompositeElement<Field> {
 
     protected final PropertyAccessor propertyAccessor;
     protected String label;
+    protected HyperlinkGenerator hyperlinkGenerator;
 
     //--------------------------------------------------------------------------
     // Costruttori
@@ -102,13 +104,13 @@ public class TableFormColumn extends AbstractCompositeElement<Field> {
             final int arrayLength = Array.getLength(obj);
             for (int i = 0; i < arrayLength; i++) {
                 Object currentObj = Array.get(obj, i);
-                get(i).readFromObject(currentObj);
+                readFromObject(i, currentObj);
             }
 
             // Scorre le rimanenti righe del table form,
             // passano null come ottetto di bind.
             for (int i = arrayLength; i < size(); i++) {
-                get(i).readFromObject(null);
+                readFromObject(i, null);
             }
         } else if (Collection.class.isAssignableFrom(clazz)) {
             // Tratta obj come collection
@@ -116,15 +118,25 @@ public class TableFormColumn extends AbstractCompositeElement<Field> {
 
             int i = 0;
             for (Object currentObj : collection) {
-                get(i).readFromObject(currentObj);
+                readFromObject(i, currentObj);
                 i++;
             }
 
             for (; i < size(); i++) {
-                get(i).readFromObject(null);
+                readFromObject(i, null);
             }
         }
     }
+
+    protected void readFromObject(int fieldIndex, Object obj) {
+        Field field = get(fieldIndex);
+        if (hyperlinkGenerator != null) {
+            field.setHref(hyperlinkGenerator.generateHref(obj));
+            field.setAlt(hyperlinkGenerator.generateAlt(obj));
+        }
+        field.readFromObject(obj);
+    }
+
 
     @Override
     public void writeToObject(Object obj) {
@@ -169,5 +181,13 @@ public class TableFormColumn extends AbstractCompositeElement<Field> {
     public List<String> getErrors(int rowIndex) {
         Field field = this.get(rowIndex);
         return field.getErrors();
+    }
+
+    public HyperlinkGenerator getHyperlinkGenerator() {
+        return hyperlinkGenerator;
+    }
+
+    public void setHyperlinkGenerator(HyperlinkGenerator hyperlinkGenerator) {
+        this.hyperlinkGenerator = hyperlinkGenerator;
     }
 }
