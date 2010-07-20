@@ -45,19 +45,41 @@ public class TableAccessor implements ClassAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final Table table;
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
+
+    protected final Table table;
+    protected final ColumnAccessor[] columnAccessors;
+
+
+    //--------------------------------------------------------------------------
+    // Constructors
+    //--------------------------------------------------------------------------
 
     public TableAccessor(Table table) {
         this.table = table;
+        List<Column> columns = table.getColumns();
+        List<Column> pkColumns = table.getPrimaryKey().getColumns();
+        columnAccessors = new ColumnAccessor[columns.size()];
+        int i = 0;
+        for (Column current : columns) {
+            boolean inPk = pkColumns.contains(current);
+            columnAccessors[i] = new ColumnAccessor(current, inPk);
+            i++;
+        }
     }
+
+
+    //--------------------------------------------------------------------------
+    // ClassAccessor implementation
+    //--------------------------------------------------------------------------
 
     public PropertyAccessor getProperty(String fieldName)
             throws NoSuchFieldException {
-        List<Column> pkColumns = table.getPrimaryKey().getColumns();
-        for (Column current : table.getColumns()) {
-            if (current.getColumnName().equals(fieldName)) {
-                boolean inPk = pkColumns.contains(current);
-                return new ColumnAccessor(current, inPk);
+        for (ColumnAccessor current : columnAccessors) {
+            if (current.getName().equals(fieldName)) {
+                return current;
             }
         }
 
@@ -65,16 +87,15 @@ public class TableAccessor implements ClassAccessor {
     }
 
     public PropertyAccessor[] getProperties() {
-        List<Column> columns = table.getColumns();
-        List<Column> pkColumns = table.getPrimaryKey().getColumns();
-        ColumnAccessor[] result =
-                new ColumnAccessor[columns.size()];
-        int i = 0;
-        for (Column current : columns) {
-            boolean inPk = pkColumns.contains(current);
-            result[i] = new ColumnAccessor(current, inPk);
-            i++;
-        }
-        return result;
+        return columnAccessors.clone();
+    }
+
+
+    //--------------------------------------------------------------------------
+    // Getters/setters
+    //--------------------------------------------------------------------------
+
+    public Table getTable() {
+        return table;
     }
 }

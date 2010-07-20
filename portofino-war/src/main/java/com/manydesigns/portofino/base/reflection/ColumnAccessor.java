@@ -78,6 +78,7 @@ public class ColumnAccessor implements PropertyAccessor {
         }
     }
 
+
     //--------------------------------------------------------------------------
     // PropertyAccessor implementation
     //--------------------------------------------------------------------------
