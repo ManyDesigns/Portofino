@@ -31,8 +31,8 @@ package com.manydesigns.portofino.base.reflection;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.base.model.Table;
 import com.manydesigns.portofino.base.model.Column;
+import com.manydesigns.portofino.base.model.Table;
 
 import java.util.List;
 
@@ -51,10 +51,13 @@ public class TableAccessor implements ClassAccessor {
         this.table = table;
     }
 
-    public PropertyAccessor getProperty(String fieldName) throws NoSuchFieldException {
+    public PropertyAccessor getProperty(String fieldName)
+            throws NoSuchFieldException {
+        List<Column> pkColumns = table.getPrimaryKey().getColumns();
         for (Column current : table.getColumns()) {
             if (current.getColumnName().equals(fieldName)) {
-                return new ColumnAccessor(current);
+                boolean inPk = pkColumns.contains(current);
+                return new ColumnAccessor(current, inPk);
             }
         }
 
@@ -63,11 +66,13 @@ public class TableAccessor implements ClassAccessor {
 
     public PropertyAccessor[] getProperties() {
         List<Column> columns = table.getColumns();
+        List<Column> pkColumns = table.getPrimaryKey().getColumns();
         ColumnAccessor[] result =
                 new ColumnAccessor[columns.size()];
         int i = 0;
         for (Column current : columns) {
-            result[i] = new ColumnAccessor(current);
+            boolean inPk = pkColumns.contains(current);
+            result[i] = new ColumnAccessor(current, inPk);
             i++;
         }
         return result;

@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.elements.reflection;
+package com.manydesigns.elements.annotations;
 
 import java.lang.annotation.Annotation;
 
@@ -36,19 +36,22 @@ import java.lang.annotation.Annotation;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface PropertyAccessor {
+@SuppressWarnings({"ClassExplicitlyAnnotation"})
+public class InputNameImpl implements InputName {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public String getName();
+    private final String value;
 
-    public int getModifiers();
+    public InputNameImpl(String value) {
+        this.value = value;
+    }
 
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass);
-    <T extends Annotation> T getAnnotation(Class<T> annotationClass);
+    public String value() {
+        return value;
+    }
 
-    public Object get(Object obj) throws IllegalAccessException;
-    public void set(Object obj, Object value) throws IllegalAccessException;
-
-    boolean isAssignableTo(Class clazz);
+    public Class<? extends Annotation> annotationType() {
+        return InputName.class;
+    }
 }

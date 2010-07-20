@@ -30,25 +30,63 @@
 package com.manydesigns.elements.reflection;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface PropertyAccessor {
+public abstract class AbstractPropertyAccessor implements PropertyAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public String getName();
+    protected String name;
+    protected int modifiers;
+    protected final List<Class<? extends Annotation>> annotations;
 
-    public int getModifiers();
+    public AbstractPropertyAccessor(String name, int modifiers) {
+        this.name = name;
+        this.modifiers = modifiers;
+        annotations = new ArrayList<Class<? extends Annotation>>();
+    }
 
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass);
-    <T extends Annotation> T getAnnotation(Class<T> annotationClass);
+    public String getName() {
+        return name;
+    }
 
-    public Object get(Object obj) throws IllegalAccessException;
-    public void set(Object obj, Object value) throws IllegalAccessException;
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    boolean isAssignableTo(Class clazz);
+    public int getModifiers() {
+        return modifiers;
+    }
+
+    public void setModifiers(int modifiers) {
+        this.modifiers = modifiers;
+    }
+
+    public List<Class<? extends Annotation>> getAnnotations() {
+        return annotations;
+    }
+
+    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+        for (Class<? extends Annotation> current : annotations) {
+            if (annotationClass.isAssignableFrom(current)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+        for (Class<? extends Annotation> current : annotations) {
+            if (annotationClass.isAssignableFrom(current)) {
+                return null; //(T) current;
+            }
+        }
+        return null;
+    }
 }

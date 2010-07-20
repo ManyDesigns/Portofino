@@ -349,7 +349,11 @@ public class TableAction extends ActionSupport
     // Delete
     //--------------------------------------------------------------------------
 
-    public String delete() {
+    public String delete() throws ModelObjectNotFoundException {
+        setupTable();
+        parsePkString();
+        object = context.getObjectByPk(qualifiedTableName, pkMap);
+        context.deleteObject(object);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
         return DELETE;
     }

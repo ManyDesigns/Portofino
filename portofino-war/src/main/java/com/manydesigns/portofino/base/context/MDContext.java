@@ -179,7 +179,7 @@ public class MDContext {
 
     public Map<String, Object> getObjectByPk(String qualifiedTableName,
                                              Object... pk) {
-        return null;
+        throw new UnsupportedOperationException();
     }
     
     public Map<String, Object> getObjectByPk(String qualifiedTableName,

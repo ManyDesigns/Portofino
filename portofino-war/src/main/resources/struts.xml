@@ -4,6 +4,8 @@
 <struts>
     <constant name="struts.i18n" value="ISO-8859-1" />
     <constant name="struts.i18n.encoding" value="ISO-8859-1" />
+    <constant name="struts.custom.i18n.resources"
+              value="com.manydesigns.elements.messages" />
     <constant name="struts.enable.SlashesInActionNames" value="true"/>
     <constant name="struts.mapper.alwaysSelectFullNamespace" value="false"/>
     <constant name="struts.ognl.allowStaticMethodAccess" value="true"/>

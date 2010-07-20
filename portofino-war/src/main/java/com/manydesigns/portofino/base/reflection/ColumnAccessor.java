@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.base.reflection;
 
+import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.base.model.Column;
 
@@ -46,9 +47,11 @@ public class ColumnAccessor implements PropertyAccessor {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     protected final Column column;
+    protected final boolean inPk;
 
-    public ColumnAccessor(Column column) {
+    public ColumnAccessor(Column column, boolean inPk) {
         this.column = column;
+        this.inPk = inPk;
     }
 
     public String getName() {
@@ -59,7 +62,10 @@ public class ColumnAccessor implements PropertyAccessor {
         return Modifier.PUBLIC;
     }
 
-    public boolean isAnnotationPresent(Class<? extends Annotation> clazz) {
+    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+        if (annotationClass == Required.class) {
+            return !column.isNullable();
+        }
         return false;
     }
 
