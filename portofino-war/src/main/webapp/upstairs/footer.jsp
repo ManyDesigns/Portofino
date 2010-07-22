@@ -8,6 +8,7 @@
                 <h2>Upstairs functions:</h2>
                 <ul>
                     <li><a href="<s:url namespace="/upstairs" action="ServerInfo"/>">Server info</a></li>
+                    <li><a href="<s:url namespace="/upstairs" action="Logs"/>">Logs</a></li>
                 </ul>
                 <hr/>
                 <a href="<s:url value="/"/>">Go downstairs</a>

@@ -91,5 +91,9 @@
                 class="com.manydesigns.portofino.actions.upstaits.ServerInfoAction">
             <result name="success">/upstairs/serverInfo.jsp</result>
         </action>
+        <action name="Logs"
+                class="com.manydesigns.portofino.actions.upstaits.LogsAction">
+            <result name="success">/upstairs/logs.jsp</result>
+        </action>
     </package>
 </struts>
