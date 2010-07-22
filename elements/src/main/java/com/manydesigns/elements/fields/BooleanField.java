@@ -29,7 +29,6 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
@@ -64,7 +63,7 @@ public class BooleanField extends AbstractField {
     // Implementazione di Component
     //--------------------------------------------------------------------------
     public void readFromRequest(HttpServletRequest req) {
-        if (mode == Mode.VIEW) {
+        if (mode.isView(immutable)) {
             return;
         }
 
@@ -108,24 +107,21 @@ public class BooleanField extends AbstractField {
     public void valueToXhtml(XhtmlBuffer xb) {
         String checkInputName = inputName + CHECK_SUFFIX;
 
-        switch(mode) {
-            case EDIT:
-                xb.writeInputCheckbox(id, inputName,
-                        "checked", booleanValue, false, "checkbox");
-                xb.writeInputHidden(checkInputName, "");
-                break;
-            case PREVIEW:
-                valueToXhtmlPreview(xb);
-                break;
-            case VIEW:
-                valueToXhtmlView(xb);
-                break;
-            case HIDDEN:
-                if (booleanValue) {
-                    xb.writeInputHidden(inputName, "checked");
-                }
-                xb.writeInputHidden(checkInputName, "");
-                break;
+        if (mode.isView(immutable)) {
+            valueToXhtmlView(xb);
+        } else if (mode.isEdit()) {
+            xb.writeInputCheckbox(id, inputName,
+                    "checked", booleanValue, false, "checkbox");
+            xb.writeInputHidden(checkInputName, "");
+        } else if (mode.isPreview()) {
+            valueToXhtmlPreview(xb);
+        } else if (mode.isHidden()) {
+            if (booleanValue) {
+                xb.writeInputHidden(inputName, "checked");
+            }
+            xb.writeInputHidden(checkInputName, "");
+        } else {
+            throw new IllegalStateException("Unknown mode: " + mode);
         }
     }
 

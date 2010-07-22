@@ -59,6 +59,9 @@ public interface Field extends Element {
     boolean isRequired();
     void setRequired(boolean required);
 
+    boolean isImmutable();
+    void setImmutable(boolean immutable);
+
     boolean isForceNewRow();
     void setForceNewRow(boolean forceNewRow);
 
@@ -77,4 +80,5 @@ public interface Field extends Element {
     public String getAlt();
     public void setAlt(String alt);
 
+    boolean isRequiredField();
 }

@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.base.model;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,5 +125,18 @@ public class Table {
     public String getQualifiedName() {
         return MessageFormat.format("{0}.{1}.{2}",
                 databaseName, schemaName, tableName);
+    }
+
+    //--------------------------------------------------------------------------
+    // toString()
+    //--------------------------------------------------------------------------
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("databaseName", databaseName)
+                .append("schemaName", schemaName)
+                .append("tableName", tableName)
+                .toString();
     }
 }

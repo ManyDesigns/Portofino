@@ -29,7 +29,6 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.MaxDecimalValue;
 import com.manydesigns.elements.annotations.MinDecimalValue;
 import com.manydesigns.elements.annotations.PrecisionScale;
@@ -97,7 +96,7 @@ public class DecimalField extends AbstractTextField {
     // Implementazione di Component
     //--------------------------------------------------------------------------
     public void readFromRequest(HttpServletRequest req) {
-        if (mode == Mode.VIEW) {
+        if (mode.isView(immutable)) {
             return;
         }
 

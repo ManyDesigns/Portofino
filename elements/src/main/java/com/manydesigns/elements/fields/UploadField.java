@@ -29,7 +29,6 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -71,18 +70,16 @@ public class UploadField extends AbstractField
     // AbstractField implementation
     //--------------------------------------------------------------------------
     public void valueToXhtml(XhtmlBuffer xb) {
-        switch (mode) {
-            case EDIT:
-                valueToXhtmlEdit(xb);
-                break;
-            case PREVIEW:
-                valueToXhtmlView(xb);
-                break;
-            case VIEW:
-                valueToXhtmlView(xb);
-                break;
-            case HIDDEN:
-                // do nothing
+        if (mode.isView(immutable)) {
+            valueToXhtmlView(xb);
+        } else if (mode.isEdit()) {
+            valueToXhtmlEdit(xb);
+        } else if (mode.isPreview()) {
+            valueToXhtmlView(xb);
+        } else if (mode.isHidden()) {
+            // do nothing
+        } else {
+            throw new IllegalStateException("Unknown mode: " + mode);
         }
     }
 
@@ -172,7 +169,7 @@ public class UploadField extends AbstractField
     // Element implementation
     //--------------------------------------------------------------------------
     public void readFromRequest(HttpServletRequest req) {
-        if (mode == Mode.VIEW) {
+        if (mode.isView(immutable)) {
             return;
         }
 

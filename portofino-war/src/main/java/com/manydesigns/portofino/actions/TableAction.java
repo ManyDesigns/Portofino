@@ -284,7 +284,7 @@ public class TableAction extends ActionSupport
 
         ClassFormBuilder formBuilder = new ClassFormBuilder(tableAccessor);
         form = formBuilder.build();
-        form.setMode(Mode.EDIT);
+        form.setMode(Mode.CREATE);
 
         return CREATE;
     }
@@ -294,6 +294,8 @@ public class TableAction extends ActionSupport
 
         ClassFormBuilder formBuilder = new ClassFormBuilder(tableAccessor);
         form = formBuilder.build();
+        form.setMode(Mode.CREATE);
+
         form.readFromRequest(req);
         if (form.validate()) {
             object = new HashMap<String, Object>();
@@ -304,7 +306,6 @@ public class TableAction extends ActionSupport
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
             return SAVE;
         } else {
-            form.setMode(Mode.EDIT);
             return CREATE;
         }
     }
@@ -321,6 +322,7 @@ public class TableAction extends ActionSupport
         ClassFormBuilder formBuilder = new ClassFormBuilder(tableAccessor);
         form = formBuilder.build();
         form.setMode(Mode.EDIT);
+
         form.readFromObject(object);
 
         return EDIT;
@@ -332,6 +334,8 @@ public class TableAction extends ActionSupport
         
         ClassFormBuilder formBuilder = new ClassFormBuilder(tableAccessor);
         form = formBuilder.build();
+        form.setMode(Mode.EDIT);
+
         form.readFromRequest(req);
         if (form.validate()) {
             object = context.getObjectByPk(qualifiedTableName, pkMap);
@@ -340,7 +344,6 @@ public class TableAction extends ActionSupport
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
             return UPDATE;
         } else {
-            form.setMode(Mode.EDIT);
             return EDIT;
         }
     }

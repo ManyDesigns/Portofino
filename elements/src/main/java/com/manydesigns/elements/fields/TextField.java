@@ -29,7 +29,6 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.HighlightLinks;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -81,7 +80,7 @@ public class TextField extends AbstractTextField {
     // Implementazione di Element
     //--------------------------------------------------------------------------
     public void readFromRequest(HttpServletRequest req) {
-        if (mode == Mode.VIEW) {
+        if (mode.isView(immutable)) {
             return;
         }
 

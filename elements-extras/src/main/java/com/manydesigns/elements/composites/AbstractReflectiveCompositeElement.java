@@ -32,14 +32,13 @@ package com.manydesigns.elements.composites;
 import com.manydesigns.elements.Element;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Id;
+import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -61,6 +60,7 @@ public abstract class AbstractReflectiveCompositeElement implements Element {
         this(null);
     }
 
+    @SuppressWarnings({"unchecked"})
     protected AbstractReflectiveCompositeElement(String prefix) {
         Class cls = this.getClass();
 

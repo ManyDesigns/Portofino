@@ -31,7 +31,6 @@ package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.AbstractCompositeElement;
 import com.manydesigns.elements.Field;
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.MultipartFormDataField;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
@@ -56,7 +55,7 @@ public class FieldSet extends AbstractCompositeElement<Field> {
     }
 
     public void toXhtml(XhtmlBuffer xb) {
-        if (mode == Mode.HIDDEN) {
+        if (mode.isHidden()) {
             for (Field current : this) {
                 current.toXhtml(xb);
             }
@@ -124,7 +123,7 @@ public class FieldSet extends AbstractCompositeElement<Field> {
 
     public boolean isRequiredFieldsPresent() {
         for (Field current : this) {
-            if (current.isRequired()) {
+            if (current.isRequiredField()) {
                 return true;
             }
         }

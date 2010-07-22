@@ -29,7 +29,6 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.MaxIntValue;
 import com.manydesigns.elements.annotations.MinIntValue;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -72,7 +71,7 @@ public class IntegerField extends AbstractTextField {
     // Implementazione di Component
     //--------------------------------------------------------------------------
     public void readFromRequest(HttpServletRequest req) {
-        if (mode == Mode.VIEW) {
+        if (mode.isView(immutable)) {
             return;
         }
 

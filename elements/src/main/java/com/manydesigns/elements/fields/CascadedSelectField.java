@@ -29,11 +29,10 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
@@ -81,19 +80,16 @@ public class CascadedSelectField extends AbstractField {
     }
 
     public void valueToXhtml(XhtmlBuffer xb) {
-        switch(mode) {
-            case EDIT:
-                valueToXhtmlEdit(xb);
-                break;
-            case PREVIEW:
-                valueToXhtmlPreview(xb);
-                break;
-            case VIEW:
-                valueToXhtmlView(xb);
-                break;
-            case HIDDEN:
-                valueToXhtmlHidden(xb);
-                break;
+        if (mode.isView(immutable)) {
+            valueToXhtmlView(xb);
+        } else if (mode.isEdit()) {
+            valueToXhtmlEdit(xb);
+        } else if (mode.isPreview()) {
+            valueToXhtmlPreview(xb);
+        } else if (mode.isHidden()) {
+            valueToXhtmlHidden(xb);
+        } else {
+            throw new IllegalStateException("Unknown mode: " + mode);
         }
     }
 
@@ -199,7 +195,7 @@ public class CascadedSelectField extends AbstractField {
     }
 
     public void readFromRequest(HttpServletRequest req) {
-        if (mode == Mode.VIEW) {
+        if (mode.isView(immutable)) {
             return;
         }
 

@@ -41,6 +41,7 @@ import org.apache.commons.lang.StringUtils;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,8 +53,6 @@ public abstract class AbstractField implements Field {
             "Copyright (c) 2005-2010, ManyDesigns srl";
     protected final PropertyAccessor accessor;
 
-    public static final String READONLY_SUFFIX = "_readonly";
-
     protected String id;
     protected String inputName;
     protected String label;
@@ -61,6 +60,7 @@ public abstract class AbstractField implements Field {
     protected String alt;
 
     protected boolean required = false;
+    protected boolean immutable = false;
     protected boolean forceNewRow = false;
     protected int colSpan = 1;
     protected String help;
@@ -68,6 +68,8 @@ public abstract class AbstractField implements Field {
     protected Mode mode = Mode.EDIT;
 
     protected List<String> errors = new ArrayList<String>();
+
+    protected Logger logger;
 
     //--------------------------------------------------------------------------
     // Costruttori
@@ -77,6 +79,9 @@ public abstract class AbstractField implements Field {
     }
 
     public AbstractField(PropertyAccessor accessor, String prefix) {
+        logger = Logger.getLogger(AbstractField.class.getName());
+        logger.entering(AbstractField.class.getName(), "AbstractField");
+
         this.accessor = accessor;
 
         String localId;
@@ -99,35 +104,49 @@ public abstract class AbstractField implements Field {
 
         if (accessor.isAnnotationPresent(LabelI18N.class)) {
             String text = accessor.getAnnotation(LabelI18N.class).value();
+            logger.finer("LabelI18N annotation present with value: " + text);
+
             String args = null;
             String textCompare = MessageFormat.format(text, args);
             String i18NText = getText(text);
             label = i18NText;
-            if(textCompare.equals(i18NText) && accessor.isAnnotationPresent(Label.class)) {
+            if (textCompare.equals(i18NText) && accessor.isAnnotationPresent(Label.class)) {
                 label = accessor.getAnnotation(Label.class).value();
-            }             
-        }else if (accessor.isAnnotationPresent(Label.class)) {
+            }
+        } else if (accessor.isAnnotationPresent(Label.class)) {
             label = accessor.getAnnotation(Label.class).value();
-        }
-        else {
+            logger.finer("Label annotation present with value: " + label);
+        } else {
             label = Util.camelCaseToWords(accessor.getName());
+            logger.finer("Setting label from property name: " + label);
         }
 
         if (accessor.isAnnotationPresent(Help.class)) {
             help = accessor.getAnnotation(Help.class).value();
+            logger.finer("Help annotation present with value: " + help);
         }
 
         if (accessor.isAnnotationPresent(Required.class)) {
             required = true;
+            logger.finer("Required annotation present");
+        }
+
+        if (accessor.isAnnotationPresent(Immutable.class)) {
+            immutable = true;
+            logger.finer("Immutable annotation present");
         }
 
         if (accessor.isAnnotationPresent(ForceNewRow.class)) {
             forceNewRow = true;
+            logger.finer("ForceNewRow annotation present");
         }
 
         if (accessor.isAnnotationPresent(ColSpan.class)) {
             colSpan = accessor.getAnnotation(ColSpan.class).value();
+            logger.finer("ColSpan annotation present with value: " + colSpan);
         }
+
+        logger.exiting(AbstractField.class.getName(), "AbstractField");
     }
 
     //--------------------------------------------------------------------------
@@ -135,47 +154,42 @@ public abstract class AbstractField implements Field {
     //--------------------------------------------------------------------------
 
     public void toXhtml(XhtmlBuffer xb) {
-        switch (mode) {
-            case EDIT:
-                xb.openElement("th");
-                labelToXhtml(xb);
-                xb.closeElement("th");
-                xb.openElement("td");
-                if (colSpan != 1) {
-                    xb.addAttribute("colspan", Integer.toString(colSpan * 2 - 1));
-                }
-                valueToXhtml(xb);
-                helpToXhtml(xb);
-                errorsToXhtml(xb);
-                xb.closeElement("td");
-                break;
-            case PREVIEW:
-                xb.openElement("th");
-                labelToXhtml(xb);
-                xb.closeElement("th");
-                xb.openElement("td");
-                if (colSpan != 1) {
-                    xb.addAttribute("colspan", Integer.toString(colSpan * 2 - 1));
-                }
-                valueToXhtml(xb);
-                String readonlyInputName = inputName + READONLY_SUFFIX;
-                xb.writeInputHidden(readonlyInputName, "");
-                xb.closeElement("td");
-                break;
-            case VIEW:
-                xb.openElement("th");
-                labelToXhtml(xb);
-                xb.closeElement("th");
-                xb.openElement("td");
-                if (colSpan != 1) {
-                    xb.addAttribute("colspan", Integer.toString(colSpan * 2 - 1));
-                }
-                valueToXhtml(xb);
-                xb.closeElement("td");
-                break;
-            case HIDDEN:
-                valueToXhtml(xb);
-                break;
+        if (mode.isView(immutable)) {
+            xb.openElement("th");
+            labelToXhtml(xb);
+            xb.closeElement("th");
+            xb.openElement("td");
+            if (colSpan != 1) {
+                xb.addAttribute("colspan", Integer.toString(colSpan * 2 - 1));
+            }
+            valueToXhtml(xb);
+            xb.closeElement("td");
+        } else if (mode.isEdit()) {
+            xb.openElement("th");
+            labelToXhtml(xb);
+            xb.closeElement("th");
+            xb.openElement("td");
+            if (colSpan != 1) {
+                xb.addAttribute("colspan", Integer.toString(colSpan * 2 - 1));
+            }
+            valueToXhtml(xb);
+            helpToXhtml(xb);
+            errorsToXhtml(xb);
+            xb.closeElement("td");
+        } else if (mode.isPreview()) {
+            xb.openElement("th");
+            labelToXhtml(xb);
+            xb.closeElement("th");
+            xb.openElement("td");
+            if (colSpan != 1) {
+                xb.addAttribute("colspan", Integer.toString(colSpan * 2 - 1));
+            }
+            valueToXhtml(xb);
+            xb.closeElement("td");
+        } else if (mode.isHidden()) {
+            valueToXhtml(xb);
+        } else {
+            throw new IllegalStateException("Unknown mode: " + mode);
         }
     }
 
@@ -183,7 +197,7 @@ public abstract class AbstractField implements Field {
         xb.openElement("label");
         xb.addAttribute("for", id);
         xb.addAttribute("class", "field");
-        if (required && (mode == Mode.EDIT)) {
+        if (isRequiredField()) {
             xb.openElement("span");
             xb.addAttribute("class", "required");
             xb.write("*");
@@ -204,7 +218,7 @@ public abstract class AbstractField implements Field {
     }
 
     public void errorsToXhtml(XhtmlBuffer xb) {
-        if (errors.size() > 0 ) {
+        if (errors.size() > 0) {
             xb.openElement("ul");
             xb.addAttribute("class", "errors");
             for (String error : errors) {
@@ -263,6 +277,14 @@ public abstract class AbstractField implements Field {
         this.required = required;
     }
 
+    public boolean isImmutable() {
+        return immutable;
+    }
+
+    public void setImmutable(boolean immutable) {
+        this.immutable = immutable;
+    }
+
     public String getHelp() {
         return help;
     }
@@ -317,5 +339,9 @@ public abstract class AbstractField implements Field {
 
     public void setAlt(String alt) {
         this.alt = alt;
+    }
+
+    public boolean isRequiredField() {
+        return required && !mode.isView(immutable);
     }
 }

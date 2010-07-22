@@ -30,11 +30,11 @@
 package com.manydesigns.elements.composites;
 
 import com.manydesigns.elements.Element;
-import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.OptionProvider;
+import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.SelectFieldOption;
-import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -82,7 +82,7 @@ public class Selection extends AbstractReflectiveCompositeElement {
         _selectField.readFromRequest(req);
         Integer selectedIndex = findIndexOfSelection();
         if (selectedIndex != null) {
-            Element component  = elements().get(selectedIndex);
+            Element component = elements().get(selectedIndex);
             component.readFromRequest(req);
         }
     }
@@ -97,66 +97,64 @@ public class Selection extends AbstractReflectiveCompositeElement {
             return true;
         }
 
-        Element component  = elements().get(selectedIndex);
+        Element component = elements().get(selectedIndex);
         return component.validate();
     }
 
     public void toXhtml(XhtmlBuffer xb) {
-        switch (_mode) {
-            case EDIT:
-            case PREVIEW:
-            case VIEW:
-                xb.openElement("fieldset");
-                xb.addAttribute("class", "group");
-                xb.writeLegend(_selectField.getLabel(), null);
-                _selectField.errorsToXhtml(xb);
-                xb.openElement("table");
-                xb.addAttribute("class", "selection");
-                xb.addAttribute("id", _selectField.getId());
-                String stringValue = _selectField.getStringValue();
-                OptionProvider optionProvider =
-                        _selectField.getOptionProvider();
-                Iterator<SelectFieldOption> optionsIterator =
-                        optionProvider.getOptions().iterator();
-                int index = 0;
+        if (_mode.isEdit() || _mode.isPreview() || _mode.isView()) {
+            xb.openElement("fieldset");
+            xb.addAttribute("class", "group");
+            xb.writeLegend(_selectField.getLabel(), null);
+            _selectField.errorsToXhtml(xb);
+            xb.openElement("table");
+            xb.addAttribute("class", "selection");
+            xb.addAttribute("id", _selectField.getId());
+            String stringValue = _selectField.getStringValue();
+            OptionProvider optionProvider =
+                    _selectField.getOptionProvider();
+            Iterator<SelectFieldOption> optionsIterator =
+                    optionProvider.getOptions().iterator();
+            int index = 0;
 
-                for (Element component : elements()) {
-                    SelectFieldOption currentOption =
-                            optionsIterator.next();
-                    String currentValue = currentOption.getValue();
-                    String currentLabel = currentOption.getLabel();
-                    String currentId = _selectField.getId() + "." + index;
-                    boolean checked = currentValue.equals(stringValue);
-                    xb.openElement("tr");
-                    xb.openElement("td");
-                    xb.addAttribute("class", "radio");
-                    xb.writeInputRadio(null, _selectField.getInputName(),
-                            currentValue, checked, false,
-                            "cleanSelect('" + _selectField.getId() + "')");
-                    xb.write(currentLabel);
-                    xb.closeElement("td");
-                    xb.openElement("td");
-                    xb.addAttribute("id", currentId);
-                    component.setMode(_mode);
-                    component.toXhtml(xb);
-                    xb.closeElement("td");
-                    xb.closeElement("tr");
-                    index = index + 1;
-                }
-                xb.closeElement("table");
-                xb.closeElement("fieldset");
-                xb.openElement("script");
-                xb.addAttribute("type", "text/javascript");
-                xb.write("cleanSelect('" + _selectField.getId() + "')");
-                xb.closeElement("script");
-                break;
-            case HIDDEN:
-                for (Element component : elements()) {
-                    component.setMode(_mode);
-                    component.toXhtml(xb);
-                }
-                _selectField.setMode(_mode);
-                _selectField.toXhtml(xb);
+            for (Element component : elements()) {
+                SelectFieldOption currentOption =
+                        optionsIterator.next();
+                String currentValue = currentOption.getValue();
+                String currentLabel = currentOption.getLabel();
+                String currentId = _selectField.getId() + "." + index;
+                boolean checked = currentValue.equals(stringValue);
+                xb.openElement("tr");
+                xb.openElement("td");
+                xb.addAttribute("class", "radio");
+                xb.writeInputRadio(null, _selectField.getInputName(),
+                        currentValue, checked, false,
+                        "cleanSelect('" + _selectField.getId() + "')");
+                xb.write(currentLabel);
+                xb.closeElement("td");
+                xb.openElement("td");
+                xb.addAttribute("id", currentId);
+                component.setMode(_mode);
+                component.toXhtml(xb);
+                xb.closeElement("td");
+                xb.closeElement("tr");
+                index = index + 1;
+            }
+            xb.closeElement("table");
+            xb.closeElement("fieldset");
+            xb.openElement("script");
+            xb.addAttribute("type", "text/javascript");
+            xb.write("cleanSelect('" + _selectField.getId() + "')");
+            xb.closeElement("script");
+        } else if (_mode.isHidden()) {
+            for (Element component : elements()) {
+                component.setMode(_mode);
+                component.toXhtml(xb);
+            }
+            _selectField.setMode(_mode);
+            _selectField.toXhtml(xb);
+        } else {
+            throw new IllegalStateException("Unknown mode:" + _mode);
         }
     }
 

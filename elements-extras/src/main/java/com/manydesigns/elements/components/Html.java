@@ -69,15 +69,12 @@ public class Html implements Element {
     public void writeToObject(Object o) {}
 
     public void toXhtml(XhtmlBuffer xb) {
-        switch (mode) {
-            case EDIT:
-            case PREVIEW:
-            case VIEW:
-                xb.writeNoHtmlEscape(html);
-                break;
-            case HIDDEN:
-                /* DO NOTHING */
-                break;
+        if (mode.isEdit() || mode.isPreview() || mode.isView()) {
+            xb.writeNoHtmlEscape(html);
+        } else if (mode.isHidden()) {
+            // do nothing
+        } else {
+            throw new IllegalStateException("Unknown mode: " + mode);
         }
     }
 

@@ -83,19 +83,16 @@ public abstract class AbstractTextField extends AbstractField {
     // Field implementation
     //--------------------------------------------------------------------------
     public void valueToXhtml(XhtmlBuffer xb) {
-        switch (mode) {
-            case EDIT:
-                valueToXhtmlEdit(xb);
-                break;
-            case PREVIEW:
-                valueToXhtmlPreview(xb);
-                break;
-            case VIEW:
-                valueToXhtmlView(xb);
-                break;
-            case HIDDEN:
-                xb.writeInputHidden(inputName, stringValue);
-                break;
+        if (mode.isView(immutable)) {
+            valueToXhtmlView(xb);
+        } else if (mode.isEdit()) {
+            valueToXhtmlEdit(xb);
+        } else if (mode.isPreview()) {
+            valueToXhtmlPreview(xb);
+        } else if (mode.isHidden()) {
+            xb.writeInputHidden(inputName, stringValue);
+        } else {
+            throw new IllegalStateException("Unknown mode: " + mode);
         }
     }
 

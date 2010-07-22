@@ -29,7 +29,6 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -92,7 +91,7 @@ public class SelectField extends AbstractField {
     // Implementazione di Component
     //--------------------------------------------------------------------------
     public void readFromRequest(HttpServletRequest req) {
-        if (mode == Mode.VIEW) {
+        if (mode.isView(immutable)) {
             return;
         }
 
@@ -157,19 +156,16 @@ public class SelectField extends AbstractField {
     }
 
     public void valueToXhtml(XhtmlBuffer xb) {
-        switch(mode) {
-            case EDIT:
-                valueToXhtmlEdit(xb);
-                break;
-            case PREVIEW:
-                valueToXhtmlPreview(xb);
-                break;
-            case VIEW:
-                valueToXhtmlView(xb);
-                break;
-            case HIDDEN:
-                valueToXhtmlHidden(xb);
-                break;
+        if (mode.isView(immutable)) {
+            valueToXhtmlView(xb);
+        } else if (mode.isEdit()) {
+            valueToXhtmlEdit(xb);
+        } else if (mode.isPreview()) {
+            valueToXhtmlPreview(xb);
+        } else if (mode.isHidden()) {
+            valueToXhtmlHidden(xb);
+        } else {
+            throw new IllegalStateException("Unknown mode: " + mode);
         }
     }
 

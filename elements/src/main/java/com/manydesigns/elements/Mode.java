@@ -29,14 +29,119 @@
 
 package com.manydesigns.elements;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public enum Mode {
-    EDIT,       // create and update forms: regular inputs (possibly with readonly flag)
-    PREVIEW,    // preview/confirmation pages: plain text values + hidden inputs
-    VIEW,       // read/view pages: plain text values, no inputs
-    HIDDEN      // no visual display, only hidden inputs.
+    /**
+     * create forms: regular inputs
+     */
+    CREATE(8, "CREATE"),
+
+    /**
+     * update forms: regular inputs
+     */
+    EDIT(0, "EDIT"),
+
+    /**
+     * create preview/confirmation pages: plain text values + hidden inputs
+     */
+    CREATE_PREVIEW(9, "CREATE_PREVIEW"),
+
+    /**
+     * update preview/confirmation pages: plain text values + hidden inputs
+     */
+    PREVIEW(1, "PREVIEW"),
+
+    /**
+     * read/view pages: plain text values, no inputs
+     */
+    VIEW(2, "VIEW"),
+
+    /**
+     * create - no visual display, only hidden inputs.
+     */
+    CREATE_HIDDEN(11, "CREATE_HIDDEN"),
+
+    /**
+     * update - no visual display, only hidden inputs.
+     */
+    HIDDEN(3, "HIDDEN");
+
+    private final static int BASE_MODE_MASK = 3;
+    private final static int CREATE_MASK = 8;
+
+    private boolean create;
+
+    private boolean edit;
+    private boolean preview;
+    private boolean view;
+    private boolean hidden;
+
+    private final String name;
+
+    Mode(int value, String name) {
+        int baseMode = value & BASE_MODE_MASK;
+        switch(baseMode) {
+            case 0:
+                edit = true;
+                break;
+            case 1:
+                preview = true;
+                break;
+            case 2:
+                view = true;
+                break;
+            case 3:
+                hidden = true;
+                break;
+            default:
+                throw new InternalError("Unrecognized mode: " + value);
+        }
+        if ((value & CREATE_MASK) != 0) {
+            create = true;
+        }
+        this.name = name;
+    }
+
+    public boolean isCreate() {
+        return create;
+    }
+
+    public boolean isEdit() {
+        return edit;
+    }
+
+    public boolean isPreview() {
+        return preview;
+    }
+
+    public boolean isView() {
+        return view;
+    }
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public boolean isView(boolean immutable) {
+        return view || (!hidden && !create && immutable);
+    }
+
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("name", name)
+                .append("create", create)
+                .append("edit", edit)
+                .append("preview", preview)
+                .append("view", view)
+                .append("hidden", hidden)
+                .toString();
+    }
 }

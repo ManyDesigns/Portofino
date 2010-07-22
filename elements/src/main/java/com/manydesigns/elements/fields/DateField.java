@@ -30,7 +30,6 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.Util;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -38,7 +37,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Date;
-import java.text.DateFormat;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 
@@ -65,7 +63,7 @@ public class DateField extends AbstractTextField {
     }
 
     public void readFromRequest(HttpServletRequest req) {
-        if (mode == Mode.VIEW) {
+        if (mode.isView(immutable)) {
             return;
         }
 
@@ -121,7 +119,7 @@ public class DateField extends AbstractTextField {
             if (obj == null) {
                 dateValue = null;
             } else {
-                dateValue = (Date)accessor.get(obj);
+                dateValue = (Date) accessor.get(obj);
             }
             if (dateValue == null) {
                 stringValue = null;
@@ -146,62 +144,58 @@ public class DateField extends AbstractTextField {
     // Other methods
     //--------------------------------------------------------------------------
     public void valueToXhtml(XhtmlBuffer xb) {
-        switch (mode) {
-            case EDIT:
-                xb.openElement("input");
-                xb.addAttribute("type", "text");
-                xb.addAttribute("class", "text");
-                xb.addAttribute("id", id);
-                xb.addAttribute("name", inputName);
-                if (stringValue != null) {
-                    xb.addAttribute("value", stringValue);
-                }
-                if (maxLength != null) {
-                    xb.addAttribute("maxlength", Integer.toString(maxLength));
-                    xb.addAttribute("size", Integer.toString(maxLength));
-                }
-                String errorMsg =
-                        getText("elements.error.field.date.format");
+        if (mode.isEdit()) {
+            xb.openElement("input");
+            xb.addAttribute("type", "text");
+            xb.addAttribute("class", "text");
+            xb.addAttribute("id", id);
+            xb.addAttribute("name", inputName);
+            if (stringValue != null) {
+                xb.addAttribute("value", stringValue);
+            }
+            if (maxLength != null) {
+                xb.addAttribute("maxlength", Integer.toString(maxLength));
+                xb.addAttribute("size", Integer.toString(maxLength));
+            }
+            String errorMsg =
+                    getText("elements.error.field.date.format");
 
-                ensureDateFormatPresent();
-                String localizedPattern = simpleDateFormat.toLocalizedPattern();
+            ensureDateFormatPresent();
+            String localizedPattern = simpleDateFormat.toLocalizedPattern();
 
-                String onBlurScript = "ctrTypeDate(this, '" +
-                        localizedPattern +
-                        "','" + StringEscapeUtils.escapeJavaScript(errorMsg) + "');";
-                xb.addAttribute("onblur", onBlurScript);
-                xb.addAttribute("onfocus", "backgroundDelete(this);");
-                xb.closeElement("input");
+            String onBlurScript = "ctrTypeDate(this, '" +
+                    localizedPattern +
+                    "','" + StringEscapeUtils.escapeJavaScript(errorMsg) + "');";
+            xb.addAttribute("onblur", onBlurScript);
+            xb.addAttribute("onfocus", "backgroundDelete(this);");
+            xb.closeElement("input");
 
-                xb.write(" (");
-                xb.write(localizedPattern);
-                xb.write(") ");
+            xb.write(" (");
+            xb.write(localizedPattern);
+            xb.write(") ");
 
-                HttpServletRequest req =
-                        ElementsThreadLocals.getHttpServletRequest();
-                String calImgLink =
-                        Util.getAbsoluteLink(req, "/jscalendar/img.gif");
-                xb.writeImage(calImgLink, "calendar", "calendar",
-                        "cal" + id, "calendar");
+            HttpServletRequest req =
+                    ElementsThreadLocals.getHttpServletRequest();
+            String calImgLink =
+                    Util.getAbsoluteLink(req, "/jscalendar/img.gif");
+            xb.writeImage(calImgLink, "calendar", "calendar",
+                    "cal" + id, "calendar");
 
-                String dateFormat = localizedPattern.toUpperCase();
-                dateFormat = dateFormat.replaceAll("DD", "%d");
-                dateFormat = dateFormat.replaceAll("YYYY", "%Y");
-                dateFormat = dateFormat.replaceAll("MM", "%m");
+            String dateFormat = localizedPattern.toUpperCase();
+            dateFormat = dateFormat.replaceAll("DD", "%d");
+            dateFormat = dateFormat.replaceAll("YYYY", "%Y");
+            dateFormat = dateFormat.replaceAll("MM", "%m");
 
-                xb.openElement("script");
-                xb.addAttribute("type", "text/javascript");
-                xb.writeNoHtmlEscape("Calendar.setup({ "
-                        + "inputField     :    \"" + id + "\","
-                        + "ifFormat       :    \"" + dateFormat + "\","
-                        + "button         :    \"cal" + id + "\""
-                        + "});");
-                xb.closeElement("script");
-                break;
-            case PREVIEW:
-            case VIEW:
-            case HIDDEN:
-                super.valueToXhtml(xb);
+            xb.openElement("script");
+            xb.addAttribute("type", "text/javascript");
+            xb.writeNoHtmlEscape("Calendar.setup({ "
+                    + "inputField     :    \"" + id + "\","
+                    + "ifFormat       :    \"" + dateFormat + "\","
+                    + "button         :    \"cal" + id + "\""
+                    + "});");
+            xb.closeElement("script");
+        } else {
+            super.valueToXhtml(xb);
         }
     }
 

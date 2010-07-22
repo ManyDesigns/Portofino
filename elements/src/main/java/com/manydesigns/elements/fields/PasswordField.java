@@ -29,7 +29,6 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -69,7 +68,7 @@ public class PasswordField extends TextField {
     public void readFromRequest(HttpServletRequest req) {
         super.readFromRequest(req);
 
-        if (mode == Mode.VIEW) {
+        if (mode.isView(immutable)) {
             return;
         }
 
@@ -121,7 +120,7 @@ public class PasswordField extends TextField {
 
     @Override
     public void toXhtml(XhtmlBuffer xb) {
-        if (mode == Mode.EDIT) {
+        if (mode.isEdit() && (mode.isCreate() || !immutable)) {
             // print out regular input field
             xb.openElement("th");
             labelToXhtml(xb);
@@ -157,7 +156,7 @@ public class PasswordField extends TextField {
         xb.openElement("label");
         xb.addAttribute("for", actualHtmlId);
         xb.addAttribute("class", "field");
-        if (required && (mode == Mode.EDIT)) {
+        if (required && (mode.isEdit())) {
             xb.openElement("span");
             xb.addAttribute("class", "required");
             xb.write("*");
@@ -175,34 +174,31 @@ public class PasswordField extends TextField {
 
     public void valueToXhtml(XhtmlBuffer xb, String actualHtmlId,
                              String actualInputName, String actualStringValue) {
-        switch (mode) {
-            case EDIT:
-                xb.openElement("input");
-                xb.addAttribute("type", "password");
-                xb.addAttribute("class", "text");
-                xb.addAttribute("id", actualHtmlId);
-                xb.addAttribute("name", actualInputName);
-                xb.addAttribute("value", actualStringValue);
-                if (maxLength != null) {
-                    int textInputSize = (maxLength > size)
-                            ? size
-                            : maxLength;
-                    xb.addAttribute("maxlength",
-                            Integer.toString(maxLength));
-                    xb.addAttribute("size",
-                            Integer.toString(textInputSize));
-                }
-                xb.closeElement("input");
-                break;
-            case PREVIEW:
-                valueToXhtmlPreview(xb, actualInputName, actualStringValue);
-                break;
-            case VIEW:
-                valueToXhtmlView(xb);
-                break;
-            case HIDDEN:
-                xb.writeInputHidden(actualInputName, actualStringValue);
-                break;
+        if (mode.isView(immutable)) {
+            valueToXhtmlView(xb);
+        } else if (mode.isEdit()) {
+            xb.openElement("input");
+            xb.addAttribute("type", "password");
+            xb.addAttribute("class", "text");
+            xb.addAttribute("id", actualHtmlId);
+            xb.addAttribute("name", actualInputName);
+            xb.addAttribute("value", actualStringValue);
+            if (maxLength != null) {
+                int textInputSize = (maxLength > size)
+                        ? size
+                        : maxLength;
+                xb.addAttribute("maxlength",
+                        Integer.toString(maxLength));
+                xb.addAttribute("size",
+                        Integer.toString(textInputSize));
+            }
+            xb.closeElement("input");
+        } else if (mode.isPreview()) {
+            valueToXhtmlPreview(xb, actualInputName, actualStringValue);
+        } else if (mode.isHidden()) {
+            xb.writeInputHidden(actualInputName, actualStringValue);
+        } else {
+            throw new IllegalStateException("Unknown mode: " + mode);
         }
     }
 

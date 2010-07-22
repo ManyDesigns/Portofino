@@ -70,29 +70,28 @@ public class Button implements Element {
     public void writeToObject(Object obj) {}
 
     public void toXhtml(XhtmlBuffer xb) {
-        switch (mode) {
-            case VIEW:
-                xb.openElement("input");
-                xb.addAttribute("id", id);
-                xb.addAttribute("type", "submit");
-                xb.addAttribute("name", name);
-                xb.addAttribute("value", value);
-                xb.addAttribute("class", "submit");
-                xb.addAttribute("disabled", "disabled");
-                xb.closeElement("input");
-                break;
-            case EDIT:
-            case PREVIEW:
-                xb.openElement("input");
-                xb.addAttribute("id", id);
-                xb.addAttribute("type", "submit");
-                xb.addAttribute("name", name);
-                xb.addAttribute("value", value);
-                xb.addAttribute("class", "submit");
-                xb.addAttribute("onclick", onclick);
-                xb.closeElement("input");
-                break;
-            case HIDDEN:
+        if (mode.isView()) {
+            xb.openElement("input");
+            xb.addAttribute("id", id);
+            xb.addAttribute("type", "submit");
+            xb.addAttribute("name", name);
+            xb.addAttribute("value", value);
+            xb.addAttribute("class", "submit");
+            xb.addAttribute("disabled", "disabled");
+            xb.closeElement("input");
+        } else if (mode.isEdit() || mode.isPreview()) {
+            xb.openElement("input");
+            xb.addAttribute("id", id);
+            xb.addAttribute("type", "submit");
+            xb.addAttribute("name", name);
+            xb.addAttribute("value", value);
+            xb.addAttribute("class", "submit");
+            xb.addAttribute("onclick", onclick);
+            xb.closeElement("input");
+        } else if (mode.isHidden()) {
+            // do nothing
+        } else {
+            throw new IllegalStateException("Unknown mode: " + mode);
         }
     }
 
