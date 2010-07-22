@@ -37,6 +37,7 @@ import javax.servlet.ServletContext;
 import java.util.*;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import java.util.logging.Handler;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,19 +50,25 @@ public class LogsAction extends ActionSupport
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public LogManager logManager;
-    public List<Logger> loggerList;
+    public List<Logger> loggers;
+    public Set<Handler> handlers;
 
     @Override
     public String execute() {
-        loggerList = new ArrayList<Logger>();
         logManager = LogManager.getLogManager();
-        Enumeration loggerNames = logManager.getLoggerNames();
+        loggers = new ArrayList<Logger>();
+        handlers = new HashSet<Handler>();
+
+        Enumeration<String> loggerNames = logManager.getLoggerNames();
         while (loggerNames.hasMoreElements()) {
-            String loggerName = (String)loggerNames.nextElement();
+            String loggerName = loggerNames.nextElement();
             Logger logger = logManager.getLogger(loggerName);
-            loggerList.add(logger);
+            loggers.add(logger);
+
+            Handler[] handlers = logger.getHandlers();
+            this.handlers.addAll(Arrays.asList(handlers));
         }
-        Collections.sort(loggerList, new LoggerComparator());
+        Collections.sort(loggers, new LoggerComparator());
         return SUCCESS;
     }
 
@@ -72,10 +79,8 @@ public class LogsAction extends ActionSupport
         this.servletContext = servletContext;
     }
 
-    public class LoggerComparator implements Comparator {
-        public int compare(Object o1, Object o2) {
-            Logger l1 = (Logger)o1;
-            Logger l2 = (Logger)o2;
+    public class LoggerComparator implements Comparator<Logger> {
+        public int compare(Logger l1, Logger l2) {
             return l1.getName().compareTo(l2.getName());
         }
     }
