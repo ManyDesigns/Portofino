@@ -18,6 +18,7 @@
 </table>
 
 <h1>Loggers</h1>
+Current LogManager: <s:property value="logManager"/><br/>
 <table>
     <tr>
         <th>Name</th>

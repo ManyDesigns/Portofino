@@ -2,7 +2,7 @@ package com.manydesigns.portofino.methods;
 
 import com.manydesigns.portofino.base.context.MDContext;
 import com.manydesigns.portofino.base.context.ServerInfo;
-import com.manydesigns.portofino.logging.LogUtil;
+import com.manydesigns.elements.logging.LogUtil;
 import org.apache.commons.lang.time.StopWatch;
 
 import javax.servlet.ServletContext;
@@ -32,23 +32,21 @@ public class PortofinoServletContextListener implements ServletContextListener {
     public static final String MDCONTEXT_ATTRIBUTE =
             "mdContext";
 
-    protected final Logger logger;
     protected ServletContext servletContext;
     protected ServerInfo serverInfo;
     protected MDContext mdContext;
+
+    protected final Logger logger =
+            LogUtil.getLogger(PortofinoServletContextListener.class);
 
     /**
      * Creates a new instance of PortofinoServletContextListener
      */
     public PortofinoServletContextListener() {
-        logger = Logger.getLogger(getClass().getName());
+
     }
 
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        LogUtil.info(logger, "\n" + SEPARATOR +
-                "\n--- ManyDesigns Portofino {0} starting..." +
-                "\n" + SEPARATOR, PORTOFINO_VERSION);
-
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
@@ -56,6 +54,16 @@ public class PortofinoServletContextListener implements ServletContextListener {
         servletContext = servletContextEvent.getServletContext();
         serverInfo = new ServerInfo(servletContext);
         
+        LogUtil.infoMF(logger, "\n" + SEPARATOR +
+                "\n--- ManyDesigns Portofino {0} starting..." +
+                "\n--- Context path: {1}" +
+                "\n--- Real path: {2}" +
+                "\n" + SEPARATOR,
+                PORTOFINO_VERSION,
+                serverInfo.getContextPath(),
+                serverInfo.getRealPath()
+        );
+
         servletContext.setAttribute(SERVER_INFO_ATTRIBUTE,
                 serverInfo);
         servletContext.setAttribute(PORTOFINO_VERSION_ATTRIBUTE,
@@ -67,7 +75,7 @@ public class PortofinoServletContextListener implements ServletContextListener {
         if (serverInfo.getServletApiMajor() < 2 ||
                 (serverInfo.getServletApiMajor() == 2 &&
                         serverInfo.getServletApiMinor() < 3)) {
-            LogUtil.severe(logger,
+            LogUtil.severeMF(logger,
                     "Servlet API version must be >= 2.3. Found: {0}.",
                     serverInfo.getServletApiVersion());
             success = false;
@@ -84,7 +92,7 @@ public class PortofinoServletContextListener implements ServletContextListener {
 
         stopWatch.stop();
         if (success) {
-            LogUtil.info(logger,
+            LogUtil.infoMF(logger,
                     "ManyDesigns Portofino successfully started in {0} ms.",
                     stopWatch.getTime());
         } else {

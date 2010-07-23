@@ -31,6 +31,7 @@ package com.manydesigns.portofino.base.context;
 
 import com.manydesigns.portofino.base.database.HibernateConfig;
 import com.manydesigns.portofino.base.model.*;
+import com.manydesigns.elements.logging.LogUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -60,14 +61,13 @@ public class MDContext {
     protected Map<String, SessionFactory> sessionFactories;
     protected final ThreadLocal<Map<String, Session>> threadSessions;
 
-    protected final Logger logger;
+    protected final Logger logger = LogUtil.getLogger(MDContext.class);
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
     public MDContext() {
-        logger = Logger.getLogger(getClass().getName());
         threadSessions = new ThreadLocal<Map<String, Session>>();
     }
 
@@ -76,9 +76,7 @@ public class MDContext {
     //--------------------------------------------------------------------------
 
     public void loadXmlModelAsResource(String resource) {
-        logger.entering("com.manydesigns.portofino.base.context.MDContext",
-                "loadXmlModelAsResource",
-                resource);
+        LogUtil.entering(logger, "loadXmlModelAsResource", resource);
 
         DBParser parser = new DBParser();
         try {
@@ -86,11 +84,11 @@ public class MDContext {
             HibernateConfig builder = new HibernateConfig();
             sessionFactories = builder.build(dataModel);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "loadXmlModelAsResource", e);
+            LogUtil.logMF(logger, Level.SEVERE, e,
+                    "Cannot load/parse model: {0}", resource);
         }
 
-        logger.exiting("com.manydesigns.portofino.base.context.MDContext",
-                "loadXmlModelAsResource");
+        LogUtil.exiting(logger, "loadXmlModelAsResource");
     }
 
     //--------------------------------------------------------------------------

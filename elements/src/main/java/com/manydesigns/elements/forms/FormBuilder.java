@@ -32,6 +32,7 @@ package com.manydesigns.elements.forms;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Field;
 import com.manydesigns.elements.FieldHelper;
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.annotations.FieldSet;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
@@ -65,7 +66,7 @@ public class FormBuilder {
     protected String prefix;
     protected int nColumns = DEFAULT_N_COLUMNS;
 
-    protected Logger logger = Logger.getLogger("FormBuilder");
+    protected final Logger logger = LogUtil.getLogger(FormBuilder.class);
 
     //**************************************************************************
     // Constructors
@@ -76,11 +77,11 @@ public class FormBuilder {
     }
 
     public FormBuilder(ClassAccessor classAccessor) {
-        logger.entering("FormBuilder", "FormBuilder");
+        LogUtil.entering(logger, "FormBuilder", classAccessor);
 
         this.classAccessor = classAccessor;
 
-        logger.exiting("FormBuilder", "FormBuilder");
+        LogUtil.exiting(logger, "FormBuilder");
     }
 
     //**************************************************************************
@@ -88,12 +89,16 @@ public class FormBuilder {
     //**************************************************************************
 
     public FormBuilder configFields(String... fieldNames) {
+        LogUtil.fineMF(logger, "Configuring fields to: {0}", fieldNames);
+
         String[][] groupedFieldNames = new String[1][];
         groupedFieldNames[0] = fieldNames;
         return configFields(groupedFieldNames);
     }
 
     public FormBuilder configFields(String[]... groupedFieldNames) {
+        LogUtil.entering(logger, "configFields", groupedFieldNames);
+
         groupedPropertyAccessors = new ArrayList<ArrayList<PropertyAccessor>>();
         for (String[] currentNameGroup : groupedFieldNames) {
             ArrayList<PropertyAccessor> currentPropertyGroup =
@@ -105,37 +110,41 @@ public class FormBuilder {
                             classAccessor.getProperty(currentField);
                     currentPropertyGroup.add(accessor);
                 } catch (NoSuchFieldException e) {
-                    // rethrow as Error, so no exception is declared
-                    // by the method. This is important so the builder
-                    // can be used in inline field initializations,
-                    // without the need for a constructor. E.g.:
-                    // public final Element myElement =
-                    //   new ClassFormBuilder(MyClass.class)
-                    //   .configFields("field1", "field2").build();
-                    
-                    throw new Error(e);
+                    LogUtil.warningMF(logger, e,
+                            "Field not found: {0}", currentField);
                 }
             }
         }
+
+        LogUtil.exiting(logger, "configFields");
         return this;
     }
 
     public FormBuilder configPrefix(String prefix) {
+        LogUtil.fineMF(logger, "Configuring prefix to: {0}", prefix);
+
         this.prefix = prefix;
         return this;
     }
 
     public FormBuilder configNColumns(int nColumns) {
+        LogUtil.fineMF(logger, "Configuring nColumns to: {0}", nColumns);
+
         this.nColumns = nColumns;
         return this;
     }
 
     public FormBuilder configFieldSetNames(String... fieldSetNames) {
+        LogUtil.fineMF(logger,
+                "Configuring configFieldSetNames to: {0}", fieldSetNames);
+
         this.fieldSetNames = Arrays.asList(fieldSetNames);
         return this;
     }
 
     public FormBuilder configReflectiveFields() {
+        LogUtil.entering(logger, "configReflectiveFields");
+
         groupedPropertyAccessors = new ArrayList<ArrayList<PropertyAccessor>>();
         fieldSetNames = new ArrayList<String>();
 
@@ -147,7 +156,8 @@ public class FormBuilder {
             }
             
             String groupName = null;
-            if (current.isAnnotationPresent(com.manydesigns.elements.annotations.FieldSet.class)) {
+            if (current.isAnnotationPresent(
+                    com.manydesigns.elements.annotations.FieldSet.class)) {
                 groupName = current.getAnnotation(FieldSet.class).value();
             }
 
@@ -160,6 +170,8 @@ public class FormBuilder {
             }
             currentGroup.add(current);
         }
+
+        LogUtil.exiting(logger, "configReflectiveFields");
         return this;
     }
 
@@ -168,6 +180,8 @@ public class FormBuilder {
     //**************************************************************************
 
     public Form build() {
+        LogUtil.entering(logger, "build");
+
         Form form = new Form();
         FieldHelper fieldHelper = ElementsThreadLocals.getFieldHelper();
 
@@ -198,6 +212,8 @@ public class FormBuilder {
                 fieldSet.add(field);
             }
         }
+
+        LogUtil.exiting(logger, "build");
         return form;
     }
 }

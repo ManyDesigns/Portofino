@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.base.context;
 
-import com.manydesigns.portofino.logging.LogUtil;
+import com.manydesigns.elements.logging.LogUtil;
 
 import javax.servlet.ServletContext;
 import java.lang.reflect.Method;
@@ -50,7 +50,7 @@ public class ServerInfo {
     // Fields
     //--------------------------------------------------------------------------
 
-    protected final Logger logger;
+    protected final Logger logger = LogUtil.getLogger(ServerInfo.class);
 
     protected final ServletContext servletContext;
 
@@ -74,24 +74,22 @@ public class ServerInfo {
     protected final Runtime runTime;
 
     public ServerInfo(ServletContext servletContext) {
-        logger = Logger.getLogger(getClass().getName());
-
         this.servletContext = servletContext;
 
         realPath = servletContext.getRealPath("/");
-        LogUtil.info(logger, "Real path: {0}", realPath);
+        LogUtil.finerMF(logger, "Real path: {0}", realPath);
 
         servletContextName = servletContext.getServletContextName();
-        LogUtil.info(logger, "Servlet context name: {0}", servletContextName);
+        LogUtil.finerMF(logger, "Servlet context name: {0}", servletContextName);
 
         serverInfo = servletContext.getServerInfo();
-        LogUtil.info(logger, "Server info: {0}", serverInfo);
+        LogUtil.finerMF(logger, "Server info: {0}", serverInfo);
 
         servletApiMajor = servletContext.getMajorVersion();
         servletApiMinor = servletContext.getMinorVersion();
         servletApiVersion = MessageFormat.format("{0}.{1}",
                         servletApiMajor, servletApiMinor);
-        LogUtil.info(logger, "Servlet API version: {0}", servletApiVersion);
+        LogUtil.finerMF(logger, "Servlet API version: {0}", servletApiVersion);
 
         String tmp = null;
         if (servletApiMajor >= 2 && servletApiMinor >= 5) {
@@ -100,35 +98,35 @@ public class ServerInfo {
                         servletContext.getClass().getMethod("getContextPath");
                 tmp = (String)method.invoke(servletContext);
             } catch (Throwable e) {
-                logger.log(Level.SEVERE, "Uncaught exception", e);
+                LogUtil.severe(logger, e, "Uncaught exception");
             }
         }
         contextPath = tmp;
-        LogUtil.info(logger, "Context path: {0}", contextPath);
+        LogUtil.finerMF(logger, "Context path: {0}", contextPath);
 
         javaRuntimeName = System.getProperty("java.runtime.name");
-        LogUtil.info(logger, "java.runtime.name: {0}", javaRuntimeName);
+        LogUtil.finerMF(logger, "java.runtime.name: {0}", javaRuntimeName);
 
         javaRuntimeVersion = System.getProperty("java.runtime.version");
-        LogUtil.info(logger, "java.runtime.version: {0}", javaRuntimeVersion);
+        LogUtil.finerMF(logger, "java.runtime.version: {0}", javaRuntimeVersion);
 
         javaVmName = System.getProperty("java.vm.name");
-        LogUtil.info(logger, "java.vm.name: {0}", javaVmName);
+        LogUtil.finerMF(logger, "java.vm.name: {0}", javaVmName);
 
         javaVmVersion = System.getProperty("java.vm.version");
-        LogUtil.info(logger, "java.vm.version: {0}", javaVmVersion);
+        LogUtil.finerMF(logger, "java.vm.version: {0}", javaVmVersion);
 
         javaVmVendor = System.getProperty("java.vm.vendor");
-        LogUtil.info(logger, "java.vm.vendor: {0}", javaVmVendor);
+        LogUtil.finerMF(logger, "java.vm.vendor: {0}", javaVmVendor);
 
         osName = System.getProperty("os.name");
-        LogUtil.info(logger, "os.name: {0}", osName);
+        LogUtil.finerMF(logger, "os.name: {0}", osName);
 
         userLanguage = System.getProperty("user.language");
-        LogUtil.info(logger, "user.language: {0}", userLanguage);
+        LogUtil.finerMF(logger, "user.language: {0}", userLanguage);
 
         userRegion = System.getProperty("user.region");
-        LogUtil.info(logger, "user.region: {0}", userRegion);
+        LogUtil.finerMF(logger, "user.region: {0}", userRegion);
 
         runTime = Runtime.getRuntime();        
     }

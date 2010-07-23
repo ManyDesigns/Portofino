@@ -40,6 +40,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -124,5 +126,15 @@ public class ColumnAccessor implements PropertyAccessor {
 
     public Column getColumn() {
         return column;
+    }
+
+    //--------------------------------------------------------------------------
+    // toString()
+    //--------------------------------------------------------------------------
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("column", column.getQualifiedName()).toString();
     }
 }

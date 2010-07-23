@@ -32,11 +32,11 @@ package com.manydesigns.portofino.elements;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.logging.LogUtil;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /*
@@ -56,7 +56,7 @@ public class SearchFormBuilder {
     protected List<PropertyAccessor> propertyAccessors;
     protected String prefix;
 
-    protected Logger logger = Logger.getLogger(SearchFormBuilder.class.getName());
+    protected final Logger logger = LogUtil.getLogger(SearchFormBuilder.class);
 
     //**************************************************************************
     // Constructors
@@ -67,11 +67,11 @@ public class SearchFormBuilder {
     }
 
     public SearchFormBuilder(ClassAccessor classAccessor) {
-        logger.entering("SearchFormBuilder", "SearchFormBuilder", classAccessor);
+        LogUtil.entering(logger, "SearchFormBuilder", classAccessor);
 
         this.classAccessor = classAccessor;
 
-        logger.exiting("SearchFormBuilder", "SearchFormBuilder");
+        LogUtil.exiting(logger, "SearchFormBuilder");
     }
 
     //**************************************************************************
@@ -79,7 +79,7 @@ public class SearchFormBuilder {
     //**************************************************************************
 
     public SearchFormBuilder configFields(String... fieldNames) {
-        logger.entering("SearchFormBuilder", "configFields");
+        LogUtil.entering(logger, "configFields", fieldNames);
 
         propertyAccessors = new ArrayList<PropertyAccessor>();
         for (String current : fieldNames) {
@@ -88,25 +88,25 @@ public class SearchFormBuilder {
                         classAccessor.getProperty(current);
                 propertyAccessors.add(accessor);
             } catch (NoSuchFieldException e) {
-                logger.log(Level.WARNING, "Field not found: " + current, e);
+                LogUtil.warningMF(logger, e, "Field not found: {0}", current);
             }
         }
 
-        logger.exiting("SearchFormBuilder", "configFields");
+        LogUtil.exiting(logger, "configFields");
         return this;
     }
 
     public SearchFormBuilder configPrefix(String prefix) {
-        logger.entering("SearchFormBuilder", "configPrefix", prefix);
+        LogUtil.entering(logger, "configPrefix", prefix);
 
         this.prefix = prefix;
 
-        logger.exiting("SearchFormBuilder", "configPrefix");
+        LogUtil.exiting(logger, "configPrefix");
         return this;
     }
 
     public SearchFormBuilder configReflectiveFields() {
-        logger.entering("SearchFormBuilder", "configReflectiveFields");
+        LogUtil.entering(logger, "configReflectiveFields");
 
         propertyAccessors = new ArrayList<PropertyAccessor>();
 
@@ -119,7 +119,7 @@ public class SearchFormBuilder {
             propertyAccessors.add(current);
         }
 
-        logger.exiting("SearchFormBuilder", "configReflectiveFields");
+        LogUtil.exiting(logger, "configReflectiveFields");
         return this;
     }
 
@@ -128,7 +128,7 @@ public class SearchFormBuilder {
     //**************************************************************************
 
     public SearchForm build() {
-        logger.entering("SearchFormBuilder", "build");
+        LogUtil.entering(logger, "build");
 
         SearchForm form = new SearchForm();
         //FieldHelper fieldHelper = ElementsThreadLocals.getFieldHelper();
@@ -148,7 +148,7 @@ public class SearchFormBuilder {
         }
         */
 
-        logger.exiting("SearchFormBuilder", "build");
+        LogUtil.exiting(logger, "build");
         return form;
     }
 }

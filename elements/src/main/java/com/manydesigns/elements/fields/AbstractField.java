@@ -33,6 +33,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Field;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.Util;
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -69,7 +70,7 @@ public abstract class AbstractField implements Field {
 
     protected List<String> errors = new ArrayList<String>();
 
-    protected Logger logger;
+    protected final Logger logger = LogUtil.getLogger(AbstractField.class);
 
     //--------------------------------------------------------------------------
     // Costruttori
@@ -79,8 +80,7 @@ public abstract class AbstractField implements Field {
     }
 
     public AbstractField(PropertyAccessor accessor, String prefix) {
-        logger = Logger.getLogger(AbstractField.class.getName());
-        logger.entering(AbstractField.class.getName(), "AbstractField");
+        LogUtil.entering(logger, "AbstractField", accessor, prefix);
 
         this.accessor = accessor;
 
@@ -146,7 +146,7 @@ public abstract class AbstractField implements Field {
             logger.finer("ColSpan annotation present with value: " + colSpan);
         }
 
-        logger.exiting(AbstractField.class.getName(), "AbstractField");
+        LogUtil.exiting(logger, "AbstractField");
     }
 
     //--------------------------------------------------------------------------
