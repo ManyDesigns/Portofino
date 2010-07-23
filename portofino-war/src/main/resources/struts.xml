@@ -51,9 +51,7 @@
         
         <action name="*/Table"
                 class="com.manydesigns.portofino.actions.TableAction">
-            <!--suppress Struts2ModelInspection -->
             <param name="skin">default</param>
-            <!--suppress Struts2ModelInspection -->
             <param name="qualifiedTableName">{1}</param>
 
             <result name="search">/skins/%{skin}/search.jsp</result>

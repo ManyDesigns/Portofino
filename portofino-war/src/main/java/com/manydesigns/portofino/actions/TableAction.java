@@ -101,7 +101,19 @@ public class TableAction extends ActionSupport
     public String qualifiedTableName;
     public String pk;
     public String cancelReturnUrl;
+    public String skin;
 
+    //--------------------------------------------------------------------------
+    // Web parameters setters (for struts.xml inspections in IntelliJ)
+    //--------------------------------------------------------------------------
+
+    public void setQualifiedTableName(String qualifiedTableName) {
+        this.qualifiedTableName = qualifiedTableName;
+    }
+
+    public void setSkin(String skin) {
+        this.skin = skin;
+    }
 
     //--------------------------------------------------------------------------
     // Model metadata
@@ -127,8 +139,6 @@ public class TableAction extends ActionSupport
     public TableForm tableForm;
     public Form form;
     public List<RelatedTableForm> relatedTableFormList;
-    public String skin;
-
 
     //--------------------------------------------------------------------------
     // Action default execute method
