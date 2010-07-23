@@ -32,8 +32,8 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.composites.ClassTableFormBuilder;
 import com.manydesigns.elements.composites.TableForm;
-import com.manydesigns.elements.forms.ClassFormBuilder;
 import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.hyperlinks.ExpressionHyperlinkGenerator;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.base.context.MDContext;
@@ -253,8 +253,8 @@ public class TableAction extends ActionSupport
         parsePkString();
 
         object = context.getObjectByPk(qualifiedTableName, pkMap);
-        ClassFormBuilder formBuilder =
-                new ClassFormBuilder(tableAccessor);
+        FormBuilder formBuilder =
+                new FormBuilder(tableAccessor);
         form = formBuilder.build();
         form.setMode(Mode.VIEW);
         form.readFromObject(object);
@@ -292,7 +292,7 @@ public class TableAction extends ActionSupport
     public String create() throws ModelObjectNotFoundException {
         setupTable();
 
-        ClassFormBuilder formBuilder = new ClassFormBuilder(tableAccessor);
+        FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
         form.setMode(Mode.CREATE);
 
@@ -302,7 +302,7 @@ public class TableAction extends ActionSupport
     public String save() throws ModelObjectNotFoundException {
         setupTable();
 
-        ClassFormBuilder formBuilder = new ClassFormBuilder(tableAccessor);
+        FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
         form.setMode(Mode.CREATE);
 
@@ -329,7 +329,7 @@ public class TableAction extends ActionSupport
         parsePkString();
         object = context.getObjectByPk(qualifiedTableName, pkMap);
 
-        ClassFormBuilder formBuilder = new ClassFormBuilder(tableAccessor);
+        FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
         form.setMode(Mode.EDIT);
 
@@ -342,7 +342,7 @@ public class TableAction extends ActionSupport
         setupTable();
         parsePkString();
         
-        ClassFormBuilder formBuilder = new ClassFormBuilder(tableAccessor);
+        FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
         form.setMode(Mode.EDIT);
 

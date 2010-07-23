@@ -41,40 +41,59 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ClassFormBuilder {
+public class FormBuilder {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public final static int DEFAULT_N_COLUMNS = 1;
 
-    private final ClassAccessor classAccessor;
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
+    protected final ClassAccessor classAccessor;
 
     protected List<ArrayList<PropertyAccessor>> groupedPropertyAccessors;
     protected List<String> fieldSetNames;
     protected String prefix;
     protected int nColumns = DEFAULT_N_COLUMNS;
 
-    public ClassFormBuilder(Class clazz) {
+    protected Logger logger = Logger.getLogger("FormBuilder");
+
+    //**************************************************************************
+    // Constructors
+    //**************************************************************************
+
+    public FormBuilder(Class clazz) {
         this(new JavaClassAccessor(clazz));
     }
 
-    public ClassFormBuilder(ClassAccessor classAccessor) {
+    public FormBuilder(ClassAccessor classAccessor) {
+        logger.entering("FormBuilder", "FormBuilder");
+
         this.classAccessor = classAccessor;
+
+        logger.exiting("FormBuilder", "FormBuilder");
     }
 
-    public ClassFormBuilder configFields(String... fieldNames) {
+    //**************************************************************************
+    // Builder configuration
+    //**************************************************************************
+
+    public FormBuilder configFields(String... fieldNames) {
         String[][] groupedFieldNames = new String[1][];
         groupedFieldNames[0] = fieldNames;
         return configFields(groupedFieldNames);
     }
 
-    public ClassFormBuilder configFields(String[]... groupedFieldNames) {
+    public FormBuilder configFields(String[]... groupedFieldNames) {
         groupedPropertyAccessors = new ArrayList<ArrayList<PropertyAccessor>>();
         for (String[] currentNameGroup : groupedFieldNames) {
             ArrayList<PropertyAccessor> currentPropertyGroup =
@@ -101,22 +120,22 @@ public class ClassFormBuilder {
         return this;
     }
 
-    public ClassFormBuilder configPrefix(String prefix) {
+    public FormBuilder configPrefix(String prefix) {
         this.prefix = prefix;
         return this;
     }
 
-    public ClassFormBuilder configNColumns(int nColumns) {
+    public FormBuilder configNColumns(int nColumns) {
         this.nColumns = nColumns;
         return this;
     }
 
-    public ClassFormBuilder configFieldSetNames(String... fieldSetNames) {
+    public FormBuilder configFieldSetNames(String... fieldSetNames) {
         this.fieldSetNames = Arrays.asList(fieldSetNames);
         return this;
     }
 
-    public ClassFormBuilder configReflectiveFields() {
+    public FormBuilder configReflectiveFields() {
         groupedPropertyAccessors = new ArrayList<ArrayList<PropertyAccessor>>();
         fieldSetNames = new ArrayList<String>();
 
@@ -143,6 +162,10 @@ public class ClassFormBuilder {
         }
         return this;
     }
+
+    //**************************************************************************
+    // Building
+    //**************************************************************************
 
     public Form build() {
         Form form = new Form();
