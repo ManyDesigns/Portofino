@@ -181,11 +181,7 @@ public class DecimalField extends AbstractTextField {
     }
 
     public void writeToObject(Object obj) {
-        try {
-            accessor.set(obj, decimalValue);
-        } catch (IllegalAccessException e) {
-            throw new Error(e);
-        }
+        writeToObject(obj, decimalValue);
     }
 
     //--------------------------------------------------------------------------

@@ -13,6 +13,10 @@
         <mdes:write value="#current.tableForm"/>
     </s:iterator>
     <s:hidden name="pk" value="%{pk}"/>
+    <s:url var="cancelReturnUrl" namespace="/" action="%{qualifiedTableName}/Table">
+        <s:param name="pk" value="%{pk}"/>
+    </s:url>
+    <s:hidden name="cancelReturnUrl" value="%{#cancelReturnUrl}"/>
     <s:include value="/skins/default/readButtonsBar.jsp"/>
 </s:form>
 <s:include value="/skins/default/footer.jsp"/>

@@ -10,7 +10,7 @@
         Fields marked with a "*" are required.
     </s:if>
     <mdes:write value="form"/>
-    <s:hidden name="pk" value="%{pk}"/>
+    <s:hidden name="cancelReturnUrl" value="%{cancelReturnUrl}"/>
     <s:include value="/skins/default/createButtonsBar.jsp"/>
 </s:form>
 <s:include value="/skins/default/footer.jsp"/>

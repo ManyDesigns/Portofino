@@ -148,11 +148,7 @@ public class SelectField extends AbstractField {
     }
 
     public void writeToObject(Object obj) {
-        try {
-            accessor.set(obj, stringValue);
-        } catch (IllegalAccessException e) {
-            throw new Error(e);
-        }
+        writeToObject(obj, stringValue);
     }
 
     public void valueToXhtml(XhtmlBuffer xb) {

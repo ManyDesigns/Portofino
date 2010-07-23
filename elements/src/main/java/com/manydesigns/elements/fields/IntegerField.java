@@ -136,11 +136,7 @@ public class IntegerField extends AbstractTextField {
     }
 
     public void writeToObject(Object obj) {
-        try {
-            accessor.set(obj, integerValue);
-        } catch (IllegalAccessException e) {
-            throw new Error(e);
-        }
+        writeToObject(obj, integerValue);
     }
 
 

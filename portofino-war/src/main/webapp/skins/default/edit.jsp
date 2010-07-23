@@ -11,6 +11,7 @@
     </s:if>
     <mdes:write value="form"/>
     <s:hidden name="pk" value="%{pk}"/>
+    <s:hidden name="cancelReturnUrl" value="%{cancelReturnUrl}"/>
     <s:include value="/skins/default/editButtonsBar.jsp"/>
 </s:form>
 <s:include value="/skins/default/footer.jsp"/>

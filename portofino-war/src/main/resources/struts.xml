@@ -48,40 +48,47 @@
         <action name="Homepage" class="com.manydesigns.portofino.actions.Homepage">
             <result name="success">/skins/%{skin}/homepage.jsp</result>
         </action>
+        
         <action name="*/Table"
                 class="com.manydesigns.portofino.actions.TableAction">
+            <!--suppress Struts2ModelInspection -->
             <param name="skin">default</param>
+            <!--suppress Struts2ModelInspection -->
             <param name="qualifiedTableName">{1}</param>
+
             <result name="search">/skins/%{skin}/search.jsp</result>
+
             <result name="read">/skins/%{skin}/read.jsp</result>
+
             <result name="create">/skins/%{skin}/create.jsp</result>
+
             <result name="save" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/Table</param>
                 <param name="namespace">/</param>
                 <param name="pk">%{pk}</param>
             </result>
+
             <result name="edit">/skins/%{skin}/edit.jsp</result>
+
             <result name="update" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/Table</param>
                 <param name="namespace">/</param>
                 <param name="pk">%{pk}</param>
             </result>
-            <result name="cancelCreate" type="redirectAction">
-                <param name="actionName">%{qualifiedTableName}/Table</param>
-                <param name="namespace">/</param>
-            </result>
-            <result name="cancelEdit" type="redirectAction">
-                <param name="actionName">%{qualifiedTableName}/Table</param>
-                <param name="namespace">/</param>
-                <param name="pk">%{pk}</param>
-            </result>
+
             <result name="returnToSearch" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/Table</param>
                 <param name="namespace">/</param>
             </result>
+
             <result name="delete" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/Table</param>
                 <param name="namespace">/</param>
+            </result>
+
+            <result name="cancel" type="redirect">
+                <param name="location">${cancelReturnUrl}</param>
+                <param name="prependServletContext">false</param>
             </result>
         </action>
     </package>

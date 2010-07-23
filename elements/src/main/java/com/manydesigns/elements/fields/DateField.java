@@ -133,11 +133,7 @@ public class DateField extends AbstractTextField {
     }
 
     public void writeToObject(Object obj) {
-        try {
-            accessor.set(obj, dateValue);
-        } catch (IllegalAccessException e) {
-            throw new Error(e);
-        }
+        writeToObject(obj, dateValue);
     }
 
     //--------------------------------------------------------------------------

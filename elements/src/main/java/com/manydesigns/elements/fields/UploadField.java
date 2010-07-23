@@ -244,10 +244,6 @@ public class UploadField extends AbstractField
     }
 
     public void writeToObject(Object obj) {
-        try {
-            accessor.set(obj, fileUpload);
-        } catch (IllegalAccessException e) {
-            throw new Error(e);
-        }
+        writeToObject(obj, fileUpload);
     }
 }

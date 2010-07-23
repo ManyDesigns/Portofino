@@ -293,6 +293,10 @@ public class CascadedSelectField extends AbstractField {
     }
 
     public void writeToObject(Object obj) {
+        if (mode.isView(immutable)) {
+            return;
+        }
+
         for (SelectField current : selectFieldArray) {
             current.writeToObject(obj);
         }

@@ -7,6 +7,9 @@
     <s:include value="/skins/default/searchButtonsBar.jsp"/>
     <h1>Search: <s:property value="table.qualifiedName"/></h1>
     <mdes:write value="tableForm"/>
+    <s:url var="cancelReturnUrl" namespace="/" action="%{qualifiedTableName}/Table">
+    </s:url>
+    <s:hidden name="cancelReturnUrl" value="%{#cancelReturnUrl}"/>
     <s:include value="/skins/default/searchButtonsBar.jsp"/>
 </s:form>
 <s:include value="/skins/default/footer.jsp"/>

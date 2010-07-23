@@ -344,4 +344,22 @@ public abstract class AbstractField implements Field {
     public boolean isRequiredField() {
         return required && !mode.isView(immutable);
     }
+
+    //--------------------------------------------------------------------------
+    // Other methods
+    //--------------------------------------------------------------------------
+
+    public void writeToObject(Object obj, Object value) {
+        if (mode.isView(immutable)) {
+            return;
+        }
+
+        try {
+            accessor.set(obj, value);
+        } catch (IllegalAccessException e) {
+            throw new Error(e);
+        }
+    }
+
+
 }

@@ -109,11 +109,7 @@ public class TextField extends AbstractTextField {
     }
 
     public void writeToObject(Object obj) {
-        try {
-            accessor.set(obj, stringValue);
-        } catch (IllegalAccessException e) {
-            throw new Error(e);
-        }
+        writeToObject(obj, stringValue);
     }
 
     protected void valueToXhtmlEdit(XhtmlBuffer xb) {

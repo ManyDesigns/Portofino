@@ -97,11 +97,7 @@ public class BooleanField extends AbstractField {
     }
 
     public void writeToObject(Object obj) {
-        try {
-            accessor.set(obj, booleanValue);
-        } catch (IllegalAccessException e) {
-            throw new Error(e);
-        }
+        writeToObject(obj, booleanValue);
     }
 
     public void valueToXhtml(XhtmlBuffer xb) {

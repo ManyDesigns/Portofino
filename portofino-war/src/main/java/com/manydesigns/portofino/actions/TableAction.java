@@ -71,8 +71,7 @@ public class TableAction extends ActionSupport
     public final static String EDIT = "edit";
     public final static String UPDATE = "update";
     public final static String DELETE = "delete";
-    public final static String CANCEL_CREATE = "cancelCreate";
-    public final static String CANCEL_EDIT = "cancelEdit";
+    public final static String CANCEL = "cancel";
 
     //--------------------------------------------------------------------------
     // MDContextAware implementation
@@ -101,10 +100,11 @@ public class TableAction extends ActionSupport
 
     public String qualifiedTableName;
     public String pk;
+    public String cancelReturnUrl;
 
 
     //--------------------------------------------------------------------------
-    // Web parameters
+    // Model metadata
     //--------------------------------------------------------------------------
 
     public Table table;
@@ -121,7 +121,7 @@ public class TableAction extends ActionSupport
 
 
     //--------------------------------------------------------------------------
-    // Elements
+    // Presentation elements
     //--------------------------------------------------------------------------
 
     public TableForm tableForm;
@@ -336,9 +336,10 @@ public class TableAction extends ActionSupport
         form = formBuilder.build();
         form.setMode(Mode.EDIT);
 
+        object = context.getObjectByPk(qualifiedTableName, pkMap);
+        form.readFromObject(object);
         form.readFromRequest(req);
         if (form.validate()) {
-            object = context.getObjectByPk(qualifiedTableName, pkMap);
             form.writeToObject(object);
             context.updateObject(object);
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
@@ -365,11 +366,8 @@ public class TableAction extends ActionSupport
     // Cancel
     //--------------------------------------------------------------------------
 
-    public String cancelCreate() {
-        return CANCEL_CREATE;
+    public String cancel() {
+        return CANCEL;
     }
 
-    public String cancelEdit() {
-        return CANCEL_EDIT;
-    }
 }
