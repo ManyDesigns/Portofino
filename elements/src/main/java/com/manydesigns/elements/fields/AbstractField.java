@@ -30,7 +30,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.Field;
+import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.Util;
 import com.manydesigns.elements.logging.LogUtil;

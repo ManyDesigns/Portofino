@@ -29,8 +29,8 @@
 
 package com.manydesigns.elements.fields.helpers;
 
-import com.manydesigns.elements.Field;
-import com.manydesigns.elements.FieldHelper;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.helpers.FieldHelper;
 import com.manydesigns.elements.annotations.Email;
 import com.manydesigns.elements.fields.EmailField;
 import com.manydesigns.elements.reflection.ClassAccessor;

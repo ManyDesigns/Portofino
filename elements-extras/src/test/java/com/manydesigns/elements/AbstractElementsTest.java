@@ -29,9 +29,6 @@
 
 package com.manydesigns.elements;
 
-import com.manydesigns.elements.fields.helpers.registry.DefaultRegistryBuilder;
-import com.manydesigns.elements.fields.helpers.registry.FieldHelperRegistry;
-import com.manydesigns.elements.fields.helpers.registry.RegistryBuilder;
 import com.manydesigns.elements.reflection.FieldAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XmlBuffer;
@@ -49,8 +46,6 @@ public abstract class AbstractElementsTest extends TestCase {
     public static final String copyright =
             "Copyright (c) 2005-2009, ManyDesigns srl";
 
-    public RegistryBuilder registryBuilder;
-    public FieldHelperRegistry fieldHelperRegistry;
     public DummyHttpServletRequest req;
 
     @Override
@@ -66,10 +61,6 @@ public abstract class AbstractElementsTest extends TestCase {
 
         ElementsThreadLocals.setTextProvider(
                 new BasicTextProvider(Locale.ENGLISH));
-
-        registryBuilder = new DefaultRegistryBuilder();
-        fieldHelperRegistry = registryBuilder.build();
-        ElementsThreadLocals.setFieldHelper(fieldHelperRegistry);
     }
 
     public FieldAccessor createPropertyAccessor(Class clazz,

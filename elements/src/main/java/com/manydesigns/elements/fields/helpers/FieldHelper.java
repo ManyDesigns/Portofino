@@ -27,10 +27,11 @@
  *
  */
 
-package com.manydesigns.elements;
+package com.manydesigns.elements.fields.helpers;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.fields.Field;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

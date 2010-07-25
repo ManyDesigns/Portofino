@@ -46,7 +46,6 @@ public class ElementsContext {
     protected HttpServletRequest httpServletRequest;
     protected HttpServletResponse httpServletResponse;
     protected ServletContext servletContext;
-    protected FieldHelper fieldHelper;
 
     //--------------------------------------------------------------------------
     // Constructors
@@ -87,13 +86,5 @@ public class ElementsContext {
 
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
-    }
-
-    public FieldHelper getFieldHelper() {
-        return fieldHelper;
-    }
-
-    public void setFieldHelper(FieldHelper fieldHelper) {
-        this.fieldHelper = fieldHelper;
     }
 }

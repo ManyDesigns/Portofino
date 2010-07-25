@@ -29,9 +29,8 @@
 
 package com.manydesigns.elements.forms;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.Field;
-import com.manydesigns.elements.FieldHelper;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.helpers.FieldHelperManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.annotations.FieldSet;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -183,7 +182,7 @@ public class FormBuilder {
         LogUtil.entering(logger, "build");
 
         Form form = new Form();
-        FieldHelper fieldHelper = ElementsThreadLocals.getFieldHelper();
+        FieldHelperManager manager = FieldHelperManager.getManager();
 
 
         if (groupedPropertyAccessors == null) {
@@ -203,7 +202,7 @@ public class FormBuilder {
                             fieldSetName, nColumns);
             form.add(fieldSet);
             for (PropertyAccessor propertyAccessor : group) {
-                Field field = fieldHelper.tryToInstantiate(
+                Field field = manager.tryToInstantiate(
                         classAccessor, propertyAccessor, prefix);
 
                 if (field == null) {

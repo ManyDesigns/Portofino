@@ -34,8 +34,6 @@ import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.ActionContext;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.TextProvider;
-import com.manydesigns.elements.fields.helpers.registry.DefaultRegistryBuilder;
-import com.manydesigns.elements.fields.helpers.registry.FieldHelperRegistry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,14 +50,9 @@ public class ElementsInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    protected FieldHelperRegistry fieldHelperRegistry;
-
     public void destroy() {}
 
-    public void init() {
-        DefaultRegistryBuilder registryBuilder = new DefaultRegistryBuilder();
-        fieldHelperRegistry = registryBuilder.build();
-    }
+    public void init() {}
 
     public String intercept(ActionInvocation invocation) throws Exception {
         Object action = invocation.getAction();
@@ -83,8 +76,6 @@ public class ElementsInterceptor implements Interceptor {
 
 
         try {
-            ElementsThreadLocals.setFieldHelper(fieldHelperRegistry);
-            
             ElementsThreadLocals.setHttpServletRequest(req);
             ElementsThreadLocals.setHttpServletResponse(res);
             ElementsThreadLocals.setServletContext(servletContext);

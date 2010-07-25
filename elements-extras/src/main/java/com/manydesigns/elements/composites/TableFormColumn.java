@@ -30,7 +30,7 @@
 package com.manydesigns.elements.composites;
 
 import com.manydesigns.elements.AbstractCompositeElement;
-import com.manydesigns.elements.Field;
+import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.Util;
 import com.manydesigns.elements.annotations.Id;
 import com.manydesigns.elements.annotations.Label;

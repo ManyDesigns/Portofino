@@ -27,35 +27,59 @@
  *
  */
 
-package com.manydesigns.elements.fields.helpers.registry;
+package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.Field;
-import com.manydesigns.elements.FieldHelper;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.xml.XhtmlBuffer;
+import com.manydesigns.elements.Element;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DefaultFieldHelperRegistry
-        extends ArrayList<FieldHelper>
-        implements FieldHelperRegistry {
-    String copyright = "Copyright (c) 2005-2010, ManyDesigns srl";
+public interface Field extends Element {
+    public static final String copyright =
+            "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Field tryToInstantiate(ClassAccessor classAccessor,
-                                  PropertyAccessor propertyAccessor,
-                                  String prefix) {
-        for (FieldHelper current : this) {
-            Field result = current.tryToInstantiate(classAccessor,
-                    propertyAccessor, prefix);
-            if (result != null) {
-                return result;
-            }
-        }
-        return null;
-    }
+    void valueToXhtml(XhtmlBuffer xb);
+    void labelToXhtml(XhtmlBuffer xb);
+    void helpToXhtml(XhtmlBuffer xb);
+    void errorsToXhtml(XhtmlBuffer xb);
+
+    public String  getId();
+    void setId(String id);
+
+    String getLabel();
+    void setLabel(String label);
+
+    String getInputName();
+    void setInputName(String inputName);
+
+    boolean isRequired();
+    void setRequired(boolean required);
+
+    boolean isImmutable();
+    void setImmutable(boolean immutable);
+
+    boolean isForceNewRow();
+    void setForceNewRow(boolean forceNewRow);
+
+    int getColSpan();
+    void setColSpan(int colSpan);
+
+    String getHelp();
+    void setHelp(String help);
+
+    List<String> getErrors();
+
+
+    public String getHref();
+    public void setHref(String href);
+
+    public String getAlt();
+    public void setAlt(String alt);
+
+    boolean isRequiredField();
 }

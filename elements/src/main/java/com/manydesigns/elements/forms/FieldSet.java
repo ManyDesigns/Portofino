@@ -30,7 +30,7 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.AbstractCompositeElement;
-import com.manydesigns.elements.Field;
+import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.MultipartFormDataField;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 

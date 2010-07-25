@@ -27,42 +27,57 @@
  *
  */
 
-package com.manydesigns.elements.fields.helpers.registry;
+package com.manydesigns.elements;
 
-import com.manydesigns.elements.FieldHelper;
-import com.manydesigns.elements.fields.helpers.*;
+import com.manydesigns.elements.logging.LogUtil;
 
-import java.util.Arrays;
+import java.util.Properties;
+import java.util.logging.Logger;
+import java.io.IOException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DefaultRegistryBuilder implements RegistryBuilder {
+public final class ElementsProperties {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    protected final static FieldHelper[] DEFAULT_FIELD_HELPERS = {
-            new BooleanFieldHelper(),
-            new DateFieldHelper(),
-            new DecimalFieldHelper(),
-            new IntegerFieldHelper(),
-            new CAPFieldHelper(),
-            new CodiceFiscaleFieldHelper(),
-            new EmailFieldHelper(),
-            new PartitaIvaFieldHelper(),
-            new PasswordFieldHandler(),
-            new PhoneFieldHandler(),
-            new RadioFieldHandler(),
-            new SelectFieldHelper(),
-            new TextFieldHelper(),
-    };
+    public final static String PROPERIES_RESOURCE =
+            "elements.properties";
+    public final static String CUSTOM_PROPERIES_RESOURCE =
+            "elements-custom.properties";
 
+    private static final Properties properties;
+    private static final Logger logger =
+            LogUtil.getLogger(ElementsProperties.class);
 
-    public FieldHelperRegistry build() {
-        FieldHelperRegistry result = new DefaultFieldHelperRegistry();
-        result.addAll(Arrays.asList(DEFAULT_FIELD_HELPERS));
-        return result;
+    static {
+        properties = new Properties();
+
+        loadProperties(PROPERIES_RESOURCE);
+        loadProperties(CUSTOM_PROPERIES_RESOURCE);
     }
+
+    private static void loadProperties(String resource) {
+        ClassLoader cl = ElementsProperties.class.getClassLoader();
+        try {
+            properties.load(cl.getResourceAsStream(resource));
+            LogUtil.infoMF(logger, "Properties loaded from: {0}",
+                    resource);
+        } catch (Throwable e) {
+            LogUtil.infoMF(logger, "Cannot load properties from: {0}",
+                    resource);
+            LogUtil.fineMF(logger, e,
+                    "Error loading properties from: {0}", resource);
+        }
+    }
+
+    public static Properties getInstance() {
+        return properties;
+    }
+
+    private ElementsProperties() {}
+
 }

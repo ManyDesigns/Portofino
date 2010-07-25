@@ -29,10 +29,9 @@
 
 package com.manydesigns.elements.fields.helpers;
 
-import com.manydesigns.elements.Field;
-import com.manydesigns.elements.FieldHelper;
 import com.manydesigns.elements.annotations.Phone;
 import com.manydesigns.elements.fields.PhoneField;
+import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 

@@ -29,8 +29,8 @@
 
 package com.manydesigns.elements.fields.helpers;
 
-import com.manydesigns.elements.Field;
-import com.manydesigns.elements.FieldHelper;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.helpers.FieldHelper;
 import com.manydesigns.elements.annotations.CAP;
 import com.manydesigns.elements.fields.CAPField;
 import com.manydesigns.elements.reflection.ClassAccessor;

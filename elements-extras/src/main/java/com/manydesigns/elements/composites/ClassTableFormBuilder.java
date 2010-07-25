@@ -29,9 +29,8 @@
 
 package com.manydesigns.elements.composites;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.Field;
-import com.manydesigns.elements.FieldHelper;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.helpers.FieldHelperManager;
 import com.manydesigns.elements.hyperlinks.HyperlinkGenerator;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
@@ -122,7 +121,7 @@ public class ClassTableFormBuilder {
 
     public TableForm build() {
         TableForm tableForm = new TableForm(nRows);
-        FieldHelper fieldHelper = ElementsThreadLocals.getFieldHelper();
+        FieldHelperManager manager = FieldHelperManager.getManager();
 
         if (propertyAccessors == null) {
             configReflectiveFields();
@@ -144,7 +143,7 @@ public class ClassTableFormBuilder {
             column.setHyperlinkGenerator(hyperlinkGenerator);
 
             for (int i = 0; i < nRows; i++) {
-                Field field = fieldHelper.tryToInstantiate(
+                Field field = manager.tryToInstantiate(
                         classAccessor, propertyAccessor, rowPrefix[i]);
 
                 if (field == null) {

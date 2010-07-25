@@ -98,14 +98,6 @@ public final class ElementsThreadLocals {
         getElementsContext().setServletContext(servletContext);
     }
 
-    public static FieldHelper getFieldHelper() {
-        return getElementsContext().getFieldHelper();
-    }
-
-    public static void setFieldHelper(FieldHelper fieldHelper) {
-        getElementsContext().setFieldHelper(fieldHelper);
-    }
-
     //--------------------------------------------------------------------------
     // i18n
     //--------------------------------------------------------------------------

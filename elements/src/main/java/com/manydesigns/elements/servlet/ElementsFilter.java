@@ -32,8 +32,6 @@ package com.manydesigns.elements.servlet;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.TextProvider;
 import com.manydesigns.elements.i18n.SimpleTextProvider;
-import com.manydesigns.elements.fields.helpers.registry.RegistryBuilder;
-import com.manydesigns.elements.fields.helpers.registry.DefaultRegistryBuilder;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -71,8 +69,6 @@ public class ElementsFilter implements Filter {
             ElementsThreadLocals.setServletContext(context);
             ElementsThreadLocals.setTextProvider
                     (new SimpleTextProvider(req.getLocale()));
-            RegistryBuilder registryBuilder = new DefaultRegistryBuilder();
-            ElementsThreadLocals.setFieldHelper(registryBuilder.build());
             filterChain.doFilter(req, res);
         } finally {
             ElementsThreadLocals.setHttpServletRequest(oldReq);
