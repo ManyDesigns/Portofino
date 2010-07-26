@@ -27,7 +27,9 @@
  *
  */
 
-package com.manydesigns.elements.annotations;
+package com.manydesigns.elements.annotations.impl;
+
+import com.manydesigns.elements.annotations.Help;
 
 import java.lang.annotation.Annotation;
 
@@ -37,11 +39,21 @@ import java.lang.annotation.Annotation;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 @SuppressWarnings({"ClassExplicitlyAnnotation"})
-public class RequiredImpl implements Required {
+public class HelpImpl implements Help {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    private final String value;
+
+    public HelpImpl(String value) {
+        this.value = value;
+    }
+
+    public String value() {
+        return value;
+    }
+
     public Class<? extends Annotation> annotationType() {
-        return Required.class;
+        return Help.class;
     }
 }

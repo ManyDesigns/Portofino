@@ -27,7 +27,9 @@
  *
  */
 
-package com.manydesigns.elements.annotations;
+package com.manydesigns.elements.annotations.impl;
+
+import com.manydesigns.elements.annotations.LabelI18N;
 
 import java.lang.annotation.Annotation;
 
@@ -37,13 +39,13 @@ import java.lang.annotation.Annotation;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 @SuppressWarnings({"ClassExplicitlyAnnotation"})
-public class IdImpl implements Id {
+public class LabelI18NImpl implements LabelI18N {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     private final String value;
 
-    public IdImpl(String value) {
+    public LabelI18NImpl(String value) {
         this.value = value;
     }
 
@@ -52,7 +54,6 @@ public class IdImpl implements Id {
     }
 
     public Class<? extends Annotation> annotationType() {
-        return Id.class;
+        return LabelI18N.class;
     }
 }
-

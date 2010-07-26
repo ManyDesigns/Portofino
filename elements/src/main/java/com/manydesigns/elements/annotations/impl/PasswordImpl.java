@@ -27,7 +27,9 @@
  *
  */
 
-package com.manydesigns.elements.annotations;
+package com.manydesigns.elements.annotations.impl;
+
+import com.manydesigns.elements.annotations.Password;
 
 import java.lang.annotation.Annotation;
 
@@ -37,22 +39,13 @@ import java.lang.annotation.Annotation;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 @SuppressWarnings({"ClassExplicitlyAnnotation"})
-public class CAPImpl implements CAP {
+public class PasswordImpl implements Password {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final String value;
-
-    public CAPImpl(String value) {
-        this.value = value;
-    }
-
-    public String value() {
-        return value;
-    }
+    public PasswordImpl() {}
 
     public Class<? extends Annotation> annotationType() {
-        return CAP.class;
+        return Password.class;
     }
 }
-

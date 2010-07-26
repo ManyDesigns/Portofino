@@ -29,18 +29,17 @@
 
 package com.manydesigns.portofino.base.reflection;
 
-import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.elements.annotations.RequiredImpl;
 import com.manydesigns.elements.annotations.Immutable;
-import com.manydesigns.elements.annotations.ImmutableImpl;
+import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.elements.annotations.impl.ImmutableImpl;
+import com.manydesigns.elements.annotations.impl.RequiredImpl;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.base.model.Column;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.Map;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

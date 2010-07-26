@@ -29,11 +29,12 @@
 package com.manydesigns.portofino.base.model;
 
 import com.manydesigns.portofino.base.context.MDContext;
+import com.manydesigns.portofino.base.context.MDContextImpl;
 import junit.framework.TestCase;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -44,7 +45,7 @@ public class HibernateTest extends TestCase {
     MDContext context;
 
     public void setUp() {
-        context = new MDContext();
+        context = new MDContextImpl();
         context.loadXmlModelAsResource(
                 "databases/jpetstore/postgresql/jpetstore-postgres.xml");
         context.openSession();

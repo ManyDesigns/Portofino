@@ -27,7 +27,9 @@
  *
  */
 
-package com.manydesigns.elements.annotations;
+package com.manydesigns.elements.annotations.impl;
+
+import com.manydesigns.elements.annotations.CodiceFiscale;
 
 import java.lang.annotation.Annotation;
 
@@ -41,15 +43,7 @@ public class CodiceFiscaleImpl implements CodiceFiscale {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final String value;
-
-    public CodiceFiscaleImpl(String value) {
-        this.value = value;
-    }
-
-    public String value() {
-        return value;
-    }
+    public CodiceFiscaleImpl() {}
 
     public Class<? extends Annotation> annotationType() {
         return CodiceFiscale.class;

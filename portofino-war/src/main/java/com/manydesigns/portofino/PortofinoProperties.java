@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.elements;
+package com.manydesigns.portofino;
 
 import com.manydesigns.elements.logging.LogUtil;
 
@@ -40,7 +40,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public final class ElementsProperties {
+public class PortofinoProperties {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -49,19 +49,19 @@ public final class ElementsProperties {
     //**************************************************************************
 
     public final static String PROPERIES_RESOURCE =
-            "elements.properties";
+            "portofino.properties";
     public final static String CUSTOM_PROPERIES_RESOURCE =
-            "elements-custom.properties";
+            "portofino-custom.properties";
 
 
     //**************************************************************************
     // Property names
     //**************************************************************************
 
-    public static final String MANAGER_PROPERTY =
-            "elements.fields.helpers.manager";
-    public static final String LIST_PROPERTY =
-            "elements.fields.helpers.list";
+    public static final String MODEL_LOCATION_PROPERTY =
+            "portofino.model.location";
+    public static final String CONTEXT_CLASS_PROPERTY =
+            "portofino.context.class";
 
 
     //**************************************************************************
@@ -70,7 +70,7 @@ public final class ElementsProperties {
 
     private static final Properties properties;
     private static final Logger logger =
-            LogUtil.getLogger(ElementsProperties.class);
+            LogUtil.getLogger(PortofinoProperties.class);
 
     static {
         properties = new Properties();
@@ -80,7 +80,7 @@ public final class ElementsProperties {
     }
 
     private static void loadProperties(String resource) {
-        ClassLoader cl = ElementsProperties.class.getClassLoader();
+        ClassLoader cl = PortofinoProperties.class.getClassLoader();
         InputStream stream = cl.getResourceAsStream(resource);
         if (stream == null) {
             LogUtil.infoMF(logger, "Properties resource not found: {0}",
@@ -105,6 +105,6 @@ public final class ElementsProperties {
     // Dummy constructor
     //**************************************************************************
 
-    private ElementsProperties() {}
+    private PortofinoProperties() {}
 
 }

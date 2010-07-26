@@ -27,7 +27,9 @@
  *
  */
 
-package com.manydesigns.elements.annotations;
+package com.manydesigns.elements.annotations.impl;
+
+import com.manydesigns.elements.annotations.MinDecimalValue;
 
 import java.lang.annotation.Annotation;
 
@@ -37,11 +39,21 @@ import java.lang.annotation.Annotation;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 @SuppressWarnings({"ClassExplicitlyAnnotation"})
-public class ImmutableImpl implements Immutable {
+public class MinDecimalValueImpl implements MinDecimalValue {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    private final double value;
+
+    public MinDecimalValueImpl(double value) {
+        this.value = value;
+    }
+
+    public double value() {
+        return value;
+    }
+
     public Class<? extends Annotation> annotationType() {
-        return Immutable.class;
+        return MinDecimalValue.class;
     }
 }

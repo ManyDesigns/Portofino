@@ -27,7 +27,9 @@
  *
  */
 
-package com.manydesigns.elements.annotations;
+package com.manydesigns.elements.annotations.impl;
+
+import com.manydesigns.elements.annotations.Radio;
 
 import java.lang.annotation.Annotation;
 
@@ -37,21 +39,27 @@ import java.lang.annotation.Annotation;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 @SuppressWarnings({"ClassExplicitlyAnnotation"})
-public class InputNameImpl implements InputName {
+public class RadioImpl implements Radio {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final String value;
+    private String[] values;
+    private String[] labels;
 
-    public InputNameImpl(String value) {
-        this.value = value;
+    public RadioImpl(String[] values, String[] labels) {
+        this.values = values;
+        this.labels = labels;
     }
 
-    public String value() {
-        return value;
+    public String[] values() {
+        return values;
+    }
+
+    public String[] labels() {
+        return labels;
     }
 
     public Class<? extends Annotation> annotationType() {
-        return InputName.class;
+        return Radio.class;
     }
 }

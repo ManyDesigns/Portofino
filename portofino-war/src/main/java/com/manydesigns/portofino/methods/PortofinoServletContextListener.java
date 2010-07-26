@@ -29,14 +29,19 @@
 
 package com.manydesigns.portofino.methods;
 
-import com.manydesigns.portofino.base.context.MDContext;
-import com.manydesigns.portofino.base.context.ServerInfo;
+import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.util.InstanceBuilder;
+import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.base.context.MDContext;
+import com.manydesigns.portofino.base.context.MDContextImpl;
+import com.manydesigns.portofino.base.context.ServerInfo;
 import org.apache.commons.lang.time.StopWatch;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 
@@ -55,17 +60,19 @@ public class PortofinoServletContextListener implements ServletContextListener {
 
     public static final String PORTOFINO_VERSION = "4.0.0-SNAPSHOT";
 
-//    public static final String MODEL_LOCATION = "portofino-model.xml";
-    public static final String MODEL_LOCATION =
-        "databases/jpetstore/postgresql/jpetstore-postgres.xml";
-
-    public static final String SERVER_INFO_ATTRIBUTE =
-            "serverInfo";
     public static final String PORTOFINO_VERSION_ATTRIBUTE =
             "portofinoVersion";
+    public static final String ELEMENTS_PROPERTIES_ATTRIBUTE =
+            "elementsProperties";
+    public static final String PORTOFINO_PROPERTIES_ATTRIBUTE =
+            "portofinoProperties";
+    public static final String SERVER_INFO_ATTRIBUTE =
+            "serverInfo";
     public static final String MDCONTEXT_ATTRIBUTE =
             "mdContext";
 
+    protected Properties elementsProperties;
+    protected Properties portofinoProperties;
     protected ServletContext servletContext;
     protected ServerInfo serverInfo;
     protected MDContext mdContext;
@@ -84,7 +91,6 @@ public class PortofinoServletContextListener implements ServletContextListener {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-
         servletContext = servletContextEvent.getServletContext();
         serverInfo = new ServerInfo(servletContext);
         
@@ -98,10 +104,18 @@ public class PortofinoServletContextListener implements ServletContextListener {
                 serverInfo.getRealPath()
         );
 
-        servletContext.setAttribute(SERVER_INFO_ATTRIBUTE,
-                serverInfo);
         servletContext.setAttribute(PORTOFINO_VERSION_ATTRIBUTE,
                 PORTOFINO_VERSION);
+        servletContext.setAttribute(SERVER_INFO_ATTRIBUTE,
+                serverInfo);
+
+        elementsProperties = ElementsProperties.getProperties();
+        portofinoProperties = PortofinoProperties.getProperties();
+
+        servletContext.setAttribute(ELEMENTS_PROPERTIES_ATTRIBUTE,
+                elementsProperties);
+        servletContext.setAttribute(PORTOFINO_PROPERTIES_ATTRIBUTE,
+                portofinoProperties);
 
         boolean success = true;
 
@@ -116,12 +130,7 @@ public class PortofinoServletContextListener implements ServletContextListener {
         }
 
         if (success) {
-            logger.info("Creating MDContext and " +
-                    "registering on servlet context...");
-            // create and register the container first, without exceptions
-            mdContext = new MDContext();
-            mdContext.loadXmlModelAsResource(MODEL_LOCATION);
-            servletContext.setAttribute(MDCONTEXT_ATTRIBUTE, mdContext);
+            createMDContext();
         }
 
         stopWatch.stop();
@@ -134,11 +143,37 @@ public class PortofinoServletContextListener implements ServletContextListener {
         }
     }
 
+    private void createMDContext() {
+        logger.info("Creating MDContext and " +
+                "registering on servlet context...");
+        // create and register the container first, without exceptions
+
+        String managerClassName =
+                portofinoProperties.getProperty(
+                        PortofinoProperties.CONTEXT_CLASS_PROPERTY);
+        InstanceBuilder<MDContext> builder =
+                new InstanceBuilder<MDContext>(
+                        MDContext.class,
+                        MDContextImpl.class,
+                        logger);
+        mdContext = builder.createInstance(managerClassName);
+
+        mdContext.loadXmlModelAsResource(
+                    portofinoProperties.getProperty(
+                            PortofinoProperties.MODEL_LOCATION_PROPERTY));
+        servletContext.setAttribute(MDCONTEXT_ATTRIBUTE, mdContext);
+    }
+
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         logger.info("ManyDesigns Portofino stopping...");
 
         logger.info("Unregistering MDContext from servlet context...");
         servletContext.removeAttribute(MDCONTEXT_ATTRIBUTE);
+
+        servletContext.removeAttribute(SERVER_INFO_ATTRIBUTE);
+        servletContext.removeAttribute(PORTOFINO_VERSION_ATTRIBUTE);
+        servletContext.removeAttribute(PORTOFINO_PROPERTIES_ATTRIBUTE);
+        servletContext.removeAttribute(ELEMENTS_PROPERTIES_ATTRIBUTE);
 
         logger.info("ManyDesigns Portofino stopped.");
     }

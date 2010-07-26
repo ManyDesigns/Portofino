@@ -27,62 +27,39 @@
  *
  */
 
-package com.manydesigns.elements;
+package com.manydesigns.elements.annotations.impl;
 
-import javax.servlet.http.HttpServletRequest;
+import com.manydesigns.elements.annotations.PrecisionScale;
+
+import java.lang.annotation.Annotation;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Util {
+@SuppressWarnings({"ClassExplicitlyAnnotation"})
+public class PrecisionScaleImpl implements PrecisionScale {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public static String getAbsoluteLink(HttpServletRequest req,
-                                         String link) {
-        StringBuilder sb = new StringBuilder();
+    private final int precision;
+    private final int scale;
 
-        if (!"/".equals(req.getContextPath())) {
-            sb.append(req.getContextPath());
-        }
-
-        if (!link.startsWith("/")) {
-            sb.append("/");
-        }
-
-        sb.append(link);
-
-        return sb.toString();
+    public PrecisionScaleImpl(int precision, int scale) {
+        this.precision = precision;
+        this.scale = scale;
     }
 
-    public static String getAbsoluteLink(String link) {
-        HttpServletRequest req =
-                ElementsThreadLocals.getHttpServletRequest();
-
-        return getAbsoluteLink(req, link);
+    public int precision() {
+        return precision;
     }
 
-    public static String camelCaseToWords(String s) {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (first) {
-                first = false;
-                sb.append(Character.toUpperCase(c));
-            } else {
-                if (Character.isUpperCase(c)) {
-                    sb.append(' ');
-                    sb.append(Character.toLowerCase(c));
-                } else {
-                    sb.append(c);
-                }
-            }
-        }
-        return sb.toString();
+    public int scale() {
+        return scale;
     }
 
-
+    public Class<? extends Annotation> annotationType() {
+        return PrecisionScale.class;
+    }
 }

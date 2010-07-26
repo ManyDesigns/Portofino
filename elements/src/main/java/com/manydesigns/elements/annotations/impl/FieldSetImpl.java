@@ -27,7 +27,9 @@
  *
  */
 
-package com.manydesigns.elements.annotations;
+package com.manydesigns.elements.annotations.impl;
+
+import com.manydesigns.elements.annotations.FieldSet;
 
 import java.lang.annotation.Annotation;
 
@@ -37,13 +39,13 @@ import java.lang.annotation.Annotation;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 @SuppressWarnings({"ClassExplicitlyAnnotation"})
-public class DecimalFormatImpl implements DecimalFormat {
+public class FieldSetImpl implements FieldSet {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     private final String value;
 
-    public DecimalFormatImpl(String value) {
+    public FieldSetImpl(String value) {
         this.value = value;
     }
 
@@ -52,6 +54,6 @@ public class DecimalFormatImpl implements DecimalFormat {
     }
 
     public Class<? extends Annotation> annotationType() {
-        return DecimalFormat.class;
+        return FieldSet.class;
     }
 }

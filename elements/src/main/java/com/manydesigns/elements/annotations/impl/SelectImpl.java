@@ -27,62 +27,45 @@
  *
  */
 
-package com.manydesigns.elements;
+package com.manydesigns.elements.annotations.impl;
 
-import javax.servlet.http.HttpServletRequest;
+import com.manydesigns.elements.annotations.Select;
+
+import java.lang.annotation.Annotation;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Util {
+@SuppressWarnings({"ClassExplicitlyAnnotation"})
+public class SelectImpl implements Select {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public static String getAbsoluteLink(HttpServletRequest req,
-                                         String link) {
-        StringBuilder sb = new StringBuilder();
+    private String[] values;
+    private String[] labels;
+    private String[] urls;
 
-        if (!"/".equals(req.getContextPath())) {
-            sb.append(req.getContextPath());
-        }
-
-        if (!link.startsWith("/")) {
-            sb.append("/");
-        }
-
-        sb.append(link);
-
-        return sb.toString();
+    public SelectImpl(String[] values, String[] labels, String[] urls) {
+        this.values = values;
+        this.labels = labels;
+        this.urls = urls;
     }
 
-    public static String getAbsoluteLink(String link) {
-        HttpServletRequest req =
-                ElementsThreadLocals.getHttpServletRequest();
-
-        return getAbsoluteLink(req, link);
+    public String[] values() {
+        return values;
     }
 
-    public static String camelCaseToWords(String s) {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (first) {
-                first = false;
-                sb.append(Character.toUpperCase(c));
-            } else {
-                if (Character.isUpperCase(c)) {
-                    sb.append(' ');
-                    sb.append(Character.toLowerCase(c));
-                } else {
-                    sb.append(c);
-                }
-            }
-        }
-        return sb.toString();
+    public String[] labels() {
+        return labels;
     }
 
+    public String[] urls() {
+        return urls;
+    }
 
+    public Class<? extends Annotation> annotationType() {
+        return Select.class;
+    }
 }

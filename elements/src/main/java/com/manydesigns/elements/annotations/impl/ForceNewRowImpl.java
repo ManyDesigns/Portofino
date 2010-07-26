@@ -27,7 +27,9 @@
  *
  */
 
-package com.manydesigns.elements.annotations;
+package com.manydesigns.elements.annotations.impl;
+
+import com.manydesigns.elements.annotations.ForceNewRow;
 
 import java.lang.annotation.Annotation;
 
@@ -37,21 +39,14 @@ import java.lang.annotation.Annotation;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 @SuppressWarnings({"ClassExplicitlyAnnotation"})
-public class HelpImpl implements Help {
+public class ForceNewRowImpl implements ForceNewRow {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final String value;
-
-    public HelpImpl(String value) {
-        this.value = value;
-    }
-
-    public String value() {
-        return value;
-    }
+    public ForceNewRowImpl() {}
 
     public Class<? extends Annotation> annotationType() {
-        return Help.class;
+        return ForceNewRow.class;
     }
 }
+
