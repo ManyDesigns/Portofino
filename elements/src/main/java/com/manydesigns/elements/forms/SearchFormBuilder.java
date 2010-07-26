@@ -27,8 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.elements;
+package com.manydesigns.elements.forms;
 
+import com.manydesigns.elements.fields.helpers.FieldHelperManager;
+import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
@@ -130,25 +132,24 @@ public class SearchFormBuilder {
     public SearchForm build() {
         LogUtil.entering(logger, "build");
 
-        SearchForm form = new SearchForm();
-        //FieldHelper fieldHelper = ElementsThreadLocals.getFieldHelper();
+        SearchForm searchForm = new SearchForm();
+        FieldHelperManager manager = FieldHelperManager.getManager();
 
         if (propertyAccessors == null) {
             configReflectiveFields();
         }
 
-        /*
         for (PropertyAccessor propertyAccessor : propertyAccessors) {
-            SearchField field = null;
+            SearchField field = manager.tryToInstantiateSearchField(
+                    classAccessor, propertyAccessor, prefix);
 
             if (field == null) {
                 continue;
             }
-            form.add(field);
+            searchForm.add(field);
         }
-        */
 
         LogUtil.exiting(logger, "build");
-        return form;
+        return searchForm;
     }
 }

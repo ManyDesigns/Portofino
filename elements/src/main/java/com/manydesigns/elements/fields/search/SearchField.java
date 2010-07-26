@@ -27,44 +27,17 @@
  *
  */
 
-package com.manydesigns.portofino.elements;
+package com.manydesigns.elements.fields.search;
 
 import com.manydesigns.elements.Element;
-import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.xml.XhtmlBuffer;
-
-import javax.servlet.http.HttpServletRequest;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SearchField implements Element {
+public interface SearchField extends Element {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-
-    public void readFromRequest(HttpServletRequest req) {
-    }
-
-    public boolean validate() {
-        return false;
-    }
-
-    public void readFromObject(Object obj) {
-    }
-
-    public void writeToObject(Object obj) {
-    }
-
-    public Mode getMode() {
-        return null;
-    }
-
-    public void setMode(Mode mode) {
-    }
-
-    public void toXhtml(XhtmlBuffer xb) {
-    }
 }

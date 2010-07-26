@@ -29,9 +29,10 @@
 
 package com.manydesigns.elements.fields.helpers;
 
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.fields.Field;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,7 +43,11 @@ public interface FieldHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    Field tryToInstantiate(ClassAccessor classAccessor,
+    Field tryToInstantiateField(ClassAccessor classAccessor,
+                           PropertyAccessor propertyAccessor,
+                           String prefix);
+
+    SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
                            PropertyAccessor propertyAccessor,
                            String prefix);
 }

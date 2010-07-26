@@ -30,8 +30,8 @@
 package com.manydesigns.elements.fields.helpers;
 
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.helpers.FieldHelper;
 import com.manydesigns.elements.fields.IntegerField;
+import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
@@ -44,7 +44,7 @@ public class BooleanFieldHelper implements FieldHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Field tryToInstantiate(ClassAccessor classAccessor,
+    public Field tryToInstantiateField(ClassAccessor classAccessor,
                                   PropertyAccessor propertyAccessor,
                                   String prefix) {
         Field result;
@@ -57,5 +57,9 @@ public class BooleanFieldHelper implements FieldHelper {
             result = null;
         }
         return result;
+    }
+
+    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor, PropertyAccessor propertyAccessor, String prefix) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

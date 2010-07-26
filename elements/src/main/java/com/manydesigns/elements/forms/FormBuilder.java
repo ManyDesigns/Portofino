@@ -202,7 +202,7 @@ public class FormBuilder {
                             fieldSetName, nColumns);
             form.add(fieldSet);
             for (PropertyAccessor propertyAccessor : group) {
-                Field field = manager.tryToInstantiate(
+                Field field = manager.tryToInstantiateField(
                         classAccessor, propertyAccessor, prefix);
 
                 if (field == null) {

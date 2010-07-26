@@ -29,10 +29,10 @@
 
 package com.manydesigns.elements.fields.helpers;
 
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.helpers.FieldHelper;
 import com.manydesigns.elements.annotations.CodiceFiscale;
 import com.manydesigns.elements.fields.CodiceFiscaleField;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
@@ -45,7 +45,7 @@ public class CodiceFiscaleFieldHelper implements FieldHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Field tryToInstantiate(ClassAccessor classAccessor,
+    public Field tryToInstantiateField(ClassAccessor classAccessor,
                                   PropertyAccessor propertyAccessor,
                                   String prefix) {
         if (propertyAccessor.isAssignableTo(String.class)
@@ -53,5 +53,9 @@ public class CodiceFiscaleFieldHelper implements FieldHelper {
                 return new CodiceFiscaleField(propertyAccessor, prefix);
         }
         return null;
+    }
+
+    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor, PropertyAccessor propertyAccessor, String prefix) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

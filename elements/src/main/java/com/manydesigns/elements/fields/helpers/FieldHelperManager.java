@@ -31,6 +31,7 @@ package com.manydesigns.elements.fields.helpers;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -107,12 +108,27 @@ public class FieldHelperManager implements FieldHelper {
         }
     }
 
-    public Field tryToInstantiate(ClassAccessor classAccessor,
+    public Field tryToInstantiateField(ClassAccessor classAccessor,
                                   PropertyAccessor propertyAccessor,
                                   String prefix) {
         for (FieldHelper current : fieldHelperList) {
-            Field result = current.tryToInstantiate(classAccessor,
+            Field result = current.tryToInstantiateField(classAccessor,
                     propertyAccessor, prefix);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    public SearchField tryToInstantiateSearchField(
+            ClassAccessor classAccessor,
+            PropertyAccessor propertyAccessor,
+            String prefix) {
+        for (FieldHelper current : fieldHelperList) {
+            SearchField result =
+                    current.tryToInstantiateSearchField(
+                            classAccessor, propertyAccessor, prefix);
             if (result != null) {
                 return result;
             }

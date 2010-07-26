@@ -27,9 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.elements;
+package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.AbstractCompositeElement;
+import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 /*

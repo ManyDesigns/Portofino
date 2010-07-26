@@ -143,7 +143,7 @@ public class ClassTableFormBuilder {
             column.setHyperlinkGenerator(hyperlinkGenerator);
 
             for (int i = 0; i < nRows; i++) {
-                Field field = manager.tryToInstantiate(
+                Field field = manager.tryToInstantiateField(
                         classAccessor, propertyAccessor, rowPrefix[i]);
 
                 if (field == null) {
