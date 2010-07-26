@@ -29,16 +29,16 @@
 
 package com.manydesigns.elements.fields.helpers;
 
-import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.ElementsProperties;
+import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.lang.reflect.Constructor;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -77,8 +77,8 @@ public class FieldHelperManager implements FieldHelper {
                 managerClass = FieldHelperManager.class;
             }
         } catch (Throwable e) {
-            LogUtil.warningMF(logger, e,
-                    "Cannot load class: {0}", managerClassName);
+            LogUtil.warningMF(logger, "Cannot load class: {0}", e,
+                    managerClassName);
             managerClass = FieldHelperManager.class;
         }
         LogUtil.finerMF(logger,
@@ -89,8 +89,8 @@ public class FieldHelperManager implements FieldHelper {
             Constructor constructor = managerClass.getConstructor();
             instance = (FieldHelperManager)constructor.newInstance();
         } catch (Throwable e) {
-            LogUtil.warningMF(logger, e,
-                    "Cannot instanciate: {0}", managerClass.getName());
+            LogUtil.warningMF(logger, "Cannot instanciate: {0}", e,
+                    managerClass.getName());
             instance = new FieldHelperManager();
         }
         manager = instance;
@@ -122,8 +122,8 @@ public class FieldHelperManager implements FieldHelper {
                 FieldHelper helper = (FieldHelper)constructor.newInstance();
                 fieldHelperList.add(helper);
             } catch (Throwable e) {
-                LogUtil.warningMF(logger, e,
-                        "Cannot load or instanciate: {0}", helperClassName);
+                LogUtil.warningMF(logger, "Cannot load or instanciate: {0}", e,
+                        helperClassName);
             }
         }
     }

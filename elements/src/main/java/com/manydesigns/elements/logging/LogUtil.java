@@ -29,9 +29,9 @@
 
 package com.manydesigns.elements.logging;
 
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -92,31 +92,31 @@ public class LogUtil {
     // Logging exceptions
     //**************************************************************************
 
-    public static void severe(Logger logger, Throwable e, String message) {
+    public static void severe(Logger logger, String message, Throwable e) {
         logger.log(Level.SEVERE, message, e);
     }
 
-    public static void warning(Logger logger, Throwable e, String message) {
+    public static void warning(Logger logger, String message, Throwable e) {
         logger.log(Level.WARNING, message, e);
     }
 
-    public static void info(Logger logger, Throwable e, String message) {
+    public static void info(Logger logger, String message, Throwable e) {
         logger.log(Level.INFO, message, e);
     }
 
-    public static void config(Logger logger, Throwable e, String message) {
+    public static void config(Logger logger, String message, Throwable e) {
         logger.log(Level.CONFIG, message, e);
     }
 
-    public static void fine(Logger logger, Throwable e, String message) {
+    public static void fine(Logger logger, String message, Throwable e) {
         logger.log(Level.FINE, message, e);
     }
 
-    public static void finer(Logger logger, Throwable e, String message) {
+    public static void finer(Logger logger, String message, Throwable e) {
         logger.log(Level.FINER, message, e);
     }
 
-    public static void finest(Logger logger, Throwable e, String message) {
+    public static void finest(Logger logger, String message, Throwable e) {
         logger.log(Level.FINEST, message, e);
     }
 
@@ -126,45 +126,45 @@ public class LogUtil {
     //**************************************************************************
 
     public static void logMF(Logger logger, Level level,
-                             Throwable e, String format, Object... args) {
+                             String format, Throwable e, Object... args) {
         if (logger.isLoggable(level)) {
             logger.log(level, MessageFormat.format(format, args), e);
         }
     }
 
-    public static void severeMF(Logger logger, Throwable e,
-                                String format, Object... args) {
-        logMF(logger, Level.SEVERE, e, format, args);
+    public static void severeMF(Logger logger, String format, Throwable e,
+                                Object... args) {
+        logMF(logger, Level.SEVERE, format, e, args);
     }
 
-    public static void warningMF(Logger logger, Throwable e,
-                                 String format, Object... args) {
-        logMF(logger, Level.WARNING, e, format, args);
+    public static void warningMF(Logger logger, String format, Throwable e,
+                                 Object... args) {
+        logMF(logger, Level.WARNING, format, e, args);
     }
 
-    public static void infoMF(Logger logger, Throwable e,
-                              String format, Object... args) {
-        logMF(logger, Level.INFO, e, format, args);
+    public static void infoMF(Logger logger, String format, Throwable e,
+                              Object... args) {
+        logMF(logger, Level.INFO, format, e, args);
     }
 
-    public static void configMF(Logger logger, Throwable e,
-                                String format, Object... args) {
-        logMF(logger, Level.CONFIG, e, format, args);
+    public static void configMF(Logger logger, String format, Throwable e,
+                                Object... args) {
+        logMF(logger, Level.CONFIG, format, e, args);
     }
 
-    public static void fineMF(Logger logger, Throwable e,
-                              String format, Object... args) {
-        logMF(logger, Level.FINE, e, format, args);
+    public static void fineMF(Logger logger, String format, Throwable e,
+                              Object... args) {
+        logMF(logger, Level.FINE, format, e, args);
     }
 
-    public static void finerMF(Logger logger, Throwable e,
-                               String format, Object... args) {
-        logMF(logger, Level.FINER, e, format, args);
+    public static void finerMF(Logger logger, String format, Throwable e,
+                               Object... args) {
+        logMF(logger, Level.FINER, format, e, args);
     }
 
-    public static void finestMF(Logger logger, Throwable e,
-                                String format, Object... args) {
-        logMF(logger, Level.FINEST, e, format, args);
+    public static void finestMF(Logger logger, String format, Throwable e,
+                                Object... args) {
+        logMF(logger, Level.FINEST, format, e, args);
     }
 
 

@@ -33,7 +33,6 @@ import com.manydesigns.elements.logging.LogUtil;
 
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.io.IOException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -69,8 +68,8 @@ public final class ElementsProperties {
         } catch (Throwable e) {
             LogUtil.infoMF(logger, "Cannot load properties from: {0}",
                     resource);
-            LogUtil.fineMF(logger, e,
-                    "Error loading properties from: {0}", resource);
+            LogUtil.fineMF(logger, "Error loading properties from: {0}", e,
+                    resource);
         }
     }
 

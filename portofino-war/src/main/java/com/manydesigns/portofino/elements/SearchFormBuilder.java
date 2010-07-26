@@ -29,10 +29,10 @@
 
 package com.manydesigns.portofino.elements;
 
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.logging.LogUtil;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -88,7 +88,7 @@ public class SearchFormBuilder {
                         classAccessor.getProperty(current);
                 propertyAccessors.add(accessor);
             } catch (NoSuchFieldException e) {
-                LogUtil.warningMF(logger, e, "Field not found: {0}", current);
+                LogUtil.warningMF(logger, "Field not found: {0}", e, current);
             }
         }
 

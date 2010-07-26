@@ -29,9 +29,9 @@
 
 package com.manydesigns.portofino.base.context;
 
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.base.database.HibernateConfig;
 import com.manydesigns.portofino.base.model.*;
-import com.manydesigns.elements.logging.LogUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -41,8 +41,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -84,8 +84,8 @@ public class MDContext {
             HibernateConfig builder = new HibernateConfig();
             sessionFactories = builder.build(dataModel);
         } catch (Exception e) {
-            LogUtil.logMF(logger, Level.SEVERE, e,
-                    "Cannot load/parse model: {0}", resource);
+            LogUtil.logMF(logger, Level.SEVERE, "Cannot load/parse model: {0}", e,
+                    resource);
         }
 
         LogUtil.exiting(logger, "loadXmlModelAsResource");

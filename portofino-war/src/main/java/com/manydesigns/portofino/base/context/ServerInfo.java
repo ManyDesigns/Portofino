@@ -34,7 +34,6 @@ import com.manydesigns.elements.logging.LogUtil;
 import javax.servlet.ServletContext;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /*
@@ -98,7 +97,7 @@ public class ServerInfo {
                         servletContext.getClass().getMethod("getContextPath");
                 tmp = (String)method.invoke(servletContext);
             } catch (Throwable e) {
-                LogUtil.severe(logger, e, "Uncaught exception");
+                LogUtil.severe(logger, "Uncaught exception", e);
             }
         }
         contextPath = tmp;

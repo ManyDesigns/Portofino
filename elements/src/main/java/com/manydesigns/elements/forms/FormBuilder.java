@@ -29,10 +29,10 @@
 
 package com.manydesigns.elements.forms;
 
+import com.manydesigns.elements.annotations.FieldSet;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.helpers.FieldHelperManager;
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.elements.annotations.FieldSet;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -109,8 +109,8 @@ public class FormBuilder {
                             classAccessor.getProperty(currentField);
                     currentPropertyGroup.add(accessor);
                 } catch (NoSuchFieldException e) {
-                    LogUtil.warningMF(logger, e,
-                            "Field not found: {0}", currentField);
+                    LogUtil.warningMF(logger, "Field not found: {0}", e,
+                            currentField);
                 }
             }
         }
