@@ -30,11 +30,14 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.composites.ClassTableFormBuilder;
 import com.manydesigns.elements.composites.TableForm;
+import com.manydesigns.elements.composites.TableFormBuilder;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.forms.SearchForm;
+import com.manydesigns.elements.forms.SearchFormBuilder;
 import com.manydesigns.elements.hyperlinks.ExpressionHyperlinkGenerator;
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.base.context.MDContext;
 import com.manydesigns.portofino.base.context.ModelObjectNotFoundException;
@@ -48,10 +51,15 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -100,6 +108,7 @@ public class TableAction extends ActionSupport
 
     public String qualifiedTableName;
     public String pk;
+    public String searchString;
     public String cancelReturnUrl;
     public String skin;
 
@@ -138,17 +147,22 @@ public class TableAction extends ActionSupport
 
     public TableForm tableForm;
     public Form form;
+    public SearchForm searchForm;
     public List<RelatedTableForm> relatedTableFormList;
+
+    //--------------------------------------------------------------------------
+    // Presentation elements
+    //--------------------------------------------------------------------------
+
+    protected Logger logger = LogUtil.getLogger(TableAction.class);
 
     //--------------------------------------------------------------------------
     // Action default execute method
     //--------------------------------------------------------------------------
 
     public String execute() throws ModelObjectNotFoundException {
-        setupTable();
-
         if (pk == null) {
-            return search();
+            return searchFromString();
         } else {
             return read();
         }
@@ -193,7 +207,52 @@ public class TableAction extends ActionSupport
     // Search
     //--------------------------------------------------------------------------
 
-    public String search() {
+    public String searchFromString() throws ModelObjectNotFoundException {
+        setupTable();
+
+        SearchFormBuilder searchFormBuilder =
+                new SearchFormBuilder(tableAccessor);
+        searchForm = searchFormBuilder.build();
+
+        if (searchString != null) {
+            DummyHttpServletRequest dummyRequest =
+                    new DummyHttpServletRequest();
+            String[] parts = searchString.split(",");
+            Pattern pattern = Pattern.compile("(.*)=(.*)");
+            for (String part : parts) {
+                Matcher matcher = pattern.matcher(part);
+                if (matcher.matches()) {
+                    String key = matcher.group(1);
+                    String value = matcher.group(2);
+                    LogUtil.fineMF(logger, "Matched part: {0}={1}", key, value);
+                    dummyRequest.setParameter(key, value);
+                } else {
+                    LogUtil.fineMF(logger, "Could not match part: {0}", part);
+                }
+            }
+            searchForm.readFromRequest(dummyRequest);
+        }
+
+        return commonSearch();
+    }
+
+    public String search() throws ModelObjectNotFoundException {
+        setupTable();
+
+        SearchFormBuilder searchFormBuilder =
+                new SearchFormBuilder(tableAccessor);
+        searchForm = searchFormBuilder.build();
+        searchForm.readFromRequest(req);
+
+        return commonSearch();
+    }
+
+    private String commonSearch() {
+        searchString = searchForm.toSearchString();
+        if (searchString.length() == 0) {
+            searchString = null;
+        }
+
         objects = context.getAllObjects(qualifiedTableName);
 
         String readLinkExpression = getReadLinkExpression();
@@ -201,8 +260,8 @@ public class TableAction extends ActionSupport
                 new ExpressionHyperlinkGenerator(
                         tableAccessor, readLinkExpression, "dummy-alt");
 
-        ClassTableFormBuilder tableFormBuilder =
-                new ClassTableFormBuilder(tableAccessor)
+        TableFormBuilder tableFormBuilder =
+                new TableFormBuilder(tableAccessor)
                         .configNRows(objects.size());
 
         // ogni colonna chiave primaria sarà clickabile
@@ -218,6 +277,20 @@ public class TableAction extends ActionSupport
         return SEARCH;
     }
 
+    public String urlencode(String s) {
+        if (s == null) {
+            return null;
+        } else {
+            try {
+                return URLEncoder.encode(s, "ISO-8859-1");
+            } catch (UnsupportedEncodingException e) {
+                throw new Error(e);
+            }
+        }
+    }
+
+
+
     public String getReadLinkExpression() {
         StringBuilder sb = new StringBuilder("/");
         sb.append(table.getQualifiedName());
@@ -232,6 +305,10 @@ public class TableAction extends ActionSupport
             sb.append("{");
             sb.append(column.getColumnName());
             sb.append("}");
+        }
+        if (searchString != null) {
+            sb.append("&searchString=");
+            sb.append(urlencode(searchString));
         }
         return sb.toString();
     }
@@ -249,7 +326,8 @@ public class TableAction extends ActionSupport
     // Read
     //--------------------------------------------------------------------------
 
-    public String read() {
+    public String read() throws ModelObjectNotFoundException {
+        setupTable();
         parsePkString();
 
         object = context.getObjectByPk(qualifiedTableName, pkMap);
@@ -273,8 +351,8 @@ public class TableAction extends ActionSupport
                         relationship.getRelationshipName());
 
         Table relatedTable = relationship.getFromTable();
-        ClassTableFormBuilder tableFormBuilder =
-                new ClassTableFormBuilder(new TableAccessor(relatedTable));
+        TableFormBuilder tableFormBuilder =
+                new TableFormBuilder(new TableAccessor(relatedTable));
         tableFormBuilder.configNRows(relatedObjects.size());
         TableForm tableForm = tableFormBuilder.build();
         tableForm.setMode(Mode.VIEW);

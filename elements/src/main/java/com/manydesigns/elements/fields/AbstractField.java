@@ -30,11 +30,10 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.Util;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;

@@ -64,8 +64,8 @@ public class TableFormTest extends AbstractElementsTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        ClassTableFormBuilder builder =
-                new ClassTableFormBuilder(Bean1.class);
+        TableFormBuilder builder =
+                new TableFormBuilder(Bean1.class);
         builder.configNRows(4);
 
         tableForm = builder.build();

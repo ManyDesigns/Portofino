@@ -88,7 +88,7 @@ public class PortofinoProperties {
             return;
         }
         try {
-            properties.load(cl.getResourceAsStream(resource));
+            properties.load(stream);
             LogUtil.infoMF(logger, "Properties loaded from: {0}",
                     resource);
         } catch (Throwable e) {

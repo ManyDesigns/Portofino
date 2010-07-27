@@ -48,7 +48,7 @@ import java.util.Map;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ClassTableFormBuilder {
+public class TableFormBuilder {
     public static final String copyright =
             "Copyright (c) 2005-2009, ManyDesigns srl";
 
@@ -61,16 +61,16 @@ public class ClassTableFormBuilder {
     protected String prefix;
     protected int nRows = DEFAULT_N_ROWS;
 
-    public ClassTableFormBuilder(Class clazz) {
+    public TableFormBuilder(Class clazz) {
         this(new JavaClassAccessor(clazz));
     }
 
-    public ClassTableFormBuilder(ClassAccessor classAccessor) {
+    public TableFormBuilder(ClassAccessor classAccessor) {
         this.classAccessor = classAccessor;
         hyperlinkGenerators = new HashMap<String, HyperlinkGenerator>();
     }
 
-    public ClassTableFormBuilder configFields(String... fieldNames) {
+    public TableFormBuilder configFields(String... fieldNames) {
         propertyAccessors = new ArrayList<PropertyAccessor>();
         for (String currentField : fieldNames) {
             try {
@@ -92,12 +92,12 @@ public class ClassTableFormBuilder {
         return this;
     }
 
-    public ClassTableFormBuilder configPrefix(String prefix) {
+    public TableFormBuilder configPrefix(String prefix) {
         this.prefix = prefix;
         return this;
     }
 
-    public ClassTableFormBuilder configNRows(int nRows) {
+    public TableFormBuilder configNRows(int nRows) {
         this.nRows = nRows;
         return this;
     }
@@ -113,7 +113,7 @@ public class ClassTableFormBuilder {
         }
     }
 
-    public ClassTableFormBuilder configHyperlinkGenerator(
+    public TableFormBuilder configHyperlinkGenerator(
             String fieldName, HyperlinkGenerator hyperlinkGenerator) {
         hyperlinkGenerators.put(fieldName, hyperlinkGenerator);
         return this;

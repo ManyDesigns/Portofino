@@ -80,3 +80,64 @@ ul.errors li {
 div#responseTime {
     float: right;
 }
+
+
+div.search_form {
+    float: right;
+    width: 250px;
+    background-color: #ffffe0;
+    border-left: 1px solid #888;
+    padding: 10px;
+    overflow: hidden;
+}
+
+div.search_form ul {
+    margin: 0px;
+    padding: 0px;
+    border: 0px none;
+}
+
+div.search_form ul li {
+    display: block;
+    list-style: none;
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+    border: 0px none;
+    border-bottom: 1px solid #888;
+}
+
+div.search_form ul li.advanced-hide {
+    display: none;
+}
+
+div.search_form fieldset {
+    margin: 0px;
+    padding: 0px;
+    border: 0px none;
+}
+
+div.search_form legend.attr_name, div.search_form label.attr_name {
+    margin: 0px;
+    padding: 0px;
+    border: 0px none;
+    font-weight: bold;
+    font-size: 1em;
+}
+
+div.search_form label.attr_name {
+    display: block;
+}
+
+table.range {
+    border-collapse: collapse;
+}
+
+table.range th {
+    text-align: left;
+    font-weight: normal;
+}
+
+label.match_mode, label.rel_name {
+    display: none;
+}
+

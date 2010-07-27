@@ -11,6 +11,9 @@
     </s:if>
     <mdes:write value="form"/>
     <s:hidden name="pk" value="%{pk}"/>
+    <s:if test="searchString != null">
+        <s:hidden name="searchString" value="%{searchString}"/>
+    </s:if>
     <s:hidden name="cancelReturnUrl" value="%{cancelReturnUrl}"/>
     <s:include value="/skins/default/editButtonsBar.jsp"/>
 </s:form>

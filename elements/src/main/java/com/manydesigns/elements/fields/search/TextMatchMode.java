@@ -29,16 +29,33 @@
 
 package com.manydesigns.elements.fields.search;
 
-import com.manydesigns.elements.Element;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface SearchField extends Element {
+public enum TextMatchMode {
+    CONTAINS("", "contains"),
+    EQUALS("equals", "equals"),
+    STARTS_WITH("starts", "starts_with"),
+    ENDS_WITH("ends", "ends_with");
+
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    void toSearchString(StringBuilder sb);
+    private final String stringValue;
+    private final String label;
+
+    TextMatchMode(String stringValue, String label) {
+        this.stringValue = stringValue;
+        this.label = label;
+    }
+
+    public String getStringValue() {
+        return stringValue;
+    }
+
+    public String getLabel() {
+        return label;
+    }
 }

@@ -32,6 +32,7 @@ package com.manydesigns.elements.fields.helpers;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.TextField;
 import com.manydesigns.elements.fields.search.SearchField;
+import com.manydesigns.elements.fields.search.TextSearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
@@ -45,15 +46,21 @@ public class TextFieldHelper implements FieldHelper {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public Field tryToInstantiateField(ClassAccessor classAccessor,
-                                  PropertyAccessor propertyAccessor,
-                                  String prefix) {
+                                       PropertyAccessor propertyAccessor,
+                                       String prefix) {
         if (propertyAccessor.isAssignableTo(String.class)) {
             return new TextField(propertyAccessor, prefix);
         }
         return null;
     }
 
-    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor, PropertyAccessor propertyAccessor, String prefix) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public SearchField tryToInstantiateSearchField(
+            ClassAccessor classAccessor,
+            PropertyAccessor propertyAccessor,
+            String prefix) {
+        if (propertyAccessor.isAssignableTo(String.class)) {
+            return new TextSearchField(propertyAccessor, prefix);
+        }
+        return null;
     }
 }
