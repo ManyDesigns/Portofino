@@ -34,7 +34,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.base.context.MDContext;
-import com.manydesigns.portofino.base.context.MDContextImpl;
+import com.manydesigns.portofino.base.context.MDContextHibernateImpl;
 import com.manydesigns.portofino.base.context.ServerInfo;
 import org.apache.commons.lang.time.StopWatch;
 
@@ -154,7 +154,7 @@ public class PortofinoServletContextListener implements ServletContextListener {
         InstanceBuilder<MDContext> builder =
                 new InstanceBuilder<MDContext>(
                         MDContext.class,
-                        MDContextImpl.class,
+                        MDContextHibernateImpl.class,
                         logger);
         mdContext = builder.createInstance(managerClassName);
 

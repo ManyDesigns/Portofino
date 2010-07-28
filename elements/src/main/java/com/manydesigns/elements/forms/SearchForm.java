@@ -30,6 +30,7 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.AbstractCompositeElement;
+import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
@@ -64,4 +65,11 @@ public class SearchForm extends AbstractCompositeElement<SearchField> {
         }
         return sb.toString();
     }
+
+    public void configureCriteria(Criteria criteria) {
+        for (SearchField current : this) {
+            current.configureCriteria(criteria);
+        }
+    }
+
 }

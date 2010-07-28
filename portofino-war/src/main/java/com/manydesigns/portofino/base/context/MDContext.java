@@ -29,8 +29,8 @@
 
 package com.manydesigns.portofino.base.context;
 
+import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.portofino.base.model.*;
-import org.hibernate.Criteria;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +45,16 @@ public interface MDContext {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //--------------------------------------------------------------------------
+    // Model loading
+    //--------------------------------------------------------------------------
+
     void loadXmlModelAsResource(String resource);
+
+
+    //--------------------------------------------------------------------------
+    // Model access
+    //--------------------------------------------------------------------------
 
     List<Table> getAllTables();
 
@@ -64,6 +73,11 @@ public interface MDContext {
     Relationship findOneToManyRelationship(Table table, String relationshipName)
             throws ModelObjectNotFoundException;
 
+
+    //--------------------------------------------------------------------------
+    // Persistance
+    //--------------------------------------------------------------------------
+
     Map<String, Object> getObjectByPk(String qualifiedTableName,
                                       Object... pk);
 
@@ -72,8 +86,9 @@ public interface MDContext {
 
     List<Map<String, Object>> getAllObjects(String qualifiedTableName);
 
-    List<Map<String, Object>> getObjects(String qualifiedTableName,
-                                         Criteria criteria);
+    Criteria createCriteria(String qualifiedTableName);
+
+    List<Map<String, Object>> getObjects(Criteria criteria);
 
     void saveOrUpdateObject(Map<String, Object> obj);
 

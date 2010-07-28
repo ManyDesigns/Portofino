@@ -16,7 +16,7 @@ public class MDContextTest extends TestCase {
     MDContext context;
 
     public void setUp() {
-        context = new MDContextImpl();
+        context = new MDContextHibernateImpl();
         context.loadXmlModelAsResource(
                 "databases/jpetstore/postgresql/jpetstore-postgres.xml");
     }

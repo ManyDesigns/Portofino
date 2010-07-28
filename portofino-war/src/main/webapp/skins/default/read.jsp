@@ -6,6 +6,7 @@
 <s:form method="post">
     <s:include value="/skins/default/readButtonsBar.jsp"/>
     <h1>Read: <s:property value="table.qualifiedName"/></h1>
+    Position: <s:property value="objects.indexOf(object)+1"/> of <s:property value="objects.size()"/>
     <mdes:write value="form"/>
     <s:iterator var="current" value="relatedTableFormList">
         <s:set name="rel" value="#current.relationship"/>
@@ -16,7 +17,10 @@
     <s:if test="searchString != null">
         <s:hidden name="searchString" value="%{searchString}"/>
     </s:if>
-    <s:url var="cancelReturnUrl" namespace="/" action="%{qualifiedTableName}/Table" escapeAmp="false">
+    <s:url var="cancelReturnUrl"
+           namespace="/"
+           action="%{qualifiedTableName}/Table"
+           escapeAmp="false">
         <s:param name="pk" value="%{pk}"/>
         <s:param name="searchString" value="%{searchString}"/>
     </s:url>

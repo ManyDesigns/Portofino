@@ -160,6 +160,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
         throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public boolean isRequestedSessionIdFromUrl() {
         throw new UnsupportedOperationException();
     }
@@ -264,6 +265,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
         throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public String getRealPath(String s) {
         throw new UnsupportedOperationException();
     }

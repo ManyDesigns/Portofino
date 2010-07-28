@@ -32,6 +32,7 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.composites.TableForm;
 import com.manydesigns.elements.composites.TableFormBuilder;
+import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.forms.SearchForm;
@@ -213,7 +214,12 @@ public class TableAction extends ActionSupport
         SearchFormBuilder searchFormBuilder =
                 new SearchFormBuilder(tableAccessor);
         searchForm = searchFormBuilder.build();
+        configureSearchFormFromString();
 
+        return commonSearch();
+    }
+
+    private void configureSearchFormFromString() {
         if (searchString != null) {
             DummyHttpServletRequest dummyRequest =
                     new DummyHttpServletRequest();
@@ -232,8 +238,6 @@ public class TableAction extends ActionSupport
             }
             searchForm.readFromRequest(dummyRequest);
         }
-
-        return commonSearch();
     }
 
     public String search() throws ModelObjectNotFoundException {
@@ -253,7 +257,9 @@ public class TableAction extends ActionSupport
             searchString = null;
         }
 
-        objects = context.getAllObjects(qualifiedTableName);
+        Criteria criteria = context.createCriteria(qualifiedTableName);
+        searchForm.configureCriteria(criteria);
+        objects = context.getObjects(criteria);
 
         String readLinkExpression = getReadLinkExpression();
         ExpressionHyperlinkGenerator generator =
@@ -314,7 +320,7 @@ public class TableAction extends ActionSupport
     }
 
     //--------------------------------------------------------------------------
-    // Read
+    // Return to search
     //--------------------------------------------------------------------------
 
     public String returnToSearch() throws ModelObjectNotFoundException {
@@ -329,6 +335,15 @@ public class TableAction extends ActionSupport
     public String read() throws ModelObjectNotFoundException {
         setupTable();
         parsePkString();
+
+        SearchFormBuilder searchFormBuilder =
+                new SearchFormBuilder(tableAccessor);
+        searchForm = searchFormBuilder.build();
+        configureSearchFormFromString();
+
+        Criteria criteria = context.createCriteria(qualifiedTableName);
+        searchForm.configureCriteria(criteria);
+        objects = context.getObjects(criteria);
 
         object = context.getObjectByPk(qualifiedTableName, pkMap);
         FormBuilder formBuilder =

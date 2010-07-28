@@ -32,6 +32,7 @@ package com.manydesigns.portofino.base.context;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.base.database.HibernateConfig;
 import com.manydesigns.portofino.base.model.*;
+import com.manydesigns.portofino.search.HibernateCriteriaAdapter;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -41,7 +42,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /*
@@ -49,7 +49,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class MDContextImpl implements MDContext {
+public class MDContextHibernateImpl implements MDContext {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -61,13 +61,13 @@ public class MDContextImpl implements MDContext {
     protected Map<String, SessionFactory> sessionFactories;
     protected final ThreadLocal<Map<String, Session>> threadSessions;
 
-    protected final Logger logger = LogUtil.getLogger(MDContextImpl.class);
+    protected final Logger logger = LogUtil.getLogger(MDContextHibernateImpl.class);
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
-    public MDContextImpl() {
+    public MDContextHibernateImpl() {
         threadSessions = new ThreadLocal<Map<String, Session>>();
     }
 
@@ -84,7 +84,7 @@ public class MDContextImpl implements MDContext {
             HibernateConfig builder = new HibernateConfig();
             sessionFactories = builder.build(dataModel);
         } catch (Exception e) {
-            LogUtil.logMF(logger, Level.SEVERE, "Cannot load/parse model: {0}", e,
+            LogUtil.severeMF(logger, "Cannot load/parse model: {0}", e,
                     resource);
         }
 
@@ -181,14 +181,7 @@ public class MDContextImpl implements MDContext {
     
     public Map<String, Object> getObjectByPk(String qualifiedTableName,
                                              HashMap<String, Object> pk) {
-        Table table;
-        try {
-            table = findTableByQualifiedName(qualifiedTableName);
-        } catch (ModelObjectNotFoundException e) {
-            throw new Error(e);
-        }
-        String databaseName = table.getDatabaseName();
-        Session session = threadSessions.get().get(databaseName);
+        Session session = getSession(qualifiedTableName);
 
         //noinspection unchecked
         return (Map<String, Object>)session.load(qualifiedTableName, pk);
@@ -196,6 +189,14 @@ public class MDContextImpl implements MDContext {
 
 
     public List<Map<String, Object>> getAllObjects(String qualifiedTableName) {
+        Session session = getSession(qualifiedTableName);
+
+        Criteria hibernateCriteria = session.createCriteria(qualifiedTableName);
+        //noinspection unchecked
+        return hibernateCriteria.list();
+    }
+
+    protected Session getSession(String qualifiedTableName) {
         Table table;
         try {
             table = findTableByQualifiedName(qualifiedTableName);
@@ -203,70 +204,49 @@ public class MDContextImpl implements MDContext {
             throw new Error(e);
         }
         String databaseName = table.getDatabaseName();
-        Session session = threadSessions.get().get(databaseName);
-
-        //noinspection unchecked
-        return (List<Map<String, Object>>)session.createQuery(
-                            "from " + qualifiedTableName).list();
+        return threadSessions.get().get(databaseName);
     }
 
-    // lasciare per ultima
-    public List<Map<String, Object>> getObjects(String qualifiedTableName,
-                                                Criteria criteria) {
-        throw new UnsupportedOperationException();
+    public com.manydesigns.elements.fields.search.Criteria
+    createCriteria(String qualifiedTableName) {
+        Session session = getSession(qualifiedTableName);
+        Criteria hibernateCriteria = session.createCriteria(qualifiedTableName);
+        return new HibernateCriteriaAdapter(hibernateCriteria);
+    }
+
+    public List<Map<String, Object>> getObjects(
+            com.manydesigns.elements.fields.search.Criteria criteria) {
+        HibernateCriteriaAdapter hibernateCriteriaAdapter =
+                (HibernateCriteriaAdapter)criteria;
+        Criteria hibernateCriteria =
+                hibernateCriteriaAdapter.getHibernateCriteria();
+        //noinspection unchecked
+        return hibernateCriteria.list();
     }
 
     public void saveOrUpdateObject(Map<String, Object> obj) {
-        Table table;
-        try {
-            table = findTableByQualifiedName((String) obj.get("$type$"));
-        } catch (ModelObjectNotFoundException e) {
-            throw new Error(e);
-        }
-        String databaseName = table.getDatabaseName();
-                Session session = threadSessions.get().get(databaseName);
+        Session session = getSession((String) obj.get("$type$"));
         session.beginTransaction();
         session.saveOrUpdate((String) obj.get("$type$"), obj);
         session.getTransaction().commit();
     }
 
     public void saveObject(Map<String, Object> obj) {
-        Table table;
-        try {
-            table = findTableByQualifiedName((String) obj.get("$type$"));
-        } catch (ModelObjectNotFoundException e) {
-            throw new Error(e);
-        }
-        String databaseName = table.getDatabaseName();
-                Session session = threadSessions.get().get(databaseName);
+        Session session = getSession((String) obj.get("$type$"));
         session.beginTransaction();
         session.save((String) obj.get("$type$"), obj);
         session.getTransaction().commit();
     }
 
     public void updateObject(Map<String, Object> obj) {
-        Table table;
-        try {
-            table = findTableByQualifiedName((String) obj.get("$type$"));
-        } catch (ModelObjectNotFoundException e) {
-            throw new Error(e);
-        }
-        String databaseName = table.getDatabaseName();
-                Session session = threadSessions.get().get(databaseName);
+        Session session = getSession((String) obj.get("$type$"));
         session.beginTransaction();
         session.update((String) obj.get("$type$"), obj);
         session.getTransaction().commit();
     }
 
     public void deleteObject(Map<String, Object> obj) {
-        Table table;
-        try {
-            table = findTableByQualifiedName((String) obj.get("$type$"));
-        } catch (ModelObjectNotFoundException e) {
-            throw new Error(e);
-        }
-        String databaseName = table.getDatabaseName();
-                Session session = threadSessions.get().get(databaseName);
+        Session session = getSession((String) obj.get("$type$"));
         session.beginTransaction();
         session.delete((String) obj.get("$type$"), obj);
         session.getTransaction().commit();

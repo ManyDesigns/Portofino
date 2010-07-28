@@ -29,17 +29,33 @@
 
 package com.manydesigns.elements.fields.search;
 
-import com.manydesigns.elements.Element;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface SearchField extends Element {
+public interface Criteria {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    void toSearchString(StringBuilder sb);
-    void configureCriteria(Criteria criteria);
+    public void eq(PropertyAccessor accessor, Object value);
+    public void ne(PropertyAccessor accessor, Object value);
+
+    public void between(PropertyAccessor accessor, Object min, Object max);
+
+    public void gt(PropertyAccessor accessor, Object value);
+    public void ge(PropertyAccessor accessor, Object value);
+
+    public void lt(PropertyAccessor accessor, Object value);
+    public void le(PropertyAccessor accessor, Object value);
+
+    public void like(PropertyAccessor accessor, String value);
+    public void like(PropertyAccessor accessor, String value,
+                     TextMatchMode textMatchMode);
+
+    public void ilike(PropertyAccessor accessor, String value);
+    public void ilike(PropertyAccessor accessor, String value,
+                     TextMatchMode textMatchMode);
 }

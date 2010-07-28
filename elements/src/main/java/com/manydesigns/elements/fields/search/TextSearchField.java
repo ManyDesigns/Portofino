@@ -118,4 +118,10 @@ public class TextSearchField extends AbstractSearchField {
             sb.append(value);
         }
     }
+
+    public void configureCriteria(Criteria criteria) {
+        if (value != null) {
+            criteria.ilike(accessor, value, TextMatchMode.CONTAINS);
+        }
+    }
 }
