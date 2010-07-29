@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.portofino.base.context.MDContext;
+import com.manydesigns.portofino.context.MDContext;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

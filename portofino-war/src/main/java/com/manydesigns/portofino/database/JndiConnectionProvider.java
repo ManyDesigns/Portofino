@@ -27,30 +27,46 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.database;
 
-import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.interceptors.MDContextAware;
-import com.opensymphony.xwork2.ActionSupport;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ProfileAction extends ActionSupport implements MDContextAware {
+public class JndiConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public MDContext context;
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
 
-    public String skin = "default";
+    private final DataSource ds;
 
-    public void setContext(MDContext context) {
-        this.context = context;
+
+    //--------------------------------------------------------------------------
+    // Constructors
+    //--------------------------------------------------------------------------
+
+    public JndiConnectionProvider(String databaseJndiName)
+            throws NamingException {
+        InitialContext ic = new InitialContext();
+        ds = (DataSource) ic.lookup(databaseJndiName);
     }
 
-    public String execute() {
-        return SUCCESS;
+    //--------------------------------------------------------------------------
+    // Implementation of ConnectionProvider
+    //--------------------------------------------------------------------------
+
+    public Connection getConnection() throws SQLException {
+        return ds.getConnection();
     }
+
 }

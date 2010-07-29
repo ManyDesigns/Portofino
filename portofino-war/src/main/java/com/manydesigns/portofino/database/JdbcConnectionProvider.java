@@ -27,30 +27,51 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.database;
 
-import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.interceptors.MDContextAware;
-import com.opensymphony.xwork2.ActionSupport;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ProfileAction extends ActionSupport implements MDContextAware {
+public class JdbcConnectionProvider implements ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public MDContext context;
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
 
-    public String skin = "default";
+    private final String jdbcConnectionURL;
+    private final String jdbcUsername;
+    private final String jdbcPassword;
 
-    public void setContext(MDContext context) {
-        this.context = context;
+
+    //--------------------------------------------------------------------------
+    // Constructors
+    //--------------------------------------------------------------------------
+
+    public JdbcConnectionProvider(String jdbcDriverClass, String jdbcConnectionURL,
+                                 String jdbcUsername, String jdbcPassword)
+            throws ClassNotFoundException {
+        Class.forName(jdbcDriverClass);
+        this.jdbcConnectionURL = jdbcConnectionURL;
+        this.jdbcUsername = jdbcUsername;
+        this.jdbcPassword = jdbcPassword;
     }
 
-    public String execute() {
-        return SUCCESS;
+
+    //--------------------------------------------------------------------------
+    // Implementation of ConnectionProvider
+    //--------------------------------------------------------------------------
+
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(jdbcConnectionURL,
+                jdbcUsername, jdbcPassword);
     }
+
 }

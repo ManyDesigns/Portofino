@@ -27,30 +27,52 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
-
-import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.interceptors.MDContextAware;
-import com.opensymphony.xwork2.ActionSupport;
+package com.manydesigns.portofino.model;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ProfileAction extends ActionSupport implements MDContextAware {
+public class Reference {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public MDContext context;
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
 
-    public String skin = "default";
+    protected Column fromColumn;
+    protected Column toColumn;
 
-    public void setContext(MDContext context) {
-        this.context = context;
+
+    //--------------------------------------------------------------------------
+    // Constructors
+    //--------------------------------------------------------------------------
+
+    public Reference(Column fromColumn, Column toColumn) {
+        this.fromColumn = fromColumn;
+        this.toColumn = toColumn;
     }
 
-    public String execute() {
-        return SUCCESS;
+
+    //--------------------------------------------------------------------------
+    // Getters/setter
+    //--------------------------------------------------------------------------
+
+    public Column getFromColumn() {
+        return fromColumn;
+    }
+
+    public void setFromColumn(Column fromColumn) {
+        this.fromColumn = fromColumn;
+    }
+
+    public Column getToColumn() {
+        return toColumn;
+    }
+
+    public void setToColumn(Column toColumn) {
+        this.toColumn = toColumn;
     }
 }

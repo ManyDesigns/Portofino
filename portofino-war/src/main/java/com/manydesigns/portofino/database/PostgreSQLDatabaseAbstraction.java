@@ -27,30 +27,47 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.database;
 
-import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.interceptors.MDContextAware;
-import com.opensymphony.xwork2.ActionSupport;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ProfileAction extends ActionSupport implements MDContextAware {
+public class PostgreSQLDatabaseAbstraction extends CommonDatabaseAbstraction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+    
+    private static final String DRIVER_CLASS_NAME = "org.postgresql.Driver";
 
-    public MDContext context;
+    //--------------------------------------------------------------------------
+    // Constructors
+    //--------------------------------------------------------------------------
 
-    public String skin = "default";
-
-    public void setContext(MDContext context) {
-        this.context = context;
+    public PostgreSQLDatabaseAbstraction(ConnectionProvider connectionProvider)
+            throws SQLException {
+        super(connectionProvider);
     }
 
-    public String execute() {
-        return SUCCESS;
+    //--------------------------------------------------------------------------
+    // Implementation of DatabaseAbstraction
+    //--------------------------------------------------------------------------
+
+    public Connection getConnection(String host, int port, String dbName,
+            String login, String password) throws SQLException {
+        return DriverManager.getConnection(
+                MessageFormat.format(
+                        "jdbc:postgresql://{0}:{1}/{2}",
+                        host, port, dbName),
+                login, password);
+    }
+
+    public String getDriverClassName() {
+        return DRIVER_CLASS_NAME;
     }
 }

@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.actions;
 
-import com.manydesigns.portofino.base.context.MDContext;
+import com.manydesigns.portofino.context.MDContext;
 import com.manydesigns.portofino.interceptors.MDContextAware;
 import com.opensymphony.xwork2.ActionSupport;
 

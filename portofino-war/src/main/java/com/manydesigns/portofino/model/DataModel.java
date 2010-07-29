@@ -27,30 +27,40 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.model;
 
-import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.interceptors.MDContextAware;
-import com.opensymphony.xwork2.ActionSupport;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ProfileAction extends ActionSupport implements MDContextAware {
+public class DataModel {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public MDContext context;
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
 
-    public String skin = "default";
+    protected final List<Database> databases;
 
-    public void setContext(MDContext context) {
-        this.context = context;
+
+    //--------------------------------------------------------------------------
+    // Constructors
+    //--------------------------------------------------------------------------
+
+    public DataModel() {
+        this.databases = new ArrayList<Database>();
     }
 
-    public String execute() {
-        return SUCCESS;
+    //--------------------------------------------------------------------------
+    // Getters/setter
+    //--------------------------------------------------------------------------
+
+    public List<Database> getDatabases() {
+        return databases;
     }
 }

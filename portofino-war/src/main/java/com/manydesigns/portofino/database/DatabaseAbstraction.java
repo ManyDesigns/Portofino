@@ -27,30 +27,52 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.database;
 
-import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.interceptors.MDContextAware;
-import com.opensymphony.xwork2.ActionSupport;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ProfileAction extends ActionSupport implements MDContextAware {
+public interface DatabaseAbstraction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public MDContext context;
+    public String getDatabaseProductName();
 
-    public String skin = "default";
+    public String getDatabaseProductVersion();
 
-    public void setContext(MDContext context) {
-        this.context = context;
-    }
+    public Integer getDatabaseMajorVersion();
 
-    public String execute() {
-        return SUCCESS;
-    }
+    public Integer getDatabaseMinorVersion();
+
+    public String getDatabaseMajorMinorVersion();
+
+    public String getDriverName();
+
+    public String getDriverVersion();
+
+    public Integer getDriverMajorVersion();
+
+    public Integer getDriverMinorVersion();
+
+    public String getDriverMajorMinorVersion();
+
+    public Integer getJDBCMajorVersion();
+
+    public Integer getJDBCMinorVersion();
+
+    public String getJDBCMajorMinorVersion();
+
+    public String getDriverClassName();
+
+    public Connection getConnection(String host, int port, String dbName,
+            String login, String password)  throws SQLException;
+
+    public Type[] getTypes();
+
+    public Type getTypeByName(String typeName);
 }

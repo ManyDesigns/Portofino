@@ -29,8 +29,8 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.portofino.base.context.MDContext;
-import com.manydesigns.portofino.methods.PortofinoServletContextListener;
+import com.manydesigns.portofino.context.MDContext;
+import com.manydesigns.portofino.servlets.PortofinoServletContextListener;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;

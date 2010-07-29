@@ -35,16 +35,15 @@ import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.hyperlinks.ExpressionHyperlinkGenerator;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.base.context.MDContext;
-import com.manydesigns.portofino.base.context.ModelObjectNotFoundException;
-import com.manydesigns.portofino.base.model.Column;
-import com.manydesigns.portofino.base.model.Relationship;
-import com.manydesigns.portofino.base.model.Table;
-import com.manydesigns.portofino.base.reflection.TableAccessor;
+import com.manydesigns.portofino.context.MDContext;
+import com.manydesigns.portofino.context.ModelObjectNotFoundException;
 import com.manydesigns.portofino.interceptors.MDContextAware;
-import com.manydesigns.portofino.methods.TableHelper;
+import com.manydesigns.portofino.model.Column;
+import com.manydesigns.portofino.model.Relationship;
+import com.manydesigns.portofino.model.Table;
+import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.util.TableHelper;
 import com.opensymphony.xwork2.ActionSupport;
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
@@ -76,6 +75,7 @@ public class TableAction extends ActionSupport
     public final static String SAVE = "save";
     public final static String EDIT = "edit";
     public final static String UPDATE = "update";
+    public final static String BULK_EDIT = "bulkEdit";
     public final static String DELETE = "delete";
     public final static String CANCEL = "cancel";
 
@@ -149,9 +149,10 @@ public class TableAction extends ActionSupport
     public List<RelatedTableForm> relatedTableFormList;
 
     //--------------------------------------------------------------------------
-    // Presentation elements
+    // Other objects
     //--------------------------------------------------------------------------
 
+    public TableHelper tableHelper = new TableHelper();
     protected Logger logger = LogUtil.getLogger(TableAction.class);
 
     //--------------------------------------------------------------------------
@@ -173,36 +174,6 @@ public class TableAction extends ActionSupport
     public void setupTable() throws ModelObjectNotFoundException {
         table = context.findTableByQualifiedName(qualifiedTableName);
         tableAccessor = new TableAccessor(table);
-    }
-
-    public HashMap<String, Object> parsePkString(Table table, String pkString) {
-        String[] pkList = StringUtils.split(pkString,",");
-
-        int i = 0;
-        HashMap<String, Object> pkMap = new HashMap<String, Object>();
-
-        pkMap.put("$type$", table.getQualifiedName());
-
-        for(Column column : table.getPrimaryKey().getColumns() ) {
-            pkMap.put(column.getColumnName(), pkList[i]);
-            i++;
-        }
-
-        return pkMap;
-    }
-
-    public String generatePkString(Map<String, Object> map) {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for(Column column : table.getPrimaryKey().getColumns() ) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(",");
-            }
-            sb.append(map.get(column.getColumnName()));
-        }
-        return sb.toString();
     }
 
     //--------------------------------------------------------------------------
@@ -278,7 +249,7 @@ public class TableAction extends ActionSupport
         }
 
         tableForm = tableFormBuilder.build();
-        tableForm.setKeyGenerator(TableHelper.createKeyGenerator(table));
+        tableForm.setKeyGenerator(tableHelper.createKeyGenerator(table));
         tableForm.setMode(Mode.VIEW);
         tableForm.setSelectable(true);
         tableForm.readFromObject(objects);
@@ -337,7 +308,7 @@ public class TableAction extends ActionSupport
 
     public String read() throws ModelObjectNotFoundException {
         setupTable();
-        HashMap<String, Object> pkMap = parsePkString(table, pk);
+        HashMap<String, Object> pkMap = tableHelper.parsePkString(table, pk);
 
         SearchFormBuilder searchFormBuilder =
                 new SearchFormBuilder(tableAccessor);
@@ -408,7 +379,7 @@ public class TableAction extends ActionSupport
             object.put("$type$", table.getQualifiedName());
             form.writeToObject(object);
             context.saveObject(object);
-            pk = generatePkString(object);
+            pk = tableHelper.generatePkString(table, object);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
             return SAVE;
         } else {
@@ -422,7 +393,7 @@ public class TableAction extends ActionSupport
 
     public String edit() throws ModelObjectNotFoundException {
         setupTable();
-        HashMap<String, Object> pkMap = parsePkString(table, pk);
+        HashMap<String, Object> pkMap = tableHelper.parsePkString(table, pk);
 
         object = context.getObjectByPk(qualifiedTableName, pkMap);
 
@@ -437,7 +408,7 @@ public class TableAction extends ActionSupport
 
     public String update() throws ModelObjectNotFoundException {
         setupTable();
-        HashMap<String, Object> pkMap = parsePkString(table, pk);
+        HashMap<String, Object> pkMap = tableHelper.parsePkString(table, pk);
 
         FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
@@ -456,13 +427,29 @@ public class TableAction extends ActionSupport
         }
     }
 
+    public String bulkEdit() throws ModelObjectNotFoundException {
+        setupTable();
+
+        if (selection == null || selection.length == 0) {
+            SessionMessages.addWarningMessage(
+                    "Nessun oggetto selezionato");
+            return RETURN_TO_SEARCH;
+        }
+
+        FormBuilder formBuilder = new FormBuilder(tableAccessor);
+        form = formBuilder.build();
+        form.setMode(Mode.EDIT);
+
+        return BULK_EDIT;
+    }
+
     //--------------------------------------------------------------------------
     // Delete
     //--------------------------------------------------------------------------
 
     public String delete() throws ModelObjectNotFoundException {
         setupTable();
-        HashMap<String, Object> pkMap = parsePkString(table, pk);
+        HashMap<String, Object> pkMap = tableHelper.parsePkString(table, pk);
         context.deleteObject(pkMap);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
         return DELETE;
@@ -476,7 +463,8 @@ public class TableAction extends ActionSupport
             return DELETE;
         }
         for (String current : selection) {
-            HashMap<String, Object> pkMap = parsePkString(table, current);
+            HashMap<String, Object> pkMap =
+                    tableHelper.parsePkString(table, current);
             //object = context.getObjectByPk(qualifiedTableName, pkMap);
             context.deleteObject(pkMap);
         }

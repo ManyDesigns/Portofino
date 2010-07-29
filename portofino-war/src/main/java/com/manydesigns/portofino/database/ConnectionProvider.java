@@ -27,30 +27,19 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.database;
 
-import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.interceptors.MDContextAware;
-import com.opensymphony.xwork2.ActionSupport;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ProfileAction extends ActionSupport implements MDContextAware {
+public interface ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public MDContext context;
-
-    public String skin = "default";
-
-    public void setContext(MDContext context) {
-        this.context = context;
-    }
-
-    public String execute() {
-        return SUCCESS;
-    }
+    public Connection getConnection() throws SQLException;
 }

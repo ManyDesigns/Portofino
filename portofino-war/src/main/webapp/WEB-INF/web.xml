@@ -12,7 +12,7 @@
     <listener>
         <description>Application startup and shutdown listener</description>
         <listener-class>
-            com.manydesigns.portofino.methods.PortofinoServletContextListener
+            com.manydesigns.portofino.servlets.PortofinoServletContextListener
         </listener-class>
     </listener>
 

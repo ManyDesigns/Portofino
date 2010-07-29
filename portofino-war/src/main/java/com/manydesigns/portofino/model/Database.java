@@ -27,32 +27,64 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.model;
 
-import com.manydesigns.elements.forms.TableForm;
-import com.manydesigns.portofino.model.Relationship;
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class RelatedTableForm {
+public class Database {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Relationship relationship;
-    public TableForm tableForm;
-    public List<Map<String, Object>> objects;
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
 
-    public RelatedTableForm(Relationship relationship,
-                          TableForm tableForm,
-                          List<Map<String, Object>> objects) {
-        this.relationship = relationship;
-        this.tableForm = tableForm;
-        this.objects = objects;
+    protected String databaseName;
+    protected Connection connection;
+    protected final List<Schema> schemas;
+
+
+    //--------------------------------------------------------------------------
+    // Constructors
+    //--------------------------------------------------------------------------
+
+    public Database() {
+        this.schemas = new ArrayList<Schema>();
+    }
+
+    public Database(String databaseName, Connection connection) {
+        this.databaseName = databaseName;
+        this.connection = connection;
+        this.schemas = new ArrayList<Schema>();
+    }
+
+    //--------------------------------------------------------------------------
+    // Getters/setter
+    //--------------------------------------------------------------------------
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
+
+    public List<Schema> getSchemas() {
+        return schemas;
     }
 }

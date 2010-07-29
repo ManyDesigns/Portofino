@@ -66,6 +66,8 @@
                 <param name="searchString">%{searchString}</param>
             </result>
 
+            <result name="bulkEdit">/skins/%{skin}/bulkEdit.jsp</result>
+
             <result name="returnToSearch" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/Table</param>
                 <param name="namespace">/</param>
@@ -104,11 +106,11 @@
 
     <package name="portofino-upstairs" extends="portofino-default" namespace="/upstairs">
         <action name="ServerInfo"
-                class="com.manydesigns.portofino.actions.upstaits.ServerInfoAction">
+                class="com.manydesigns.portofino.actions.upstairs.ServerInfoAction">
             <result name="success">/upstairs/serverInfo.jsp</result>
         </action>
         <action name="Logs"
-                class="com.manydesigns.portofino.actions.upstaits.LogsAction">
+                class="com.manydesigns.portofino.actions.upstairs.LogsAction">
             <result name="success">/upstairs/logs.jsp</result>
         </action>
     </package>

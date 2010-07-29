@@ -27,30 +27,35 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.util;
 
-import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.interceptors.MDContextAware;
-import com.opensymphony.xwork2.ActionSupport;
+import com.manydesigns.portofino.model.Column;
+import com.manydesigns.portofino.model.Table;
+
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ProfileAction extends ActionSupport implements MDContextAware {
+public class LinkHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public MDContext context;
+    public static String getPk(Table table, Map<String, Object> object) {
+        StringBuilder sb = new StringBuilder();
 
-    public String skin = "default";
-
-    public void setContext(MDContext context) {
-        this.context = context;
-    }
-
-    public String execute() {
-        return SUCCESS;
+        boolean first = true;
+        for (Column column : table.getPrimaryKey().getColumns()) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(",");
+            }
+            
+            sb.append(object.get(column.getColumnName()));
+        }
+        return sb.toString();
     }
 }

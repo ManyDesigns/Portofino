@@ -8,12 +8,14 @@
         <div style="float: right;">
             <s:if test="#position > 0">
                 <s:url var="firstUrl" namespace="/" action="%{qualifiedTableName}/Table">
-                    <s:param name="pk" value="%{generatePkString(objects.get(0))}" />
+                    <s:param name="pk"
+                             value="%{tableHelper.generatePkString(table, objects.get(0))}" />
                     <s:param name="searchString" value="%{searchString}" />
                 </s:url>
                 <s:a id="first" href="%{#firstUrl}">first</s:a>
                 <s:url var="previousUrl" namespace="/" action="%{qualifiedTableName}/Table">
-                    <s:param name="pk" value="%{generatePkString(objects.get(#position-1))}" />
+                    <s:param name="pk"
+                             value="%{tableHelper.generatePkString(table, objects.get(#position-1))}" />
                     <s:param name="searchString" value="%{searchString}" />
                 </s:url>
                 <s:a id="previous" href="%{#previousUrl}">previous</s:a>
@@ -23,12 +25,14 @@
             <s:property value="#position+1"/> of <s:property value="objects.size()"/>
             <s:if test="#position < #size-1">
                 <s:url var="nextUrl" namespace="/" action="%{qualifiedTableName}/Table">
-                    <s:param name="pk" value="%{generatePkString(objects.get(#position+1))}" />
+                    <s:param name="pk"
+                             value="%{tableHelper.generatePkString(table, objects.get(#position+1))}" />
                     <s:param name="searchString" value="%{searchString}" />
                 </s:url>
                 <s:a id="next" href="%{#nextUrl}">next</s:a>
                 <s:url var="lastUrl" namespace="/" action="%{qualifiedTableName}/Table">
-                    <s:param name="pk" value="%{generatePkString(objects.get(#size - 1))}" />
+                    <s:param name="pk"
+                             value="%{tableHelper.generatePkString(table, objects.get(#size - 1))}" />
                     <s:param name="searchString" value="%{searchString}" />
                 </s:url>
                 <s:a id="last" href="%{#lastUrl}">last</s:a>
