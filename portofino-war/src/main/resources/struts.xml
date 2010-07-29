@@ -2,15 +2,6 @@
     "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
     "http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
-    <constant name="struts.i18n" value="ISO-8859-1" />
-    <constant name="struts.i18n.encoding" value="ISO-8859-1" />
-    <constant name="struts.custom.i18n.resources"
-              value="com.manydesigns.elements.messages" />
-    <constant name="struts.enable.SlashesInActionNames" value="true"/>
-    <constant name="struts.mapper.alwaysSelectFullNamespace" value="false"/>
-    <constant name="struts.ognl.allowStaticMethodAccess" value="true"/>
-    <constant name="struts.ui.theme" value="simple"/>
-
     <package name="portofino-default" extends="struts-default" abstract="true">
         <interceptors>
             <interceptor name="elements-struts2"
@@ -45,7 +36,7 @@
     </package>
 
     <package name="portofino" extends="portofino-default" namespace="/">
-        <action name="Homepage" class="com.manydesigns.portofino.actions.Homepage">
+        <action name="Homepage" class="com.manydesigns.portofino.actions.HomepageAction">
             <result name="success">/skins/%{skin}/homepage.jsp</result>
         </action>
         
@@ -92,6 +83,23 @@
                 <param name="prependServletContext">false</param>
             </result>
         </action>
+
+        <!-- User management -->
+
+        <action name="Profile" class="com.manydesigns.portofino.actions.ProfileAction">
+            <result name="success">/skins/%{skin}/profile.jsp</result>
+        </action>
+
+        <action name="Settings" class="com.manydesigns.portofino.actions.SettingsAction">
+            <result name="success">/skins/%{skin}/settings.jsp</result>
+        </action>
+
+        <!-- Help -->
+
+        <action name="Help" class="com.manydesigns.portofino.actions.HelpAction">
+            <result name="success">/skins/%{skin}/help.jsp</result>
+        </action>
+
     </package>
 
     <package name="portofino-upstairs" extends="portofino-default" namespace="/upstairs">

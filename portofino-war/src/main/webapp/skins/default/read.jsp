@@ -6,7 +6,6 @@
 <s:form method="post">
     <s:include value="/skins/default/readButtonsBar.jsp"/>
     <h1>Read: <s:property value="table.qualifiedName"/></h1>
-    Position: <s:property value="objects.indexOf(object)+1"/> of <s:property value="objects.size()"/>
     <mdes:write value="form"/>
     <s:iterator var="current" value="relatedTableFormList">
         <s:set name="rel" value="#current.relationship"/>

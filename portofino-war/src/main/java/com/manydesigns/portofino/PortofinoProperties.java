@@ -62,6 +62,8 @@ public class PortofinoProperties {
             "portofino.model.location";
     public static final String CONTEXT_CLASS_PROPERTY =
             "portofino.context.class";
+    public static final String APPLICATION_NAME_PROPERTY =
+            "application.name";
 
 
     //**************************************************************************

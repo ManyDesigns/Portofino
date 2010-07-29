@@ -9,6 +9,7 @@
     <div class="search_form">
         <mdes:write value="searchForm"/>
         <s:submit method="search" value="Search"/>
+        <s:reset value="Reset form"/>
     </div>
     <mdes:write value="tableForm"/>
     <s:if test="searchString != null">

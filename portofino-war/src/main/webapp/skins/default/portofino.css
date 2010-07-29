@@ -1,20 +1,25 @@
-div#hd {
+div#hd, div#ft {
     padding: .5em;
-    height: 2em;
     color: white;
     background-color: #166bbf;
+/*    background-color: #65a7db;*/
+/*    background: #65a7db url("images/gradient.png") repeat-y; */
+
 }
 
-div#ft {
-    padding: .5em;
-    color: white;
-    background-color: #166bbf;
-}
 
 div#hd a, div#ft a {
     color: white;
+    text-decoration: none;
 }
 
+div#hd a:hover, div#ft a:hover {
+    text-decoration: underline;
+}
+
+div#hd h1 {
+    margin: 0.5em 0;
+}
 
 div#sidebar {
     color: black;
@@ -31,6 +36,7 @@ div.buttons-bar {
     border-bottom: 1px solid gray;
     margin: 0.5em 0;
     padding: 0.5em;
+    clear: both;
 }
 
 ul.errorMessages, ul.warningMessages, ul.infoMessages {
@@ -85,10 +91,12 @@ div#responseTime {
 div.search_form {
     float: right;
     width: 250px;
-    background-color: #ffffe0;
-    border-left: 1px solid #888;
+    background-color: #f0f0f0;
+    border: 1px solid #888;
     padding: 10px;
     overflow: hidden;
+    margin: 0 0 0.5em 1em;
+
 }
 
 div.search_form ul {
@@ -141,3 +149,6 @@ label.match_mode, label.rel_name {
     display: none;
 }
 
+span.disabled {
+    color: gray;
+}

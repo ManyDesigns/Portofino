@@ -38,7 +38,7 @@ import com.opensymphony.xwork2.ActionSupport;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Homepage extends ActionSupport implements MDContextAware {
+public class SettingsAction extends ActionSupport implements MDContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 

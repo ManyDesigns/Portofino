@@ -22,7 +22,20 @@
 </head>
 <body>
 <div id="doc3" class="yui-t2">
-    <div id="hd">Downstairs header</div>
+    <s:url var="homepageUrl" namespace="/" action="Homepage"/>
+    <s:url var="profileUrl" namespace="/" action="Profile"/>
+    <s:url var="settingsUrl" namespace="/" action="Settings"/>
+    <s:url var="helpUrl" namespace="/" action="Help"/>
+    <s:url var="logoutUrl" namespace="/" action="Homepage"/>
+    <div id="hd">
+        <div style="float: right;">
+            Welcome, <s:a href="%{#profileUrl}">User Name</s:a> -
+            <s:a href="%{#settingsUrl}">Settings</s:a> -
+            <s:a href="%{#helpUrl}">Help</s:a> -
+            <s:a href="%{#logoutUrl}">Log out</s:a>
+        </div>
+        <h1><s:a href="%{#homepageUrl}"><s:property value="#application.portofinoProperties['application.name']"/></s:a></h1>
+    </div>
     <div id="bd">
         <div id="yui-main">
             <div class="yui-b">
