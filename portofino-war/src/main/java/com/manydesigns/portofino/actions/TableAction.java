@@ -429,13 +429,18 @@ public class TableAction extends ActionSupport
     }
 
     public String bulkEdit() throws ModelObjectNotFoundException {
-        setupTable();
-
         if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage(
                     "Nessun oggetto selezionato");
-            return RETURN_TO_SEARCH;
+            return CANCEL;
         }
+
+        if (selection.length == 1) {
+            pk = selection[0];
+            return edit();
+        }
+
+        setupTable();
 
         FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
@@ -485,7 +490,7 @@ public class TableAction extends ActionSupport
         if (selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
-            return DELETE;
+            return CANCEL;
         }
         for (String current : selection) {
             HashMap<String, Object> pkMap =
