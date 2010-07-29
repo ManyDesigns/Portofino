@@ -48,6 +48,11 @@ public enum Mode {
     EDIT(0, "EDIT"),
 
     /**
+     * bulk update forms: regular inputs
+     */
+    BULK_EDIT(16, "BULK_EDIT"),
+
+    /**
      * create preview/confirmation pages: plain text values + hidden inputs
      */
     CREATE_PREVIEW(9, "CREATE_PREVIEW"),
@@ -74,13 +79,15 @@ public enum Mode {
 
     private final static int BASE_MODE_MASK = 3;
     private final static int CREATE_MASK = 8;
+    private final static int BULK_MASK = 16;
 
-    private boolean create;
+    private final boolean create;
+    private final boolean bulk;
 
-    private boolean edit;
-    private boolean preview;
-    private boolean view;
-    private boolean hidden;
+    private final boolean edit;
+    private final boolean preview;
+    private final boolean view;
+    private final boolean hidden;
 
     private final String name;
 
@@ -89,27 +96,42 @@ public enum Mode {
         switch(baseMode) {
             case 0:
                 edit = true;
+                preview = false;
+                view = false;
+                hidden = false;
                 break;
             case 1:
+                edit = false;
                 preview = true;
+                view = false;
+                hidden = false;
                 break;
             case 2:
+                edit = false;
+                preview = false;
                 view = true;
+                hidden = false;
                 break;
             case 3:
+                edit = false;
+                preview = false;
+                view = false;
                 hidden = true;
                 break;
             default:
                 throw new InternalError("Unrecognized mode: " + value);
         }
-        if ((value & CREATE_MASK) != 0) {
-            create = true;
-        }
+        create = (value & CREATE_MASK) != 0;
+        bulk = (value & BULK_MASK) != 0;
         this.name = name;
     }
 
     public boolean isCreate() {
         return create;
+    }
+
+    public boolean isBulk() {
+        return bulk;
     }
 
     public boolean isEdit() {

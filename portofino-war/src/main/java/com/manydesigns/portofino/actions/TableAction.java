@@ -76,6 +76,7 @@ public class TableAction extends ActionSupport
     public final static String EDIT = "edit";
     public final static String UPDATE = "update";
     public final static String BULK_EDIT = "bulkEdit";
+    public final static String BULK_UPDATE = "bulkUpdate";
     public final static String DELETE = "delete";
     public final static String CANCEL = "cancel";
 
@@ -438,9 +439,33 @@ public class TableAction extends ActionSupport
 
         FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
-        form.setMode(Mode.EDIT);
+        form.setMode(Mode.BULK_EDIT);
 
         return BULK_EDIT;
+    }
+
+    public String bulkUpdate() throws ModelObjectNotFoundException {
+        setupTable();
+
+        FormBuilder formBuilder = new FormBuilder(tableAccessor);
+        form = formBuilder.build();
+        form.setMode(Mode.BULK_EDIT);
+        form.readFromRequest(req);
+        if (form.validate()) {
+            for (String current : selection) {
+                HashMap<String, Object> pkMap =
+                        tableHelper.parsePkString(table, current);
+                object = context.getObjectByPk(qualifiedTableName, pkMap);
+                form.writeToObject(object);
+            }
+            form.writeToObject(object);
+            context.updateObject(object);
+            SessionMessages.addInfoMessage(MessageFormat.format(
+                    "UPDATE di {0} oggetti avvenuto con successo", selection.length));
+            return BULK_UPDATE;
+        } else {
+            return BULK_EDIT;
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -465,7 +490,6 @@ public class TableAction extends ActionSupport
         for (String current : selection) {
             HashMap<String, Object> pkMap =
                     tableHelper.parsePkString(table, current);
-            //object = context.getObjectByPk(qualifiedTableName, pkMap);
             context.deleteObject(pkMap);
         }
         SessionMessages.addInfoMessage(MessageFormat.format(

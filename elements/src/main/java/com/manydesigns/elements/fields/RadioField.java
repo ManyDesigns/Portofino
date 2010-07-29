@@ -89,6 +89,8 @@ public class RadioField extends AbstractField {
     //--------------------------------------------------------------------------
 
     public void readFromRequest(HttpServletRequest req) {
+        super.readFromRequest(req);
+
         if (mode.isView(immutable)) {
             return;
         }
@@ -125,6 +127,10 @@ public class RadioField extends AbstractField {
     }
 
     public boolean validate() {
+        if (mode.isView(immutable) || (mode.isBulk() && !bulkChecked)) {
+            return true;
+        }
+
         if (required && stringValue == null) {
             errors.add(getText("elements.error.field.required"));
             return false;

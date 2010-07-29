@@ -80,6 +80,8 @@ public class TextField extends AbstractTextField {
     // Implementazione di Element
     //--------------------------------------------------------------------------
     public void readFromRequest(HttpServletRequest req) {
+        super.readFromRequest(req);
+
         if (mode.isView(immutable)) {
             return;
         }

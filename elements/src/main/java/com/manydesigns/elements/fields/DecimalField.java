@@ -96,6 +96,8 @@ public class DecimalField extends AbstractTextField {
     // Implementazione di Component
     //--------------------------------------------------------------------------
     public void readFromRequest(HttpServletRequest req) {
+        super.readFromRequest(req);
+
         if (mode.isView(immutable)) {
             return;
         }
@@ -139,6 +141,10 @@ public class DecimalField extends AbstractTextField {
 
     @Override
     public boolean validate() {
+        if (mode.isView(immutable) || (mode.isBulk() && !bulkChecked)) {
+            return true;
+        }
+
         if (!super.validate()) {
             return false;
         }

@@ -63,6 +63,8 @@ public class DateField extends AbstractTextField {
     }
 
     public void readFromRequest(HttpServletRequest req) {
+        super.readFromRequest(req);
+
         if (mode.isView(immutable)) {
             return;
         }
@@ -101,6 +103,10 @@ public class DateField extends AbstractTextField {
 
     @Override
     public boolean validate() {
+        if (mode.isView(immutable) || (mode.isBulk() && !bulkChecked)) {
+            return true;
+        }
+
         if (!super.validate()) {
             return false;
         }

@@ -38,6 +38,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,9 +52,14 @@ import java.util.logging.Logger;
 public abstract class AbstractField implements Field {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    public final static String BULK_SUFFIX = "_bulk";
+
     protected final PropertyAccessor accessor;
 
     protected String id;
+    protected String bulkCheckboxName;
+    protected boolean bulkChecked;
     protected String inputName;
     protected String label;
     protected String href;
@@ -100,6 +106,8 @@ public abstract class AbstractField implements Field {
         }
         Object[] inputNameArgs = {prefix, localInputName};
         inputName = StringUtils.join(inputNameArgs);
+        Object[] bulkInputNameArgs = {inputName,  "_bulk"};
+        bulkCheckboxName = StringUtils.join(bulkInputNameArgs);
 
         if (accessor.isAnnotationPresent(LabelI18N.class)) {
             String text = accessor.getAnnotation(LabelI18N.class).value();
@@ -154,6 +162,12 @@ public abstract class AbstractField implements Field {
 
     public void toXhtml(XhtmlBuffer xb) {
         if (mode.isView(immutable)) {
+            if (mode.isBulk()) {
+                xb.openElement("td");
+                xb.writeNbsp();
+                xb.closeElement("td");
+            }
+
             xb.openElement("th");
             labelToXhtml(xb);
             xb.closeElement("th");
@@ -164,6 +178,12 @@ public abstract class AbstractField implements Field {
             valueToXhtml(xb);
             xb.closeElement("td");
         } else if (mode.isEdit()) {
+            if (mode.isBulk()) {
+                xb.openElement("td");
+                xb.writeInputCheckbox(null, bulkCheckboxName, "checked", false);
+                xb.closeElement("td");
+            }
+
             xb.openElement("th");
             labelToXhtml(xb);
             xb.closeElement("th");
@@ -231,6 +251,10 @@ public abstract class AbstractField implements Field {
 
     public String getText(String key, Object... args) {
         return ElementsThreadLocals.getTextProvider().getText(key, args);
+    }
+
+    public void readFromRequest(HttpServletRequest req) {
+        bulkChecked = (req.getParameter(bulkCheckboxName) != null);
     }
 
     public void readFromObject(Object obj) {
@@ -349,7 +373,7 @@ public abstract class AbstractField implements Field {
     //--------------------------------------------------------------------------
 
     public void writeToObject(Object obj, Object value) {
-        if (mode.isView(immutable)) {
+        if (mode.isView(immutable) || (mode.isBulk() && !bulkChecked)) {
             return;
         }
 

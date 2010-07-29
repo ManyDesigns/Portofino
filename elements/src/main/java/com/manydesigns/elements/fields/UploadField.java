@@ -169,6 +169,8 @@ public class UploadField extends AbstractField
     // Element implementation
     //--------------------------------------------------------------------------
     public void readFromRequest(HttpServletRequest req) {
+        super.readFromRequest(req);
+
         if (mode.isView(immutable)) {
             return;
         }
@@ -222,6 +224,10 @@ public class UploadField extends AbstractField
     }
 
     public boolean validate() {
+        if (mode.isView(immutable) || (mode.isBulk() && !bulkChecked)) {
+            return true;
+        }
+
         boolean result = true;
         if (required && (fileUpload == null)) {
             errors.add(getText("elements.error.field.required"));

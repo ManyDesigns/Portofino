@@ -91,6 +91,8 @@ public class SelectField extends AbstractField {
     // Implementazione di Component
     //--------------------------------------------------------------------------
     public void readFromRequest(HttpServletRequest req) {
+        super.readFromRequest(req);
+
         if (mode.isView(immutable)) {
             return;
         }
@@ -127,6 +129,10 @@ public class SelectField extends AbstractField {
     }
 
     public boolean validate() {
+        if (mode.isView(immutable) || (mode.isBulk() && !bulkChecked)) {
+            return true;
+        }
+
         if (required && stringValue == null) {
             errors.add(getText("elements.error.field.required"));
             return false;

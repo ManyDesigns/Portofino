@@ -23,15 +23,11 @@ Current LogManager: <s:property value="logManager"/><br/>
     <tr>
         <th>Name</th>
         <th>Level</th>
-        <th>Handlers</th>
     </tr>
 <s:iterator value="loggers">
     <tr>
         <td><s:property value="name"/></td>
         <td><s:property value="level.name"/></td>
-        <td><s:iterator value="handlers">
-             <s:property value="toString()"/>
-        </s:iterator></td>
     </tr>
 </s:iterator>
 </table>

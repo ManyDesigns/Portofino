@@ -61,6 +61,10 @@ public class RegExpTextField extends TextField {
     //--------------------------------------------------------------------------
     @Override
     public boolean validate() {
+        if (mode.isView(immutable) || (mode.isBulk() && !bulkChecked)) {
+            return true;
+        }
+
         if (!super.validate()) {
             return false;
         }

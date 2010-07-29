@@ -66,6 +66,10 @@ public abstract class AbstractTextField extends AbstractField {
     // Implementazione di Element
     //--------------------------------------------------------------------------
     public boolean validate() {
+        if (mode.isView(immutable) || (mode.isBulk() && !bulkChecked)) {
+            return true;
+        }
+
         boolean result = true;
         if (required && (stringValue == null || stringValue.length() == 0)) {
             errors.add(getText("elements.error.field.required"));

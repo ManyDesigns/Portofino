@@ -63,6 +63,8 @@ public class BooleanField extends AbstractField {
     // Implementazione di Component
     //--------------------------------------------------------------------------
     public void readFromRequest(HttpServletRequest req) {
+        super.readFromRequest(req);
+
         if (mode.isView(immutable)) {
             return;
         }

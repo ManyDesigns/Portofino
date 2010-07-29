@@ -195,6 +195,8 @@ public class CascadedSelectField extends AbstractField {
     }
 
     public void readFromRequest(HttpServletRequest req) {
+        super.readFromRequest(req);
+
         if (mode.isView(immutable)) {
             return;
         }
@@ -265,6 +267,10 @@ public class CascadedSelectField extends AbstractField {
     }
 
     public boolean validate() {
+        if (mode.isView(immutable) || (mode.isBulk() && !bulkChecked)) {
+            return true;
+        }
+
         boolean result = getLastSelectField().validate();
         errors.addAll(getLastSelectField().getErrors());
         return result;

@@ -68,6 +68,12 @@
 
             <result name="bulkEdit">/skins/%{skin}/bulkEdit.jsp</result>
 
+            <result name="bulkUpdate" type="redirectAction">
+                <param name="actionName">%{qualifiedTableName}/Table</param>
+                <param name="namespace">/</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
             <result name="returnToSearch" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/Table</param>
                 <param name="namespace">/</param>
