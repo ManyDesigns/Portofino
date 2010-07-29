@@ -31,6 +31,8 @@ package com.manydesigns.elements.composites;
 
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.forms.TableForm;
+import com.manydesigns.elements.forms.TableFormBuilder;
 
 import java.util.Arrays;
 import java.util.Collection;

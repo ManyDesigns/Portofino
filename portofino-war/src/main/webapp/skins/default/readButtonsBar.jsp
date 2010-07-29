@@ -39,7 +39,8 @@
     </s:if>
     <s:submit id="Table_returnToSearch" method="returnToSearch" value="<< Return to search"/>
     <s:submit id="Table_edit" method="edit" value="Edit"/>
-    <s:submit id="Table_delete" method="delete" value="Delete" />
+    <s:submit id="Table_delete" method="delete" value="Delete"
+              onclick="return confirm ('Are you sure?');"/>
     <s:submit id="Table_duplicate" method="duplicate" value="Duplicate" disabled="true"/>
     <s:submit id="Table_print" method="print" value="Print" disabled="true"/>
     <s:submit id="Table_export" method="export" value="Export" disabled="true"/>

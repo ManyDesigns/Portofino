@@ -30,13 +30,8 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.composites.TableForm;
-import com.manydesigns.elements.composites.TableFormBuilder;
 import com.manydesigns.elements.fields.search.Criteria;
-import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.forms.SearchForm;
-import com.manydesigns.elements.forms.SearchFormBuilder;
+import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.hyperlinks.ExpressionHyperlinkGenerator;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
@@ -47,6 +42,7 @@ import com.manydesigns.portofino.base.model.Relationship;
 import com.manydesigns.portofino.base.model.Table;
 import com.manydesigns.portofino.base.reflection.TableAccessor;
 import com.manydesigns.portofino.interceptors.MDContextAware;
+import com.manydesigns.portofino.methods.TableHelper;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -54,6 +50,7 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -109,6 +106,7 @@ public class TableAction extends ActionSupport
 
     public String qualifiedTableName;
     public String pk;
+    public String[] selection;
     public String searchString;
     public String cancelReturnUrl;
     public String skin;
@@ -137,7 +135,6 @@ public class TableAction extends ActionSupport
     // Model objects
     //--------------------------------------------------------------------------
 
-    public HashMap<String, Object> pkMap;
     public Map<String, Object> object;
     public List<Map<String, Object>> objects;
 
@@ -178,16 +175,20 @@ public class TableAction extends ActionSupport
         tableAccessor = new TableAccessor(table);
     }
 
-    public void parsePkString() {
-        String[] pkList = StringUtils.split(pk,",");
+    public HashMap<String, Object> parsePkString(Table table, String pkString) {
+        String[] pkList = StringUtils.split(pkString,",");
 
         int i = 0;
-        pkMap = new HashMap<String, Object>();
+        HashMap<String, Object> pkMap = new HashMap<String, Object>();
+
+        pkMap.put("$type$", table.getQualifiedName());
 
         for(Column column : table.getPrimaryKey().getColumns() ) {
             pkMap.put(column.getColumnName(), pkList[i]);
             i++;
         }
+
+        return pkMap;
     }
 
     public String generatePkString(Map<String, Object> map) {
@@ -277,7 +278,9 @@ public class TableAction extends ActionSupport
         }
 
         tableForm = tableFormBuilder.build();
+        tableForm.setKeyGenerator(TableHelper.createKeyGenerator(table));
         tableForm.setMode(Mode.VIEW);
+        tableForm.setSelectable(true);
         tableForm.readFromObject(objects);
 
         return SEARCH;
@@ -334,7 +337,7 @@ public class TableAction extends ActionSupport
 
     public String read() throws ModelObjectNotFoundException {
         setupTable();
-        parsePkString();
+        HashMap<String, Object> pkMap = parsePkString(table, pk);
 
         SearchFormBuilder searchFormBuilder =
                 new SearchFormBuilder(tableAccessor);
@@ -419,7 +422,8 @@ public class TableAction extends ActionSupport
 
     public String edit() throws ModelObjectNotFoundException {
         setupTable();
-        parsePkString();
+        HashMap<String, Object> pkMap = parsePkString(table, pk);
+
         object = context.getObjectByPk(qualifiedTableName, pkMap);
 
         FormBuilder formBuilder = new FormBuilder(tableAccessor);
@@ -433,8 +437,8 @@ public class TableAction extends ActionSupport
 
     public String update() throws ModelObjectNotFoundException {
         setupTable();
-        parsePkString();
-        
+        HashMap<String, Object> pkMap = parsePkString(table, pk);
+
         FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
         form.setMode(Mode.EDIT);
@@ -458,10 +462,26 @@ public class TableAction extends ActionSupport
 
     public String delete() throws ModelObjectNotFoundException {
         setupTable();
-        parsePkString();
-        object = context.getObjectByPk(qualifiedTableName, pkMap);
-        context.deleteObject(object);
+        HashMap<String, Object> pkMap = parsePkString(table, pk);
+        context.deleteObject(pkMap);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
+        return DELETE;
+    }
+
+    public String bulkDelete() throws ModelObjectNotFoundException {
+        setupTable();
+        if (selection == null) {
+            SessionMessages.addWarningMessage(
+                    "DELETE non avvenuto: nessun oggetto selezionato");
+            return DELETE;
+        }
+        for (String current : selection) {
+            HashMap<String, Object> pkMap = parsePkString(table, current);
+            //object = context.getObjectByPk(qualifiedTableName, pkMap);
+            context.deleteObject(pkMap);
+        }
+        SessionMessages.addInfoMessage(MessageFormat.format(
+                "DELETE di {0} oggetti avvenuto con successo", selection.length));
         return DELETE;
     }
 

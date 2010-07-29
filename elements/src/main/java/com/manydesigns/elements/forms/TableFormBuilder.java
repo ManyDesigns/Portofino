@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.elements.composites;
+package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.helpers.FieldHelperManager;

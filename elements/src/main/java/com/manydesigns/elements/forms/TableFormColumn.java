@@ -27,13 +27,13 @@
  *
  */
 
-package com.manydesigns.elements.composites;
+package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.AbstractCompositeElement;
-import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.Util;
 import com.manydesigns.elements.annotations.Id;
 import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.hyperlinks.HyperlinkGenerator;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -128,8 +128,8 @@ public class TableFormColumn extends AbstractCompositeElement<Field> {
         }
     }
 
-    protected void readFromObject(int fieldIndex, Object obj) {
-        Field field = get(fieldIndex);
+    protected void readFromObject(int rowIndex, Object obj) {
+        Field field = get(rowIndex);
         if (hyperlinkGenerator != null) {
             field.setHref(hyperlinkGenerator.generateHref(obj));
             field.setAlt(hyperlinkGenerator.generateAlt(obj));

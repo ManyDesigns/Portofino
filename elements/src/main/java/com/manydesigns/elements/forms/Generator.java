@@ -27,32 +27,17 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
-
-import com.manydesigns.elements.forms.TableForm;
-import com.manydesigns.portofino.base.model.Relationship;
-
-import java.util.List;
-import java.util.Map;
+package com.manydesigns.elements.forms;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class RelatedTableForm {
+public interface Generator {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Relationship relationship;
-    public TableForm tableForm;
-    public List<Map<String, Object>> objects;
+    public String generate(Object obj);
 
-    public RelatedTableForm(Relationship relationship,
-                          TableForm tableForm,
-                          List<Map<String, Object>> objects) {
-        this.relationship = relationship;
-        this.tableForm = tableForm;
-        this.objects = objects;
-    }
 }

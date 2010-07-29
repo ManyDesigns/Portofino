@@ -27,32 +27,37 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.methods;
 
-import com.manydesigns.elements.forms.TableForm;
-import com.manydesigns.portofino.base.model.Relationship;
-
-import java.util.List;
-import java.util.Map;
+import com.manydesigns.elements.forms.ExpressionGenerator;
+import com.manydesigns.elements.forms.Generator;
+import com.manydesigns.portofino.base.model.Column;
+import com.manydesigns.portofino.base.model.Table;
+import com.manydesigns.portofino.base.reflection.TableAccessor;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class RelatedTableForm {
+public class TableHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Relationship relationship;
-    public TableForm tableForm;
-    public List<Map<String, Object>> objects;
-
-    public RelatedTableForm(Relationship relationship,
-                          TableForm tableForm,
-                          List<Map<String, Object>> objects) {
-        this.relationship = relationship;
-        this.tableForm = tableForm;
-        this.objects = objects;
+    public static Generator createKeyGenerator(Table table) {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (Column column : table.getPrimaryKey().getColumns()) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(",");
+            }
+            sb.append("{");
+            sb.append(column.getColumnName());
+            sb.append("}");
+        }
+        TableAccessor accessor = new TableAccessor(table);
+        return new ExpressionGenerator(accessor, sb.toString());
     }
 }
