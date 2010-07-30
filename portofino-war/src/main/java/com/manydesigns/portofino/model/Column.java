@@ -170,7 +170,16 @@ public class Column {
 
         Column column = (Column) o;
 
+        if (length != column.length) return false;
+        if (nullable != column.nullable) return false;
+        if (scale != column.scale) return false;
         if (columnName != null ? !columnName.equals(column.columnName) : column.columnName != null)
+            return false;
+        if (columnType != null ? !columnType.equals(column.columnType) : column.columnType != null)
+            return false;
+        if (databaseName != null ? !databaseName.equals(column.databaseName) : column.databaseName != null)
+            return false;
+        if (javaType != null ? !javaType.equals(column.javaType) : column.javaType != null)
             return false;
         if (schemaName != null ? !schemaName.equals(column.schemaName) : column.schemaName != null)
             return false;
@@ -180,5 +189,18 @@ public class Column {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        int result = databaseName != null ? databaseName.hashCode() : 0;
+        result = 31 * result + (schemaName != null ? schemaName.hashCode() : 0);
+        result = 31 * result + (tableName != null ? tableName.hashCode() : 0);
+        result = 31 * result + (columnName != null ? columnName.hashCode() : 0);
+        result = 31 * result + (columnType != null ? columnType.hashCode() : 0);
+        result = 31 * result + (nullable ? 1 : 0);
+        result = 31 * result + length;
+        result = 31 * result + scale;
+        result = 31 * result + (javaType != null ? javaType.hashCode() : 0);
+        return result;
+    }
 
 }

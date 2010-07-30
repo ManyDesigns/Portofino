@@ -4,7 +4,7 @@
 <%@taglib prefix="mdes" uri="/manydesigns-elements-struts2" %>
 <s:include value="/skins/default/header.jsp"/>
 <s:form method="post">
-    <s:include value="/skins/default/readButtonsBar.jsp"/>
+    <s:include value="/skins/default/tableData/readButtonsBar.jsp"/>
     <h1>Read: <s:property value="table.qualifiedName"/></h1>
     <mdes:write value="form"/>
     <s:iterator var="current" value="relatedTableFormList">
@@ -18,12 +18,12 @@
     </s:if>
     <s:url var="cancelReturnUrl"
            namespace="/"
-           action="%{qualifiedTableName}/Table"
+           action="%{qualifiedTableName}/TableData"
            escapeAmp="false">
         <s:param name="pk" value="%{pk}"/>
         <s:param name="searchString" value="%{searchString}"/>
     </s:url>
     <s:hidden name="cancelReturnUrl" value="%{#cancelReturnUrl}"/>
-    <s:include value="/skins/default/readButtonsBar.jsp"/>
+    <s:include value="/skins/default/tableData/readButtonsBar.jsp"/>
 </s:form>
-<s:include value="/skins/default/footer.jsp"/>
+<s:include value="/skins/default/tableData/tableDataFooter.jsp"/>

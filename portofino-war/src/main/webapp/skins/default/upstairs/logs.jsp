@@ -2,7 +2,7 @@
          pageEncoding="ISO-8859-1" %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <%@taglib prefix="mdes" uri="/manydesigns-elements-struts2" %>
-<s:include value="/upstairs/header.jsp"/>
+<s:include value="/skins/default/header.jsp"/>
 <h1>Handlers</h1>
 <table>
     <tr>
@@ -31,4 +31,4 @@ Current LogManager: <s:property value="logManager"/><br/>
     </tr>
 </s:iterator>
 </table>
-<s:include value="/upstairs/footer.jsp"/>
+<s:include value="/skins/default/upstairs/upstairsFooter.jsp"/>

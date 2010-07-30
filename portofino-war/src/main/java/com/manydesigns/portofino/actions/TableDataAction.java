@@ -63,10 +63,14 @@ import java.util.regex.Pattern;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableAction extends ActionSupport
+public class TableDataAction extends ActionSupport
         implements MDContextAware, ServletRequestAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    //--------------------------------------------------------------------------
+    // Action results
+    //--------------------------------------------------------------------------
 
     public final static String SEARCH = "search";
     public final static String RETURN_TO_SEARCH = "returnToSearch";
@@ -80,6 +84,7 @@ public class TableAction extends ActionSupport
     public final static String DELETE = "delete";
     public final static String CANCEL = "cancel";
 
+    
     //--------------------------------------------------------------------------
     // MDContextAware implementation
     //--------------------------------------------------------------------------
@@ -154,7 +159,7 @@ public class TableAction extends ActionSupport
     //--------------------------------------------------------------------------
 
     public TableHelper tableHelper = new TableHelper();
-    protected Logger logger = LogUtil.getLogger(TableAction.class);
+    protected Logger logger = LogUtil.getLogger(TableDataAction.class);
 
     //--------------------------------------------------------------------------
     // Action default execute method
@@ -275,7 +280,7 @@ public class TableAction extends ActionSupport
     public String getReadLinkExpression() {
         StringBuilder sb = new StringBuilder("/");
         sb.append(table.getQualifiedName());
-        sb.append("/Table.action?pk=");
+        sb.append("/TableData.action?pk=");
         boolean first = true;
         for (Column column : table.getPrimaryKey().getColumns()) {
             if (first) {

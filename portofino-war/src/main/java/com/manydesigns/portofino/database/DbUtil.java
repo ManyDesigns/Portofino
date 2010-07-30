@@ -29,12 +29,14 @@
 
 package com.manydesigns.portofino.database;
 
+import com.manydesigns.elements.logging.LogUtil;
 import org.hibernate.Hibernate;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -44,6 +46,8 @@ import java.sql.Types;
 public class DbUtil {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    private final static Logger logger = LogUtil.getLogger(DbUtil.class);
 
     public static void closeResultSetStatementAndConnection(ResultSet rs,
                                                             Statement st,
@@ -61,8 +65,8 @@ public class DbUtil {
     public static void closeResultSet(ResultSet rs) {
         if (rs != null) try {
             rs.close();
-        } catch (Exception ignore) {
-            /*IGNORE*/
+        } catch (Exception e) {
+            LogUtil.finer(logger, "Could not close result set", e);
         }
     }
 
@@ -73,24 +77,24 @@ public class DbUtil {
             if (st != null) {
                 st.close();
             }
-        } catch (Exception ignore) {
-            /*IGNORE*/
+        } catch (Exception e) {
+            LogUtil.finer(logger, "Could not close statement", e);
         }
     }
 
     public static void closeStatement(Statement st) {
         if (st != null) try {
             st.close();
-        } catch (Exception ignore) {
-            /*IGNORE*/
+        } catch (Exception e) {
+            LogUtil.finer(logger, "Could not close statement", e);
         }
     }
 
     public static void closeConnection(Connection conn) {
         if (conn != null) try {
             conn.close();
-        } catch (Exception ignore) {
-            /*IGNORE*/
+        } catch (Exception e) {
+            LogUtil.finer(logger, "Could not close connection", e);
         }
     }
 

@@ -85,8 +85,8 @@ public class TableFormTest extends AbstractElementsTest {
         assertEquals(4, tableForm.getNRows());
         assertNull(tableForm.getId());
         String text = elementToString(tableForm);
-        assertEquals("<table><thead><th>Id</th><th>Nome</th><th>Attivo</th>" +
-                "</thead><tbody>" +
+        assertEquals("<table><thead><tr><th>Id</th><th>Nome</th><th>Attivo</th>" +
+                "</tr></thead><tbody>" +
                 "<tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row0.id\" name=\"row0.id\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row0.nome\" name=\"row0.nome\"></input></td>" +
@@ -111,8 +111,8 @@ public class TableFormTest extends AbstractElementsTest {
         assertEquals(4, tableFormWithPrefix.getNRows());
         assertNull(tableFormWithPrefix.getId());
         String text = elementToString(tableFormWithPrefix);
-        assertEquals("<table><thead><th>Id</th><th>Nome</th><th>Attivo</th>" +
-                "</thead><tbody>" +
+        assertEquals("<table><thead><tr><th>Id</th><th>Nome</th><th>Attivo</th>" +
+                "</tr></thead><tbody>" +
                 "<tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"prova.row0.id\" name=\"prova.row0.id\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"prova.row0.nome\" name=\"prova.row0.nome\"></input></td>" +
@@ -137,8 +137,8 @@ public class TableFormTest extends AbstractElementsTest {
         assertEquals(4, tableFormWithFieldNames.getNRows());
         assertNull(tableFormWithFieldNames.getId());
         String text = elementToString(tableFormWithFieldNames);
-        assertEquals("<table><thead><th>Id</th><th>Nome</th>" +
-                "</thead><tbody>" +
+        assertEquals("<table><thead><tr><th>Id</th><th>Nome</th>" +
+                "</tr></thead><tbody>" +
                 "<tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row0.id\" name=\"row0.id\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row0.nome\" name=\"row0.nome\"></input></td>" +
@@ -169,8 +169,8 @@ public class TableFormTest extends AbstractElementsTest {
 
     private void commonReadFromObject() {
         String text = elementToString(tableForm);
-        assertEquals("<table><thead><th>Id</th><th>Nome</th><th>Attivo</th>" +
-                "</thead><tbody>" +
+        assertEquals("<table><thead><tr><th>Id</th><th>Nome</th><th>Attivo</th>" +
+                "</tr></thead><tbody>" +
                 "<tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row0.id\" name=\"row0.id\" value=\"1\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row0.nome\" name=\"row0.nome\" value=\"qui\"></input></td>" +
@@ -201,8 +201,8 @@ public class TableFormTest extends AbstractElementsTest {
         req.setParameter("row1.attivo_chk", "");
         tableForm.readFromRequest(req);
         String text = elementToString(tableForm);
-        assertEquals("<table><thead><th>Id</th><th>Nome</th><th>Attivo</th>" +
-                "</thead><tbody>" +
+        assertEquals("<table><thead><tr><th>Id</th><th>Nome</th><th>Attivo</th>" +
+                "</tr></thead><tbody>" +
                 "<tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row0.id\" name=\"row0.id\" value=\"10\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row0.nome\" name=\"row0.nome\" value=\"bla\"></input></td>" +
@@ -243,8 +243,8 @@ public class TableFormTest extends AbstractElementsTest {
         tableForm.readFromObject(beanArray1);
         tableForm.setMode(Mode.VIEW);
         String text = elementToString(tableForm);
-        assertEquals("<table><thead><th>Id</th><th>Nome</th><th>Attivo</th>" +
-                "</thead><tbody>" +
+        assertEquals("<table><thead><tr><th>Id</th><th>Nome</th><th>Attivo</th>" +
+                "</tr></thead><tbody>" +
                 "<tr>" +
                 "<td><div class=\"value\" id=\"row0.id\">1</div></td>" +
                 "<td><div class=\"value\" id=\"row0.nome\">qui</div></td>" +

@@ -45,18 +45,26 @@ public class TextSearchField extends AbstractSearchField {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    public final static String MODE_SUFFIX = "_mode";
+
     protected String value;
+    protected TextMatchMode matchMode = TextMatchMode.CONTAINS;
+    protected String matchModeId;
+    protected String matchModeParam;
+
 
     //--------------------------------------------------------------------------
     // Costruttori
     //--------------------------------------------------------------------------
 
     public TextSearchField(PropertyAccessor accessor) {
-        super(accessor);
+        this(accessor, null);
     }
 
     public TextSearchField(PropertyAccessor accessor, String prefix) {
         super(accessor, prefix);
+        matchModeId = id + MODE_SUFFIX;
+        matchModeParam = this.inputName + MODE_SUFFIX;
     }
 
 
@@ -65,28 +73,17 @@ public class TextSearchField extends AbstractSearchField {
     //--------------------------------------------------------------------------
 
     public void toXhtml(XhtmlBuffer xb) {
-        String modeParam = this.inputName + "_mode";
-        TextMatchMode mode = TextMatchMode.CONTAINS;
-
         xb.writeLabel(StringUtils.capitalize(accessor.getName()),
                 id, "attr_name");
-        String matchModeLabel = "Match_mode";
-        String matchModeId = "matchmode" + id;
+        String matchModeLabel = "Match mode";
         xb.writeLabel(matchModeLabel, matchModeId, "match_mode");
         xb.openElement("select");
         xb.addAttribute("id", matchModeId);
-        xb.addAttribute("name", modeParam);
+        xb.addAttribute("name", matchModeParam);
         for (TextMatchMode m : TextMatchMode.values()) {
-            boolean checked = mode == m;
+            boolean checked = matchMode == m;
             String option = m.getStringValue();
             xb.writeOption(option, checked, getText(m.getLabel()));
-
-            /*
-            if (checked && (value != null) && (value.length() > 0)) {
-                appendToReturnUrl(modeParam, option);
-                appendToReturnUrl(attrInputName, value);
-            }
-            */
         }
         xb.closeElement("select");
         xb.writeInputText(id, inputName, value, "text", "18");
@@ -95,6 +92,13 @@ public class TextSearchField extends AbstractSearchField {
 
     public void readFromRequest(HttpServletRequest req) {
         value = StringUtils.trimToNull(req.getParameter(inputName));
+        String matchModeStr = req.getParameter(matchModeParam);
+        matchMode = TextMatchMode.CONTAINS; // default
+        for (TextMatchMode m : TextMatchMode.values()) {
+            if (m.getStringValue().equals(matchModeStr)) {
+                matchMode = m;
+            }
+        }
     }
 
     public boolean validate() {
@@ -121,7 +125,7 @@ public class TextSearchField extends AbstractSearchField {
 
     public void configureCriteria(Criteria criteria) {
         if (value != null) {
-            criteria.ilike(accessor, value, TextMatchMode.CONTAINS);
+            criteria.ilike(accessor, value, matchMode);
         }
     }
 }

@@ -58,6 +58,8 @@ public class PortofinoProperties {
     // Property names
     //**************************************************************************
 
+    public static final String VERSION_PROPERTY =
+            "portofino.version";
     public static final String MODEL_LOCATION_PROPERTY =
             "portofino.model.location";
     public static final String CONTEXT_CLASS_PROPERTY =

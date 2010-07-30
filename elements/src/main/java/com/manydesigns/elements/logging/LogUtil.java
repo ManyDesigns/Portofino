@@ -29,8 +29,11 @@
 
 package com.manydesigns.elements.logging;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /*
@@ -47,6 +50,19 @@ public class LogUtil {
 
     public static Logger getLogger(Class clazz) {
         return Logger.getLogger(clazz.getName());
+    }
+
+    public static void initializeLoggingSystem() {
+        LogManager manager = LogManager.getLogManager();
+        Logger logger = getLogger(LogUtil.class);
+        ClassLoader cl = LogUtil.class.getClassLoader();
+        InputStream is = cl.getResourceAsStream("logging.properties");
+        try {
+            manager.reset();
+            manager.readConfiguration(is);
+        } catch (IOException e) {
+            warning(logger, "Failed to initialize logging system", e);
+        }
     }
 
     //**************************************************************************

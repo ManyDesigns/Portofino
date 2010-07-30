@@ -4,17 +4,17 @@
 <%@taglib prefix="mdes" uri="/manydesigns-elements-struts2" %>
 <s:include value="/skins/default/header.jsp"/>
 <s:form method="post">
-    <s:include value="/skins/default/editButtonsBar.jsp"/>
-    <h1>Edit: <s:property value="table.qualifiedName"/></h1>
-    <s:if test="form.requiredFieldsPresent">
-        Fields marked with a "*" are required.
-    </s:if>
+    <s:include value="/skins/default/tableData/bulkEditButtonsBar.jsp"/>
+    <h1>Bulk edit: <s:property value="table.qualifiedName"/></h1>
+    In the first column, select the fields you want to edit. Then, fill in their values.
     <mdes:write value="form"/>
-    <s:hidden name="pk" value="%{pk}"/>
+    <s:iterator var="#current" value="selection">
+        <s:hidden name="selection" value="%{#current}"/>
+    </s:iterator>
     <s:if test="searchString != null">
         <s:hidden name="searchString" value="%{searchString}"/>
     </s:if>
     <s:hidden name="cancelReturnUrl" value="%{cancelReturnUrl}"/>
-    <s:include value="/skins/default/editButtonsBar.jsp"/>
+    <s:include value="/skins/default/tableData/bulkEditButtonsBar.jsp"/>
 </s:form>
-<s:include value="/skins/default/footer.jsp"/>
+<s:include value="/skins/default/tableData/tableDataFooter.jsp"/>

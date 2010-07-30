@@ -58,10 +58,6 @@ public class PortofinoServletContextListener implements ServletContextListener {
             "----------------------------------------" +
             "----------------------------------------";
 
-    public static final String PORTOFINO_VERSION = "4.0.0-SNAPSHOT";
-
-    public static final String PORTOFINO_VERSION_ATTRIBUTE =
-            "portofinoVersion";
     public static final String ELEMENTS_PROPERTIES_ATTRIBUTE =
             "elementsProperties";
     public static final String PORTOFINO_PROPERTIES_ATTRIBUTE =
@@ -91,6 +87,11 @@ public class PortofinoServletContextListener implements ServletContextListener {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
+        LogUtil.initializeLoggingSystem();
+        
+        elementsProperties = ElementsProperties.getProperties();
+        portofinoProperties = PortofinoProperties.getProperties();
+
         servletContext = servletContextEvent.getServletContext();
         serverInfo = new ServerInfo(servletContext);
         
@@ -99,18 +100,14 @@ public class PortofinoServletContextListener implements ServletContextListener {
                 "\n--- Context path: {1}" +
                 "\n--- Real path: {2}" +
                 "\n" + SEPARATOR,
-                PORTOFINO_VERSION,
+                portofinoProperties.getProperty(
+                        PortofinoProperties.VERSION_PROPERTY),
                 serverInfo.getContextPath(),
                 serverInfo.getRealPath()
         );
 
-        servletContext.setAttribute(PORTOFINO_VERSION_ATTRIBUTE,
-                PORTOFINO_VERSION);
         servletContext.setAttribute(SERVER_INFO_ATTRIBUTE,
                 serverInfo);
-
-        elementsProperties = ElementsProperties.getProperties();
-        portofinoProperties = PortofinoProperties.getProperties();
 
         servletContext.setAttribute(ELEMENTS_PROPERTIES_ATTRIBUTE,
                 elementsProperties);
@@ -171,7 +168,6 @@ public class PortofinoServletContextListener implements ServletContextListener {
         servletContext.removeAttribute(MDCONTEXT_ATTRIBUTE);
 
         servletContext.removeAttribute(SERVER_INFO_ATTRIBUTE);
-        servletContext.removeAttribute(PORTOFINO_VERSION_ATTRIBUTE);
         servletContext.removeAttribute(PORTOFINO_PROPERTIES_ATTRIBUTE);
         servletContext.removeAttribute(ELEMENTS_PROPERTIES_ATTRIBUTE);
 

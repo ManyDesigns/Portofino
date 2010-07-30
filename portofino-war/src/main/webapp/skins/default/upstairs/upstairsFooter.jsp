@@ -11,17 +11,8 @@
                     <li><a href="<s:url namespace="/upstairs" action="Logs"/>">Logs</a></li>
                 </ul>
                 <hr/>
-                <a href="<s:url value="/"/>">Go downstairs</a>
+                <a href="<s:url namespace="/" action="Homepage"/>">Go downstairs</a>
             </div>
         </div>
     </div>
-    <div id="ft"><div id="responseTime">Page response time: <s:property value="#request.stopWatch.time"/> ms</div>
-        Powered by <a href="http://www.manydesigns.com/">ManyDesigns Portofino</a>
-        <s:property value="#application.portofinoVersion"/>
-    </div>
-</div>
-<script type="text/javascript">
-YAHOO.example.fixSideBar();
-</script>
-</body>
-</html>
+<s:include value="/skins/default/footer.jsp"/></html>
