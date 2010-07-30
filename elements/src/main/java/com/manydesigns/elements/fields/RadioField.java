@@ -34,6 +34,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -147,6 +148,8 @@ public class RadioField extends AbstractField {
                 stringValue = (String)accessor.get(obj);
             }
         } catch (IllegalAccessException e) {
+            throw new Error(e);
+        } catch (InvocationTargetException e) {
             throw new Error(e);
         }
     }

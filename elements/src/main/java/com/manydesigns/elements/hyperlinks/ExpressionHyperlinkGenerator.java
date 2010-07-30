@@ -33,6 +33,7 @@ import com.manydesigns.elements.Util;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,6 +131,8 @@ public class ExpressionHyperlinkGenerator implements HyperlinkGenerator {
             return MessageFormat.format(parsedExpression, args);
         } catch (IllegalAccessException e) {
             return null;
+        } catch (InvocationTargetException e) {
+            throw new Error(e);
         }
     }
 

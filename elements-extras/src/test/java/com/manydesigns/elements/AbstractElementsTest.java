@@ -29,10 +29,10 @@
 
 package com.manydesigns.elements;
 
-import com.manydesigns.elements.reflection.FieldAccessor;
+import com.manydesigns.elements.reflection.JavaFieldAccessor;
+import com.manydesigns.elements.text.BasicTextProvider;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XmlBuffer;
-import com.manydesigns.elements.text.BasicTextProvider;
 import junit.framework.TestCase;
 
 import java.util.Locale;
@@ -63,11 +63,11 @@ public abstract class AbstractElementsTest extends TestCase {
                 new BasicTextProvider(Locale.ENGLISH));
     }
 
-    public FieldAccessor createPropertyAccessor(Class clazz,
+    public JavaFieldAccessor createPropertyAccessor(Class clazz,
                                                 String fieldName)
             throws NoSuchFieldException {
         java.lang.reflect.Field field = clazz.getField(fieldName);
-        return new FieldAccessor(field);
+        return new JavaFieldAccessor(field);
     }
 
 

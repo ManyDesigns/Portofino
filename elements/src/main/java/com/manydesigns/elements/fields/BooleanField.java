@@ -34,6 +34,7 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -94,6 +95,8 @@ public class BooleanField extends AbstractField {
             }
             booleanValue = tmpValue != null && tmpValue;
         } catch (IllegalAccessException e) {
+            throw new Error(e);
+        } catch (InvocationTargetException e) {
             throw new Error(e);
         }
     }

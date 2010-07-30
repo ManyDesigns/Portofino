@@ -7,6 +7,8 @@
     <s:include value="/skins/default/tableDesign/summaryButtonsBar.jsp"/>
     <h1>Table design summary: <s:property value="table.qualifiedName"/></h1>
     <mdes:write value="form"/>
+    <h2>Columns</h2>
+    <mdes:write value="columnTableForm"/>
     <s:hidden name="cancelReturnUrl" value="%{cancelReturnUrl}"/>
     <s:include value="/skins/default/tableDesign/summaryButtonsBar.jsp"/>
 </s:form>

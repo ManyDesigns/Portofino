@@ -35,6 +35,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /*
@@ -245,6 +246,8 @@ public class UploadField extends AbstractField
                 fileUpload = (FileUpload) accessor.get(obj);
             }
         } catch (IllegalAccessException e) {
+            throw new Error(e);
+        } catch (InvocationTargetException e) {
             throw new Error(e);
         }
     }

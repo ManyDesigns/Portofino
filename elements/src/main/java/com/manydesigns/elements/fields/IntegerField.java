@@ -34,6 +34,7 @@ import com.manydesigns.elements.annotations.MinIntValue;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -137,6 +138,8 @@ public class IntegerField extends AbstractTextField {
                 stringValue = integerValue.toString();
             }
         } catch (IllegalAccessException e) {
+            throw new Error(e);
+        } catch (InvocationTargetException e) {
             throw new Error(e);
         }
     }

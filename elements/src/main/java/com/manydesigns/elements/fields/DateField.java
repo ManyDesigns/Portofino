@@ -36,6 +36,7 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -134,6 +135,8 @@ public class DateField extends AbstractTextField {
                 stringValue = simpleDateFormat.format(dateValue);
             }
         } catch (IllegalAccessException e) {
+            throw new Error(e);
+        } catch (InvocationTargetException e) {
             throw new Error(e);
         }
     }

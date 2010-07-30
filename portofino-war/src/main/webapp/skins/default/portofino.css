@@ -30,7 +30,12 @@ div#sidebar div {
     padding: .5em;
 }
 
-div#sidebar div#sidebar ul li {
+div#sidebar ul {
+    margin-left: 0;
+    list-style-type: none;
+}
+
+div#sidebar li {
     margin-left: 0;
     list-style-type: none;
 }

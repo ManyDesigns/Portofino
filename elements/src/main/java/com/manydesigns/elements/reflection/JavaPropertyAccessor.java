@@ -29,27 +29,55 @@
 
 package com.manydesigns.elements.reflection;
 
+import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface PropertyAccessor {
+public class JavaPropertyAccessor implements PropertyAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public String getName();
+    private final PropertyDescriptor propertyDescriptor;
+    private final Method getter;
+    private final Method setter;
 
-    public int getModifiers();
+    public JavaPropertyAccessor(PropertyDescriptor propertyDescriptor) {
+        this.propertyDescriptor = propertyDescriptor;
+        getter = propertyDescriptor.getReadMethod();
+        setter = propertyDescriptor.getWriteMethod();
+    }
 
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass);
-    <T extends Annotation> T getAnnotation(Class<T> annotationClass);
+    public String getName() {
+        return propertyDescriptor.getName();
+    }
 
-    public Object get(Object obj) throws IllegalAccessException, InvocationTargetException;
-    public void set(Object obj, Object value) throws IllegalAccessException, InvocationTargetException;
+    public int getModifiers() {
+        return getter.getModifiers();
+    }
 
-    boolean isAssignableTo(Class clazz);
+    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+        return getter.isAnnotationPresent(annotationClass);
+    }
+
+    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+        return getter.getAnnotation(annotationClass);
+    }
+
+    public Object get(Object obj) throws IllegalAccessException, InvocationTargetException {
+        return getter.invoke(obj);
+    }
+
+    public void set(Object obj, Object value) throws IllegalAccessException, InvocationTargetException {
+        setter.invoke(obj, value);
+    }
+
+    public boolean isAssignableTo(Class clazz) {
+        return clazz.isAssignableFrom(getter.getReturnType());
+    }
 }

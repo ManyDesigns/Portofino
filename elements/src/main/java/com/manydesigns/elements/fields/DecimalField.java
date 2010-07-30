@@ -35,6 +35,7 @@ import com.manydesigns.elements.annotations.PrecisionScale;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
@@ -182,6 +183,8 @@ public class DecimalField extends AbstractTextField {
                 stringValue = decimalFormat.format(decimalValue);
             }
         } catch (IllegalAccessException e) {
+            throw new Error(e);
+        } catch (InvocationTargetException e) {
             throw new Error(e);
         }
     }

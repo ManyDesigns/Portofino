@@ -32,10 +32,13 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.forms.TableForm;
+import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.context.MDContext;
 import com.manydesigns.portofino.context.ModelObjectNotFoundException;
 import com.manydesigns.portofino.interceptors.MDContextAware;
+import com.manydesigns.portofino.model.Column;
 import com.manydesigns.portofino.model.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.opensymphony.xwork2.ActionSupport;
@@ -121,6 +124,7 @@ public class TableDesignAction extends ActionSupport
     //--------------------------------------------------------------------------
 
     public Form form;
+    public TableForm columnTableForm;
 
     //--------------------------------------------------------------------------
     // Other objects
@@ -135,9 +139,18 @@ public class TableDesignAction extends ActionSupport
     public String execute() throws ModelObjectNotFoundException {
         setupTable();
 
-        FormBuilder builder = new FormBuilder(Table.class);
-        form = builder.build();
+        form = new FormBuilder(Table.class)
+                .configFields("databaseName", "schemaName", "tableName")
+                .build();
         form.setMode(Mode.VIEW);
+        form.readFromObject(table);
+
+        columnTableForm = new TableFormBuilder(Column.class)
+                .configFields("columnName", "columnType")
+                .configNRows(table.getColumns().size())
+                .build();
+        columnTableForm.readFromObject(table.getColumns());
+        columnTableForm.setMode(Mode.VIEW);
 
         return SUMMARY;
     }

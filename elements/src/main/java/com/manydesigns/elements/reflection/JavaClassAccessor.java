@@ -29,7 +29,13 @@
 
 package com.manydesigns.elements.reflection;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,21 +47,49 @@ public class JavaClassAccessor implements ClassAccessor {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     protected final Class javaClass;
-    protected final FieldAccessor[] fieldAccessors;
+    protected final PropertyAccessor[] propertyAccessors;
 
     public JavaClassAccessor(Class javaClass) {
         this.javaClass = javaClass;
 
-        Field[] fields = javaClass.getFields();
-        fieldAccessors = new FieldAccessor[fields.length];
-        for (int i = 0; i < fields.length; i++) {
-            fieldAccessors[i] = new FieldAccessor(fields[i]);
+        List<PropertyAccessor> accessorList =
+                new ArrayList<PropertyAccessor>();
+
+        // handle properties through introspection
+        try {
+            BeanInfo beanInfo = Introspector.getBeanInfo(javaClass);
+            PropertyDescriptor[] propertyDescriptors =
+                    beanInfo.getPropertyDescriptors();
+            for (PropertyDescriptor current : propertyDescriptors) {
+                accessorList.add(new JavaPropertyAccessor(current));
+            }
+        } catch (IntrospectionException e) {
+            e.printStackTrace();
         }
+
+        // handle public fields
+        for (Field field : javaClass.getFields()) {
+            if (isPropertyPresent(accessorList, field.getName())) {
+                continue;
+            }
+            accessorList.add(new JavaFieldAccessor(field));
+        }
+        propertyAccessors = new PropertyAccessor[accessorList.size()];
+        accessorList.toArray(propertyAccessors);
     }
 
-    public FieldAccessor getProperty(String propertyName)
+    private boolean isPropertyPresent(List<PropertyAccessor> accessorList, String name) {
+        for (PropertyAccessor current : accessorList) {
+            if (current.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public PropertyAccessor getProperty(String propertyName)
             throws NoSuchFieldException {
-        for (FieldAccessor current : fieldAccessors) {
+        for (PropertyAccessor current : propertyAccessors) {
             if (current.getName().equals(propertyName)) {
                 return current;
             }
@@ -63,8 +97,8 @@ public class JavaClassAccessor implements ClassAccessor {
         throw new NoSuchFieldException(propertyName);
     }
 
-    public FieldAccessor[] getProperties() {
-        return fieldAccessors.clone();
+    public PropertyAccessor[] getProperties() {
+        return propertyAccessors.clone();
     }
 
     public Class getJavaClass() {

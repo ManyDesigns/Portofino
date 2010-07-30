@@ -32,6 +32,7 @@ package com.manydesigns.elements.forms;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +100,8 @@ public class ExpressionGenerator implements Generator {
             }
             return MessageFormat.format(parsedExpression, args);
         } catch (IllegalAccessException e) {
+            return null;
+        } catch (InvocationTargetException e) {
             return null;
         }
     }
