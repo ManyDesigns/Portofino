@@ -40,22 +40,34 @@ public class JavaClassAccessor implements ClassAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final Class clazz;
+    protected final Class javaClass;
+    protected final FieldAccessor[] fieldAccessors;
 
-    public JavaClassAccessor(Class clazz) {
-        this.clazz = clazz;
+    public JavaClassAccessor(Class javaClass) {
+        this.javaClass = javaClass;
+
+        Field[] fields = javaClass.getFields();
+        fieldAccessors = new FieldAccessor[fields.length];
+        for (int i = 0; i < fields.length; i++) {
+            fieldAccessors[i] = new FieldAccessor(fields[i]);
+        }
     }
 
-    public FieldAccessor getProperty(String fieldName) throws NoSuchFieldException {
-        return new FieldAccessor(clazz.getField(fieldName));
+    public FieldAccessor getProperty(String propertyName)
+            throws NoSuchFieldException {
+        for (FieldAccessor current : fieldAccessors) {
+            if (current.getName().equals(propertyName)) {
+                return current;
+            }
+        }
+        throw new NoSuchFieldException(propertyName);
     }
 
     public FieldAccessor[] getProperties() {
-        Field[] fields = clazz.getFields();
-        FieldAccessor[] result = new FieldAccessor[fields.length];
-        for (int i = 0; i < fields.length; i++) {
-            result[i] = new FieldAccessor(fields[i]);
-        }
-        return result;
+        return fieldAccessors.clone();
+    }
+
+    public Class getJavaClass() {
+        return javaClass;
     }
 }
