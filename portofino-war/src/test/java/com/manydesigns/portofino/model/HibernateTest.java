@@ -61,7 +61,7 @@ public class HibernateTest extends TestCase {
                 context.getAllObjects("jpetstore.public.category");
 
         int sizeCat = resultCat.size();
-        assertEquals("categorie", sizeCat, 6);
+        assertEquals("categorie", 5, sizeCat);
 
 
         Map categoria0 = resultCat.get(0);

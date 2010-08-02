@@ -8,7 +8,7 @@
     <packaging>pom</packaging>
     <version>4.0.0-SNAPSHOT</version>
     <name>manydesigns-portofino</name>
-    <url>http://www.manydesigns.com/</url>
+    <url>http://www.manydesigns.com/</url> 
     <properties>
         <servlet.api.version>2.4</servlet.api.version>
         <jsp.api.version>2.1</jsp.api.version>
