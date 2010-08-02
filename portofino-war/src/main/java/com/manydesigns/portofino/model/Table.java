@@ -60,11 +60,6 @@ public class Table {
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
-
-    public Table() {
-        this(null, null, null);
-    }
-
     public Table(String databaseName, String schemaName, String tableName) {
         this.databaseName = databaseName;
         this.schemaName = schemaName;

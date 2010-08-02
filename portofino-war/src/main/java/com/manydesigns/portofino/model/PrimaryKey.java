@@ -59,10 +59,6 @@ public class PrimaryKey {
         this.columns = new ArrayList<Column>();
     }
 
-    public PrimaryKey() {
-        this.columns = new ArrayList<Column>();
-    }
-
     //--------------------------------------------------------------------------
     // Getters/setter
     //--------------------------------------------------------------------------

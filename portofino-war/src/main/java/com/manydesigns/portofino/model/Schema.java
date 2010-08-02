@@ -54,11 +54,6 @@ public class Schema {
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
-
-    public Schema() {
-        this.tables = new ArrayList<Table>();
-    }
-
     public Schema(String databaseName, String schemaName) {
         this.databaseName = databaseName;
         this.schemaName = schemaName;

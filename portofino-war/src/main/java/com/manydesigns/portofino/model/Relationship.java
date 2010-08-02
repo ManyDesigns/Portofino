@@ -64,11 +64,6 @@ public class Relationship {
         references = new ArrayList<Reference>();
     }
 
-    public Relationship() {
-        this(null, null, null);
-    }
-
-
     //--------------------------------------------------------------------------
     // Getters/setter
     //--------------------------------------------------------------------------

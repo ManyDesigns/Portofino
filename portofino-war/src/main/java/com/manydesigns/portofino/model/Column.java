@@ -62,10 +62,6 @@ public class Column {
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
-
-    public Column() {
-    }
-
     public Column(String databaseName, String schemaName,
                   String tableName, String columnName,
                   String columnType, boolean nullable, int length,
@@ -77,7 +73,6 @@ public class Column {
         this.columnType = columnType;
         this.nullable = nullable;
         this.length = length;
-
         this.scale = scale;
     }
 
