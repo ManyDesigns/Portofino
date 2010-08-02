@@ -35,6 +35,7 @@ import junit.framework.TestCase;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.math.BigDecimal;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -97,6 +98,21 @@ public class HibernateTest extends TestCase {
                   "Worms</font>");
         context.saveOrUpdateObject(worms);
     }
+
+    public void testSaveLineItem() {
+        context.openSession();
+        Map<String, Object> lineItem = new HashMap<String, Object>();
+        lineItem.put("$type$", "jpetstore.public.lineitem");
+        lineItem.put("orderid", 1);
+        lineItem.put("linenum", 1);
+        lineItem.put("itemid",
+          "test");
+        lineItem.put("quantity", 20);
+        lineItem.put("unitprice", new BigDecimal(10.80));
+
+        context.saveOrUpdateObject(lineItem);
+    }
+
 
     public void testDeleteCategoria() {
         context.openSession();

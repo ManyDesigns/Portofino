@@ -10,49 +10,95 @@
         <schemas>
             <schema name="public">
                 <tables>
+                     <table name="lineitem">
+                        <columns>
+                            <column name="orderid"
+                                    columnType="INTEGER"
+                                    javaType="java.lang.Integer"
+                                    length="8"
+                                    scale="0"
+                                    nullable="false"/>
+                            <column name="linenum"
+                                    columnType="INTEGER"
+                                    javaType="java.lang.Integer"
+                                    length="8"
+                                    scale="0"
+                                    nullable="false"/>
+                            <column name="itemid"
+                                    columnType="VARCHAR"
+                                    javaType="java.lang.String"
+                                    length="255"
+                                    scale="0"
+                                    nullable="false" />
+                            <column name="quantity"
+                                    columnType="INTEGER"
+                                    javaType="java.lang.Integer"
+                                    length="8"
+                                    scale="0"
+                                    nullable="false"/>
+                            <column name="unitprice"
+                                    columnType="DECIMAL"
+                                    javaType="java.lang.Integer"
+                                    length="10"
+                                    scale="2"
+                                    nullable="false"/>
+                        </columns>
+                        <primaryKey name="pk_lineitem">
+                            <column name="orderid"/>
+                            <column name="linenum"/>
+                        </primaryKey>
+                    </table>
                     <table name="category">
                         <columns>
                             <column name="catid"
                                     columnType="VARCHAR"
                                     javaType="java.lang.String"
                                     length="10"
+                                    scale = "0"
                                     nullable="false"/>
                             <column name="name"
                                     columnType="VARCHAR"
                                     javaType="java.lang.String"
                                     length="80"
+                                    scale="0"
                                     nullable="true"/>
                             <column name="descn"
                                     columnType="VARCHAR"
                                     javaType="java.lang.String"
                                     length="255"
+                                    scale="0"
                                     nullable="true"/>
                         </columns>
                         <primaryKey name="pk_category">
                             <column name="catid"/>
                         </primaryKey>
                     </table>
+
                     <table name="product">
                         <columns>
                             <column name="productid"
                                     columnType="VARCHAR"
                                     javaType="java.lang.String"
                                     length="10"
+                                    scale="0"
                                     nullable="false"/>
                             <column name="category"
                                     columnType="VARCHAR"
                                     javaType="java.lang.String"
                                     length="10"
+                                    scale="0"
                                     nullable="false"/>
                             <column name="name"
                                     columnType="VARCHAR"
                                     javaType="java.lang.String"
                                     length="80"
+                                    scale="0"
                                     nullable="true"/>
                             <column name="descn"
                                     columnType="VARCHAR"
                                     javaType="java.lang.String"
                                     length="255"
+                                    scale="0"
                                     nullable="true"/>
                         </columns>
                         <primaryKey name="pk_category">
@@ -69,6 +115,7 @@
                             </relationship>
                         </relationships>
                     </table>
+
                 </tables>
             </schema>
         </schemas>

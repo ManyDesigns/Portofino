@@ -78,10 +78,10 @@ public class DBParserTest extends TestCase {
         assertEquals("jpetstore.public", schema.getQualifiedName());
 
         List<Table> tables = schema.getTables();
-        assertEquals(2, tables.size());
+        assertEquals(3, tables.size());
 
         // tabella 0
-        Table table0 = tables.get(0);
+        Table table0 = tables.get(1);
         checkTable(table0, "jpetstore", "public", "category");
 
         List<Column> columns0 = table0.getColumns();
@@ -104,7 +104,7 @@ public class DBParserTest extends TestCase {
         assertEquals(columns0.get(0), pkColumns0.get(0));
 
         // tabella 1
-        Table table1 = tables.get(1);
+        Table table1 = tables.get(2);
         checkTable(table1, "jpetstore", "public", "product");
 
         List<Column> columns1 = table1.getColumns();
@@ -122,6 +122,36 @@ public class DBParserTest extends TestCase {
         checkColumn(columns1.get(3),
                 "jpetstore", "public", "product", "descn",
                 "VARCHAR", true, 255, 0);
+
+        // tabella 2
+        Table table2 = tables.get(0);
+        checkTable(table2, "jpetstore", "public", "lineitem");
+
+        List<Column> columns2 = table2.getColumns();
+        assertEquals(3, columns0.size());
+
+        checkColumn(columns2.get(0),
+                "jpetstore", "public", "lineitem", "orderid",
+                "INTEGER", false, 8, 0);
+        checkColumn(columns2.get(1),
+                "jpetstore", "public", "lineitem", "linenum",
+                "INTEGER", false, 8, 0);
+        checkColumn(columns2.get(2),
+                "jpetstore", "public", "lineitem", "itemid",
+                "VARCHAR", false, 255, 0);
+        checkColumn(columns2.get(3),
+                "jpetstore", "public", "lineitem", "quantity",
+                "INTEGER", false, 8, 0);
+        checkColumn(columns2.get(4),
+                "jpetstore", "public", "lineitem", "unitprice",
+                "DECIMAL", false, 10, 2);
+
+        PrimaryKey primaryKey2 = table2.getPrimaryKey();
+        assertEquals("pk_lineitem", primaryKey2.getName());
+        List<Column> pkColumns2 = primaryKey2.getColumns();
+        assertEquals(2, pkColumns2.size());
+        assertEquals(columns2.get(0), pkColumns2.get(0));
+        assertEquals(columns2.get(1), pkColumns2.get(1));
     }
 
     public void testFindTableByQualifiedName() {

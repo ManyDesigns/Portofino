@@ -386,22 +386,27 @@ public class DBParser {
                     }
                     if (attName.equals("length")) {
                         length = Integer.parseInt(attValue);
+                        expectedValList.remove(attName);
                         continue;
                     }
                     if (attName.equals("nullable")) {
                         nullable = Boolean.parseBoolean(attValue);
+                        expectedValList.remove(attName);
                         continue;
                     }
                    
                     if (attName.equals("scale")) {
                         scale = Integer.parseInt(attValue);
+                        expectedValList.remove(attName);
                     }
                 }
 
                 if (expectedValList.size() != 0) {
 
                     throw new Exception(MessageFormat.format("Non sono presenti gli " +
-                            "attributi {0} di Column", StringUtils.join(expectedValList, ", ")));
+                            "attributi {0} di Column {1}, {2}",
+                            StringUtils.join(expectedValList, ", "),
+                            table.getQualifiedName(), name));
                 }
                 Column col = new Column(table.getDatabaseName(), table.getSchemaName(),
                   table.getTableName(), name,
@@ -447,9 +452,11 @@ public class DBParser {
                 throw new Exception(MessageFormat.format(
                         "TAG Primary Key, ATTR {0} non presente", PRIMARY_KEY));
             }
-            do {
-                event = next(xmlStreamReader);
-                xmlStreamReader.getLocalName();
+            event = next(xmlStreamReader);
+            lName= xmlStreamReader.getLocalName();
+            while (lName.equals(COLUMN) && event
+                    == XMLStreamConstants.START_ELEMENT)
+            {
                 attValue = xmlStreamReader.getAttributeValue(0);
                 pk.getColumns().add(getColumn(table, attValue));
                 event = next(xmlStreamReader);
@@ -459,13 +466,13 @@ public class DBParser {
                     throw new Exception("TAG "
                             + COLUMN + " in Primary Key non chiuso");
                 }
+                event = next(xmlStreamReader);
+                lName = xmlStreamReader.getLocalName();
 
             }
-            while (lName.equals(COLUMN) && event
-                    == XMLStreamConstants.START_ELEMENT);
+
             table.setPrimaryKey(pk);
-            event = next(xmlStreamReader);
-            lName = xmlStreamReader.getLocalName();
+
             if (event != XMLStreamConstants.END_ELEMENT
                     && !lName.equals(PRIMARY_KEY)) {
                 throw new Exception("TAG Primary Key non chiuso");
