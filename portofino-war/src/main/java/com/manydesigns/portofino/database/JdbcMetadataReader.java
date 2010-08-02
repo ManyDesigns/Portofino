@@ -36,6 +36,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -55,6 +56,7 @@ public class JdbcMetadataReader {
 
     protected String databaseName;
     protected DatabaseMetaData metadata;
+    protected DataModel dataModel;
     protected Database database;
     protected List<Schema> schemas;
     protected List<Table> tables;
@@ -77,7 +79,9 @@ public class JdbcMetadataReader {
     public Database readModelFromConnection(Connection conn, String databaseName)
             throws SQLException {
         this.databaseName = databaseName;
+        dataModel = new DataModel();
         database = new Database(databaseName, null);
+        dataModel.getDatabases().add(database);
         schemas = database.getSchemas();
         tables = new ArrayList<Table>();
         try {
@@ -240,9 +244,10 @@ public class JdbcMetadataReader {
         LogUtil.fineMF(logger, "Searching for primary key in table {0}",
                 table.getQualifiedName());
         ResultSet rs = null;
-        PrimaryKey primaryKey = null;
-        Column[] pkColumnArray = new Column[0];
         try {
+            PrimaryKey primaryKey = null;
+            Column[] pkColumnArray = new Column[0];
+
             rs = metadata.getPrimaryKeys(null, expectedSchemaName,
                     expectedTableName);
             while(rs.next()) {
@@ -335,7 +340,13 @@ public class JdbcMetadataReader {
         }
     }
 
-
+    private Column findColumn(Table table, String columnName) {
+        String qualifiedColumnName =
+                MessageFormat.format("{0}.{1}",
+                        table.getQualifiedName(), columnName);
+        return dataModel.findColumnByQualifiedName(
+                        qualifiedColumnName);
+    }
 
 
     //**************************************************************************
@@ -349,16 +360,15 @@ public class JdbcMetadataReader {
     }
 
     private void readFKs(Table table) throws SQLException {
-        /*
         String expectedSchemaName = table.getSchemaName();
         String expectedTableName = table.getTableName();
-        LogUtil.fineMF(logger, "Searching for primary key in table {0}",
+        LogUtil.fineMF(logger, "Searching for forwign keys in table {0}",
                 table.getQualifiedName());
         ResultSet rs = null;
         Relationship relationship = null;
         Reference[] referenceArray = new Reference[0];
         try {
-            rs = metadata.getPrimaryKeys(null, expectedSchemaName,
+            rs = metadata.getImportedKeys(null, expectedSchemaName,
                     expectedTableName);
             while(rs.next()) {
                 String schemaName = rs.getString("FKTABLE_SCHEM");
@@ -390,71 +400,95 @@ public class JdbcMetadataReader {
                     continue;
                 }
 
-                if (relationship == null) {
+                String qualifiedReferencedTableName =
+                        MessageFormat.format("{0}.{1}.{2}",
+                                databaseName,
+                                referencedSchemaName,
+                                referencedTableName
+                        );
+                Table referencedTable =
+                        dataModel.findTableByQualifiedName(
+                                qualifiedReferencedTableName);
+
+                if (relationship == null ||
+                        !relationship.getRelationshipName().equals(fkName)) {
+                    if (relationship != null) {
+                        installRelationship(relationship, referenceArray);
+                    }
+
                     relationship = new Relationship(
                             fkName,
                             decodeUpdateDeleteRule(updateRule),
                             decodeUpdateDeleteRule(deleteRule));
+                    relationship.setFromTable(table);
+                    relationship.setToTable(referencedTable);
+
+                    // reset the refernceArray
+                    referenceArray = new Reference[0];
                     LogUtil.fineMF(logger, "Found foreign key: {0}", fkName);
-                } else if (!relationship.getRelationshipName().equals(fkName)) {
-                    //sanity check
-                    LogUtil.warningMF(logger, "Found FK name {0} different " +
-                            "from previous name {1}",
-                            fkName, relationship.getRelationshipName());
-                    return;
                 }
 
                 Column column = findColumn(table, columnName);
-
-                // sanity check
                 if (column == null) {
-                    LogUtil.warningMF(logger, "PK column {0} not found in " +
-                            "columns of table {1}. " +
-                            "Aborting PK search for this table.",
-                            columnName, table.getQualifiedName());
+                    LogUtil.warningMF(logger, "Column {0} not found. " +
+                            "Aborting FK search for this table.",
+                            column.getQualifiedName());
                     return;
                 }
 
+                Column referencedColumn =
+                        findColumn(referencedTable, referencedColumnName);
+                if (referencedColumn == null) {
+                    LogUtil.warningMF(logger, "Column {0} not found. " +
+                            "Aborting FK search for this table.",
+                            column.getQualifiedName());
+                    return;
+                }
+
+                Reference reference = new Reference(column, referencedColumn);
+
                 LogUtil.fineMF(logger,
-                        "Found PK column {0} with key sequence {1}",
+                        "Found FK reference {0} -> {1} with key sequence {2}",
                         column.getQualifiedName(),
+                        referencedColumn.getQualifiedName(),
                         keySeq);
 
-                pkColumnArray =
-                        ensureMinimumArrayLength(pkColumnArray, keySeq + 1);
-                pkColumnArray[keySeq] = column;
+                referenceArray =
+                        ensureMinimumArrayLength(referenceArray, keySeq + 1);
+                referenceArray[keySeq] = reference;
             }
-
-            if (primaryKey == null) {
-                LogUtil.fineMF(logger,
-                        "No PK found for: {0}",
-                        table.getQualifiedName());
-                return;
+            if (relationship != null) {
+                installRelationship(relationship, referenceArray);
             }
-
-            // copy non-null elements of array
-            for (Column current : pkColumnArray) {
-                if (current == null) {
-                    continue;
-                }
-                primaryKey.getColumns().add(current);
-            }
-            // sanity check
-            if (primaryKey.getColumns().size() == 0) {
-                LogUtil.warningMF(logger,
-                        "Primary key {0} is empty. Discarding.",
-                        primaryKey.getPkName());
-                return;
-            }
-            table.setPrimaryKey(primaryKey);
-            LogUtil.fineMF(logger,
-                    "Installed PK {0} with number of columns: {1}",
-                    primaryKey.getPkName(),
-                    primaryKey.getColumns().size());
         } finally {
             DbUtil.closeResultSetAndStatement(rs);
         }
-        */
+    }
+
+    private void installRelationship(Relationship relationship,
+                                     Reference[] referenceArray) {
+        // copy non-null elements of array
+        for (Reference current : referenceArray) {
+            if (current == null) {
+                continue;
+            }
+            relationship.getReferences().add(current);
+        }
+        // sanity check
+        if (relationship.getReferences().size() == 0) {
+            LogUtil.warningMF(logger,
+                    "Foreign key {0} is empty. Discarding.",
+                    relationship.getRelationshipName());
+            return;
+        }
+        relationship.getFromTable()
+                    .getManyToOneRelationships().add(relationship);
+        relationship.getToTable()
+                    .getOneToManyRelationships().add(relationship);
+        LogUtil.fineMF(logger,
+                    "Installed FK {0} with number of columns: {1}",
+                relationship.getRelationshipName(),
+                relationship.getReferences().size());
     }
 
     private String decodeUpdateDeleteRule(short rule) {
@@ -477,20 +511,20 @@ public class JdbcMetadataReader {
     // Utility methods
     //**************************************************************************
 
-    private Column findColumn(Table table, String columnName) {
-        for (Column current : table.getColumns()) {
-            if (current.getColumnName().equals(columnName)) {
-                return current;
-            }
-        }
-        return null;
-    }
-
     private Column[] ensureMinimumArrayLength(Column[] oldArray, int length) {
         if (oldArray.length >= length) {
             return oldArray;
         }
         Column[] newArray = new Column[length];
+        System.arraycopy(oldArray, 0, newArray, 0, oldArray.length);
+        return newArray;
+    }
+
+    private Reference[] ensureMinimumArrayLength(Reference[] oldArray, int length) {
+        if (oldArray.length >= length) {
+            return oldArray;
+        }
+        Reference[] newArray = new Reference[length];
         System.arraycopy(oldArray, 0, newArray, 0, oldArray.length);
         return newArray;
     }

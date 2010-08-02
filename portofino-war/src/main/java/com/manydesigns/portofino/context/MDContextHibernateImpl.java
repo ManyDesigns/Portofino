@@ -208,18 +208,11 @@ public class MDContextHibernateImpl implements MDContext {
                     obj.get(oneToManyRelationshipName);
         }
         String qualifiedTableName = (String)obj.get("$type$");
-        Table table;
-        Relationship relationship;
-        try {
-            table = dataModel.findTableByQualifiedName(qualifiedTableName);
-            relationship =
-                    dataModel.findOneToManyRelationship(
-                            table, oneToManyRelationshipName);
-        } catch (ModelObjectNotFoundException e) {
-            throw new Error(e);
-        }
-        Table fromTable =
-                relationship.getFromTable();
+        Relationship relationship =
+                dataModel.findOneToManyRelationship(
+                        qualifiedTableName, oneToManyRelationshipName);
+        Table fromTable = relationship.getFromTable();
+
         Session session =
                 threadSessions.get().get(fromTable.getDatabaseName());
         Criteria criteria =

@@ -36,7 +36,7 @@ import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.context.ModelObjectNotFoundException;
+import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.interceptors.MDContextAware;
 import com.manydesigns.portofino.model.Column;
 import com.manydesigns.portofino.model.DataModel;
@@ -139,7 +139,7 @@ public class TableDesignAction extends ActionSupport
     // Action default execute method
     //--------------------------------------------------------------------------
 
-    public String execute() throws ModelObjectNotFoundException {
+    public String execute() {
         setupTable();
 
         form = new FormBuilder(Table.class)
@@ -162,10 +162,10 @@ public class TableDesignAction extends ActionSupport
     // Common methods
     //--------------------------------------------------------------------------
 
-    public void setupTable() throws ModelObjectNotFoundException {
+    public void setupTable() {
         table = dataModel.findTableByQualifiedName(qualifiedTableName);
         if (table == null) {
-            throw new ModelObjectNotFoundException(qualifiedTableName);
+            throw new ModelObjectNotFoundError(qualifiedTableName);
         }
     }
 

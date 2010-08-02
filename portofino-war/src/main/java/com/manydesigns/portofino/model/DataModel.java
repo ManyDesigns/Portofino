@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.portofino.context.ModelObjectNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +48,7 @@ public class DataModel {
     // Fields
     //--------------------------------------------------------------------------
 
-    protected final List<Database> databases;
+    protected final ArrayList<Database> databases;
 
     public static final Logger logger = LogUtil.getLogger(DataModel.class);
 
@@ -62,8 +61,23 @@ public class DataModel {
     }
 
     //--------------------------------------------------------------------------
-    // Model access
+    // Get all objects of a certain kind
     //--------------------------------------------------------------------------
+
+    @SuppressWarnings({"unchecked"})
+    public List<Database> getAllDatabases() {
+        return (List<Database>) databases.clone();
+    }
+
+    public List<Schema> getAllSchemas() {
+        List<Schema> result = new ArrayList<Schema>();
+        for (Database database : getDatabases()) {
+            for (Schema schema : database.getSchemas()) {
+                result.add(schema);
+            }
+        }
+        return result;
+    }
 
     public List<Table> getAllTables() {
         List<Table> result = new ArrayList<Table>();
@@ -76,6 +90,24 @@ public class DataModel {
         }
         return result;
     }
+
+    public List<Column> getAllColumns() {
+        List<Column> result = new ArrayList<Column>();
+        for (Database database : getDatabases()) {
+            for (Schema schema : database.getSchemas()) {
+                for (Table table : schema.getTables()) {
+                    for (Column column : table.getColumns()) {
+                        result.add(column);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    //--------------------------------------------------------------------------
+    // Search objects of a certain kind
+    //--------------------------------------------------------------------------
 
     public Database findDatabaseByName(String databaseName) {
         for (Database database : getDatabases()) {
@@ -135,15 +167,18 @@ public class DataModel {
         return null;
     }
 
-    public Relationship findOneToManyRelationship(Table table,
-                                                  String relationshipName)
-            throws ModelObjectNotFoundException {
-        for (Relationship relationship : table.getOneToManyRelationships()) {
-            if (relationship.getRelationshipName().equals(relationshipName)) {
-                return relationship;
+    public Relationship findOneToManyRelationship(String qualifiedTableName,
+                                                  String relationshipName) {
+        Table table = findTableByQualifiedName(qualifiedTableName);
+        if (table != null) {
+            for (Relationship relationship : table.getOneToManyRelationships()) {
+                if (relationship.getRelationshipName().equals(relationshipName)) {
+                    return relationship;
+                }
             }
         }
-        throw new ModelObjectNotFoundException(relationshipName);
+        LogUtil.fineMF(logger, "Relationship not found: {0}", relationshipName);
+        return null;
     }
 
     //--------------------------------------------------------------------------
