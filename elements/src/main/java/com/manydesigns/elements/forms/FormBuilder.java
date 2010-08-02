@@ -65,7 +65,7 @@ public class FormBuilder {
     protected String prefix;
     protected int nColumns = DEFAULT_N_COLUMNS;
 
-    protected final Logger logger = LogUtil.getLogger(FormBuilder.class);
+    public static final Logger logger = LogUtil.getLogger(FormBuilder.class);
 
     //**************************************************************************
     // Constructors

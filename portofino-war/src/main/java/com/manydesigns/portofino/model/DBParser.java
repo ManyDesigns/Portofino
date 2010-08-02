@@ -447,7 +447,11 @@ public class DBParser {
             attName = xmlStreamReader.getAttributeLocalName(0);
             attValue = xmlStreamReader.getAttributeValue(0);
             if (attName.equals("name")) {
-                pk = new PrimaryKey(attValue);
+                pk = new PrimaryKey(
+                        table.getDatabaseName(),
+                        table.getSchemaName(),
+                        table.getTableName(),
+                        attValue);
             } else {
                 throw new Exception(MessageFormat.format(
                         "TAG Primary Key, ATTR {0} non presente", PRIMARY_KEY));

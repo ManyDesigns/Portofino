@@ -49,7 +49,8 @@ public class ServerInfo {
     // Fields
     //--------------------------------------------------------------------------
 
-    protected final Logger logger = LogUtil.getLogger(ServerInfo.class);
+    public static final Logger logger =
+            LogUtil.getLogger(ServerInfo.class);
 
     protected final ServletContext servletContext;
 

@@ -131,7 +131,7 @@ public class HibernateConfig {
         List<com.manydesigns.portofino.model.Column> columnPKList
                 = aTable.getPrimaryKey().getColumns();
 
-        createPKColumn(mappings, aTable, aTable.getPrimaryKey().getName(),
+        createPKColumn(mappings, aTable, aTable.getPrimaryKey().getPkName(),
                 clazz, tab, columnPKList);
         //Other columns
         columnList.removeAll(columnPKList);

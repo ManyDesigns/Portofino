@@ -57,7 +57,8 @@ public abstract class AbstractSearchField implements SearchField {
     protected String inputName;
     protected String label;
 
-    protected final Logger logger = LogUtil.getLogger(AbstractSearchField.class);
+    public static final Logger logger =
+            LogUtil.getLogger(AbstractSearchField.class);
 
     //--------------------------------------------------------------------------
     // Costruttori

@@ -33,6 +33,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import junit.framework.TestCase;
 
 import java.sql.SQLException;
+import java.util.logging.Level;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -48,6 +49,8 @@ public class JdbcMetadataReaderTest extends TestCase {
 
     public void setUp() throws ClassNotFoundException {
         LogUtil.initializeLoggingSystem();
+        JdbcMetadataReader.logger.setLevel(Level.FINE);
+        
         connectionProvider =
                 new JdbcConnectionProvider(
                         "org.postgresql.Driver",

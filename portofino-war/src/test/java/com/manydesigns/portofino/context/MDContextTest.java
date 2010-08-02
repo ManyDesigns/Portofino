@@ -1,9 +1,6 @@
 package com.manydesigns.portofino.context;
 
-import com.manydesigns.portofino.model.Column;
-import com.manydesigns.portofino.model.Database;
-import com.manydesigns.portofino.model.Schema;
-import com.manydesigns.portofino.model.Table;
+import com.manydesigns.portofino.model.*;
 import junit.framework.TestCase;
 
 /**
@@ -14,91 +11,57 @@ import junit.framework.TestCase;
 public class MDContextTest extends TestCase {
 
     MDContext context;
+    DataModel dataModel;
 
     public void setUp() {
         context = new MDContextHibernateImpl();
         context.loadXmlModelAsResource(
                 "databases/jpetstore/postgresql/jpetstore-postgres.xml");
+        dataModel = context.getDataModel();
     }
 
 
     public void testFindDatabaseByName() {
         String qualifiedName = "jpetstore";
-        Database database = null;
-        try {
-            database = context.findDatabaseByName(qualifiedName);
-        } catch (ModelObjectNotFoundException e) {
-            e.printStackTrace();
-            fail();
-        }
+        Database database = dataModel.findDatabaseByName(qualifiedName);
+        assertNotNull(database);
         assertEquals(qualifiedName, database.getDatabaseName());
 
         String dummyName = "foo";
-        try {
-            context.findDatabaseByName(dummyName);
-            fail("Must throw exception.");
-        } catch (ModelObjectNotFoundException e) {
-            assertEquals(dummyName, e.getMessage());
-        }
+        database = dataModel.findDatabaseByName(dummyName);
+        assertNull(database);
     }
 
     public void testFindSchemaByQualifiedName() {
         String qualifiedName = "jpetstore.public";
-        Schema schema = null;
-        try {
-            schema = context.findSchemaByQualifiedName(qualifiedName);
-        } catch (ModelObjectNotFoundException e) {
-            e.printStackTrace();
-            fail();
-        }
+        Schema schema = dataModel.findSchemaByQualifiedName(qualifiedName);
+        assertNotNull(schema);
         assertEquals(qualifiedName, schema.getQualifiedName());
 
         String dummyName = "jpetstore.foo";
-        try {
-            context.findSchemaByQualifiedName(dummyName);
-            fail("Must throw exception.");
-        } catch (ModelObjectNotFoundException e) {
-            assertEquals(dummyName, e.getMessage());
-        }
+        schema = dataModel.findSchemaByQualifiedName(dummyName);
+        assertNull(schema);
     }
 
     public void testFindTableByQualifiedName() {
         String qualifiedName = "jpetstore.public.product";
-        Table table = null;
-        try {
-            table = context.findTableByQualifiedName(qualifiedName);
-        } catch (ModelObjectNotFoundException e) {
-            e.printStackTrace();
-            fail();
-        }
+        Table table = dataModel.findTableByQualifiedName(qualifiedName);
+        assertNotNull(table);
         assertEquals(qualifiedName, table.getQualifiedName());
 
         String dummyName = "jpetstore.public.foo";
-        try {
-            context.findTableByQualifiedName(dummyName);
-            fail("Must throw exception.");
-        } catch (ModelObjectNotFoundException e) {
-            assertEquals(dummyName, e.getMessage());
-        }
+        table = dataModel.findTableByQualifiedName(dummyName);
+        assertNull(table);
     }
 
     public void testFindColumnByQualifiedName() {
         String qualifiedName = "jpetstore.public.product.category";
-        Column column = null;
-        try {
-            column = context.findColumnByQualifiedName(qualifiedName);
-        } catch (ModelObjectNotFoundException e) {
-            e.printStackTrace();
-            fail();
-        }
+        Column column = dataModel.findColumnByQualifiedName(qualifiedName);
+        assertNotNull(column);
         assertEquals(qualifiedName, column.getQualifiedName());
 
         String dummyName = "jpetstore.public.product.foo";
-        try {
-            context.findColumnByQualifiedName(dummyName);
-            fail("Must throw exception.");
-        } catch (ModelObjectNotFoundException e) {
-            assertEquals(dummyName, e.getMessage());
-        }
+        column = dataModel.findColumnByQualifiedName(dummyName);
+        assertNull(column);
     }
 }
