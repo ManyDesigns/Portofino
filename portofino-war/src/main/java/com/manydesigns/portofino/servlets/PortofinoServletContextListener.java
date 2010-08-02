@@ -73,7 +73,7 @@ public class PortofinoServletContextListener implements ServletContextListener {
     protected ServerInfo serverInfo;
     protected MDContext mdContext;
 
-    protected final Logger logger =
+    public static final Logger logger =
             LogUtil.getLogger(PortofinoServletContextListener.class);
 
     /**

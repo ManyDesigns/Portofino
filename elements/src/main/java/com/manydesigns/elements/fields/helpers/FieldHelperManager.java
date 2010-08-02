@@ -54,7 +54,7 @@ public class FieldHelperManager implements FieldHelper {
     protected static final Properties elementsProperties;
     protected static final FieldHelperManager manager;
 
-    protected static Logger logger =
+    public static final Logger logger =
             LogUtil.getLogger(FieldHelperManager.class);
 
     protected ArrayList<FieldHelper> fieldHelperList;

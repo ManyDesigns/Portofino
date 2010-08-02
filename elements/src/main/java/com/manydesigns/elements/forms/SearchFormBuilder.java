@@ -58,7 +58,8 @@ public class SearchFormBuilder {
     protected List<PropertyAccessor> propertyAccessors;
     protected String prefix;
 
-    protected final Logger logger = LogUtil.getLogger(SearchFormBuilder.class);
+    public static final Logger logger =
+            LogUtil.getLogger(SearchFormBuilder.class);
 
     //**************************************************************************
     // Constructors

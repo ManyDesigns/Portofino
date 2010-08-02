@@ -29,8 +29,12 @@
 
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.context.ModelObjectNotFoundException;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -47,6 +51,7 @@ public class DataModel {
 
     protected final List<Database> databases;
 
+    public static final Logger logger = LogUtil.getLogger(DataModel.class);
 
     //--------------------------------------------------------------------------
     // Constructors
@@ -54,6 +59,91 @@ public class DataModel {
 
     public DataModel() {
         this.databases = new ArrayList<Database>();
+    }
+
+    //--------------------------------------------------------------------------
+    // Model access
+    //--------------------------------------------------------------------------
+
+    public List<Table> getAllTables() {
+        List<Table> result = new ArrayList<Table>();
+        for (Database database : getDatabases()) {
+            for (Schema schema : database.getSchemas()) {
+                for (Table table : schema.getTables()) {
+                    result.add(table);
+                }
+            }
+        }
+        return result;
+    }
+
+    public Database findDatabaseByName(String databaseName) {
+        for (Database database : getDatabases()) {
+            if (database.getDatabaseName().equals(databaseName)) {
+                return database;
+            }
+        }
+        LogUtil.fineMF(logger, "Database not found: {0}", databaseName);
+        return null;
+    }
+
+    public Schema findSchemaByQualifiedName(String qualifiedSchemaName) {
+        int lastDot = qualifiedSchemaName.lastIndexOf(".");
+        String databaseName = qualifiedSchemaName.substring(0, lastDot);
+        String schemaName = qualifiedSchemaName.substring(lastDot + 1);
+        Database database = findDatabaseByName(databaseName);
+        if (database != null) {
+            for (Schema schema : database.getSchemas()) {
+                if (schema.getSchemaName().equals(schemaName)) {
+                    return schema;
+                }
+            }
+        }
+        LogUtil.fineMF(logger, "Schema not found: {0}", qualifiedSchemaName);
+        return null;
+    }
+
+    public Table findTableByQualifiedName(String qualifiedTableName) {
+        int lastDot = qualifiedTableName.lastIndexOf(".");
+        String qualifiedSchemaName = qualifiedTableName.substring(0, lastDot);
+        String tableName = qualifiedTableName.substring(lastDot + 1);
+        Schema schema = findSchemaByQualifiedName(qualifiedSchemaName);
+        if (schema != null) {
+            for (Table table : schema.getTables()) {
+                if (table.getTableName().equals(tableName)) {
+                    return table;
+                }
+            }
+        }
+        LogUtil.fineMF(logger, "Table not found: {0}", qualifiedTableName);
+        return null;
+    }
+
+    public Column findColumnByQualifiedName(String qualifiedColumnName) {
+        int lastDot = qualifiedColumnName.lastIndexOf(".");
+        String qualifiedTableName = qualifiedColumnName.substring(0, lastDot);
+        String columnName = qualifiedColumnName.substring(lastDot + 1);
+        Table table = findTableByQualifiedName(qualifiedTableName);
+        if (table != null) {
+            for (Column column : table.getColumns()) {
+                if (column.getColumnName().equals(columnName)) {
+                    return column;
+                }
+            }
+        }
+        LogUtil.fineMF(logger, "Column not found: {0}", qualifiedColumnName);
+        return null;
+    }
+
+    public Relationship findOneToManyRelationship(Table table,
+                                                  String relationshipName)
+            throws ModelObjectNotFoundException {
+        for (Relationship relationship : table.getOneToManyRelationships()) {
+            if (relationship.getRelationshipName().equals(relationshipName)) {
+                return relationship;
+            }
+        }
+        throw new ModelObjectNotFoundException(relationshipName);
     }
 
     //--------------------------------------------------------------------------

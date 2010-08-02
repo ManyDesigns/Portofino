@@ -47,7 +47,7 @@ public class DbUtil {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final static Logger logger = LogUtil.getLogger(DbUtil.class);
+    public final static Logger logger = LogUtil.getLogger(DbUtil.class);
 
     public static void closeResultSetStatementAndConnection(ResultSet rs,
                                                             Statement st,

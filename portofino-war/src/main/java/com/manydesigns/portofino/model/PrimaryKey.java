@@ -44,9 +44,10 @@ public class PrimaryKey {
     //--------------------------------------------------------------------------
     // Fields
     //--------------------------------------------------------------------------
+    protected String databaseName;
     protected String schemaName;
     protected String tableName;
-    protected String name;
+    protected String pkName;
     protected final List<Column> columns;
 
 
@@ -54,25 +55,25 @@ public class PrimaryKey {
     // Constructors
     //--------------------------------------------------------------------------
 
-    public PrimaryKey(String name) {
-        this.name = name;
-        this.columns = new ArrayList<Column>();
+    public PrimaryKey(String databaseName, String schemaName,
+                      String tableName, String pkName) {
+        this.databaseName = databaseName;
+        this.schemaName = schemaName;
+        this.tableName = tableName;
+        this.pkName = pkName;
+        columns = new ArrayList<Column>();
     }
 
     //--------------------------------------------------------------------------
     // Getters/setter
     //--------------------------------------------------------------------------
 
-    public String getName() {
-        return name;
+    public String getDatabaseName() {
+        return databaseName;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Column> getColumns() {
-        return columns;
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
     }
 
     public String getSchemaName() {
@@ -89,5 +90,17 @@ public class PrimaryKey {
 
     public void setTableName(String tableName) {
         this.tableName = tableName;
+    }
+
+    public String getPkName() {
+        return pkName;
+    }
+
+    public void setPkName(String pkName) {
+        this.pkName = pkName;
+    }
+
+    public List<Column> getColumns() {
+        return columns;
     }
 }

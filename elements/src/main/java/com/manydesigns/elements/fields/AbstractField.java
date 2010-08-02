@@ -76,7 +76,7 @@ public abstract class AbstractField implements Field {
 
     protected List<String> errors = new ArrayList<String>();
 
-    protected final Logger logger = LogUtil.getLogger(AbstractField.class);
+    public static final Logger logger = LogUtil.getLogger(AbstractField.class);
 
     //--------------------------------------------------------------------------
     // Costruttori

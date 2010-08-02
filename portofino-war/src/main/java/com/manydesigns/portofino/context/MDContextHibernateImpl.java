@@ -38,7 +38,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +60,8 @@ public class MDContextHibernateImpl implements MDContext {
     protected Map<String, SessionFactory> sessionFactories;
     protected final ThreadLocal<Map<String, Session>> threadSessions;
 
-    protected final Logger logger = LogUtil.getLogger(MDContextHibernateImpl.class);
+    public static final Logger logger =
+            LogUtil.getLogger(MDContextHibernateImpl.class);
 
     //--------------------------------------------------------------------------
     // Constructors
@@ -92,82 +92,11 @@ public class MDContextHibernateImpl implements MDContext {
     }
 
     //--------------------------------------------------------------------------
-    // Model access
+    // Modell access
     //--------------------------------------------------------------------------
 
-    public List<Table> getAllTables() {
-        List<Table> result = new ArrayList<Table>();
-        for (Database database : dataModel.getDatabases()) {
-            for (Schema schema : database.getSchemas()) {
-                for (Table table : schema.getTables()) {
-                    result.add(table);
-                }
-            }
-        }
-        return result;
-    }
-
-    public Database findDatabaseByName(String databaseName)
-            throws ModelObjectNotFoundException {
-        for (Database database : dataModel.getDatabases()) {
-            if (database.getDatabaseName().equals(databaseName)) {
-                return database;
-            }
-        }
-        throw new ModelObjectNotFoundException(databaseName);
-    }
-
-    public Schema findSchemaByQualifiedName(String qualifiedSchemaName)
-            throws ModelObjectNotFoundException {
-        int lastDot = qualifiedSchemaName.lastIndexOf(".");
-        String databaseName = qualifiedSchemaName.substring(0, lastDot);
-        String schemaName = qualifiedSchemaName.substring(lastDot + 1);
-        Database database = findDatabaseByName(databaseName);
-        for (Schema schema : database.getSchemas()) {
-            if (schema.getSchemaName().equals(schemaName)) {
-                return schema;
-            }
-        }
-        throw new ModelObjectNotFoundException(qualifiedSchemaName);
-    }
-
-    public Table findTableByQualifiedName(String qualifiedTableName)
-            throws ModelObjectNotFoundException {
-        int lastDot = qualifiedTableName.lastIndexOf(".");
-        String qualifiedSchemaName = qualifiedTableName.substring(0, lastDot);
-        String tableName = qualifiedTableName.substring(lastDot + 1);
-        Schema schema = findSchemaByQualifiedName(qualifiedSchemaName);
-        for (Table table : schema.getTables()) {
-            if (table.getTableName().equals(tableName)) {
-                return table;
-            }
-        }
-        throw new ModelObjectNotFoundException(qualifiedTableName);
-    }
-
-    public Column findColumnByQualifiedName(String qualifiedColumnName)
-            throws ModelObjectNotFoundException {
-        int lastDot = qualifiedColumnName.lastIndexOf(".");
-        String qualifiedTableName = qualifiedColumnName.substring(0, lastDot);
-        String columnName = qualifiedColumnName.substring(lastDot + 1);
-        Table table = findTableByQualifiedName(qualifiedTableName);
-        for (Column column : table.getColumns()) {
-            if (column.getColumnName().equals(columnName)) {
-                return column;
-            }
-        }
-        throw new ModelObjectNotFoundException(qualifiedColumnName);
-    }
-
-    public Relationship findOneToManyRelationship(Table table,
-                                                  String relationshipName)
-            throws ModelObjectNotFoundException {
-        for (Relationship relationship : table.getOneToManyRelationships()) {
-            if (relationship.getRelationshipName().equals(relationshipName)) {
-                return relationship;
-            }
-        }
-        throw new ModelObjectNotFoundException(relationshipName);
+    public DataModel getDataModel() {
+        return dataModel;
     }
 
     //--------------------------------------------------------------------------
@@ -197,12 +126,7 @@ public class MDContextHibernateImpl implements MDContext {
     }
 
     protected Session getSession(String qualifiedTableName) {
-        Table table;
-        try {
-            table = findTableByQualifiedName(qualifiedTableName);
-        } catch (ModelObjectNotFoundException e) {
-            throw new Error(e);
-        }
+        Table table = dataModel.findTableByQualifiedName(qualifiedTableName);
         String databaseName = table.getDatabaseName();
         return threadSessions.get().get(databaseName);
     }
@@ -287,9 +211,10 @@ public class MDContextHibernateImpl implements MDContext {
         Table table;
         Relationship relationship;
         try {
-            table = findTableByQualifiedName(qualifiedTableName);
+            table = dataModel.findTableByQualifiedName(qualifiedTableName);
             relationship =
-                    findOneToManyRelationship(table, oneToManyRelationshipName);
+                    dataModel.findOneToManyRelationship(
+                            table, oneToManyRelationshipName);
         } catch (ModelObjectNotFoundException e) {
             throw new Error(e);
         }

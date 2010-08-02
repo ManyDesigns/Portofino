@@ -39,6 +39,7 @@ import com.manydesigns.portofino.context.MDContext;
 import com.manydesigns.portofino.context.ModelObjectNotFoundException;
 import com.manydesigns.portofino.interceptors.MDContextAware;
 import com.manydesigns.portofino.model.Column;
+import com.manydesigns.portofino.model.DataModel;
 import com.manydesigns.portofino.model.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.opensymphony.xwork2.ActionSupport;
@@ -70,6 +71,7 @@ public class TableDesignAction extends ActionSupport
     //--------------------------------------------------------------------------
 
     public MDContext context;
+    public DataModel dataModel;
 
     public void setContext(MDContext context) {
         this.context = context;
@@ -130,7 +132,8 @@ public class TableDesignAction extends ActionSupport
     // Other objects
     //--------------------------------------------------------------------------
 
-    protected Logger logger = LogUtil.getLogger(TableDataAction.class);
+    public static final Logger logger =
+            LogUtil.getLogger(TableDataAction.class);
 
     //--------------------------------------------------------------------------
     // Action default execute method
@@ -160,7 +163,10 @@ public class TableDesignAction extends ActionSupport
     //--------------------------------------------------------------------------
 
     public void setupTable() throws ModelObjectNotFoundException {
-        table = context.findTableByQualifiedName(qualifiedTableName);
+        table = dataModel.findTableByQualifiedName(qualifiedTableName);
+        if (table == null) {
+            throw new ModelObjectNotFoundException(qualifiedTableName);
+        }
     }
 
     //--------------------------------------------------------------------------

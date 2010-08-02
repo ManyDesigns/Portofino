@@ -7,7 +7,7 @@
             <div>
                 <h2>Tables:</h2>
                 <ul>
-                    <s:iterator value="context.allTables">
+                    <s:iterator value="dataModel.allTables">
                         <li><a href="<s:url namespace="/" action="%{qualifiedName}/TableData"/>"><s:property value="qualifiedName"/></a></li>
                     </s:iterator>
                 </ul>

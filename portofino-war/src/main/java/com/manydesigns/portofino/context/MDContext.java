@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.context;
 
 import com.manydesigns.elements.fields.search.Criteria;
-import com.manydesigns.portofino.model.*;
+import com.manydesigns.portofino.model.DataModel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,23 +56,7 @@ public interface MDContext {
     // Model access
     //--------------------------------------------------------------------------
 
-    List<Table> getAllTables();
-
-    Database findDatabaseByName(String databaseName)
-            throws ModelObjectNotFoundException;
-
-    Schema findSchemaByQualifiedName(String qualifiedSchemaName)
-            throws ModelObjectNotFoundException;
-
-    Table findTableByQualifiedName(String qualifiedTableName)
-            throws ModelObjectNotFoundException;
-
-    Column findColumnByQualifiedName(String qualifiedColumnName)
-            throws ModelObjectNotFoundException;
-
-    Relationship findOneToManyRelationship(Table table, String relationshipName)
-            throws ModelObjectNotFoundException;
-
+    DataModel getDataModel();
 
     //--------------------------------------------------------------------------
     // Persistance

@@ -69,7 +69,8 @@ public final class ElementsProperties {
     //**************************************************************************
 
     private static final Properties properties;
-    private static final Logger logger =
+
+    public static final Logger logger =
             LogUtil.getLogger(ElementsProperties.class);
 
     static {

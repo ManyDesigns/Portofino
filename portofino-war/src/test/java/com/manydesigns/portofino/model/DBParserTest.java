@@ -98,7 +98,7 @@ public class DBParserTest extends TestCase {
                 "VARCHAR", true, 255, 0);
 
         PrimaryKey primaryKey0 = table0.getPrimaryKey();
-        assertEquals("pk_category", primaryKey0.getName());
+        assertEquals("pk_category", primaryKey0.getPkName());
         List<Column> pkColumns0 = primaryKey0.getColumns();
         assertEquals(1, pkColumns0.size());
         assertEquals(columns0.get(0), pkColumns0.get(0));
