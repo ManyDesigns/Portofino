@@ -75,6 +75,7 @@ public class TableDesignAction extends ActionSupport
 
     public void setContext(MDContext context) {
         this.context = context;
+        dataModel = context.getDataModel();
     }
 
     //--------------------------------------------------------------------------

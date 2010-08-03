@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.database;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.model.DataModel;
 import junit.framework.TestCase;
 
 import java.sql.SQLException;
@@ -45,11 +46,11 @@ public class JdbcMetadataReaderTest extends TestCase {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     ConnectionProvider connectionProvider;
-    JdbcMetadataReader jdbcMetadataReader;
+    DatabaseAbstraction databaseAbstraction;
 
     public void setUp() throws ClassNotFoundException {
         LogUtil.initializeLoggingSystem();
-        JdbcMetadataReader.logger.setLevel(Level.FINE);
+        CommonDatabaseAbstraction.logger.setLevel(Level.FINE);
         
         connectionProvider =
                 new JdbcConnectionProvider(
@@ -57,11 +58,17 @@ public class JdbcMetadataReaderTest extends TestCase {
                         "jdbc:postgresql://127.0.0.1:5432/jpetstore",
                         "manydesigns",
                         "manydesigns");
-        jdbcMetadataReader = new JdbcMetadataReader();
+        databaseAbstraction =
+                DatabaseAbstractionManager.getManager()
+                        .getDatabaseAbstraction(connectionProvider);
     }
 
     public void testReadModelFromConnection() throws SQLException {
-        jdbcMetadataReader.readModelFromConnection(
-                connectionProvider.getConnection(), "dbprova");
+        DataModel dataModel =
+                databaseAbstraction.readModelFromConnection("dbprova");
+        assertEquals(1, dataModel.getDatabases().size());
+        assertEquals(4, dataModel.getAllSchemas().size());
+        assertEquals(13, dataModel.getAllTables().size());
+        assertEquals(86, dataModel.getAllColumns().size());
     }
 }

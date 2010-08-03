@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.database;
 
+import com.manydesigns.portofino.model.DataModel;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -75,4 +77,8 @@ public interface DatabaseAbstraction {
     public Type[] getTypes();
 
     public Type getTypeByName(String typeName);
+
+    public DataModel readModelFromConnection(String databaseName)
+            throws SQLException;
+
 }

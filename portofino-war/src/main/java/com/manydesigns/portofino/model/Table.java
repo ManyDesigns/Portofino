@@ -29,11 +29,13 @@
 
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.elements.logging.LogUtil;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -55,6 +57,8 @@ public class Table {
     protected final List<Relationship> manyToOneRelationships;
     protected final List<Relationship> oneToManyRelationships;
     protected PrimaryKey primaryKey;
+
+    public static final Logger logger = LogUtil.getLogger(Table.class);
 
 
     //--------------------------------------------------------------------------
@@ -121,6 +125,21 @@ public class Table {
         return MessageFormat.format("{0}.{1}.{2}",
                 databaseName, schemaName, tableName);
     }
+
+    //--------------------------------------------------------------------------
+    // Search objects of a certain kind
+    //--------------------------------------------------------------------------
+
+    public Column findColumnByName(String columnName) {
+        for (Column column : columns) {
+            if (column.getColumnName().equals(columnName)) {
+                return column;
+            }
+        }
+        LogUtil.fineMF(logger, "Column not found: {0}", columnName);
+        return null;
+    }
+
 
     //--------------------------------------------------------------------------
     // toString()

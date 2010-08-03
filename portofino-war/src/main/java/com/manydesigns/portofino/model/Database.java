@@ -29,8 +29,11 @@
 
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.elements.logging.LogUtil;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -48,6 +51,8 @@ public class Database {
     protected String databaseName;
     protected Connection connection;
     protected final List<Schema> schemas;
+
+    public static final Logger logger = LogUtil.getLogger(Database.class);
 
 
     //--------------------------------------------------------------------------
@@ -81,5 +86,93 @@ public class Database {
 
     public List<Schema> getSchemas() {
         return schemas;
+    }
+
+    //--------------------------------------------------------------------------
+    // Get all objects of a certain kind
+    //--------------------------------------------------------------------------
+
+    public List<Table> getAllTables() {
+        List<Table> result = new ArrayList<Table>();
+        for (Schema schema : schemas) {
+            for (Table table : schema.getTables()) {
+                result.add(table);
+            }
+        }
+        return result;
+    }
+
+    public List<Column> getAllColumns() {
+        List<Column> result = new ArrayList<Column>();
+        for (Schema schema : schemas) {
+            for (Table table : schema.getTables()) {
+                for (Column column : table.getColumns()) {
+                    result.add(column);
+                }
+            }
+        }
+        return result;
+    }
+
+    //--------------------------------------------------------------------------
+    // Search objects of a certain kind
+    //--------------------------------------------------------------------------
+
+    public Schema findSchemaByQualifiedName(String qualifiedSchemaName) {
+        int lastDot = qualifiedSchemaName.lastIndexOf(".");
+        String schemaName = qualifiedSchemaName.substring(lastDot + 1);
+        for (Schema schema : schemas) {
+            if (schema.getSchemaName().equals(schemaName)) {
+                return schema;
+            }
+        }
+        LogUtil.fineMF(logger, "Schema not found: {0}", qualifiedSchemaName);
+        return null;
+    }
+
+    public Table findTableByQualifiedName(String qualifiedTableName) {
+        int lastDot = qualifiedTableName.lastIndexOf(".");
+        String qualifiedSchemaName = qualifiedTableName.substring(0, lastDot);
+        String tableName = qualifiedTableName.substring(lastDot + 1);
+        Schema schema = findSchemaByQualifiedName(qualifiedSchemaName);
+        if (schema != null) {
+            for (Table table : schema.getTables()) {
+                if (table.getTableName().equals(tableName)) {
+                    return table;
+                }
+            }
+        }
+        LogUtil.fineMF(logger, "Table not found: {0}", qualifiedTableName);
+        return null;
+    }
+
+    public Column findColumnByQualifiedName(String qualifiedColumnName) {
+        int lastDot = qualifiedColumnName.lastIndexOf(".");
+        String qualifiedTableName = qualifiedColumnName.substring(0, lastDot);
+        String columnName = qualifiedColumnName.substring(lastDot + 1);
+        Table table = findTableByQualifiedName(qualifiedTableName);
+        if (table != null) {
+            for (Column column : table.getColumns()) {
+                if (column.getColumnName().equals(columnName)) {
+                    return column;
+                }
+            }
+        }
+        LogUtil.fineMF(logger, "Column not found: {0}", qualifiedColumnName);
+        return null;
+    }
+
+    public Relationship findOneToManyRelationship(String qualifiedTableName,
+                                                  String relationshipName) {
+        Table table = findTableByQualifiedName(qualifiedTableName);
+        if (table != null) {
+            for (Relationship relationship : table.getOneToManyRelationships()) {
+                if (relationship.getRelationshipName().equals(relationshipName)) {
+                    return relationship;
+                }
+            }
+        }
+        LogUtil.fineMF(logger, "Relationship not found: {0}", relationshipName);
+        return null;
     }
 }

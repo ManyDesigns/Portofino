@@ -64,11 +64,6 @@ public class DataModel {
     // Get all objects of a certain kind
     //--------------------------------------------------------------------------
 
-    @SuppressWarnings({"unchecked"})
-    public List<Database> getAllDatabases() {
-        return (List<Database>) databases.clone();
-    }
-
     public List<Schema> getAllSchemas() {
         List<Schema> result = new ArrayList<Schema>();
         for (Database database : getDatabases()) {
