@@ -35,6 +35,7 @@ import com.manydesigns.portofino.database.DatabaseAbstraction;
 import com.manydesigns.portofino.database.DatabaseAbstractionManager;
 import com.manydesigns.portofino.database.HibernateConfig;
 import com.manydesigns.portofino.model.*;
+import com.manydesigns.portofino.model.io.DBParser;
 import com.manydesigns.portofino.search.HibernateCriteriaAdapter;
 import org.hibernate.Criteria;
 import org.hibernate.Session;

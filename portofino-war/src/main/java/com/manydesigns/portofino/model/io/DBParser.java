@@ -1,3 +1,6 @@
+package com.manydesigns.portofino.model.io;
+
+import com.manydesigns.portofino.model.*;
 /*
  * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
@@ -9,8 +12,8 @@
  * it under the terms of the GNU General Public License version 3 as published by
  * the Free Software Foundation.
  *
- * There are special exceptions to the terms and conditions of the GPL 
- * as it is applied to this software. View the full text of the 
+ * There are special exceptions to the terms and conditions of the GPL
+ * as it is applied to this software. View the full text of the
  * exception in file OPEN-SOURCE-LICENSE.txt in the directory of this
  * software distribution.
  *
@@ -26,17 +29,15 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.model;
-
-import org.apache.commons.lang.StringUtils;
-
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamConstants;
+import java.util.List;
+import java.util.ArrayList;
 import java.io.InputStream;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -353,14 +354,14 @@ public class DBParser {
                 List<String> expectedValList = new ArrayList<String>();
                 String name = null;
                 String type = null;
-                Class javaTypeClass = null;
+                Class javatype = null;
                 int length = 0;
                 boolean nullable = false;
                 int scale=0;
 
                 expectedValList.add("name");
                 expectedValList.add("columnType");
-//                expectedValList.add("javaType");
+                //expectedValList.add("javaType");
                 expectedValList.add("length");
                 expectedValList.add("nullable");
                 expectedValList.add("scale");
@@ -380,8 +381,8 @@ public class DBParser {
                         continue;
                     }
                     if (attName.equals("javaType")) {
-                        javaTypeClass = classLoader.loadClass(attValue);
-//                        expectedValList.remove(attName);
+                        javatype = Class.forName(attValue);
+                        //expectedValList.remove(attName);
                         continue;
                     }
                     if (attName.equals("length")) {
@@ -394,7 +395,7 @@ public class DBParser {
                         expectedValList.remove(attName);
                         continue;
                     }
-                   
+
                     if (attName.equals("scale")) {
                         scale = Integer.parseInt(attValue);
                         expectedValList.remove(attName);
@@ -412,7 +413,9 @@ public class DBParser {
                   table.getTableName(), name,
                   type, nullable, length,
                   scale);
-                col.setJavaType(javaTypeClass);
+                if(javatype!=null){
+                    col.setJavaType(javatype);    
+                }
 
                 table.getColumns().add(col);
 
@@ -676,117 +679,3 @@ public class DBParser {
     }
 }
 
-class RelationshipPre {
-    public String fromDB;
-    public String toDB;
-    public String fromSchema;
-    public String toSchema;
-    public String fromTable;
-    public String toTable;
-    public String relationshipName;
-    public String onUpdate;
-    public String onDelete;
-    List<ReferencePre>references = new ArrayList<ReferencePre>();
-
-    public String getFromTable() {
-        return fromTable;
-    }
-
-    public void setFromTable(String fromTable) {
-        this.fromTable = fromTable;
-    }
-
-    public String getToTable() {
-        return toTable;
-    }
-
-    public void setToTable(String toTable) {
-        this.toTable = toTable;
-    }
-
-    public String getRelationshipName() {
-        return relationshipName;
-    }
-
-    public void setRelationshipName(String relationshipName) {
-        this.relationshipName = relationshipName;
-    }
-
-    public String getOnUpdate() {
-        return onUpdate;
-    }
-
-    public void setOnUpdate(String onUpdate) {
-        this.onUpdate = onUpdate;
-    }
-
-    public String getOnDelete() {
-        return onDelete;
-    }
-
-    public void setOnDelete(String onDelete) {
-        this.onDelete = onDelete;
-    }
-
-    public List<ReferencePre> getReferences() {
-        return references;
-    }
-
-    public void setReferences(List<ReferencePre> references) {
-        this.references = references;
-    }
-
-    public String getFromDB() {
-        return fromDB;
-    }
-
-    public void setFromDB(String fromDB) {
-        this.fromDB = fromDB;
-    }
-
-    public String getToDB() {
-        return toDB;
-    }
-
-    public void setToDB(String toDB) {
-        this.toDB = toDB;
-    }
-
-    public String getFromSchema() {
-        return fromSchema;
-    }
-
-    public void setFromSchema(String fromSchema) {
-        this.fromSchema = fromSchema;
-    }
-
-    public String getToSchema() {
-        return toSchema;
-    }
-
-    public void setToSchema(String toSchema) {
-        this.toSchema = toSchema;
-    }
-}
-
-class ReferencePre {
-    public String fromColumn;
-    public String toColumn;
-
-
-    public String getFromColumn() {
-        return fromColumn;
-    }
-
-    public void setFromColumn(String fromColumn) {
-        this.fromColumn = fromColumn;
-    }
-
-    public String getToColumn() {
-        return toColumn;
-    }
-
-    public void setToColumn(String toColumn) {
-        this.toColumn = toColumn;
-    }
-}
