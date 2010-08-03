@@ -353,14 +353,14 @@ public class DBParser {
                 List<String> expectedValList = new ArrayList<String>();
                 String name = null;
                 String type = null;
-                String javatype = null;
+                Class javaTypeClass = null;
                 int length = 0;
                 boolean nullable = false;
                 int scale=0;
 
                 expectedValList.add("name");
                 expectedValList.add("columnType");
-                expectedValList.add("javaType");
+//                expectedValList.add("javaType");
                 expectedValList.add("length");
                 expectedValList.add("nullable");
                 expectedValList.add("scale");
@@ -380,8 +380,8 @@ public class DBParser {
                         continue;
                     }
                     if (attName.equals("javaType")) {
-                        javatype = attValue;
-                        expectedValList.remove(attName);
+                        javaTypeClass = classLoader.loadClass(attValue);
+//                        expectedValList.remove(attName);
                         continue;
                     }
                     if (attName.equals("length")) {
@@ -412,6 +412,8 @@ public class DBParser {
                   table.getTableName(), name,
                   type, nullable, length,
                   scale);
+                col.setJavaType(javaTypeClass);
+
                 table.getColumns().add(col);
 
 

@@ -147,7 +147,7 @@ public class DBParserTest extends TestCase {
                 "DECIMAL", false, 10, 2);
 
         PrimaryKey primaryKey2 = table2.getPrimaryKey();
-        assertEquals("pk_lineitem", primaryKey2.getName());
+        assertEquals("pk_lineitem", primaryKey2.getPkName());
         List<Column> pkColumns2 = primaryKey2.getColumns();
         assertEquals(2, pkColumns2.size());
         assertEquals(columns2.get(0), pkColumns2.get(0));

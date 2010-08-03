@@ -30,6 +30,9 @@
 package com.manydesigns.portofino.context;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.database.ConnectionProvider;
+import com.manydesigns.portofino.database.DatabaseAbstraction;
+import com.manydesigns.portofino.database.DatabaseAbstractionManager;
 import com.manydesigns.portofino.database.HibernateConfig;
 import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.search.HibernateCriteriaAdapter;
@@ -38,6 +41,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +62,7 @@ public class MDContextHibernateImpl implements MDContext {
 
     protected DataModel dataModel;
     protected Map<String, SessionFactory> sessionFactories;
+    protected Map<String, DatabaseAbstraction> databaseAbstractions;
     protected final ThreadLocal<Map<String, Session>> threadSessions;
 
     public static final Logger logger =
@@ -83,12 +88,31 @@ public class MDContextHibernateImpl implements MDContext {
             dataModel = parser.parse(resource);
             HibernateConfig builder = new HibernateConfig();
             sessionFactories = builder.build(dataModel);
+            databaseAbstractions = new HashMap<String, DatabaseAbstraction>();
+            openSession();
+            for (String databaseName : sessionFactories.keySet()) {
+                ConnectionProvider connectionProvider =
+                        new HibernateConnectionProvider(databaseName);
+                DatabaseAbstraction abstraction =
+                        DatabaseAbstractionManager.getManager()
+                                .getDatabaseAbstraction(connectionProvider);
+                databaseAbstractions.put(databaseName, abstraction);
+            }
+            closeSession();
         } catch (Exception e) {
             LogUtil.severeMF(logger, "Cannot load/parse model: {0}", e,
                     resource);
         }
 
         LogUtil.exiting(logger, "loadXmlModelAsResource");
+    }
+
+    //--------------------------------------------------------------------------
+    // Database stuff
+    //--------------------------------------------------------------------------
+
+    public DatabaseAbstraction getDatabaseAbstraction(String databaseName) {
+        return databaseAbstractions.get(databaseName);
     }
 
     //--------------------------------------------------------------------------
@@ -224,5 +248,18 @@ public class MDContextHibernateImpl implements MDContext {
                     obj.get(toColumn.getColumnName())));
         }
         return (List<Map<String, Object>>)criteria.list();
+    }
+
+    public class HibernateConnectionProvider implements ConnectionProvider {
+
+        protected final String databaseName;
+
+        public HibernateConnectionProvider(String databaseName) {
+            this.databaseName = databaseName;
+        }
+
+        public java.sql.Connection getConnection() throws SQLException {
+            return threadSessions.get().get(databaseName).connection();
+        }
     }
 }

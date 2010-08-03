@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.context;
 
 import com.manydesigns.elements.fields.search.Criteria;
+import com.manydesigns.portofino.database.DatabaseAbstraction;
 import com.manydesigns.portofino.model.DataModel;
 
 import java.util.HashMap;
@@ -51,6 +52,12 @@ public interface MDContext {
 
     void loadXmlModelAsResource(String resource);
 
+
+    //--------------------------------------------------------------------------
+    // Database stuff
+    //--------------------------------------------------------------------------
+
+    DatabaseAbstraction getDatabaseAbstraction(String databaseName);
 
     //--------------------------------------------------------------------------
     // Model access
