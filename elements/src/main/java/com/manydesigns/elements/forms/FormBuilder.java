@@ -206,6 +206,9 @@ public class FormBuilder {
                         classAccessor, propertyAccessor, prefix);
 
                 if (field == null) {
+                    LogUtil.warningMF(logger,
+                            "Cannot instanciate field for property {0}",
+                            propertyAccessor);
                     continue;
                 }
                 fieldSet.add(field);

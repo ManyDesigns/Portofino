@@ -27,39 +27,25 @@
  *
  */
 
-package com.manydesigns.elements.fields.helpers;
+package com.manydesigns.elements.annotations.impl;
 
-import com.manydesigns.elements.fields.BooleanField;
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.search.SearchField;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.annotations.Memory;
+
+import java.lang.annotation.Annotation;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class IntegerFieldHelper implements FieldHelper {
+@SuppressWarnings({"ClassExplicitlyAnnotation"})
+public class MemoryImpl implements Memory {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Field tryToInstantiateField(ClassAccessor classAccessor,
-                                  PropertyAccessor propertyAccessor,
-                                  String prefix) {
-        Field result;
-        if (propertyAccessor.isAssignableTo(Boolean.class)) {
-            result = new BooleanField(propertyAccessor, prefix);
-        } else if (propertyAccessor.isAssignableTo(Boolean.TYPE)) {
-            result = new BooleanField(propertyAccessor, prefix);
-            result.setRequired(true);
-        } else {
-            result = null;
-        }
-        return result;
-    }
+    public MemoryImpl() {}
 
-    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor, PropertyAccessor propertyAccessor, String prefix) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public Class<? extends Annotation> annotationType() {
+        return Memory.class;
     }
 }

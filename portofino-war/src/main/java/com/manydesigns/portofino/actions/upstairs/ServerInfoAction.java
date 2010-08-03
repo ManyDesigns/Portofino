@@ -29,6 +29,9 @@
 
 package com.manydesigns.portofino.actions.upstairs;
 
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.servlets.PortofinoServletContextListener;
 import com.opensymphony.xwork2.ActionSupport;
@@ -50,11 +53,33 @@ public class ServerInfoAction extends ActionSupport
     public String execute() {
         serverInfo = (ServerInfo)servletContext.getAttribute(
                 PortofinoServletContextListener.SERVER_INFO_ATTRIBUTE);
+        form = new FormBuilder(ServerInfo.class).
+                configFields("contextPath",
+                        "realPath",
+                        "servletContextName",
+                        "serverInfo",
+                        "servletApiVersion",
+                        "javaRuntimeName",
+                        "javaRuntimeVersion",
+                        "javaVmName",
+                        "javaVmVersion",
+                        "javaVmVendor",
+                        "osName",
+                        "userLanguage",
+                        "userRegion",
+                        "usedMemory",
+                        "totalMemory",
+                        "maxMemory",
+                        "availableProcessors")
+                .build();
+        form.setMode(Mode.VIEW);
+        form.readFromObject(serverInfo);
         return SUCCESS;
     }
 
     public ServletContext servletContext;
     public ServerInfo serverInfo;
+    public Form form;
 
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;

@@ -50,6 +50,10 @@ public class DummyPropertyAccessor implements PropertyAccessor {
         return name;
     }
 
+    public Class getType() {
+        return null;
+    }
+
     public int getModifiers() {
         return 0;
     }
@@ -68,7 +72,4 @@ public class DummyPropertyAccessor implements PropertyAccessor {
 
     public void set(Object obj, Object value) {}
 
-    public boolean isAssignableTo(Class clazz) {
-        return false;
-    }
 }

@@ -27,22 +27,48 @@
  *
  */
 
-package com.manydesigns.elements.annotations;
+package com.manydesigns.elements.fields.helpers;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.NumericField;
+import com.manydesigns.elements.fields.search.SearchField;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
-public @interface Phone {
+public class NumericFieldHelper implements FieldHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    public Field tryToInstantiateField(ClassAccessor classAccessor,
+                                  PropertyAccessor propertyAccessor,
+                                  String prefix) {
+        Class type = propertyAccessor.getType();
+        if (type == BigDecimal.class
+                || type == BigInteger.class
+                || type == Byte.class
+                || type == Byte.TYPE
+                || type == Short.class
+                || type == Short.TYPE
+                || type == Integer.class
+                || type == Integer.TYPE
+                || type == Long.class
+                || type == Long.TYPE
+                ) {
+            return new NumericField(propertyAccessor, prefix);
+        }
+
+        return null;
+    }
+
+    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor, PropertyAccessor propertyAccessor, String prefix) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

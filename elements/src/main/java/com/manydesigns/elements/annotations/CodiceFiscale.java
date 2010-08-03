@@ -40,7 +40,7 @@ import java.lang.annotation.Target;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.METHOD})
 public @interface CodiceFiscale {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";

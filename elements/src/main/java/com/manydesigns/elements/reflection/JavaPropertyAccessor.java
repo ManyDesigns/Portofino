@@ -57,6 +57,10 @@ public class JavaPropertyAccessor implements PropertyAccessor {
         return propertyDescriptor.getName();
     }
 
+    public Class getType() {
+        return getter.getReturnType();
+    }
+
     public int getModifiers() {
         return getter.getModifiers();
     }
@@ -75,9 +79,5 @@ public class JavaPropertyAccessor implements PropertyAccessor {
 
     public void set(Object obj, Object value) throws IllegalAccessException, InvocationTargetException {
         setter.invoke(obj, value);
-    }
-
-    public boolean isAssignableTo(Class clazz) {
-        return clazz.isAssignableFrom(getter.getReturnType());
     }
 }

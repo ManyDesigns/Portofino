@@ -43,6 +43,8 @@ public interface PropertyAccessor {
 
     public String getName();
 
+    public Class getType();
+
     public int getModifiers();
 
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass);
@@ -50,6 +52,4 @@ public interface PropertyAccessor {
 
     public Object get(Object obj) throws IllegalAccessException, InvocationTargetException;
     public void set(Object obj, Object value) throws IllegalAccessException, InvocationTargetException;
-
-    boolean isAssignableTo(Class clazz);
 }

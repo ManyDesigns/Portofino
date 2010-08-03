@@ -29,9 +29,7 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.annotations.MaxDecimalValue;
-import com.manydesigns.elements.annotations.MinDecimalValue;
-import com.manydesigns.elements.annotations.PrecisionScale;
+import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +44,7 @@ import java.text.ParsePosition;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DecimalField extends AbstractTextField {
+public class NumericField extends AbstractTextField {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -62,12 +60,26 @@ public class DecimalField extends AbstractTextField {
     //--------------------------------------------------------------------------
     // Costruttori
     //--------------------------------------------------------------------------
-    public DecimalField(PropertyAccessor accessor) {
+    public NumericField(PropertyAccessor accessor) {
         this(accessor, null);
     }
 
-    public DecimalField(PropertyAccessor accessor, String prefix) {
+    public NumericField(PropertyAccessor accessor, String prefix) {
         super(accessor, prefix);
+        Class type = accessor.getType();
+        if (type == Byte.class || type == Byte.TYPE) {
+            minValue = new BigDecimal(Byte.MIN_VALUE);
+            maxValue = new BigDecimal(Byte.MAX_VALUE);
+        } else if (type == Short.class || type == Short.TYPE) {
+            minValue = new BigDecimal(Short.MIN_VALUE);
+            maxValue = new BigDecimal(Short.MAX_VALUE);
+        } else if (type == Integer.class || type == Integer.TYPE) {
+            minValue = new BigDecimal(Integer.MIN_VALUE);
+            maxValue = new BigDecimal(Integer.MAX_VALUE);
+        } else if (type == Long.class || type == Long.TYPE) {
+            minValue = new BigDecimal(Long.MIN_VALUE);
+            maxValue = new BigDecimal(Long.MAX_VALUE);
+        }
         if (accessor.isAnnotationPresent(PrecisionScale.class)) {
             PrecisionScale annotation =
                     accessor.getAnnotation(PrecisionScale.class);
@@ -79,17 +91,34 @@ public class DecimalField extends AbstractTextField {
             maxValue = absMaxValue;
             minValue = absMaxValue.negate();
         }
+
         if (accessor.isAnnotationPresent(MinDecimalValue.class)) {
-            setMinValue(accessor.getAnnotation(MinDecimalValue.class).value());
+            double minDecimalValue =
+                    accessor.getAnnotation(MinDecimalValue.class).value();
+            minValue = new BigDecimal(minDecimalValue);
+        } else if (accessor.isAnnotationPresent(MinIntValue.class)) {
+            int minIntValue =
+                    accessor.getAnnotation(MinIntValue.class).value();
+            minValue = new BigDecimal(minIntValue);
         }
+
         if (accessor.isAnnotationPresent(MaxDecimalValue.class)) {
-            setMaxValue(accessor.getAnnotation(MaxDecimalValue.class).value());
+            double maxDecimalValue =
+                    accessor.getAnnotation(MaxDecimalValue.class).value();
+            maxValue = new BigDecimal(maxDecimalValue);
+        } else if (accessor.isAnnotationPresent(MaxIntValue.class)) {
+            int maxIntValue =
+                    accessor.getAnnotation(MaxIntValue.class).value();
+            minValue = new BigDecimal(maxIntValue);
         }
+
+        if (accessor.isAnnotationPresent(com.manydesigns.elements.annotations.Memory.class)) {
+            decimalFormat = new DecimalFormat("#,##0");
+        }
+
         if (accessor.isAnnotationPresent(com.manydesigns.elements.annotations.DecimalFormat.class)) {
-            DecimalFormat format =
-                    new DecimalFormat(accessor.getAnnotation(
+            decimalFormat = new DecimalFormat(accessor.getAnnotation(
                             com.manydesigns.elements.annotations.DecimalFormat.class).value());
-            setDecimalFormat(format);
         }
     }
 
@@ -173,7 +202,21 @@ public class DecimalField extends AbstractTextField {
             if (obj == null) {
                 decimalValue = null;
             } else {
-                decimalValue = (BigDecimal) accessor.get(obj);
+                Object value = accessor.get(obj);
+                Class type = accessor.getType();
+                if (type == BigDecimal.class) {
+                    decimalValue = (BigDecimal)value;
+                } else if (type == Byte.class || type == Byte.TYPE) {
+                    decimalValue = new BigDecimal((Byte)value);
+                } else if (type == Short.class || type == Short.TYPE) {
+                    decimalValue = new BigDecimal((Short)value);
+                } else if (type == Integer.class || type == Integer.TYPE) {
+                    decimalValue = new BigDecimal((Integer)value);
+                } else if (type == Long.class || type == Long.TYPE) {
+                    decimalValue = new BigDecimal((Long)value);
+                } else {
+                    throw new Error("Unknown type");
+                }
             }
             if (decimalValue == null) {
                 stringValue = null;
@@ -190,7 +233,22 @@ public class DecimalField extends AbstractTextField {
     }
 
     public void writeToObject(Object obj) {
-        writeToObject(obj, decimalValue);
+        Object value;
+        Class type = accessor.getType();
+        if (type == BigDecimal.class) {
+            value = decimalValue;
+        } else if (type == Byte.class || type == Byte.TYPE) {
+            value = decimalValue.byteValue();
+        } else if (type == Short.class || type == Short.TYPE) {
+            value = decimalValue.shortValue();
+        } else if (type == Integer.class || type == Integer.TYPE) {
+            value = decimalValue.intValue();
+        } else if (type == Long.class || type == Long.TYPE) {
+            value = decimalValue.longValue();
+        } else {
+            throw new Error("Unknown type");
+        }
+        writeToObject(obj, value);
     }
 
     //--------------------------------------------------------------------------
@@ -203,14 +261,6 @@ public class DecimalField extends AbstractTextField {
 
     public void setMinValue(BigDecimal minValue) {
         this.minValue = minValue;
-    }
-
-    public void setMinValue(Double minValue) {
-        if (minValue == null) {
-            this.minValue = null;
-        } else {
-            this.minValue = new BigDecimal(minValue);
-        }
     }
 
     public BigDecimal getMaxValue() {

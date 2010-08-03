@@ -48,7 +48,7 @@ public class SelectFieldHelper implements FieldHelper {
     public Field tryToInstantiateField(ClassAccessor classAccessor,
                                   PropertyAccessor propertyAccessor,
                                   String prefix) {
-        if (propertyAccessor.isAssignableTo(String.class)
+        if (String.class.isAssignableFrom(propertyAccessor.getType())
                 && propertyAccessor.isAnnotationPresent(Select.class)) {
                 return new SelectField(propertyAccessor, prefix);
         }

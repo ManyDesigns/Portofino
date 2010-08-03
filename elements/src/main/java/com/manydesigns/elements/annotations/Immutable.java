@@ -29,10 +29,10 @@
 
 package com.manydesigns.elements.annotations;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -40,7 +40,7 @@ import java.lang.annotation.ElementType;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.METHOD})
 public @interface Immutable {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";

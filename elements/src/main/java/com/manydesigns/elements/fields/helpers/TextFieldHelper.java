@@ -48,7 +48,7 @@ public class TextFieldHelper implements FieldHelper {
     public Field tryToInstantiateField(ClassAccessor classAccessor,
                                        PropertyAccessor propertyAccessor,
                                        String prefix) {
-        if (propertyAccessor.isAssignableTo(String.class)) {
+        if (String.class.isAssignableFrom(propertyAccessor.getType())) {
             return new TextField(propertyAccessor, prefix);
         }
         return null;
@@ -58,7 +58,7 @@ public class TextFieldHelper implements FieldHelper {
             ClassAccessor classAccessor,
             PropertyAccessor propertyAccessor,
             String prefix) {
-        if (propertyAccessor.isAssignableTo(String.class)) {
+        if (String.class.isAssignableFrom(propertyAccessor.getType())) {
             return new TextSearchField(propertyAccessor, prefix);
         }
         return null;

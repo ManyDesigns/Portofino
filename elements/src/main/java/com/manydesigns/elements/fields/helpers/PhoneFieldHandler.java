@@ -48,7 +48,7 @@ public class PhoneFieldHandler implements FieldHelper {
     public Field tryToInstantiateField(ClassAccessor classAccessor,
                                   PropertyAccessor propertyAccessor,
                                   String prefix) {
-        if (propertyAccessor.isAssignableTo(String.class)
+        if (String.class.isAssignableFrom(propertyAccessor.getType())
                 && propertyAccessor.isAnnotationPresent(Phone.class)) {
                 return new PhoneField(propertyAccessor, prefix);
         }

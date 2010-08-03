@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.context;
 
+import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.Memory;
 import com.manydesigns.elements.logging.LogUtil;
 
 import javax.servlet.ServletContext;
@@ -152,14 +154,17 @@ public class ServerInfo {
         return serverInfo;
     }
 
+    @Label("servlet API major")
     public int getServletApiMajor() {
         return servletApiMajor;
     }
 
+    @Label("servlet API minor")
     public int getServletApiMinor() {
         return servletApiMinor;
     }
 
+    @Label("servlet API version")
     public String getServletApiVersion() {
         return servletApiVersion;
     }
@@ -172,18 +177,22 @@ public class ServerInfo {
         return javaRuntimeVersion;
     }
 
+    @Label("Java VM name")
     public String getJavaVmName() {
         return javaVmName;
     }
 
+    @Label("Java VM version")
     public String getJavaVmVersion() {
         return javaVmVersion;
     }
 
+    @Label("Java VM vendor")
     public String getJavaVmVendor() {
         return javaVmVendor;
     }
 
+    @Label("OS name")
     public String getOsName() {
         return osName;
     }
@@ -196,18 +205,22 @@ public class ServerInfo {
         return userRegion;
     }
 
+    @Memory
     public long getFreeMemory() {
         return runTime.freeMemory();
     }
 
+    @Memory
     public long getUsedMemory() {
         return getTotalMemory() - getFreeMemory();
     }
 
+    @Memory
     public long getTotalMemory() {
         return runTime.totalMemory();
     }
 
+    @Memory
     public long getMaxMemory() {
         return runTime.maxMemory();
     }

@@ -49,7 +49,7 @@ public class DateFieldHelper implements FieldHelper {
     public Field tryToInstantiateField(ClassAccessor classAccessor,
                                   PropertyAccessor propertyAccessor,
                                   String prefix) {
-        if (propertyAccessor.isAssignableTo(Date.class)) {
+        if (Date.class.isAssignableFrom(propertyAccessor.getType())) {
             return new DateField(propertyAccessor, prefix);
         }
         return null;

@@ -29,8 +29,8 @@
 
 package com.manydesigns.elements.fields.helpers;
 
+import com.manydesigns.elements.fields.BooleanField;
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.IntegerField;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -48,10 +48,10 @@ public class BooleanFieldHelper implements FieldHelper {
                                   PropertyAccessor propertyAccessor,
                                   String prefix) {
         Field result;
-        if (propertyAccessor.isAssignableTo(Integer.class)) {
-            result = new IntegerField(propertyAccessor, prefix);
-        } else if (propertyAccessor.isAssignableTo(Integer.TYPE)) {
-            result = new IntegerField(propertyAccessor, prefix);
+        if (Boolean.class.isAssignableFrom(propertyAccessor.getType())) {
+            result = new BooleanField(propertyAccessor, prefix);
+        } else if (Boolean.TYPE.isAssignableFrom(propertyAccessor.getType())) {
+            result = new BooleanField(propertyAccessor, prefix);
             result.setRequired(true);
         } else {
             result = null;

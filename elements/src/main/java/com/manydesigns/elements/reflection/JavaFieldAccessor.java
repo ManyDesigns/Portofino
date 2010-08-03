@@ -51,6 +51,10 @@ public class JavaFieldAccessor implements PropertyAccessor {
         return field.getName();
     }
 
+    public Class getType() {
+        return field.getType();
+    }
+
     public int getModifiers() {
         return field.getModifiers();
     }
@@ -69,9 +73,5 @@ public class JavaFieldAccessor implements PropertyAccessor {
 
     public void set(Object obj, Object value) throws IllegalAccessException {
         field.set(obj, value);
-    }
-
-    public boolean isAssignableTo(Class clazz) {
-        return clazz.isAssignableFrom(field.getType());
     }
 }

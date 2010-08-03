@@ -88,6 +88,10 @@ public class ColumnAccessor implements PropertyAccessor {
         return column.getColumnName();
     }
 
+    public Class getType() {
+        return column.getJavaType();
+    }
+
     public int getModifiers() {
         return Modifier.PUBLIC;
     }
@@ -113,10 +117,6 @@ public class ColumnAccessor implements PropertyAccessor {
     @SuppressWarnings({"unchecked"})
     public void set(Object obj, Object value) throws IllegalAccessException {
         ((Map)obj).put(column.getColumnName(), value);
-    }
-
-    public boolean isAssignableTo(Class clazz) {
-        return clazz.isAssignableFrom(column.getJavaType());
     }
 
     //--------------------------------------------------------------------------
