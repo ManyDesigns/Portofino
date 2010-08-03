@@ -33,6 +33,8 @@ import junit.framework.TestCase;
 
 import java.util.List;
 
+import com.manydesigns.portofino.model.io.DBParser;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
