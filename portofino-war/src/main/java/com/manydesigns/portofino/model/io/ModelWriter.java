@@ -158,7 +158,6 @@ public class ModelWriter {
         w.writeAttribute("length", Integer.toString(column.getLength()));
         w.writeAttribute("scale", Integer.toString(column.getScale()));
         w.writeAttribute("nullable", Boolean.toString(column.isNullable()));
-        w.writeCharacters("\n");
         w.writeEndElement();//column
         w.writeCharacters("\n");
     }
