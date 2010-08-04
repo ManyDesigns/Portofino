@@ -117,14 +117,9 @@ public class DataModel {
     public Schema findSchemaByQualifiedName(String qualifiedSchemaName) {
         int lastDot = qualifiedSchemaName.lastIndexOf(".");
         String databaseName = qualifiedSchemaName.substring(0, lastDot);
-        String schemaName = qualifiedSchemaName.substring(lastDot + 1);
         Database database = findDatabaseByName(databaseName);
         if (database != null) {
-            for (Schema schema : database.getSchemas()) {
-                if (schema.getSchemaName().equals(schemaName)) {
-                    return schema;
-                }
-            }
+            return database.findSchemaByQualifiedName(qualifiedSchemaName);
         }
         LogUtil.fineMF(logger, "Schema not found: {0}", qualifiedSchemaName);
         return null;

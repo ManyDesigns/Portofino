@@ -29,9 +29,12 @@
 
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.elements.logging.LogUtil;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,6 +52,8 @@ public class Schema {
     protected String databaseName;
     protected String schemaName;
     protected final List<Table> tables;
+
+    public static final Logger logger = LogUtil.getLogger(Schema.class);
 
 
     //--------------------------------------------------------------------------
@@ -89,4 +94,63 @@ public class Schema {
         return MessageFormat.format("{0}.{1}", databaseName, schemaName);
     }
 
+        //--------------------------------------------------------------------------
+    // Get all objects of a certain kind
+    //--------------------------------------------------------------------------
+
+    public List<Column> getAllColumns() {
+        List<Column> result = new ArrayList<Column>();
+        for (Table table : tables) {
+            for (Column column : table.getColumns()) {
+                result.add(column);
+            }
+        }
+        return result;
+    }
+
+    //--------------------------------------------------------------------------
+    // Search objects of a certain kind
+    //--------------------------------------------------------------------------
+
+    public Table findTableByQualifiedName(String qualifiedTableName) {
+        int lastDot = qualifiedTableName.lastIndexOf(".");
+        String tableName = qualifiedTableName.substring(lastDot + 1);
+        for (Table table : tables) {
+            if (table.getTableName().equals(tableName)) {
+                return table;
+            }
+        }
+        LogUtil.fineMF(logger, "Table not found: {0}", qualifiedTableName);
+        return null;
+    }
+
+    public Column findColumnByQualifiedName(String qualifiedColumnName) {
+        int lastDot = qualifiedColumnName.lastIndexOf(".");
+        String qualifiedTableName = qualifiedColumnName.substring(0, lastDot);
+        String columnName = qualifiedColumnName.substring(lastDot + 1);
+        Table table = findTableByQualifiedName(qualifiedTableName);
+        if (table != null) {
+            for (Column column : table.getColumns()) {
+                if (column.getColumnName().equals(columnName)) {
+                    return column;
+                }
+            }
+        }
+        LogUtil.fineMF(logger, "Column not found: {0}", qualifiedColumnName);
+        return null;
+    }
+
+    public Relationship findOneToManyRelationship(String qualifiedTableName,
+                                                  String relationshipName) {
+        Table table = findTableByQualifiedName(qualifiedTableName);
+        if (table != null) {
+            for (Relationship relationship : table.getOneToManyRelationships()) {
+                if (relationship.getRelationshipName().equals(relationshipName)) {
+                    return relationship;
+                }
+            }
+        }
+        LogUtil.fineMF(logger, "Relationship not found: {0}", relationshipName);
+        return null;
+    }
 }
