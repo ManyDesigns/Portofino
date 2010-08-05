@@ -31,15 +31,16 @@ package com.manydesigns.portofino.context.hibernate;
 
 import com.manydesigns.portofino.database.DatabaseAbstraction;
 import com.manydesigns.portofino.database.DbUtil;
+import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.Type;
-import com.manydesigns.portofino.model.*;
+import com.manydesigns.portofino.model.Database;
+import com.manydesigns.portofino.model.Reference;
+import com.manydesigns.portofino.model.Relationship;
+import com.manydesigns.portofino.model.Schema;
 import org.hibernate.FetchMode;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Mappings;
 import org.hibernate.mapping.*;
-import org.hibernate.mapping.Column;
-import org.hibernate.mapping.PrimaryKey;
-import org.hibernate.mapping.Table;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,15 +65,16 @@ public class HibernateConfig {
             Configuration configuration = new Configuration()
                     .setProperty("default_entity_mode", "dynamic-map");
 
-            Connection connection = database.getConnection();
+            JdbcConnectionProvider connectionProvider = 
+                    (JdbcConnectionProvider)databaseAbstraction.getConnectionProvider();
             configuration.setProperty("hibernate.connection.url",
-                    connection.getConnectionUrl())
+                    connectionProvider.getJdbcConnectionURL())
                     .setProperty("hibernate.connection.driver_class",
-                            connection.getDriverClass())
+                            connectionProvider.getJdbcDriverClass())
                     .setProperty("hibernate.connection.username",
-                            connection.getUsername())
+                            connectionProvider.getJdbcUsername())
                     .setProperty("hibernate.connection.password",
-                            connection.getPassword())
+                            connectionProvider.getJdbcPassword())
                     .setProperty("hibernate.current_session_context_class",
                             "org.hibernate.context.ThreadLocalSessionContext")
                     .setProperty("hibernate.show_sql", "true");

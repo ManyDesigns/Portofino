@@ -47,6 +47,7 @@ public class HibernateTest extends TestCase {
 
     public void setUp() {
         context = new MDContextHibernateImpl();
+        context.loadConnectionsAsResource("portofino-connections.xml");
         context.loadXmlModelAsResource(
                 "databases/jpetstore/postgresql/jpetstore-postgres.xml");
         context.openSession();

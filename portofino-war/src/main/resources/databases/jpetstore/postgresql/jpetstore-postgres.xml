@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <datamodel>
     <database name="jpetstore">
-        <connection
-                type="jdbc"
-                driver="org.postgresql.Driver"
-                url="jdbc:postgresql://127.0.0.1:5432/jpetstore"
-                username="manydesigns"
-                password="manydesigns"/>
         <schemas>
             <schema name="public">
                 <tables>

@@ -49,7 +49,6 @@ public class Database {
     //--------------------------------------------------------------------------
 
     protected String databaseName;
-    protected Connection connection;
     protected final List<Schema> schemas;
 
     public static final Logger logger = LogUtil.getLogger(Database.class);
@@ -58,9 +57,8 @@ public class Database {
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
-    public Database(String databaseName, Connection connection) {
+    public Database(String databaseName) {
         this.databaseName = databaseName;
-        this.connection = connection;
         this.schemas = new ArrayList<Schema>();
     }
 
@@ -74,14 +72,6 @@ public class Database {
 
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
-    }
-
-    public Connection getConnection() {
-        return connection;
-    }
-
-    public void setConnection(Connection connection) {
-        this.connection = connection;
     }
 
     public List<Schema> getSchemas() {

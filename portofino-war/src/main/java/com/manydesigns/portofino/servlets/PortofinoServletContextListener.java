@@ -155,9 +155,12 @@ public class PortofinoServletContextListener implements ServletContextListener {
                         logger);
         mdContext = builder.createInstance(managerClassName);
 
+        mdContext.loadConnectionsAsResource(
+                portofinoProperties.getProperty(
+                        PortofinoProperties.CONNECTIONS_LOCATION_PROPERTY));
         mdContext.loadXmlModelAsResource(
-                    portofinoProperties.getProperty(
-                            PortofinoProperties.MODEL_LOCATION_PROPERTY));
+                portofinoProperties.getProperty(
+                        PortofinoProperties.MODEL_LOCATION_PROPERTY));
         servletContext.setAttribute(MDCONTEXT_ATTRIBUTE, mdContext);
     }
 

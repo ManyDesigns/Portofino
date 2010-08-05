@@ -36,6 +36,7 @@ import com.manydesigns.portofino.database.DatabaseAbstraction;
 import com.manydesigns.portofino.database.DatabaseAbstractionManager;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.model.*;
+import com.manydesigns.portofino.model.io.ConnectionsParser;
 import com.manydesigns.portofino.model.io.DBParser;
 import com.manydesigns.portofino.search.HibernateCriteriaAdapter;
 import org.apache.commons.lang.time.StopWatch;
@@ -64,6 +65,7 @@ public class MDContextHibernateImpl implements MDContext {
     // Fields
     //--------------------------------------------------------------------------
 
+    protected List<Connection> connections;
     protected DataModel dataModel;
     protected Map<String, HibernateDatabaseSetup> setups;
     protected final ThreadLocal<StopWatch> stopWatches;
@@ -76,17 +78,26 @@ public class MDContextHibernateImpl implements MDContext {
     //--------------------------------------------------------------------------
 
     public MDContextHibernateImpl() {
-        stopWatches = new ThreadLocal<StopWatch>() {
-            @Override
-            protected StopWatch initialValue() {
-                return new StopWatch();
-            }
-        };
+        stopWatches = new ThreadLocal<StopWatch>();
     }
 
     //--------------------------------------------------------------------------
     // Model loading
     //--------------------------------------------------------------------------
+
+    public void loadConnectionsAsResource(String resource) {
+        LogUtil.entering(logger, "loadConnectionsAsResource", resource);
+
+        ConnectionsParser parser = new ConnectionsParser();
+        try {
+            connections = parser.parse(resource);
+        } catch (Exception e) {
+            LogUtil.severeMF(logger, "Cannot load/parse connection: {0}", e,
+                    resource);
+        }
+
+        LogUtil.exiting(logger, "loadConnectionsAsResource");
+    }
 
     public void loadXmlModelAsResource(String resource) {
         LogUtil.entering(logger, "loadXmlModelAsResource", resource);
@@ -109,7 +120,9 @@ public class MDContextHibernateImpl implements MDContext {
                     new HashMap<String, HibernateDatabaseSetup>();
             for (Database database : newDataModel.getDatabases()) {
                 String databaseName = database.getDatabaseName();
-                Connection connection = database.getConnection();
+
+                Connection connection =
+                        findConnectionByDatabaseName(databaseName);
                 ConnectionProvider connectionProvider =
                         new JdbcConnectionProvider(
                                 connection.getDriverClass(),
@@ -137,6 +150,15 @@ public class MDContextHibernateImpl implements MDContext {
         }
     }
 
+    private Connection findConnectionByDatabaseName(String name) {
+        for (Connection current : connections) {
+            if (current.getDatabaseName().equals(name)) {
+                return current;
+            }
+        }
+        return null;
+    }
+
     //--------------------------------------------------------------------------
     // Database stuff
     //--------------------------------------------------------------------------
@@ -162,7 +184,6 @@ public class MDContextHibernateImpl implements MDContext {
                 Database syncDatabase =
                         abstraction.readModelFromConnection(
                                 database.getDatabaseName());
-                syncDatabase.setConnection(database.getConnection());
                 syncDataModel.getDatabases().add(syncDatabase);
 
                 installDataModel(syncDataModel);
@@ -319,7 +340,7 @@ public class MDContextHibernateImpl implements MDContext {
     //--------------------------------------------------------------------------
 
     public void resetDbTimer() {
-        stopWatches.get().reset();
+        stopWatches.set(null);
     }
 
     public long getDbTime() {
@@ -328,7 +349,9 @@ public class MDContextHibernateImpl implements MDContext {
 
     private void startTimer() {
         StopWatch stopWatch = stopWatches.get();
-        if (stopWatch.getTime() == 0) {
+        if (stopWatch == null) {
+            stopWatch = new StopWatch();
+            stopWatches.set(stopWatch);
             stopWatch.start();
         } else {
             stopWatch.resume();
@@ -336,6 +359,9 @@ public class MDContextHibernateImpl implements MDContext {
     }
 
     private void stopTimer() {
-        stopWatches.get().suspend();
+        StopWatch stopWatch = stopWatches.get();
+        if (stopWatch != null) {
+            stopWatch.suspend();
+        }
     }
 }

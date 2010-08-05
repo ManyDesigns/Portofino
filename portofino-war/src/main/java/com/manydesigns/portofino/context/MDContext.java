@@ -50,6 +50,7 @@ public interface MDContext {
     // Model loading
     //--------------------------------------------------------------------------
 
+    void loadConnectionsAsResource(String resource);
     void loadXmlModelAsResource(String resource);
 
 
@@ -99,4 +100,5 @@ public interface MDContext {
 
     void resetDbTimer();
     long getDbTime();
+
 }

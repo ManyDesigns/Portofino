@@ -37,11 +37,24 @@ package com.manydesigns.portofino.model;
 public class Connection {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+    protected String databaseName;
+    protected String type;
     protected String connectionUrl;
     protected String driverClass;
     protected String username;
     protected String password;
-    protected String type;
+
+    public Connection(String databaseName, String type,
+                      String connectionUrl, String driverClass,
+                      String username, String password
+    ) {
+        this.databaseName = databaseName;
+        this.type = type;
+        this.connectionUrl = connectionUrl;
+        this.driverClass = driverClass;
+        this.username = username;
+        this.password = password;
+    }
 
     public String getConnectionUrl() {
         return connectionUrl;
@@ -81,5 +94,9 @@ public class Connection {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
     }
 }

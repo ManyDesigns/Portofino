@@ -29,11 +29,10 @@
 
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.portofino.model.io.DBParser;
 import junit.framework.TestCase;
 
 import java.util.List;
-
-import com.manydesigns.portofino.model.io.DBParser;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -68,9 +67,6 @@ public class DBParserTest extends TestCase {
         Database database = databases.get(0);
         assertEquals("jpetstore", database.getDatabaseName());
 
-        Connection connection = database.getConnection();
-        assertNotNull(connection);
-
         List<Schema> schemas = database.getSchemas();
         assertEquals(1, schemas.size());
 
@@ -91,13 +87,13 @@ public class DBParserTest extends TestCase {
 
         checkColumn(columns0.get(0),
                 "jpetstore", "public", "category", "catid",
-                "VARCHAR", false, 10, 0);
+                "varchar", false, 10, 0);
         checkColumn(columns0.get(1),
                 "jpetstore", "public", "category", "name",
-                "VARCHAR", true, 80, 0);
+                "varchar", true, 80, 0);
         checkColumn(columns0.get(2),
                 "jpetstore", "public", "category", "descn",
-                "VARCHAR", true, 255, 0);
+                "varchar", true, 255, 0);
 
         PrimaryKey primaryKey0 = table0.getPrimaryKey();
         assertEquals("pk_category", primaryKey0.getPkName());
@@ -114,16 +110,16 @@ public class DBParserTest extends TestCase {
 
         checkColumn(columns1.get(0),
                 "jpetstore", "public", "product", "productid",
-                "VARCHAR", false, 10, 0);
+                "varchar", false, 10, 0);
         checkColumn(columns1.get(1),
                 "jpetstore", "public", "product", "category",
-                "VARCHAR", false, 10, 0);
+                "varchar", false, 10, 0);
         checkColumn(columns1.get(2),
                 "jpetstore", "public", "product", "name",
-                "VARCHAR", true, 80, 0);
+                "varchar", true, 80, 0);
         checkColumn(columns1.get(3),
                 "jpetstore", "public", "product", "descn",
-                "VARCHAR", true, 255, 0);
+                "varchar", true, 255, 0);
 
         // tabella 2
         Table table2 = tables.get(0);
@@ -134,19 +130,19 @@ public class DBParserTest extends TestCase {
 
         checkColumn(columns2.get(0),
                 "jpetstore", "public", "lineitem", "orderid",
-                "INTEGER", false, 8, 0);
+                "int4", false, 8, 0);
         checkColumn(columns2.get(1),
                 "jpetstore", "public", "lineitem", "linenum",
-                "INTEGER", false, 8, 0);
+                "int4", false, 8, 0);
         checkColumn(columns2.get(2),
                 "jpetstore", "public", "lineitem", "itemid",
-                "VARCHAR", false, 255, 0);
+                "varchar", false, 255, 0);
         checkColumn(columns2.get(3),
                 "jpetstore", "public", "lineitem", "quantity",
-                "INTEGER", false, 8, 0);
+                "int4", false, 8, 0);
         checkColumn(columns2.get(4),
                 "jpetstore", "public", "lineitem", "unitprice",
-                "DECIMAL", false, 10, 2);
+                "numeric", false, 10, 2);
 
         PrimaryKey primaryKey2 = table2.getPrimaryKey();
         assertEquals("pk_lineitem", primaryKey2.getPkName());

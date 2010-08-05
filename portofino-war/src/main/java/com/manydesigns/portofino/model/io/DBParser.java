@@ -1,43 +1,15 @@
 package com.manydesigns.portofino.model.io;
 
 import com.manydesigns.portofino.model.*;
-/*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
- * http://www.manydesigns.com/
- *
- * Unless you have purchased a commercial license agreement from ManyDesigns srl,
- * the following license terms apply:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 3 as published by
- * the Free Software Foundation.
- *
- * There are special exceptions to the terms and conditions of the GPL
- * as it is applied to this software. View the full text of the
- * exception in file OPEN-SOURCE-LICENSE.txt in the directory of this
- * software distribution.
- *
- * This program is distributed WITHOUT ANY WARRANTY; and without the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, see http://www.gnu.org/licenses/gpl.txt
- * or write to:
- * Free Software Foundation, Inc.,
- * 59 Temple Place - Suite 330,
- * Boston, MA  02111-1307  USA
- *
- */
+import org.apache.commons.lang.StringUtils;
+
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamConstants;
-import java.util.List;
-import java.util.ArrayList;
+import javax.xml.stream.XMLStreamReader;
 import java.io.InputStream;
 import java.text.MessageFormat;
-
-import org.apache.commons.lang.StringUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -130,8 +102,7 @@ public class DBParser {
                             ", attr name non presente");
                 }
 
-                Connection conn = doConnection(xmlStreamReader);
-                Database db = new Database(name, conn);
+                Database db = new Database(name);
                 dataModel.getDatabases().add(db);
                 doSchemas(xmlStreamReader, dataModel, db);
             }
@@ -148,74 +119,6 @@ public class DBParser {
         }
 
         createRelationshipsPost(dataModel);
-    }
-
-    private Connection doConnection(XMLStreamReader xmlStreamReader)
-            throws Exception {
-        Connection conn = new Connection();
-        int event = next(xmlStreamReader);
-        String lName = xmlStreamReader.getLocalName();
-        if (event == XMLStreamConstants.START_ELEMENT && lName.equals(CONNECTION)) {
-            String attName;
-            String attValue;
-            List<String> expectedValList = new ArrayList<String>();
-            expectedValList.add("type");
-            expectedValList.add("driver");
-            expectedValList.add("url");
-            expectedValList.add("username");
-            expectedValList.add("password");
-            for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
-                attName = xmlStreamReader.getAttributeLocalName(i);
-                attValue = xmlStreamReader.getAttributeValue(i);
-
-                if (attName.equals("type")) {
-                    expectedValList.remove(attName);
-                    conn.setType(attValue);
-                    continue;
-                }
-                if (attName.equals("driver")) {
-                    expectedValList.remove(attName);
-                    conn.setDriverClass(attValue);
-                    continue;
-                }
-                if (attName.equals("url")) {
-                    expectedValList.remove(attName);
-                    conn.setConnectionUrl(attValue);
-                    continue;
-                }
-                if (attName.equals("username")) {
-                    expectedValList.remove(attName);
-                    conn.setUsername(attValue);
-                    continue;
-                }
-                if (attName.equals("password")) {
-                    expectedValList.remove(attName);
-                    conn.setPassword(attValue);
-
-                }
-            }
-
-            if (expectedValList.size() != 0) {
-
-                throw new Exception(MessageFormat.format("Non sono presenti gli " +
-                        "attributi {0} di Connection",
-                        StringUtils.join(expectedValList, ", ")));
-            }
-
-
-            if (xmlStreamReader.hasNext()) {
-                event = next(xmlStreamReader);
-                lName = xmlStreamReader.getLocalName();
-                if (event != XMLStreamConstants.END_ELEMENT
-                        || !lName.equals(CONNECTION)) {
-                    throw new Exception(
-                            MessageFormat.format("TAG {0} non chiuso", CONNECTION));
-                }
-            }
-        } else {
-            throw new Exception("TAG Connection non presente");
-        }
-        return conn;
     }
 
     private void doSchemas(XMLStreamReader xmlStreamReader,

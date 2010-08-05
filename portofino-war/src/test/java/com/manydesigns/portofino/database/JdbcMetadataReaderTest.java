@@ -81,7 +81,7 @@ public class JdbcMetadataReaderTest extends TestCase {
         ModelDiff.logger.setLevel(Level.FINE);
 
 
-        Database database2 = new Database("pippo", null);
+        Database database2 = new Database("pippo");
         Schema schema2 = new Schema(database2.getDatabaseName(), "public");
         database2.getSchemas().add(schema2);
         Table table2 = new Table(schema2.getDatabaseName(),

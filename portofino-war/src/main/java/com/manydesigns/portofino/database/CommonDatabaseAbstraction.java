@@ -243,7 +243,7 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
 
     public Database readModelFromConnection(String databaseName)
             throws SQLException {
-        Database database = new Database(databaseName, null);
+        Database database = new Database(databaseName);
         Connection conn = null;
         try {
             conn = connectionProvider.acquireConnection();

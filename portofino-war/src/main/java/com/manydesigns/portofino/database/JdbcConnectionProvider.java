@@ -49,6 +49,7 @@ public class JdbcConnectionProvider implements ConnectionProvider {
     // Fields
     //--------------------------------------------------------------------------
 
+    private final String jdbcDriverClass;
     private final String jdbcConnectionURL;
     private final String jdbcUsername;
     private final String jdbcPassword;
@@ -61,10 +62,11 @@ public class JdbcConnectionProvider implements ConnectionProvider {
     // Constructors
     //--------------------------------------------------------------------------
 
-    public JdbcConnectionProvider(String jdbcDriverClass, String jdbcConnectionURL,
-                                 String jdbcUsername, String jdbcPassword)
-            throws ClassNotFoundException {
-        Class.forName(jdbcDriverClass);
+    public JdbcConnectionProvider(String jdbcDriverClass,
+                                  String jdbcConnectionURL,
+                                  String jdbcUsername,
+                                  String jdbcPassword) {
+        this.jdbcDriverClass = jdbcDriverClass;
         this.jdbcConnectionURL = jdbcConnectionURL;
         this.jdbcUsername = jdbcUsername;
         this.jdbcPassword = jdbcPassword;
@@ -77,6 +79,7 @@ public class JdbcConnectionProvider implements ConnectionProvider {
 
     public Connection acquireConnection() {
         try {
+            Class.forName(jdbcDriverClass);
             return DriverManager.getConnection(jdbcConnectionURL,
                     jdbcUsername, jdbcPassword);
         } catch (Throwable e) {
@@ -88,6 +91,26 @@ public class JdbcConnectionProvider implements ConnectionProvider {
 
     public void releaseConnection(Connection conn) {
         DbUtil.closeConnection(conn);
+    }
+
+    //--------------------------------------------------------------------------
+    // Getters
+    //--------------------------------------------------------------------------
+
+    public String getJdbcDriverClass() {
+        return jdbcDriverClass;
+    }
+
+    public String getJdbcConnectionURL() {
+        return jdbcConnectionURL;
+    }
+
+    public String getJdbcUsername() {
+        return jdbcUsername;
+    }
+
+    public String getJdbcPassword() {
+        return jdbcPassword;
     }
 
     //--------------------------------------------------------------------------
