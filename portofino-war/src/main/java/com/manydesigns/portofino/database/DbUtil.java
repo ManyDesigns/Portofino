@@ -139,7 +139,7 @@ public class DbUtil {
             return Hibernate.INTEGER;
         }
         if ("NUMERIC".equalsIgnoreCase(type)){
-            return Hibernate.FLOAT;
+            return Hibernate.DOUBLE;
         }
         if ("SMALLINT".equalsIgnoreCase(type)){
             return Hibernate.INTEGER;
@@ -149,6 +149,9 @@ public class DbUtil {
         }
         if ("TIMESTAMP".equalsIgnoreCase(type)){
             return Hibernate.TIMESTAMP;
+        }
+        if ("SERIAL".equalsIgnoreCase(type)){
+            return Hibernate.INTEGER;
         }
 
         return null;

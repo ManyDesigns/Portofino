@@ -73,6 +73,25 @@
                             <column name="catid"/>
                         </primaryKey>
                     </table>
+                    <table name="test">
+                        <columns>
+                            <column name="id_pk"
+                                    columnType="serial"
+                                    javaType="java.lang.Integer"
+                                    length="10"
+                                    scale = "0"
+                                    nullable="false"/>
+                            <column name="a"
+                                    columnType="varchar"
+                                    javaType="java.lang.String"
+                                    length="1"
+                                    scale="0"
+                                    nullable="true"/>
+                        </columns>
+                        <primaryKey name="pk_test">
+                            <column name="id_pk"/>
+                        </primaryKey>
+                    </table>
 
                     <table name="product">
                         <columns>

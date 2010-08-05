@@ -108,9 +108,17 @@ public class HibernateTest extends TestCase {
         lineItem.put("itemid",
           "test");
         lineItem.put("quantity", 20);
-        lineItem.put("unitprice", new BigDecimal(10.80));
+        lineItem.put("unitprice", 10.80);
 
         context.saveOrUpdateObject(lineItem);
+    }
+
+    public void testSaveTestElement() {
+        context.openSession();
+        Map<String, Object> lineItem = new HashMap<String, Object>();
+        lineItem.put("$type$", "jpetstore.public.test");
+        lineItem.put("a", "z");
+        context.saveObject(lineItem);
     }
 
 
