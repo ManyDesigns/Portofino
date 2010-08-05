@@ -29,9 +29,12 @@
 
 package com.manydesigns.portofino.database;
 
+import com.manydesigns.elements.logging.LogUtil;
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,6 +52,9 @@ public class JdbcConnectionProvider implements ConnectionProvider {
     private final String jdbcConnectionURL;
     private final String jdbcUsername;
     private final String jdbcPassword;
+
+    public static final Logger logger =
+            LogUtil.getLogger(JdbcConnectionProvider.class);
 
 
     //--------------------------------------------------------------------------
@@ -69,9 +75,31 @@ public class JdbcConnectionProvider implements ConnectionProvider {
     // Implementation of ConnectionProvider
     //--------------------------------------------------------------------------
 
-    public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(jdbcConnectionURL,
-                jdbcUsername, jdbcPassword);
+    public Connection acquireConnection() {
+        try {
+            return DriverManager.getConnection(jdbcConnectionURL,
+                    jdbcUsername, jdbcPassword);
+        } catch (Throwable e) {
+            LogUtil.severeMF(logger, "Could not acquire connection ({0})",
+                    e , this);
+            return null;
+        }
     }
 
+    public void releaseConnection(Connection conn) {
+        DbUtil.closeConnection(conn);
+    }
+
+    //--------------------------------------------------------------------------
+    // Other methods
+    //--------------------------------------------------------------------------
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("jdbcConnectionURL", jdbcConnectionURL)
+                .append("jdbcUsername", jdbcUsername)
+                .append("jdbcPassword", "********")
+                .toString();
+    }
 }

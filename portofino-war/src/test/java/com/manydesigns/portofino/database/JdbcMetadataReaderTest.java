@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.database;
 
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.portofino.model.DataModel;
 import com.manydesigns.portofino.model.Database;
 import com.manydesigns.portofino.model.Schema;
 import com.manydesigns.portofino.model.Table;
@@ -51,7 +50,7 @@ public class JdbcMetadataReaderTest extends TestCase {
 
     ConnectionProvider connectionProvider;
     DatabaseAbstraction databaseAbstraction;
-    DataModel dataModel;
+    Database database;
 
     public void setUp() throws ClassNotFoundException, SQLException {
         LogUtil.initializeLoggingSystem();
@@ -67,22 +66,20 @@ public class JdbcMetadataReaderTest extends TestCase {
                 DatabaseAbstractionManager.getManager()
                         .getDatabaseAbstraction(connectionProvider);
 
-        dataModel = databaseAbstraction.readModelFromConnection("dbprova");
+        database = databaseAbstraction.readModelFromConnection("dbprova");
     }
 
     public void testReadModelFromConnection() {
         CommonDatabaseAbstraction.logger.setLevel(Level.FINE);
 
-        assertEquals(1, dataModel.getDatabases().size());
-        assertEquals(4, dataModel.getAllSchemas().size());
-        assertEquals(13, dataModel.getAllTables().size());
-        assertEquals(86, dataModel.getAllColumns().size());
+        assertEquals(4, database.getSchemas().size());
+        assertEquals(13, database.getAllTables().size());
+        assertEquals(86, database.getAllColumns().size());
     }
 
     public void testDiff() {
         ModelDiff.logger.setLevel(Level.FINE);
 
-        Database database1 = dataModel.getDatabases().get(0);
 
         Database database2 = new Database("pippo", null);
         Schema schema2 = new Schema(database2.getDatabaseName(), "public");
@@ -92,7 +89,7 @@ public class JdbcMetadataReaderTest extends TestCase {
         schema2.getTables().add(table2);
 
         ModelDiff diff = new ModelDiff();
-        diff.diff(database1, database2);
+        diff.diff(database, database2);
 
         assertEquals(20, diff.size());
         assertEquals("Database names dbprova / pippo are different", diff.get(0));

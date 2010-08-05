@@ -1,0 +1,12 @@
+<connections>
+    <connection
+            databaseName="jpetstore"
+            type="jdbc"
+            driver="org.postgresql.Driver"
+            url="jdbc:postgresql://127.0.0.1:5432/jpetstore"
+            username="manydesigns"
+            password="manydesigns"
+            schemaInclude=".*"
+            schemaExclude=""
+            />
+</connections>

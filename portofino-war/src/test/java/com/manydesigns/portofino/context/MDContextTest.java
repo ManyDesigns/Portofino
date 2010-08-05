@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.context;
 
+import com.manydesigns.portofino.context.hibernate.MDContextHibernateImpl;
 import com.manydesigns.portofino.model.*;
 import junit.framework.TestCase;
 

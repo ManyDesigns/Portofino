@@ -34,8 +34,8 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.context.MDContextHibernateImpl;
 import com.manydesigns.portofino.context.ServerInfo;
+import com.manydesigns.portofino.context.hibernate.MDContextHibernateImpl;
 import org.apache.commons.lang.time.StopWatch;
 
 import javax.servlet.ServletContext;

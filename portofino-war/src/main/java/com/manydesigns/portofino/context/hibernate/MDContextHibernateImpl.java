@@ -27,19 +27,21 @@
  *
  */
 
-package com.manydesigns.portofino.context;
+package com.manydesigns.portofino.context.hibernate;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.context.MDContext;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DatabaseAbstraction;
 import com.manydesigns.portofino.database.DatabaseAbstractionManager;
-import com.manydesigns.portofino.database.HibernateConfig;
+import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.io.DBParser;
 import com.manydesigns.portofino.search.HibernateCriteriaAdapter;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 
 import java.sql.SQLException;
@@ -62,9 +64,7 @@ public class MDContextHibernateImpl implements MDContext {
     //--------------------------------------------------------------------------
 
     protected DataModel dataModel;
-    protected Map<String, SessionFactory> sessionFactories;
-    protected Map<String, DatabaseAbstraction> databaseAbstractions;
-    protected final ThreadLocal<Map<String, Session>> threadSessions;
+    protected Map<String, HibernateDatabaseSetup> setups;
 
     public static final Logger logger =
             LogUtil.getLogger(MDContextHibernateImpl.class);
@@ -74,7 +74,6 @@ public class MDContextHibernateImpl implements MDContext {
     //--------------------------------------------------------------------------
 
     public MDContextHibernateImpl() {
-        threadSessions = new ThreadLocal<Map<String, Session>>();
     }
 
     //--------------------------------------------------------------------------
@@ -86,20 +85,8 @@ public class MDContextHibernateImpl implements MDContext {
 
         DBParser parser = new DBParser();
         try {
-            dataModel = parser.parse(resource);
-            HibernateConfig builder = new HibernateConfig();
-            sessionFactories = builder.build(dataModel);
-            databaseAbstractions = new HashMap<String, DatabaseAbstraction>();
-            openSession();
-            for (String databaseName : sessionFactories.keySet()) {
-                ConnectionProvider connectionProvider =
-                        new HibernateConnectionProvider(databaseName);
-                DatabaseAbstraction abstraction =
-                        DatabaseAbstractionManager.getManager()
-                                .getDatabaseAbstraction(connectionProvider);
-                databaseAbstractions.put(databaseName, abstraction);
-            }
-            closeSession();
+            DataModel loadedDataModel = parser.parse(resource);
+            installDataModel(loadedDataModel);
         } catch (Exception e) {
             LogUtil.severeMF(logger, "Cannot load/parse model: {0}", e,
                     resource);
@@ -108,12 +95,46 @@ public class MDContextHibernateImpl implements MDContext {
         LogUtil.exiting(logger, "loadXmlModelAsResource");
     }
 
+    private synchronized void installDataModel(DataModel newDataModel) {
+        try {
+            HashMap<String, HibernateDatabaseSetup> newSetups =
+                    new HashMap<String, HibernateDatabaseSetup>();
+            for (Database database : newDataModel.getDatabases()) {
+                String databaseName = database.getDatabaseName();
+                Connection connection = database.getConnection();
+                ConnectionProvider connectionProvider =
+                        new JdbcConnectionProvider(
+                                connection.getDriverClass(),
+                                connection.getConnectionUrl(),
+                                connection.getUsername(),
+                                connection.getPassword());
+                DatabaseAbstraction abstraction =
+                        DatabaseAbstractionManager.getManager()
+                                .getDatabaseAbstraction(connectionProvider);
+                HibernateConfig builder = new HibernateConfig(abstraction);
+                Configuration configuration =
+                        builder.buildSessionFactory(database);
+                SessionFactory sessionFactory =
+                        configuration.buildSessionFactory();
+
+                HibernateDatabaseSetup setup =
+                        new HibernateDatabaseSetup(abstraction,
+                                configuration, sessionFactory);
+                newSetups.put(databaseName, setup);
+            }
+            setups = newSetups;
+            dataModel = newDataModel;
+        } catch (Exception e) {
+            LogUtil.severe(logger, "Cannot install model", e);
+        }
+    }
+
     //--------------------------------------------------------------------------
     // Database stuff
     //--------------------------------------------------------------------------
 
     public DatabaseAbstraction getDatabaseAbstraction(String databaseName) {
-        return databaseAbstractions.get(databaseName);
+        return setups.get(databaseName).getDatabaseAbstraction();
     }
 
     //--------------------------------------------------------------------------
@@ -122,6 +143,25 @@ public class MDContextHibernateImpl implements MDContext {
 
     public DataModel getDataModel() {
         return dataModel;
+    }
+
+    public void syncDataModel() {
+        DataModel syncDataModel = new DataModel();
+        try {
+            for (Database database : dataModel.getDatabases()) {
+                DatabaseAbstraction abstraction =
+                        getDatabaseAbstraction(database.getDatabaseName());
+                Database syncDatabase =
+                        abstraction.readModelFromConnection(
+                                database.getDatabaseName());
+                syncDatabase.setConnection(database.getConnection());
+                syncDataModel.getDatabases().add(syncDatabase);
+
+                installDataModel(syncDataModel);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -153,7 +193,7 @@ public class MDContextHibernateImpl implements MDContext {
     protected Session getSession(String qualifiedTableName) {
         Table table = dataModel.findTableByQualifiedName(qualifiedTableName);
         String databaseName = table.getDatabaseName();
-        return threadSessions.get().get(databaseName);
+        return setups.get(databaseName).getThreadSession();
     }
 
     public com.manydesigns.elements.fields.search.Criteria
@@ -203,26 +243,22 @@ public class MDContextHibernateImpl implements MDContext {
     }
 
     public void openSession() {
-        Map<String, Session> sessions = new HashMap<String, Session>();
-
-        for (Map.Entry<String, SessionFactory> current : sessionFactories.entrySet()) {
-            String databaseName = current.getKey();
-            SessionFactory sessionFactory = current.getValue();
+        for (HibernateDatabaseSetup current: setups.values()) {
+            SessionFactory sessionFactory = current.getSessionFactory();
             Session session = sessionFactory.openSession();
-            sessions.put(databaseName, session);
+            current.setThreadSession(session);
         }
-        threadSessions.set(sessions);
     }
 
 
     public void closeSession() {
-        Map<String, Session> sessions = threadSessions.get();
-
-        for (Session current : sessions.values()) {
-            current.close();
+        for (HibernateDatabaseSetup current: setups.values()) {
+            Session session = current.getThreadSession();
+            if (session != null) {
+                session.close();
+            }
+            current.setThreadSession(null);
         }
-
-        threadSessions.set(null);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -239,7 +275,7 @@ public class MDContextHibernateImpl implements MDContext {
         Table fromTable = relationship.getFromTable();
 
         Session session =
-                threadSessions.get().get(fromTable.getDatabaseName());
+                setups.get(fromTable.getDatabaseName()).getThreadSession();
         Criteria criteria =
                 session.createCriteria(fromTable.getQualifiedName());
         for (Reference reference : relationship.getReferences()) {
@@ -249,18 +285,5 @@ public class MDContextHibernateImpl implements MDContext {
                     obj.get(toColumn.getColumnName())));
         }
         return (List<Map<String, Object>>)criteria.list();
-    }
-
-    public class HibernateConnectionProvider implements ConnectionProvider {
-
-        protected final String databaseName;
-
-        public HibernateConnectionProvider(String databaseName) {
-            this.databaseName = databaseName;
-        }
-
-        public java.sql.Connection getConnection() throws SQLException {
-            return threadSessions.get().get(databaseName).connection();
-        }
     }
 }

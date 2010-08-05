@@ -50,8 +50,16 @@ public class ModelDiff extends ArrayList<String> {
 
     public static final Logger logger = LogUtil.getLogger(ModelDiff.class);
 
+    protected final String modelName1;
+    protected final String modelName2;
 
     public ModelDiff() {
+        this("Model 1", "Model 2");
+    }
+
+    public ModelDiff(String modelName1, String modelName2) {
+        this.modelName1 = modelName1;
+        this.modelName2 = modelName2;
     }
 
     public void diff(Database database1, Database database2) {
@@ -74,11 +82,11 @@ public class ModelDiff extends ArrayList<String> {
             Schema schema1 = database1.findSchemaByQualifiedName(schemaName);
             Schema schema2 = database2.findSchemaByQualifiedName(schemaName);
             if (schema1 == null) {
-                addDifference("Model 1 does not contain schema: {0}.{1}",
-                        databaseName1, schemaName);
+                addDifference("{0} does not contain schema: {1}.{2}",
+                        modelName1, databaseName1, schemaName);
             } else if (schema2 == null) {
-                addDifference("Model 2 does not contain schema: {0}.{1}",
-                        databaseName2, schemaName);
+                addDifference("{0} does not contain schema: {1}.{2}",
+                        modelName2, databaseName2, schemaName);
             } else {
                 commonSchemaNames.add(schemaName);
             }
@@ -113,11 +121,11 @@ public class ModelDiff extends ArrayList<String> {
             Table table1 = schema1.findTableByQualifiedName(tableName);
             Table table2 = schema2.findTableByQualifiedName(tableName);
             if (table1 == null) {
-                addDifference("Model 1 does not contain table: {0}.{1}.{2}",
-                        databaseName1, schemaName1, tableName);
+                addDifference("{0} does not contain table: {1}.{2}.{3}",
+                        modelName1, databaseName1, schemaName1, tableName);
             } else if (table2 == null) {
-                addDifference("Model 2 does not contain table: {0}.{1}.{2}",
-                        databaseName2, schemaName2, tableName);
+                addDifference("{0} does not contain table: {1}.{2}.{3}",
+                        modelName2, databaseName2, schemaName2, tableName);
             } else {
                 commonTableNames.add(tableName);
             }
@@ -155,11 +163,12 @@ public class ModelDiff extends ArrayList<String> {
             Column column1 = table1.findColumnByName(columnName);
             Column column2 = table2.findColumnByName(columnName);
             if (column1 == null) {
-                addDifference("Model 1 does not contain column: {0}.{1}.{2}.{3}",
-                        databaseName1, schemaName1, tableName1, columnName);
+                addDifference("{0} does not contain column: {1}.{2}.{3}.{4}",
+                        modelName1, databaseName1, schemaName1,
+                        tableName1, columnName);
             } else if (column2 == null) {
-                addDifference("Model 2 does not contain column: {0}.{1}.{2}.{3}",
-                        databaseName2, schemaName2, tableName2, columnName);
+                addDifference("{0} does not contain column: {1}.{2}.{3}.{4}",
+                        modelName2, databaseName2, schemaName2, tableName2, columnName);
             } else {
                 commonColumnNames.add(columnName);
             }
@@ -196,4 +205,12 @@ public class ModelDiff extends ArrayList<String> {
         }
     }
 
+
+    public String getModelName1() {
+        return modelName1;
+    }
+
+    public String getModelName2() {
+        return modelName2;
+    }
 }

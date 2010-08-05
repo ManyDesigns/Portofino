@@ -27,59 +27,57 @@
  *
  */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.context.hibernate;
 
-import com.manydesigns.portofino.model.Database;
-
-import java.sql.SQLException;
+import com.manydesigns.portofino.database.DatabaseAbstraction;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface DatabaseAbstraction {
+public class HibernateDatabaseSetup {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public String getDatabaseProductName();
+    protected final DatabaseAbstraction databaseAbstraction;
+    protected final Configuration configuration;
+    protected final SessionFactory sessionFactory;
+    protected final ThreadLocal<Session> threadSessions;
 
-    public String getDatabaseProductVersion();
+    public HibernateDatabaseSetup(DatabaseAbstraction databaseAbstraction,
+                                  Configuration configuration, SessionFactory sessionFactory
+    ) {
+        this.databaseAbstraction = databaseAbstraction;
+        this.sessionFactory = sessionFactory;
+        this.configuration = configuration;
+        threadSessions = new ThreadLocal<Session>();
+    }
 
-    public Integer getDatabaseMajorVersion();
+    public DatabaseAbstraction getDatabaseAbstraction() {
+        return databaseAbstraction;
+    }
 
-    public Integer getDatabaseMinorVersion();
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
 
-    public String getDatabaseMajorMinorVersion();
+    public Configuration getConfiguration() {
+        return configuration;
+    }
 
-    public String getDriverName();
+    public ThreadLocal<Session> getThreadSessions() {
+        return threadSessions;
+    }
 
-    public String getDriverVersion();
+    public Session getThreadSession() {
+        return threadSessions.get();
+    }
 
-    public Integer getDriverMajorVersion();
-
-    public Integer getDriverMinorVersion();
-
-    public String getDriverMajorMinorVersion();
-
-    public Integer getJDBCMajorVersion();
-
-    public Integer getJDBCMinorVersion();
-
-    public String getJDBCMajorMinorVersion();
-
-    public String getDriverClassName();
-
-    public ConnectionProvider getConnectionProvider();
-
-    public String getConnectionString(String host, int port, String dbName,
-            String login, String password);
-
-    public Type[] getTypes();
-
-    public Type getTypeByName(String typeName);
-
-    public Database readModelFromConnection(String databaseName)
-            throws SQLException;
-
+    public void setThreadSession(Session session) {
+        threadSessions.set(session);
+    }
 }

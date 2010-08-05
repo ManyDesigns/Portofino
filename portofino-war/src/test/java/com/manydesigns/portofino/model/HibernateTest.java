@@ -29,13 +29,13 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.context.MDContextHibernateImpl;
+import com.manydesigns.portofino.context.hibernate.MDContextHibernateImpl;
 import junit.framework.TestCase;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.math.BigDecimal;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com

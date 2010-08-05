@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.database;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,5 +40,6 @@ public interface ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Connection getConnection() throws SQLException;
+    public Connection acquireConnection();
+    public void releaseConnection(Connection conn);
 }

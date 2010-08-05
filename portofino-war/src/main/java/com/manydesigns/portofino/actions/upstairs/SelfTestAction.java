@@ -27,9 +27,16 @@
  *
  */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.actions.upstairs;
 
+import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.context.MDContext;
+import com.manydesigns.portofino.database.DatabaseAbstraction;
+import com.manydesigns.portofino.interceptors.MDContextAware;
+import com.manydesigns.portofino.model.DataModel;
 import com.manydesigns.portofino.model.Database;
+import com.manydesigns.portofino.model.diff.ModelDiff;
+import com.opensymphony.xwork2.ActionSupport;
 
 import java.sql.SQLException;
 
@@ -38,48 +45,37 @@ import java.sql.SQLException;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface DatabaseAbstraction {
+public class SelfTestAction extends ActionSupport implements MDContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public String getDatabaseProductName();
+    public MDContext context;
+    public DataModel dataModel;
+    public ModelDiff diff;
 
-    public String getDatabaseProductVersion();
+    public String skin = "default";
 
-    public Integer getDatabaseMajorVersion();
+    public void setContext(MDContext context) {
+        this.context = context;
+    }
 
-    public Integer getDatabaseMinorVersion();
+    public String execute() throws SQLException {
+        dataModel = context.getDataModel();
+        diff = new ModelDiff("In-memory model", "Database model");
+        for (Database database : dataModel.getDatabases()) {
+            DatabaseAbstraction abstraction =
+                    context.getDatabaseAbstraction(database.getDatabaseName());
+            Database database2 =
+                    abstraction.readModelFromConnection(database.getDatabaseName());
 
-    public String getDatabaseMajorMinorVersion();
+            diff.diff(database, database2);
+        }
+        return SUCCESS;
+    }
 
-    public String getDriverName();
-
-    public String getDriverVersion();
-
-    public Integer getDriverMajorVersion();
-
-    public Integer getDriverMinorVersion();
-
-    public String getDriverMajorMinorVersion();
-
-    public Integer getJDBCMajorVersion();
-
-    public Integer getJDBCMinorVersion();
-
-    public String getJDBCMajorMinorVersion();
-
-    public String getDriverClassName();
-
-    public ConnectionProvider getConnectionProvider();
-
-    public String getConnectionString(String host, int port, String dbName,
-            String login, String password);
-
-    public Type[] getTypes();
-
-    public Type getTypeByName(String typeName);
-
-    public Database readModelFromConnection(String databaseName)
-            throws SQLException;
-
+    public String sync() throws SQLException {
+        context.syncDataModel();
+        SessionMessages.addInfoMessage("In-memory model synchronized to database model");
+        return execute();
+    }
 }

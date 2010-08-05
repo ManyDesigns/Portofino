@@ -87,7 +87,7 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
         Connection conn = null;
         ResultSet typeRs = null;
         try {
-            conn = connectionProvider.getConnection();
+            conn = connectionProvider.acquireConnection();
 
             DatabaseMetaData metadata = conn.getMetaData();
 
@@ -160,7 +160,7 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
             typeList.toArray(types);
         } finally {
             DbUtil.closeResultSetAndStatement(typeRs);
-            DbUtil.closeConnection(conn);
+            connectionProvider.releaseConnection(conn);
         }
     }
 
@@ -220,31 +220,33 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
         return JDBCMajorMinorVersion;
     }
 
+    public ConnectionProvider getConnectionProvider() {
+        return connectionProvider;
+    }
+
     public Type[] getTypes() {
         return types.clone();
     }
 
     public Type getTypeByName(String typeName) {
         for (Type current : types) {
-            if (current.getTypeName().equals(typeName)) {
+            if (current.getTypeName().equalsIgnoreCase(typeName)) {
                 return current;
             }
         }
-        throw new Error(typeName);
+        return null;
     }
 
     //**************************************************************************
     // Read entire model
     //**************************************************************************
 
-    public DataModel readModelFromConnection(String databaseName)
+    public Database readModelFromConnection(String databaseName)
             throws SQLException {
-        DataModel dataModel = new DataModel();
         Database database = new Database(databaseName, null);
-        dataModel.getDatabases().add(database);
         Connection conn = null;
         try {
-            conn = connectionProvider.getConnection();
+            conn = connectionProvider.acquireConnection();
             DatabaseMetaData metadata = conn.getMetaData();
             readSchemas(metadata, database);
             readTables(metadata, database);
@@ -255,7 +257,7 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
             DbUtil.closeConnection(conn);
         }
 
-        return dataModel;
+        return database;
     }
 
 

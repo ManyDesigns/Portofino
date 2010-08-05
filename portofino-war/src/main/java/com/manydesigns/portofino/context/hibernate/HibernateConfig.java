@@ -26,12 +26,14 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.context.hibernate;
 
 
+import com.manydesigns.portofino.database.DatabaseAbstraction;
+import com.manydesigns.portofino.database.DbUtil;
+import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.*;
 import org.hibernate.FetchMode;
-import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Mappings;
 import org.hibernate.mapping.*;
@@ -39,9 +41,10 @@ import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PrimaryKey;
 import org.hibernate.mapping.Table;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -50,54 +53,54 @@ import java.util.Map;
  */
 public class HibernateConfig {
 
-    protected final Map<String, SessionFactory> sessionFactories =
-            new HashMap<String, SessionFactory>();
+    protected final DatabaseAbstraction databaseAbstraction;
 
-    protected void buildSessionFactory(DataModel model) {
+    public HibernateConfig(DatabaseAbstraction databaseAbstraction) {
+        this.databaseAbstraction = databaseAbstraction;
+    }
+
+    public Configuration buildSessionFactory(Database database) {
         try {
-            for (Database database : model.getDatabases()) {
-                Configuration configuration = new Configuration()
-                        .setProperty("default_entity_mode", "dynamic-map");
+            Configuration configuration = new Configuration()
+                    .setProperty("default_entity_mode", "dynamic-map");
 
-                Connection connection = database.getConnection();
-                configuration.setProperty("hibernate.connection.url",
-                        connection.getConnectionUrl())
-                        .setProperty("hibernate.connection.driver_class",
-                                connection.getDriverClass())
-                        .setProperty("hibernate.connection.username",
-                                connection.getUsername())
-                        .setProperty("hibernate.connection.password",
-                                connection.getPassword())
-                        .setProperty("hibernate.current_session_context_class",
-                                "org.hibernate.context.ThreadLocalSessionContext")
-                        .setProperty("hibernate.show_sql", "true");
+            Connection connection = database.getConnection();
+            configuration.setProperty("hibernate.connection.url",
+                    connection.getConnectionUrl())
+                    .setProperty("hibernate.connection.driver_class",
+                            connection.getDriverClass())
+                    .setProperty("hibernate.connection.username",
+                            connection.getUsername())
+                    .setProperty("hibernate.connection.password",
+                            connection.getPassword())
+                    .setProperty("hibernate.current_session_context_class",
+                            "org.hibernate.context.ThreadLocalSessionContext")
+                    .setProperty("hibernate.show_sql", "true");
 
-                Mappings mappings = configuration.createMappings();
-                for (Schema schema : database.getSchemas()) {
-                    for (com.manydesigns.portofino.model.Table aTable :
-                            schema.getTables()) {
-                        RootClass clazz = createTableMapping(configuration,
-                                mappings, aTable);
-                        mappings.addClass(clazz);
-                        mappings.addImport(clazz.getEntityName(),
-                                aTable.getTableName());
-                        mappings.addImport(clazz.getEntityName(),
-                                clazz.getEntityName());
+            Mappings mappings = configuration.createMappings();
+            for (Schema schema : database.getSchemas()) {
+                for (com.manydesigns.portofino.model.Table aTable :
+                        schema.getTables()) {
+                    RootClass clazz = createTableMapping(configuration,
+                            mappings, aTable);
+                    mappings.addClass(clazz);
+                    mappings.addImport(clazz.getEntityName(),
+                            aTable.getTableName());
+                    mappings.addImport(clazz.getEntityName(),
+                            clazz.getEntityName());
 
-                    }
                 }
-
-               for (Schema schema : database.getSchemas()) {
-                    for (com.manydesigns.portofino.model.Table aTable :
-                            schema.getTables()) {
-                        for (Relationship rel: aTable.getOneToManyRelationships()) {
-                            createO2M(configuration, mappings, rel);
-                        }
-                    }
-                }
-                sessionFactories.put(database.getDatabaseName(),
-                        configuration.buildSessionFactory());
             }
+
+           for (Schema schema : database.getSchemas()) {
+                for (com.manydesigns.portofino.model.Table aTable :
+                        schema.getTables()) {
+                    for (Relationship rel: aTable.getOneToManyRelationships()) {
+                        createO2M(configuration, mappings, rel);
+                    }
+                }
+            }
+            return configuration;
         }
         catch (Throwable ex) {
             // Make sure you log the exception, as it might be swallowed
@@ -150,15 +153,22 @@ public class HibernateConfig {
                         com.manydesigns.portofino.model.Column column) {
         Column col = new Column();
         col.setName(column.getColumnName());
-        col.setSqlTypeCode(DbUtil.getSQLType(column.getColumnType()));
+
+        String columnType = column.getColumnType();
+        System.out.println("Column type: " + columnType);
+
+        Type type = databaseAbstraction.getTypeByName(columnType);
+        System.out.println("Portofino type: " + type);
+        col.setSqlTypeCode(type.getDataType());
 
         Property prop = new Property();
         prop.setName(column.getColumnName());
         prop.setNodeName(column.getColumnName());
         SimpleValue value = new SimpleValue();
         value.setTable(tab);
-        value.setTypeName(DbUtil.getHibernateType(column.getColumnType())
-                .getName());
+        org.hibernate.type.Type hibernateType = DbUtil.getHibernateType(columnType);
+        System.out.println("Hibernate type: " + hibernateType);
+        value.setTypeName(hibernateType.getName());
         value.addColumn(col);
         tab.addColumn(col);
         prop.setValue(value);
@@ -319,8 +329,4 @@ public class HibernateConfig {
 
     }
 
-   public Map<String, SessionFactory> build(DataModel model) {
-        buildSessionFactory(model);
-        return sessionFactories;
-   }
 }

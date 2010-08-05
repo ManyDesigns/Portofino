@@ -77,21 +77,17 @@ public class DatabaseAbstractionManager {
     public DatabaseAbstraction getDatabaseAbstraction(
             ConnectionProvider connectionProvider) {
         String databaseProductName;
+        Connection conn = null;
         try {
-            Connection conn = connectionProvider.getConnection();
+            conn = connectionProvider.acquireConnection();
             databaseProductName = conn.getMetaData().getDatabaseProductName();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            LogUtil.severeMF(logger,
+                    "Could not create database abstraction for {0}",
+                    e, connectionProvider);
             return null;
         } finally {
-            /*
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception e) {
-                }
-            }
-    */
+            connectionProvider.releaseConnection(conn);
         }
 
         LogUtil.fineMF(logger, "Database product name: {0}", databaseProductName);

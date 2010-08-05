@@ -146,5 +146,9 @@
                 <param name="bufferSize">1024</param>
             </result>
         </action>
+        <action name="SelfTest"
+                class="com.manydesigns.portofino.actions.upstairs.SelfTestAction">
+            <result name="success">/skins/default/upstairs/selfTest.jsp</result>
+        </action>
     </package>
 </struts>

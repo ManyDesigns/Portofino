@@ -35,7 +35,6 @@ import org.hibernate.Hibernate;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.logging.Logger;
 
 /*
@@ -98,56 +97,6 @@ public class DbUtil {
         }
     }
 
-    public static int getSQLType(String type) {
-        if ("VARCHAR".equalsIgnoreCase(type)){
-            return Types.VARCHAR;
-        }
-        if ("BIT".equalsIgnoreCase(type)){
-            return Types.BIT;
-        }
-        if ("BLOB".equalsIgnoreCase(type)){
-            return Types.BLOB;
-        }
-        if ("BOOLEAN".equalsIgnoreCase(type)){
-            return Types.BOOLEAN;
-        }
-        if ("CHAR".equalsIgnoreCase(type)){
-            return Types.CHAR;
-        }
-        if ("CLOB".equalsIgnoreCase(type)){
-            return Types.CLOB;
-        }
-        if ("DATE".equalsIgnoreCase(type)){
-            return Types.DATE;
-        }
-        if ("DECIMAL".equalsIgnoreCase(type)){
-            return Types.DECIMAL;
-        }
-        if ("DOUBLE".equalsIgnoreCase(type)){
-            return Types.DOUBLE;
-        }
-        if ("FLOAT".equalsIgnoreCase(type)){
-            return Types.FLOAT;
-        }
-        if ("INTEGER".equalsIgnoreCase(type)){
-            return Types.INTEGER;
-        }
-        if ("NUMERIC".equalsIgnoreCase(type)){
-            return Types.NUMERIC;
-        }
-        if ("SMALLINT".equalsIgnoreCase(type)){
-            return Types.SMALLINT;
-        }
-        if ("TIME".equalsIgnoreCase(type)){
-            return Types.TIME;
-        }
-        if ("TIMESTAMP".equalsIgnoreCase(type)){
-            return Types.TIMESTAMP;
-        }
-
-        return 0;
-    }
-
 
     public static org.hibernate.type.Type getHibernateType(String type) {
         if ("VARCHAR".equalsIgnoreCase(type)){
@@ -157,6 +106,9 @@ public class DbUtil {
             return Hibernate.BYTE;
         }
         if ("BOOLEAN".equalsIgnoreCase(type)){
+            return Hibernate.BOOLEAN;
+        }
+        if ("BOOL".equalsIgnoreCase(type)){
             return Hibernate.BOOLEAN;
         }
         if ("CHAR".equalsIgnoreCase(type)){
@@ -181,6 +133,9 @@ public class DbUtil {
             return Hibernate.FLOAT;
         }
         if ("INTEGER".equalsIgnoreCase(type)){
+            return Hibernate.INTEGER;
+        }
+        if ("INT4".equalsIgnoreCase(type)){
             return Hibernate.INTEGER;
         }
         if ("NUMERIC".equalsIgnoreCase(type)){

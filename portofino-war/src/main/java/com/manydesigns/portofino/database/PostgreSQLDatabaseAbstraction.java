@@ -29,8 +29,6 @@
 
 package com.manydesigns.portofino.database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 
@@ -58,13 +56,10 @@ public class PostgreSQLDatabaseAbstraction extends CommonDatabaseAbstraction {
     // Implementation of DatabaseAbstraction
     //--------------------------------------------------------------------------
 
-    public Connection getConnection(String host, int port, String dbName,
-            String login, String password) throws SQLException {
-        return DriverManager.getConnection(
-                MessageFormat.format(
-                        "jdbc:postgresql://{0}:{1}/{2}",
-                        host, port, dbName),
-                login, password);
+    public String getConnectionString(String host, int port, String dbName,
+            String login, String password) {
+        return MessageFormat.format("jdbc:postgresql://{0}:{1}/{2}",
+                host, port, dbName);
     }
 
     public String getDriverClassName() {
