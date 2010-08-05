@@ -79,6 +79,7 @@ public class PortofinoInterceptor implements Interceptor {
             MDContext mdContext =
                     (MDContext)servletContext.getAttribute(
                             PortofinoServletContextListener.MDCONTEXT_ATTRIBUTE);
+            mdContext.resetDbTimer();
             ((MDContextAware)action).setContext(mdContext);
 
             try {

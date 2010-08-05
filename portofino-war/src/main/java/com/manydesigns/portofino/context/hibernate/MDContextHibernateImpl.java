@@ -38,6 +38,7 @@ import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.io.DBParser;
 import com.manydesigns.portofino.search.HibernateCriteriaAdapter;
+import org.apache.commons.lang.time.StopWatch;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -65,6 +66,7 @@ public class MDContextHibernateImpl implements MDContext {
 
     protected DataModel dataModel;
     protected Map<String, HibernateDatabaseSetup> setups;
+    protected final ThreadLocal<StopWatch> stopWatches;
 
     public static final Logger logger =
             LogUtil.getLogger(MDContextHibernateImpl.class);
@@ -74,6 +76,12 @@ public class MDContextHibernateImpl implements MDContext {
     //--------------------------------------------------------------------------
 
     public MDContextHibernateImpl() {
+        stopWatches = new ThreadLocal<StopWatch>() {
+            @Override
+            protected StopWatch initialValue() {
+                return new StopWatch();
+            }
+        };
     }
 
     //--------------------------------------------------------------------------
@@ -177,8 +185,11 @@ public class MDContextHibernateImpl implements MDContext {
                                              HashMap<String, Object> pk) {
         Session session = getSession(qualifiedTableName);
 
-        //noinspection unchecked
-        return (Map<String, Object>)session.load(qualifiedTableName, pk);
+        startTimer();
+        @SuppressWarnings({"unchecked"}) Map<String, Object> result =
+                (Map<String, Object>)session.load(qualifiedTableName, pk);
+        stopTimer();
+        return result;
     }
 
 
@@ -186,8 +197,11 @@ public class MDContextHibernateImpl implements MDContext {
         Session session = getSession(qualifiedTableName);
 
         Criteria hibernateCriteria = session.createCriteria(qualifiedTableName);
+        startTimer();
         //noinspection unchecked
-        return hibernateCriteria.list();
+        List<Map<String, Object>> result = hibernateCriteria.list();
+        stopTimer();
+        return result;
     }
 
     protected Session getSession(String qualifiedTableName) {
@@ -209,8 +223,11 @@ public class MDContextHibernateImpl implements MDContext {
                 (HibernateCriteriaAdapter)criteria;
         Criteria hibernateCriteria =
                 hibernateCriteriaAdapter.getHibernateCriteria();
+        startTimer();
         //noinspection unchecked
-        return hibernateCriteria.list();
+        List<Map<String, Object>> result = hibernateCriteria.list();
+        stopTimer();
+        return result;
     }
 
     public void saveOrUpdateObject(Map<String, Object> obj) {
@@ -223,21 +240,27 @@ public class MDContextHibernateImpl implements MDContext {
     public void saveObject(Map<String, Object> obj) {
         Session session = getSession((String) obj.get("$type$"));
         session.beginTransaction();
+        startTimer();
         session.save((String) obj.get("$type$"), obj);
+        stopTimer();
         session.getTransaction().commit();
     }
 
     public void updateObject(Map<String, Object> obj) {
         Session session = getSession((String) obj.get("$type$"));
         session.beginTransaction();
+        startTimer();
         session.update((String) obj.get("$type$"), obj);
+        stopTimer();
         session.getTransaction().commit();
     }
 
     public void deleteObject(Map<String, Object> obj) {
         Session session = getSession((String) obj.get("$type$"));
         session.beginTransaction();
+        startTimer();
         session.delete((String) obj.get("$type$"), obj);
+        stopTimer();
         session.getTransaction().commit();
 
     }
@@ -284,6 +307,35 @@ public class MDContextHibernateImpl implements MDContext {
             criteria.add(Restrictions.eq(fromColumn.getColumnName(),
                     obj.get(toColumn.getColumnName())));
         }
-        return (List<Map<String, Object>>)criteria.list();
+        startTimer();
+        //noinspection unchecked
+        List<Map<String, Object>> result = criteria.list();
+        stopTimer();
+        return result;
+    }
+
+    //--------------------------------------------------------------------------
+    // Timers
+    //--------------------------------------------------------------------------
+
+    public void resetDbTimer() {
+        stopWatches.get().reset();
+    }
+
+    public long getDbTime() {
+        return stopWatches.get().getTime();
+    }
+
+    private void startTimer() {
+        StopWatch stopWatch = stopWatches.get();
+        if (stopWatch.getTime() == 0) {
+            stopWatch.start();
+        } else {
+            stopWatch.resume();
+        }
+    }
+
+    private void stopTimer() {
+        stopWatches.get().suspend();
     }
 }

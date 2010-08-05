@@ -96,4 +96,7 @@ public interface MDContext {
 
     List<Map<String, Object>> getRelatedObjects(
             Map<String, Object> obj, String oneToManyRelationshipName);
+
+    void resetDbTimer();
+    long getDbTime();
 }
