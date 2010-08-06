@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.io.Serializable;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -185,11 +186,26 @@ public class MDContextHibernateImpl implements MDContext {
                                              HashMap<String, Object> pk) {
         Session session = getSession(qualifiedTableName);
 
-        startTimer();
-        @SuppressWarnings({"unchecked"}) Map<String, Object> result =
-                (Map<String, Object>)session.load(qualifiedTableName, pk);
-        stopTimer();
-        return result;
+        if (pk.size()>2){
+            startTimer();
+            @SuppressWarnings({"unchecked"}) Map<String, Object> result =
+                    (Map<String, Object>)session.load(qualifiedTableName, pk);
+            stopTimer();
+            return result;
+        } else {
+            startTimer();
+            for (Map.Entry entry : pk.entrySet()){
+                if (((String)entry.getKey()).startsWith("$")) {
+                    continue;
+                }
+                @SuppressWarnings({"unchecked"}) Map<String, Object> result =
+                        (Map<String, Object>)session.load(qualifiedTableName,
+                                (Serializable) entry.getValue());
+                stopTimer();
+                return result;
+            }
+            return null;
+        }
     }
 
 

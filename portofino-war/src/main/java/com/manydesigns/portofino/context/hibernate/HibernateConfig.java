@@ -81,7 +81,6 @@ public class HibernateConfig {
                     .setProperty("hibernate.show_sql", "true");
 
 
-
             Mappings mappings = configuration.createMappings();
             for (Schema schema : database.getSchemas()) {
                 for (com.manydesigns.portofino.model.Table aTable :
@@ -96,10 +95,10 @@ public class HibernateConfig {
                 }
             }
 
-           for (Schema schema : database.getSchemas()) {
+            for (Schema schema : database.getSchemas()) {
                 for (com.manydesigns.portofino.model.Table aTable :
                         schema.getTables()) {
-                    for (Relationship rel: aTable.getOneToManyRelationships()) {
+                    for (Relationship rel : aTable.getOneToManyRelationships()) {
                         createO2M(configuration, mappings, rel);
                     }
                 }
@@ -115,18 +114,18 @@ public class HibernateConfig {
     }
 
     protected RootClass createTableMapping(Configuration conf, Mappings mappings,
-                         com.manydesigns.portofino.model.Table aTable) {
+                                           com.manydesigns.portofino.model.Table aTable) {
 
 
         RootClass clazz = new RootClass();
         clazz.setEntityName(aTable.getQualifiedName());
         clazz.setLazy(true);
         Table tab = mappings.addTable(aTable.getSchemaName(), null,
-                aTable.getTableName() ,null, false);
+                aTable.getTableName(), null, false);
         tab.setName(aTable.getTableName());
         tab.setSchema(aTable.getSchemaName());
         mappings.addTableBinding(aTable.getSchemaName(), null,
-                aTable.getTableName(), aTable.getTableName(), null );
+                aTable.getTableName(), aTable.getTableName(), null);
         clazz.setTable(tab);
         clazz.setNodeName(aTable.getTableName());
 
@@ -138,12 +137,12 @@ public class HibernateConfig {
         List<com.manydesigns.portofino.model.Column> columnPKList
                 = aTable.getPrimaryKey().getColumns();
 
-        if(columnPKList.size()>1){
+        if (columnPKList.size() > 1) {
             createPKComposite(conf, mappings, aTable, aTable.getPrimaryKey().getPkName(),
-                clazz, tab, columnPKList);
+                    clazz, tab, columnPKList);
         } else {
             createPKSingle(conf, mappings, aTable, aTable.getPrimaryKey().getPkName(),
-                clazz, tab, columnPKList);
+                    clazz, tab, columnPKList);
         }
 
         //Other columns
@@ -151,7 +150,7 @@ public class HibernateConfig {
 
         for (com.manydesigns.portofino.model.Column column
                 : columnList) {
-            createColumn(mappings, clazz,  tab, column);
+            createColumn(mappings, clazz, tab, column);
 
         }
 
@@ -159,8 +158,8 @@ public class HibernateConfig {
     }
 
     protected void createColumn(Mappings mappings, RootClass clazz,
-                        Table tab,
-                        com.manydesigns.portofino.model.Column column) {
+                                Table tab,
+                                com.manydesigns.portofino.model.Column column) {
         Column col = new Column();
         col.setName(column.getColumnName());
         col.setLength(column.getLength());
@@ -188,14 +187,14 @@ public class HibernateConfig {
         prop.setValue(value);
         clazz.addProperty(prop);
         mappings.addColumnBinding(column.getColumnName(),
-                    col, tab);
+                col, tab);
     }
 
     protected void createPKComposite(Configuration cfg, Mappings mappings,
-              com.manydesigns.portofino.model.Table mdTable,
-              String pkName, RootClass clazz,
-              Table tab,
-              List<com.manydesigns.portofino.model.Column> columnPKList) {
+                                     com.manydesigns.portofino.model.Table mdTable,
+                                     String pkName, RootClass clazz,
+                                     Table tab,
+                                     List<com.manydesigns.portofino.model.Column> columnPKList) {
 
         clazz.setEmbeddedIdentifier(true);
         final PrimaryKey primaryKey = new PrimaryKey();
@@ -205,7 +204,7 @@ public class HibernateConfig {
 
         Component component = new Component(clazz);
         component.setDynamic(true);
-        component.setRoleName(mdTable.getQualifiedName()+".id");
+        component.setRoleName(mdTable.getQualifiedName() + ".id");
         component.setEmbedded(true);
         component.setNodeName(mdTable.getTableName());
         component.setKey(true);
@@ -229,7 +228,6 @@ public class HibernateConfig {
             value.addColumn(col);
 
 
-
             tab.getPrimaryKey().addColumn(col);
             tab.addColumn(col);
             Property prop = new Property();
@@ -239,46 +237,23 @@ public class HibernateConfig {
             prop.setNodeName(column.getColumnName());
             prop.setPropertyAccessorName("property");
             component.addProperty(prop);
-
-            if (type.isAutoincrement()) {
-                Properties params = new Properties();
-                // YUCK!  but cannot think of a clean way to do this given the string-config based scheme
-                params.put( PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER, mappings.getObjectNameNormalizer() );
-
-                if ( mappings.getSchemaName() != null ) {
-                    params.setProperty(
-                            PersistentIdentifierGenerator.SCHEMA,
-                            mappings.getObjectNameNormalizer().normalizeIdentifierQuoting( mappings.getSchemaName() )
-                    );
-                }
-                if ( mappings.getCatalogName() != null ) {
-                    params.setProperty(
-                            PersistentIdentifierGenerator.CATALOG,
-                            mappings.getObjectNameNormalizer().normalizeIdentifierQuoting( mappings.getCatalogName() )
-                    );
-                }
-
-                component.setIdentifierGeneratorStrategy("identity");
-                component.setIdentifierGeneratorProperties(params);
-                prop.setNaturalIdentifier(false);
-                prop.setGeneration(PropertyGeneration.NEVER);
-            }
-
             mappings.addColumnBinding(column.getColumnName(),
                     col, tab);
         }
         tab.setIdentifierValue(component);
         clazz.setIdentifier(component);
         clazz.setDiscriminatorValue(mdTable.getQualifiedName());
+
     }
 
+
     protected void createPKSingle(Configuration cfg, Mappings mappings,
-              com.manydesigns.portofino.model.Table mdTable,
-              String pkName, RootClass clazz,
-              Table tab,
-              List<com.manydesigns.portofino.model.Column> columnPKList) {
+                                  com.manydesigns.portofino.model.Table mdTable,
+                                  String pkName, RootClass clazz,
+                                  Table tab,
+                                  List<com.manydesigns.portofino.model.Column> columnPKList) {
         com.manydesigns.portofino.model.Column
-            column = columnPKList.get(0);
+                column = columnPKList.get(0);
         SimpleValue id = new SimpleValue(tab);
         final PrimaryKey primaryKey = new PrimaryKey();
         primaryKey.setName(pkName);
@@ -310,32 +285,32 @@ public class HibernateConfig {
         Property prop = new Property();
         prop.setName(column.getColumnName());
         prop.setNodeName(column.getColumnName());
-		prop.setValue( id );
-        prop.setPropertyAccessorName( mappings.getDefaultAccess() );
+        prop.setValue(id);
+        prop.setPropertyAccessorName(mappings.getDefaultAccess());
         PropertyGeneration generation = PropertyGeneration.parse(null);
-		prop.setGeneration( generation );
-        clazz.setIdentifierProperty(prop);
-        
+        prop.setGeneration(generation);
+
+
         if (type.isAutoincrement()) {
             id.setIdentifierGeneratorStrategy("identity");
-             Properties params = new Properties();
-            // YUCK!  but cannot think of a clean way to do this given the string-config based scheme
-            params.put( PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER, mappings.getObjectNameNormalizer() );
+            Properties params = new Properties();
+            params.put(PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER,
+                    mappings.getObjectNameNormalizer());
 
             params.setProperty(
-                        PersistentIdentifierGenerator.SCHEMA,
-                        tab.getSchema());
-            id.setIdentifierGeneratorProperties( params );
+                    PersistentIdentifierGenerator.SCHEMA,
+                    tab.getSchema());
+            id.setIdentifierGeneratorProperties(params);
             id.setNullValue(null);
         }
-        
+
         tab.setIdentifierValue(id);
 
         clazz.setIdentifier(id);
-        tab.setIdentifierValue(id);
+        clazz.setIdentifierProperty(prop);
         clazz.setDiscriminatorValue(mdTable.getQualifiedName());
-    }
 
+    }
 
 
     protected void createO2M(
@@ -355,53 +330,72 @@ public class HibernateConfig {
 
         Bag set = new Bag(clazzOne);
         set.setLazy(true);
-        set.setRole(manyTable.getQualifiedName()+"."
-                +relationship.getRelationshipName());
+        set.setRole(manyTable.getQualifiedName() + "."
+                + relationship.getRelationshipName());
         set.setNodeName(relationship.getRelationshipName());
         set.setCollectionTable(clazzMany.getTable());
-        OneToMany oneToMany = new OneToMany( set.getOwner() );
-        set.setElement( oneToMany );
-        oneToMany.setReferencedEntityName(manyTable.getQualifiedName() );
+        OneToMany oneToMany = new OneToMany(set.getOwner());
+        set.setElement(oneToMany);
+        oneToMany.setReferencedEntityName(manyTable.getQualifiedName());
         oneToMany.setAssociatedClass(clazzMany);
         oneToMany.setEmbedded(true);
-        
+
         set.setSorted(false);
         set.setFetchMode(FetchMode.DEFAULT);
         //Riferimenti alle colonne
-        Component component = new Component(set);
-        DependantValue dv = new DependantValue(clazzMany.getTable(), component);
-        dv.setNullable(true);
-        dv.setUpdateable(true);
 
-        component.setDynamic(true);
-        component.setEmbedded(true);
+        DependantValue dv;
+        
+        //Chiave multipla
+        final List<Reference> refs = relationship.getReferences();
+        if (refs.size()>1) {
 
-        for (Reference ref:  relationship.getReferences() ){
-            String colToName = ref.getToColumn().getColumnName();
-            String colFromName = ref.getFromColumn().getColumnName();
+            Component component = new Component(set);
+            component.setDynamic(true);
+            component.setEmbedded(true);
+            dv= new DependantValue(clazzMany.getTable(), component);
+            dv.setNullable(true);
+            dv.setUpdateable(true);
+
+
+            for (Reference ref : relationship.getReferences()) {
+                String colToName = ref.getToColumn().getColumnName();
+                String colFromName = ref.getFromColumn().getColumnName();
+                Iterator it = clazzMany.getTable().getColumnIterator();
+                while (it.hasNext()) {
+                    Column col = (Column) it.next();
+                    if (col.getName().equals(colFromName)) {
+                        dv.addColumn(col);
+                        break;
+                    }
+                }
+
+                Property refProp;
+                refProp = getRefProperty(clazzOne, colToName);
+                component.addProperty(refProp);
+            }
+
+        } else {  //chiave straniera singola
+            Property refProp;
+
+            String colFromName = refs.get(0).getFromColumn().getColumnName();
+            String colToName = refs.get(0).getToColumn().getColumnName();
+            refProp = getRefProperty(clazzOne, colToName);
+            dv= new DependantValue(clazzMany.getTable(),
+                    refProp.getPersistentClass().getKey());
+            dv.setNullable(true);
+            dv.setUpdateable(true);
+
             Iterator it = clazzMany.getTable().getColumnIterator();
-            while (it.hasNext())
-            {
+            while (it.hasNext()) {
                 Column col = (Column) it.next();
-                if (col.getName().equals(colFromName)){
+                if (col.getName().equals(colFromName)) {
                     dv.addColumn(col);
                     break;
                 }
             }
 
-            Property refProp;
-
-            if (null != clazzOne.getIdentifierProperty()){
-                refProp = clazzOne.getIdentifierProperty();
-            } else if (null!=clazzOne.getProperty(colToName)) {
-                refProp = clazzOne.getProperty(colToName);
-            }else{
-                    refProp = ((Component) clazzOne.getIdentifier())
-                            .getProperty(colToName);
-            }
-            component.addProperty(refProp);
         }
-
         set.setKey(dv);
 
         mappings.addCollection(set);
@@ -411,12 +405,25 @@ public class HibernateConfig {
         prop.setNodeName(relationship.getRelationshipName());
         prop.setValue(set);
         clazzOne.addProperty(prop);
-   }
+    }
 
-   protected void createFKReference(Configuration config, RootClass clazz,
-                         Table tab,
-                         Relationship relationship,
-                         List<com.manydesigns.portofino.model.Column> cols) {
+    private Property getRefProperty(PersistentClass clazzOne, String colToName) {
+        Property refProp;
+        if (null != clazzOne.getIdentifierProperty()) {
+            refProp = clazzOne.getIdentifierProperty();
+        } else if (null != clazzOne.getProperty(colToName)) {
+            refProp = clazzOne.getProperty(colToName);
+        } else {
+            refProp = ((Component) clazzOne.getIdentifier())
+                    .getProperty(colToName);
+        }
+        return refProp;
+    }
+
+    protected void createFKReference(Configuration config, RootClass clazz,
+                                     Table tab,
+                                     Relationship relationship,
+                                     List<com.manydesigns.portofino.model.Column> cols) {
 
 
         ManyToOne m2o = new ManyToOne(tab);

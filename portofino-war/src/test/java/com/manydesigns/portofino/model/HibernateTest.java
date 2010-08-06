@@ -37,6 +37,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.Session;
+
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Angelo    Lupo       - angelo.lupo@manydesigns.com
@@ -55,6 +57,15 @@ public class HibernateTest extends TestCase {
 
     public void tearDown() {
         context.closeSession();
+    }
+
+    public void testReadProdotti() {
+        List<Map<String, Object>> resultProd =
+                context.getAllObjects("jpetstore.public.product");
+
+        int sizePrd = resultProd.size();
+        assertEquals("prodotti", 16, sizePrd);
+
     }
 
     public void testReadCategorieProdotti() {
@@ -96,7 +107,7 @@ public class HibernateTest extends TestCase {
         worms.put("descn",
           "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
                   "Worms</font>");
-        context.saveOrUpdateObject(worms);
+        context.saveObject(worms);
     }
 
     public void testSaveLineItem() {
@@ -108,10 +119,20 @@ public class HibernateTest extends TestCase {
         lineItem.put("itemid",
           "test");
         lineItem.put("quantity", 20);
-        lineItem.put("unitprice", 10.80);
+        lineItem.put("unitprice", new BigDecimal(10.80));
 
-        context.saveOrUpdateObject(lineItem);
+        context.saveObject(lineItem);
     }
+
+   /* public void testGetObjectByPk(){
+        String qualifiedTableName="jpetstore.public.category";
+        HashMap<String, Object> pk=new HashMap();
+        //pk.put("catid", )
+        context.openSession();
+        @SuppressWarnings({"unchecked"}) Map<String, Object> result =
+                (Map<String, Object>)context.getObjectByPk(qualifiedTableName, pk);
+
+    }*/
 
     public void testSaveTestElement() {
         context.openSession();

@@ -80,7 +80,7 @@ public class DBParserTest extends TestCase {
         assertEquals("jpetstore.public", schema.getQualifiedName());
 
         List<Table> tables = schema.getTables();
-        assertEquals(3, tables.size());
+        assertEquals(4, tables.size());
 
         // tabella 0
         Table table0 = tables.get(1);
@@ -106,7 +106,7 @@ public class DBParserTest extends TestCase {
         assertEquals(columns0.get(0), pkColumns0.get(0));
 
         // tabella 1
-        Table table1 = tables.get(2);
+        Table table1 = tables.get(3);
         checkTable(table1, "jpetstore", "public", "product");
 
         List<Column> columns1 = table1.getColumns();
@@ -134,19 +134,19 @@ public class DBParserTest extends TestCase {
 
         checkColumn(columns2.get(0),
                 "jpetstore", "public", "lineitem", "orderid",
-                "INTEGER", false, 8, 0);
+                "INT4", false, 8, 0);
         checkColumn(columns2.get(1),
                 "jpetstore", "public", "lineitem", "linenum",
-                "INTEGER", false, 8, 0);
+                "INT4", false, 8, 0);
         checkColumn(columns2.get(2),
                 "jpetstore", "public", "lineitem", "itemid",
                 "VARCHAR", false, 255, 0);
         checkColumn(columns2.get(3),
                 "jpetstore", "public", "lineitem", "quantity",
-                "INTEGER", false, 8, 0);
+                "INT4", false, 8, 0);
         checkColumn(columns2.get(4),
                 "jpetstore", "public", "lineitem", "unitprice",
-                "DECIMAL", false, 10, 2);
+                "NUMERIC", false, 10, 2);
 
         PrimaryKey primaryKey2 = table2.getPrimaryKey();
         assertEquals("pk_lineitem", primaryKey2.getPkName());
@@ -175,7 +175,7 @@ public class DBParserTest extends TestCase {
         assertEquals(schemaName, column.getSchemaName());
         assertEquals(tableName, column.getTableName());
         assertEquals(columnName, column.getColumnName());
-        assertEquals(columnType, column.getColumnType());
+        assertEquals(columnType.toUpperCase(), column.getColumnType().toUpperCase());
         assertEquals(nullable, column.isNullable());
         assertEquals(length, column.getLength());
         assertEquals(scale, column.getScale());

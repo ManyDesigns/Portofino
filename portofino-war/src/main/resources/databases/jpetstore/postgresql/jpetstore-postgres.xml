@@ -38,7 +38,7 @@
                                     nullable="false"/>
                             <column name="unitprice"
                                     columnType="numeric"
-                                    javaType="java.lang.Integer"
+                                    javaType="java.math.BigDecimal"
                                     length="10"
                                     scale="2"
                                     nullable="false"/>

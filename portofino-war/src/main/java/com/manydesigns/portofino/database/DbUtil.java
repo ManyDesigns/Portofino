@@ -139,7 +139,7 @@ public class DbUtil {
             return Hibernate.INTEGER;
         }
         if ("NUMERIC".equalsIgnoreCase(type)){
-            return Hibernate.DOUBLE;
+            return Hibernate.BIG_DECIMAL;
         }
         if ("SMALLINT".equalsIgnoreCase(type)){
             return Hibernate.INTEGER;
