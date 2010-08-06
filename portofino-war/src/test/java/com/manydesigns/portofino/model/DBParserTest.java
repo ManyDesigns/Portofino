@@ -76,7 +76,7 @@ public class DBParserTest extends TestCase {
         assertEquals("jpetstore.public", schema.getQualifiedName());
 
         List<Table> tables = schema.getTables();
-        assertEquals(4, tables.size());
+        assertEquals(3, tables.size());
 
         // tabella 0
         Table table0 = tables.get(1);
@@ -102,7 +102,7 @@ public class DBParserTest extends TestCase {
         assertEquals(columns0.get(0), pkColumns0.get(0));
 
         // tabella 1
-        Table table1 = tables.get(3);
+        Table table1 = tables.get(2);
         checkTable(table1, "jpetstore", "public", "product");
 
         List<Column> columns1 = table1.getColumns();

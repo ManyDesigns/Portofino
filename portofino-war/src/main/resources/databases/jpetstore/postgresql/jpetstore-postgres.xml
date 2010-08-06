@@ -113,4 +113,31 @@
             </schema>
         </schemas>
     </database>
+        <database name="hibernatetest">
+        <schemas>
+            <schema name="public">
+                <tables>
+                    <table name="table1">
+                        <columns>
+                            <column name="id"
+                                    columnType="int4"
+                                    javaType="java.lang.Integer"
+                                    length="8"
+                                    scale="0"
+                                    nullable="false"/>
+                            <column name="testo"
+                                    columnType="varchar"
+                                    javaType="java.lang.String"
+                                    length="15"
+                                    scale="0"
+                                    nullable="false"/>
+                        </columns>
+                        <primaryKey name="pk_table1">
+                            <column name="id"/>
+                        </primaryKey>
+                    </table>
+                </tables>
+            </schema>
+        </schemas>
+    </database>
 </datamodel>

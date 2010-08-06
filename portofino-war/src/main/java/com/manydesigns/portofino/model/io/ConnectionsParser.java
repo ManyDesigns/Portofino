@@ -69,57 +69,68 @@ public class ConnectionsParser {
         ClassLoader cl = this.getClass().getClassLoader();
         InputStream input = cl.getResourceAsStream(resourceName);
         xmlStreamReader = inputFactory.createXMLStreamReader(input);
-        next();
         doStartDocument();
         return connections;
     }
 
     private void doStartDocument()
             throws XMLStreamException {
+        next();
         for (;;) {
             switch (event) {
                 case XMLStreamConstants.END_DOCUMENT:
                     return;
                 case XMLStreamConstants.START_ELEMENT:
                     if (CONNECTIONS.equals(localName)) {
-                        next();
+//                        next();
                         doConnections();
                     } else {
                         throw new Error("Unrecognized tag");
                     }
                     break;
                 case XMLStreamConstants.END_ELEMENT:
-                    next();
-                    return;
+                    if (CONNECTIONS.equals(localName)) {
+//                        next();
+                    } else {
+                        throw new Error("Unrecognized tag");
+                    }
+                    break;
                 case XMLStreamConstants.CHARACTERS:
-                    next();
+//                    next();
                     break;
                 default:
                     throw new Error("Invalid XML");
             }
+            next();
         }
     }
 
     private void doConnections() throws XMLStreamException {
+        next();
         for (;;) {
             switch (event) {
                 case XMLStreamConstants.START_ELEMENT:
                     if (CONNECTION.equals(localName)) {
                         doConnection();
-                        next();
+//                        next();
                     } else {
                         throw new Error("Unrecognized tag");
                     }
                     break;
                 case XMLStreamConstants.END_ELEMENT:
-                    next();
-                    return;
+                    if (CONNECTION.equals(localName)){
+//                        next();
+                        break;
+                    } else {
+                        return;
+                    }
                 case XMLStreamConstants.CHARACTERS:
-                    next();
+//                    next();
                     break;
                 default:
                     throw new Error("Invalid XML");
             }
+            next();
         }
     }
 

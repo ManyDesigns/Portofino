@@ -138,8 +138,8 @@ public class HibernateTest extends TestCase {
     public void testSaveTestElement() {
         context.openSession();
         Map<String, Object> lineItem = new HashMap<String, Object>();
-        lineItem.put("$type$", "jpetstore.public.test");
-        lineItem.put("a", "z");
+        lineItem.put("$type$", "hibernatetest.public.table1");
+        lineItem.put("testo", "esempio");
         context.saveObject(lineItem);
     }
 
