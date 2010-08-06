@@ -52,38 +52,39 @@ public class DBParser {
         relationships = new ArrayList<RelationshipPre>();
         int event = -1;
         while (xmlStreamReader.hasNext()) {
+             
             if (event == XMLStreamConstants.END_ELEMENT
                     && xmlStreamReader.getLocalName().equals(DATAMODEL)) {
-                break;
+                return;
             }
             event = next(xmlStreamReader);
 
             if (event == XMLStreamConstants.START_ELEMENT
                     && xmlStreamReader.getLocalName().equals(DATAMODEL)) {
-                doDataModel(xmlStreamReader, dataModel);
+                event = doDataModel(xmlStreamReader, dataModel);
             }
         }
     }
 
-    private void doDataModel(XMLStreamReader xmlStreamReader, DataModel dataModel)
+    private int  doDataModel(XMLStreamReader xmlStreamReader, DataModel dataModel)
             throws Exception {
-         doDataBase(xmlStreamReader, dataModel);
+         return doDataBase(xmlStreamReader, dataModel);
     }
 
-    private void doDataBase(XMLStreamReader xmlStreamReader, DataModel dataModel)
+    private int doDataBase(XMLStreamReader xmlStreamReader, DataModel dataModel)
             throws Exception {
-        int event=-1;
         String lName=null;
         int dbopen = 0;
         boolean dbpresent = false;
-
+        int event = -1;
 
         while (xmlStreamReader.hasNext()) {
-            if (event == XMLStreamConstants.END_ELEMENT && DATABASE.equals(lName)) {
-                break;
-            }
             event = next(xmlStreamReader);
             lName = xmlStreamReader.getLocalName();
+            if (event == XMLStreamConstants.END_ELEMENT
+                    && xmlStreamReader.getLocalName().equals(DATAMODEL)) {
+                return event;
+            }
             if (event == XMLStreamConstants.START_ELEMENT && lName.equals(DATABASE)) {
                 dbpresent = true;
                 dbopen++;
@@ -119,6 +120,7 @@ public class DBParser {
         }
 
         createRelationshipsPost(dataModel);
+        return event;
     }
 
     private void doSchemas(XMLStreamReader xmlStreamReader,

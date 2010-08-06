@@ -123,25 +123,27 @@ public class HibernateTest extends TestCase {
         lineItem.put("unitprice", new BigDecimal(10.80));
 
         context.saveObject(lineItem);
+        //e ora cancello
+        context.deleteObject(lineItem);
     }
 
-   /* public void testGetObjectByPk(){
-        String qualifiedTableName="jpetstore.public.category";
-        HashMap<String, Object> pk=new HashMap();
-        //pk.put("catid", )
-        context.openSession();
-        @SuppressWarnings({"unchecked"}) Map<String, Object> result =
-                (Map<String, Object>)context.getObjectByPk(qualifiedTableName, pk);
-
-    }*/
 
     public void testSaveTestElement() {
-        context.openSession();
-        Map<String, Object> lineItem = new HashMap<String, Object>();
-        lineItem.put("$type$", "hibernatetest.public.table1");
-        lineItem.put("testo", "esempio");
-        context.saveObject(lineItem);
+        try {
+            context.openSession();
+            Map<String, Object> testItem = new HashMap<String, Object>();
+            testItem.put("$type$", "hibernatetest.public.table1");
+            testItem.put("testo", "esempio");
+            //salvo
+            context.saveObject(testItem);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
     }
+
+
 
 
     public void testDeleteCategoria() {

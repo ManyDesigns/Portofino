@@ -62,7 +62,7 @@ public class DBParserTest extends TestCase {
         assertNotNull(dataModel);
 
         List<Database> databases = dataModel.getDatabases();
-        assertEquals(1, databases.size());
+        assertEquals(2, databases.size());
 
         Database database = databases.get(0);
         assertEquals("jpetstore", database.getDatabaseName());

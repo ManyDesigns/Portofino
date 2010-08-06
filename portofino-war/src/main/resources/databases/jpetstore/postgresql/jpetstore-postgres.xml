@@ -113,14 +113,14 @@
             </schema>
         </schemas>
     </database>
-        <database name="hibernatetest">
+    <database name="hibernatetest">
         <schemas>
             <schema name="public">
                 <tables>
                     <table name="table1">
                         <columns>
                             <column name="id"
-                                    columnType="int4"
+                                    columnType="serial"
                                     javaType="java.lang.Integer"
                                     length="8"
                                     scale="0"
