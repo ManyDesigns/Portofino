@@ -52,6 +52,7 @@ public class DBParser extends XmlParser {
         XMLStreamReader xmlStreamReader = inputFactory.createXMLStreamReader(input);
         initParser(xmlStreamReader);
         expectDocument(new DatamodelDocumentCallback());
+        createRelationshipsPost();
         return dataModel;
     }
 
@@ -75,7 +76,7 @@ public class DBParser extends XmlParser {
             currentDatabase = new Database(attributes.get("name"));
             dataModel.getDatabases().add(currentDatabase);
             expectElement(SCHEMAS, 1, 1, new SchemasCallback());
-            createRelationshipsPost();
+
         }
     }
 

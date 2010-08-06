@@ -105,10 +105,27 @@ public class DBParserTest extends TestCase {
         List<Column> pkColumns0 = primaryKey0.getColumns();
         assertEquals(1, pkColumns0.size());
         assertEquals(columns0.get(0), pkColumns0.get(0));
+        assertEquals(1, table0.getOneToManyRelationships().size());
+        checkRelationships(table0.getOneToManyRelationships()
+                , 0, "fk_product_1", "public" ,
+                "category", "NO ACTION", "NO ACTION");
+        List<Reference> references =
+                table0.getOneToManyRelationships().get(0).getReferences();
+        checkReference(references, 0, "category", "catid");
+
 
         // tabella 1
         Table table1 = tables.get(2);
         checkTable(table1, "jpetstore", "public", "product");
+
+        int idxRel = 0;
+        checkRelationships(table1.getManyToOneRelationships()
+                , idxRel, "fk_product_1", "public" ,
+                "category", "NO ACTION", "NO ACTION");
+        assertEquals(1, table1.getManyToOneRelationships().size());
+        List<Reference> references2 =
+                table1.getManyToOneRelationships().get(idxRel).getReferences();
+        checkReference(references2, 0, "category", "catid");
 
         List<Column> columns1 = table1.getColumns();
         assertEquals(4, columns1.size());
@@ -157,6 +174,25 @@ public class DBParserTest extends TestCase {
         assertEquals(columns2.get(1), pkColumns2.get(1));
     }
 
+    private void checkReference(List<Reference> references, int idx,
+                                String fromColumn, String toColumn) {
+        Reference ref = references.get(0);
+        assertEquals(fromColumn, ref.fromColumn.getColumnName());
+        assertEquals(toColumn, ref.toColumn.getColumnName());
+    }
+
+    private void checkRelationships(List<Relationship> relationships, int idx, String name,
+                                    String toSchema, String toTable,
+                                    String onUpdate, String onDelete) {
+        Relationship rel = relationships.get(idx);
+        assertEquals(name, rel.getRelationshipName());
+        assertEquals(toSchema, rel.getToTable().getSchemaName());
+        assertEquals(toTable, rel.getToTable().getTableName());
+        assertEquals(onUpdate, rel.getOnUpdate());
+        assertEquals(onUpdate, rel.getOnDelete());
+
+    }
+
     public void testFindTableByQualifiedName() {
         try {
             dataModel = parser.parse(
@@ -165,7 +201,6 @@ public class DBParserTest extends TestCase {
             e.printStackTrace();
             fail();
         }
-
     }
 
     private void checkColumn(Column column, String databaseName,

@@ -115,8 +115,8 @@ public class HibernateTest extends TestCase {
         context.openSession();
         Map<String, Object> lineItem = new HashMap<String, Object>();
         lineItem.put("$type$", "jpetstore.public.lineitem");
-        lineItem.put("orderid", 1);
-        lineItem.put("linenum", 1);
+        lineItem.put("orderid", 2);
+        lineItem.put("linenum", 2);
         lineItem.put("itemid",
           "test");
         lineItem.put("quantity", 20);

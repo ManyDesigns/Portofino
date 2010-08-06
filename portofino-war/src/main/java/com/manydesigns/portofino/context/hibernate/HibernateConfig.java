@@ -393,10 +393,8 @@ public class HibernateConfig {
                     break;
                 }
             }
-
         }
         set.setKey(dv);
-
         mappings.addCollection(set);
 
         Property prop = new Property();
