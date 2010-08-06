@@ -28,9 +28,8 @@
  */
 package com.manydesigns.portofino.model.io;
 
-import com.manydesigns.portofino.model.io.ReferencePre;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -47,6 +46,22 @@ class RelationshipPre {
     public String onUpdate;
     public String onDelete;
     List<ReferencePre> references = new ArrayList<ReferencePre>();
+
+    RelationshipPre(String fromDB, String toDB,
+                    String fromSchema, String toSchema,
+                    String fromTable, String toTable,
+                    String relationshipName,
+                    String onUpdate, String onDelete) {
+        this.fromDB = fromDB;
+        this.toDB = toDB;
+        this.fromSchema = fromSchema;
+        this.toSchema = toSchema;
+        this.fromTable = fromTable;
+        this.toTable = toTable;
+        this.relationshipName = relationshipName;
+        this.onUpdate = onUpdate;
+        this.onDelete = onDelete;
+    }
 
     public String getFromTable() {
         return fromTable;

@@ -29,10 +29,12 @@
 
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.io.DBParser;
 import junit.framework.TestCase;
 
 import java.util.List;
+import java.util.logging.Level;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -47,6 +49,9 @@ public class DBParserTest extends TestCase {
     DataModel dataModel;
 
     public void setUp() {
+        LogUtil.initializeLoggingSystem();
+        DBParser.logger.setLevel(Level.ALL);
+
         parser = new DBParser();
     }
 

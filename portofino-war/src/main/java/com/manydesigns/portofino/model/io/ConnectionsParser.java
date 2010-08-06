@@ -31,13 +31,16 @@ package com.manydesigns.portofino.model.io;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.Connection;
+import com.manydesigns.portofino.xml.DocumentCallback;
+import com.manydesigns.portofino.xml.ElementCallback;
+import com.manydesigns.portofino.xml.XmlParser;
 
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /*
@@ -45,7 +48,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ConnectionsParser {
+public class ConnectionsParser extends XmlParser {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -53,12 +56,6 @@ public class ConnectionsParser {
     public final static String CONNECTIONS = "connections";
 
     List<Connection> connections;
-    XMLStreamReader xmlStreamReader;
-    int event;
-    String localName;
-    String text;
-    Map<String, String> attributes;
-    Stack<String> elementStack = new Stack<String>();
 
     public static final Logger logger =
             LogUtil.getLogger(ConnectionsParser.class);
@@ -69,170 +66,39 @@ public class ConnectionsParser {
         ClassLoader cl = this.getClass().getClassLoader();
         InputStream input = cl.getResourceAsStream(resourceName);
         xmlStreamReader = inputFactory.createXMLStreamReader(input);
-        doStartDocument();
+        initParser(xmlStreamReader);
+        expectDocument(new ConnectionsDocumentCallback());
         return connections;
     }
 
-    private void doStartDocument()
-            throws XMLStreamException {
-        next();
-        for (;;) {
-            switch (event) {
-                case XMLStreamConstants.END_DOCUMENT:
-                    return;
-                case XMLStreamConstants.START_ELEMENT:
-                    if (CONNECTIONS.equals(localName)) {
-//                        next();
-                        doConnections();
-                    } else {
-                        throw new Error("Unrecognized tag");
-                    }
-                    break;
-                case XMLStreamConstants.END_ELEMENT:
-                    if (CONNECTIONS.equals(localName)) {
-//                        next();
-                    } else {
-                        throw new Error("Unrecognized tag");
-                    }
-                    break;
-                case XMLStreamConstants.CHARACTERS:
-//                    next();
-                    break;
-                default:
-                    throw new Error("Invalid XML");
-            }
-            next();
+    private class ConnectionsDocumentCallback implements DocumentCallback {
+        public void doDocument() throws XMLStreamException {
+            expectElement(CONNECTIONS, 1, 1, new ConnectionsCallback());
         }
     }
 
-    private void doConnections() throws XMLStreamException {
-        next();
-        for (;;) {
-            switch (event) {
-                case XMLStreamConstants.START_ELEMENT:
-                    if (CONNECTION.equals(localName)) {
-                        doConnection();
-//                        next();
-                    } else {
-                        throw new Error("Unrecognized tag");
-                    }
-                    break;
-                case XMLStreamConstants.END_ELEMENT:
-                    if (CONNECTION.equals(localName)){
-//                        next();
-                        break;
-                    } else {
-                        return;
-                    }
-                case XMLStreamConstants.CHARACTERS:
-//                    next();
-                    break;
-                default:
-                    throw new Error("Invalid XML");
-            }
-            next();
+    private class ConnectionsCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(CONNECTION, 1, null, new ConnectionCallback());
         }
     }
 
-    private void doConnection() {
-        checkRequiredAttributes("databaseName", "url", "driver", "username", "password");
+    private class ConnectionCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes) {
+            checkRequiredAttributes(attributes,
+                    "databaseName", "url", "driver", "username", "password");
 
-        Connection connection = new Connection(
-                attributes.get("databaseName"),
-                attributes.get("type"),
-                attributes.get("url"),
-                attributes.get("driver"),
-                attributes.get("username"),
-                attributes.get("password")
-        );
-        connections.add(connection);
-    }
+            Connection connection = new Connection(
+                    attributes.get("databaseName"),
+                    attributes.get("type"),
+                    attributes.get("url"),
+                    attributes.get("driver"),
+                    attributes.get("username"),
+                    attributes.get("password")
+            );
+            connections.add(connection);
 
-    private void checkRequiredAttributes(String... attrNames) {
-        for (String current : attrNames) {
-            if (attributes.get(current) == null) {
-                throw new Error("Attribute " + current + " required");
-            }
-        }
-    }
-
-    private void next() throws XMLStreamException {
-        event = xmlStreamReader.next();
-        switch (event) {
-            case XMLStreamConstants.START_ELEMENT:
-                loadLocalName();
-                LogUtil.fineMF(logger, "START_ELEMENT: {0}", localName);
-                loadAttributes();
-                elementStack.push(localName);
-                break;
-            case XMLStreamConstants.END_ELEMENT:
-                loadLocalName();
-                LogUtil.fineMF(logger, "END_ELEMENT: {0}", localName);
-                String matchingElementName = elementStack.pop();
-                if (!matchingElementName.equals(localName)) {
-                    throw new Error("Open/close tags don't match: " +
-                            matchingElementName + "/" + localName);
-                }
-                break;
-            case XMLStreamConstants.PROCESSING_INSTRUCTION:
-                LogUtil.fineMF(logger, "PROCESSING_INSTRUCTION");
-                break;
-            case XMLStreamConstants.CHARACTERS:
-                loadText();
-                LogUtil.fineMF(logger, "CHARACTERS: {0}", text);
-                break;
-            case XMLStreamConstants.COMMENT:
-                LogUtil.fineMF(logger, "COMMENT");
-                break;
-            case XMLStreamConstants.SPACE:
-                LogUtil.fineMF(logger, "SPACE");
-                break;
-            case XMLStreamConstants.START_DOCUMENT:
-                LogUtil.fineMF(logger, "START_DOCUMENT");
-                break;
-            case XMLStreamConstants.END_DOCUMENT:
-                LogUtil.fineMF(logger, "END_DOCUMENT");
-                break;
-            case XMLStreamConstants.ENTITY_REFERENCE:
-                LogUtil.fineMF(logger, "ENTITY_REFERENCE");
-                break;
-            case XMLStreamConstants.ATTRIBUTE:
-                LogUtil.fineMF(logger, "ATTRIBUTE");
-                break;
-            case XMLStreamConstants.DTD:
-                LogUtil.fineMF(logger, "DTD");
-                break;
-            case XMLStreamConstants.CDATA:
-                loadText();
-                LogUtil.fineMF(logger, "CDATA: {0}", text);
-                break;
-            case XMLStreamConstants.NAMESPACE:
-                LogUtil.fineMF(logger, "NAMESPACE");
-                break;
-            case XMLStreamConstants.NOTATION_DECLARATION:
-                LogUtil.fineMF(logger, "NOTATION_DECLARATION");
-                break;
-            case XMLStreamConstants.ENTITY_DECLARATION:
-                LogUtil.fineMF(logger, "ENTITY_DECLARATION");
-                break;
-        }
-    }
-
-    private void loadText() {
-        text = xmlStreamReader.getText();
-    }
-
-    private void loadLocalName() {
-        localName = xmlStreamReader.getLocalName();
-    }
-
-    private void loadAttributes() {
-        attributes = new HashMap<String, String>();
-        for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
-            String attrName = xmlStreamReader.getAttributeLocalName(i);
-            String attrvalue = xmlStreamReader.getAttributeValue(i);
-            attributes.put(attrName, attrvalue);
-            LogUtil.fineMF(logger, "Attribute {0} = {1}", attrName, attrvalue);
         }
     }
 

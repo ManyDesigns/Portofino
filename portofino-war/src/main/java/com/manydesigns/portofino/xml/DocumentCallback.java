@@ -26,36 +26,19 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.model.io;
+
+package com.manydesigns.portofino.xml;
+
+import javax.xml.stream.XMLStreamException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+public interface DocumentCallback {
+    public static final String copyright =
+            "Copyright (c) 2005-2010, ManyDesigns srl";
 
-public class ReferencePre {
-    public String fromColumn;
-    public String toColumn;
-
-    public ReferencePre(String fromColumn, String toColumn) {
-        this.fromColumn = fromColumn;
-        this.toColumn = toColumn;
-    }
-
-    public String getFromColumn() {
-        return fromColumn;
-    }
-
-    public void setFromColumn(String fromColumn) {
-        this.fromColumn = fromColumn;
-    }
-
-    public String getToColumn() {
-        return toColumn;
-    }
-
-    public void setToColumn(String toColumn) {
-        this.toColumn = toColumn;
-    }
+    public void doDocument() throws XMLStreamException;
 }
