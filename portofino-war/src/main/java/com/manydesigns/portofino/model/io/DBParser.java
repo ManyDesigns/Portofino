@@ -140,6 +140,7 @@ public class DBParser extends XmlParser {
                             attributes.get("name"),
                             attributes.get("columnType"),
                             Boolean.parseBoolean(attributes.get("nullable")),
+                            Boolean.parseBoolean(attributes.get("autoincrement")),
                             Integer.parseInt(attributes.get("length")),
                             Integer.parseInt(attributes.get("scale"))
                             );

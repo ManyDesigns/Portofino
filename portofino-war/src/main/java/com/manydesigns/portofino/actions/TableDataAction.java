@@ -71,23 +71,6 @@ public class TableDataAction extends ActionSupport
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // Action results
-    //**************************************************************************
-
-    public final static String SEARCH = "search";
-    public final static String RETURN_TO_SEARCH = "returnToSearch";
-    public final static String READ = "read";
-    public final static String CREATE = "create";
-    public final static String SAVE = "save";
-    public final static String EDIT = "edit";
-    public final static String UPDATE = "update";
-    public final static String BULK_EDIT = "bulkEdit";
-    public final static String BULK_UPDATE = "bulkUpdate";
-    public final static String DELETE = "delete";
-    public final static String CANCEL = "cancel";
-
-    
-    //**************************************************************************
     // MDContextAware implementation
     //**************************************************************************
 
@@ -268,7 +251,7 @@ public class TableDataAction extends ActionSupport
         tableForm.setSelectable(true);
         tableForm.readFromObject(objects);
 
-        return SEARCH;
+        return ActionResults.SEARCH;
     }
 
     public String urlencode(String s) {
@@ -313,7 +296,7 @@ public class TableDataAction extends ActionSupport
 
     public String returnToSearch() {
         setupTable();
-        return RETURN_TO_SEARCH;
+        return ActionResults.RETURN_TO_SEARCH;
     }
 
     //**************************************************************************
@@ -345,7 +328,7 @@ public class TableDataAction extends ActionSupport
             setupRelatedTableForm(relationship);
         }
 
-        return READ;
+        return ActionResults.READ;
     }
 
     public void setupRelatedTableForm(Relationship relationship) {
@@ -377,7 +360,7 @@ public class TableDataAction extends ActionSupport
         form = formBuilder.build();
         form.setMode(Mode.CREATE);
 
-        return CREATE;
+        return ActionResults.CREATE;
     }
 
     public String save() {
@@ -395,9 +378,9 @@ public class TableDataAction extends ActionSupport
             context.saveObject(object);
             pk = tableHelper.generatePkString(table, object);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
-            return SAVE;
+            return ActionResults.SAVE;
         } else {
-            return CREATE;
+            return ActionResults.CREATE;
         }
     }
 
@@ -417,7 +400,7 @@ public class TableDataAction extends ActionSupport
 
         form.readFromObject(object);
 
-        return EDIT;
+        return ActionResults.EDIT;
     }
 
     public String update() {
@@ -435,9 +418,9 @@ public class TableDataAction extends ActionSupport
             form.writeToObject(object);
             context.updateObject(object);
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
-            return UPDATE;
+            return ActionResults.UPDATE;
         } else {
-            return EDIT;
+            return ActionResults.EDIT;
         }
     }
 
@@ -445,7 +428,7 @@ public class TableDataAction extends ActionSupport
         if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage(
                     "Nessun oggetto selezionato");
-            return CANCEL;
+            return ActionResults.CANCEL;
         }
 
         if (selection.length == 1) {
@@ -459,7 +442,7 @@ public class TableDataAction extends ActionSupport
         form = formBuilder.build();
         form.setMode(Mode.BULK_EDIT);
 
-        return BULK_EDIT;
+        return ActionResults.BULK_EDIT;
     }
 
     public String bulkUpdate() {
@@ -480,9 +463,9 @@ public class TableDataAction extends ActionSupport
             context.updateObject(object);
             SessionMessages.addInfoMessage(MessageFormat.format(
                     "UPDATE di {0} oggetti avvenuto con successo", selection.length));
-            return BULK_UPDATE;
+            return ActionResults.BULK_UPDATE;
         } else {
-            return BULK_EDIT;
+            return ActionResults.BULK_EDIT;
         }
     }
 
@@ -495,7 +478,7 @@ public class TableDataAction extends ActionSupport
         HashMap<String, Object> pkMap = tableHelper.parsePkString(table, pk);
         context.deleteObject(pkMap);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
-        return DELETE;
+        return ActionResults.DELETE;
     }
 
     public String bulkDelete() {
@@ -503,7 +486,7 @@ public class TableDataAction extends ActionSupport
         if (selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
-            return CANCEL;
+            return ActionResults.CANCEL;
         }
         for (String current : selection) {
             HashMap<String, Object> pkMap =
@@ -512,7 +495,7 @@ public class TableDataAction extends ActionSupport
         }
         SessionMessages.addInfoMessage(MessageFormat.format(
                 "DELETE di {0} oggetti avvenuto con successo", selection.length));
-        return DELETE;
+        return ActionResults.DELETE;
     }
 
     //**************************************************************************
@@ -520,7 +503,7 @@ public class TableDataAction extends ActionSupport
     //**************************************************************************
 
     public String cancel() {
-        return CANCEL;
+        return ActionResults.CANCEL;
     }
 
 }

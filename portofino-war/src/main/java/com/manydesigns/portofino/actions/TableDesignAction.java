@@ -59,14 +59,6 @@ public class TableDesignAction extends ActionSupport
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // Action results
-    //**************************************************************************
-
-    public final static String SUMMARY = "summary";
-    public final static String CANCEL = "cancel";
-
-
-    //**************************************************************************
     // MDContextAware implementation
     //**************************************************************************
 
@@ -156,7 +148,7 @@ public class TableDesignAction extends ActionSupport
         columnTableForm.readFromObject(table.getColumns());
         columnTableForm.setMode(Mode.VIEW);
 
-        return SUMMARY;
+        return ActionResults.SUMMARY;
     }
 
     //**************************************************************************
@@ -175,7 +167,7 @@ public class TableDesignAction extends ActionSupport
     //**************************************************************************
 
     public String cancel() {
-        return CANCEL;
+        return ActionResults.CANCEL;
     }
 
 }

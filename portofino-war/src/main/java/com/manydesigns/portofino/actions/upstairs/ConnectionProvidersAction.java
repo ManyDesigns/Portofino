@@ -37,6 +37,7 @@ import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.text.Generator;
 import com.manydesigns.elements.text.HrefExpressionGenerator;
+import com.manydesigns.portofino.actions.ActionResults;
 import com.manydesigns.portofino.context.MDContext;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DatabaseAbstraction;
@@ -58,11 +59,6 @@ public class ConnectionProvidersAction
         extends ActionSupport implements MDContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-
-    public final static String SEARCH = "search";
-    public final static String READ = "read";
-    public final static String RETURN_TO_SEARCH = "returnToSearch";
-    public final static String RETURN_TO_READ = "returnToRead";
 
     public MDContext context;
     public List<ConnectionProvider> connectionProviders;
@@ -107,7 +103,7 @@ public class ConnectionProvidersAction
         tableForm.setMode(Mode.VIEW);
         tableForm.readFromObject(connectionProviders);
 
-        return SEARCH;
+        return ActionResults.LIST;
     }
 
     public String read() {
@@ -167,16 +163,16 @@ public class ConnectionProvidersAction
         typesTableForm.setMode(Mode.VIEW);
         typesTableForm.readFromObject(types);
 
-        return READ;
+        return ActionResults.READ;
     }
 
     public String returnToSearch() {
-        return RETURN_TO_SEARCH;
+        return ActionResults.RETURN_TO_LIST;
     }
 
     public String test() {
         SessionMessages.addInfoMessage("Connection tested successfully");
-        return RETURN_TO_READ;
+        return ActionResults.RETURN_TO_READ;
     }
 
 }

@@ -124,7 +124,8 @@
                                     javaType="java.lang.Integer"
                                     length="8"
                                     scale="0"
-                                    nullable="false"/>
+                                    nullable="false"
+                                    autoincrement="true"/>
                             <column name="testo"
                                     columnType="varchar"
                                     javaType="java.lang.String"

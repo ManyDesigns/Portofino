@@ -50,6 +50,7 @@ public class Column {
     protected String columnName;
     protected String columnType;
     protected boolean nullable;
+    protected boolean autoincrement;
     protected int length;
     protected int scale;
 
@@ -64,14 +65,16 @@ public class Column {
     //**************************************************************************
     public Column(String databaseName, String schemaName,
                   String tableName, String columnName,
-                  String columnType, boolean nullable, int length,
-                   int scale) {
+                  String columnType, boolean nullable,
+                  boolean autoincrement, int length,
+                  int scale) {
         this.databaseName = databaseName;
         this.schemaName = schemaName;
         this.tableName = tableName;
         this.columnName = columnName;
         this.columnType = columnType;
         this.nullable = nullable;
+        this.autoincrement = autoincrement;
         this.length = length;
         this.scale = scale;
     }
@@ -152,6 +155,13 @@ public class Column {
         this.javaType = javaType;
     }
 
+    public boolean isAutoincrement() {
+        return autoincrement;
+    }
+
+    public void setAutoincrement(boolean autoincrement) {
+        this.autoincrement = autoincrement;
+    }
 
     public String getQualifiedName() {
         return MessageFormat.format("{0}.{1}.{2}.{3}",

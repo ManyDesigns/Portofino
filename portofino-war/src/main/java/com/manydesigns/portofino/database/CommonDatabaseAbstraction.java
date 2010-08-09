@@ -379,13 +379,15 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
                     continue;
                 }
 
+                Type type = getTypeByName(columnType);
                 Column column = new Column(expectedDatabaseName,
                         expectedSchemaName, expectedTableName,
-                        columnName, columnType, nullable, length, scale);
+                        columnName, columnType,
+                        nullable, type.isAutoincrement(),
+                        length, scale);
                 LogUtil.fineMF(logger, "Found column: {0} of type {1}",
                         column.getQualifiedName(),
                         column.getColumnType());
-                Type type = getTypeByName(columnType);
                 column.setJavaType(type.getDefaultJavaType());
 
                 table.getColumns().add(column);

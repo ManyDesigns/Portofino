@@ -136,7 +136,7 @@
         </action>
         <action name="ConnectionProviders"
                 class="com.manydesigns.portofino.actions.upstairs.ConnectionProvidersAction">
-            <result name="search">/skins/default/upstairs/connectionProviders/search.jsp</result>
+            <result name="list">/skins/default/upstairs/connectionProviders/list.jsp</result>
             <result name="read">/skins/default/upstairs/connectionProviders/read.jsp</result>
             <result name="returnToSearch" type="redirectAction">
                 <param name="actionName">ConnectionProviders</param>
