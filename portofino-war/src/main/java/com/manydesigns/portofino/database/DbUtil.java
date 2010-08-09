@@ -35,6 +35,7 @@ import org.hibernate.Hibernate;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.logging.Logger;
 
 /*
@@ -98,63 +99,53 @@ public class DbUtil {
     }
 
 
-    public static org.hibernate.type.Type getHibernateType(String type) {
-        if ("VARCHAR".equalsIgnoreCase(type)){
-            return Hibernate.STRING;
+    public static org.hibernate.type.Type getHibernateType(int jdbcType) {
+        switch (jdbcType) {
+            case Types.BIGINT:
+                return Hibernate.LONG;
+            case Types.BIT:
+            case Types.BOOLEAN:
+                return Hibernate.BOOLEAN;
+            case Types.CHAR:
+            case Types.VARCHAR:
+                return Hibernate.STRING;
+            case Types.DATE:
+                return Hibernate.DATE;
+            case Types.TIME:
+                return Hibernate.TIME;
+            case Types.TIMESTAMP:
+                return Hibernate.TIMESTAMP;
+            case Types.DECIMAL:
+            case Types.NUMERIC:
+                return Hibernate.BIG_DECIMAL;
+            case Types.DOUBLE:
+            case Types.REAL:
+                return Hibernate.DOUBLE;
+            case Types.FLOAT:
+                return Hibernate.FLOAT;
+            case Types.INTEGER:
+                return Hibernate.INTEGER;
+            case Types.SMALLINT:
+                return Hibernate.SHORT;
+            case Types.TINYINT:
+                return Hibernate.BYTE;
+            case Types.ARRAY:
+            case Types.BINARY:
+            case Types.BLOB:
+            case Types.CLOB:
+            case Types.DATALINK:
+            case Types.DISTINCT:
+            case Types.JAVA_OBJECT:
+            case Types.LONGVARBINARY:
+            case Types.LONGVARCHAR:
+            case Types.NULL:
+            case Types.OTHER:
+            case Types.REF:
+            case Types.STRUCT:
+            case Types.VARBINARY:
+            default:
+                throw new Error("Unsupported type: " + jdbcType);
         }
-        if ("BIT".equalsIgnoreCase(type)){
-            return Hibernate.BYTE;
-        }
-        if ("BOOLEAN".equalsIgnoreCase(type)){
-            return Hibernate.BOOLEAN;
-        }
-        if ("BOOL".equalsIgnoreCase(type)){
-            return Hibernate.BOOLEAN;
-        }
-        if ("CHAR".equalsIgnoreCase(type)){
-            return Hibernate.CHARACTER;
-        }
-        if ("CLOB".equalsIgnoreCase(type)){
-            return Hibernate.CLOB;
-        }
-        if ("BLOB".equalsIgnoreCase(type)){
-            return Hibernate.BLOB;
-        }
-        if ("DATE".equalsIgnoreCase(type)){
-            return Hibernate.DATE;
-        }
-        if ("DECIMAL".equalsIgnoreCase(type)){
-            return Hibernate.BIG_DECIMAL;
-        }
-        if ("DOUBLE".equalsIgnoreCase(type)){
-            return Hibernate.DOUBLE;
-        }
-        if ("FLOAT".equalsIgnoreCase(type)){
-            return Hibernate.FLOAT;
-        }
-        if ("INTEGER".equalsIgnoreCase(type)){
-            return Hibernate.INTEGER;
-        }
-        if ("INT4".equalsIgnoreCase(type)){
-            return Hibernate.INTEGER;
-        }
-        if ("NUMERIC".equalsIgnoreCase(type)){
-            return Hibernate.BIG_DECIMAL;
-        }
-        if ("SMALLINT".equalsIgnoreCase(type)){
-            return Hibernate.INTEGER;
-        }
-        if ("TIME".equalsIgnoreCase(type)){
-            return Hibernate.TIME;
-        }
-        if ("TIMESTAMP".equalsIgnoreCase(type)){
-            return Hibernate.TIMESTAMP;
-        }
-        if ("SERIAL".equalsIgnoreCase(type)){
-            return Hibernate.INTEGER;
-        }
-
-        return null;
     }
 
 }

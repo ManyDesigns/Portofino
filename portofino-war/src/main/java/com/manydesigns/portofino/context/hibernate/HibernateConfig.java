@@ -165,10 +165,7 @@ public class HibernateConfig {
         col.setScale(column.getScale());
         col.setNullable(column.isNullable());
         String columnType = column.getColumnType();
-        System.out.println("Column type: " + columnType);
-
         Type type = databaseAbstraction.getTypeByName(columnType);
-        System.out.println("Portofino type: " + type);
         col.setSqlTypeCode(type.getJdbcType());
 
 
@@ -177,8 +174,8 @@ public class HibernateConfig {
         prop.setNodeName(column.getColumnName());
         SimpleValue value = new SimpleValue();
         value.setTable(tab);
-        org.hibernate.type.Type hibernateType = DbUtil.getHibernateType(columnType);
-        System.out.println("Hibernate type: " + hibernateType);
+        org.hibernate.type.Type hibernateType =
+                DbUtil.getHibernateType(type.getJdbcType());
         value.setTypeName(hibernateType.getName());
         value.addColumn(col);
         tab.addColumn(col);
@@ -213,15 +210,13 @@ public class HibernateConfig {
             Column col = new Column();
             col.setName(column.getColumnName());
             String columnType = column.getColumnType();
-            System.out.println("Column type: " + columnType);
 
             Type type = databaseAbstraction.getTypeByName(columnType);
-            System.out.println("Portofino type: " + type);
             col.setSqlTypeCode(type.getJdbcType());
             primaryKey.addColumn(col);
             SimpleValue value = new SimpleValue();
             value.setTable(tab);
-            value.setTypeName(DbUtil.getHibernateType(column.getColumnType())
+            value.setTypeName(DbUtil.getHibernateType(type.getJdbcType())
                     .getName());
             value.addColumn(col);
 
@@ -269,8 +264,7 @@ public class HibernateConfig {
         col.setNullable(column.isNullable());
         Type type = databaseAbstraction.getTypeByName(columnType);
         col.setSqlTypeCode(type.getJdbcType());
-        org.hibernate.type.Type hibernateType = DbUtil.getHibernateType(columnType);
-        System.out.println("Hibernate type: " + hibernateType);
+        org.hibernate.type.Type hibernateType = DbUtil.getHibernateType(type.getJdbcType());
         id.setTypeName(hibernateType.getName());
 
         mappings.addColumnBinding(column.getColumnName(),

@@ -29,6 +29,10 @@
 
 package com.manydesigns.portofino.database;
 
+import java.math.BigDecimal;
+import java.sql.Types;
+import java.util.Date;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -85,6 +89,53 @@ public class Type {
 
     public int getJdbcType() {
         return jdbcType;
+    }
+
+    public Class getDefaultJavaType() {
+        switch (jdbcType) {
+            case Types.BIGINT:
+                return Long.class;
+            case Types.BIT:
+            case Types.BOOLEAN:
+                return Boolean.class;
+            case Types.CHAR:
+            case Types.VARCHAR:
+                return String.class;
+            case Types.DATE:
+            case Types.TIME:
+            case Types.TIMESTAMP:
+                return Date.class;
+            case Types.DECIMAL:
+            case Types.NUMERIC:
+                return BigDecimal.class;
+            case Types.DOUBLE:
+            case Types.REAL:
+                return Double.class;
+            case Types.FLOAT:
+                return Float.class;
+            case Types.INTEGER:
+                return Integer.class;
+            case Types.SMALLINT:
+                return Short.class;
+            case Types.TINYINT:
+                return Byte.class;
+            case Types.ARRAY:
+            case Types.BINARY:
+            case Types.BLOB:
+            case Types.CLOB:
+            case Types.DATALINK:
+            case Types.DISTINCT:
+            case Types.JAVA_OBJECT:
+            case Types.LONGVARBINARY:
+            case Types.LONGVARCHAR:
+            case Types.NULL:
+            case Types.OTHER:
+            case Types.REF:
+            case Types.STRUCT:
+            case Types.VARBINARY:
+            default:
+                throw new Error("Unsupported type: " + jdbcType);
+        }
     }
 
     public boolean isAutoincrement() {

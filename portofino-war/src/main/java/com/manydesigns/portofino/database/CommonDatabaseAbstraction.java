@@ -385,6 +385,9 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
                 LogUtil.fineMF(logger, "Found column: {0} of type {1}",
                         column.getQualifiedName(),
                         column.getColumnType());
+                Type type = getTypeByName(columnType);
+                column.setJavaType(type.getDefaultJavaType());
+
                 table.getColumns().add(column);
             }
         } finally {

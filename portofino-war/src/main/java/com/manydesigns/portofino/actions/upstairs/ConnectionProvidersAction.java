@@ -138,6 +138,7 @@ public class ConnectionProvidersAction
                         "databaseProductName",
                         "databaseProductVersion",
                         "databaseMajorMinorVersion",
+                        "driverClassName",
                         "driverName",
                         "driverVersion",
                         "driverMajorMinorVersion",
