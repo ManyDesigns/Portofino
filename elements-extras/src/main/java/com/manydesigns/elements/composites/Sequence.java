@@ -30,7 +30,6 @@
 package com.manydesigns.elements.composites;
 
 import com.manydesigns.elements.Element;
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 /*
@@ -42,9 +41,9 @@ public class Sequence extends AbstractReflectiveCompositeElement {
     public static final String copyright =
             "Copyright (c) 2005-2009, ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Costruttori
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public Sequence() {
         this(null);
     }
@@ -53,9 +52,9 @@ public class Sequence extends AbstractReflectiveCompositeElement {
         super(prefix);
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Implementazione di Element
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public void toXhtml(XhtmlBuffer xb) {
         for (Element component : elements()) {
             component.toXhtml(xb);

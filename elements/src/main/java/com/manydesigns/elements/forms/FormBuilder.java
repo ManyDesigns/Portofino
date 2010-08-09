@@ -53,6 +53,7 @@ public class FormBuilder {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public final static int DEFAULT_N_COLUMNS = 1;
+    public final static String[] PROPERTY_NAME_BLACKLIST = {"class"};
 
     //**************************************************************************
     // Fields
@@ -144,6 +145,7 @@ public class FormBuilder {
     public FormBuilder configReflectiveFields() {
         LogUtil.entering(logger, "configReflectiveFields");
 
+        List<String> blackList = Arrays.asList(PROPERTY_NAME_BLACKLIST);
         groupedPropertyAccessors = new ArrayList<ArrayList<PropertyAccessor>>();
         fieldSetNames = new ArrayList<String>();
 
@@ -153,7 +155,10 @@ public class FormBuilder {
             if (Modifier.isStatic(current.getModifiers())) {
                 continue;
             }
-            
+            if (blackList.contains(current.getName())) {
+                continue;
+            }
+
             String groupName = null;
             if (current.isAnnotationPresent(
                     com.manydesigns.elements.annotations.FieldSet.class)) {

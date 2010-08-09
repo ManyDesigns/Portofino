@@ -29,8 +29,8 @@
 
 package com.manydesigns.portofino.util;
 
-import com.manydesigns.elements.forms.ExpressionGenerator;
-import com.manydesigns.elements.forms.Generator;
+import com.manydesigns.elements.text.ExpressionGenerator;
+import com.manydesigns.elements.text.Generator;
 import com.manydesigns.portofino.model.Column;
 import com.manydesigns.portofino.model.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;

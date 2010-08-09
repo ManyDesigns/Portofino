@@ -53,9 +53,9 @@ public class TextSearchField extends AbstractSearchField {
     protected String matchModeParam;
 
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Costruttori
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public TextSearchField(PropertyAccessor accessor) {
         this(accessor, null);
@@ -68,9 +68,9 @@ public class TextSearchField extends AbstractSearchField {
     }
 
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Element implementation
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public void toXhtml(XhtmlBuffer xb) {
         xb.writeLabel(StringUtils.capitalize(accessor.getName()),

@@ -27,13 +27,12 @@
  *
  */
 
-package com.manydesigns.elements.hyperlinks;
+package com.manydesigns.elements.text;
 
-import com.manydesigns.elements.Util;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
-import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,39 +44,35 @@ import java.util.regex.Pattern;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ExpressionHyperlinkGenerator implements HyperlinkGenerator {
+public class ExpressionGenerator implements Generator {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
     public final Pattern pattern = Pattern.compile("\\{[^\\}]*\\}");
 
-    private final String parsedHrefExpression;
-    private final List<PropertyAccessor> hrefPropertyAccessors;
+    protected final String parsedExpression;
+    protected final List<PropertyAccessor> propertyAccessors;
 
-    private final String parsedAltExpression;
-    private final List<PropertyAccessor> altPropertyAccessors;
 
-    public ExpressionHyperlinkGenerator(ClassAccessor classAccessor,
-                                   String hrefExpression,
-                                   String altExpression) {
-        hrefPropertyAccessors = new ArrayList<PropertyAccessor>();
-        parsedHrefExpression =
-                parseExpression(classAccessor, hrefExpression,
-                        hrefPropertyAccessors);
+    //**************************************************************************
+    // Constructors
+    //**************************************************************************
 
-        // alt can be null
-        if (altExpression == null) {
-            altPropertyAccessors = null;
-            parsedAltExpression = null;
-        } else {
-            altPropertyAccessors = new ArrayList<PropertyAccessor>();
-            parsedAltExpression =
-                    parseExpression(classAccessor, altExpression,
-                            altPropertyAccessors);
-        }
+    public ExpressionGenerator(Class clazz, String expression) {
+        this(new JavaClassAccessor(clazz), expression);
     }
 
-    private String parseExpression(ClassAccessor classAccessor,
+    public ExpressionGenerator(ClassAccessor classAccessor, String expression) {
+        propertyAccessors = new ArrayList<PropertyAccessor>();
+        parsedExpression =
+                parseExpression(classAccessor, expression, propertyAccessors);
+    }
+
+    protected String parseExpression(ClassAccessor classAccessor,
                                    String expression,
                                    List<PropertyAccessor> propertyAccessors) {
         Matcher m = pattern.matcher(expression);
@@ -107,19 +102,12 @@ public class ExpressionHyperlinkGenerator implements HyperlinkGenerator {
         return sb.toString();
     }
 
-    public String generateHref(Object obj) {
-        return Util.getAbsoluteLink(
-                runExpression(obj,
-                        hrefPropertyAccessors, parsedHrefExpression));
-    }
 
-    public String generateAlt(Object obj) {
-        return runExpression(obj, altPropertyAccessors, parsedAltExpression);
-    }
+    //**************************************************************************
+    // Generator implementation
+    //**************************************************************************
 
-    protected String runExpression(Object obj,
-                                 List<PropertyAccessor> propertyAccessors,
-                                 String parsedExpression) {
+    public String generate(Object obj) {
         if (obj == null) {
             return null;
         }
@@ -129,10 +117,8 @@ public class ExpressionHyperlinkGenerator implements HyperlinkGenerator {
                 args[i] = propertyAccessors.get(i).get(obj);
             }
             return MessageFormat.format(parsedExpression, args);
-        } catch (IllegalAccessException e) {
+        } catch (Throwable e) {
             return null;
-        } catch (InvocationTargetException e) {
-            throw new Error(e);
         }
     }
 

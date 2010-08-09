@@ -51,9 +51,9 @@ public class RadioField extends AbstractField {
     protected OptionProvider optionProvider;
     protected String stringValue;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Constructors
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public RadioField(PropertyAccessor accessor) {
         this(accessor, null);
     }
@@ -85,9 +85,9 @@ public class RadioField extends AbstractField {
         }
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Implementazione di Component
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public void readFromRequest(HttpServletRequest req) {
         super.readFromRequest(req);
@@ -231,9 +231,9 @@ public class RadioField extends AbstractField {
         xb.closeElement("div");
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Getter/setter
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public OptionProvider getOptionProvider() {
         return optionProvider;

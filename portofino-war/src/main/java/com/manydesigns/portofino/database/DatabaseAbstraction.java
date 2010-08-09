@@ -29,9 +29,8 @@
 
 package com.manydesigns.portofino.database;
 
+import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.portofino.model.Database;
-
-import java.sql.SQLException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -50,6 +49,7 @@ public interface DatabaseAbstraction {
 
     public Integer getDatabaseMinorVersion();
 
+    @Label("database major/minor version")
     public String getDatabaseMajorMinorVersion();
 
     public String getDriverName();
@@ -60,17 +60,17 @@ public interface DatabaseAbstraction {
 
     public Integer getDriverMinorVersion();
 
+    @Label("driver major/minor version")
     public String getDriverMajorMinorVersion();
 
     public Integer getJDBCMajorVersion();
 
     public Integer getJDBCMinorVersion();
 
+    @Label("JDBC major/minor version")
     public String getJDBCMajorMinorVersion();
 
     public String getDriverClassName();
-
-    public ConnectionProvider getConnectionProvider();
 
     public String getConnectionString(String host, int port, String dbName,
             String login, String password);
@@ -79,7 +79,6 @@ public interface DatabaseAbstraction {
 
     public Type getTypeByName(String typeName);
 
-    public Database readModelFromConnection(String databaseName)
-            throws SQLException;
+    public Database readModelFromConnection();
 
 }

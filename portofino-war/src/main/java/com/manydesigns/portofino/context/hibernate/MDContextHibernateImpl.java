@@ -33,8 +33,6 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.context.MDContext;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DatabaseAbstraction;
-import com.manydesigns.portofino.database.DatabaseAbstractionManager;
-import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.io.ConnectionsParser;
 import com.manydesigns.portofino.model.io.DBParser;
@@ -46,12 +44,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 
-import java.sql.SQLException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.io.Serializable;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -62,11 +59,11 @@ public class MDContextHibernateImpl implements MDContext {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Fields
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
-    protected List<Connection> connections;
+    protected List<ConnectionProvider> connectionProviders;
     protected DataModel dataModel;
     protected Map<String, HibernateDatabaseSetup> setups;
     protected final ThreadLocal<StopWatch> stopWatches;
@@ -74,24 +71,24 @@ public class MDContextHibernateImpl implements MDContext {
     public static final Logger logger =
             LogUtil.getLogger(MDContextHibernateImpl.class);
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Constructors
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public MDContextHibernateImpl() {
         stopWatches = new ThreadLocal<StopWatch>();
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Model loading
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public void loadConnectionsAsResource(String resource) {
         LogUtil.entering(logger, "loadConnectionsAsResource", resource);
 
         ConnectionsParser parser = new ConnectionsParser();
         try {
-            connections = parser.parse(resource);
+            connectionProviders = parser.parse(resource);
         } catch (Exception e) {
             LogUtil.severeMF(logger, "Cannot load/parse connection: {0}", e,
                     resource);
@@ -122,25 +119,17 @@ public class MDContextHibernateImpl implements MDContext {
             for (Database database : newDataModel.getDatabases()) {
                 String databaseName = database.getDatabaseName();
 
-                Connection connection =
-                        findConnectionByDatabaseName(databaseName);
                 ConnectionProvider connectionProvider =
-                        new JdbcConnectionProvider(
-                                connection.getDriverClass(),
-                                connection.getConnectionUrl(),
-                                connection.getUsername(),
-                                connection.getPassword());
-                DatabaseAbstraction abstraction =
-                        DatabaseAbstractionManager.getManager()
-                                .getDatabaseAbstraction(connectionProvider);
-                HibernateConfig builder = new HibernateConfig(abstraction);
+                        getConnectionProvider(databaseName);
+                HibernateConfig builder =
+                        new HibernateConfig(connectionProvider);
                 Configuration configuration =
                         builder.buildSessionFactory(database);
                 SessionFactory sessionFactory =
                         configuration.buildSessionFactory();
 
                 HibernateDatabaseSetup setup =
-                        new HibernateDatabaseSetup(abstraction,
+                        new HibernateDatabaseSetup(
                                 configuration, sessionFactory);
                 newSetups.put(databaseName, setup);
             }
@@ -151,26 +140,26 @@ public class MDContextHibernateImpl implements MDContext {
         }
     }
 
-    private Connection findConnectionByDatabaseName(String name) {
-        for (Connection current : connections) {
-            if (current.getDatabaseName().equals(name)) {
+    //**************************************************************************
+    // Database stuff
+    //**************************************************************************
+
+    public ConnectionProvider getConnectionProvider(String databaseName) {
+        for (ConnectionProvider current : connectionProviders) {
+            if (current.getDatabaseName().equals(databaseName)) {
                 return current;
             }
         }
         return null;
     }
 
-    //--------------------------------------------------------------------------
-    // Database stuff
-    //--------------------------------------------------------------------------
-
-    public DatabaseAbstraction getDatabaseAbstraction(String databaseName) {
-        return setups.get(databaseName).getDatabaseAbstraction();
-    }
-
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Modell access
-    //--------------------------------------------------------------------------
+    //**************************************************************************
+
+    public List<ConnectionProvider> getConnectionProviders() {
+        return connectionProviders;
+    }
 
     public DataModel getDataModel() {
         return dataModel;
@@ -178,25 +167,20 @@ public class MDContextHibernateImpl implements MDContext {
 
     public void syncDataModel() {
         DataModel syncDataModel = new DataModel();
-        try {
-            for (Database database : dataModel.getDatabases()) {
-                DatabaseAbstraction abstraction =
-                        getDatabaseAbstraction(database.getDatabaseName());
-                Database syncDatabase =
-                        abstraction.readModelFromConnection(
-                                database.getDatabaseName());
+        for (ConnectionProvider current : connectionProviders) {
+            DatabaseAbstraction abstraction =
+                    current.getDatabaseAbstraction();
+            if (abstraction != null) {
+                Database syncDatabase = abstraction.readModelFromConnection();
                 syncDataModel.getDatabases().add(syncDatabase);
-
-                installDataModel(syncDataModel);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+        installDataModel(syncDataModel);
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Persistance
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public Map<String, Object> getObjectByPk(String qualifiedTableName,
                                              Object... pk) {
@@ -351,16 +335,20 @@ public class MDContextHibernateImpl implements MDContext {
         return result;
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Timers
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public void resetDbTimer() {
         stopWatches.set(null);
     }
 
     public long getDbTime() {
-        return stopWatches.get().getTime();
+        StopWatch stopWatch = stopWatches.get();
+        if (stopWatch != null) {
+            return stopWatch.getTime();
+        }
+        return 0L;
     }
 
     private void startTimer() {

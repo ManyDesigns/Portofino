@@ -57,16 +57,14 @@ public class JdbcMetadataReaderTest extends TestCase {
 
         connectionProvider =
                 new JdbcConnectionProvider(
+                        "dbprova",
                         "org.postgresql.Driver",
                         "jdbc:postgresql://127.0.0.1:5432/jpetstore",
                         "manydesigns",
                         "manydesigns");
 
-        databaseAbstraction =
-                DatabaseAbstractionManager.getManager()
-                        .getDatabaseAbstraction(connectionProvider);
-
-        database = databaseAbstraction.readModelFromConnection("dbprova");
+        databaseAbstraction = connectionProvider.getDatabaseAbstraction();
+        database = databaseAbstraction.readModelFromConnection();
     }
 
     public void testReadModelFromConnection() {

@@ -51,9 +51,9 @@ public class Selection extends AbstractReflectiveCompositeElement {
 
     protected SelectField _selectField;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Costruttori
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public Selection(PropertyAccessor accessor) {
         this(accessor, null);
     }
@@ -75,9 +75,9 @@ public class Selection extends AbstractReflectiveCompositeElement {
         }
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Implementazione di Component
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public void readFromRequest(HttpServletRequest req) {
         _selectField.readFromRequest(req);
         Integer selectedIndex = findIndexOfSelection();

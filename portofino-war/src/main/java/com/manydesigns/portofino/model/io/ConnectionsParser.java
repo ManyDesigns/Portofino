@@ -30,7 +30,8 @@
 package com.manydesigns.portofino.model.io;
 
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.portofino.model.Connection;
+import com.manydesigns.portofino.database.ConnectionProvider;
+import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.xml.DocumentCallback;
 import com.manydesigns.portofino.xml.ElementCallback;
 import com.manydesigns.portofino.xml.XmlParser;
@@ -55,13 +56,13 @@ public class ConnectionsParser extends XmlParser {
     public final static String CONNECTION = "connection";
     public final static String CONNECTIONS = "connections";
 
-    List<Connection> connections;
+    List<ConnectionProvider> connections;
 
     public static final Logger logger =
             LogUtil.getLogger(ConnectionsParser.class);
 
-    public List<Connection> parse(String resourceName) throws Exception {
-        connections = new ArrayList<Connection>();
+    public List<ConnectionProvider> parse(String resourceName) throws Exception {
+        connections = new ArrayList<ConnectionProvider>();
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         ClassLoader cl = this.getClass().getClassLoader();
         InputStream input = cl.getResourceAsStream(resourceName);
@@ -89,11 +90,10 @@ public class ConnectionsParser extends XmlParser {
             checkRequiredAttributes(attributes,
                     "databaseName", "url", "driver", "username", "password");
 
-            Connection connection = new Connection(
+            ConnectionProvider connection = new JdbcConnectionProvider(
                     attributes.get("databaseName"),
-                    attributes.get("type"),
-                    attributes.get("url"),
                     attributes.get("driver"),
+                    attributes.get("url"),
                     attributes.get("username"),
                     attributes.get("password")
             );

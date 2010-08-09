@@ -32,9 +32,10 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
-import com.manydesigns.elements.hyperlinks.ExpressionHyperlinkGenerator;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.text.Generator;
+import com.manydesigns.elements.text.HrefExpressionGenerator;
 import com.manydesigns.portofino.context.MDContext;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.interceptors.MDContextAware;
@@ -69,9 +70,9 @@ public class TableDataAction extends ActionSupport
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Action results
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public final static String SEARCH = "search";
     public final static String RETURN_TO_SEARCH = "returnToSearch";
@@ -86,9 +87,9 @@ public class TableDataAction extends ActionSupport
     public final static String CANCEL = "cancel";
 
     
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // MDContextAware implementation
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public MDContext context;
     public DataModel dataModel;
@@ -98,9 +99,9 @@ public class TableDataAction extends ActionSupport
         dataModel = context.getDataModel();
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // ServletRequestAware implementation
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public HttpServletRequest req;
 
@@ -109,9 +110,9 @@ public class TableDataAction extends ActionSupport
     }
 
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Web parameters
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String qualifiedTableName;
     public String pk;
@@ -120,9 +121,9 @@ public class TableDataAction extends ActionSupport
     public String cancelReturnUrl;
     public String skin;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Web parameters setters (for struts.xml inspections in IntelliJ)
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public void setQualifiedTableName(String qualifiedTableName) {
         this.qualifiedTableName = qualifiedTableName;
@@ -132,43 +133,43 @@ public class TableDataAction extends ActionSupport
         this.skin = skin;
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Model metadata
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public Table table;
     public TableAccessor tableAccessor;
 
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Model objects
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public Map<String, Object> object;
     public List<Map<String, Object>> objects;
 
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Presentation elements
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public TableForm tableForm;
     public Form form;
     public SearchForm searchForm;
     public List<RelatedTableForm> relatedTableFormList;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Other objects
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public TableHelper tableHelper = new TableHelper();
 
     public static final Logger logger =
             LogUtil.getLogger(TableDataAction.class);
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Action default execute method
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String execute() {
         if (pk == null) {
@@ -178,9 +179,9 @@ public class TableDataAction extends ActionSupport
         }
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Common methods
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public void setupTable() {
         table = dataModel.findTableByQualifiedName(qualifiedTableName);
@@ -190,9 +191,9 @@ public class TableDataAction extends ActionSupport
         tableAccessor = new TableAccessor(table);
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Search
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String searchFromString() {
         setupTable();
@@ -248,9 +249,8 @@ public class TableDataAction extends ActionSupport
         objects = context.getObjects(criteria);
 
         String readLinkExpression = getReadLinkExpression();
-        ExpressionHyperlinkGenerator generator =
-                new ExpressionHyperlinkGenerator(
-                        tableAccessor, readLinkExpression, "dummy-alt");
+        Generator hrefGenerator =
+                new HrefExpressionGenerator(tableAccessor, readLinkExpression);
 
         TableFormBuilder tableFormBuilder =
                 new TableFormBuilder(tableAccessor)
@@ -258,8 +258,8 @@ public class TableDataAction extends ActionSupport
 
         // ogni colonna chiave primaria sarà clickabile
         for (Column column : table.getPrimaryKey().getColumns()) {
-            tableFormBuilder.configHyperlinkGenerator(
-                    column.getColumnName(), generator);
+            tableFormBuilder.configHyperlinkGenerators(
+                    column.getColumnName(), hrefGenerator, null);
         }
 
         tableForm = tableFormBuilder.build();
@@ -307,18 +307,18 @@ public class TableDataAction extends ActionSupport
         return sb.toString();
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Return to search
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String returnToSearch() {
         setupTable();
         return RETURN_TO_SEARCH;
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Read
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String read() {
         setupTable();
@@ -366,9 +366,9 @@ public class TableDataAction extends ActionSupport
         relatedTableFormList.add(relatedTableForm);
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Create/Save
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String create() {
         setupTable();
@@ -401,9 +401,9 @@ public class TableDataAction extends ActionSupport
         }
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Edit/Update
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String edit() {
         setupTable();
@@ -486,9 +486,9 @@ public class TableDataAction extends ActionSupport
         }
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Delete
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String delete() {
         setupTable();
@@ -515,9 +515,9 @@ public class TableDataAction extends ActionSupport
         return DELETE;
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Cancel
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String cancel() {
         return CANCEL;

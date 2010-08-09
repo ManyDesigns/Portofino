@@ -29,16 +29,16 @@
 
 package com.manydesigns.elements.forms;
 
-import com.manydesigns.elements.AbstractCompositeElement;
+import com.manydesigns.elements.Element;
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.Util;
-import com.manydesigns.elements.annotations.Id;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.hyperlinks.HyperlinkGenerator;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.text.Generator;
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import org.apache.commons.lang.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.List;
@@ -48,17 +48,22 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableFormColumn extends AbstractCompositeElement<Field> {
+public class TableFormColumn implements Element {
     public static final String copyright =
             "Copyright (c) 2005-2009, ManyDesigns srl";
 
+    protected final Field[] fields;
     protected final PropertyAccessor propertyAccessor;
-    protected String label;
-    protected HyperlinkGenerator hyperlinkGenerator;
 
-    //--------------------------------------------------------------------------
+    protected Mode mode = Mode.EDIT;
+
+    protected String label;
+    protected Generator hrefGenerator;
+    protected Generator altGenerator;
+
+    //**************************************************************************
     // Costruttori
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public TableFormColumn(PropertyAccessor propertyAccessor, int nRows) {
         this(propertyAccessor, nRows, null);
@@ -66,17 +71,8 @@ public class TableFormColumn extends AbstractCompositeElement<Field> {
 
     public TableFormColumn(PropertyAccessor propertyAccessor,
                            int nRows, String prefix) {
-        super(nRows);
+        fields = new Field[nRows];
         this.propertyAccessor = propertyAccessor;
-
-        String localId;
-        if (propertyAccessor.isAnnotationPresent(Id.class)) {
-            localId = propertyAccessor.getAnnotation(Id.class).value();
-        } else {
-            localId = propertyAccessor.getName();
-        }
-        Object[] idArgs = {prefix, localId};
-        id = StringUtils.join(idArgs);
 
         if (propertyAccessor.isAnnotationPresent(Label.class)) {
             label = propertyAccessor.getAnnotation(Label.class).value();
@@ -86,15 +82,29 @@ public class TableFormColumn extends AbstractCompositeElement<Field> {
     }
 
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Implementazione di Element
-    //--------------------------------------------------------------------------
+    //**************************************************************************
+
+    public void readFromRequest(HttpServletRequest req) {
+        for (Field current : fields) {
+            current.readFromRequest(req);
+        }
+    }
+
+
+    public boolean validate() {
+        boolean result = true;
+        for (Field current : fields) {
+            result = current.validate() && result;
+        }
+        return result;
+    }
 
     public void toXhtml(XhtmlBuffer xhtmlBuffer) {
 
     }
 
-    @Override
     public void readFromObject(Object obj) {
         Class clazz = obj.getClass();
         if (clazz.isArray()) { // Tratta obj come un array
@@ -109,7 +119,7 @@ public class TableFormColumn extends AbstractCompositeElement<Field> {
 
             // Scorre le rimanenti righe del table form,
             // passano null come ottetto di bind.
-            for (int i = arrayLength; i < size(); i++) {
+            for (int i = arrayLength; i < fields.length; i++) {
                 readFromObject(i, null);
             }
         } else if (Collection.class.isAssignableFrom(clazz)) {
@@ -122,23 +132,24 @@ public class TableFormColumn extends AbstractCompositeElement<Field> {
                 i++;
             }
 
-            for (; i < size(); i++) {
+            for (; i < fields.length; i++) {
                 readFromObject(i, null);
             }
         }
     }
 
     protected void readFromObject(int rowIndex, Object obj) {
-        Field field = get(rowIndex);
-        if (hyperlinkGenerator != null) {
-            field.setHref(hyperlinkGenerator.generateHref(obj));
-            field.setAlt(hyperlinkGenerator.generateAlt(obj));
+        Field field = fields[rowIndex];
+        if (hrefGenerator != null) {
+            field.setHref(hrefGenerator.generate(obj));
+            if (altGenerator != null) {
+                field.setAlt(altGenerator.generate(obj));
+            }
         }
         field.readFromObject(obj);
     }
 
 
-    @Override
     public void writeToObject(Object obj) {
         Class clazz = obj.getClass();
         if (clazz.isArray()) { // Tratta obj come un array
@@ -148,14 +159,24 @@ public class TableFormColumn extends AbstractCompositeElement<Field> {
             final int arrayLength = Array.getLength(obj);
             for (int i = 0; i < arrayLength; i++) {
                 Object currentObj = Array.get(obj, i);
-                get(i).writeToObject(currentObj);
+                fields[i].writeToObject(currentObj);
             }
         }
     }
 
-    //--------------------------------------------------------------------------
+    public Mode getMode() {
+        return mode;
+    }
+
+    public void setMode(Mode mode) {
+        this.mode = mode;
+        for (Field current : fields) {
+            current.setMode(mode);
+        }
+    }
+    //**************************************************************************
     // Getter/setter
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public PropertyAccessor getPropertyAccessor() {
         return propertyAccessor;
@@ -174,20 +195,32 @@ public class TableFormColumn extends AbstractCompositeElement<Field> {
     }
 
     public void valueToXhtml(XhtmlBuffer xb, int rowIndex) {
-        Field field = this.get(rowIndex);
+        Field field = fields[rowIndex];
         field.valueToXhtml(xb);
     }
 
     public List<String> getErrors(int rowIndex) {
-        Field field = this.get(rowIndex);
+        Field field = fields[rowIndex];
         return field.getErrors();
     }
 
-    public HyperlinkGenerator getHyperlinkGenerator() {
-        return hyperlinkGenerator;
+    public Generator getHrefGenerator() {
+        return hrefGenerator;
     }
 
-    public void setHyperlinkGenerator(HyperlinkGenerator hyperlinkGenerator) {
-        this.hyperlinkGenerator = hyperlinkGenerator;
+    public void setHrefGenerator(Generator hrefGenerator) {
+        this.hrefGenerator = hrefGenerator;
+    }
+
+    public Generator getAltGenerator() {
+        return altGenerator;
+    }
+
+    public void setAltGenerator(Generator altGenerator) {
+        this.altGenerator = altGenerator;
+    }
+
+    public Field[] getFields() {
+        return fields;
     }
 }

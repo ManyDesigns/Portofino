@@ -27,17 +27,17 @@
  *
  */
 
-package com.manydesigns.elements.hyperlinks;
+package com.manydesigns.elements.text;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface HyperlinkGenerator {
+public interface Generator {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public String generateHref(Object obj);
-    public String generateAlt(Object obj);
+    public String generate(Object obj);
+
 }

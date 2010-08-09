@@ -53,9 +53,9 @@ public abstract class AbstractReflectiveCompositeElement implements Element {
     protected Mode _mode = Mode.EDIT;
     protected List<Field> _fields;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Costruttori
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     protected AbstractReflectiveCompositeElement() {
         this(null);
     }
@@ -85,9 +85,9 @@ public abstract class AbstractReflectiveCompositeElement implements Element {
         }
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Implementazioni di Element
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public void readFromRequest(HttpServletRequest req) {
         for (Element component : elements()) {
@@ -127,9 +127,9 @@ public abstract class AbstractReflectiveCompositeElement implements Element {
     }
 
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Altri metodi
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public List<Element> elements() {
         List<Element> components = new ArrayList<Element>();

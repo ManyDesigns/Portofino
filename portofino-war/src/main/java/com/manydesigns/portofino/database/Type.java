@@ -38,32 +38,32 @@ public class Type {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Fields
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     protected final String typeName;
-    protected final int dataType;
+    protected final int jdbcType;
+    protected final boolean autoincrement;
     protected final int maximumPrecision;
     protected final String literalPrefix;
     protected final String literalSuffix;
     protected final boolean nullable;
     protected final boolean caseSensitive;
     protected final boolean searchable;
-    protected final boolean autoincrement;
     protected final short minimumScale;
     protected final short maximumScale;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Constructors
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
-    public Type(String typeName, int dataType, int maximumPrecision,
+    public Type(String typeName, int jdbcType, int maximumPrecision,
                 String literalPrefix, String literalSuffix,
                 boolean nullable, boolean caseSensitive, boolean searchable,
                 boolean autoincrement, short minimumScale, short maximumScale) {
         this.typeName = typeName;
-        this.dataType = dataType;
+        this.jdbcType = jdbcType;
         this.maximumPrecision = maximumPrecision;
         this.literalPrefix = literalPrefix;
         this.literalSuffix = literalSuffix;
@@ -75,16 +75,20 @@ public class Type {
         this.maximumScale = maximumScale;
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Getters/setter
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String getTypeName() {
         return typeName;
     }
 
-    public int getDataType() {
-        return dataType;
+    public int getJdbcType() {
+        return jdbcType;
+    }
+
+    public boolean isAutoincrement() {
+        return autoincrement;
     }
 
     public int getMaximumPrecision() {
@@ -109,10 +113,6 @@ public class Type {
 
     public boolean isSearchable() {
         return searchable;
-    }
-
-    public boolean isAutoincrement() {
-        return autoincrement;
     }
 
     public short getMinimumScale() {

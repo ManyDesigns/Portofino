@@ -40,6 +40,11 @@ public interface ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Connection acquireConnection();
+    public String getDatabaseName();
+    public String getDescription();
+
+    public DatabaseAbstraction getDatabaseAbstraction();
+    public void test() throws Exception;
+    public Connection acquireConnection() throws Exception;
     public void releaseConnection(Connection conn);
 }

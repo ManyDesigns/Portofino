@@ -43,9 +43,9 @@ public class CodiceFiscaleField extends RegExpTextField {
     public final static String codiceFiscaleRegExp =
             "[A-Z]{6}[\\d]{2}[A-Z][\\d]{2}[A-Z][\\d]{3}[A-Z]";
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Constructors
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public CodiceFiscaleField(PropertyAccessor accessor) {
         this(accessor, null);
     }

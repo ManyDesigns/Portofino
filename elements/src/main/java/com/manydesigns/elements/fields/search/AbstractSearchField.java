@@ -60,9 +60,9 @@ public abstract class AbstractSearchField implements SearchField {
     public static final Logger logger =
             LogUtil.getLogger(AbstractSearchField.class);
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Costruttori
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public AbstractSearchField(PropertyAccessor accessor) {
         this(accessor, null);
     }
@@ -112,9 +112,9 @@ public abstract class AbstractSearchField implements SearchField {
         LogUtil.exiting(logger, "AbstractSearchField");
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Implementation of Element
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String getText(String key, Object... args) {
         return ElementsThreadLocals.getTextProvider().getText(key, args);
@@ -126,9 +126,9 @@ public abstract class AbstractSearchField implements SearchField {
     public void writeToObject(Object obj) {
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Getters/setters
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public PropertyAccessor getAccessor() {
         return accessor;

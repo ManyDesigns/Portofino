@@ -78,9 +78,9 @@ public abstract class AbstractField implements Field {
 
     public static final Logger logger = LogUtil.getLogger(AbstractField.class);
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Costruttori
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public AbstractField(PropertyAccessor accessor) {
         this(accessor, null);
     }
@@ -157,9 +157,9 @@ public abstract class AbstractField implements Field {
         LogUtil.exiting(logger, "AbstractField");
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Implementation of Element
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public void toXhtml(XhtmlBuffer xb) {
         if (mode.isView(immutable)) {
@@ -261,9 +261,9 @@ public abstract class AbstractField implements Field {
     public void readFromObject(Object obj) {
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Getters/setters
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public PropertyAccessor getAccessor() {
         return accessor;
@@ -369,9 +369,9 @@ public abstract class AbstractField implements Field {
         return required && !mode.isView(immutable);
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Other methods
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public void writeToObject(Object obj, Object value) {
         if (mode.isView(immutable) || (mode.isBulk() && !bulkChecked)) {

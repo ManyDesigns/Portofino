@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.context;
 
 import com.manydesigns.elements.fields.search.Criteria;
-import com.manydesigns.portofino.database.DatabaseAbstraction;
+import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.DataModel;
 
 import java.util.HashMap;
@@ -46,30 +46,31 @@ public interface MDContext {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Model loading
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     void loadConnectionsAsResource(String resource);
     void loadXmlModelAsResource(String resource);
 
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Database stuff
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
-    DatabaseAbstraction getDatabaseAbstraction(String databaseName);
+    List<ConnectionProvider> getConnectionProviders();
+    ConnectionProvider getConnectionProvider(String databaseName);
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Model access
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     DataModel getDataModel();
     void syncDataModel();
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Persistance
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     Map<String, Object> getObjectByPk(String qualifiedTableName,
                                       Object... pk);

@@ -29,7 +29,6 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
 /*
@@ -44,9 +43,9 @@ public class EmailField extends RegExpTextField {
     public final static String emailRegExp =
             "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Constructors
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public EmailField(PropertyAccessor accessor) {
         this(accessor, null);

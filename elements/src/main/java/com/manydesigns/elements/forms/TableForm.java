@@ -30,6 +30,7 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.AbstractCompositeElement;
+import com.manydesigns.elements.text.Generator;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 import java.lang.reflect.Array;
@@ -53,9 +54,9 @@ public class TableForm extends AbstractCompositeElement<TableFormColumn> {
     protected final boolean[] selected;
     protected Generator keyGenerator;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Costruttori
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public TableForm(int nRows) {
         this.nRows = nRows;
@@ -63,9 +64,9 @@ public class TableForm extends AbstractCompositeElement<TableFormColumn> {
         selected = new boolean[nRows];
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Implementazione di Element
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public void toXhtml(XhtmlBuffer xb) {
         xb.openElement("table");
@@ -159,9 +160,9 @@ public class TableForm extends AbstractCompositeElement<TableFormColumn> {
         rowKeys[index] = key;
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Getter/setter
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String getCaption() {
         return caption;

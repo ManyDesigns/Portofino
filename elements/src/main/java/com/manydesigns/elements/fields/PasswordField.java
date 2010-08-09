@@ -50,9 +50,9 @@ public class PasswordField extends TextField {
     private String confirmationValue;
     private boolean confirmationRequired = false;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Constructors
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public PasswordField(PropertyAccessor accessor) {
         this(accessor, null);
     }
@@ -61,9 +61,9 @@ public class PasswordField extends TextField {
         super(accessor, prefix);
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Field override
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     @Override
     public void readFromRequest(HttpServletRequest req) {
         super.readFromRequest(req);
@@ -221,9 +221,9 @@ public class PasswordField extends TextField {
         xb.closeElement("div");
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Getters/setters
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String getConfirmationValue() {
         return confirmationValue;

@@ -50,9 +50,9 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Fields
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     protected final ConnectionProvider connectionProvider;
 
@@ -77,12 +77,12 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
     public static final Logger logger =
             LogUtil.getLogger(CommonDatabaseAbstraction.class);
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Constructors
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public CommonDatabaseAbstraction(ConnectionProvider connectionProvider)
-            throws SQLException {
+            throws Exception {
         this.connectionProvider = connectionProvider;
         Connection conn = null;
         ResultSet typeRs = null;
@@ -164,9 +164,9 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
         }
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Implementation of DatabaseAbstraction
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String getDatabaseProductName() {
         return databaseProductName;
@@ -220,10 +220,6 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
         return JDBCMajorMinorVersion;
     }
 
-    public ConnectionProvider getConnectionProvider() {
-        return connectionProvider;
-    }
-
     public Type[] getTypes() {
         return types.clone();
     }
@@ -241,9 +237,8 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
     // Read entire model
     //**************************************************************************
 
-    public Database readModelFromConnection(String databaseName)
-            throws SQLException {
-        Database database = new Database(databaseName);
+    public Database readModelFromConnection() {
+        Database database = new Database(connectionProvider.getDatabaseName());
         Connection conn = null;
         try {
             conn = connectionProvider.acquireConnection();
@@ -253,6 +248,10 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
             readColumns(metadata, database);
             readPKs(metadata, database);
             readFKs(metadata, database);
+        } catch (Throwable e) {
+            LogUtil.severeMF(logger, "Could not read model from {0}",
+                    e, connectionProvider.getDatabaseName());
+            return null;
         } finally {
             DbUtil.closeConnection(conn);
         }

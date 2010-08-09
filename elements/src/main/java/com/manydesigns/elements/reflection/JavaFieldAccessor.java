@@ -29,6 +29,8 @@
 
 package com.manydesigns.elements.reflection;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
@@ -41,11 +43,25 @@ public class JavaFieldAccessor implements PropertyAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
     private Field field;
+
+
+    //**************************************************************************
+    // Constructors
+    //**************************************************************************
 
     public JavaFieldAccessor(Field field) {
         this.field = field;
     }
+
+
+    //**************************************************************************
+    // PropertyAccessor implementation
+    //**************************************************************************
 
     public String getName() {
         return field.getName();
@@ -73,5 +89,17 @@ public class JavaFieldAccessor implements PropertyAccessor {
 
     public void set(Object obj, Object value) throws IllegalAccessException {
         field.set(obj, value);
+    }
+
+
+    //**************************************************************************
+    // Overrides
+    //**************************************************************************
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("name", field.getName())
+                .toString();
     }
 }

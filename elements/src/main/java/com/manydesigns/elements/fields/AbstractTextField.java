@@ -48,9 +48,9 @@ public abstract class AbstractTextField extends AbstractField {
 
     protected int size = 70;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Costruttori
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public AbstractTextField(PropertyAccessor accessor) {
         this(accessor, null);
     }
@@ -62,9 +62,9 @@ public abstract class AbstractTextField extends AbstractField {
         }
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Implementazione di Element
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public boolean validate() {
         if (mode.isView(immutable) || (mode.isBulk() && !bulkChecked)) {
             return true;
@@ -83,9 +83,9 @@ public abstract class AbstractTextField extends AbstractField {
         return result;
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Field implementation
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public void valueToXhtml(XhtmlBuffer xb) {
         if (mode.isView(immutable)) {
             valueToXhtmlView(xb);
@@ -139,9 +139,9 @@ public abstract class AbstractTextField extends AbstractField {
         xb.closeElement("div");
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Getters/setters
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public String getStringValue() {
         return stringValue;
     }

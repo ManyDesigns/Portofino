@@ -31,6 +31,7 @@ package com.manydesigns.portofino.actions.upstairs;
 
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.context.MDContext;
+import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DatabaseAbstraction;
 import com.manydesigns.portofino.interceptors.MDContextAware;
 import com.manydesigns.portofino.model.DataModel;
@@ -62,11 +63,12 @@ public class SelfTestAction extends ActionSupport implements MDContextAware {
     public String execute() throws SQLException {
         dataModel = context.getDataModel();
         diff = new ModelDiff("In-memory model", "Database model");
-        for (Database database : dataModel.getDatabases()) {
+        for (ConnectionProvider current : context.getConnectionProviders()) {
+            Database database =
+                    dataModel.findDatabaseByName(current.getDatabaseName());
             DatabaseAbstraction abstraction =
-                    context.getDatabaseAbstraction(database.getDatabaseName());
-            Database database2 =
-                    abstraction.readModelFromConnection(database.getDatabaseName());
+                    current.getDatabaseAbstraction();
+            Database database2 = abstraction.readModelFromConnection();
 
             diff.diff(database, database2);
         }

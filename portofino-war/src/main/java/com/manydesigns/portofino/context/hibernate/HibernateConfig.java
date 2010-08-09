@@ -29,10 +29,7 @@
 package com.manydesigns.portofino.context.hibernate;
 
 
-import com.manydesigns.portofino.database.DatabaseAbstraction;
-import com.manydesigns.portofino.database.DbUtil;
-import com.manydesigns.portofino.database.JdbcConnectionProvider;
-import com.manydesigns.portofino.database.Type;
+import com.manydesigns.portofino.database.*;
 import com.manydesigns.portofino.model.Database;
 import com.manydesigns.portofino.model.Reference;
 import com.manydesigns.portofino.model.Relationship;
@@ -54,10 +51,12 @@ import java.util.List;
  */
 public class HibernateConfig {
 
+    protected final ConnectionProvider connectionProvider;
     protected final DatabaseAbstraction databaseAbstraction;
 
-    public HibernateConfig(DatabaseAbstraction databaseAbstraction) {
-        this.databaseAbstraction = databaseAbstraction;
+    public HibernateConfig(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
+        databaseAbstraction = connectionProvider.getDatabaseAbstraction();
     }
 
     public Configuration buildSessionFactory(Database database) {
@@ -65,16 +64,16 @@ public class HibernateConfig {
             Configuration configuration = new Configuration()
                     .setProperty("default_entity_mode", "dynamic-map");
 
-            JdbcConnectionProvider connectionProvider =
-                    (JdbcConnectionProvider)databaseAbstraction.getConnectionProvider();
+            JdbcConnectionProvider jdbcConnectionProvider =
+                    (JdbcConnectionProvider)connectionProvider;
             configuration.setProperty("hibernate.connection.url",
-                    connectionProvider.getJdbcConnectionURL())
+                    jdbcConnectionProvider.getConnectionURL())
                     .setProperty("hibernate.connection.driver_class",
-                            connectionProvider.getJdbcDriverClass())
+                            jdbcConnectionProvider.getDriverClass())
                     .setProperty("hibernate.connection.username",
-                            connectionProvider.getJdbcUsername())
+                            jdbcConnectionProvider.getUsername())
                     .setProperty("hibernate.connection.password",
-                            connectionProvider.getJdbcPassword())
+                            jdbcConnectionProvider.getPassword())
                     .setProperty("hibernate.current_session_context_class",
                             "org.hibernate.context.ThreadLocalSessionContext")
                     .setProperty("hibernate.show_sql", "true");
@@ -170,7 +169,7 @@ public class HibernateConfig {
 
         Type type = databaseAbstraction.getTypeByName(columnType);
         System.out.println("Portofino type: " + type);
-        col.setSqlTypeCode(type.getDataType());
+        col.setSqlTypeCode(type.getJdbcType());
 
 
         Property prop = new Property();
@@ -218,7 +217,7 @@ public class HibernateConfig {
 
             Type type = databaseAbstraction.getTypeByName(columnType);
             System.out.println("Portofino type: " + type);
-            col.setSqlTypeCode(type.getDataType());
+            col.setSqlTypeCode(type.getJdbcType());
             primaryKey.addColumn(col);
             SimpleValue value = new SimpleValue();
             value.setTable(tab);
@@ -269,7 +268,7 @@ public class HibernateConfig {
         col.setScale(column.getScale());
         col.setNullable(column.isNullable());
         Type type = databaseAbstraction.getTypeByName(columnType);
-        col.setSqlTypeCode(type.getDataType());
+        col.setSqlTypeCode(type.getJdbcType());
         org.hibernate.type.Type hibernateType = DbUtil.getHibernateType(columnType);
         System.out.println("Hibernate type: " + hibernateType);
         id.setTypeName(hibernateType.getName());

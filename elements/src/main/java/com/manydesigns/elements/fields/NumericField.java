@@ -57,9 +57,9 @@ public class NumericField extends AbstractTextField {
     protected BigDecimal maxValue;
     protected boolean decimalFormatError;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Costruttori
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public NumericField(PropertyAccessor accessor) {
         this(accessor, null);
     }
@@ -122,9 +122,9 @@ public class NumericField extends AbstractTextField {
         }
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Implementazione di Component
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public void readFromRequest(HttpServletRequest req) {
         super.readFromRequest(req);
 
@@ -251,9 +251,9 @@ public class NumericField extends AbstractTextField {
         writeToObject(obj, value);
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Getter/setter
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public BigDecimal getMinValue() {
         return minValue;

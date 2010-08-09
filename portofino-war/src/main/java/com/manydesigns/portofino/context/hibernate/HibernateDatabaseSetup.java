@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.context.hibernate;
 
-import com.manydesigns.portofino.database.DatabaseAbstraction;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -43,22 +42,15 @@ public class HibernateDatabaseSetup {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    protected final DatabaseAbstraction databaseAbstraction;
     protected final Configuration configuration;
     protected final SessionFactory sessionFactory;
     protected final ThreadLocal<Session> threadSessions;
 
-    public HibernateDatabaseSetup(DatabaseAbstraction databaseAbstraction,
-                                  Configuration configuration, SessionFactory sessionFactory
-    ) {
-        this.databaseAbstraction = databaseAbstraction;
+    public HibernateDatabaseSetup(Configuration configuration,
+                                  SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         this.configuration = configuration;
         threadSessions = new ThreadLocal<Session>();
-    }
-
-    public DatabaseAbstraction getDatabaseAbstraction() {
-        return databaseAbstraction;
     }
 
     public SessionFactory getSessionFactory() {

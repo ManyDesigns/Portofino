@@ -29,8 +29,8 @@
 
 package com.manydesigns.elements.composites;
 
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.Element;
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,17 +48,17 @@ public class Wizard extends AbstractReflectiveCompositeElement {
 
     protected int _step;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Costruttori
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public Wizard() {
         super();
         _step = 0;
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Implementazione di Element
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public void readFromRequest(HttpServletRequest req) {
         super.readFromRequest(req);
         String stepStr = req.getParameter(_id + STEP_SUFFIX);
@@ -95,9 +95,9 @@ public class Wizard extends AbstractReflectiveCompositeElement {
         xb.writeInputHidden(_id + STEP_SUFFIX, Integer.toString(_step));
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Altri metodi
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public boolean hasNext() {
         return _step < _fields.size() - 1;
     }

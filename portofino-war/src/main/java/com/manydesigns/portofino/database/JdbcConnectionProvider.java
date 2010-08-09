@@ -29,11 +29,14 @@
 
 package com.manydesigns.portofino.database;
 
+import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.Password;
 import com.manydesigns.elements.logging.LogUtil;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.text.MessageFormat;
 import java.util.logging.Logger;
 
 /*
@@ -45,84 +48,137 @@ public class JdbcConnectionProvider implements ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Fields
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
-    private final String jdbcDriverClass;
-    private final String jdbcConnectionURL;
-    private final String jdbcUsername;
-    private final String jdbcPassword;
+    protected final String databaseName;
+    protected final String driverClass;
+    protected final String connectionURL;
+    protected final String username;
+    protected final String password;
+
+    protected DatabaseAbstraction databaseAbstraction;
 
     public static final Logger logger =
             LogUtil.getLogger(JdbcConnectionProvider.class);
 
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Constructors
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
-    public JdbcConnectionProvider(String jdbcDriverClass,
-                                  String jdbcConnectionURL,
-                                  String jdbcUsername,
-                                  String jdbcPassword) {
-        this.jdbcDriverClass = jdbcDriverClass;
-        this.jdbcConnectionURL = jdbcConnectionURL;
-        this.jdbcUsername = jdbcUsername;
-        this.jdbcPassword = jdbcPassword;
+    public JdbcConnectionProvider(String databaseName,
+                                  String driverClass,
+                                  String connectionURL,
+                                  String username,
+                                  String password) {
+        this.databaseName = databaseName;
+        this.driverClass = driverClass;
+        this.connectionURL = connectionURL;
+        this.username = username;
+        this.password = password;
     }
 
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Implementation of ConnectionProvider
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
-    public Connection acquireConnection() {
-        try {
-            Class.forName(jdbcDriverClass);
-            return DriverManager.getConnection(jdbcConnectionURL,
-                    jdbcUsername, jdbcPassword);
-        } catch (Throwable e) {
-            LogUtil.severeMF(logger, "Could not acquire connection ({0})",
-                    e , this);
-            return null;
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public String getDescription() {
+        return MessageFormat.format(
+                "JDBC connection to URL: {0}", connectionURL);
+    }
+
+    public DatabaseAbstraction getDatabaseAbstraction() {
+        if (databaseAbstraction == null) {
+            createDatabaseAbstraction();
         }
+        return databaseAbstraction;
+    }
+
+    protected void createDatabaseAbstraction() {
+        String databaseProductName;
+        Connection conn = null;
+        try {
+            conn = acquireConnection();
+            databaseProductName = conn.getMetaData().getDatabaseProductName();
+        } catch (Throwable e) {
+            LogUtil.severeMF(logger,
+                    "Could not create database abstraction for {0}",
+                    e, databaseName);
+            return;
+        } finally {
+            releaseConnection(conn);
+        }
+
+        LogUtil.fineMF(logger, "Database product name: {0}", databaseProductName);
+
+        try {
+            if ("PostgreSQL".equals(databaseProductName)) {
+                databaseAbstraction = new PostgreSQLDatabaseAbstraction(this);
+            } else {
+                LogUtil.warningMF(logger,
+                        "Database product name {0} not supported",
+                        databaseProductName);
+            }
+        } catch (Throwable e) {
+            LogUtil.warning(logger, "Could not instanciate abstraction", e);
+        }
+    }
+
+    public void test() throws Exception {
+
+    }
+
+    public Connection acquireConnection() throws Exception {
+        Class.forName(driverClass);
+        return DriverManager.getConnection(connectionURL,
+                username, password);
     }
 
     public void releaseConnection(Connection conn) {
         DbUtil.closeConnection(conn);
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Getters
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
-    public String getJdbcDriverClass() {
-        return jdbcDriverClass;
+    public String getDriverClass() {
+        return driverClass;
     }
 
-    public String getJdbcConnectionURL() {
-        return jdbcConnectionURL;
+    @Label("connection URL")
+    public String getConnectionURL() {
+        return connectionURL;
     }
 
-    public String getJdbcUsername() {
-        return jdbcUsername;
+    public String getUsername() {
+        return username;
     }
 
-    public String getJdbcPassword() {
-        return jdbcPassword;
+    @Password
+    public String getPassword() {
+        return password;
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Other methods
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("jdbcConnectionURL", jdbcConnectionURL)
-                .append("jdbcUsername", jdbcUsername)
-                .append("jdbcPassword", "********")
+                .append("databaseName", connectionURL)
+                .append("driverClass", driverClass)
+                .append("connectionURL", connectionURL)
+                .append("username", username)
+                .append("password", "********")
                 .toString();
     }
 }

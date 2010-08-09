@@ -134,6 +134,20 @@
                 class="com.manydesigns.portofino.actions.upstairs.ServerInfoAction">
             <result name="success">/skins/default/upstairs/serverInfo.jsp</result>
         </action>
+        <action name="ConnectionProviders"
+                class="com.manydesigns.portofino.actions.upstairs.ConnectionProvidersAction">
+            <result name="search">/skins/default/upstairs/connectionProviders/search.jsp</result>
+            <result name="read">/skins/default/upstairs/connectionProviders/read.jsp</result>
+            <result name="returnToSearch" type="redirectAction">
+                <param name="actionName">ConnectionProviders</param>
+                <param name="namespace">/upstairs</param>
+            </result>
+            <result name="returnToRead" type="redirectAction">
+                <param name="actionName">ConnectionProviders</param>
+                <param name="namespace">/upstairs</param>
+                <param name="databaseName">%{databaseName}</param>
+            </result>
+        </action>
         <action name="Logs"
                 class="com.manydesigns.portofino.actions.upstairs.LogsAction">
             <result name="success">/skins/default/upstairs/logs.jsp</result>

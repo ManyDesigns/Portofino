@@ -56,9 +56,9 @@ public class UploadField extends AbstractField
 
     protected FileUpload fileUpload;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Costruttori
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public UploadField(PropertyAccessor accessor) {
         this(accessor, null);
     }
@@ -67,9 +67,9 @@ public class UploadField extends AbstractField
         super(accessor, prefix);
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // AbstractField implementation
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public void valueToXhtml(XhtmlBuffer xb) {
         if (mode.isView(immutable)) {
             valueToXhtmlView(xb);
@@ -166,9 +166,9 @@ public class UploadField extends AbstractField
         }
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Element implementation
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     public void readFromRequest(HttpServletRequest req) {
         super.readFromRequest(req);
 

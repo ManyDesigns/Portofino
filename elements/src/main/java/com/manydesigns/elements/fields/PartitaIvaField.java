@@ -42,9 +42,9 @@ public class PartitaIvaField extends RegExpTextField {
 
     public final static String partitaIvaRegExp = "[0-9]{11}";
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Constructors
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public PartitaIvaField(PropertyAccessor accessor) {
         this(accessor, null);

@@ -35,9 +35,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Stack;
-import java.util.EmptyStackException;
 import java.text.MessageFormat;
+import java.util.EmptyStackException;
+import java.util.Stack;
 
 /**
  * @author Paolo Predonzani - paolo.predonzani@manydesigns.com
@@ -52,23 +52,23 @@ public class XmlBuffer {
     private static final int OPEN = 2;
     private static final int CLOSE = 1;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Static fields
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public static boolean checkWellFormed = false;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Fields
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     private final Writer writer;
     private int state;
     private final Stack<String> tagStack;
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Constructors
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
 
     /**

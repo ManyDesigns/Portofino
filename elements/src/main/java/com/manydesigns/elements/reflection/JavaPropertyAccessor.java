@@ -29,6 +29,8 @@
 
 package com.manydesigns.elements.reflection;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -43,15 +45,30 @@ public class JavaPropertyAccessor implements PropertyAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
     private final PropertyDescriptor propertyDescriptor;
     private final Method getter;
     private final Method setter;
+
+
+    //**************************************************************************
+    // Constructors
+    //**************************************************************************
 
     public JavaPropertyAccessor(PropertyDescriptor propertyDescriptor) {
         this.propertyDescriptor = propertyDescriptor;
         getter = propertyDescriptor.getReadMethod();
         setter = propertyDescriptor.getWriteMethod();
     }
+
+
+    //**************************************************************************
+    // PropertyAccessor implementation
+    //**************************************************************************
 
     public String getName() {
         return propertyDescriptor.getName();
@@ -79,5 +96,17 @@ public class JavaPropertyAccessor implements PropertyAccessor {
 
     public void set(Object obj, Object value) throws IllegalAccessException, InvocationTargetException {
         setter.invoke(obj, value);
+    }
+
+    
+    //**************************************************************************
+    // Overrides
+    //**************************************************************************
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("name", getName())
+                .toString();
     }
 }

@@ -42,9 +42,9 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Constructors
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public XhtmlBuffer() {
         super();

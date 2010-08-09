@@ -31,17 +31,16 @@ package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.helpers.FieldHelperManager;
-import com.manydesigns.elements.hyperlinks.HyperlinkGenerator;
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.text.Generator;
 import org.apache.commons.lang.StringUtils;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -54,12 +53,24 @@ public class TableFormBuilder {
 
     public final static int DEFAULT_N_ROWS = 1;
 
-    private final ClassAccessor classAccessor;
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
+    protected final ClassAccessor classAccessor;
+    protected final Map<String, Generator> hrefGenerators;
+    protected final Map<String, Generator> altGenerators;
 
     protected List<PropertyAccessor> propertyAccessors;
-    protected Map<String, HyperlinkGenerator> hyperlinkGenerators;
     protected String prefix;
     protected int nRows = DEFAULT_N_ROWS;
+
+    public static final Logger logger = LogUtil.getLogger(TableFormBuilder.class);
+
+
+    //**************************************************************************
+    // Constructors
+    //**************************************************************************
 
     public TableFormBuilder(Class clazz) {
         this(new JavaClassAccessor(clazz));
@@ -67,8 +78,14 @@ public class TableFormBuilder {
 
     public TableFormBuilder(ClassAccessor classAccessor) {
         this.classAccessor = classAccessor;
-        hyperlinkGenerators = new HashMap<String, HyperlinkGenerator>();
+        hrefGenerators = new HashMap<String, Generator>();
+        altGenerators = new HashMap<String, Generator>();
     }
+
+
+    //**************************************************************************
+    // Builder configuration
+    //**************************************************************************
 
     public TableFormBuilder configFields(String... fieldNames) {
         propertyAccessors = new ArrayList<PropertyAccessor>();
@@ -78,15 +95,8 @@ public class TableFormBuilder {
                         classAccessor.getProperty(currentField);
                 propertyAccessors.add(accessor);
             } catch (NoSuchFieldException e) {
-                // rethrow as Error, so no exception is declared
-                // by the method. This is important so the builder
-                // can be used in inline field initializations,
-                // without the need for a constructor. E.g.:
-                // public final Element myElement =
-                //   new ClassTableFormBuilder(MyClass.class)
-                //   .configFields("field1", "field2").build();
-
-                throw new Error(e);
+                LogUtil.warningMF(logger, "Field not found: {0}", e,
+                        currentField);
             }
         }
         return this;
@@ -104,20 +114,30 @@ public class TableFormBuilder {
 
     public void configReflectiveFields() {
         propertyAccessors = new ArrayList<PropertyAccessor>();
-
+        List<String> blackList =
+                Arrays.asList(FormBuilder.PROPERTY_NAME_BLACKLIST);
         for (PropertyAccessor current : classAccessor.getProperties()) {
             if (Modifier.isStatic(current.getModifiers())) {
+                continue;
+            }
+            if (blackList.contains(current.getName())) {
                 continue;
             }
             propertyAccessors.add(current);
         }
     }
 
-    public TableFormBuilder configHyperlinkGenerator(
-            String fieldName, HyperlinkGenerator hyperlinkGenerator) {
-        hyperlinkGenerators.put(fieldName, hyperlinkGenerator);
+    public TableFormBuilder configHyperlinkGenerators(
+            String fieldName, Generator hrefGenerator, Generator altGenerator) {
+        hrefGenerators.put(fieldName, hrefGenerator);
+        altGenerators.put(fieldName, altGenerator);
         return this;
     }
+
+
+    //**************************************************************************
+    // Building
+    //**************************************************************************
 
     public TableForm build() {
         TableForm tableForm = new TableForm(nRows);
@@ -136,21 +156,27 @@ public class TableFormBuilder {
         for (PropertyAccessor propertyAccessor : propertyAccessors) {
             TableFormColumn column =
                     new TableFormColumn(propertyAccessor, nRows);
-            tableForm.add(column);
 
-            HyperlinkGenerator hyperlinkGenerator =
-                    hyperlinkGenerators.get(propertyAccessor.getName());
-            column.setHyperlinkGenerator(hyperlinkGenerator);
+            final String propertyName = propertyAccessor.getName();
+            column.setHrefGenerator(hrefGenerators.get(propertyName));
+            column.setAltGenerator(altGenerators.get(propertyName));
 
+            boolean columnSuccess = true;
             for (int i = 0; i < nRows; i++) {
                 Field field = manager.tryToInstantiateField(
                         classAccessor, propertyAccessor, rowPrefix[i]);
 
                 if (field == null) {
-                    throw new Error("Cannot instanciate field for: " +
-                            propertyAccessor.getName());
+                    LogUtil.warningMF(logger,
+                            "Cannot instanciate field for property {0}",
+                            propertyAccessor);
+                    columnSuccess = false;
+                    break;
                 }
-                column.add(field);
+                column.getFields()[i] = field;
+            }
+            if (columnSuccess) {
+                tableForm.add(column);
             }
         }
 

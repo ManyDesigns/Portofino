@@ -27,17 +27,30 @@
  *
  */
 
-package com.manydesigns.elements.forms;
+package com.manydesigns.elements.text;
+
+import com.manydesigns.elements.Util;
+import com.manydesigns.elements.reflection.ClassAccessor;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface Generator {
+public class HrefExpressionGenerator extends ExpressionGenerator {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public String generate(Object obj);
+    public HrefExpressionGenerator(Class clazz, String expression) {
+        super(clazz, expression);
+    }
 
+    public HrefExpressionGenerator(ClassAccessor classAccessor, String expression) {
+        super(classAccessor, expression);
+    }
+
+    @Override
+    public String generate(Object obj) {
+        return Util.getAbsoluteLink(super.generate(obj));
+    }
 }

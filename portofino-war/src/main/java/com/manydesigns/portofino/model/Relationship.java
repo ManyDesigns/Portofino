@@ -41,9 +41,9 @@ public class Relationship {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Constants
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public static final String RULE_NO_ACTION = "NO ACTION";
     public static final String RULE_CASCADE = "CASCADE";
@@ -51,9 +51,9 @@ public class Relationship {
     public static final String RULE_SET_DEFAULT = "SET DEFAULT";
     
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Fields
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     protected Table fromTable;
     protected Table toTable;
     protected String relationshipName;
@@ -63,9 +63,9 @@ public class Relationship {
     protected final List<Reference>references;
 
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Constructors
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public Relationship(String relationshipName, String onUpdate, String onDelete) {
         this.relationshipName = relationshipName;
@@ -74,9 +74,9 @@ public class Relationship {
         references = new ArrayList<Reference>();
     }
 
-    //--------------------------------------------------------------------------
+    //**************************************************************************
     // Getters/setter
-    //--------------------------------------------------------------------------
+    //**************************************************************************
 
     public String getRelationshipName() {
         return relationshipName;
