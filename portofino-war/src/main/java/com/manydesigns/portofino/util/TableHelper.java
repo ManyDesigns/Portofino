@@ -34,6 +34,7 @@ import com.manydesigns.elements.text.Generator;
 import com.manydesigns.portofino.model.Column;
 import com.manydesigns.portofino.model.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
@@ -74,7 +75,10 @@ public class TableHelper {
         pkMap.put("$type$", table.getQualifiedName());
 
         for(Column column : table.getPrimaryKey().getColumns() ) {
-            pkMap.put(column.getColumnName(), pkList[i]);
+            String stringValue = pkList[i];
+            Object value = ConvertUtils.convert(
+                    stringValue, column.getJavaType());
+            pkMap.put(column.getColumnName(), value);
             i++;
         }
 
