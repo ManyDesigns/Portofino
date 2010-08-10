@@ -66,7 +66,7 @@ public class JdbcMetadataReaderTest extends TestCase {
     }
 
     public void testReadModelFromConnection() {
-        CommonDatabaseAbstraction.logger.setLevel(Level.FINE);
+        AbstractDatabasePlatform.logger.setLevel(Level.FINE);
 
         assertEquals(4, database.getSchemas().size());
         assertEquals(13, database.getAllTables().size());

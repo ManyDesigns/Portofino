@@ -30,17 +30,16 @@
 package com.manydesigns.portofino.database;
 
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.SQLException;
+import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class JndiConnectionProvider {
+public class JndiConnectionProvider extends AbstractConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -48,25 +47,45 @@ public class JndiConnectionProvider {
     // Fields
     //**************************************************************************
 
-    private final DataSource ds;
+    private String jndiResource;
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public JndiConnectionProvider(String databaseJndiName)
-            throws NamingException {
-        InitialContext ic = new InitialContext();
-        ds = (DataSource) ic.lookup(databaseJndiName);
+    public JndiConnectionProvider(String databaseName, String jndiResource) {
+        super(databaseName);
+        this.jndiResource = jndiResource;
     }
 
     //**************************************************************************
     // Implementation of ConnectionProvider
     //**************************************************************************
 
-    public Connection getConnection() throws SQLException {
+    public String getDescription() {
+        return MessageFormat.format("JNDI data source: {0}", jndiResource);
+    }
+
+    public Connection acquireConnection() throws Exception {
+        InitialContext ic = new InitialContext();
+        DataSource ds = (DataSource) ic.lookup(jndiResource);
         return ds.getConnection();
     }
 
+    public void releaseConnection(Connection conn) {
+        DbUtil.closeConnection(conn);
+    }
+
+    //**************************************************************************
+    // Getters/setters
+    //**************************************************************************
+
+    public String getJndiResource() {
+        return jndiResource;
+    }
+
+    public void setJndiResource(String jndiResource) {
+        this.jndiResource = jndiResource;
+    }
 }

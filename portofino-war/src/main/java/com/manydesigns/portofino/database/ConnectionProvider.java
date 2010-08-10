@@ -69,7 +69,7 @@ public interface ConnectionProvider {
     public Type[] getTypes();
     public Type getTypeByName(String typeName);
 
-    public DatabaseAbstraction getDatabaseAbstraction();
+    public DatabasePlatform getDatabaseAbstraction();
     public void test();
     public Connection acquireConnection() throws Exception;
     public void releaseConnection(Connection conn);

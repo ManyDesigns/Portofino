@@ -68,8 +68,10 @@ public class PortofinoProperties {
             "portofino.context.class";
     public static final String APPLICATION_NAME_PROPERTY =
             "application.name";
-    public static final String DATABASE_ABSTRACTION_MANAGER_CLASS_PROPERTY =
-            "portofino.database.abstraction.manager.class";
+    public static final String DATABASE_PLATFORM_MANAGER_PROPERTY =
+            "portofino.database.platform.manager";
+    public static final String DATABASE_PLATFORM_LIST_PROPERTY =
+            "portofino.database.platform.list";
 
 
     //**************************************************************************

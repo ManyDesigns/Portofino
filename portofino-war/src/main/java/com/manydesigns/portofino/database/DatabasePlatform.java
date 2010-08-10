@@ -36,9 +36,13 @@ import com.manydesigns.portofino.model.Database;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface DatabaseAbstraction {
+public interface DatabasePlatform {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    public String getDescription();
+    public String getStandardDriverClassName();
+    public boolean isApplicable(ConnectionProvider connectionProvider);
 
     public String getConnectionString(String host, int port, String dbName,
             String login, String password);

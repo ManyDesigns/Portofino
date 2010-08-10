@@ -44,21 +44,21 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
+public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public static final Logger logger =
-            LogUtil.getLogger(CommonDatabaseAbstraction.class);
+            LogUtil.getLogger(AbstractDatabasePlatform.class);
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public CommonDatabaseAbstraction() {}
+    public AbstractDatabasePlatform() {}
 
     //**************************************************************************
-    // Implementation of DatabaseAbstraction
+    // Implementation of DatabasePlatform
     //**************************************************************************
 
     //**************************************************************************

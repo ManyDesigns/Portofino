@@ -58,9 +58,9 @@ public final class ElementsProperties {
     // Property names
     //**************************************************************************
 
-    public static final String MANAGER_PROPERTY =
+    public static final String FIELDS_HELPERS_MANAGER_PROPERTY =
             "elements.fields.helpers.manager";
-    public static final String LIST_PROPERTY =
+    public static final String FIELDS_HELPERS_LIST_PROPERTY =
             "elements.fields.helpers.list";
 
 

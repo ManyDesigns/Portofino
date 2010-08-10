@@ -36,21 +36,37 @@ import java.text.MessageFormat;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PostgreSQLDatabaseAbstraction extends CommonDatabaseAbstraction {
+public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    public final static String DESCRIPTION = "PostgreSQL database platform";
+    public final static String STANDARD_DRIVER_CLASS_NAME =
+            "org.postgresql.Driver";
     
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public PostgreSQLDatabaseAbstraction() {
+    public PostgreSQLDatabasePlatform() {
         super();
     }
 
     //**************************************************************************
     // Implementation of DatabaseAbstraction
     //**************************************************************************
+
+    public String getDescription() {
+        return DESCRIPTION;
+    }
+
+    public String getStandardDriverClassName() {
+        return STANDARD_DRIVER_CLASS_NAME;
+    }
+
+    public boolean isApplicable(ConnectionProvider connectionProvider) {
+        return "PostgreSQL".equals(connectionProvider.getDatabaseProductName());
+    }
 
     public String getConnectionString(String host, int port, String dbName,
             String login, String password) {

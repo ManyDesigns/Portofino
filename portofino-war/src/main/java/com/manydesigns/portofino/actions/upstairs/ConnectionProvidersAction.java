@@ -40,7 +40,7 @@ import com.manydesigns.elements.text.HrefExpressionGenerator;
 import com.manydesigns.portofino.actions.ActionResults;
 import com.manydesigns.portofino.context.MDContext;
 import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.database.DatabaseAbstraction;
+import com.manydesigns.portofino.database.DatabasePlatform;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.interceptors.MDContextAware;
@@ -61,7 +61,7 @@ public class ConnectionProvidersAction
     public MDContext context;
     public List<ConnectionProvider> connectionProviders;
     public ConnectionProvider connectionProvider;
-    public DatabaseAbstraction databaseAbstraction;
+    public DatabasePlatform databasePlatform;
     public Type[] types;
 
     public TableForm tableForm;
@@ -106,7 +106,7 @@ public class ConnectionProvidersAction
 
     public String read() {
         connectionProvider = context.getConnectionProvider(databaseName);
-        databaseAbstraction = connectionProvider.getDatabaseAbstraction();
+        databasePlatform = connectionProvider.getDatabaseAbstraction();
         types = connectionProvider.getTypes();
 
         if (connectionProvider instanceof JdbcConnectionProvider) {

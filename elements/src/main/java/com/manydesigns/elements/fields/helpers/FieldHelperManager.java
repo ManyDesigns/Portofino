@@ -63,7 +63,7 @@ public class FieldHelperManager implements FieldHelper {
         elementsProperties = ElementsProperties.getProperties();
         String managerClassName =
                 elementsProperties.getProperty(
-                        ElementsProperties.MANAGER_PROPERTY);
+                        ElementsProperties.FIELDS_HELPERS_MANAGER_PROPERTY);
         InstanceBuilder<FieldHelperManager> builder =
                 new InstanceBuilder<FieldHelperManager>(
                         FieldHelperManager.class,
@@ -79,7 +79,7 @@ public class FieldHelperManager implements FieldHelper {
     public FieldHelperManager() {
         fieldHelperList = new ArrayList<FieldHelper>();
         String listString = elementsProperties.getProperty(
-                ElementsProperties.LIST_PROPERTY);
+                ElementsProperties.FIELDS_HELPERS_LIST_PROPERTY);
         if (listString == null) {
             logger.finer("Empty list");
             return;
