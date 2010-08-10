@@ -162,3 +162,17 @@ label.match_mode, label.rel_name {
 span.disabled {
     color: gray;
 }
+
+/* status */
+.status_red {
+    color: red;
+    font-weight: bold;
+}
+.status_amber {
+    color: #880;
+    font-weight: bold;
+}
+.status_green {
+    color: green;
+    font-weight: bold;
+}

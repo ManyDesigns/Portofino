@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.database;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.database.platforms.AbstractDatabasePlatform;
 import com.manydesigns.portofino.model.Database;
 import com.manydesigns.portofino.model.Schema;
 import com.manydesigns.portofino.model.Table;

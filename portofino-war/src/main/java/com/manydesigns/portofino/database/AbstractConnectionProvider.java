@@ -30,7 +30,10 @@
 package com.manydesigns.portofino.database;
 
 import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.database.platforms.DatabasePlatform;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformManager;
 import com.manydesigns.portofino.model.Database;
 
 import java.sql.Connection;
@@ -105,6 +108,7 @@ public abstract class AbstractConnectionProvider implements ConnectionProvider {
         return databaseName;
     }
 
+    @Status(red={STATUS_ERROR}, amber={STATUS_DISCONNECTED}, green={STATUS_CONNECTED})
     public String getStatus() {
         return status;
     }

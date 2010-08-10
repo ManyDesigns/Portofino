@@ -27,56 +27,32 @@
  *
  */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.elements.annotations.Status;
-import com.manydesigns.portofino.database.platforms.DatabasePlatform;
+import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.Database;
-
-import java.sql.Connection;
-import java.util.Date;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface ConnectionProvider {
+public interface DatabasePlatform {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public final static String STATUS_DISCONNECTED = "disconnected";
-    public final static String STATUS_CONNECTED = "connected";
-    public final static String STATUS_ERROR = "error";
+    final static String STATUS_CREATED = "created";
+    final static String STATUS_OK = "ok";
+    final static String STATUS_DRIVER_NOT_FOUND = "driver not found";
 
-    public String getDatabaseName();
-    public String getDescription();
-    @Status(red={STATUS_ERROR}, amber={STATUS_DISCONNECTED}, green={STATUS_CONNECTED})
-    public String getStatus();
-    public String getErrorMessage();
-    public Date getLastTested();
+    String getDescription();
+    String getStandardDriverClassName();
 
-    public String getDatabaseProductName();
-    public String getDatabaseProductVersion();
-    public Integer getDatabaseMajorVersion();
-    public Integer getDatabaseMinorVersion();
-    public String getDatabaseMajorMinorVersion();
-    public String getDriverName();
-    public String getDriverVersion();
-    public Integer getDriverMajorVersion();
-    public Integer getDriverMinorVersion();
-    public String getDriverMajorMinorVersion();
-    public Integer getJDBCMajorVersion();
-    public Integer getJDBCMinorVersion();
-    public String getJDBCMajorMinorVersion();
-    public Type[] getTypes();
-    public Type getTypeByName(String typeName);
+    @Status(red={}, amber={STATUS_CREATED, STATUS_DRIVER_NOT_FOUND}, green={STATUS_OK})
+    String getStatus();
 
-    public DatabasePlatform getDatabaseAbstraction();
-    public void test();
-    public Connection acquireConnection() throws Exception;
-    public void releaseConnection(Connection conn);
-
-    public Database readModel();
-
+    void test();
+    boolean isApplicable(ConnectionProvider connectionProvider);
+    Database readModel(ConnectionProvider connectionProvider);
 }

@@ -40,9 +40,10 @@ import com.manydesigns.elements.text.HrefExpressionGenerator;
 import com.manydesigns.portofino.actions.ActionResults;
 import com.manydesigns.portofino.context.MDContext;
 import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.database.DatabasePlatform;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.Type;
+import com.manydesigns.portofino.database.platforms.DatabasePlatform;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformManager;
 import com.manydesigns.portofino.interceptors.MDContextAware;
 import com.opensymphony.xwork2.ActionSupport;
 
@@ -61,6 +62,7 @@ public class ConnectionProvidersAction
     public MDContext context;
     public List<ConnectionProvider> connectionProviders;
     public ConnectionProvider connectionProvider;
+    public DatabasePlatform[] databasePlatforms;
     public DatabasePlatform databasePlatform;
     public Type[] types;
 
@@ -68,6 +70,7 @@ public class ConnectionProvidersAction
     public Form form;
     public Form detectedValuesForm;
     public TableForm typesTableForm;
+    public TableForm databasePlatformsTableForm;
 
     public String databaseName;
 
@@ -100,6 +103,19 @@ public class ConnectionProvidersAction
                 .build();
         tableForm.setMode(Mode.VIEW);
         tableForm.readFromObject(connectionProviders);
+
+        // database platforms
+        DatabasePlatformManager manager = DatabasePlatformManager.getManager();
+        databasePlatforms = manager.getDatabasePlatforms();
+        databasePlatformsTableForm =
+                new TableFormBuilder(DatabasePlatform.class)
+                        .configFields("description",
+                                "standardDriverClassName",
+                                "status")
+                        .configNRows(databasePlatforms.length)
+                        .build();
+        databasePlatformsTableForm.setMode(Mode.VIEW);
+        databasePlatformsTableForm.readFromObject(databasePlatforms);
 
         return ActionResults.LIST;
     }

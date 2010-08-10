@@ -132,7 +132,7 @@ public class TableForm extends AbstractCompositeElement<TableFormColumn> {
 
             // Scorre le rimanenti righe del table form,
             // passano null come ottetto di bind.
-            for (int i = arrayLength; i < size(); i++) {
+            for (int i = arrayLength; i < nRows; i++) {
                 readFromObject(i, null);
             }
         } else if (Collection.class.isAssignableFrom(clazz)) {

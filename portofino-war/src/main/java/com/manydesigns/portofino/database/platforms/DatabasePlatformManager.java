@@ -27,11 +27,12 @@
  *
  */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.database.ConnectionProvider;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -47,6 +48,10 @@ public class DatabasePlatformManager {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
     protected static final Properties portofinoProperties;
     protected static final DatabasePlatformManager manager;
 
@@ -55,6 +60,10 @@ public class DatabasePlatformManager {
 
     protected ClassLoader cl;
     protected ArrayList<DatabasePlatform> databasePlatformList;
+
+    //**************************************************************************
+    // Static initializer
+    //**************************************************************************
 
     static {
         portofinoProperties = PortofinoProperties.getProperties();
@@ -72,6 +81,10 @@ public class DatabasePlatformManager {
     public static DatabasePlatformManager getManager() {
         return manager;
     }
+
+    //**************************************************************************
+    // Constructors / building
+    //**************************************************************************
 
     public DatabasePlatformManager() {
         cl = DatabasePlatformManager.class.getClassLoader();
@@ -98,12 +111,17 @@ public class DatabasePlatformManager {
             Constructor constructor = helperClass.getConstructor();
             DatabasePlatform databasePlatform =
                     (DatabasePlatform)constructor.newInstance();
+            databasePlatform.test();
             databasePlatformList.add(databasePlatform);
         } catch (Throwable e) {
             LogUtil.warningMF(logger, "Cannot load or instanciate: {0}", e,
                     databasePlatformClassName);
         }
     }
+
+    //**************************************************************************
+    // Methdos
+    //**************************************************************************
 
     public DatabasePlatform findApplicableAbstraction(
             ConnectionProvider connectionProvider) {
@@ -113,5 +131,12 @@ public class DatabasePlatformManager {
             }
         }
         return null;
+    }
+
+    public DatabasePlatform[] getDatabasePlatforms() {
+        DatabasePlatform[] result =
+                new DatabasePlatform[databasePlatformList.size()];
+        databasePlatformList.toArray(result);
+        return result;
     }
 }

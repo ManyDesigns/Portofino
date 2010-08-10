@@ -27,28 +27,28 @@
  *
  */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.database.platforms;
 
-import java.text.MessageFormat;
+import com.manydesigns.portofino.database.ConnectionProvider;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
+public class IbmDb2DatabasePlatform extends AbstractDatabasePlatform {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public final static String DESCRIPTION = "PostgreSQL database platform";
+    public final static String DESCRIPTION = "IBM DB2";
     public final static String STANDARD_DRIVER_CLASS_NAME =
-            "org.postgresql.Driver";
-    
+            "com.ibm.db2.jcc.DB2Driver";
+
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public PostgreSQLDatabasePlatform() {
+    public IbmDb2DatabasePlatform() {
         super();
     }
 
@@ -65,12 +65,6 @@ public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
     }
 
     public boolean isApplicable(ConnectionProvider connectionProvider) {
-        return "PostgreSQL".equals(connectionProvider.getDatabaseProductName());
-    }
-
-    public String getConnectionString(String host, int port, String dbName,
-            String login, String password) {
-        return MessageFormat.format("jdbc:postgresql://{0}:{1}/{2}",
-                host, port, dbName);
+        return connectionProvider.getDatabaseProductName().startsWith("DB2/");
     }
 }

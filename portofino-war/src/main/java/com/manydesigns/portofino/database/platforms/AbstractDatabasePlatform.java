@@ -27,9 +27,12 @@
  *
  */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.database.ConnectionProvider;
+import com.manydesigns.portofino.database.DbUtil;
+import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.*;
 
 import java.sql.Connection;
@@ -48,6 +51,12 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
+    protected String status;
+    protected ClassLoader cl;
     public static final Logger logger =
             LogUtil.getLogger(AbstractDatabasePlatform.class);
 
@@ -55,11 +64,27 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     // Constructors
     //**************************************************************************
 
-    public AbstractDatabasePlatform() {}
+    public AbstractDatabasePlatform() {
+        cl = AbstractDatabasePlatform.class.getClassLoader();
+        status = STATUS_CREATED;
+    }
 
     //**************************************************************************
     // Implementation of DatabasePlatform
     //**************************************************************************
+
+    public void test() {
+        try {
+            cl.loadClass(getStandardDriverClassName());
+            status = STATUS_OK;
+        } catch (Throwable e) {
+            status = STATUS_DRIVER_NOT_FOUND;
+        }
+    }
+
+    public String getStatus() {
+        return status;
+    }
 
     //**************************************************************************
     // Read entire model

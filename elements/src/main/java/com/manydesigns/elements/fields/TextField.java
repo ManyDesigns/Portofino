@@ -31,8 +31,10 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.annotations.HighlightLinks;
 import com.manydesigns.elements.annotations.Multiline;
+import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,6 +61,9 @@ public class TextField extends AbstractTextField {
     protected boolean multiline = false;
     protected int textAreaWidth = 70;
     protected int textAreaMinRows = 4;
+    protected String[] red;
+    protected String[] amber;
+    protected String[] green;
 
     //**************************************************************************
     // Costruttori
@@ -74,6 +79,12 @@ public class TextField extends AbstractTextField {
         }
         if (accessor.isAnnotationPresent(Multiline.class)) {
             setMultiline(true);
+        }
+        if (accessor.isAnnotationPresent(Status.class)) {
+            Status annotation = accessor.getAnnotation(Status.class);
+            red = annotation.red();
+            amber = annotation.amber();
+            green = annotation.green();
         }
     }
 
@@ -140,7 +151,15 @@ public class TextField extends AbstractTextField {
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
         xb.openElement("div");
-        xb.addAttribute("class", "value");
+        String cssClass = "value";
+        if (ArrayUtils.contains(red, stringValue)) {
+            cssClass += " status_red";
+        } else if (ArrayUtils.contains(amber, stringValue)) {
+            cssClass += " status_amber";
+        } else if (ArrayUtils.contains(green, stringValue)) {
+            cssClass += " status_green";
+        }
+        xb.addAttribute("class", cssClass);
         xb.addAttribute("id", id);
         String escapedText = StringEscapeUtils.escapeHtml(stringValue);
         if (href != null) {

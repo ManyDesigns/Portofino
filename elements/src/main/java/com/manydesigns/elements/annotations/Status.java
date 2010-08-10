@@ -27,26 +27,25 @@
  *
  */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.elements.annotations;
 
-import com.manydesigns.portofino.model.Database;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface DatabasePlatform {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface Status {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public String getDescription();
-    public String getStandardDriverClassName();
-    public boolean isApplicable(ConnectionProvider connectionProvider);
-
-    public String getConnectionString(String host, int port, String dbName,
-            String login, String password);
-
-    public Database readModel(ConnectionProvider connectionProvider);
-
+    String[] red();
+    String[] amber();
+    String[] green();
 }

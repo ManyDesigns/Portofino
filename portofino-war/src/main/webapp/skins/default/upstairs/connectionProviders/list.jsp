@@ -7,6 +7,8 @@
     <s:include value="/skins/default/upstairs/connectionProviders/listButtonsBar.jsp"/>
     <h1>Connection providers</h1>
     <mdes:write value="tableForm"/>
+    <h2>Available database platforms</h2>
+    <mdes:write value="databasePlatformsTableForm"/>
     <s:include value="/skins/default/upstairs/connectionProviders/listButtonsBar.jsp"/>
 </s:form>
 <s:include value="/skins/default/upstairs/upstairsFooter.jsp"/>
