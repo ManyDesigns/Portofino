@@ -123,17 +123,20 @@ public class MDContextHibernateImpl implements MDContext {
 
                 ConnectionProvider connectionProvider =
                         getConnectionProvider(databaseName);
-                HibernateConfig builder =
-                        new HibernateConfig(connectionProvider);
-                Configuration configuration =
-                        builder.buildSessionFactory(database);
-                SessionFactory sessionFactory =
-                        configuration.buildSessionFactory();
+                if (connectionProvider.getStatus()
+                        .equals(ConnectionProvider.STATUS_CONNECTED)) {
+                    HibernateConfig builder =
+                            new HibernateConfig(connectionProvider);
+                    Configuration configuration =
+                            builder.buildSessionFactory(database);
+                    SessionFactory sessionFactory =
+                            configuration.buildSessionFactory();
 
-                HibernateDatabaseSetup setup =
-                        new HibernateDatabaseSetup(
-                                configuration, sessionFactory);
-                newSetups.put(databaseName, setup);
+                    HibernateDatabaseSetup setup =
+                            new HibernateDatabaseSetup(
+                                    configuration, sessionFactory);
+                    newSetups.put(databaseName, setup);
+                }
             }
             setups = newSetups;
             dataModel = newDataModel;

@@ -37,8 +37,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.sql.*;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.Date;
 import java.util.logging.Logger;
 
 /*
@@ -49,10 +49,6 @@ import java.util.logging.Logger;
 public class JdbcConnectionProvider implements ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-
-    public final static String STATUS_CREATED = "created";
-    public final static String STATUS_CONNECTED = "connected";
-    public final static String STATUS_ERROR = "error";
 
     //**************************************************************************
     // Fields (configured values)
@@ -95,6 +91,7 @@ public class JdbcConnectionProvider implements ConnectionProvider {
 
     protected String status;
     protected String errorMessage;
+    protected Date lastTested;
 
     public static final Logger logger =
             LogUtil.getLogger(JdbcConnectionProvider.class);
@@ -115,7 +112,7 @@ public class JdbcConnectionProvider implements ConnectionProvider {
         this.username = username;
         this.password = password;
 
-        status = STATUS_CREATED;
+        status = STATUS_DISCONNECTED;
         errorMessage = null;
     }
 
@@ -140,6 +137,10 @@ public class JdbcConnectionProvider implements ConnectionProvider {
 
     public String getErrorMessage() {
         return errorMessage;
+    }
+
+    public Date getLastTested() {
+        return lastTested;
     }
 
     public DatabaseAbstraction getDatabaseAbstraction() {
@@ -210,6 +211,11 @@ public class JdbcConnectionProvider implements ConnectionProvider {
             }
             types = new Type[typeList.size()];
             typeList.toArray(types);
+            Arrays.sort(types, new Comparator<Type>() {
+                public int compare(Type o1, Type o2) {
+                    return o1.getTypeName().compareToIgnoreCase(o2.getTypeName());
+                }
+            });
 
             if ("PostgreSQL".equals(databaseProductName)) {
                 databaseAbstraction = new PostgreSQLDatabaseAbstraction();
@@ -225,12 +231,13 @@ public class JdbcConnectionProvider implements ConnectionProvider {
         } catch (Throwable e) {
             status = STATUS_ERROR;
             errorMessage = e.getMessage();
-            LogUtil.severeMF(logger,
+            LogUtil.warningMF(logger,
                     "Could not create database abstraction for {0}",
                     e, databaseName);
         } finally {
             DbUtil.closeResultSetAndStatement(typeRs);
             releaseConnection(conn);
+            lastTested = new Date();
         }
     }
 
@@ -300,10 +307,16 @@ public class JdbcConnectionProvider implements ConnectionProvider {
     }
 
     public Type[] getTypes() {
+        if (types == null) {
+            return null;
+        }
         return types.clone();
     }
 
     public Type getTypeByName(String typeName) {
+        if (types == null) {
+            return null;
+        }
         for (Type current : types) {
             if (current.getTypeName().equalsIgnoreCase(typeName)) {
                 return current;

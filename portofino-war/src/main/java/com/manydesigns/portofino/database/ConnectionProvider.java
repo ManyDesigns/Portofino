@@ -32,6 +32,7 @@ package com.manydesigns.portofino.database;
 import com.manydesigns.portofino.model.Database;
 
 import java.sql.Connection;
+import java.util.Date;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,10 +43,15 @@ public interface ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    public final static String STATUS_DISCONNECTED = "disconnected";
+    public final static String STATUS_CONNECTED = "connected";
+    public final static String STATUS_ERROR = "error";
+
     public String getDatabaseName();
     public String getDescription();
     public String getStatus();
     public String getErrorMessage();
+    public Date getLastTested();
 
     public String getDatabaseProductName();
     public String getDatabaseProductVersion();
@@ -64,7 +70,7 @@ public interface ConnectionProvider {
     public Type getTypeByName(String typeName);
 
     public DatabaseAbstraction getDatabaseAbstraction();
-    public void test() throws Exception;
+    public void test();
     public Connection acquireConnection() throws Exception;
     public void releaseConnection(Connection conn);
 

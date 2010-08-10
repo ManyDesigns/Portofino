@@ -46,8 +46,6 @@ import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.interceptors.MDContextAware;
 import com.opensymphony.xwork2.ActionSupport;
 
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 /*
@@ -111,18 +109,11 @@ public class ConnectionProvidersAction
         databaseAbstraction = connectionProvider.getDatabaseAbstraction();
         types = connectionProvider.getTypes();
 
-        Arrays.sort(types, new Comparator<Type>() {
-
-            public int compare(Type o1, Type o2) {
-                return o1.getTypeName().compareToIgnoreCase(o2.getTypeName());
-            }
-        });
-
         if (connectionProvider instanceof JdbcConnectionProvider) {
             form = new FormBuilder(JdbcConnectionProvider.class)
                     .configFields("databaseName", "driverClass",
                             "connectionURL", "username", "password",
-                            "status", "errorMessage")
+                            "status", "errorMessage", "lastTested")
                     .build();
         } else {
             form = new FormBuilder(connectionProvider.getClass())
@@ -131,12 +122,20 @@ public class ConnectionProvidersAction
         form.setMode(Mode.VIEW);
         form.readFromObject(connectionProvider);
 
+        if (ConnectionProvider.STATUS_CONNECTED
+                .equals(connectionProvider.getStatus())) {
+            configureDetectedAndTypes();
+        }
+
+        return ActionResults.READ;
+    }
+
+    protected void configureDetectedAndTypes() {
         detectedValuesForm = new FormBuilder(JdbcConnectionProvider.class)
                 .configFields(
                         "databaseProductName",
                         "databaseProductVersion",
                         "databaseMajorMinorVersion",
-                        "driverClassName",
                         "driverName",
                         "driverVersion",
                         "driverMajorMinorVersion",
@@ -164,8 +163,6 @@ public class ConnectionProvidersAction
                 .build();
         typesTableForm.setMode(Mode.VIEW);
         typesTableForm.readFromObject(types);
-
-        return ActionResults.READ;
     }
 
     public String returnToSearch() {
@@ -173,7 +170,16 @@ public class ConnectionProvidersAction
     }
 
     public String test() {
-        SessionMessages.addInfoMessage("Connection tested successfully");
+        connectionProvider = context.getConnectionProvider(databaseName);
+        connectionProvider.test();
+        String status = connectionProvider.getStatus();
+        if (ConnectionProvider.STATUS_CONNECTED.equals(status)) {
+            SessionMessages.addInfoMessage("Connection tested successfully");
+        } else {
+            SessionMessages.addErrorMessage(
+                    String.format("Connection failed. Status: %s. Error message: %s",
+                            status, connectionProvider.getErrorMessage()));
+        }
         return ActionResults.RETURN_TO_READ;
     }
 

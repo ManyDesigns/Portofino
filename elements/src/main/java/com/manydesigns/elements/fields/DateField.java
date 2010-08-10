@@ -37,9 +37,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Date;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -126,7 +126,12 @@ public class DateField extends AbstractTextField {
             if (obj == null) {
                 dateValue = null;
             } else {
-                dateValue = (Date) accessor.get(obj);
+                Object value = accessor.get(obj);
+                if (value == null) {
+                    dateValue = null;
+                } else {
+                    dateValue = (Date)value;
+                }
             }
             if (dateValue == null) {
                 stringValue = null;
