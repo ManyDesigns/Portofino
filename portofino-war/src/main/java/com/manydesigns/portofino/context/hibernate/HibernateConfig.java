@@ -29,7 +29,10 @@
 package com.manydesigns.portofino.context.hibernate;
 
 
-import com.manydesigns.portofino.database.*;
+import com.manydesigns.portofino.database.ConnectionProvider;
+import com.manydesigns.portofino.database.DbUtil;
+import com.manydesigns.portofino.database.JdbcConnectionProvider;
+import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.Database;
 import com.manydesigns.portofino.model.Reference;
 import com.manydesigns.portofino.model.Relationship;
@@ -52,11 +55,9 @@ import java.util.List;
 public class HibernateConfig {
 
     protected final ConnectionProvider connectionProvider;
-    protected final DatabaseAbstraction databaseAbstraction;
 
     public HibernateConfig(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
-        databaseAbstraction = connectionProvider.getDatabaseAbstraction();
     }
 
     public Configuration buildSessionFactory(Database database) {
@@ -165,7 +166,7 @@ public class HibernateConfig {
         col.setScale(column.getScale());
         col.setNullable(column.isNullable());
         String columnType = column.getColumnType();
-        Type type = databaseAbstraction.getTypeByName(columnType);
+        Type type = connectionProvider.getTypeByName(columnType);
         col.setSqlTypeCode(type.getJdbcType());
 
 
@@ -211,7 +212,7 @@ public class HibernateConfig {
             col.setName(column.getColumnName());
             String columnType = column.getColumnType();
 
-            Type type = databaseAbstraction.getTypeByName(columnType);
+            Type type = connectionProvider.getTypeByName(columnType);
             col.setSqlTypeCode(type.getJdbcType());
             primaryKey.addColumn(col);
             SimpleValue value = new SimpleValue();
@@ -262,7 +263,7 @@ public class HibernateConfig {
         col.setPrecision(column.getLength());
         col.setScale(column.getScale());
         col.setNullable(column.isNullable());
-        Type type = databaseAbstraction.getTypeByName(columnType);
+        Type type = connectionProvider.getTypeByName(columnType);
         col.setSqlTypeCode(type.getJdbcType());
         org.hibernate.type.Type hibernateType = DbUtil.getHibernateType(type.getJdbcType());
         id.setTypeName(hibernateType.getName());

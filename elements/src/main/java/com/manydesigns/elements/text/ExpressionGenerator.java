@@ -32,6 +32,7 @@ package com.manydesigns.elements.text;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import org.apache.commons.beanutils.ConvertUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -112,9 +113,12 @@ public class ExpressionGenerator implements Generator {
             return null;
         }
         try {
-            Object[] args = new Object[propertyAccessors.size()];
+            String[] args = new String[propertyAccessors.size()];
             for (int i = 0; i < args.length; i++) {
-                args[i] = propertyAccessors.get(i).get(obj);
+                Object value = propertyAccessors.get(i).get(obj);
+                String stringValue =
+                        (String) ConvertUtils.convert(value, String.class);
+                args[i] = stringValue;
             }
             return MessageFormat.format(parsedExpression, args);
         } catch (Throwable e) {

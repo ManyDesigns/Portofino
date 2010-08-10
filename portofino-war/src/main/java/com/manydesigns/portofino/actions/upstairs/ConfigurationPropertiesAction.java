@@ -29,52 +29,58 @@
 
 package com.manydesigns.portofino.actions.upstairs;
 
-import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.interceptors.MDContextAware;
-import com.manydesigns.portofino.model.DataModel;
-import com.manydesigns.portofino.model.Database;
-import com.manydesigns.portofino.model.diff.ModelDiff;
+import com.manydesigns.elements.ElementsProperties;
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertiesAccessor;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.opensymphony.xwork2.ActionSupport;
+import org.apache.struts2.util.ServletContextAware;
 
-import java.sql.SQLException;
+import javax.servlet.ServletContext;
+import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SelfTestAction extends ActionSupport implements MDContextAware {
+public class ConfigurationPropertiesAction extends ActionSupport
+        implements ServletContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public MDContext context;
-    public DataModel dataModel;
-    public ModelDiff diff;
+    public Properties portofinoProperties;
+    public Form portofinoForm;
 
-    public String skin = "default";
+    public Properties elementsProperties;
+    public Form elementsForm;
 
-    public void setContext(MDContext context) {
-        this.context = context;
-    }
+    @Override
+    public String execute() {
+        portofinoProperties = PortofinoProperties.getProperties();
+        portofinoForm = configureForm(portofinoProperties);
 
-    public String execute() throws SQLException {
-        dataModel = context.getDataModel();
-        diff = new ModelDiff("In-memory model", "Database model");
-        for (ConnectionProvider current : context.getConnectionProviders()) {
-            Database database =
-                    dataModel.findDatabaseByName(current.getDatabaseName());
-            Database database2 = current.readModel();
+        elementsProperties = ElementsProperties.getProperties();
+        elementsForm = configureForm(elementsProperties);
 
-            diff.diff(database, database2);
-        }
         return SUCCESS;
     }
 
-    public String sync() throws SQLException {
-        context.syncDataModel();
-        SessionMessages.addInfoMessage("In-memory model synchronized to database model");
-        return execute();
+    private Form configureForm(Properties properties) {
+        ClassAccessor accessor = new PropertiesAccessor(properties);
+        Form form = new FormBuilder(accessor).build();
+        form.setMode(Mode.VIEW);
+        form.readFromObject(properties);
+        return form;
     }
+
+    public ServletContext servletContext;
+
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
+    }
+
 }

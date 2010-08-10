@@ -29,16 +29,49 @@
 
 package com.manydesigns.elements.reflection;
 
+import java.lang.annotation.Annotation;
+import java.util.Properties;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface ClassAccessor {
+public class PropertiesEntryAccessor implements PropertyAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public PropertyAccessor getProperty(String propertyName)
-            throws NoSuchFieldException;
-    public PropertyAccessor[] getProperties();
+    protected final String name;
+
+    public PropertiesEntryAccessor(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Class getType() {
+        return String.class;
+    }
+
+    public int getModifiers() {
+        return 0;
+    }
+
+    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+        return false;
+    }
+
+    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+        return null;
+    }
+
+    public String get(Object obj) {
+        return ((Properties)obj).getProperty(name);
+    }
+
+    public void set(Object obj, Object value) {
+        ((Properties)obj).setProperty(name, (String)value);
+    }
 }

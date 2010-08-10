@@ -32,7 +32,6 @@ package com.manydesigns.portofino.context.hibernate;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.context.MDContext;
 import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.database.DatabaseAbstraction;
 import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.io.ConnectionsParser;
 import com.manydesigns.portofino.model.io.DBParser;
@@ -89,6 +88,9 @@ public class MDContextHibernateImpl implements MDContext {
         ConnectionsParser parser = new ConnectionsParser();
         try {
             connectionProviders = parser.parse(resource);
+            for (ConnectionProvider current : connectionProviders) {
+                current.test();
+            }
         } catch (Exception e) {
             LogUtil.severeMF(logger, "Cannot load/parse connection: {0}", e,
                     resource);
@@ -168,12 +170,8 @@ public class MDContextHibernateImpl implements MDContext {
     public void syncDataModel() {
         DataModel syncDataModel = new DataModel();
         for (ConnectionProvider current : connectionProviders) {
-            DatabaseAbstraction abstraction =
-                    current.getDatabaseAbstraction();
-            if (abstraction != null) {
-                Database syncDatabase = abstraction.readModelFromConnection();
-                syncDataModel.getDatabases().add(syncDatabase);
-            }
+            Database syncDatabase = current.readModel();
+            syncDataModel.getDatabases().add(syncDatabase);
         }
         installDataModel(syncDataModel);
     }

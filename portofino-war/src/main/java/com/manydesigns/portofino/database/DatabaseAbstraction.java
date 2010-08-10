@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.database;
 
-import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.portofino.model.Database;
 
 /*
@@ -41,44 +40,9 @@ public interface DatabaseAbstraction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public String getDatabaseProductName();
-
-    public String getDatabaseProductVersion();
-
-    public Integer getDatabaseMajorVersion();
-
-    public Integer getDatabaseMinorVersion();
-
-    @Label("database major/minor version")
-    public String getDatabaseMajorMinorVersion();
-
-    public String getDriverName();
-
-    public String getDriverVersion();
-
-    public Integer getDriverMajorVersion();
-
-    public Integer getDriverMinorVersion();
-
-    @Label("driver major/minor version")
-    public String getDriverMajorMinorVersion();
-
-    public Integer getJDBCMajorVersion();
-
-    public Integer getJDBCMinorVersion();
-
-    @Label("JDBC major/minor version")
-    public String getJDBCMajorMinorVersion();
-
-    public String getDriverClassName();
-
     public String getConnectionString(String host, int port, String dbName,
             String login, String password);
 
-    public Type[] getTypes();
-
-    public Type getTypeByName(String typeName);
-
-    public Database readModelFromConnection();
+    public Database readModel(ConnectionProvider connectionProvider);
 
 }

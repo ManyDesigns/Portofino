@@ -94,7 +94,10 @@ public class TableHelper {
             } else {
                 sb.append(",");
             }
-            sb.append(map.get(column.getColumnName()));
+            Object value = map.get(column.getColumnName());
+            String stringValue =
+                    (String)ConvertUtils.convert(value, String.class);
+            sb.append(stringValue);
         }
         return sb.toString();
     }

@@ -37,8 +37,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 /*
@@ -50,30 +48,6 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    protected final ConnectionProvider connectionProvider;
-
-    protected final String databaseProductName;
-    protected final String databaseProductVersion;
-    protected final Integer databaseMajorVersion;
-    protected final Integer databaseMinorVersion;
-    protected final String databaseMajorMinorVersion;
-
-    protected final String driverName;
-    protected final String driverVersion;
-    protected final Integer driverMajorVersion;
-    protected final Integer driverMinorVersion;
-    protected final String driverMajorMinorVersion;
-
-    protected final Integer JDBCMajorVersion;
-    protected final Integer JDBCMinorVersion;
-    protected final String JDBCMajorMinorVersion;
-
-    protected final Type[] types;
-
     public static final Logger logger =
             LogUtil.getLogger(CommonDatabaseAbstraction.class);
 
@@ -81,163 +55,17 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
     // Constructors
     //**************************************************************************
 
-    public CommonDatabaseAbstraction(ConnectionProvider connectionProvider)
-            throws Exception {
-        this.connectionProvider = connectionProvider;
-        Connection conn = null;
-        ResultSet typeRs = null;
-        try {
-            conn = connectionProvider.acquireConnection();
-
-            DatabaseMetaData metadata = conn.getMetaData();
-
-            databaseProductName = metadata.getDatabaseProductName();
-            databaseProductVersion = metadata.getDatabaseProductVersion();
-
-            Integer tmpMajorVersion = null;
-            Integer tmpMinorVersion = null;
-            String tmpMajorMinorVersion;
-            try {
-                tmpMajorVersion = metadata.getDatabaseMajorVersion();
-                tmpMinorVersion = metadata.getDatabaseMinorVersion();
-                tmpMajorMinorVersion = MessageFormat.format("{0}.{1}",
-                        tmpMajorVersion, tmpMinorVersion);
-            } catch (SQLException e) {
-                tmpMajorMinorVersion = e.getMessage();
-            }
-            databaseMajorVersion = tmpMajorVersion;
-            databaseMinorVersion = tmpMinorVersion;
-            databaseMajorMinorVersion = tmpMajorMinorVersion;
-
-            this.driverName = metadata.getDriverName();
-            this.driverVersion = metadata.getDriverVersion();
-
-            this.driverMajorVersion = metadata.getDriverMajorVersion();
-            this.driverMinorVersion = metadata.getDriverMinorVersion();
-            this.driverMajorMinorVersion = MessageFormat.format("{0}.{1}",
-                    driverMajorVersion, driverMinorVersion);
-
-            tmpMajorVersion = null;
-            tmpMinorVersion = null;
-            try {
-                tmpMajorVersion = metadata.getJDBCMajorVersion();
-                tmpMinorVersion = metadata.getJDBCMinorVersion();
-                tmpMajorMinorVersion = MessageFormat.format("{0}.{1}",
-                        tmpMajorVersion, tmpMinorVersion);
-            } catch (SQLException e) {
-                tmpMajorMinorVersion = e.getMessage();
-            }
-            this.JDBCMajorVersion = tmpMajorVersion;
-            this.JDBCMinorVersion = tmpMinorVersion;
-            this.JDBCMajorMinorVersion = tmpMajorMinorVersion;
-
-            // extract supported types
-            List<Type> typeList = new ArrayList<Type>();
-            typeRs = metadata.getTypeInfo();
-            while (typeRs.next()) {
-                String typeName = typeRs.getString("TYPE_NAME");
-                int dataType = typeRs.getInt("DATA_TYPE");
-                int maximumPrecision = typeRs.getInt("PRECISION");
-                String literalPrefix = typeRs.getString("LITERAL_PREFIX");
-                String literalSuffix = typeRs.getString("LITERAL_SUFFIX");
-                boolean nullable =
-                        (typeRs.getShort("NULLABLE") ==
-                                DatabaseMetaData.typeNullable);
-                boolean caseSensitive = typeRs.getBoolean("CASE_SENSITIVE");
-                boolean searchable =
-                        (typeRs.getShort("SEARCHABLE") ==
-                                DatabaseMetaData.typeSearchable);
-                boolean autoincrement = typeRs.getBoolean("AUTO_INCREMENT");
-                short minimumScale = typeRs.getShort("MINIMUM_SCALE");
-                short maximumScale = typeRs.getShort("MAXIMUM_SCALE");
-
-                Type type = new Type(typeName, dataType, maximumPrecision,
-                        literalPrefix, literalSuffix, nullable, caseSensitive,
-                        searchable, autoincrement, minimumScale, maximumScale);
-                typeList.add(type);
-            }
-            types = new Type[typeList.size()];
-            typeList.toArray(types);
-        } finally {
-            DbUtil.closeResultSetAndStatement(typeRs);
-            connectionProvider.releaseConnection(conn);
-        }
-    }
+    public CommonDatabaseAbstraction() {}
 
     //**************************************************************************
     // Implementation of DatabaseAbstraction
     //**************************************************************************
 
-    public String getDatabaseProductName() {
-        return databaseProductName;
-    }
-
-    public String getDatabaseProductVersion() {
-        return databaseProductVersion;
-    }
-
-    public Integer getDatabaseMajorVersion() {
-        return databaseMajorVersion;
-    }
-
-    public Integer getDatabaseMinorVersion() {
-        return databaseMinorVersion;
-    }
-
-    public String getDatabaseMajorMinorVersion() {
-        return databaseMajorMinorVersion;
-    }
-
-    public String getDriverName() {
-        return driverName;
-    }
-
-    public String getDriverVersion() {
-        return driverVersion;
-    }
-
-    public Integer getDriverMajorVersion() {
-        return driverMajorVersion;
-    }
-
-    public Integer getDriverMinorVersion() {
-        return driverMinorVersion;
-    }
-
-    public String getDriverMajorMinorVersion() {
-        return driverMajorMinorVersion;
-    }
-
-    public Integer getJDBCMajorVersion() {
-        return JDBCMajorVersion;
-    }
-
-    public Integer getJDBCMinorVersion() {
-        return JDBCMinorVersion;
-    }
-
-    public String getJDBCMajorMinorVersion() {
-        return JDBCMajorMinorVersion;
-    }
-
-    public Type[] getTypes() {
-        return types.clone();
-    }
-
-    public Type getTypeByName(String typeName) {
-        for (Type current : types) {
-            if (current.getTypeName().equalsIgnoreCase(typeName)) {
-                return current;
-            }
-        }
-        return null;
-    }
-
     //**************************************************************************
     // Read entire model
     //**************************************************************************
 
-    public Database readModelFromConnection() {
+    public Database readModel(ConnectionProvider connectionProvider) {
         Database database = new Database(connectionProvider.getDatabaseName());
         Connection conn = null;
         try {
@@ -245,7 +73,7 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
             DatabaseMetaData metadata = conn.getMetaData();
             readSchemas(metadata, database);
             readTables(metadata, database);
-            readColumns(metadata, database);
+            readColumns(connectionProvider, metadata, database);
             readPKs(metadata, database);
             readFKs(metadata, database);
         } catch (Throwable e) {
@@ -253,7 +81,7 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
                     e, connectionProvider.getDatabaseName());
             return null;
         } finally {
-            DbUtil.closeConnection(conn);
+            connectionProvider.releaseConnection(conn);
         }
 
         return database;
@@ -336,14 +164,16 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
     // Read columns
     //**************************************************************************
 
-    protected void readColumns(DatabaseMetaData metadata, Database database)
+    protected void readColumns(ConnectionProvider connectionProvider,
+                               DatabaseMetaData metadata, Database database)
             throws SQLException {
         for (Table table : database.getAllTables()) {
-            readColumns(metadata, table);
+            readColumns(connectionProvider, metadata, table);
         }
     }
 
-    protected void readColumns(DatabaseMetaData metadata, Table table)
+    protected void readColumns(ConnectionProvider connectionProvider,
+                               DatabaseMetaData metadata, Table table)
             throws SQLException {
         String expectedDatabaseName = table.getDatabaseName();
         String expectedSchemaName = table.getSchemaName();
@@ -379,7 +209,7 @@ public abstract class CommonDatabaseAbstraction implements DatabaseAbstraction {
                     continue;
                 }
 
-                Type type = getTypeByName(columnType);
+                Type type = connectionProvider.getTypeByName(columnType);
                 Column column = new Column(expectedDatabaseName,
                         expectedSchemaName, expectedTableName,
                         columnName, columnType,

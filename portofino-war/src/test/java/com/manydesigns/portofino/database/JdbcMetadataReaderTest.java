@@ -49,7 +49,6 @@ public class JdbcMetadataReaderTest extends TestCase {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     ConnectionProvider connectionProvider;
-    DatabaseAbstraction databaseAbstraction;
     Database database;
 
     public void setUp() throws ClassNotFoundException, SQLException {
@@ -63,8 +62,7 @@ public class JdbcMetadataReaderTest extends TestCase {
                         "manydesigns",
                         "manydesigns");
 
-        databaseAbstraction = connectionProvider.getDatabaseAbstraction();
-        database = databaseAbstraction.readModelFromConnection();
+        database = connectionProvider.readModel();
     }
 
     public void testReadModelFromConnection() {

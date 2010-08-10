@@ -7,9 +7,9 @@
     <s:include value="/skins/default/upstairs/connectionProviders/readButtonsBar.jsp"/>
     <h1>Connection provider: <s:property value="databaseName"/></h1>
     <mdes:write value="form"/>
-    <h2>Database abstraction</h2>
-    <mdes:write value="databaseAbstractionForm"/>
-    <h2>Types</h2>
+    <h2>Detected values</h2>
+    <mdes:write value="detectedValuesForm"/>
+    <h2>Supported column types</h2>
     <mdes:write value="typesTableForm"/>
     <s:hidden name="databaseName" value="%{databaseName}"/>
     <s:include value="/skins/default/upstairs/connectionProviders/readButtonsBar.jsp"/>

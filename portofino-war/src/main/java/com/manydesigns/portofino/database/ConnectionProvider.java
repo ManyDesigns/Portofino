@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.database;
 
+import com.manydesigns.portofino.model.Database;
+
 import java.sql.Connection;
 
 /*
@@ -42,9 +44,30 @@ public interface ConnectionProvider {
 
     public String getDatabaseName();
     public String getDescription();
+    public String getStatus();
+    public String getErrorMessage();
+
+    public String getDatabaseProductName();
+    public String getDatabaseProductVersion();
+    public Integer getDatabaseMajorVersion();
+    public Integer getDatabaseMinorVersion();
+    public String getDatabaseMajorMinorVersion();
+    public String getDriverName();
+    public String getDriverVersion();
+    public Integer getDriverMajorVersion();
+    public Integer getDriverMinorVersion();
+    public String getDriverMajorMinorVersion();
+    public Integer getJDBCMajorVersion();
+    public Integer getJDBCMinorVersion();
+    public String getJDBCMajorMinorVersion();
+    public Type[] getTypes();
+    public Type getTypeByName(String typeName);
 
     public DatabaseAbstraction getDatabaseAbstraction();
     public void test() throws Exception;
     public Connection acquireConnection() throws Exception;
     public void releaseConnection(Connection conn);
+
+    public Database readModel();
+
 }

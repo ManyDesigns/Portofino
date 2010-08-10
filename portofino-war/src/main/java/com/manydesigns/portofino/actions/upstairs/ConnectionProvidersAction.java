@@ -68,7 +68,7 @@ public class ConnectionProvidersAction
 
     public TableForm tableForm;
     public Form form;
-    public Form databaseAbstractionForm;
+    public Form detectedValuesForm;
     public TableForm typesTableForm;
 
     public String databaseName;
@@ -96,7 +96,7 @@ public class ConnectionProvidersAction
                                 "databaseName={databaseName}");
 
         tableForm = new TableFormBuilder(ConnectionProvider.class)
-                .configFields("databaseName", "description")
+                .configFields("databaseName", "description", "status")
                 .configNRows(connectionProviders.size())
                 .configHyperlinkGenerators("databaseName", hrefGenerator, null)
                 .build();
@@ -109,7 +109,8 @@ public class ConnectionProvidersAction
     public String read() {
         connectionProvider = context.getConnectionProvider(databaseName);
         databaseAbstraction = connectionProvider.getDatabaseAbstraction();
-        types = databaseAbstraction.getTypes();
+        types = connectionProvider.getTypes();
+
         Arrays.sort(types, new Comparator<Type>() {
 
             public int compare(Type o1, Type o2) {
@@ -120,7 +121,8 @@ public class ConnectionProvidersAction
         if (connectionProvider instanceof JdbcConnectionProvider) {
             form = new FormBuilder(JdbcConnectionProvider.class)
                     .configFields("databaseName", "driverClass",
-                            "connectionURL", "username", "password")
+                            "connectionURL", "username", "password",
+                            "status", "errorMessage")
                     .build();
         } else {
             form = new FormBuilder(connectionProvider.getClass())
@@ -129,7 +131,7 @@ public class ConnectionProvidersAction
         form.setMode(Mode.VIEW);
         form.readFromObject(connectionProvider);
 
-        databaseAbstractionForm = new FormBuilder(DatabaseAbstraction.class)
+        detectedValuesForm = new FormBuilder(JdbcConnectionProvider.class)
                 .configFields(
                         "databaseProductName",
                         "databaseProductVersion",
@@ -141,22 +143,22 @@ public class ConnectionProvidersAction
                         "JDBCMajorMinorVersion"
                         )
                 .build();
-        databaseAbstractionForm.setMode(Mode.VIEW);
-        databaseAbstractionForm.readFromObject(databaseAbstraction);
+        detectedValuesForm.setMode(Mode.VIEW);
+        detectedValuesForm.readFromObject(connectionProvider);
 
         typesTableForm = new TableFormBuilder(Type.class)
                 .configFields(
                         "typeName",
                         "jdbcType",
                         "autoincrement",
-                        "maximumPrecision",
-                        "literalPrefix",
-                        "literalSuffix",
+//                        "maximumPrecision",
+//                        "literalPrefix",
+//                        "literalSuffix",
                         "nullable",
                         "caseSensitive",
-                        "searchable",
-                        "minimumScale",
-                        "maximumScale"
+                        "searchable"
+//                        "minimumScale",
+//                        "maximumScale"
                 )
                 .configNRows(types.length)
                 .build();

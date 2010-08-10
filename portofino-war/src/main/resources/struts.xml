@@ -138,7 +138,7 @@
                 class="com.manydesigns.portofino.actions.upstairs.ConnectionProvidersAction">
             <result name="list">/skins/default/upstairs/connectionProviders/list.jsp</result>
             <result name="read">/skins/default/upstairs/connectionProviders/read.jsp</result>
-            <result name="returnToSearch" type="redirectAction">
+            <result name="returnToList" type="redirectAction">
                 <param name="actionName">ConnectionProviders</param>
                 <param name="namespace">/upstairs</param>
             </result>
@@ -151,6 +151,10 @@
         <action name="Logs"
                 class="com.manydesigns.portofino.actions.upstairs.LogsAction">
             <result name="success">/skins/default/upstairs/logs.jsp</result>
+        </action>
+        <action name="ConfigurationProperties"
+                class="com.manydesigns.portofino.actions.upstairs.ConfigurationPropertiesAction">
+            <result name="success">/skins/default/upstairs/configurationProperties.jsp</result>
         </action>
         <action name="PrintModel" class="com.manydesigns.portofino.actions.upstairs.ModelWriterAction">
             <result name="success" type="stream">

@@ -40,15 +40,12 @@ public class PostgreSQLDatabaseAbstraction extends CommonDatabaseAbstraction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
     
-    private static final String DRIVER_CLASS_NAME = "org.postgresql.Driver";
-
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public PostgreSQLDatabaseAbstraction(ConnectionProvider connectionProvider)
-            throws Exception {
-        super(connectionProvider);
+    public PostgreSQLDatabaseAbstraction() {
+        super();
     }
 
     //**************************************************************************
@@ -59,9 +56,5 @@ public class PostgreSQLDatabaseAbstraction extends CommonDatabaseAbstraction {
             String login, String password) {
         return MessageFormat.format("jdbc:postgresql://{0}:{1}/{2}",
                 host, port, dbName);
-    }
-
-    public String getDriverClassName() {
-        return DRIVER_CLASS_NAME;
     }
 }

@@ -29,16 +29,50 @@
 
 package com.manydesigns.elements.reflection;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Properties;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface ClassAccessor {
+public class PropertiesAccessor implements ClassAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public PropertyAccessor getProperty(String propertyName)
-            throws NoSuchFieldException;
-    public PropertyAccessor[] getProperties();
+    protected final PropertiesEntryAccessor[] accessors;
+
+    public PropertiesAccessor(Properties properties) {
+        accessors = new PropertiesEntryAccessor[properties.size()];
+        int i = 0;
+        for (Object current : properties.keySet()) {
+            String name = (String)current;
+            accessors[i] = new PropertiesEntryAccessor(name);
+            i++;
+        }
+
+        // sort alphabetically
+        Arrays.sort(accessors, new Comparator<PropertiesEntryAccessor>() {
+
+            public int compare(PropertiesEntryAccessor o1,
+                               PropertiesEntryAccessor o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
+    }
+
+    public PropertyAccessor getProperty(String propertyName) throws NoSuchFieldException {
+        for (PropertiesEntryAccessor current : accessors) {
+            if (current.getName().equals(propertyName)) {
+                return current;
+            }
+        }
+        throw new NoSuchFieldException(propertyName);
+    }
+
+    public PropertyAccessor[] getProperties() {
+        return accessors.clone();
+    }
 }
