@@ -34,9 +34,11 @@
             <s:a href="%{#helpUrl}">Help</s:a> -
             <s:a href="%{#logoutUrl}">Log out</s:a>
         </div>
+        <div style="position: absolute; left: 20em;">
+            <mdes:sessionMessages/>
+        </div>
         <h1><s:a href="%{#homepageUrl}"><s:property value="#application.portofinoProperties['application.name']"/></s:a></h1>
     </div>
     <div id="bd">
         <div id="yui-main">
-            <div class="yui-b">
-                <mdes:sessionMessages/>
+            <div id="content" class="yui-b">

@@ -5,10 +5,10 @@ YAHOO.example.fixSideBar = function() {
         outerContainer.id = (currentWidth < 950) ? 'doc' : 'doc2';
     }
     ;
-    var mainContainer = YAHOO.util.Dom.get('yui-main');
+    var mainContainer = YAHOO.util.Dom.get('content');
     var sideBar = YAHOO.util.Dom.get('sidebar');
-    if (mainContainer && sideBar && mainContainer.offsetHeight > sideBar.offsetHeight) {
-        YAHOO.util.Dom.setStyle(sideBar, 'height', mainContainer.offsetHeight + 'px');
+    if (mainContainer && sideBar && mainContainer.offsetHeight < sideBar.offsetHeight) {
+        YAHOO.util.Dom.setStyle(mainContainer, 'height', sideBar.offsetHeight + 'px');
     }
     ;
 };

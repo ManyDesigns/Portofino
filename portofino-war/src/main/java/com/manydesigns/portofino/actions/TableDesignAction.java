@@ -133,6 +133,11 @@ public class TableDesignAction extends ActionSupport
     //**************************************************************************
 
     public String execute() {
+        if (qualifiedTableName == null) {
+            qualifiedTableName = dataModel.getAllTables().get(0).getQualifiedName();
+            return "redirectToTable";
+        }
+
         setupTable();
 
         form = new FormBuilder(Table.class)

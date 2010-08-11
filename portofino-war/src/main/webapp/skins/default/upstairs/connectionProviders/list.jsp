@@ -5,10 +5,12 @@
 <s:include value="/skins/default/header.jsp"/>
 <s:form method="post">
     <s:include value="/skins/default/upstairs/connectionProviders/listButtonsBar.jsp"/>
-    <h1>Connection providers</h1>
-    <mdes:write value="tableForm"/>
-    <h2>Available database platforms</h2>
-    <mdes:write value="databasePlatformsTableForm"/>
+    <div id="inner-content">
+        <h1>Connection providers</h1>
+        <mdes:write value="tableForm"/>
+        <h2>Available database platforms</h2>
+        <mdes:write value="databasePlatformsTableForm"/>
+    </div>
     <s:include value="/skins/default/upstairs/connectionProviders/listButtonsBar.jsp"/>
 </s:form>
 <s:include value="/skins/default/upstairs/upstairsFooter.jsp"/>

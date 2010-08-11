@@ -4,17 +4,24 @@
             </div>
         </div>
         <div id="sidebar" class="yui-b">
-            <div>
-                <h2>Tables:</h2>
-                <ul>
-                    <s:iterator value="dataModel.allTables">
-                        <li><a href="<s:url namespace="/" action="%{qualifiedName}/TableData"/>"><s:property value="qualifiedName"/></a></li>
-                    </s:iterator>
-                </ul>
-                <a href="<s:url namespace="/" action="%{qualifiedTableName}/TableDesign"/>">Switch to table design</a>
-                <hr/>
-                <a href="<s:url namespace="/upstairs" action="Homepage"/>">Go upstairs</a>
-            </div>
+            <ul class="areas">
+                <li><a href="<s:url namespace="/" action="Homepage"/>">Homepage</a></li>
+                <li class="selected"><a href="<s:url namespace="/" action="%{qualifiedTableName}/TableData"/>">Table data</a></li>
+                <li><a href="<s:url namespace="/" action="%{qualifiedTableName}/TableDesign"/>">Table design</a></li>
+                <li><a href="<s:url namespace="/upstairs" action="Homepage"/>">Admin</a></li>
+                <li><a href="<s:url namespace="/" action="Profile"/>">Personal area</a></li>
+            </ul>
+            <hr/>
+            <ul>
+                <s:iterator value="dataModel.allTables">
+                    <s:if test="qualifiedName.equals(qualifiedTableName)">
+                        <li class="selected">
+                    </s:if><s:else>
+                        <li>
+                    </s:else>
+                    <a href="<s:url namespace="/" action="%{qualifiedName}/TableData"/>"><s:property value="qualifiedName"/></a></li>
+                </s:iterator>
+            </ul>
         </div>
     </div>
 <s:include value="/skins/default/footer.jsp"/>

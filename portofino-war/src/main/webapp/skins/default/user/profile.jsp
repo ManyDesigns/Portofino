@@ -3,5 +3,7 @@
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <%@taglib prefix="mdes" uri="/manydesigns-elements-struts2" %>
 <s:include value="/skins/default/header.jsp"/>
-<h1>Profile</h1>
-<s:include value="/skins/default/tableData/tableDataFooter.jsp"/>
+<div id="inner-content">
+    <h1>Profile</h1>
+</div>
+<s:include value="/skins/default/user/userFooter.jsp"/>

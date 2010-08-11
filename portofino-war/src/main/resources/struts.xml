@@ -40,6 +40,14 @@
             <result name="success">/skins/%{skin}/homepage.jsp</result>
         </action>
         
+        <action name="TableData"
+                class="com.manydesigns.portofino.actions.TableDataAction">
+            <result name="redirectToTable" type="redirectAction">
+                <param name="actionName">%{qualifiedTableName}/TableData</param>
+                <param name="namespace">/</param>
+            </result>
+        </action>
+
         <action name="*/TableData"
                 class="com.manydesigns.portofino.actions.TableDataAction">
             <param name="skin">default</param>
@@ -92,6 +100,14 @@
             </result>
         </action>
 
+        <action name="TableDesign"
+                class="com.manydesigns.portofino.actions.TableDesignAction">
+            <result name="redirectToTable" type="redirectAction">
+                <param name="actionName">%{qualifiedTableName}/TableDesign</param>
+                <param name="namespace">/</param>
+            </result>
+        </action>
+
         <action name="*/TableDesign"
                 class="com.manydesigns.portofino.actions.TableDesignAction">
             <param name="skin">default</param>
@@ -108,17 +124,17 @@
         <!-- User management -->
 
         <action name="Profile" class="com.manydesigns.portofino.actions.ProfileAction">
-            <result name="success">/skins/%{skin}/profile.jsp</result>
+            <result name="success">/skins/%{skin}/user/profile.jsp</result>
         </action>
 
         <action name="Settings" class="com.manydesigns.portofino.actions.SettingsAction">
-            <result name="success">/skins/%{skin}/settings.jsp</result>
+            <result name="success">/skins/%{skin}/user/settings.jsp</result>
         </action>
 
         <!-- Help -->
 
         <action name="Help" class="com.manydesigns.portofino.actions.HelpAction">
-            <result name="success">/skins/%{skin}/help.jsp</result>
+            <result name="success">/skins/%{skin}/user/help.jsp</result>
         </action>
 
     </package>

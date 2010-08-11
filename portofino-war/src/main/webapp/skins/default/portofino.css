@@ -1,57 +1,86 @@
-div#hd, div#ft {
-    padding: .5em;
-    color: white;
-    background-color: #166bbf;
+div#hd {
+    height: 3em;
+/*    color: white; */
+/*    background-color: #166bbf; */
 /*    background-color: #65a7db;*/
 /*    background: #65a7db url("images/gradient.png") repeat-y; */
-
 }
 
+div#ft {
+    padding-top: .5em;
+    border-top: 1px solid gray;
+    margin-top: 1em;
+}
 
-div#hd a, div#ft a {
-    color: white;
+a, a:visited {
+    color: blue;
     text-decoration: none;
 }
 
-div#hd a:hover, div#ft a:hover {
+a:hover {
     text-decoration: underline;
 }
 
-div#hd h1 {
-    margin: 0.5em 0;
+div#hd h1 a {
+    color: #166bbf;
 }
 
-div#sidebar {
-    color: black;
-    background-color: #ffe;
+.yui-t2 #yui-main div#content {
+    margin-left: 13.8461em;
+    border: 3px solid #65a7db;
 }
 
-div#sidebar div {
-    padding: .5em;
+div#inner-content {
+    padding: 0 1em;
 }
 
 div#sidebar ul {
-    margin-left: 0;
+    margin: 0;
     list-style-type: none;
 }
 
 div#sidebar li {
-    margin-left: 0;
+    padding: 0 0.5em;
     list-style-type: none;
 }
 
-div.buttons-bar {
+div#sidebar ul a {
+    color: black;
+}
+
+div#sidebar ul.areas {
+    margin-right: 1em;
+}
+
+ul li.selected, div#sidebar ul li.selected a {
+    color: white;
+    background-color: #65a7db;
+    font-weight: bold;
+}
+
+ul.areas li.selected, div#sidebar ul.areas li.selected a {
+    color: black;
     background-color: #eef;
-    border-top: 1px solid gray;
-    border-bottom: 1px solid gray;
-    margin: 0.5em 0;
+    font-weight: bold;
+}
+
+div.buttons-bar-top, div.buttons-bar-bottom {
+    background-color: #eef;
     padding: 0.5em;
     clear: both;
 }
 
+div.buttons-bar-top {
+    border-bottom: 1px solid gray;
+}
+
+div.buttons-bar-bottom {
+    border-top: 1px solid gray;
+}
+
 ul.errorMessages, ul.warningMessages, ul.infoMessages {
-    padding: 0.5em;
-    margin: 0.5em 0;
+    margin: 0;
+    padding: 0 0.5em;
     font-weight: normal;
     font-style: italic;
     list-style-type: none;
@@ -176,3 +205,4 @@ span.disabled {
     color: green;
     font-weight: bold;
 }
+

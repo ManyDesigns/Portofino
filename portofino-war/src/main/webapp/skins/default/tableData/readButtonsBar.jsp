@@ -1,7 +1,12 @@
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1" %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
-<div class="buttons-bar">
+<s:if test="#buttonsBarBottom">
+    <div class="buttons-bar-bottom">
+</s:if><s:else>
+    <s:set var="buttonsBarBottom" value="true"/>
+    <div class="buttons-bar-top">
+</s:else>
     <s:set name="position" value="objects.indexOf(object)"/>
     <s:set name="size" value="objects.size()"/>
     <s:if test="#position >= 0">

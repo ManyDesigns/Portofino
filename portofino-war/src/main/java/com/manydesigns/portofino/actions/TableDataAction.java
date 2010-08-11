@@ -155,6 +155,10 @@ public class TableDataAction extends ActionSupport
     //**************************************************************************
 
     public String execute() {
+        if (qualifiedTableName == null) {
+            qualifiedTableName = dataModel.getAllTables().get(0).getQualifiedName();
+            return "redirectToTable";
+        }
         if (pk == null) {
             return searchFromString();
         } else {
