@@ -95,8 +95,7 @@ public class TableHelper {
                 sb.append(",");
             }
             Object value = map.get(column.getColumnName());
-            String stringValue =
-                    (String)ConvertUtils.convert(value, String.class);
+            String stringValue = ConvertUtils.convert(value);
             sb.append(stringValue);
         }
         return sb.toString();

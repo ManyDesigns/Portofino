@@ -98,6 +98,7 @@ public class ExpressionGenerator implements Generator {
             }
             propertyAccessors.add(propertyAccessor);
             previousEnd = end;
+            index++;
         }
         sb.append(expression.substring(previousEnd, expression.length()));
         return sb.toString();
@@ -116,8 +117,7 @@ public class ExpressionGenerator implements Generator {
             String[] args = new String[propertyAccessors.size()];
             for (int i = 0; i < args.length; i++) {
                 Object value = propertyAccessors.get(i).get(obj);
-                String stringValue =
-                        (String) ConvertUtils.convert(value, String.class);
+                String stringValue = ConvertUtils.convert(value);
                 args[i] = stringValue;
             }
             return MessageFormat.format(parsedExpression, args);
