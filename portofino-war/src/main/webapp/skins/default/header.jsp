@@ -28,7 +28,7 @@
     <s:url var="helpUrl" namespace="/" action="Help"/>
     <s:url var="logoutUrl" namespace="/" action="Homepage"/>
     <div id="hd">
-        <div style="float: right;">
+        <div id="globalLinks">
             Welcome, <s:a href="%{#profileUrl}">User Name</s:a> -
             <s:a href="%{#settingsUrl}">Settings</s:a> -
             <s:a href="%{#helpUrl}">Help</s:a> -

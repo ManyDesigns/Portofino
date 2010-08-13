@@ -33,7 +33,7 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.portofino.context.ServerInfo;
-import com.manydesigns.portofino.servlets.PortofinoServletContextListener;
+import com.manydesigns.portofino.servlets.PortofinoListener;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.util.ServletContextAware;
 
@@ -52,7 +52,7 @@ public class ServerInfoAction extends ActionSupport
     @Override
     public String execute() {
         serverInfo = (ServerInfo)servletContext.getAttribute(
-                PortofinoServletContextListener.SERVER_INFO_ATTRIBUTE);
+                PortofinoListener.SERVER_INFO_ATTRIBUTE);
         form = new FormBuilder(ServerInfo.class).
                 configFields("contextPath",
                         "realPath",

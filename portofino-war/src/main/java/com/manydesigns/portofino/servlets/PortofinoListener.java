@@ -45,6 +45,9 @@ import org.apache.commons.lang.time.StopWatch;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -55,9 +58,14 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PortofinoServletContextListener implements ServletContextListener {
+public class PortofinoListener
+        implements ServletContextListener, HttpSessionListener {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    //**************************************************************************
+    // Constants
+    //**************************************************************************
 
     public static final String SEPARATOR =
             "----------------------------------------" +
@@ -72,6 +80,10 @@ public class PortofinoServletContextListener implements ServletContextListener {
     public static final String MDCONTEXT_ATTRIBUTE =
             "mdContext";
 
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
     protected Properties elementsProperties;
     protected Properties portofinoProperties;
     protected ServletContext servletContext;
@@ -79,14 +91,22 @@ public class PortofinoServletContextListener implements ServletContextListener {
     protected MDContext mdContext;
 
     public static final Logger logger =
-            LogUtil.getLogger(PortofinoServletContextListener.class);
+            LogUtil.getLogger(PortofinoListener.class);
+
+    //**************************************************************************
+    // Constructors
+    //**************************************************************************
 
     /**
      * Creates a new instance of PortofinoServletContextListener
      */
-    public PortofinoServletContextListener() {
+    public PortofinoListener() {
 
     }
+
+    //**************************************************************************
+    // ServletContextListener implementation
+    //**************************************************************************
 
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         StopWatch stopWatch = new StopWatch();
@@ -146,7 +166,41 @@ public class PortofinoServletContextListener implements ServletContextListener {
         }
     }
 
-    private void createPages() {
+    public void contextDestroyed(ServletContextEvent servletContextEvent) {
+        logger.info("ManyDesigns Portofino stopping...");
+
+        logger.info("Unregistering MDContext from servlet context...");
+        servletContext.removeAttribute(MDCONTEXT_ATTRIBUTE);
+
+        servletContext.removeAttribute(SERVER_INFO_ATTRIBUTE);
+        servletContext.removeAttribute(PORTOFINO_PROPERTIES_ATTRIBUTE);
+        servletContext.removeAttribute(ELEMENTS_PROPERTIES_ATTRIBUTE);
+
+        logger.info("ManyDesigns Portofino stopped.");
+    }
+
+    
+    //**************************************************************************
+    // HttpSessionListener implementation
+    //**************************************************************************
+
+    public void sessionCreated(HttpSessionEvent httpSessionEvent) {
+        HttpSession session = httpSessionEvent.getSession();
+        LogUtil.infoMF(logger, "Session created: id={0}",
+                session.getId());
+    }
+
+    public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
+        HttpSession session = httpSessionEvent.getSession();
+        LogUtil.infoMF(logger, "Session destroyed: id={0}", session.getId());
+    }
+
+
+    //**************************************************************************
+    // Other methods
+    //**************************************************************************
+
+    protected void createPages() {
         List<SiteNode> rootNodes = mdContext.getSiteNodes();
         SimpleSiteNode homepage =
                 new SimpleSiteNode("/Homepage.action", "Homepage", "Homepage");
@@ -193,7 +247,7 @@ public class PortofinoServletContextListener implements ServletContextListener {
         personalArea.add(help);
     }
 
-    private void createMDContext() {
+    protected void createMDContext() {
         logger.info("Creating MDContext and " +
                 "registering on servlet context...");
         // create and register the container first, without exceptions
@@ -216,18 +270,4 @@ public class PortofinoServletContextListener implements ServletContextListener {
                         PortofinoProperties.MODEL_LOCATION_PROPERTY));
         servletContext.setAttribute(MDCONTEXT_ATTRIBUTE, mdContext);
     }
-
-    public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        logger.info("ManyDesigns Portofino stopping...");
-
-        logger.info("Unregistering MDContext from servlet context...");
-        servletContext.removeAttribute(MDCONTEXT_ATTRIBUTE);
-
-        servletContext.removeAttribute(SERVER_INFO_ATTRIBUTE);
-        servletContext.removeAttribute(PORTOFINO_PROPERTIES_ATTRIBUTE);
-        servletContext.removeAttribute(ELEMENTS_PROPERTIES_ATTRIBUTE);
-
-        logger.info("ManyDesigns Portofino stopped.");
-    }
-
 }

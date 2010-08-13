@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.servlets.PortofinoServletContextListener;
+import com.manydesigns.portofino.servlets.PortofinoListener;
 import com.manydesigns.portofino.site.Navigation;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
@@ -74,7 +74,7 @@ public class PortofinoInterceptor implements Interceptor {
                 (ServletContext)context.get(StrutsStatics.SERVLET_CONTEXT);
         MDContext mdContext =
                 (MDContext)servletContext.getAttribute(
-                        PortofinoServletContextListener.MDCONTEXT_ATTRIBUTE);
+                        PortofinoListener.MDCONTEXT_ATTRIBUTE);
 
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
         Navigation navigation = new Navigation(mdContext.getSiteNodes());

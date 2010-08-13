@@ -10,15 +10,17 @@
     <description>ManyDesigns Portofino</description>
 
     <listener>
-        <description>Application startup and shutdown listener</description>
+        <description>Application context and session listener</description>
         <listener-class>
-            com.manydesigns.portofino.servlets.PortofinoServletContextListener
+            com.manydesigns.portofino.servlets.PortofinoListener
         </listener-class>
     </listener>
 
     <filter>
         <filter-name>struts2</filter-name>
-        <filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+        <filter-class>
+            org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter
+        </filter-class>
     </filter>
     <filter-mapping>
         <filter-name>struts2</filter-name>
