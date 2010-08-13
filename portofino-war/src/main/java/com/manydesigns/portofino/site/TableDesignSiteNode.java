@@ -29,13 +29,13 @@
 
 package com.manydesigns.portofino.site;
 
+import com.manydesigns.elements.Util;
 import com.manydesigns.portofino.context.MDContext;
 import com.manydesigns.portofino.model.Table;
-import com.manydesigns.elements.Util;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -57,7 +57,7 @@ public class TableDesignSiteNode implements SiteNode {
     }
 
     public String getTitle() {
-        return "TableDesign";
+        return "Table design";
     }
 
     public String getDescription() {

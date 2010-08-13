@@ -33,9 +33,9 @@ import com.manydesigns.elements.Util;
 import com.manydesigns.portofino.context.MDContext;
 import com.manydesigns.portofino.model.Table;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -57,7 +57,7 @@ public class TableDataSiteNode implements SiteNode {
     }
 
     public String getTitle() {
-        return "TableData";
+        return "Table data";
     }
 
     public String getDescription() {
