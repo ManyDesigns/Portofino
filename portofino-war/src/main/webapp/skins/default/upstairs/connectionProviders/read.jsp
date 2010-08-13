@@ -20,4 +20,4 @@
     </div>
     <s:include value="/skins/default/upstairs/connectionProviders/readButtonsBar.jsp"/>
 </s:form>
-<s:include value="/skins/default/upstairs/upstairsFooter.jsp"/>
+<s:include value="/skins/default/footer.jsp"/>

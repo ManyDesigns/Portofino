@@ -35,6 +35,7 @@ import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.io.ConnectionsParser;
 import com.manydesigns.portofino.model.io.DBParser;
+import com.manydesigns.portofino.site.SiteNode;
 import com.manydesigns.portofino.search.HibernateCriteriaAdapter;
 import org.apache.commons.lang.time.StopWatch;
 import org.hibernate.Criteria;
@@ -44,6 +45,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +68,7 @@ public class MDContextHibernateImpl implements MDContext {
     protected DataModel dataModel;
     protected Map<String, HibernateDatabaseSetup> setups;
     protected final ThreadLocal<StopWatch> stopWatches;
+    protected final List<SiteNode> siteNodes;
 
     public static final Logger logger =
             LogUtil.getLogger(MDContextHibernateImpl.class);
@@ -76,6 +79,7 @@ public class MDContextHibernateImpl implements MDContext {
 
     public MDContextHibernateImpl() {
         stopWatches = new ThreadLocal<StopWatch>();
+        siteNodes = new ArrayList<SiteNode>();
     }
 
     //**************************************************************************
@@ -350,6 +354,10 @@ public class MDContextHibernateImpl implements MDContext {
             return stopWatch.getTime();
         }
         return 0L;
+    }
+
+    public List<SiteNode> getSiteNodes() {
+        return siteNodes;
     }
 
     private void startTimer() {

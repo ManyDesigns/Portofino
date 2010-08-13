@@ -35,7 +35,7 @@ div#inner-content {
 }
 
 div#sidebar ul {
-    margin: 0;
+    margin: 0.5em 0 0 0;
     list-style-type: none;
 }
 
@@ -48,17 +48,14 @@ div#sidebar ul a {
     color: black;
 }
 
-div#sidebar ul.areas {
-    margin-right: 1em;
-}
-
 ul li.selected, div#sidebar ul li.selected a {
     color: white;
     background-color: #65a7db;
     font-weight: bold;
 }
 
-ul.areas li.selected, div#sidebar ul.areas li.selected a {
+ul li.path, div#sidebar ul li.path a {
+    margin-right: 1em;
     color: black;
     background-color: #eef;
     font-weight: bold;

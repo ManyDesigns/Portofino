@@ -51,6 +51,6 @@ public class HrefExpressionGenerator extends ExpressionGenerator {
 
     @Override
     public String generate(Object obj) {
-        return Util.getAbsoluteLink(super.generate(obj));
+        return Util.getAbsoluteUrl(super.generate(obj));
     }
 }

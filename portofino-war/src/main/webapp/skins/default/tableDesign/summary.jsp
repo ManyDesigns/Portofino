@@ -14,4 +14,4 @@
     </div>
     <s:include value="/skins/default/tableDesign/summaryButtonsBar.jsp"/>
 </s:form>
-<s:include value="/skins/default/tableDesign/tableDesignFooter.jsp"/>
+<s:include value="/skins/default/footer.jsp"/>

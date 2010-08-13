@@ -28,4 +28,4 @@
     </div>
     <s:include value="/skins/default/tableData/readButtonsBar.jsp"/>
 </s:form>
-<s:include value="/skins/default/tableData/tableDataFooter.jsp"/>
+<s:include value="/skins/default/footer.jsp"/>

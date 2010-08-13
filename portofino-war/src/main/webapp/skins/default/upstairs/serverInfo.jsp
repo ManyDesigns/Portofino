@@ -7,4 +7,4 @@
     <h1>Server info</h1>
     <mdes:write value="form"/>
 </div>
-<s:include value="/skins/default/upstairs/upstairsFooter.jsp"/>
+<s:include value="/skins/default/footer.jsp"/>

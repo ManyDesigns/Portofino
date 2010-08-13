@@ -97,7 +97,7 @@ public class JFreeChartElement implements Element{
         alt = "";
         xb.addAttribute("alt", alt);
         xb.addAttribute("src",
-                Util.getAbsoluteLink(getServletName()+"?f="+filename));
+                Util.getAbsoluteUrl(getServletName()+"?f="+filename));
         xb.closeElement("img");
         xb.closeElement("div");
     }

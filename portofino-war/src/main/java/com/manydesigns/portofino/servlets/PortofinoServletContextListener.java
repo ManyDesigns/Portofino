@@ -36,11 +36,16 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.MDContext;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.context.hibernate.MDContextHibernateImpl;
+import com.manydesigns.portofino.site.SimpleSiteNode;
+import com.manydesigns.portofino.site.SiteNode;
+import com.manydesigns.portofino.site.TableDataSiteNode;
+import com.manydesigns.portofino.site.TableDesignSiteNode;
 import org.apache.commons.lang.time.StopWatch;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -94,7 +99,7 @@ public class PortofinoServletContextListener implements ServletContextListener {
 
         servletContext = servletContextEvent.getServletContext();
         serverInfo = new ServerInfo(servletContext);
-        
+
         LogUtil.infoMF(logger, "\n" + SEPARATOR +
                 "\n--- ManyDesigns Portofino {0} starting..." +
                 "\n--- Context path: {1}" +
@@ -128,6 +133,7 @@ public class PortofinoServletContextListener implements ServletContextListener {
 
         if (success) {
             createMDContext();
+            createPages();
         }
 
         stopWatch.stop();
@@ -138,6 +144,53 @@ public class PortofinoServletContextListener implements ServletContextListener {
         } else {
             logger.severe("Failed to start ManyDesigns Portofino.");
         }
+    }
+
+    private void createPages() {
+        List<SiteNode> rootNodes = mdContext.getSiteNodes();
+        SimpleSiteNode homepage =
+                new SimpleSiteNode("/Homepage.action", "Homepage", "Homepage");
+        rootNodes.add(homepage);
+
+        TableDataSiteNode tableDataPage = new TableDataSiteNode(mdContext);
+        rootNodes.add(tableDataPage);
+        TableDesignSiteNode tableDesignPage = new TableDesignSiteNode(mdContext);
+        rootNodes.add(tableDesignPage);
+
+        SimpleSiteNode admin =
+                new SimpleSiteNode("/upstairs/Homepage.action", "Admin", "Admin");
+        rootNodes.add(admin);
+        SimpleSiteNode serverInfo =
+                new SimpleSiteNode("/upstairs/ServerInfo.action", "Server info", "Server info");
+        admin.add(serverInfo);
+        SimpleSiteNode connectionProviders =
+                new SimpleSiteNode("/upstairs/ConnectionProviders.action", "Connection providers", "Connection providers");
+        admin.add(connectionProviders);
+        SimpleSiteNode configurationProperties =
+                new SimpleSiteNode("/upstairs/ConfigurationProperties.action", "Configuration properties", "Configuration properties");
+        admin.add(configurationProperties);
+        SimpleSiteNode logs =
+                new SimpleSiteNode("/upstairs/Logs.action", "Logs", "Logs");
+        admin.add(logs);
+        SimpleSiteNode printModel =
+                new SimpleSiteNode("/upstairs/PrintModel.action", "Print model", "Print model");
+        admin.add(printModel);
+        SimpleSiteNode selfTest =
+                new SimpleSiteNode("/upstairs/SelfTest.action", "Self test", "Self test");
+        admin.add(selfTest);
+
+        SimpleSiteNode personalArea =
+                new SimpleSiteNode("/User.action", "Personal area", "Personal area");
+        rootNodes.add(personalArea);
+        SimpleSiteNode profile =
+                new SimpleSiteNode("/Profile.action", "Profile", "Profile");
+        personalArea.add(profile);
+        SimpleSiteNode settings =
+                new SimpleSiteNode("/Settings.action", "Settings", "Settings");
+        personalArea.add(settings);
+        SimpleSiteNode help =
+                new SimpleSiteNode("/Help.action", "Help", "Help");
+        personalArea.add(help);
     }
 
     private void createMDContext() {

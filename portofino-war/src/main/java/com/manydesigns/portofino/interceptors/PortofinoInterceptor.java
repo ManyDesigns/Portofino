@@ -31,6 +31,7 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.portofino.context.MDContext;
 import com.manydesigns.portofino.servlets.PortofinoServletContextListener;
+import com.manydesigns.portofino.site.Navigation;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
@@ -52,6 +53,8 @@ public class PortofinoInterceptor implements Interceptor {
 
     public final static String STOP_WATCH_ATTRIBUTE =
             "stopWatch";
+    public final static String NAVIGATION_ATTRIBUTE =
+            "navigation";
 
     public void destroy() {}
 
@@ -69,16 +72,18 @@ public class PortofinoInterceptor implements Interceptor {
                 (HttpServletResponse)context.get(StrutsStatics.HTTP_RESPONSE);
         ServletContext servletContext =
                 (ServletContext)context.get(StrutsStatics.SERVLET_CONTEXT);
+        MDContext mdContext =
+                (MDContext)servletContext.getAttribute(
+                        PortofinoServletContextListener.MDCONTEXT_ATTRIBUTE);
 
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
+        Navigation navigation = new Navigation(mdContext.getSiteNodes());
+        req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
 
         String result;
         if (action instanceof MDContextAware) {
             setHeaders(res);
 
-            MDContext mdContext =
-                    (MDContext)servletContext.getAttribute(
-                            PortofinoServletContextListener.MDCONTEXT_ATTRIBUTE);
             mdContext.resetDbTimer();
             ((MDContextAware)action).setContext(mdContext);
 

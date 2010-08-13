@@ -33,4 +33,4 @@
     </s:iterator>
     </table>
 </div>
-<s:include value="/skins/default/upstairs/upstairsFooter.jsp"/>
+<s:include value="/skins/default/footer.jsp"/>

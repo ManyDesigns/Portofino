@@ -121,8 +121,14 @@
             </result>
         </action>
 
-        <!-- User management -->
+        <!-- Personal area -->
 
+        <action name="User">
+            <result name="success" type="redirectAction">
+                <param name="namespace">/</param>
+                <param name="actionName">Profile</param>
+            </result>
+        </action>
         <action name="Profile" class="com.manydesigns.portofino.actions.ProfileAction">
             <result name="success">/skins/%{skin}/user/profile.jsp</result>
         </action>
@@ -130,8 +136,6 @@
         <action name="Settings" class="com.manydesigns.portofino.actions.SettingsAction">
             <result name="success">/skins/%{skin}/user/settings.jsp</result>
         </action>
-
-        <!-- Help -->
 
         <action name="Help" class="com.manydesigns.portofino.actions.HelpAction">
             <result name="success">/skins/%{skin}/user/help.jsp</result>
@@ -164,13 +168,13 @@
                 <param name="databaseName">%{databaseName}</param>
             </result>
         </action>
-        <action name="Logs"
-                class="com.manydesigns.portofino.actions.upstairs.LogsAction">
-            <result name="success">/skins/default/upstairs/logs.jsp</result>
-        </action>
         <action name="ConfigurationProperties"
                 class="com.manydesigns.portofino.actions.upstairs.ConfigurationPropertiesAction">
             <result name="success">/skins/default/upstairs/configurationProperties.jsp</result>
+        </action>
+        <action name="Logs"
+                class="com.manydesigns.portofino.actions.upstairs.LogsAction">
+            <result name="success">/skins/default/upstairs/logs.jsp</result>
         </action>
         <action name="PrintModel" class="com.manydesigns.portofino.actions.upstairs.ModelWriterAction">
             <result name="success" type="stream">

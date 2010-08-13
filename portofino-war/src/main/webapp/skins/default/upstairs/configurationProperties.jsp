@@ -9,4 +9,4 @@
     <h1>Elements properties</h1>
     <mdes:write value="elementsForm"/>
 </div>
-<s:include value="/skins/default/upstairs/upstairsFooter.jsp"/>
+<s:include value="/skins/default/footer.jsp"/>

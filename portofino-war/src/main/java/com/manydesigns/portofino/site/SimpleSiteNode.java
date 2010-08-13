@@ -27,81 +27,81 @@
  *
  */
 
-package com.manydesigns.portofino.context;
+package com.manydesigns.portofino.site;
 
-import com.manydesigns.elements.fields.search.Criteria;
-import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.model.DataModel;
-import com.manydesigns.portofino.site.SiteNode;
+import com.manydesigns.elements.Util;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface MDContext {
+public class SimpleSiteNode extends ArrayList<SiteNode> implements SiteNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // Model loading
+    // Fields
     //**************************************************************************
 
-    void loadConnectionsAsResource(String resource);
-    void loadXmlModelAsResource(String resource);
+    protected String url;
+    protected String title;
+    protected String description;
 
 
     //**************************************************************************
-    // Database stuff
+    // Constructors
     //**************************************************************************
 
-    List<ConnectionProvider> getConnectionProviders();
-    ConnectionProvider getConnectionProvider(String databaseName);
+    public SimpleSiteNode(String url, String title, String description) {
+        this.url = url;
+        this.title = title;
+        this.description = description;
+    }
+
 
     //**************************************************************************
-    // Model access
+    // Page implementation
     //**************************************************************************
 
-    DataModel getDataModel();
-    void syncDataModel();
+    public String getUrl() {
+        return Util.getAbsoluteUrl(url);
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public List<SiteNode> getChildNodes() {
+        return this;
+    }
 
     //**************************************************************************
-    // Persistance
+    // Setters
     //**************************************************************************
 
-    Map<String, Object> getObjectByPk(String qualifiedTableName,
-                                      Object... pk);
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-    Map<String, Object> getObjectByPk(String qualifiedTableName,
-                                      HashMap<String, Object> pk);
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    List<Map<String, Object>> getAllObjects(String qualifiedTableName);
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    Criteria createCriteria(String qualifiedTableName);
+    @Override
+    public boolean equals(Object o) {
+        return this == o;
+    }
 
-    List<Map<String, Object>> getObjects(Criteria criteria);
-
-    void saveOrUpdateObject(Map<String, Object> obj);
-
-    void saveObject(Map<String, Object> obj);
-
-    void updateObject(Map<String, Object> obj);
-
-    void deleteObject(Map<String, Object> obj);
-
-    void openSession();
-
-    void closeSession();
-
-    List<Map<String, Object>> getRelatedObjects(
-            Map<String, Object> obj, String oneToManyRelationshipName);
-
-    void resetDbTimer();
-    long getDbTime();
-
-    List<SiteNode> getSiteNodes();
 }

@@ -6,4 +6,4 @@
 <div id="inner-content">
     <h1>Profile</h1>
 </div>
-<s:include value="/skins/default/user/userFooter.jsp"/>
+<s:include value="/skins/default/footer.jsp"/>
