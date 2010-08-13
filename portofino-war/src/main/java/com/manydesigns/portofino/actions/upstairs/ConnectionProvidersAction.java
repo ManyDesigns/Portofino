@@ -93,7 +93,7 @@ public class ConnectionProvidersAction
 
         Generator hrefGenerator =
                 new HrefExpressionGenerator(ConnectionProvider.class,
-                        "/upstairs/ConnectionProviders.action?" +
+                        "/model/ConnectionProviders.action?" +
                                 "databaseName={databaseName}");
 
         tableForm = new TableFormBuilder(ConnectionProvider.class)

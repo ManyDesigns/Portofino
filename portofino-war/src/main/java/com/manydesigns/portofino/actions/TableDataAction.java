@@ -273,7 +273,7 @@ public class TableDataAction extends ActionSupport
 
 
     public String getReadLinkExpression() {
-        StringBuilder sb = new StringBuilder("/");
+        StringBuilder sb = new StringBuilder("/model/");
         sb.append(table.getQualifiedName());
         sb.append("/TableData.action?pk=");
         boolean first = true;

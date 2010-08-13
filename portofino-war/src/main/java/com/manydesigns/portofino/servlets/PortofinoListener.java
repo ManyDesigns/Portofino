@@ -206,44 +206,47 @@ public class PortofinoListener
                 new SimpleSiteNode("/Homepage.action", "Homepage", "Homepage");
         rootNodes.add(homepage);
 
-        TableDataSiteNode tableDataPage = new TableDataSiteNode(mdContext);
-        rootNodes.add(tableDataPage);
-        TableDesignSiteNode tableDesignPage = new TableDesignSiteNode(mdContext);
-        rootNodes.add(tableDesignPage);
-
-        SimpleSiteNode admin =
-                new SimpleSiteNode("/upstairs/Homepage.action", "Admin", "Admin");
-        rootNodes.add(admin);
-        SimpleSiteNode serverInfo =
-                new SimpleSiteNode("/upstairs/ServerInfo.action", "Server info", "Server info");
-        admin.add(serverInfo);
+        SimpleSiteNode model =
+                new SimpleSiteNode("/model/Index.action", "Model", "Model");
+        rootNodes.add(model);
         SimpleSiteNode connectionProviders =
-                new SimpleSiteNode("/upstairs/ConnectionProviders.action", "Connection providers", "Connection providers");
-        admin.add(connectionProviders);
-        SimpleSiteNode configurationProperties =
-                new SimpleSiteNode("/upstairs/ConfigurationProperties.action", "Configuration properties", "Configuration properties");
-        admin.add(configurationProperties);
-        SimpleSiteNode logs =
-                new SimpleSiteNode("/upstairs/Logs.action", "Logs", "Logs");
-        admin.add(logs);
+                new SimpleSiteNode("/model/ConnectionProviders.action", "Connection providers", "Connection providers");
+        model.add(connectionProviders);
+        TableDataSiteNode tableDataPage = new TableDataSiteNode(mdContext);
+        model.add(tableDataPage);
+        TableDesignSiteNode tableDesignPage = new TableDesignSiteNode(mdContext);
+        model.add(tableDesignPage);
         SimpleSiteNode printModel =
-                new SimpleSiteNode("/upstairs/PrintModel.action", "Print model", "Print model");
-        admin.add(printModel);
+                new SimpleSiteNode("/model/PrintModel.action", "Print model", "Print model");
+        model.add(printModel);
         SimpleSiteNode selfTest =
-                new SimpleSiteNode("/upstairs/SelfTest.action", "Self test", "Self test");
-        admin.add(selfTest);
+                new SimpleSiteNode("/model/SelfTest.action", "Self test", "Self test");
+        model.add(selfTest);
+
+        SimpleSiteNode systemAdmin =
+                new SimpleSiteNode("/system-admin/Index.action", "System administration", "System administration");
+        rootNodes.add(systemAdmin);
+        SimpleSiteNode serverInfo =
+                new SimpleSiteNode("/system-admin/ServerInfo.action", "Server info", "Server info");
+        systemAdmin.add(serverInfo);
+        SimpleSiteNode configurationProperties =
+                new SimpleSiteNode("/system-admin/ConfigurationProperties.action", "Configuration properties", "Configuration properties");
+        systemAdmin.add(configurationProperties);
+        SimpleSiteNode logs =
+                new SimpleSiteNode("/system-admin/Logs.action", "Logs", "Logs");
+        systemAdmin.add(logs);
 
         SimpleSiteNode personalArea =
-                new SimpleSiteNode("/User.action", "Personal area", "Personal area");
+                new SimpleSiteNode("/user/Index.action", "Personal area", "Personal area");
         rootNodes.add(personalArea);
         SimpleSiteNode profile =
-                new SimpleSiteNode("/Profile.action", "Profile", "Profile");
+                new SimpleSiteNode("/user/Profile.action", "Profile", "Profile");
         personalArea.add(profile);
         SimpleSiteNode settings =
-                new SimpleSiteNode("/Settings.action", "Settings", "Settings");
+                new SimpleSiteNode("/user/Settings.action", "Settings", "Settings");
         personalArea.add(settings);
         SimpleSiteNode help =
-                new SimpleSiteNode("/Help.action", "Help", "Help");
+                new SimpleSiteNode("/user/Help.action", "Help", "Help");
         personalArea.add(help);
     }
 

@@ -18,7 +18,7 @@
             <s:hidden name="searchString" value="%{searchString}"/>
         </s:if>
         <s:url var="cancelReturnUrl"
-               namespace="/"
+               namespace="/model"
                action="%{qualifiedTableName}/TableData"
                escapeAmp="false">
             <s:param name="pk" value="%{pk}"/>

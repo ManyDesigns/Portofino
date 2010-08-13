@@ -23,9 +23,9 @@
 <body>
 <div id="doc3" class="yui-t2">
     <s:url var="homepageUrl" namespace="/" action="Homepage"/>
-    <s:url var="profileUrl" namespace="/" action="Profile"/>
-    <s:url var="settingsUrl" namespace="/" action="Settings"/>
-    <s:url var="helpUrl" namespace="/" action="Help"/>
+    <s:url var="profileUrl" namespace="/user" action="Profile"/>
+    <s:url var="settingsUrl" namespace="/user" action="Settings"/>
+    <s:url var="helpUrl" namespace="/user" action="Help"/>
     <s:url var="logoutUrl" namespace="/" action="Homepage"/>
     <div id="hd">
         <div id="globalLinks">

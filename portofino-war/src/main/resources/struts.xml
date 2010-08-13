@@ -2,6 +2,12 @@
     "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
     "http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
+    <!--
+    ****************************************************************************
+    Common settings
+    ****************************************************************************
+    -->
+
     <package name="portofino-default" extends="struts-default" abstract="true">
         <interceptors>
             <interceptor name="elements-struts2"
@@ -35,16 +41,49 @@
         </global-results>
     </package>
 
+
+    <!--
+    ****************************************************************************
+    Operational functions (namespace='/')
+    ****************************************************************************
+    -->
+
     <package name="portofino" extends="portofino-default" namespace="/">
         <action name="Homepage" class="com.manydesigns.portofino.actions.HomepageAction">
-            <result name="success">/skins/%{skin}/homepage.jsp</result>
+            <result name="success">/skins/default/homepage.jsp</result>
+        </action>
+    </package>
+
+
+    <!--
+    ****************************************************************************
+    Modeling (namespace='/model')
+    ****************************************************************************
+    -->
+
+    <package name="portofino-model" extends="portofino-default" namespace="/model">
+        <action name="Index">
+            <result name="success" type="redirectAction">
+                <param name="actionName">ConnectionProviders</param>
+            </result>
+        </action>
+        <action name="ConnectionProviders"
+                class="com.manydesigns.portofino.actions.upstairs.ConnectionProvidersAction">
+            <result name="list">/skins/default/upstairs/connectionProviders/list.jsp</result>
+            <result name="read">/skins/default/upstairs/connectionProviders/read.jsp</result>
+            <result name="returnToList" type="redirectAction">
+                <param name="actionName">ConnectionProviders</param>
+            </result>
+            <result name="returnToRead" type="redirectAction">
+                <param name="actionName">ConnectionProviders</param>
+                <param name="databaseName">%{databaseName}</param>
+            </result>
         </action>
         
         <action name="TableData"
                 class="com.manydesigns.portofino.actions.TableDataAction">
             <result name="redirectToTable" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableData</param>
-                <param name="namespace">/</param>
             </result>
         </action>
 
@@ -53,44 +92,39 @@
             <param name="skin">default</param>
             <param name="qualifiedTableName">{1}</param>
 
-            <result name="search">/skins/%{skin}/tableData/search.jsp</result>
+            <result name="search">/skins/default/tableData/search.jsp</result>
 
-            <result name="read">/skins/%{skin}/tableData/read.jsp</result>
+            <result name="read">/skins/default/tableData/read.jsp</result>
 
-            <result name="create">/skins/%{skin}/tableData/create.jsp</result>
+            <result name="create">/skins/default/tableData/create.jsp</result>
 
             <result name="save" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableData</param>
-                <param name="namespace">/</param>
                 <param name="pk">%{pk}</param>
             </result>
 
-            <result name="edit">/skins/%{skin}/tableData/edit.jsp</result>
+            <result name="edit">/skins/default/tableData/edit.jsp</result>
 
             <result name="update" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableData</param>
-                <param name="namespace">/</param>
                 <param name="pk">%{pk}</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
-            <result name="bulkEdit">/skins/%{skin}/tableData/bulkEdit.jsp</result>
+            <result name="bulkEdit">/skins/default/tableData/bulkEdit.jsp</result>
 
             <result name="bulkUpdate" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableData</param>
-                <param name="namespace">/</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="returnToSearch" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableData</param>
-                <param name="namespace">/</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="delete" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableData</param>
-                <param name="namespace">/</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
@@ -104,16 +138,14 @@
                 class="com.manydesigns.portofino.actions.TableDesignAction">
             <result name="redirectToTable" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableDesign</param>
-                <param name="namespace">/</param>
             </result>
         </action>
-
         <action name="*/TableDesign"
                 class="com.manydesigns.portofino.actions.TableDesignAction">
             <param name="skin">default</param>
             <param name="qualifiedTableName">{1}</param>
 
-            <result name="summary">/skins/%{skin}/tableDesign/summary.jsp</result>
+            <result name="summary">/skins/default/tableDesign/summary.jsp</result>
 
             <result name="cancel" type="redirect">
                 <param name="location">${cancelReturnUrl}</param>
@@ -121,61 +153,6 @@
             </result>
         </action>
 
-        <!-- Personal area -->
-
-        <action name="User">
-            <result name="success" type="redirectAction">
-                <param name="namespace">/</param>
-                <param name="actionName">Profile</param>
-            </result>
-        </action>
-        <action name="Profile" class="com.manydesigns.portofino.actions.ProfileAction">
-            <result name="success">/skins/%{skin}/user/profile.jsp</result>
-        </action>
-
-        <action name="Settings" class="com.manydesigns.portofino.actions.SettingsAction">
-            <result name="success">/skins/%{skin}/user/settings.jsp</result>
-        </action>
-
-        <action name="Help" class="com.manydesigns.portofino.actions.HelpAction">
-            <result name="success">/skins/%{skin}/user/help.jsp</result>
-        </action>
-
-    </package>
-
-    <package name="portofino-upstairs" extends="portofino-default" namespace="/upstairs">
-        <action name="Homepage">
-            <result name="success" type="redirectAction">
-                <param name="namespace">/upstairs</param>
-                <param name="actionName">ServerInfo</param>
-            </result>
-        </action>
-        <action name="ServerInfo"
-                class="com.manydesigns.portofino.actions.upstairs.ServerInfoAction">
-            <result name="success">/skins/default/upstairs/serverInfo.jsp</result>
-        </action>
-        <action name="ConnectionProviders"
-                class="com.manydesigns.portofino.actions.upstairs.ConnectionProvidersAction">
-            <result name="list">/skins/default/upstairs/connectionProviders/list.jsp</result>
-            <result name="read">/skins/default/upstairs/connectionProviders/read.jsp</result>
-            <result name="returnToList" type="redirectAction">
-                <param name="actionName">ConnectionProviders</param>
-                <param name="namespace">/upstairs</param>
-            </result>
-            <result name="returnToRead" type="redirectAction">
-                <param name="actionName">ConnectionProviders</param>
-                <param name="namespace">/upstairs</param>
-                <param name="databaseName">%{databaseName}</param>
-            </result>
-        </action>
-        <action name="ConfigurationProperties"
-                class="com.manydesigns.portofino.actions.upstairs.ConfigurationPropertiesAction">
-            <result name="success">/skins/default/upstairs/configurationProperties.jsp</result>
-        </action>
-        <action name="Logs"
-                class="com.manydesigns.portofino.actions.upstairs.LogsAction">
-            <result name="success">/skins/default/upstairs/logs.jsp</result>
-        </action>
         <action name="PrintModel" class="com.manydesigns.portofino.actions.upstairs.ModelWriterAction">
             <result name="success" type="stream">
                 <param name="contentType">%{contentType}</param>
@@ -189,4 +166,58 @@
             <result name="success">/skins/default/upstairs/selfTest.jsp</result>
         </action>
     </package>
+
+
+    <!--
+    ****************************************************************************
+    System admin (namespace='/system-admin')
+    ****************************************************************************
+    -->
+
+    <package name="portofino-system-admin" extends="portofino-default" namespace="/system-admin">
+        <action name="Index">
+            <result name="success" type="redirectAction">
+                <param name="actionName">ServerInfo</param>
+            </result>
+        </action>
+        <action name="ServerInfo"
+                class="com.manydesigns.portofino.actions.upstairs.ServerInfoAction">
+            <result name="success">/skins/default/upstairs/serverInfo.jsp</result>
+        </action>
+        <action name="ConfigurationProperties"
+                class="com.manydesigns.portofino.actions.upstairs.ConfigurationPropertiesAction">
+            <result name="success">/skins/default/upstairs/configurationProperties.jsp</result>
+        </action>
+        <action name="Logs"
+                class="com.manydesigns.portofino.actions.upstairs.LogsAction">
+            <result name="success">/skins/default/upstairs/logs.jsp</result>
+        </action>
+    </package>
+
+    
+    <!--
+    ****************************************************************************
+    User-related functions (namespace='/user')
+    ****************************************************************************
+    -->
+
+    <package name="portofino-user" extends="portofino-default" namespace="/user">
+        <action name="Index">
+            <result name="success" type="redirectAction">
+                <param name="actionName">Profile</param>
+            </result>
+        </action>
+        <action name="Profile" class="com.manydesigns.portofino.actions.ProfileAction">
+            <result name="success">/skins/default/user/profile.jsp</result>
+        </action>
+
+        <action name="Settings" class="com.manydesigns.portofino.actions.SettingsAction">
+            <result name="success">/skins/default/user/settings.jsp</result>
+        </action>
+
+        <action name="Help" class="com.manydesigns.portofino.actions.HelpAction">
+            <result name="success">/skins/default/user/help.jsp</result>
+        </action>
+    </package>
+
 </struts>

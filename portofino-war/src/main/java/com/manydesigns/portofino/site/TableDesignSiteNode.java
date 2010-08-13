@@ -53,7 +53,7 @@ public class TableDesignSiteNode implements SiteNode {
     }
 
     public String getUrl() {
-        return Util.getAbsoluteUrl("/TableDesign.action");
+        return Util.getAbsoluteUrl("/model/TableDesign.action");
     }
 
     public String getTitle() {
@@ -82,7 +82,7 @@ public class TableDesignSiteNode implements SiteNode {
 
         public String getUrl() {
             return Util.getAbsoluteUrl(
-                    MessageFormat.format("/{0}/TableDesign.action",
+                    MessageFormat.format("/model/{0}/TableDesign.action",
                             table.getQualifiedName()));
         }
 
