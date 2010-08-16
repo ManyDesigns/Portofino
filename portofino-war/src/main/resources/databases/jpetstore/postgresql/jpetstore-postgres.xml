@@ -153,6 +153,7 @@
                 <siteNode url="/model/PrintModel.action" title="Print model" description="Print model"/>
                 <siteNode url="/model/SelfTest.action" title="Self test" description="Self test"/>
                 <siteNode url="/model/SiteMap.action" title="Site map" description="Site map"/>
+                <siteNode url="/model/DDLWriter.action" title="DDL Writer" description="DDL Writer"/>
             </childNodes>
         </siteNode>
         <siteNode url="/system-admin/Index.action" title="System administration" description="System administration">

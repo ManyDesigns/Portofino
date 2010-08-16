@@ -43,8 +43,11 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.dialect.*;
+import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 
 import java.io.Serializable;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -341,6 +344,62 @@ public class HibernateContextImpl implements Context {
     }
 
     //**************************************************************************
+    // DDL
+    //**************************************************************************
+
+    public List<String> getDDLCreate() {
+        List<String> result = new ArrayList<String>();
+        for (Database db : model.getDatabases()){
+            result.add("-- DB: " + db.getDatabaseName());
+            HibernateDatabaseSetup setup = setups.get(db.getDatabaseName());
+            Configuration conf = setup.getConfiguration();
+            String[] ddls = conf.generateSchemaCreationScript
+                    (getDialect(getConnectionProvider(db.getDatabaseName())));
+            for (int i=0; i < ddls.length;i++) {
+                result.add(ddls[i]);
+            }
+
+        }
+        return result;
+    }
+
+    public List<String> getDDLUpdate() {
+        List<String> result = new ArrayList<String>();
+
+
+        for (Database db : model.getDatabases()){
+            HibernateDatabaseSetup setup = setups.get(db.getDatabaseName());
+            DatabaseMetadata databaseMetadata = null;
+            ConnectionProvider provider= null;
+            Connection conn = null;
+            try {
+                provider =  getConnectionProvider(db.getDatabaseName());
+                conn = provider.acquireConnection();
+
+                databaseMetadata = new DatabaseMetadata(
+                        conn,
+                        getDialect(provider));
+
+            result.add("-- DB: " + db.getDatabaseName());
+
+            Configuration conf = setup.getConfiguration();
+            String[] ddls = conf.generateSchemaUpdateScript(
+                    getDialect(provider), databaseMetadata);
+            for (int i=0; i < ddls.length;i++) {
+                result.add(ddls[i]);
+            }
+
+            } catch (Throwable e) {
+              //TODO
+            } finally {
+              provider.releaseConnection(conn);  
+            }
+
+        }
+        return result;
+    }
+
+    //**************************************************************************
     // Timers
     //**************************************************************************
 
@@ -372,5 +431,22 @@ public class HibernateContextImpl implements Context {
         if (stopWatch != null) {
             stopWatch.suspend();
         }
+    }
+
+    private Dialect getDialect (ConnectionProvider provider) {
+        String vendor = provider.getDatabaseProductName();
+        if (vendor.toLowerCase().contains("derby"))
+            return  new DerbyDialect();
+        if (vendor.toLowerCase().contains("postgres"))
+            return  new PostgreSQLDialect();
+        if (vendor.toLowerCase().contains("db2"))
+            return  new DB2Dialect();
+        if (vendor.toLowerCase().contains("mysql"))
+            return  new MySQL5Dialect();
+        if (vendor.toLowerCase().contains("microsoft sql"))
+            return  new SQLServerDialect();
+        if (vendor.toLowerCase().contains("oracle"))
+            return  new Oracle9iDialect();
+        return null;
     }
 }

@@ -188,61 +188,6 @@ public class PortofinoListener
         LogUtil.infoMF(logger, "Session destroyed: id={0}", session.getId());
     }
 
-
-    //**************************************************************************
-    // Other methods
-    //**************************************************************************
-/*
-    protected void createPages() {
-        List<SiteNode> rootNodes = context.getSiteNodes();
-        SimpleSiteNode homepage =
-                new SimpleSiteNode("/Homepage.action", "Homepage", "Homepage");
-        rootNodes.add(homepage);
-
-        SimpleSiteNode model =
-                new SimpleSiteNode("/model/Index.action", "Model", "Model");
-        rootNodes.add(model);
-        SimpleSiteNode connectionProviders =
-                new SimpleSiteNode("/model/ConnectionProviders.action", "Connection providers", "Connection providers");
-        model.add(connectionProviders);
-        TableDataSiteNode tableDataPage = new TableDataSiteNode();
-        model.add(tableDataPage);
-        TableDesignSiteNode tableDesignPage = new TableDesignSiteNode();
-        model.add(tableDesignPage);
-        SimpleSiteNode printModel =
-                new SimpleSiteNode("/model/PrintModel.action", "Print model", "Print model");
-        model.add(printModel);
-        SimpleSiteNode selfTest =
-                new SimpleSiteNode("/model/SelfTest.action", "Self test", "Self test");
-        model.add(selfTest);
-
-        SimpleSiteNode systemAdmin =
-                new SimpleSiteNode("/system-admin/Index.action", "System administration", "System administration");
-        rootNodes.add(systemAdmin);
-        SimpleSiteNode serverInfo =
-                new SimpleSiteNode("/system-admin/ServerInfo.action", "Server info", "Server info");
-        systemAdmin.add(serverInfo);
-        SimpleSiteNode configurationProperties =
-                new SimpleSiteNode("/system-admin/ConfigurationProperties.action", "Configuration properties", "Configuration properties");
-        systemAdmin.add(configurationProperties);
-        SimpleSiteNode logs =
-                new SimpleSiteNode("/system-admin/Logs.action", "Logs", "Logs");
-        systemAdmin.add(logs);
-
-        SimpleSiteNode personalArea =
-                new SimpleSiteNode("/user/Index.action", "Personal area", "Personal area");
-        rootNodes.add(personalArea);
-        SimpleSiteNode profile =
-                new SimpleSiteNode("/user/Profile.action", "Profile", "Profile");
-        personalArea.add(profile);
-        SimpleSiteNode settings =
-                new SimpleSiteNode("/user/Settings.action", "Settings", "Settings");
-        personalArea.add(settings);
-        SimpleSiteNode help =
-                new SimpleSiteNode("/user/Help.action", "Help", "Help");
-        personalArea.add(help);
-    }
-*/
     protected void createContext() {
         logger.info("Creating Context and " +
                 "registering on servlet context...");

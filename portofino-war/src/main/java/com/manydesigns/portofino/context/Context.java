@@ -100,5 +100,10 @@ public interface Context {
             Map<String, Object> obj, String oneToManyRelationshipName);
 
     void resetDbTimer();
+
     long getDbTime();
+
+    public List<String> getDDLCreate();
+
+    public List<String> getDDLUpdate();
 }

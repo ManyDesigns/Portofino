@@ -141,7 +141,6 @@
                 <param name="prependServletContext">false</param>
             </result>
         </action>
-
         <action name="TableDesign"
                 class="com.manydesigns.portofino.actions.model.TableDesignAction">
             <result name="redirectToTable" type="redirectAction">
@@ -178,6 +177,12 @@
                 class="com.manydesigns.portofino.actions.model.SiteMap">
             <result name="success">/skins/default/model/siteMap.jsp</result>
         </action>
+
+        <action name="DDLWriter"
+                class="com.manydesigns.portofino.actions.model.DDLWriterAction">
+            <result name="success">/skins/default/model/ddl.jsp</result>
+        </action>
+
     </package>
 
 
