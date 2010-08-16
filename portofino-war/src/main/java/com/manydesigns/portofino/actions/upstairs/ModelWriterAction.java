@@ -29,10 +29,10 @@
 package com.manydesigns.portofino.actions.upstairs;
 
 import com.opensymphony.xwork2.ActionSupport;
-import com.manydesigns.portofino.context.MDContext;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.DataModel;
 import com.manydesigns.portofino.model.io.ModelWriter;
-import com.manydesigns.portofino.interceptors.MDContextAware;
+import com.manydesigns.portofino.interceptors.ContextAware;
 
 import java.io.InputStream;
 import java.io.FileInputStream;
@@ -45,11 +45,11 @@ import java.text.MessageFormat;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ModelWriterAction extends ActionSupport implements MDContextAware {
+public class ModelWriterAction extends ActionSupport implements ContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public MDContext context;
+    public Context context;
     public DataModel dataModel;
     // result parameters
     public InputStream inputStream;
@@ -58,7 +58,7 @@ public class ModelWriterAction extends ActionSupport implements MDContextAware {
 
     public String skin = "default";
 
-    public void setContext(MDContext context) {
+    public void setContext(Context context) {
         this.context = context;
         dataModel = context.getDataModel();
     }

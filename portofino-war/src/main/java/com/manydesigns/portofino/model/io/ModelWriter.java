@@ -31,14 +31,13 @@ package com.manydesigns.portofino.model.io;
 
 import com.manydesigns.portofino.model.*;
 
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
-import java.io.IOException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
-
-//LIbreria necessaria per StAX
-import javax.xml.stream.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -70,12 +69,14 @@ public class ModelWriter {
             //Ritorni a capo nel documento finale
             w.writeCharacters("\n");
            
-            w.writeStartElement( "datamodel");
+            w.writeStartElement( "model");
             w.writeCharacters("\n");
+            w.writeStartElement( "databases");
             for (Database database :model.getDatabases()){
                 visit (w, database);
             }
-            w.writeEndElement();
+            w.writeEndElement(); // databases
+            w.writeEndElement(); // model
     
             // Chiudo il documento
             w.writeEndDocument();
@@ -218,7 +219,7 @@ public class ModelWriter {
 
     public static void main(String[] args){
         try {
-            DBParser parser = new DBParser();
+            ModelParser parser = new ModelParser();
              DataModel dataModel = parser.parse(
                     "databases/jpetstore/postgresql/jpetstore-postgres.xml");
             ModelWriter writer = new ModelWriter(dataModel);

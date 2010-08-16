@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.site;
 
 import com.manydesigns.elements.Util;
-import com.manydesigns.portofino.context.MDContext;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.Table;
 
 import java.text.MessageFormat;
@@ -46,9 +46,9 @@ public class TableDesignSiteNode implements SiteNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    protected final MDContext context;
+    protected final Context context;
 
-    public TableDesignSiteNode(MDContext context) {
+    public TableDesignSiteNode(Context context) {
         this.context = context;
     }
 

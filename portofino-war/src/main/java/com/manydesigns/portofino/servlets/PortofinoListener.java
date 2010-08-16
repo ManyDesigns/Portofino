@@ -33,9 +33,9 @@ import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.context.MDContext;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.ServerInfo;
-import com.manydesigns.portofino.context.hibernate.MDContextHibernateImpl;
+import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
 import com.manydesigns.portofino.site.SimpleSiteNode;
 import com.manydesigns.portofino.site.SiteNode;
 import com.manydesigns.portofino.site.TableDataSiteNode;
@@ -77,8 +77,8 @@ public class PortofinoListener
             "portofinoProperties";
     public static final String SERVER_INFO_ATTRIBUTE =
             "serverInfo";
-    public static final String MDCONTEXT_ATTRIBUTE =
-            "mdContext";
+    public static final String CONTEXT_ATTRIBUTE =
+            "context";
 
     //**************************************************************************
     // Fields
@@ -88,7 +88,7 @@ public class PortofinoListener
     protected Properties portofinoProperties;
     protected ServletContext servletContext;
     protected ServerInfo serverInfo;
-    protected MDContext mdContext;
+    protected Context context;
 
     public static final Logger logger =
             LogUtil.getLogger(PortofinoListener.class);
@@ -109,11 +109,11 @@ public class PortofinoListener
     //**************************************************************************
 
     public void contextInitialized(ServletContextEvent servletContextEvent) {
+        LogUtil.initializeLoggingSystem();
+
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        LogUtil.initializeLoggingSystem();
-        
         elementsProperties = ElementsProperties.getProperties();
         portofinoProperties = PortofinoProperties.getProperties();
 
@@ -152,7 +152,7 @@ public class PortofinoListener
         }
 
         if (success) {
-            createMDContext();
+            createContext();
             createPages();
         }
 
@@ -169,9 +169,7 @@ public class PortofinoListener
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         logger.info("ManyDesigns Portofino stopping...");
 
-        logger.info("Unregistering MDContext from servlet context...");
-        servletContext.removeAttribute(MDCONTEXT_ATTRIBUTE);
-
+        servletContext.removeAttribute(CONTEXT_ATTRIBUTE);
         servletContext.removeAttribute(SERVER_INFO_ATTRIBUTE);
         servletContext.removeAttribute(PORTOFINO_PROPERTIES_ATTRIBUTE);
         servletContext.removeAttribute(ELEMENTS_PROPERTIES_ATTRIBUTE);
@@ -201,7 +199,7 @@ public class PortofinoListener
     //**************************************************************************
 
     protected void createPages() {
-        List<SiteNode> rootNodes = mdContext.getSiteNodes();
+        List<SiteNode> rootNodes = context.getSiteNodes();
         SimpleSiteNode homepage =
                 new SimpleSiteNode("/Homepage.action", "Homepage", "Homepage");
         rootNodes.add(homepage);
@@ -212,9 +210,9 @@ public class PortofinoListener
         SimpleSiteNode connectionProviders =
                 new SimpleSiteNode("/model/ConnectionProviders.action", "Connection providers", "Connection providers");
         model.add(connectionProviders);
-        TableDataSiteNode tableDataPage = new TableDataSiteNode(mdContext);
+        TableDataSiteNode tableDataPage = new TableDataSiteNode(context);
         model.add(tableDataPage);
-        TableDesignSiteNode tableDesignPage = new TableDesignSiteNode(mdContext);
+        TableDesignSiteNode tableDesignPage = new TableDesignSiteNode(context);
         model.add(tableDesignPage);
         SimpleSiteNode printModel =
                 new SimpleSiteNode("/model/PrintModel.action", "Print model", "Print model");
@@ -250,27 +248,27 @@ public class PortofinoListener
         personalArea.add(help);
     }
 
-    protected void createMDContext() {
-        logger.info("Creating MDContext and " +
+    protected void createContext() {
+        logger.info("Creating Context and " +
                 "registering on servlet context...");
         // create and register the container first, without exceptions
 
         String managerClassName =
                 portofinoProperties.getProperty(
                         PortofinoProperties.CONTEXT_CLASS_PROPERTY);
-        InstanceBuilder<MDContext> builder =
-                new InstanceBuilder<MDContext>(
-                        MDContext.class,
-                        MDContextHibernateImpl.class,
+        InstanceBuilder<Context> builder =
+                new InstanceBuilder<Context>(
+                        Context.class,
+                        HibernateContextImpl.class,
                         logger);
-        mdContext = builder.createInstance(managerClassName);
+        context = builder.createInstance(managerClassName);
 
-        mdContext.loadConnectionsAsResource(
+        context.loadConnectionsAsResource(
                 portofinoProperties.getProperty(
                         PortofinoProperties.CONNECTIONS_LOCATION_PROPERTY));
-        mdContext.loadXmlModelAsResource(
+        context.loadXmlModelAsResource(
                 portofinoProperties.getProperty(
                         PortofinoProperties.MODEL_LOCATION_PROPERTY));
-        servletContext.setAttribute(MDCONTEXT_ATTRIBUTE, mdContext);
+        servletContext.setAttribute(CONTEXT_ATTRIBUTE, context);
     }
 }

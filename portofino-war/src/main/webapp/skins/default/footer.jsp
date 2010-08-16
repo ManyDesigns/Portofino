@@ -9,7 +9,7 @@
         </div>
     </div>
     <div id="ft">
-        <div id="responseTime">Page response time: <s:property value="#request.stopWatch.time"/> ms. DB time: <s:property value="#application.mdContext.dbTime"/> ms.</div>
+        <div id="responseTime">Page response time: <s:property value="#request.stopWatch.time"/> ms. DB time: <s:property value="#application.context.dbTime"/> ms.</div>
         Powered by <a href="http://www.manydesigns.com/">ManyDesigns Portofino</a>
         <s:property value="#application.portofinoProperties['portofino.version']"/>
     </div>

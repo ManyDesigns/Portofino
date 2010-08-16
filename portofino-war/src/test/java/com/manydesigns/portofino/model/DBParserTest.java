@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.portofino.model.io.DBParser;
+import com.manydesigns.portofino.model.io.ModelParser;
 import junit.framework.TestCase;
 
 import java.util.List;
@@ -45,14 +45,14 @@ public class DBParserTest extends TestCase {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    DBParser parser;
+    ModelParser parser;
     DataModel dataModel;
 
     public void setUp() {
         LogUtil.initializeLoggingSystem();
-        DBParser.logger.setLevel(Level.ALL);
+        ModelParser.logger.setLevel(Level.ALL);
 
-        parser = new DBParser();
+        parser = new ModelParser();
     }
 
     public void testParseJpetStorePostgresql() {

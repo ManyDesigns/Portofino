@@ -28,8 +28,8 @@
  */
 package com.manydesigns.portofino.model;
 
-import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.context.hibernate.MDContextHibernateImpl;
+import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
 import junit.framework.TestCase;
 
 import java.math.BigDecimal;
@@ -37,18 +37,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.Session;
-
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Angelo    Lupo       - angelo.lupo@manydesigns.com
  * @author Paolo     Predonzani - paolo.predonzani@manydesigns.com
  */
 public class HibernateTest extends TestCase {
-    MDContext context;
+    Context context;
 
     public void setUp() {
-        context = new MDContextHibernateImpl();
+        context = new HibernateContextImpl();
         context.loadConnectionsAsResource("portofino-connections.xml");
         context.loadXmlModelAsResource(
                 "databases/jpetstore/postgresql/jpetstore-postgres.xml");

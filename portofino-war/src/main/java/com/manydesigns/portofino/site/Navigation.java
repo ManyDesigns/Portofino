@@ -29,12 +29,10 @@
 
 package com.manydesigns.portofino.site;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
+import com.manydesigns.portofino.context.Context;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -52,20 +50,43 @@ public class Navigation implements XhtmlFragment {
     // Fields
     //**************************************************************************
 
-    protected final List<SiteNode> rootNodes;
-    protected Stack<SiteNode> path;
-    protected List<SiteNode> foundPath;
-    protected String currentUrl;
+    protected final Context context;
+    protected final String requestUrl;
+    protected final List<SiteNode> foundPath;
 
     //**************************************************************************
-    // Constructiors
+    // Constructors
     //**************************************************************************
 
-    public Navigation(List<SiteNode> rootNodes) {
-        this.rootNodes = rootNodes;
-        HttpServletRequest request =
-                ElementsThreadLocals.getHttpServletRequest();
-        currentUrl = Util.getAbsoluteUrl(request.getServletPath());
+    public Navigation(Context context, String requestUrl) {
+        this.context = context;
+        this.requestUrl = requestUrl;
+        Stack<SiteNode> stack = new Stack<SiteNode>();
+        foundPath = new ArrayList<SiteNode>();
+        searchPath(context.getSiteNodes(), stack);
+    }
+
+    protected boolean searchPath(List<SiteNode> nodes, Stack<SiteNode> stack) {
+        if (nodes == null || nodes.isEmpty()) {
+            return false;
+        }
+        for (SiteNode current : nodes) {
+            boolean found;
+            stack.push(current);
+            String nodeUrl = current.getUrl();
+            if (requestUrl.equals(nodeUrl)) {
+                foundPath.clear();
+                foundPath.addAll(stack);
+                found = true;
+            } else {
+                found = searchPath(current.getChildNodes(), stack);
+            }
+            stack.pop();
+            if (found) {
+                return true;
+            }
+        }
+        return false;
     }
 
     //**************************************************************************
@@ -73,10 +94,7 @@ public class Navigation implements XhtmlFragment {
     //**************************************************************************
 
     public void toXhtml(XhtmlBuffer xb) {
-        path = new Stack<SiteNode>();
-
-        boolean found = searchPath(rootNodes);
-        print(rootNodes, xb);
+        print(context.getSiteNodes(), xb);
     }
 
     private void print(List<SiteNode> nodes, XhtmlBuffer xb) {
@@ -88,7 +106,7 @@ public class Navigation implements XhtmlFragment {
         for (SiteNode current : nodes) {
             xb.openElement("li");
             String nodeUrl = current.getUrl();
-            if (currentUrl.equals(nodeUrl)) {
+            if (requestUrl.equals(nodeUrl)) {
                 xb.addAttribute("class", "selected");
                 expand = current.getChildNodes();
             } else if (foundPath != null && foundPath.contains(current)) {
@@ -105,25 +123,19 @@ public class Navigation implements XhtmlFragment {
         }
     }
 
-    private boolean searchPath(List<SiteNode> nodes) {
-        if (nodes == null || nodes.isEmpty()) {
-            return false;
-        }
-        for (SiteNode current : nodes) {
-            boolean found;
-            path.push(current);
-            String nodeUrl = current.getUrl();
-            if (currentUrl.equals(nodeUrl)) {
-                foundPath = new ArrayList<SiteNode>(path);
-                found = true;
-            } else {
-                found = searchPath(current.getChildNodes());
-            }
-            path.pop();
-            if (found) {
-                return true;
-            }
-        }
-        return false;
+    //**************************************************************************
+    // Getters/setters
+    //**************************************************************************
+
+    public Context getContext() {
+        return context;
+    }
+
+    public List<SiteNode> getFoundPath() {
+        return foundPath;
+    }
+
+    public String getRequestUrl() {
+        return requestUrl;
     }
 }

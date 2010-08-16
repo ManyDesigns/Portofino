@@ -1,144 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<datamodel>
-    <database name="jpetstore">
-        <schemas>
-            <schema name="public">
-                <tables>
-                     <table name="lineitem">
-                        <columns>
-                            <column name="orderid"
-                                    columnType="int4"
-                                    javaType="java.lang.Integer"
-                                    length="8"
-                                    scale="0"
-                                    nullable="false"/>
-                            <column name="linenum"
-                                    columnType="int4"
-                                    javaType="java.lang.Integer"
-                                    length="8"
-                                    scale="0"
-                                    nullable="false"/>
-                            <column name="itemid"
-                                    columnType="varchar"
-                                    javaType="java.lang.String"
-                                    length="255"
-                                    scale="0"
-                                    nullable="false" />
-                            <column name="quantity"
-                                    columnType="int4"
-                                    javaType="java.lang.Integer"
-                                    length="8"
-                                    scale="0"
-                                    nullable="false"/>
-                            <column name="unitprice"
-                                    columnType="numeric"
-                                    javaType="java.math.BigDecimal"
-                                    length="10"
-                                    scale="2"
-                                    nullable="false"/>
-                        </columns>
-                        <primaryKey name="pk_lineitem">
-                            <column name="orderid"/>
-                            <column name="linenum"/>
-                        </primaryKey>
-                    </table>
-                    <table name="category">
-                        <columns>
-                            <column name="catid"
-                                    columnType="varchar"
-                                    javaType="java.lang.String"
-                                    length="10"
-                                    scale = "0"
-                                    nullable="false"/>
-                            <column name="name"
-                                    columnType="varchar"
-                                    javaType="java.lang.String"
-                                    length="80"
-                                    scale="0"
-                                    nullable="true"/>
-                            <column name="descn"
-                                    columnType="varchar"
-                                    javaType="java.lang.String"
-                                    length="255"
-                                    scale="0"
-                                    nullable="true"/>
-                        </columns>
-                        <primaryKey name="pk_category">
-                            <column name="catid"/>
-                        </primaryKey>
-                    </table>
-                    <table name="product">
-                        <columns>
-                            <column name="productid"
-                                    columnType="varchar"
-                                    javaType="java.lang.String"
-                                    length="10"
-                                    scale="0"
-                                    nullable="false"/>
-                            <column name="category"
-                                    columnType="varchar"
-                                    javaType="java.lang.String"
-                                    length="10"
-                                    scale="0"
-                                    nullable="false"/>
-                            <column name="name"
-                                    columnType="varchar"
-                                    javaType="java.lang.String"
-                                    length="80"
-                                    scale="0"
-                                    nullable="true"/>
-                            <column name="descn"
-                                    columnType="varchar"
-                                    javaType="java.lang.String"
-                                    length="255"
-                                    scale="0"
-                                    nullable="true"/>
-                        </columns>
-                        <primaryKey name="pk_category">
-                            <column name="productid"/>
-                        </primaryKey>
-                        <relationships>
-                            <relationship name="fk_product_1"
-                                          toSchema="public"
-                                          toTable="category"
-                                          onUpdate="NO ACTION"
-                                          onDelete="NO ACTION">
-                                <reference fromColumn="category"
-                                           toColumn="catid"/>
-                            </relationship>
-                        </relationships>
-                    </table>
+<model>
+    <databases>
+        <database name="jpetstore">
+            <schemas>
+                <schema name="public">
+                    <tables>
+                         <table name="lineitem">
+                            <columns>
+                                <column name="orderid"
+                                        columnType="int4"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"/>
+                                <column name="linenum"
+                                        columnType="int4"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"/>
+                                <column name="itemid"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        nullable="false" />
+                                <column name="quantity"
+                                        columnType="int4"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"/>
+                                <column name="unitprice"
+                                        columnType="numeric"
+                                        javaType="java.math.BigDecimal"
+                                        length="10"
+                                        scale="2"
+                                        nullable="false"/>
+                            </columns>
+                            <primaryKey name="pk_lineitem">
+                                <column name="orderid"/>
+                                <column name="linenum"/>
+                            </primaryKey>
+                        </table>
+                        <table name="category">
+                            <columns>
+                                <column name="catid"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="10"
+                                        scale = "0"
+                                        nullable="false"/>
+                                <column name="name"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="80"
+                                        scale="0"
+                                        nullable="true"/>
+                                <column name="descn"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        nullable="true"/>
+                            </columns>
+                            <primaryKey name="pk_category">
+                                <column name="catid"/>
+                            </primaryKey>
+                        </table>
+                        <table name="product">
+                            <columns>
+                                <column name="productid"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="10"
+                                        scale="0"
+                                        nullable="false"/>
+                                <column name="category"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="10"
+                                        scale="0"
+                                        nullable="false"/>
+                                <column name="name"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="80"
+                                        scale="0"
+                                        nullable="true"/>
+                                <column name="descn"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        nullable="true"/>
+                            </columns>
+                            <primaryKey name="pk_category">
+                                <column name="productid"/>
+                            </primaryKey>
+                            <relationships>
+                                <relationship name="fk_product_1"
+                                              toSchema="public"
+                                              toTable="category"
+                                              onUpdate="NO ACTION"
+                                              onDelete="NO ACTION">
+                                    <reference fromColumn="category"
+                                               toColumn="catid"/>
+                                </relationship>
+                            </relationships>
+                        </table>
 
-                </tables>
-            </schema>
-        </schemas>
-    </database>
-    <database name="hibernatetest">
-        <schemas>
-            <schema name="public">
-                <tables>
-                    <table name="table1">
-                        <columns>
-                            <column name="id"
-                                    columnType="serial"
-                                    javaType="java.lang.Integer"
-                                    length="8"
-                                    scale="0"
-                                    nullable="false"
-                                    autoincrement="true"/>
-                            <column name="testo"
-                                    columnType="varchar"
-                                    javaType="java.lang.String"
-                                    length="15"
-                                    scale="0"
-                                    nullable="false"/>
-                        </columns>
-                        <primaryKey name="pk_table1">
-                            <column name="id"/>
-                        </primaryKey>
-                    </table>
-                </tables>
-            </schema>
-        </schemas>
-    </database>
-</datamodel>
+                    </tables>
+                </schema>
+            </schemas>
+        </database>
+        <database name="hibernatetest">
+            <schemas>
+                <schema name="public">
+                    <tables>
+                        <table name="table1">
+                            <columns>
+                                <column name="id"
+                                        columnType="serial"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="true"/>
+                                <column name="testo"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="15"
+                                        scale="0"
+                                        nullable="false"/>
+                            </columns>
+                            <primaryKey name="pk_table1">
+                                <column name="id"/>
+                            </primaryKey>
+                        </table>
+                    </tables>
+                </schema>
+            </schemas>
+        </database>
+    </databases>
+</model>

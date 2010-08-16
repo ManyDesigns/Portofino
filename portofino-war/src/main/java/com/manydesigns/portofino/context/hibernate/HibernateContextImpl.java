@@ -30,11 +30,11 @@
 package com.manydesigns.portofino.context.hibernate;
 
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.portofino.context.MDContext;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.io.ConnectionsParser;
-import com.manydesigns.portofino.model.io.DBParser;
+import com.manydesigns.portofino.model.io.ModelParser;
 import com.manydesigns.portofino.site.SiteNode;
 import com.manydesigns.portofino.search.HibernateCriteriaAdapter;
 import org.apache.commons.lang.time.StopWatch;
@@ -56,7 +56,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class MDContextHibernateImpl implements MDContext {
+public class HibernateContextImpl implements Context {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -71,13 +71,13 @@ public class MDContextHibernateImpl implements MDContext {
     protected final List<SiteNode> siteNodes;
 
     public static final Logger logger =
-            LogUtil.getLogger(MDContextHibernateImpl.class);
+            LogUtil.getLogger(HibernateContextImpl.class);
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public MDContextHibernateImpl() {
+    public HibernateContextImpl() {
         stopWatches = new ThreadLocal<StopWatch>();
         siteNodes = new ArrayList<SiteNode>();
     }
@@ -106,7 +106,7 @@ public class MDContextHibernateImpl implements MDContext {
     public void loadXmlModelAsResource(String resource) {
         LogUtil.entering(logger, "loadXmlModelAsResource", resource);
 
-        DBParser parser = new DBParser();
+        ModelParser parser = new ModelParser();
         try {
             DataModel loadedDataModel = parser.parse(resource);
             installDataModel(loadedDataModel);

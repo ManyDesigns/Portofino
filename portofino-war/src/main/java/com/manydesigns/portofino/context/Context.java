@@ -43,7 +43,7 @@ import java.util.Map;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface MDContext {
+public interface Context {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 

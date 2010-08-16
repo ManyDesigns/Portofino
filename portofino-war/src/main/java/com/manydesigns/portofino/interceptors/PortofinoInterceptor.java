@@ -29,7 +29,8 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.portofino.context.MDContext;
+import com.manydesigns.elements.Util;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.servlets.PortofinoListener;
 import com.manydesigns.portofino.site.Navigation;
 import com.opensymphony.xwork2.ActionContext;
@@ -65,33 +66,35 @@ public class PortofinoInterceptor implements Interceptor {
         stopWatch.start();
 
         Object action = invocation.getAction();
-        ActionContext context = invocation.getInvocationContext();
+        ActionContext actionContext = invocation.getInvocationContext();
         HttpServletRequest req =
-                (HttpServletRequest)context.get(StrutsStatics.HTTP_REQUEST);
+                (HttpServletRequest)actionContext.get(StrutsStatics.HTTP_REQUEST);
         HttpServletResponse res =
-                (HttpServletResponse)context.get(StrutsStatics.HTTP_RESPONSE);
+                (HttpServletResponse)actionContext.get(StrutsStatics.HTTP_RESPONSE);
         ServletContext servletContext =
-                (ServletContext)context.get(StrutsStatics.SERVLET_CONTEXT);
-        MDContext mdContext =
-                (MDContext)servletContext.getAttribute(
-                        PortofinoListener.MDCONTEXT_ATTRIBUTE);
+                (ServletContext)actionContext.get(StrutsStatics.SERVLET_CONTEXT);
+        Context context =
+                (Context)servletContext.getAttribute(
+                        PortofinoListener.CONTEXT_ATTRIBUTE);
 
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
-        Navigation navigation = new Navigation(mdContext.getSiteNodes());
+
+        String requestUrl = Util.getAbsoluteUrl(req.getServletPath());
+        Navigation navigation = new Navigation(context, requestUrl);
         req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
 
         String result;
-        if (action instanceof MDContextAware) {
+        if (action instanceof ContextAware) {
             setHeaders(res);
 
-            mdContext.resetDbTimer();
-            ((MDContextAware)action).setContext(mdContext);
+            context.resetDbTimer();
+            ((ContextAware)action).setContext(context);
 
             try {
-                mdContext.openSession();
+                context.openSession();
                 result = invocation.invoke();
             } finally {
-                mdContext.closeSession();
+                context.closeSession();
             }
         } else {
             result = invocation.invoke();

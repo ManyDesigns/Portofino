@@ -1,6 +1,6 @@
 package com.manydesigns.portofino.context;
 
-import com.manydesigns.portofino.context.hibernate.MDContextHibernateImpl;
+import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
 import com.manydesigns.portofino.model.*;
 import junit.framework.TestCase;
 
@@ -9,13 +9,13 @@ import junit.framework.TestCase;
  * Copyright Paolo Predonzani (paolo.predonzani@gmail.com)
  * All rights reserved
  */
-public class MDContextTest extends TestCase {
+public class ContextTest extends TestCase {
 
-    MDContext context;
+    Context context;
     DataModel dataModel;
 
     public void setUp() {
-        context = new MDContextHibernateImpl();
+        context = new HibernateContextImpl();
         context.loadConnectionsAsResource("portofino-connections.xml");
         context.loadXmlModelAsResource(
                 "databases/jpetstore/postgresql/jpetstore-postgres.xml");

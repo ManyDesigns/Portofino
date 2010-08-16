@@ -36,9 +36,9 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.text.Generator;
 import com.manydesigns.elements.text.HrefExpressionGenerator;
-import com.manydesigns.portofino.context.MDContext;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
-import com.manydesigns.portofino.interceptors.MDContextAware;
+import com.manydesigns.portofino.interceptors.ContextAware;
 import com.manydesigns.portofino.model.Column;
 import com.manydesigns.portofino.model.DataModel;
 import com.manydesigns.portofino.model.Relationship;
@@ -66,18 +66,18 @@ import java.util.regex.Pattern;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class TableDataAction extends ActionSupport
-        implements MDContextAware, ServletRequestAware {
+        implements ContextAware, ServletRequestAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // MDContextAware implementation
+    // ContextAware implementation
     //**************************************************************************
 
-    public MDContext context;
+    public Context context;
     public DataModel dataModel;
 
-    public void setContext(MDContext context) {
+    public void setContext(Context context) {
         this.context = context;
         dataModel = context.getDataModel();
     }

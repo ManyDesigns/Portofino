@@ -18,8 +18,9 @@ import java.util.Map;
  * @author Angelo    Lupo       - angelo.lupo@manydesigns.com
  * @author Paolo     Predonzani - paolo.predonzani@manydesigns.com
  */
-public class DBParser extends XmlParser {
-    private static final String DATAMODEL = "datamodel";
+public class ModelParser extends XmlParser {
+    private static final String MODEL = "model";
+    private static final String DATABASES = "databases";
     private static final String DATABASE = "database";
     private static final String SCHEMAS = "schemas";
     private static final String SCHEMA = "schema";
@@ -39,7 +40,7 @@ public class DBParser extends XmlParser {
     Schema currentSchema;
     Table currentTable;
 
-    public DBParser() {
+    public ModelParser() {
         classLoader = this.getClass().getClassLoader();
     }
 
@@ -51,18 +52,25 @@ public class DBParser extends XmlParser {
         InputStream input = cl.getResourceAsStream(fileName);
         XMLStreamReader xmlStreamReader = inputFactory.createXMLStreamReader(input);
         initParser(xmlStreamReader);
-        expectDocument(new DatamodelDocumentCallback());
+        expectDocument(new ModelDocumentCallback());
         createRelationshipsPost();
         return dataModel;
     }
 
-    private class DatamodelDocumentCallback implements DocumentCallback {
+    private class ModelDocumentCallback implements DocumentCallback {
         public void doDocument() throws XMLStreamException {
-            expectElement(DATAMODEL, 1, 1, new DatamodelCallback());
+            expectElement(MODEL, 1, 1, new ModelCallback());
         }
     }
 
-    private class DatamodelCallback implements ElementCallback {
+    private class ModelCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(DATABASES, 1, 1, new DatabasesCallback());
+        }
+    }
+
+    private class DatabasesCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             expectElement(DATABASE, 1, null, new DatabaseCallback());

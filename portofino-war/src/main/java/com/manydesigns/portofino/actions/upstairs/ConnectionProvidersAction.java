@@ -38,13 +38,13 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.text.Generator;
 import com.manydesigns.elements.text.HrefExpressionGenerator;
 import com.manydesigns.portofino.actions.ActionResults;
-import com.manydesigns.portofino.context.MDContext;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformManager;
-import com.manydesigns.portofino.interceptors.MDContextAware;
+import com.manydesigns.portofino.interceptors.ContextAware;
 import com.opensymphony.xwork2.ActionSupport;
 
 import java.util.List;
@@ -55,11 +55,11 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class ConnectionProvidersAction
-        extends ActionSupport implements MDContextAware {
+        extends ActionSupport implements ContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public MDContext context;
+    public Context context;
     public List<ConnectionProvider> connectionProviders;
     public ConnectionProvider connectionProvider;
     public DatabasePlatform[] databasePlatforms;
@@ -76,7 +76,7 @@ public class ConnectionProvidersAction
 
     public String skin = "default";
 
-    public void setContext(MDContext context) {
+    public void setContext(Context context) {
         this.context = context;
     }
 

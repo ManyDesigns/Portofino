@@ -29,8 +29,8 @@
 
 package com.manydesigns.portofino.actions;
 
-import com.manydesigns.portofino.context.MDContext;
-import com.manydesigns.portofino.interceptors.MDContextAware;
+import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.interceptors.ContextAware;
 import com.manydesigns.portofino.model.DataModel;
 import com.opensymphony.xwork2.ActionSupport;
 
@@ -39,16 +39,16 @@ import com.opensymphony.xwork2.ActionSupport;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class HomepageAction extends ActionSupport implements MDContextAware {
+public class HomepageAction extends ActionSupport implements ContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public MDContext context;
+    public Context context;
     public DataModel dataModel;
 
     public String skin = "default";
 
-    public void setContext(MDContext context) {
+    public void setContext(Context context) {
         this.context = context;
         dataModel = context.getDataModel();
     }

@@ -29,16 +29,16 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.portofino.context.MDContext;
+import com.manydesigns.portofino.context.Context;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface MDContextAware {
+public interface ContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public void setContext(MDContext context);
+    public void setContext(Context context);
 }
