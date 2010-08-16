@@ -165,7 +165,7 @@ public class XmlParser {
                         && _localName.equals(elementName)) {
                     next();
                 } else {
-                    throw new Error("Closing tag not found");
+                    throw new Error("Closing tag not found for: "  + elementName);
                 }
             } else {
                 break;

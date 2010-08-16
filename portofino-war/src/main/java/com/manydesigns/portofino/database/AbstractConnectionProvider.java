@@ -121,7 +121,7 @@ public abstract class AbstractConnectionProvider implements ConnectionProvider {
         return lastTested;
     }
 
-    public DatabasePlatform getDatabaseAbstraction() {
+    public DatabasePlatform getDatabasePlatform() {
         return databasePlatform;
     }
 

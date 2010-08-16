@@ -31,6 +31,7 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.Util;
 import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.PortofinoThreadLocals;
 import com.manydesigns.portofino.servlets.PortofinoListener;
 import com.manydesigns.portofino.site.Navigation;
 import com.opensymphony.xwork2.ActionContext;
@@ -76,6 +77,7 @@ public class PortofinoInterceptor implements Interceptor {
         Context context =
                 (Context)servletContext.getAttribute(
                         PortofinoListener.CONTEXT_ATTRIBUTE);
+        PortofinoThreadLocals.setContext(context);
 
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
 
@@ -100,6 +102,8 @@ public class PortofinoInterceptor implements Interceptor {
             result = invocation.invoke();
         }
 
+        PortofinoThreadLocals.setContext(null);
+        
         stopWatch.stop();
 
         return result;

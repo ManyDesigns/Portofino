@@ -12,58 +12,58 @@ import junit.framework.TestCase;
 public class ContextTest extends TestCase {
 
     Context context;
-    DataModel dataModel;
+    Model model;
 
     public void setUp() {
         context = new HibernateContextImpl();
         context.loadConnectionsAsResource("portofino-connections.xml");
         context.loadXmlModelAsResource(
                 "databases/jpetstore/postgresql/jpetstore-postgres.xml");
-        dataModel = context.getDataModel();
+        model = context.getModel();
     }
 
 
     public void testFindDatabaseByName() {
         String qualifiedName = "jpetstore";
-        Database database = dataModel.findDatabaseByName(qualifiedName);
+        Database database = model.findDatabaseByName(qualifiedName);
         assertNotNull(database);
         assertEquals(qualifiedName, database.getDatabaseName());
 
         String dummyName = "foo";
-        database = dataModel.findDatabaseByName(dummyName);
+        database = model.findDatabaseByName(dummyName);
         assertNull(database);
     }
 
     public void testFindSchemaByQualifiedName() {
         String qualifiedName = "jpetstore.public";
-        Schema schema = dataModel.findSchemaByQualifiedName(qualifiedName);
+        Schema schema = model.findSchemaByQualifiedName(qualifiedName);
         assertNotNull(schema);
         assertEquals(qualifiedName, schema.getQualifiedName());
 
         String dummyName = "jpetstore.foo";
-        schema = dataModel.findSchemaByQualifiedName(dummyName);
+        schema = model.findSchemaByQualifiedName(dummyName);
         assertNull(schema);
     }
 
     public void testFindTableByQualifiedName() {
         String qualifiedName = "jpetstore.public.product";
-        Table table = dataModel.findTableByQualifiedName(qualifiedName);
+        Table table = model.findTableByQualifiedName(qualifiedName);
         assertNotNull(table);
         assertEquals(qualifiedName, table.getQualifiedName());
 
         String dummyName = "jpetstore.public.foo";
-        table = dataModel.findTableByQualifiedName(dummyName);
+        table = model.findTableByQualifiedName(dummyName);
         assertNull(table);
     }
 
     public void testFindColumnByQualifiedName() {
         String qualifiedName = "jpetstore.public.product.category";
-        Column column = dataModel.findColumnByQualifiedName(qualifiedName);
+        Column column = model.findColumnByQualifiedName(qualifiedName);
         assertNotNull(column);
         assertEquals(qualifiedName, column.getQualifiedName());
 
         String dummyName = "jpetstore.public.product.foo";
-        column = dataModel.findColumnByQualifiedName(dummyName);
+        column = model.findColumnByQualifiedName(dummyName);
         assertNull(column);
     }
 }

@@ -39,7 +39,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SimpleSiteNode extends ArrayList<SiteNode> implements SiteNode {
+public class SimpleSiteNode implements SiteNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -50,16 +50,21 @@ public class SimpleSiteNode extends ArrayList<SiteNode> implements SiteNode {
     protected String url;
     protected String title;
     protected String description;
-
+    protected final ArrayList<SiteNode> childNodes;
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
+    public SimpleSiteNode() {
+        this(null, null, null);
+    }
+
     public SimpleSiteNode(String url, String title, String description) {
         this.url = url;
         this.title = title;
         this.description = description;
+        childNodes = new ArrayList<SiteNode>();
     }
 
 
@@ -80,7 +85,7 @@ public class SimpleSiteNode extends ArrayList<SiteNode> implements SiteNode {
     }
 
     public List<SiteNode> getChildNodes() {
-        return this;
+        return childNodes;
     }
 
     //**************************************************************************
@@ -97,11 +102,6 @@ public class SimpleSiteNode extends ArrayList<SiteNode> implements SiteNode {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return this == o;
     }
 
 }

@@ -63,7 +63,7 @@ public class Navigation implements XhtmlFragment {
         this.requestUrl = requestUrl;
         Stack<SiteNode> stack = new Stack<SiteNode>();
         foundPath = new ArrayList<SiteNode>();
-        searchPath(context.getSiteNodes(), stack);
+        searchPath(context.getModel().getSiteNodes(), stack);
     }
 
     protected boolean searchPath(List<SiteNode> nodes, Stack<SiteNode> stack) {
@@ -94,7 +94,7 @@ public class Navigation implements XhtmlFragment {
     //**************************************************************************
 
     public void toXhtml(XhtmlBuffer xb) {
-        print(context.getSiteNodes(), xb);
+        print(context.getModel().getSiteNodes(), xb);
     }
 
     private void print(List<SiteNode> nodes, XhtmlBuffer xb) {
@@ -133,6 +133,13 @@ public class Navigation implements XhtmlFragment {
 
     public List<SiteNode> getFoundPath() {
         return foundPath;
+    }
+
+    public SiteNode getSelectedSiteNode() {
+        if (foundPath == null || foundPath.size() == 0) {
+            return null;
+        }
+        return foundPath.get(foundPath.size() - 1);
     }
 
     public String getRequestUrl() {

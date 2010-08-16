@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.site.SiteNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DataModel {
+public class Model {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -49,15 +50,17 @@ public class DataModel {
     //**************************************************************************
 
     protected final ArrayList<Database> databases;
+    protected final ArrayList<SiteNode> siteNodes;
 
-    public static final Logger logger = LogUtil.getLogger(DataModel.class);
+    public static final Logger logger = LogUtil.getLogger(Model.class);
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public DataModel() {
+    public Model() {
         this.databases = new ArrayList<Database>();
+        this.siteNodes = new ArrayList<SiteNode>();
     }
 
     //**************************************************************************
@@ -177,5 +180,9 @@ public class DataModel {
 
     public List<Database> getDatabases() {
         return databases;
+    }
+
+    public ArrayList<SiteNode> getSiteNodes() {
+        return siteNodes;
     }
 }

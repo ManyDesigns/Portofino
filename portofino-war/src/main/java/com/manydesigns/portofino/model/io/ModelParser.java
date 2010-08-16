@@ -1,6 +1,10 @@
 package com.manydesigns.portofino.model.io;
 
+import com.manydesigns.elements.reflection.JavaClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.model.*;
+import com.manydesigns.portofino.site.SimpleSiteNode;
+import com.manydesigns.portofino.site.SiteNode;
 import com.manydesigns.portofino.xml.DocumentCallback;
 import com.manydesigns.portofino.xml.ElementCallback;
 import com.manydesigns.portofino.xml.XmlParser;
@@ -9,6 +13,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +25,7 @@ import java.util.Map;
  */
 public class ModelParser extends XmlParser {
     private static final String MODEL = "model";
+
     private static final String DATABASES = "databases";
     private static final String DATABASE = "database";
     private static final String SCHEMAS = "schemas";
@@ -32,20 +38,27 @@ public class ModelParser extends XmlParser {
     private static final String RELATIONSHIPS = "relationships";
     private static final String RELATIONSHIP = "relationship";
     private static final String REFERENCE = "reference";
+
+    private static final String SITENODES = "siteNodes";
+    private static final String SITENODE = "siteNode";
+    private static final String CHILDNODES = "childNodes";
+
     private List<RelationshipPre> relationships;
     protected ClassLoader classLoader;
 
-    DataModel dataModel;
+    Model model;
     Database currentDatabase;
     Schema currentSchema;
     Table currentTable;
+
+    SiteNode currentSiteNode;
 
     public ModelParser() {
         classLoader = this.getClass().getClassLoader();
     }
 
-    public DataModel parse(String fileName) throws Exception {
-        dataModel = new DataModel();
+    public Model parse(String fileName) throws Exception {
+        model = new Model();
         relationships = new ArrayList<RelationshipPre>();
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         ClassLoader cl = this.getClass().getClassLoader();
@@ -54,7 +67,7 @@ public class ModelParser extends XmlParser {
         initParser(xmlStreamReader);
         expectDocument(new ModelDocumentCallback());
         createRelationshipsPost();
-        return dataModel;
+        return model;
     }
 
     private class ModelDocumentCallback implements DocumentCallback {
@@ -67,8 +80,13 @@ public class ModelParser extends XmlParser {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             expectElement(DATABASES, 1, 1, new DatabasesCallback());
+            expectElement(SITENODES, 1, 1, new SiteNodesCallback());
         }
     }
+
+    //**************************************************************************
+    // datamodel/databases
+    //**************************************************************************
 
     private class DatabasesCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
@@ -82,7 +100,7 @@ public class ModelParser extends XmlParser {
                 throws XMLStreamException {
             checkRequiredAttributes(attributes, "name");
             currentDatabase = new Database(attributes.get("name"));
-            dataModel.getDatabases().add(currentDatabase);
+            model.getDatabases().add(currentDatabase);
             expectElement(SCHEMAS, 1, 1, new SchemasCallback());
 
         }
@@ -227,7 +245,78 @@ public class ModelParser extends XmlParser {
         }
     }
 
+    //**************************************************************************
+    // datamodel/databases
+    //**************************************************************************
 
+    private class SiteNodesCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(SITENODE, 1, null,
+                    new SiteNodeCallback(model.getSiteNodes()));
+        }
+    }
+
+    private class SiteNodeCallback implements ElementCallback {
+        private final List<SiteNode> parentNodes;
+
+        private SiteNodeCallback(List<SiteNode> parentNodes) {
+            this.parentNodes = parentNodes;
+        }
+
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            String nodeClassName = attributes.get("class");
+            if (nodeClassName == null) {
+                nodeClassName = SimpleSiteNode.class.getName();
+            }
+            try {
+                Class nodeClass = classLoader.loadClass(nodeClassName);
+                Constructor constructor = nodeClass.getConstructor();
+                currentSiteNode = (SiteNode)constructor.newInstance();
+                parentNodes.add(currentSiteNode);
+
+                JavaClassAccessor classAccessor =
+                        new JavaClassAccessor(nodeClass);
+                for (Map.Entry<String, String> entry : attributes.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+
+                    if ("class".equals(key)) {
+                        continue;
+                    }
+
+                    PropertyAccessor propertyAccessor =
+                            classAccessor.getProperty(key);
+                    propertyAccessor.set(currentSiteNode, value);
+                }
+
+                expectElement(CHILDNODES, 0, 1,
+                        new ChildNodesCallback(currentSiteNode.getChildNodes()));
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class ChildNodesCallback implements ElementCallback {
+        private final List<SiteNode> parentNodes;
+
+        private ChildNodesCallback(List<SiteNode> parentNodes) {
+            this.parentNodes = parentNodes;
+        }
+
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(SITENODE, 1, null, new SiteNodeCallback(parentNodes));
+        }
+    }
+
+
+
+    //**************************************************************************
+    // utility methods
+    //**************************************************************************
 
     private void createRelationshipsPost() {
         for (RelationshipPre relPre: relationships) {
@@ -249,7 +338,7 @@ public class ModelParser extends XmlParser {
     }
 
     private Table getTable(String schemaName, String tableName) {
-        for (Database db : dataModel.getDatabases()) {
+        for (Database db : model.getDatabases()) {
             for (Schema schema : db.getSchemas()) {
                 if (schemaName.equals(schema.getSchemaName())){
                     for (Table tb : schema.getTables()) {

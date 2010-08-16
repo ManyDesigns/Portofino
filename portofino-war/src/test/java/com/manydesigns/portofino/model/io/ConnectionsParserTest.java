@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.model.io;
 
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.portofino.model.DataModel;
+import com.manydesigns.portofino.model.Model;
 import junit.framework.TestCase;
 
 import java.util.logging.Level;
@@ -44,7 +44,7 @@ public class ConnectionsParserTest extends TestCase {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
     ConnectionsParser parser;
-    DataModel dataModel;
+    Model model;
 
     public void setUp() {
         LogUtil.initializeLoggingSystem();

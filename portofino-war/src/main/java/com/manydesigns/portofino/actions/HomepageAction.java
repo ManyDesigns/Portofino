@@ -31,7 +31,7 @@ package com.manydesigns.portofino.actions;
 
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.interceptors.ContextAware;
-import com.manydesigns.portofino.model.DataModel;
+import com.manydesigns.portofino.model.Model;
 import com.opensymphony.xwork2.ActionSupport;
 
 /*
@@ -44,13 +44,13 @@ public class HomepageAction extends ActionSupport implements ContextAware {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public Context context;
-    public DataModel dataModel;
+    public Model model;
 
     public String skin = "default";
 
     public void setContext(Context context) {
         this.context = context;
-        dataModel = context.getDataModel();
+        model = context.getModel();
     }
 
     public String execute() {

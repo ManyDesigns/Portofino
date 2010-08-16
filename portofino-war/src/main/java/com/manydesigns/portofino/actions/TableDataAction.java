@@ -40,7 +40,7 @@ import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.interceptors.ContextAware;
 import com.manydesigns.portofino.model.Column;
-import com.manydesigns.portofino.model.DataModel;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.Relationship;
 import com.manydesigns.portofino.model.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -75,11 +75,11 @@ public class TableDataAction extends ActionSupport
     //**************************************************************************
 
     public Context context;
-    public DataModel dataModel;
+    public Model model;
 
     public void setContext(Context context) {
         this.context = context;
-        dataModel = context.getDataModel();
+        model = context.getModel();
     }
 
     //**************************************************************************
@@ -156,7 +156,7 @@ public class TableDataAction extends ActionSupport
 
     public String execute() {
         if (qualifiedTableName == null) {
-            qualifiedTableName = dataModel.getAllTables().get(0).getQualifiedName();
+            qualifiedTableName = model.getAllTables().get(0).getQualifiedName();
             return "redirectToTable";
         }
         if (pk == null) {
@@ -171,7 +171,7 @@ public class TableDataAction extends ActionSupport
     //**************************************************************************
 
     public void setupTable() {
-        table = dataModel.findTableByQualifiedName(qualifiedTableName);
+        table = model.findTableByQualifiedName(qualifiedTableName);
         if (table == null) {
             throw new ModelObjectNotFoundError(qualifiedTableName);
         }

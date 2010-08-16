@@ -34,12 +34,9 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.PortofinoThreadLocals;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
-import com.manydesigns.portofino.site.SimpleSiteNode;
-import com.manydesigns.portofino.site.SiteNode;
-import com.manydesigns.portofino.site.TableDataSiteNode;
-import com.manydesigns.portofino.site.TableDesignSiteNode;
 import org.apache.commons.lang.time.StopWatch;
 
 import javax.servlet.ServletContext;
@@ -48,7 +45,6 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -153,7 +149,6 @@ public class PortofinoListener
 
         if (success) {
             createContext();
-            createPages();
         }
 
         stopWatch.stop();
@@ -197,7 +192,7 @@ public class PortofinoListener
     //**************************************************************************
     // Other methods
     //**************************************************************************
-
+/*
     protected void createPages() {
         List<SiteNode> rootNodes = context.getSiteNodes();
         SimpleSiteNode homepage =
@@ -210,9 +205,9 @@ public class PortofinoListener
         SimpleSiteNode connectionProviders =
                 new SimpleSiteNode("/model/ConnectionProviders.action", "Connection providers", "Connection providers");
         model.add(connectionProviders);
-        TableDataSiteNode tableDataPage = new TableDataSiteNode(context);
+        TableDataSiteNode tableDataPage = new TableDataSiteNode();
         model.add(tableDataPage);
-        TableDesignSiteNode tableDesignPage = new TableDesignSiteNode(context);
+        TableDesignSiteNode tableDesignPage = new TableDesignSiteNode();
         model.add(tableDesignPage);
         SimpleSiteNode printModel =
                 new SimpleSiteNode("/model/PrintModel.action", "Print model", "Print model");
@@ -247,7 +242,7 @@ public class PortofinoListener
                 new SimpleSiteNode("/user/Help.action", "Help", "Help");
         personalArea.add(help);
     }
-
+*/
     protected void createContext() {
         logger.info("Creating Context and " +
                 "registering on servlet context...");
@@ -263,6 +258,8 @@ public class PortofinoListener
                         logger);
         context = builder.createInstance(managerClassName);
 
+        PortofinoThreadLocals.setContext(context);
+
         context.loadConnectionsAsResource(
                 portofinoProperties.getProperty(
                         PortofinoProperties.CONNECTIONS_LOCATION_PROPERTY));
@@ -270,5 +267,7 @@ public class PortofinoListener
                 portofinoProperties.getProperty(
                         PortofinoProperties.MODEL_LOCATION_PROPERTY));
         servletContext.setAttribute(CONTEXT_ATTRIBUTE, context);
+
+        PortofinoThreadLocals.setContext(null);
     }
 }

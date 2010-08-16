@@ -46,9 +46,9 @@ import java.util.List;
 */
 
 public class ModelWriter {
-    public final DataModel model;
+    public final Model model;
 
-    public ModelWriter(DataModel model) {
+    public ModelWriter(Model model) {
         this.model = model;
     }
 
@@ -220,9 +220,9 @@ public class ModelWriter {
     public static void main(String[] args){
         try {
             ModelParser parser = new ModelParser();
-             DataModel dataModel = parser.parse(
+             Model model = parser.parse(
                     "databases/jpetstore/postgresql/jpetstore-postgres.xml");
-            ModelWriter writer = new ModelWriter(dataModel);
+            ModelWriter writer = new ModelWriter(model);
             System.out.println(writer.write(null));
         } catch (Throwable e) {
 

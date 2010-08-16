@@ -33,8 +33,8 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.interceptors.ContextAware;
-import com.manydesigns.portofino.model.DataModel;
 import com.manydesigns.portofino.model.Database;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.diff.ModelDiff;
 import com.opensymphony.xwork2.ActionSupport;
 
@@ -50,7 +50,7 @@ public class SelfTestAction extends ActionSupport implements ContextAware {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public Context context;
-    public DataModel dataModel;
+    public Model model;
     public ModelDiff diff;
 
     public String skin = "default";
@@ -60,11 +60,11 @@ public class SelfTestAction extends ActionSupport implements ContextAware {
     }
 
     public String execute() throws SQLException {
-        dataModel = context.getDataModel();
+        model = context.getModel();
         diff = new ModelDiff("In-memory model", "Database model");
         for (ConnectionProvider current : context.getConnectionProviders()) {
             Database database =
-                    dataModel.findDatabaseByName(current.getDatabaseName());
+                    model.findDatabaseByName(current.getDatabaseName());
             Database database2 = current.readModel();
 
             diff.diff(database, database2);

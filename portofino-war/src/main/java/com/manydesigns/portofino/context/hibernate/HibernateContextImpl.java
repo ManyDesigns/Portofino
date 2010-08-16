@@ -35,8 +35,8 @@ import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.io.ConnectionsParser;
 import com.manydesigns.portofino.model.io.ModelParser;
-import com.manydesigns.portofino.site.SiteNode;
 import com.manydesigns.portofino.search.HibernateCriteriaAdapter;
+import com.manydesigns.portofino.site.SiteNode;
 import org.apache.commons.lang.time.StopWatch;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -65,7 +65,7 @@ public class HibernateContextImpl implements Context {
     //**************************************************************************
 
     protected List<ConnectionProvider> connectionProviders;
-    protected DataModel dataModel;
+    protected Model model;
     protected Map<String, HibernateDatabaseSetup> setups;
     protected final ThreadLocal<StopWatch> stopWatches;
     protected final List<SiteNode> siteNodes;
@@ -108,8 +108,8 @@ public class HibernateContextImpl implements Context {
 
         ModelParser parser = new ModelParser();
         try {
-            DataModel loadedDataModel = parser.parse(resource);
-            installDataModel(loadedDataModel);
+            Model loadedModel = parser.parse(resource);
+            installDataModel(loadedModel);
         } catch (Exception e) {
             LogUtil.severeMF(logger, "Cannot load/parse model: {0}", e,
                     resource);
@@ -118,11 +118,11 @@ public class HibernateContextImpl implements Context {
         LogUtil.exiting(logger, "loadXmlModelAsResource");
     }
 
-    private synchronized void installDataModel(DataModel newDataModel) {
+    private synchronized void installDataModel(Model newModel) {
         try {
             HashMap<String, HibernateDatabaseSetup> newSetups =
                     new HashMap<String, HibernateDatabaseSetup>();
-            for (Database database : newDataModel.getDatabases()) {
+            for (Database database : newModel.getDatabases()) {
                 String databaseName = database.getDatabaseName();
 
                 ConnectionProvider connectionProvider =
@@ -143,7 +143,7 @@ public class HibernateContextImpl implements Context {
                 }
             }
             setups = newSetups;
-            dataModel = newDataModel;
+            model = newModel;
         } catch (Exception e) {
             LogUtil.severe(logger, "Cannot install model", e);
         }
@@ -170,17 +170,17 @@ public class HibernateContextImpl implements Context {
         return connectionProviders;
     }
 
-    public DataModel getDataModel() {
-        return dataModel;
+    public Model getModel() {
+        return model;
     }
 
     public void syncDataModel() {
-        DataModel syncDataModel = new DataModel();
+        Model syncModel = new Model();
         for (ConnectionProvider current : connectionProviders) {
             Database syncDatabase = current.readModel();
-            syncDataModel.getDatabases().add(syncDatabase);
+            syncModel.getDatabases().add(syncDatabase);
         }
-        installDataModel(syncDataModel);
+        installDataModel(syncModel);
     }
 
     //**************************************************************************
@@ -231,7 +231,7 @@ public class HibernateContextImpl implements Context {
     }
 
     protected Session getSession(String qualifiedTableName) {
-        Table table = dataModel.findTableByQualifiedName(qualifiedTableName);
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
         String databaseName = table.getDatabaseName();
         return setups.get(databaseName).getThreadSession();
     }
@@ -319,7 +319,7 @@ public class HibernateContextImpl implements Context {
         }
         String qualifiedTableName = (String)obj.get("$type$");
         Relationship relationship =
-                dataModel.findOneToManyRelationship(
+                model.findOneToManyRelationship(
                         qualifiedTableName, oneToManyRelationshipName);
         Table fromTable = relationship.getFromTable();
 
@@ -354,10 +354,6 @@ public class HibernateContextImpl implements Context {
             return stopWatch.getTime();
         }
         return 0L;
-    }
-
-    public List<SiteNode> getSiteNodes() {
-        return siteNodes;
     }
 
     private void startTimer() {

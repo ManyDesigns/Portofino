@@ -46,7 +46,7 @@ public class DBParserTest extends TestCase {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     ModelParser parser;
-    DataModel dataModel;
+    Model model;
 
     public void setUp() {
         LogUtil.initializeLoggingSystem();
@@ -57,16 +57,16 @@ public class DBParserTest extends TestCase {
 
     public void testParseJpetStorePostgresql() {
         try {
-            dataModel = parser.parse(
+            model = parser.parse(
                     "databases/jpetstore/postgresql/jpetstore-postgres.xml");
         } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
 
-        assertNotNull(dataModel);
+        assertNotNull(model);
 
-        List<Database> databases = dataModel.getDatabases();
+        List<Database> databases = model.getDatabases();
         assertEquals(2, databases.size());
 
         Database database = databases.get(0);
@@ -195,7 +195,7 @@ public class DBParserTest extends TestCase {
 
     public void testFindTableByQualifiedName() {
         try {
-            dataModel = parser.parse(
+            model = parser.parse(
                     "databases/jpetstore/postgresql/jpetstore-postgres.xml");
         } catch (Exception e) {
             e.printStackTrace();

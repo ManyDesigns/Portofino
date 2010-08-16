@@ -31,8 +31,7 @@ package com.manydesigns.portofino.context;
 
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.model.DataModel;
-import com.manydesigns.portofino.site.SiteNode;
+import com.manydesigns.portofino.model.Model;
 
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +65,7 @@ public interface Context {
     // Model access
     //**************************************************************************
 
-    DataModel getDataModel();
+    Model getModel();
     void syncDataModel();
 
     //**************************************************************************
@@ -102,6 +101,4 @@ public interface Context {
 
     void resetDbTimer();
     long getDbTime();
-
-    List<SiteNode> getSiteNodes();
 }

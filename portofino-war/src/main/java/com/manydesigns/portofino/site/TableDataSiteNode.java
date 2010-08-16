@@ -31,6 +31,7 @@ package com.manydesigns.portofino.site;
 
 import com.manydesigns.elements.Util;
 import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.PortofinoThreadLocals;
 import com.manydesigns.portofino.model.Table;
 
 import java.text.MessageFormat;
@@ -42,30 +43,23 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableDataSiteNode implements SiteNode {
+public class TableDataSiteNode extends SimpleSiteNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    protected final Context context;
-
-    public TableDataSiteNode(Context context) {
-        this.context = context;
+    public TableDataSiteNode() {
     }
 
-    public String getUrl() {
-        return Util.getAbsoluteUrl("/model/TableData.action");
-    }
-
-    public String getTitle() {
-        return "Table data";
-    }
-
-    public String getDescription() {
-        return "Redirects to the first table available";
+    public TableDataSiteNode(String url, String title, String description) {
+        super(url, title, description);
     }
 
     public List<SiteNode> getChildNodes() {
-        List<Table> tables = context.getDataModel().getAllTables();
+        Context context = PortofinoThreadLocals.getContext();
+        if (context == null || context.getModel() == null) {
+            return null;
+        }
+        List<Table> tables = context.getModel().getAllTables();
         List<SiteNode> result = new ArrayList<SiteNode>();
         for (Table table : tables) {
             result.add(new TableSiteNode(table));
@@ -91,7 +85,7 @@ public class TableDataSiteNode implements SiteNode {
         }
 
         public String getDescription() {
-            return "Single table data view";
+            return "Table data view: " + table.getQualifiedName();
         }
 
         public List<SiteNode> getChildNodes() {

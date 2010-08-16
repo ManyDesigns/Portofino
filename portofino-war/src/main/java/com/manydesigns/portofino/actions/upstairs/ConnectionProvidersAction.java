@@ -122,7 +122,7 @@ public class ConnectionProvidersAction
 
     public String read() {
         connectionProvider = context.getConnectionProvider(databaseName);
-        databasePlatform = connectionProvider.getDatabaseAbstraction();
+        databasePlatform = connectionProvider.getDatabasePlatform();
         types = connectionProvider.getTypes();
 
         if (connectionProvider instanceof JdbcConnectionProvider) {

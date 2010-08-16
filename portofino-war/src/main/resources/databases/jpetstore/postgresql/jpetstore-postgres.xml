@@ -143,4 +143,30 @@
             </schemas>
         </database>
     </databases>
+    <siteNodes>
+        <siteNode url="/Homepage.action" title="Homepage" description="Homepage"/>
+        <siteNode url="/model/Index.action" title="Model" description="Model">
+            <childNodes>
+                <siteNode url="/model/ConnectionProviders.action" title="Connection providers" description="Connection providers"/>
+                <siteNode class="com.manydesigns.portofino.site.TableDataSiteNode" url="/model/TableData.action" title="Table data" description="Table data"/>
+                <siteNode class="com.manydesigns.portofino.site.TableDesignSiteNode" url="/model/TableDesign.action" title="Table design" description="Table design"/>
+                <siteNode url="/model/PrintModel.action" title="Print model" description="Print model"/>
+                <siteNode url="/model/SelfTest.action" title="Self test" description="Self test"/>
+            </childNodes>
+        </siteNode>
+        <siteNode url="/system-admin/Index.action" title="System administration" description="System administration">
+            <childNodes>
+                <siteNode url="/system-admin/ServerInfo.action" title="Server info" description="Server info"/>
+                <siteNode url="/system-admin/ConfigurationProperties.action" title="Configuration properties" description="Configuration properties"/>
+                <siteNode url="/system-admin/Logs.action" title="Logs" description="Logs"/>
+            </childNodes>
+        </siteNode>
+        <siteNode url="/user/Index.action" title="Personal area" description="Personal area">
+            <childNodes>
+                <siteNode url="/user/Profile.action" title="Profile" description="Profile"/>
+                <siteNode url="/user/Settings.action" title="Settings" description="Settings"/>
+                <siteNode url="/user/Help.action" title="Help" description="Help"/>
+            </childNodes>
+        </siteNode>
+    </siteNodes>
 </model>
