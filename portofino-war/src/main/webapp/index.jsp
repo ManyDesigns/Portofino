@@ -1,4 +1,4 @@
 <%
-        String redirectURL = "Homepage.action";
+        String redirectURL = "Index.action";
         response.sendRedirect(redirectURL);
 %>

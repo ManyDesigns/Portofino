@@ -27,36 +27,20 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.actions.user;
+
+import com.manydesigns.portofino.actions.PortofinoAction;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ActionResults {
+public class HelpAction extends PortofinoAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //**************************************************************************
-    // Common action results
-    //**************************************************************************
-
-    public final static String SEARCH = "search";
-    public final static String LIST = "list";
-    public final static String RETURN_TO_SEARCH = "returnToSearch";
-    public final static String RETURN_TO_LIST = "returnToList";
-    public final static String RETURN_TO_READ = "returnToRead";
-    public final static String READ = "read";
-    public final static String CREATE = "create";
-    public final static String SAVE = "save";
-    public final static String EDIT = "edit";
-    public final static String UPDATE = "update";
-    public final static String BULK_EDIT = "bulkEdit";
-    public final static String BULK_UPDATE = "bulkUpdate";
-    public final static String DELETE = "delete";
-    public final static String SUMMARY = "summary";
-    public final static String CANCEL = "cancel";
-
-
+    public String execute() {
+        return SUCCESS;
+    }
 }

@@ -26,57 +26,21 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.actions.upstairs;
 
-import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.interceptors.ContextAware;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.io.ModelWriter;
-import com.opensymphony.xwork2.ActionSupport;
+package com.manydesigns.portofino.actions.user;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.MessageFormat;
+import com.manydesigns.portofino.actions.PortofinoAction;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ModelWriterAction extends ActionSupport implements ContextAware {
+public class SettingsAction extends PortofinoAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Context context;
-    public Model model;
-    // result parameters
-    public InputStream inputStream;
-    String contentType;
-    String contentDisposition;
-
-    public String skin = "default";
-
-    public void setContext(Context context) {
-        this.context = context;
-        model = context.getModel();
-    }
-
     public String execute() {
-
-        try {
-            contentType= "text/xml";
-            contentDisposition= MessageFormat.format("inline; filename={0}.xml",
-                        "datamodel");
-            ModelWriter writer = new ModelWriter(model);
-            File tempFile = File.createTempFile("portofino", ".xml");
-            writer.write(tempFile);
-            inputStream = new FileInputStream(tempFile);
-        } catch (IOException e) {
-            throw new Error(e);
-        }
-
         return SUCCESS;
     }
 }

@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.actions.upstairs;
+package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
@@ -37,15 +37,12 @@ import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.text.Generator;
 import com.manydesigns.elements.text.HrefExpressionGenerator;
-import com.manydesigns.portofino.actions.ActionResults;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformManager;
-import com.manydesigns.portofino.interceptors.ContextAware;
-import com.opensymphony.xwork2.ActionSupport;
 
 import java.util.List;
 
@@ -54,12 +51,10 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ConnectionProvidersAction
-        extends ActionSupport implements ContextAware {
+public class ConnectionProvidersAction extends PortofinoAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Context context;
     public List<ConnectionProvider> connectionProviders;
     public ConnectionProvider connectionProvider;
     public DatabasePlatform[] databasePlatforms;
@@ -73,12 +68,6 @@ public class ConnectionProvidersAction
     public TableForm databasePlatformsTableForm;
 
     public String databaseName;
-
-    public String skin = "default";
-
-    public void setContext(Context context) {
-        this.context = context;
-    }
 
     public String execute() {
         if (databaseName == null) {
@@ -117,7 +106,7 @@ public class ConnectionProvidersAction
         databasePlatformsTableForm.setMode(Mode.VIEW);
         databasePlatformsTableForm.readFromObject(databasePlatforms);
 
-        return ActionResults.LIST;
+        return LIST;
     }
 
     public String read() {
@@ -143,7 +132,7 @@ public class ConnectionProvidersAction
             configureDetectedAndTypes();
         }
 
-        return ActionResults.READ;
+        return READ;
     }
 
     protected void configureDetectedAndTypes() {
@@ -182,7 +171,7 @@ public class ConnectionProvidersAction
     }
 
     public String returnToSearch() {
-        return ActionResults.RETURN_TO_LIST;
+        return RETURN_TO_LIST;
     }
 
     public String test() {
@@ -196,7 +185,7 @@ public class ConnectionProvidersAction
                     String.format("Connection failed. Status: %s. Error message: %s",
                             status, connectionProvider.getErrorMessage()));
         }
-        return ActionResults.RETURN_TO_READ;
+        return RETURN_TO_READ;
     }
 
 }

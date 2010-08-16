@@ -49,7 +49,15 @@
     -->
 
     <package name="portofino" extends="portofino-default" namespace="/">
-        <action name="Homepage" class="com.manydesigns.portofino.actions.HomepageAction">
+        <action name="Index"
+                class="com.manydesigns.portofino.actions.IndexAction">
+            <result name="success" type="redirect">
+                <param name="location">${redirectUrl}</param>
+                <param name="prependServletContext">false</param>
+            </result>
+        </action>
+        <action name="Homepage"
+                class="com.manydesigns.portofino.actions.HomepageAction">
             <result name="success">/skins/default/homepage.jsp</result>
         </action>
     </package>
@@ -68,9 +76,9 @@
             </result>
         </action>
         <action name="ConnectionProviders"
-                class="com.manydesigns.portofino.actions.upstairs.ConnectionProvidersAction">
-            <result name="list">/skins/default/upstairs/connectionProviders/list.jsp</result>
-            <result name="read">/skins/default/upstairs/connectionProviders/read.jsp</result>
+                class="com.manydesigns.portofino.actions.model.ConnectionProvidersAction">
+            <result name="list">/skins/default/model/connectionProviders/list.jsp</result>
+            <result name="read">/skins/default/model/connectionProviders/read.jsp</result>
             <result name="returnToList" type="redirectAction">
                 <param name="actionName">ConnectionProviders</param>
             </result>
@@ -81,29 +89,29 @@
         </action>
         
         <action name="TableData"
-                class="com.manydesigns.portofino.actions.TableDataAction">
+                class="com.manydesigns.portofino.actions.model.TableDataAction">
             <result name="redirectToTable" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableData</param>
             </result>
         </action>
 
         <action name="*/TableData"
-                class="com.manydesigns.portofino.actions.TableDataAction">
+                class="com.manydesigns.portofino.actions.model.TableDataAction">
             <param name="skin">default</param>
             <param name="qualifiedTableName">{1}</param>
 
-            <result name="search">/skins/default/tableData/search.jsp</result>
+            <result name="search">/skins/default/model/tableData/search.jsp</result>
 
-            <result name="read">/skins/default/tableData/read.jsp</result>
+            <result name="read">/skins/default/model/tableData/read.jsp</result>
 
-            <result name="create">/skins/default/tableData/create.jsp</result>
+            <result name="create">/skins/default/model/tableData/create.jsp</result>
 
             <result name="save" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableData</param>
                 <param name="pk">%{pk}</param>
             </result>
 
-            <result name="edit">/skins/default/tableData/edit.jsp</result>
+            <result name="edit">/skins/default/model/tableData/edit.jsp</result>
 
             <result name="update" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableData</param>
@@ -111,7 +119,7 @@
                 <param name="searchString">%{searchString}</param>
             </result>
 
-            <result name="bulkEdit">/skins/default/tableData/bulkEdit.jsp</result>
+            <result name="bulkEdit">/skins/default/model/tableData/bulkEdit.jsp</result>
 
             <result name="bulkUpdate" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableData</param>
@@ -135,17 +143,17 @@
         </action>
 
         <action name="TableDesign"
-                class="com.manydesigns.portofino.actions.TableDesignAction">
+                class="com.manydesigns.portofino.actions.model.TableDesignAction">
             <result name="redirectToTable" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableDesign</param>
             </result>
         </action>
         <action name="*/TableDesign"
-                class="com.manydesigns.portofino.actions.TableDesignAction">
+                class="com.manydesigns.portofino.actions.model.TableDesignAction">
             <param name="skin">default</param>
             <param name="qualifiedTableName">{1}</param>
 
-            <result name="summary">/skins/default/tableDesign/summary.jsp</result>
+            <result name="summary">/skins/default/model/tableDesign/summary.jsp</result>
 
             <result name="cancel" type="redirect">
                 <param name="location">${cancelReturnUrl}</param>
@@ -153,7 +161,8 @@
             </result>
         </action>
 
-        <action name="PrintModel" class="com.manydesigns.portofino.actions.upstairs.ModelWriterAction">
+        <action name="PrintModel"
+                class="com.manydesigns.portofino.actions.model.ModelWriterAction">
             <result name="success" type="stream">
                 <param name="contentType">%{contentType}</param>
                 <param name="contentDisposition">%{contentDisposition}</param>
@@ -162,8 +171,12 @@
             </result>
         </action>
         <action name="SelfTest"
-                class="com.manydesigns.portofino.actions.upstairs.SelfTestAction">
-            <result name="success">/skins/default/upstairs/selfTest.jsp</result>
+                class="com.manydesigns.portofino.actions.model.SelfTestAction">
+            <result name="success">/skins/default/model/selfTest.jsp</result>
+        </action>
+        <action name="Site map"
+                class="com.manydesigns.portofino.actions.model.SiteMap">
+            <result name="success">/skins/default/model/siteMap.jsp</result>
         </action>
     </package>
 
@@ -181,16 +194,16 @@
             </result>
         </action>
         <action name="ServerInfo"
-                class="com.manydesigns.portofino.actions.upstairs.ServerInfoAction">
-            <result name="success">/skins/default/upstairs/serverInfo.jsp</result>
+                class="com.manydesigns.portofino.actions.systemadmin.ServerInfoAction">
+            <result name="success">/skins/default/system-admin/serverInfo.jsp</result>
         </action>
         <action name="ConfigurationProperties"
-                class="com.manydesigns.portofino.actions.upstairs.ConfigurationPropertiesAction">
-            <result name="success">/skins/default/upstairs/configurationProperties.jsp</result>
+                class="com.manydesigns.portofino.actions.systemadmin.ConfigurationPropertiesAction">
+            <result name="success">/skins/default/system-admin/configurationProperties.jsp</result>
         </action>
         <action name="Logs"
-                class="com.manydesigns.portofino.actions.upstairs.LogsAction">
-            <result name="success">/skins/default/upstairs/logs.jsp</result>
+                class="com.manydesigns.portofino.actions.systemadmin.LogsAction">
+            <result name="success">/skins/default/system-admin/logs.jsp</result>
         </action>
     </package>
 
@@ -207,15 +220,15 @@
                 <param name="actionName">Profile</param>
             </result>
         </action>
-        <action name="Profile" class="com.manydesigns.portofino.actions.ProfileAction">
+        <action name="Profile" class="com.manydesigns.portofino.actions.user.ProfileAction">
             <result name="success">/skins/default/user/profile.jsp</result>
         </action>
 
-        <action name="Settings" class="com.manydesigns.portofino.actions.SettingsAction">
+        <action name="Settings" class="com.manydesigns.portofino.actions.user.SettingsAction">
             <result name="success">/skins/default/user/settings.jsp</result>
         </action>
 
-        <action name="Help" class="com.manydesigns.portofino.actions.HelpAction">
+        <action name="Help" class="com.manydesigns.portofino.actions.user.HelpAction">
             <result name="success">/skins/default/user/help.jsp</result>
         </action>
     </package>

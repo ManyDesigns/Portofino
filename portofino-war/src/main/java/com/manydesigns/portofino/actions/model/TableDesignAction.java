@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
@@ -35,17 +35,12 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
-import com.manydesigns.portofino.interceptors.ContextAware;
 import com.manydesigns.portofino.model.Column;
-import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.opensymphony.xwork2.ActionSupport;
-import org.apache.struts2.interceptor.ServletRequestAware;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.logging.Logger;
 
 /*
@@ -53,33 +48,9 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableDesignAction extends ActionSupport
-        implements ContextAware, ServletRequestAware {
+public class TableDesignAction extends PortofinoAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-
-    //**************************************************************************
-    // ContextAware implementation
-    //**************************************************************************
-
-    public Context context;
-    public Model model;
-
-    public void setContext(Context context) {
-        this.context = context;
-        model = context.getModel();
-    }
-
-    //**************************************************************************
-    // ServletRequestAware implementation
-    //**************************************************************************
-
-    public HttpServletRequest req;
-
-    public void setServletRequest(HttpServletRequest req) {
-        this.req = req;
-    }
-
 
     //**************************************************************************
     // Web parameters
@@ -87,7 +58,6 @@ public class TableDesignAction extends ActionSupport
 
     public String qualifiedTableName;
     public String cancelReturnUrl;
-    public String skin;
 
     //**************************************************************************
     // Web parameters setters (for struts.xml inspections in IntelliJ)
@@ -95,10 +65,6 @@ public class TableDesignAction extends ActionSupport
 
     public void setQualifiedTableName(String qualifiedTableName) {
         this.qualifiedTableName = qualifiedTableName;
-    }
-
-    public void setSkin(String skin) {
-        this.skin = skin;
     }
 
     //**************************************************************************
@@ -153,7 +119,7 @@ public class TableDesignAction extends ActionSupport
         columnTableForm.readFromObject(table.getColumns());
         columnTableForm.setMode(Mode.VIEW);
 
-        return ActionResults.SUMMARY;
+        return SUMMARY;
     }
 
     //**************************************************************************
@@ -172,7 +138,7 @@ public class TableDesignAction extends ActionSupport
     //**************************************************************************
 
     public String cancel() {
-        return ActionResults.CANCEL;
+        return CANCEL;
     }
 
 }

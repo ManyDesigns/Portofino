@@ -26,61 +26,57 @@
  * Boston, MA  02111-1307  USA
  *
  */
+package com.manydesigns.portofino.actions.model;
 
-package com.manydesigns.portofino.actions.upstairs;
-
-import com.manydesigns.elements.ElementsProperties;
-import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertiesAccessor;
-import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.interceptors.ContextAware;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.io.ModelWriter;
 import com.opensymphony.xwork2.ActionSupport;
-import org.apache.struts2.util.ServletContextAware;
 
-import javax.servlet.ServletContext;
-import java.util.Properties;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ConfigurationPropertiesAction extends ActionSupport
-        implements ServletContextAware {
+public class ModelWriterAction extends ActionSupport implements ContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Properties portofinoProperties;
-    public Form portofinoForm;
+    public Context context;
+    public Model model;
+    // result parameters
+    public InputStream inputStream;
+    String contentType;
+    String contentDisposition;
 
-    public Properties elementsProperties;
-    public Form elementsForm;
+    public String skin = "default";
 
-    @Override
+    public void setContext(Context context) {
+        this.context = context;
+        model = context.getModel();
+    }
+
     public String execute() {
-        portofinoProperties = PortofinoProperties.getProperties();
-        portofinoForm = configureForm(portofinoProperties);
 
-        elementsProperties = ElementsProperties.getProperties();
-        elementsForm = configureForm(elementsProperties);
+        try {
+            contentType= "text/xml";
+            contentDisposition= MessageFormat.format("inline; filename={0}.xml",
+                        "datamodel");
+            ModelWriter writer = new ModelWriter(model);
+            File tempFile = File.createTempFile("portofino", ".xml");
+            writer.write(tempFile);
+            inputStream = new FileInputStream(tempFile);
+        } catch (IOException e) {
+            throw new Error(e);
+        }
 
         return SUCCESS;
     }
-
-    private Form configureForm(Properties properties) {
-        ClassAccessor accessor = new PropertiesAccessor(properties);
-        Form form = new FormBuilder(accessor).build();
-        form.setMode(Mode.VIEW);
-        form.readFromObject(properties);
-        return form;
-    }
-
-    public ServletContext servletContext;
-
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
-
 }

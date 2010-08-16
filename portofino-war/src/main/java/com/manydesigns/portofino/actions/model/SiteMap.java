@@ -27,22 +27,31 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.actions.model;
 
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.interceptors.ContextAware;
+import com.manydesigns.portofino.model.Database;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.diff.ModelDiff;
 import com.opensymphony.xwork2.ActionSupport;
+
+import java.sql.SQLException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SettingsAction extends ActionSupport implements ContextAware {
+public class SiteMap extends ActionSupport implements ContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public Context context;
+    public Model model;
+    public ModelDiff diff;
 
     public String skin = "default";
 
@@ -50,7 +59,22 @@ public class SettingsAction extends ActionSupport implements ContextAware {
         this.context = context;
     }
 
-    public String execute() {
+    public String execute() throws SQLException {
+        model = context.getModel();
+        diff = new ModelDiff("In-memory model", "Database model");
+        for (ConnectionProvider current : context.getConnectionProviders()) {
+            Database database =
+                    model.findDatabaseByName(current.getDatabaseName());
+            Database database2 = current.readModel();
+
+            diff.diff(database, database2);
+        }
         return SUCCESS;
+    }
+
+    public String sync() throws SQLException {
+        context.syncDataModel();
+        SessionMessages.addInfoMessage("In-memory model synchronized to database model");
+        return execute();
     }
 }

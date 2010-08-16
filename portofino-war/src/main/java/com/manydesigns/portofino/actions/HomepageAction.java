@@ -29,29 +29,14 @@
 
 package com.manydesigns.portofino.actions;
 
-import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.interceptors.ContextAware;
-import com.manydesigns.portofino.model.Model;
-import com.opensymphony.xwork2.ActionSupport;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class HomepageAction extends ActionSupport implements ContextAware {
+public class HomepageAction extends PortofinoAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-
-    public Context context;
-    public Model model;
-
-    public String skin = "default";
-
-    public void setContext(Context context) {
-        this.context = context;
-        model = context.getModel();
-    }
 
     public String execute() {
         return SUCCESS;

@@ -22,7 +22,7 @@
 </head>
 <body>
 <div id="doc3" class="yui-t2">
-    <s:url var="homepageUrl" namespace="/" action="Homepage"/>
+    <s:url var="indexUrl" namespace="/" action="Index"/>
     <s:url var="profileUrl" namespace="/user" action="Profile"/>
     <s:url var="settingsUrl" namespace="/user" action="Settings"/>
     <s:url var="helpUrl" namespace="/user" action="Help"/>
@@ -37,7 +37,7 @@
         <div style="position: absolute; left: 20em;">
             <mdes:sessionMessages/>
         </div>
-        <h1><s:a href="%{#homepageUrl}"><s:property value="#application.portofinoProperties['application.name']"/></s:a></h1>
+        <h1><s:a href="%{#indexUrl}"><s:property value="#application.portofinoProperties['application.name']"/></s:a></h1>
     </div>
     <div id="bd">
         <div id="yui-main">

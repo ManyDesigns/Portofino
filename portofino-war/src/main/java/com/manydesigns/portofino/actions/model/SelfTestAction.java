@@ -27,30 +27,43 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.actions.model;
 
-import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.interceptors.ContextAware;
-import com.opensymphony.xwork2.ActionSupport;
+import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.database.ConnectionProvider;
+import com.manydesigns.portofino.model.Database;
+import com.manydesigns.portofino.model.diff.ModelDiff;
+
+import java.sql.SQLException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class HelpAction extends ActionSupport implements ContextAware {
+public class SelfTestAction extends PortofinoAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Context context;
+    public ModelDiff diff;
 
-    public String skin = "default";
+    public String execute() throws SQLException {
+        model = context.getModel();
+        diff = new ModelDiff("In-memory model", "Database model");
+        for (ConnectionProvider current : context.getConnectionProviders()) {
+            Database database =
+                    model.findDatabaseByName(current.getDatabaseName());
+            Database database2 = current.readModel();
 
-    public void setContext(Context context) {
-        this.context = context;
+            diff.diff(database, database2);
+        }
+        return SUCCESS;
     }
 
-    public String execute() {
-        return SUCCESS;
+    public String sync() throws SQLException {
+        context.syncDataModel();
+        SessionMessages.addInfoMessage("In-memory model synchronized to database model");
+        return execute();
     }
 }

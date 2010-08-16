@@ -27,61 +27,61 @@
  *
  */
 
-package com.manydesigns.portofino.actions.upstairs;
+package com.manydesigns.portofino.actions.systemadmin;
 
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.portofino.context.ServerInfo;
+import com.manydesigns.portofino.servlets.PortofinoListener;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.util.ServletContextAware;
 
 import javax.servlet.ServletContext;
-import java.util.*;
-import java.util.logging.Handler;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class LogsAction extends ActionSupport
+public class ServerInfoAction extends ActionSupport
         implements ServletContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public LogManager logManager;
-    public List<Logger> loggers;
-    public Set<Handler> handlers;
-
     @Override
     public String execute() {
-        logManager = LogManager.getLogManager();
-        loggers = new ArrayList<Logger>();
-        handlers = new HashSet<Handler>();
-
-        Enumeration<String> loggerNames = logManager.getLoggerNames();
-        while (loggerNames.hasMoreElements()) {
-            String loggerName = loggerNames.nextElement();
-            Logger logger = logManager.getLogger(loggerName);
-            loggers.add(logger);
-
-            Handler[] handlers = logger.getHandlers();
-            this.handlers.addAll(Arrays.asList(handlers));
-        }
-        Collections.sort(loggers, new LoggerComparator());
+        serverInfo = (ServerInfo)servletContext.getAttribute(
+                PortofinoListener.SERVER_INFO_ATTRIBUTE);
+        form = new FormBuilder(ServerInfo.class).
+                configFields("contextPath",
+                        "realPath",
+                        "servletContextName",
+                        "serverInfo",
+                        "servletApiVersion",
+                        "javaRuntimeName",
+                        "javaRuntimeVersion",
+                        "javaVmName",
+                        "javaVmVersion",
+                        "javaVmVendor",
+                        "osName",
+                        "userLanguage",
+                        "userRegion",
+                        "usedMemory",
+                        "totalMemory",
+                        "maxMemory",
+                        "availableProcessors")
+                .build();
+        form.setMode(Mode.VIEW);
+        form.readFromObject(serverInfo);
         return SUCCESS;
     }
 
     public ServletContext servletContext;
     public ServerInfo serverInfo;
+    public Form form;
 
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
-    }
-
-    public class LoggerComparator implements Comparator<Logger> {
-        public int compare(Logger l1, Logger l2) {
-            return l1.getName().compareTo(l2.getName());
-        }
     }
 }

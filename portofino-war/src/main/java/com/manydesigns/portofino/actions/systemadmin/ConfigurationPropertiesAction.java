@@ -27,61 +27,60 @@
  *
  */
 
-package com.manydesigns.portofino.actions.upstairs;
+package com.manydesigns.portofino.actions.systemadmin;
 
+import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.portofino.context.ServerInfo;
-import com.manydesigns.portofino.servlets.PortofinoListener;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertiesAccessor;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.util.ServletContextAware;
 
 import javax.servlet.ServletContext;
+import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ServerInfoAction extends ActionSupport
+public class ConfigurationPropertiesAction extends ActionSupport
         implements ServletContextAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    public Properties portofinoProperties;
+    public Form portofinoForm;
+
+    public Properties elementsProperties;
+    public Form elementsForm;
+
     @Override
     public String execute() {
-        serverInfo = (ServerInfo)servletContext.getAttribute(
-                PortofinoListener.SERVER_INFO_ATTRIBUTE);
-        form = new FormBuilder(ServerInfo.class).
-                configFields("contextPath",
-                        "realPath",
-                        "servletContextName",
-                        "serverInfo",
-                        "servletApiVersion",
-                        "javaRuntimeName",
-                        "javaRuntimeVersion",
-                        "javaVmName",
-                        "javaVmVersion",
-                        "javaVmVendor",
-                        "osName",
-                        "userLanguage",
-                        "userRegion",
-                        "usedMemory",
-                        "totalMemory",
-                        "maxMemory",
-                        "availableProcessors")
-                .build();
-        form.setMode(Mode.VIEW);
-        form.readFromObject(serverInfo);
+        portofinoProperties = PortofinoProperties.getProperties();
+        portofinoForm = configureForm(portofinoProperties);
+
+        elementsProperties = ElementsProperties.getProperties();
+        elementsForm = configureForm(elementsProperties);
+
         return SUCCESS;
     }
 
+    private Form configureForm(Properties properties) {
+        ClassAccessor accessor = new PropertiesAccessor(properties);
+        Form form = new FormBuilder(accessor).build();
+        form.setMode(Mode.VIEW);
+        form.readFromObject(properties);
+        return form;
+    }
+
     public ServletContext servletContext;
-    public ServerInfo serverInfo;
-    public Form form;
 
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
     }
+
 }

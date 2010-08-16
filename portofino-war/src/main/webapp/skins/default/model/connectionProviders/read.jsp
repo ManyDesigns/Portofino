@@ -4,7 +4,7 @@
 <%@taglib prefix="mdes" uri="/manydesigns-elements-struts2" %>
 <s:include value="/skins/default/header.jsp"/>
 <s:form method="post">
-    <s:include value="/skins/default/upstairs/connectionProviders/readButtonsBar.jsp"/>
+    <s:include value="/skins/default/model/connectionProviders/readButtonsBar.jsp"/>
     <div id="inner-content">
         <h1>Connection provider: <s:property value="databaseName"/></h1>
         <mdes:write value="form"/>
@@ -18,6 +18,6 @@
         </s:if>
         <s:hidden name="databaseName" value="%{databaseName}"/>
     </div>
-    <s:include value="/skins/default/upstairs/connectionProviders/readButtonsBar.jsp"/>
+    <s:include value="/skins/default/model/connectionProviders/readButtonsBar.jsp"/>
 </s:form>
 <s:include value="/skins/default/footer.jsp"/>

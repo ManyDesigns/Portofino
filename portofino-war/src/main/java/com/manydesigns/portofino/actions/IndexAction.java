@@ -29,28 +29,23 @@
 
 package com.manydesigns.portofino.actions;
 
-import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.interceptors.ContextAware;
-import com.opensymphony.xwork2.ActionSupport;
+import com.manydesigns.portofino.site.SiteNode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ProfileAction extends ActionSupport implements ContextAware {
+public class IndexAction extends PortofinoAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Context context;
-
-    public String skin = "default";
-
-    public void setContext(Context context) {
-        this.context = context;
-    }
+    public String redirectUrl;
 
     public String execute() {
+        SiteNode siteNode = context.getModel().getSiteNodes().get(0);
+        redirectUrl = siteNode.getUrl();
+
         return SUCCESS;
     }
 }
