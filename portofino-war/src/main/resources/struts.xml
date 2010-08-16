@@ -134,6 +134,11 @@
             </result>
         </action>
 
+        <action name="DDLWriter"
+                class="com.manydesigns.portofino.actions.upstairs.DDLWriterAction">
+            <result name="success">/skins/default/upstairs/ddl.jsp</result>
+        </action>
+
         <action name="TableDesign"
                 class="com.manydesigns.portofino.actions.TableDesignAction">
             <result name="redirectToTable" type="redirectAction">
@@ -165,6 +170,7 @@
                 class="com.manydesigns.portofino.actions.upstairs.SelfTestAction">
             <result name="success">/skins/default/upstairs/selfTest.jsp</result>
         </action>
+
     </package>
 
 

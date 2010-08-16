@@ -220,6 +220,9 @@ public class PortofinoListener
         SimpleSiteNode selfTest =
                 new SimpleSiteNode("/model/SelfTest.action", "Self test", "Self test");
         model.add(selfTest);
+        SimpleSiteNode ddl =
+                new SimpleSiteNode("/model/DDLWriter.action", "DDL", "DDL");
+        model.add(ddl);
 
         SimpleSiteNode systemAdmin =
                 new SimpleSiteNode("/system-admin/Index.action", "System administration", "System administration");
