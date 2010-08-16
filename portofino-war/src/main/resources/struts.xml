@@ -174,7 +174,7 @@
                 class="com.manydesigns.portofino.actions.model.SelfTestAction">
             <result name="success">/skins/default/model/selfTest.jsp</result>
         </action>
-        <action name="Site map"
+        <action name="SiteMap"
                 class="com.manydesigns.portofino.actions.model.SiteMap">
             <result name="success">/skins/default/model/siteMap.jsp</result>
         </action>
