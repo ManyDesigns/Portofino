@@ -73,6 +73,7 @@ div.buttons-bar-top {
 
 div.buttons-bar-bottom {
     border-top: 1px solid gray;
+    margin-top: 1em;
 }
 
 ul.errorMessages, ul.warningMessages, ul.infoMessages {

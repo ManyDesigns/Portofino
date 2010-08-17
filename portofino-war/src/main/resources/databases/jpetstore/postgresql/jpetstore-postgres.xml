@@ -154,6 +154,7 @@
                 <siteNode url="/model/SelfTest.action" title="Self test" description="Self test"/>
                 <siteNode url="/model/SiteMap.action" title="Site map" description="Site map"/>
                 <siteNode url="/model/DDLWriter.action" title="DDL Writer" description="DDL Writer"/>
+                <siteNode type="portlet-design" url="/model/PortletDesign.action" title="Portlet design" description="Portlet design"/>
             </childNodes>
         </siteNode>
         <siteNode url="/system-admin/Index.action" title="System administration" description="System administration">
@@ -171,4 +172,7 @@
             </childNodes>
         </siteNode>
     </siteNodes>
+    <portlets>
+        <portlet name="portlet1" title="Title 1" legend="category" database="jpetstore" sql="select category, count(*) from product group by category order by category"/>
+    </portlets>
 </model>

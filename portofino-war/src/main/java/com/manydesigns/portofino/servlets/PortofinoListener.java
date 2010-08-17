@@ -89,17 +89,6 @@ public class PortofinoListener
             LogUtil.getLogger(PortofinoListener.class);
 
     //**************************************************************************
-    // Constructors
-    //**************************************************************************
-
-    /**
-     * Creates a new instance of PortofinoServletContextListener
-     */
-    public PortofinoListener() {
-
-    }
-
-    //**************************************************************************
     // ServletContextListener implementation
     //**************************************************************************
 
@@ -202,12 +191,14 @@ public class PortofinoListener
                         logger);
         context = builder.createInstance(managerClassName);
 
+        servletContext.setAttribute(CONTEXT_ATTRIBUTE, context);
+
         context.loadConnectionsAsResource(
                 portofinoProperties.getProperty(
                         PortofinoProperties.CONNECTIONS_LOCATION_PROPERTY));
         context.loadXmlModelAsResource(
                 portofinoProperties.getProperty(
                         PortofinoProperties.MODEL_LOCATION_PROPERTY));
-        servletContext.setAttribute(CONTEXT_ATTRIBUTE, context);
+
     }
 }

@@ -193,4 +193,13 @@ public class Model {
     public ArrayList<Portlet> getPortlets() {
         return portlets;
     }
+
+    public Portlet findPortletByName(String portletName) {
+        for (Portlet current : portlets) {
+            if (current.getName().equals(portletName)) {
+                return current;
+            }
+        }
+        return null;
+    }
 }

@@ -27,85 +27,70 @@
  *
  */
 
-package com.manydesigns.portofino.context;
+package com.manydesigns.portofino.navigation;
 
-import com.manydesigns.elements.fields.search.Criteria;
-import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.elements.Util;
+import com.manydesigns.portofino.model.portlets.Portlet;
 
-import java.util.HashMap;
+import java.text.MessageFormat;
 import java.util.List;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface Context {
+public class PortletNavigationNode implements NavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // Model loading
+    // Fields
     //**************************************************************************
 
-    void loadConnectionsAsResource(String resource);
-    void loadXmlModelAsResource(String resource);
+    protected final Portlet portlet;
+    protected final String url;
+    protected final String title;
+    protected final String description;
 
 
     //**************************************************************************
-    // Database stuff
+    // Constructors
     //**************************************************************************
 
-    List<ConnectionProvider> getConnectionProviders();
-    ConnectionProvider getConnectionProvider(String databaseName);
+    public PortletNavigationNode(Portlet portlet,
+                               String urlFormat,
+                               String titleFormat,
+                               String descriptionFormat) {
+        this.portlet = portlet;
+        this.url =
+                Util.getAbsoluteUrl(
+                        MessageFormat.format(
+                                urlFormat, portlet.getName()));
+        this.title = MessageFormat.format(
+                titleFormat, portlet.getName());
+        this.description = MessageFormat.format(
+                descriptionFormat, portlet.getName());
+    }
+
 
     //**************************************************************************
-    // Model access
+    // NavigationNode implementation
     //**************************************************************************
 
-    Model getModel();
-    void syncDataModel();
+    public String getUrl() {
+        return url;
+    }
 
-    //**************************************************************************
-    // Persistance
-    //**************************************************************************
+    public String getTitle() {
+        return title;
+    }
 
-    Map<String, Object> getObjectByPk(String qualifiedTableName,
-                                      Object... pk);
+    public String getDescription() {
+        return description;
+    }
 
-    Map<String, Object> getObjectByPk(String qualifiedTableName,
-                                      HashMap<String, Object> pk);
-
-    List<Map<String, Object>> getAllObjects(String qualifiedTableName);
-
-    Criteria createCriteria(String qualifiedTableName);
-
-    List<Map<String, Object>> getObjects(Criteria criteria);
-
-    void saveOrUpdateObject(Map<String, Object> obj);
-
-    void saveObject(Map<String, Object> obj);
-
-    void updateObject(Map<String, Object> obj);
-
-    void deleteObject(Map<String, Object> obj);
-
-    List<Object[]> runSql(String databaseName, String sql);
-
-    void openSession();
-
-    void closeSession();
-
-    List<Map<String, Object>> getRelatedObjects(
-            Map<String, Object> obj, String oneToManyRelationshipName);
-
-    void resetDbTimer();
-
-    long getDbTime();
-
-    public List<String> getDDLCreate();
-
-    public List<String> getDDLUpdate();
+    public List<NavigationNode> getChildNodes() {
+        return null;
+    }
 }

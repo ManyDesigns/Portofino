@@ -84,11 +84,17 @@ public class Navigation implements XhtmlFragment {
                 generateNavigationNodes(siteNode.getChildNodes(),
                         navigationNode.getChildNodes());
             } else if ("table-data".equals(type)) {
-                navigationNode = new TableDataNavigationNode(context, siteNode);
+                navigationNode =
+                        new TableDataNavigationNode(context, siteNode);
             } else if ("table-design".equals(type)) {
-                navigationNode = new TableDesignNavigationNode(context, siteNode);
+                navigationNode =
+                        new TableDesignNavigationNode(context, siteNode);
+            } else if ("portlet-design".equals(type)) {
+                navigationNode =
+                        new PortletDesignNavigationNode(context, siteNode);
             } else {
-                LogUtil.warningMF(logger, "Unrecognized site node type: {0}", type);
+                LogUtil.warningMF(logger,
+                        "Unrecognized site node type: {0}", type);
                 continue;
             }
             navigationNodes.add(navigationNode);

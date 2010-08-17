@@ -72,6 +72,8 @@ public class PortofinoProperties {
             "portofino.database.platform.manager";
     public static final String DATABASE_PLATFORM_LIST_PROPERTY =
             "portofino.database.platform.list";
+    public static final String RANDOM_CODE_LENGTH_PROPERTY =
+            "random.code.length";
 
 
     //**************************************************************************

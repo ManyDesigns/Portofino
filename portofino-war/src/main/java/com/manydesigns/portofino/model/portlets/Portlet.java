@@ -39,12 +39,37 @@ public class Portlet {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     protected final String name;
+    protected final String title;
+    protected final String legend;
+    protected final String database;
+    protected final String sql;
 
-    public Portlet(String name) {
+    public Portlet(String name, String title, String legend,
+                   String database, String sql) {
         this.name = name;
+        this.title = title;
+        this.legend = legend;
+        this.database = database;
+        this.sql = sql;
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getLegend() {
+        return legend;
+    }
+
+    public String getDatabase() {
+        return database;
+    }
+
+    public String getSql() {
+        return sql;
     }
 }

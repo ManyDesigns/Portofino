@@ -78,6 +78,18 @@
             <version>${struts.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>${jfreechart.version}</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>gnujaxp</groupId>
+                    <artifactId>gnujaxp</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <!--
         <dependency>
             <groupId>log4j</groupId>

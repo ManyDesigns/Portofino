@@ -37,7 +37,6 @@ import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
 import org.apache.commons.lang.time.StopWatch;
-import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.StrutsStatics;
 
 import javax.servlet.ServletContext;
@@ -57,15 +56,7 @@ public class PortofinoInterceptor implements Interceptor {
 
     public void destroy() {}
 
-    public void init() {
-        ActionContext context = ActionContext.getContext();
-        System.out.println(context);
-        ServletContext servletContext = ServletActionContext.getServletContext();
-        System.out.println(servletContext);
-        ServletContext servletContext2 = (ServletContext)context.get(StrutsStatics.SERVLET_CONTEXT);
-        System.out.println(servletContext2);
-
-    }
+    public void init() {}
 
     public String intercept(ActionInvocation invocation) throws Exception {
         StopWatch stopWatch = new StopWatch();

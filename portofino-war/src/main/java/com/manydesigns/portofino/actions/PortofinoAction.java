@@ -64,6 +64,7 @@ public class PortofinoAction extends ActionSupport
     public final static String BULK_UPDATE = "bulkUpdate";
     public final static String DELETE = "delete";
     public final static String SUMMARY = "summary";
+    public final static String CHART = "chart";
     public final static String CANCEL = "cancel";
 
 

@@ -2,6 +2,7 @@ package com.manydesigns.portofino.model.io;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
+import com.manydesigns.portofino.model.portlets.Portlet;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.xml.DocumentCallback;
 import com.manydesigns.portofino.xml.ElementCallback;
@@ -40,6 +41,9 @@ public class ModelParser extends XmlParser {
     private static final String SITENODE = "siteNode";
     private static final String CHILDNODES = "childNodes";
 
+    private static final String PORTLETS = "portlets";
+    private static final String PORTLET = "portlet";
+
     private List<RelationshipPre> relationships;
     protected ClassLoader classLoader;
 
@@ -76,6 +80,7 @@ public class ModelParser extends XmlParser {
                 throws XMLStreamException {
             expectElement(DATABASES, 1, 1, new DatabasesCallback());
             expectElement(SITENODES, 1, 1, new SiteNodesCallback());
+            expectElement(PORTLETS, 0, 1, new PortletsCallback());
         }
     }
 
@@ -241,7 +246,7 @@ public class ModelParser extends XmlParser {
     }
 
     //**************************************************************************
-    // datamodel/databases
+    // Site nodes
     //**************************************************************************
 
     private class SiteNodesCallback implements ElementCallback {
@@ -291,6 +296,32 @@ public class ModelParser extends XmlParser {
         }
     }
 
+
+    //**************************************************************************
+    // Portlets
+    //**************************************************************************
+
+    private class PortletsCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(PORTLET, 0, null, new PortletCallback());
+        }
+    }
+
+    private class PortletCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            checkRequiredAttributes(attributes,
+                    "name", "title", "legend", "database", "sql");
+            String name = attributes.get("name");
+            String title = attributes.get("title");
+            String legend = attributes.get("legend");
+            String database = attributes.get("database");
+            String sql = attributes.get("sql");
+            Portlet portlet = new Portlet(name, title, legend, database, sql);
+            model.getPortlets().add(portlet);
+        }
+    }
 
 
     //**************************************************************************

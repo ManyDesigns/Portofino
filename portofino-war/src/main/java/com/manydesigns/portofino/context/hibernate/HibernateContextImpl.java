@@ -295,6 +295,15 @@ public class HibernateContextImpl implements Context {
 
     }
 
+    public List<Object[]> runSql(String databaseName, String sql) {
+        Session session = setups.get(databaseName).getThreadSession();
+        startTimer();
+        //noinspection unchecked
+        List<Object[]> result = session.createSQLQuery(sql).list();
+        stopTimer();
+        return result;
+    }
+
     public void openSession() {
         for (HibernateDatabaseSetup current: setups.values()) {
             SessionFactory sessionFactory = current.getSessionFactory();

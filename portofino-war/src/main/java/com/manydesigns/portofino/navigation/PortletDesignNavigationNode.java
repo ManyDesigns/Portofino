@@ -27,85 +27,73 @@
  *
  */
 
-package com.manydesigns.portofino.context;
+package com.manydesigns.portofino.navigation;
 
-import com.manydesigns.elements.fields.search.Criteria;
-import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.elements.Util;
+import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.model.portlets.Portlet;
+import com.manydesigns.portofino.model.site.SiteNode;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface Context {
+public class PortletDesignNavigationNode implements NavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //**************************************************************************
-    // Model loading
-    //**************************************************************************
-
-    void loadConnectionsAsResource(String resource);
-    void loadXmlModelAsResource(String resource);
-
 
     //**************************************************************************
-    // Database stuff
+    // Fields
     //**************************************************************************
 
-    List<ConnectionProvider> getConnectionProviders();
-    ConnectionProvider getConnectionProvider(String databaseName);
+    protected final SiteNode siteNode;
+    protected final List<NavigationNode> childNodes;
+    protected final String url;
+
 
     //**************************************************************************
-    // Model access
+    // Constructors
     //**************************************************************************
 
-    Model getModel();
-    void syncDataModel();
+    public PortletDesignNavigationNode(Context context, SiteNode siteNode) {
+        this.siteNode = siteNode;
+        childNodes = new ArrayList<NavigationNode>();
+
+        List<Portlet> portlets = context.getModel().getPortlets();
+        for (Portlet portlet : portlets) {
+            PortletNavigationNode node =
+                    new PortletNavigationNode(portlet,
+                            "/model/{0}/PortletDesign.action",
+                            "{0}",
+                            "Portlet design: {0}");
+            childNodes.add(node);
+        }
+        url = Util.getAbsoluteUrl(siteNode.getUrl());
+    }
+
 
     //**************************************************************************
-    // Persistance
+    // NavigationNode implementation
     //**************************************************************************
 
-    Map<String, Object> getObjectByPk(String qualifiedTableName,
-                                      Object... pk);
+    public String getUrl() {
+        return url;
+    }
 
-    Map<String, Object> getObjectByPk(String qualifiedTableName,
-                                      HashMap<String, Object> pk);
+    public String getTitle() {
+        return siteNode.getTitle();
+    }
 
-    List<Map<String, Object>> getAllObjects(String qualifiedTableName);
+    public String getDescription() {
+        return siteNode.getDescription();
+    }
 
-    Criteria createCriteria(String qualifiedTableName);
-
-    List<Map<String, Object>> getObjects(Criteria criteria);
-
-    void saveOrUpdateObject(Map<String, Object> obj);
-
-    void saveObject(Map<String, Object> obj);
-
-    void updateObject(Map<String, Object> obj);
-
-    void deleteObject(Map<String, Object> obj);
-
-    List<Object[]> runSql(String databaseName, String sql);
-
-    void openSession();
-
-    void closeSession();
-
-    List<Map<String, Object>> getRelatedObjects(
-            Map<String, Object> obj, String oneToManyRelationshipName);
-
-    void resetDbTimer();
-
-    long getDbTime();
-
-    public List<String> getDDLCreate();
-
-    public List<String> getDDLUpdate();
+    public List<NavigationNode> getChildNodes() {
+        return childNodes;
+    }
 }

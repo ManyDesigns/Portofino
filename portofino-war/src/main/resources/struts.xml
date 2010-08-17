@@ -141,6 +141,7 @@
                 <param name="prependServletContext">false</param>
             </result>
         </action>
+
         <action name="TableDesign"
                 class="com.manydesigns.portofino.actions.model.TableDesignAction">
             <result name="redirectToTable" type="redirectAction">
@@ -181,6 +182,33 @@
         <action name="DDLWriter"
                 class="com.manydesigns.portofino.actions.model.DDLWriterAction">
             <result name="success">/skins/default/model/ddl.jsp</result>
+        </action>
+
+        <action name="PortletDesign"
+                class="com.manydesigns.portofino.actions.model.PortletDesignAction">
+            <result name="redirectToPortlet" type="redirectAction">
+                <param name="actionName">%{portletName}/PortletDesign</param>
+            </result>
+        </action>
+        <action name="*/PortletDesign"
+                class="com.manydesigns.portofino.actions.model.PortletDesignAction">
+            <param name="skin">default</param>
+            <param name="portletName">{1}</param>
+
+            <result name="summary">/skins/default/model/portletDesign/summary.jsp</result>
+
+            <result name="cancel" type="redirect">
+                <param name="location">${cancelReturnUrl}</param>
+                <param name="prependServletContext">false</param>
+            </result>
+
+            <result name="chart" type="stream">
+               <param name="contentType">image/png</param>
+               <param name="inputName">inputStream</param>
+               <param name="bufferSize">4096</param>
+               <param name="contentDisposition">filename="%{fileName}"</param>
+             </result>
+
         </action>
 
     </package>

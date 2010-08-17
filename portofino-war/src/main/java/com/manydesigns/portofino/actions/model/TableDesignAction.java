@@ -92,7 +92,7 @@ public class TableDesignAction extends PortofinoAction {
     //**************************************************************************
 
     public static final Logger logger =
-            LogUtil.getLogger(TableDataAction.class);
+            LogUtil.getLogger(TableDesignAction.class);
 
     //**************************************************************************
     // Action default execute method

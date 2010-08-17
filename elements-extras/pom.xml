@@ -35,9 +35,9 @@
             <version>4.5</version>
         </dependency>
          <dependency>
-            <groupId>jfreechart</groupId>
+            <groupId>jfree</groupId>
             <artifactId>jfreechart</artifactId>
-            <version>1.0.0</version>
+            <version>${jfreechart.version}</version>
         </dependency>
     </dependencies>
 </project>
