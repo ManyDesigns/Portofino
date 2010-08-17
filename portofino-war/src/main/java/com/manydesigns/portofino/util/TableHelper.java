@@ -31,8 +31,8 @@ package com.manydesigns.portofino.util;
 
 import com.manydesigns.elements.text.ExpressionGenerator;
 import com.manydesigns.elements.text.Generator;
-import com.manydesigns.portofino.model.Column;
-import com.manydesigns.portofino.model.Table;
+import com.manydesigns.portofino.model.datamodel.Column;
+import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.StringUtils;

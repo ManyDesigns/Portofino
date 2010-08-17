@@ -27,12 +27,9 @@
  *
  */
 
-package com.manydesigns.portofino.model;
+package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.portlets.Portlet;
-import com.manydesigns.portofino.model.site.SiteNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +40,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Model {
+public class Database {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -51,43 +48,45 @@ public class Model {
     // Fields
     //**************************************************************************
 
-    protected final ArrayList<Database> databases;
-    protected final ArrayList<SiteNode> siteNodes;
-    protected final ArrayList<Portlet> portlets;
+    protected String databaseName;
+    protected final List<Schema> schemas;
 
-    public static final Logger logger = LogUtil.getLogger(Model.class);
+    public static final Logger logger = LogUtil.getLogger(Database.class);
+
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
+    public Database(String databaseName) {
+        this.databaseName = databaseName;
+        this.schemas = new ArrayList<Schema>();
+    }
 
-    public Model() {
-        this.databases = new ArrayList<Database>();
-        this.siteNodes = new ArrayList<SiteNode>();
-        this.portlets = new ArrayList<Portlet>();
+    //**************************************************************************
+    // Getters/setter
+    //**************************************************************************
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
+
+    public List<Schema> getSchemas() {
+        return schemas;
     }
 
     //**************************************************************************
     // Get all objects of a certain kind
     //**************************************************************************
 
-    public List<Schema> getAllSchemas() {
-        List<Schema> result = new ArrayList<Schema>();
-        for (Database database : getDatabases()) {
-            for (Schema schema : database.getSchemas()) {
-                result.add(schema);
-            }
-        }
-        return result;
-    }
-
     public List<Table> getAllTables() {
         List<Table> result = new ArrayList<Table>();
-        for (Database database : getDatabases()) {
-            for (Schema schema : database.getSchemas()) {
-                for (Table table : schema.getTables()) {
-                    result.add(table);
-                }
+        for (Schema schema : schemas) {
+            for (Table table : schema.getTables()) {
+                result.add(table);
             }
         }
         return result;
@@ -95,12 +94,10 @@ public class Model {
 
     public List<Column> getAllColumns() {
         List<Column> result = new ArrayList<Column>();
-        for (Database database : getDatabases()) {
-            for (Schema schema : database.getSchemas()) {
-                for (Table table : schema.getTables()) {
-                    for (Column column : table.getColumns()) {
-                        result.add(column);
-                    }
+        for (Schema schema : schemas) {
+            for (Table table : schema.getTables()) {
+                for (Column column : table.getColumns()) {
+                    result.add(column);
                 }
             }
         }
@@ -111,22 +108,13 @@ public class Model {
     // Search objects of a certain kind
     //**************************************************************************
 
-    public Database findDatabaseByName(String databaseName) {
-        for (Database database : getDatabases()) {
-            if (database.getDatabaseName().equals(databaseName)) {
-                return database;
-            }
-        }
-        LogUtil.fineMF(logger, "Database not found: {0}", databaseName);
-        return null;
-    }
-
     public Schema findSchemaByQualifiedName(String qualifiedSchemaName) {
         int lastDot = qualifiedSchemaName.lastIndexOf(".");
-        String databaseName = qualifiedSchemaName.substring(0, lastDot);
-        Database database = findDatabaseByName(databaseName);
-        if (database != null) {
-            return database.findSchemaByQualifiedName(qualifiedSchemaName);
+        String schemaName = qualifiedSchemaName.substring(lastDot + 1);
+        for (Schema schema : schemas) {
+            if (schema.getSchemaName().equals(schemaName)) {
+                return schema;
+            }
         }
         LogUtil.fineMF(logger, "Schema not found: {0}", qualifiedSchemaName);
         return null;
@@ -176,21 +164,5 @@ public class Model {
         }
         LogUtil.fineMF(logger, "Relationship not found: {0}", relationshipName);
         return null;
-    }
-
-    //**************************************************************************
-    // Getters/setter
-    //**************************************************************************
-
-    public List<Database> getDatabases() {
-        return databases;
-    }
-
-    public ArrayList<SiteNode> getSiteNodes() {
-        return siteNodes;
-    }
-
-    public ArrayList<Portlet> getPortlets() {
-        return portlets;
     }
 }

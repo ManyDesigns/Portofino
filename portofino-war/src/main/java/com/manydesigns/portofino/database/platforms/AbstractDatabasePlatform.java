@@ -33,7 +33,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
-import com.manydesigns.portofino.model.*;
+import com.manydesigns.portofino.model.datamodel.*;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

@@ -36,16 +36,18 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.text.Generator;
 import com.manydesigns.elements.text.HrefExpressionGenerator;
-import com.manydesigns.portofino.actions.DummyHttpServletRequest;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RelatedTableForm;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
-import com.manydesigns.portofino.model.Column;
-import com.manydesigns.portofino.model.Relationship;
-import com.manydesigns.portofino.model.Table;
+import com.manydesigns.portofino.model.datamodel.Column;
+import com.manydesigns.portofino.model.datamodel.Relationship;
+import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.TableHelper;
+import org.apache.struts2.interceptor.ServletRequestAware;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
@@ -62,9 +64,19 @@ import java.util.regex.Pattern;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableDataAction extends PortofinoAction {
+public class TableDataAction extends PortofinoAction
+        implements ServletRequestAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    //**************************************************************************
+    // ServletRequestAware implementation
+    //**************************************************************************
+    public HttpServletRequest req;
+
+    public void setServletRequest(HttpServletRequest req) {
+        this.req = req;
+    }
 
     //**************************************************************************
     // Web parameters

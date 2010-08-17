@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.forms.TableForm;
-import com.manydesigns.portofino.model.Relationship;
+import com.manydesigns.portofino.model.datamodel.Relationship;
 
 import java.util.List;
 import java.util.Map;

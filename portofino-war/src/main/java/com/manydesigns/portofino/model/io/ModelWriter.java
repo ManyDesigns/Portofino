@@ -29,7 +29,8 @@
 
 package com.manydesigns.portofino.model.io;
 
-import com.manydesigns.portofino.model.*;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.*;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;

@@ -30,10 +30,10 @@
 package com.manydesigns.portofino.model.diff;
 
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.portofino.model.Column;
-import com.manydesigns.portofino.model.Database;
-import com.manydesigns.portofino.model.Schema;
-import com.manydesigns.portofino.model.Table;
+import com.manydesigns.portofino.model.datamodel.Column;
+import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.datamodel.Schema;
+import com.manydesigns.portofino.model.datamodel.Table;
 
 import java.text.MessageFormat;
 import java.util.*;

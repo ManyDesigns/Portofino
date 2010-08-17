@@ -31,7 +31,7 @@ package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.model.Database;
+import com.manydesigns.portofino.model.datamodel.Database;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

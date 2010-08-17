@@ -27,38 +27,52 @@
  *
  */
 
-package com.manydesigns.portofino.context;
+package com.manydesigns.portofino.model.datamodel;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PortofinoThreadLocals {
+public class Reference {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // Static
+    // Fields
     //**************************************************************************
-    private static final ThreadLocal<Context> threadLocalContext =
-            new ThreadLocal<Context>();
+
+    protected Column fromColumn;
+    protected Column toColumn;
+
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
-    private PortofinoThreadLocals() {}
 
-    //**************************************************************************
-    // Static getters/setters
-    //**************************************************************************
-
-    public static Context getContext() {
-        return threadLocalContext.get();
+    public Reference(Column fromColumn, Column toColumn) {
+        this.fromColumn = fromColumn;
+        this.toColumn = toColumn;
     }
 
 
-    public static void setContext(Context context) {
-        threadLocalContext.set(context);
+    //**************************************************************************
+    // Getters/setter
+    //**************************************************************************
+
+    public Column getFromColumn() {
+        return fromColumn;
+    }
+
+    public void setFromColumn(Column fromColumn) {
+        this.fromColumn = fromColumn;
+    }
+
+    public Column getToColumn() {
+        return toColumn;
+    }
+
+    public void setToColumn(Column toColumn) {
+        this.toColumn = toColumn;
     }
 }

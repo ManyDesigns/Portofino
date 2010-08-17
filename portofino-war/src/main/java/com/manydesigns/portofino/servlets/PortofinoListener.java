@@ -34,7 +34,6 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.context.PortofinoThreadLocals;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
 import org.apache.commons.lang.time.StopWatch;
@@ -203,8 +202,6 @@ public class PortofinoListener
                         logger);
         context = builder.createInstance(managerClassName);
 
-        PortofinoThreadLocals.setContext(context);
-
         context.loadConnectionsAsResource(
                 portofinoProperties.getProperty(
                         PortofinoProperties.CONNECTIONS_LOCATION_PROPERTY));
@@ -212,7 +209,5 @@ public class PortofinoListener
                 portofinoProperties.getProperty(
                         PortofinoProperties.MODEL_LOCATION_PROPERTY));
         servletContext.setAttribute(CONTEXT_ATTRIBUTE, context);
-
-        PortofinoThreadLocals.setContext(null);
     }
 }

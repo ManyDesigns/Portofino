@@ -1,10 +1,8 @@
 package com.manydesigns.portofino.model.io;
 
-import com.manydesigns.elements.reflection.JavaClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.model.*;
-import com.manydesigns.portofino.site.SimpleSiteNode;
-import com.manydesigns.portofino.site.SiteNode;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.*;
+import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.xml.DocumentCallback;
 import com.manydesigns.portofino.xml.ElementCallback;
 import com.manydesigns.portofino.xml.XmlParser;
@@ -13,7 +11,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +47,6 @@ public class ModelParser extends XmlParser {
     Database currentDatabase;
     Schema currentSchema;
     Table currentTable;
-
-    SiteNode currentSiteNode;
 
     public ModelParser() {
         classLoader = this.getClass().getClassLoader();
@@ -266,36 +261,20 @@ public class ModelParser extends XmlParser {
 
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            String nodeClassName = attributes.get("class");
-            if (nodeClassName == null) {
-                nodeClassName = SimpleSiteNode.class.getName();
+            checkRequiredAttributes(attributes,
+                    "url", "title", "description");
+            String type = attributes.get("type");
+            if (type == null) {
+                type = "simple";
             }
-            try {
-                Class nodeClass = classLoader.loadClass(nodeClassName);
-                Constructor constructor = nodeClass.getConstructor();
-                currentSiteNode = (SiteNode)constructor.newInstance();
-                parentNodes.add(currentSiteNode);
-
-                JavaClassAccessor classAccessor =
-                        new JavaClassAccessor(nodeClass);
-                for (Map.Entry<String, String> entry : attributes.entrySet()) {
-                    String key = entry.getKey();
-                    String value = entry.getValue();
-
-                    if ("class".equals(key)) {
-                        continue;
-                    }
-
-                    PropertyAccessor propertyAccessor =
-                            classAccessor.getProperty(key);
-                    propertyAccessor.set(currentSiteNode, value);
-                }
-
-                expectElement(CHILDNODES, 0, 1,
-                        new ChildNodesCallback(currentSiteNode.getChildNodes()));
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
+            String url = attributes.get("url");
+            String title = attributes.get("title");
+            String description = attributes.get("description");
+            SiteNode currentSiteNode =
+                    new SiteNode(type, url, title, description);
+            parentNodes.add(currentSiteNode);
+            expectElement(CHILDNODES, 0, 1,
+                    new ChildNodesCallback(currentSiteNode.getChildNodes()));
         }
     }
 

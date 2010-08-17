@@ -27,10 +27,11 @@
  *
  */
 
-package com.manydesigns.portofino.model;
+package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -40,7 +41,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Database {
+public class Schema {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -49,17 +50,19 @@ public class Database {
     //**************************************************************************
 
     protected String databaseName;
-    protected final List<Schema> schemas;
+    protected String schemaName;
+    protected final List<Table> tables;
 
-    public static final Logger logger = LogUtil.getLogger(Database.class);
+    public static final Logger logger = LogUtil.getLogger(Schema.class);
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
-    public Database(String databaseName) {
+    public Schema(String databaseName, String schemaName) {
         this.databaseName = databaseName;
-        this.schemas = new ArrayList<Schema>();
+        this.schemaName = schemaName;
+        this.tables = new ArrayList<Table>();
     }
 
     //**************************************************************************
@@ -74,31 +77,32 @@ public class Database {
         this.databaseName = databaseName;
     }
 
-    public List<Schema> getSchemas() {
-        return schemas;
+    public String getSchemaName() {
+        return schemaName;
     }
 
-    //**************************************************************************
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
+    }
+
+    public List<Table> getTables() {
+        return tables;
+    }
+
+
+    public String getQualifiedName() {
+        return MessageFormat.format("{0}.{1}", databaseName, schemaName);
+    }
+
+        //**************************************************************************
     // Get all objects of a certain kind
     //**************************************************************************
 
-    public List<Table> getAllTables() {
-        List<Table> result = new ArrayList<Table>();
-        for (Schema schema : schemas) {
-            for (Table table : schema.getTables()) {
-                result.add(table);
-            }
-        }
-        return result;
-    }
-
     public List<Column> getAllColumns() {
         List<Column> result = new ArrayList<Column>();
-        for (Schema schema : schemas) {
-            for (Table table : schema.getTables()) {
-                for (Column column : table.getColumns()) {
-                    result.add(column);
-                }
+        for (Table table : tables) {
+            for (Column column : table.getColumns()) {
+                result.add(column);
             }
         }
         return result;
@@ -108,28 +112,12 @@ public class Database {
     // Search objects of a certain kind
     //**************************************************************************
 
-    public Schema findSchemaByQualifiedName(String qualifiedSchemaName) {
-        int lastDot = qualifiedSchemaName.lastIndexOf(".");
-        String schemaName = qualifiedSchemaName.substring(lastDot + 1);
-        for (Schema schema : schemas) {
-            if (schema.getSchemaName().equals(schemaName)) {
-                return schema;
-            }
-        }
-        LogUtil.fineMF(logger, "Schema not found: {0}", qualifiedSchemaName);
-        return null;
-    }
-
     public Table findTableByQualifiedName(String qualifiedTableName) {
         int lastDot = qualifiedTableName.lastIndexOf(".");
-        String qualifiedSchemaName = qualifiedTableName.substring(0, lastDot);
         String tableName = qualifiedTableName.substring(lastDot + 1);
-        Schema schema = findSchemaByQualifiedName(qualifiedSchemaName);
-        if (schema != null) {
-            for (Table table : schema.getTables()) {
-                if (table.getTableName().equals(tableName)) {
-                    return table;
-                }
+        for (Table table : tables) {
+            if (table.getTableName().equals(tableName)) {
+                return table;
             }
         }
         LogUtil.fineMF(logger, "Table not found: {0}", qualifiedTableName);

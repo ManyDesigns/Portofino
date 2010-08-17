@@ -27,15 +27,18 @@
  *
  */
 
-package com.manydesigns.portofino.site;
+package com.manydesigns.portofino.navigation;
 
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.model.site.SiteNode;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,7 +55,10 @@ public class Navigation implements XhtmlFragment {
 
     protected final Context context;
     protected final String requestUrl;
-    protected final List<SiteNode> foundPath;
+    protected final List<NavigationNode> foundPath;
+    protected final List<NavigationNode> rootNodes;
+
+    public static final Logger logger = LogUtil.getLogger(Navigation.class);
 
     //**************************************************************************
     // Constructors
@@ -61,16 +67,40 @@ public class Navigation implements XhtmlFragment {
     public Navigation(Context context, String requestUrl) {
         this.context = context;
         this.requestUrl = requestUrl;
-        Stack<SiteNode> stack = new Stack<SiteNode>();
-        foundPath = new ArrayList<SiteNode>();
-        searchPath(context.getModel().getSiteNodes(), stack);
+        Stack<NavigationNode> stack = new Stack<NavigationNode>();
+        foundPath = new ArrayList<NavigationNode>();
+        rootNodes = new ArrayList<NavigationNode>();
+        generateNavigationNodes(context.getModel().getSiteNodes(), rootNodes);
+        searchPath(rootNodes, stack);
     }
 
-    protected boolean searchPath(List<SiteNode> nodes, Stack<SiteNode> stack) {
+    protected void generateNavigationNodes(List<SiteNode> siteNodes,
+                                           List<NavigationNode> navigationNodes) {
+        for (SiteNode siteNode : siteNodes) {
+            String type = siteNode.getType();
+            NavigationNode navigationNode;
+            if ("simple".equals(type)) {
+                navigationNode = new SimpleNavigationNode(siteNode);
+                generateNavigationNodes(siteNode.getChildNodes(),
+                        navigationNode.getChildNodes());
+            } else if ("table-data".equals(type)) {
+                navigationNode = new TableDataNavigationNode(context, siteNode);
+            } else if ("table-design".equals(type)) {
+                navigationNode = new TableDesignNavigationNode(context, siteNode);
+            } else {
+                LogUtil.warningMF(logger, "Unrecognized site node type: {0}", type);
+                continue;
+            }
+            navigationNodes.add(navigationNode);
+        }
+    }
+
+    protected boolean searchPath(List<NavigationNode> nodes,
+                                 Stack<NavigationNode> stack) {
         if (nodes == null || nodes.isEmpty()) {
             return false;
         }
-        for (SiteNode current : nodes) {
+        for (NavigationNode current : nodes) {
             boolean found;
             stack.push(current);
             String nodeUrl = current.getUrl();
@@ -94,16 +124,16 @@ public class Navigation implements XhtmlFragment {
     //**************************************************************************
 
     public void toXhtml(XhtmlBuffer xb) {
-        print(context.getModel().getSiteNodes(), xb);
+        print(rootNodes, xb);
     }
 
-    private void print(List<SiteNode> nodes, XhtmlBuffer xb) {
+    private void print(List<NavigationNode> nodes, XhtmlBuffer xb) {
         if (nodes == null || nodes.isEmpty()) {
             return;
         }
         xb.openElement("ul");
-        List<SiteNode> expand = null;
-        for (SiteNode current : nodes) {
+        List<NavigationNode> expand = null;
+        for (NavigationNode current : nodes) {
             xb.openElement("li");
             String nodeUrl = current.getUrl();
             if (requestUrl.equals(nodeUrl)) {
@@ -131,11 +161,11 @@ public class Navigation implements XhtmlFragment {
         return context;
     }
 
-    public List<SiteNode> getFoundPath() {
+    public List<NavigationNode> getFoundPath() {
         return foundPath;
     }
 
-    public SiteNode getSelectedSiteNode() {
+    public NavigationNode getSelectedNavigationNode() {
         if (foundPath == null || foundPath.size() == 0) {
             return null;
         }
@@ -144,5 +174,9 @@ public class Navigation implements XhtmlFragment {
 
     public String getRequestUrl() {
         return requestUrl;
+    }
+
+    public List<NavigationNode> getRootNodes() {
+        return rootNodes;
     }
 }

@@ -32,7 +32,7 @@ package com.manydesigns.portofino.actions.model;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.model.Database;
+import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.diff.ModelDiff;
 
 import java.sql.SQLException;

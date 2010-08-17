@@ -27,52 +27,80 @@
  *
  */
 
-package com.manydesigns.portofino.model;
+package com.manydesigns.portofino.model.datamodel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Reference {
+public class PrimaryKey {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
     // Fields
     //**************************************************************************
-
-    protected Column fromColumn;
-    protected Column toColumn;
+    protected String databaseName;
+    protected String schemaName;
+    protected String tableName;
+    protected String pkName;
+    protected final List<Column> columns;
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public Reference(Column fromColumn, Column toColumn) {
-        this.fromColumn = fromColumn;
-        this.toColumn = toColumn;
+    public PrimaryKey(String databaseName, String schemaName,
+                      String tableName, String pkName) {
+        this.databaseName = databaseName;
+        this.schemaName = schemaName;
+        this.tableName = tableName;
+        this.pkName = pkName;
+        columns = new ArrayList<Column>();
     }
-
 
     //**************************************************************************
     // Getters/setter
     //**************************************************************************
 
-    public Column getFromColumn() {
-        return fromColumn;
+    public String getDatabaseName() {
+        return databaseName;
     }
 
-    public void setFromColumn(Column fromColumn) {
-        this.fromColumn = fromColumn;
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
     }
 
-    public Column getToColumn() {
-        return toColumn;
+    public String getSchemaName() {
+        return schemaName;
     }
 
-    public void setToColumn(Column toColumn) {
-        this.toColumn = toColumn;
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public String getPkName() {
+        return pkName;
+    }
+
+    public void setPkName(String pkName) {
+        this.pkName = pkName;
+    }
+
+    public List<Column> getColumns() {
+        return columns;
     }
 }

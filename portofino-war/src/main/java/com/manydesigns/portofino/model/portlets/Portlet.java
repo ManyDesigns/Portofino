@@ -27,35 +27,24 @@
  *
  */
 
-package com.manydesigns.portofino.util;
-
-import com.manydesigns.portofino.model.datamodel.Column;
-import com.manydesigns.portofino.model.datamodel.Table;
-
-import java.util.Map;
+package com.manydesigns.portofino.model.portlets;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class LinkHelper {
+public class Portlet {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public static String getPk(Table table, Map<String, Object> object) {
-        StringBuilder sb = new StringBuilder();
+    protected final String name;
 
-        boolean first = true;
-        for (Column column : table.getPrimaryKey().getColumns()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(",");
-            }
-            
-            sb.append(object.get(column.getColumnName()));
-        }
-        return sb.toString();
+    public Portlet(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 }

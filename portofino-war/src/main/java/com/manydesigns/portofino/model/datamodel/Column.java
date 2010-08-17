@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.model;
+package com.manydesigns.portofino.model.datamodel;
 
 import java.text.MessageFormat;
 

@@ -31,18 +31,17 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.Util;
 import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.context.PortofinoThreadLocals;
+import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.servlets.PortofinoListener;
-import com.manydesigns.portofino.site.Navigation;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.StrutsStatics;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -53,14 +52,20 @@ public class PortofinoInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public final static String STOP_WATCH_ATTRIBUTE =
-            "stopWatch";
-    public final static String NAVIGATION_ATTRIBUTE =
-            "navigation";
+    public final static String STOP_WATCH_ATTRIBUTE = "stopWatch";
+    public final static String NAVIGATION_ATTRIBUTE = "navigation";
 
     public void destroy() {}
 
-    public void init() {}
+    public void init() {
+        ActionContext context = ActionContext.getContext();
+        System.out.println(context);
+        ServletContext servletContext = ServletActionContext.getServletContext();
+        System.out.println(servletContext);
+        ServletContext servletContext2 = (ServletContext)context.get(StrutsStatics.SERVLET_CONTEXT);
+        System.out.println(servletContext2);
+
+    }
 
     public String intercept(ActionInvocation invocation) throws Exception {
         StopWatch stopWatch = new StopWatch();
@@ -70,14 +75,11 @@ public class PortofinoInterceptor implements Interceptor {
         ActionContext actionContext = invocation.getInvocationContext();
         HttpServletRequest req =
                 (HttpServletRequest)actionContext.get(StrutsStatics.HTTP_REQUEST);
-        HttpServletResponse res =
-                (HttpServletResponse)actionContext.get(StrutsStatics.HTTP_RESPONSE);
         ServletContext servletContext =
                 (ServletContext)actionContext.get(StrutsStatics.SERVLET_CONTEXT);
         Context context =
                 (Context)servletContext.getAttribute(
                         PortofinoListener.CONTEXT_ATTRIBUTE);
-        PortofinoThreadLocals.setContext(context);
 
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
 
@@ -85,38 +87,25 @@ public class PortofinoInterceptor implements Interceptor {
         Navigation navigation = new Navigation(context, requestUrl);
         req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
 
-        String result;
         if (action instanceof ContextAware) {
-            setHeaders(res);
-
-            context.resetDbTimer();
             ((ContextAware)action).setContext(context);
-
-            try {
-                context.openSession();
-                result = invocation.invoke();
-            } finally {
-                context.closeSession();
-            }
-        } else {
-            result = invocation.invoke();
         }
 
-        PortofinoThreadLocals.setContext(null);
-        
+        if (action instanceof NavigationAware) {
+            ((NavigationAware)action).setNavigation(navigation);
+        }
+
+        String result;
+        try {
+            context.resetDbTimer();
+            context.openSession();
+            result = invocation.invoke();
+        } finally {
+            context.closeSession();
+        }
+
         stopWatch.stop();
 
         return result;
-    }
-
-    private void setHeaders(HttpServletResponse response) {
-        if(response!=null) {
-			// Invia header per evitare cache delle pagine dinamiche
-            response.setHeader("Pragma", "no-cache");
-            response.addHeader("Cache-Control", "must-revalidate");
-            response.addHeader("Cache-Control", "no-cache");
-            response.addHeader("Cache-Control", "no-store");
-            response.setDateHeader("Expires", 0);
-		}
     }
 }

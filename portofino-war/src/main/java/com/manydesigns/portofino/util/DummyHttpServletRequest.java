@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.util;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;

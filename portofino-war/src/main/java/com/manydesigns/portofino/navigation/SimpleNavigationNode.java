@@ -27,7 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.model;
+package com.manydesigns.portofino.navigation;
+
+import com.manydesigns.elements.Util;
+import com.manydesigns.portofino.model.site.SiteNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,88 +40,47 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Relationship {
+public class SimpleNavigationNode implements NavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // Constants
-    //**************************************************************************
-
-    public static final String RULE_NO_ACTION = "NO ACTION";
-    public static final String RULE_CASCADE = "CASCADE";
-    public static final String RULE_SET_NULL = "SET NULL";
-    public static final String RULE_SET_DEFAULT = "SET DEFAULT";
-    
-
-    //**************************************************************************
     // Fields
     //**************************************************************************
-    protected Table fromTable;
-    protected Table toTable;
-    protected String relationshipName;
-    protected String onUpdate;
-    protected String onDelete;
 
-    protected final List<Reference>references;
+    protected final SiteNode siteNode;
+    protected final List<NavigationNode> childNodes;
+    protected final String url;
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public Relationship(String relationshipName, String onUpdate, String onDelete) {
-        this.relationshipName = relationshipName;
-        this.onUpdate = onUpdate;
-        this.onDelete = onDelete;
-        references = new ArrayList<Reference>();
+    public SimpleNavigationNode(SiteNode siteNode) {
+        this.siteNode = siteNode;
+        childNodes = new ArrayList<NavigationNode>();
+        url = Util.getAbsoluteUrl(siteNode.getUrl());
     }
+
 
     //**************************************************************************
-    // Getters/setter
+    // NavigationNode implementation
     //**************************************************************************
 
-    public String getRelationshipName() {
-        return relationshipName;
+    public String getUrl() {
+        return url;
     }
 
-    public void setRelationshipName(String relationshipName) {
-        this.relationshipName = relationshipName;
+    public String getTitle() {
+        return siteNode.getTitle();
     }
 
-    public String getOnUpdate() {
-        return onUpdate;
+    public String getDescription() {
+        return siteNode.getDescription();
     }
 
-    public void setOnUpdate(String onUpdate) {
-        this.onUpdate = onUpdate;
-    }
-
-    public String getOnDelete() {
-        return onDelete;
-    }
-
-    public void setOnDelete(String onDelete) {
-        this.onDelete = onDelete;
-    }
-
-    public List<Reference> getReferences() {
-        return references;
-    }
-
-    public Table getToTable() {
-        return toTable;
-    }
-
-    public void setToTable(Table toTable) {
-        this.toTable = toTable;
-    }
-
-    public Table getFromTable() {
-        return fromTable;
-    }
-
-    public void setFromTable(Table fromTable) {
-        this.fromTable = fromTable;
+    public List<NavigationNode> getChildNodes() {
+        return childNodes;
     }
 }

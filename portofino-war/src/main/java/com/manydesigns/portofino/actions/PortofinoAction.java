@@ -31,13 +31,10 @@ package com.manydesigns.portofino.actions;
 
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.interceptors.ContextAware;
-import com.manydesigns.portofino.interceptors.PortofinoInterceptor;
+import com.manydesigns.portofino.interceptors.NavigationAware;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.site.Navigation;
+import com.manydesigns.portofino.navigation.Navigation;
 import com.opensymphony.xwork2.ActionSupport;
-import org.apache.struts2.interceptor.ServletRequestAware;
-
-import javax.servlet.http.HttpServletRequest;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,7 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class PortofinoAction extends ActionSupport
-        implements ContextAware, ServletRequestAware {
+        implements ContextAware, NavigationAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -83,22 +80,16 @@ public class PortofinoAction extends ActionSupport
     }
 
     //**************************************************************************
-    // ServletRequestAware implementation
+    // NavigationAware implementation
     //**************************************************************************
 
-    public HttpServletRequest req;
     public Navigation navigation;
 
-    public void setServletRequest(HttpServletRequest req) {
-        this.req = req;
-        navigation =
-                (Navigation)req.getAttribute(
-                        PortofinoInterceptor.NAVIGATION_ATTRIBUTE);
+    public void setNavigation(Navigation navigation) {
+        this.navigation = navigation;
     }
 
-
-
-    //**************************************************************************
+//**************************************************************************
     // Skin
     //**************************************************************************
 

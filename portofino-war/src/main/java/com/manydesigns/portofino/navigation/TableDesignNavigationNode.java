@@ -27,7 +27,12 @@
  *
  */
 
-package com.manydesigns.portofino.model;
+package com.manydesigns.portofino.navigation;
+
+import com.manydesigns.elements.Util;
+import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.site.SiteNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,70 +42,58 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PrimaryKey {
+public class TableDesignNavigationNode implements NavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
 
     //**************************************************************************
     // Fields
     //**************************************************************************
-    protected String databaseName;
-    protected String schemaName;
-    protected String tableName;
-    protected String pkName;
-    protected final List<Column> columns;
+
+    protected final SiteNode siteNode;
+    protected final List<NavigationNode> childNodes;
+    protected final String url;
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public PrimaryKey(String databaseName, String schemaName,
-                      String tableName, String pkName) {
-        this.databaseName = databaseName;
-        this.schemaName = schemaName;
-        this.tableName = tableName;
-        this.pkName = pkName;
-        columns = new ArrayList<Column>();
+    public TableDesignNavigationNode(Context context, SiteNode siteNode) {
+        this.siteNode = siteNode;
+        childNodes = new ArrayList<NavigationNode>();
+
+        List<Table> tables = context.getModel().getAllTables();
+        for (Table table : tables) {
+            TableNavigationNode node =
+                    new TableNavigationNode(table,
+                            "/model/{0}/TableDesign.action",
+                            "{0}",
+                            "Table design: {0}");
+            childNodes.add(node);
+        }
+        url = Util.getAbsoluteUrl(siteNode.getUrl());
     }
+
 
     //**************************************************************************
-    // Getters/setter
+    // NavigationNode implementation
     //**************************************************************************
 
-    public String getDatabaseName() {
-        return databaseName;
+    public String getUrl() {
+        return url;
     }
 
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
+    public String getTitle() {
+        return siteNode.getTitle();
     }
 
-    public String getSchemaName() {
-        return schemaName;
+    public String getDescription() {
+        return siteNode.getDescription();
     }
 
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
-
-    public String getPkName() {
-        return pkName;
-    }
-
-    public void setPkName(String pkName) {
-        this.pkName = pkName;
-    }
-
-    public List<Column> getColumns() {
-        return columns;
+    public List<NavigationNode> getChildNodes() {
+        return childNodes;
     }
 }

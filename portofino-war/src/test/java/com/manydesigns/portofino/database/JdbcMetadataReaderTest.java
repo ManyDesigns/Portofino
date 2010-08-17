@@ -31,9 +31,9 @@ package com.manydesigns.portofino.database;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.database.platforms.AbstractDatabasePlatform;
-import com.manydesigns.portofino.model.Database;
-import com.manydesigns.portofino.model.Schema;
-import com.manydesigns.portofino.model.Table;
+import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.datamodel.Schema;
+import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.diff.ModelDiff;
 import junit.framework.TestCase;
 

@@ -27,21 +27,18 @@
  *
  */
 
-package com.manydesigns.portofino.site;
+package com.manydesigns.portofino.interceptors;
 
-import java.util.List;
+import com.manydesigns.portofino.navigation.Navigation;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface SiteNode {
+public interface NavigationAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    String getUrl();
-    String getTitle();
-    String getDescription();
-    List<SiteNode> getChildNodes();
+    public void setNavigation(Navigation navigation);
 }

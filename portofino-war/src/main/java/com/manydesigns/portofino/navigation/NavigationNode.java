@@ -27,35 +27,22 @@
  *
  */
 
-package com.manydesigns.portofino.util;
+package com.manydesigns.portofino.navigation;
 
-import com.manydesigns.portofino.model.datamodel.Column;
-import com.manydesigns.portofino.model.datamodel.Table;
-
-import java.util.Map;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class LinkHelper {
+public interface NavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public static String getPk(Table table, Map<String, Object> object) {
-        StringBuilder sb = new StringBuilder();
+    String getUrl();
+    String getTitle();
+    String getDescription();
+    List<NavigationNode> getChildNodes();
 
-        boolean first = true;
-        for (Column column : table.getPrimaryKey().getColumns()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(",");
-            }
-            
-            sb.append(object.get(column.getColumnName()));
-        }
-        return sb.toString();
-    }
 }

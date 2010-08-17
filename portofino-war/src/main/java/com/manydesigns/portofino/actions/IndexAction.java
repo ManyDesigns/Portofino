@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.actions;
 
-import com.manydesigns.portofino.site.SiteNode;
+import com.manydesigns.portofino.navigation.NavigationNode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,8 +43,8 @@ public class IndexAction extends PortofinoAction {
     public String redirectUrl;
 
     public String execute() {
-        SiteNode siteNode = context.getModel().getSiteNodes().get(0);
-        redirectUrl = siteNode.getUrl();
+        NavigationNode navigationNode = navigation.getRootNodes().get(0);
+        redirectUrl = navigationNode.getUrl();
 
         return SUCCESS;
     }

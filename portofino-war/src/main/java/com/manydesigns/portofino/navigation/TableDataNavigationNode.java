@@ -27,14 +27,13 @@
  *
  */
 
-package com.manydesigns.portofino.site;
+package com.manydesigns.portofino.navigation;
 
 import com.manydesigns.elements.Util;
 import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.context.PortofinoThreadLocals;
-import com.manydesigns.portofino.model.Table;
+import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.site.SiteNode;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,53 +42,58 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableDataSiteNode extends SimpleSiteNode {
+public class TableDataNavigationNode implements NavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public TableDataSiteNode() {
-    }
 
-    public TableDataSiteNode(String url, String title, String description) {
-        super(url, title, description);
-    }
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
 
-    public List<SiteNode> getChildNodes() {
-        Context context = PortofinoThreadLocals.getContext();
-        if (context == null || context.getModel() == null) {
-            return null;
-        }
+    protected final SiteNode siteNode;
+    protected final List<NavigationNode> childNodes;
+    protected final String url;
+
+
+    //**************************************************************************
+    // Constructors
+    //**************************************************************************
+
+    public TableDataNavigationNode(Context context, SiteNode siteNode) {
+        this.siteNode = siteNode;
+        childNodes = new ArrayList<NavigationNode>();
+
         List<Table> tables = context.getModel().getAllTables();
-        List<SiteNode> result = new ArrayList<SiteNode>();
         for (Table table : tables) {
-            result.add(new TableSiteNode(table));
+            TableNavigationNode node =
+                    new TableNavigationNode(table,
+                            "/model/{0}/TableData.action",
+                            "{0}",
+                            "Table data: {0}");
+            childNodes.add(node);
         }
-        return result;
+        url = Util.getAbsoluteUrl(siteNode.getUrl());
     }
 
-    class TableSiteNode implements SiteNode {
-        protected final Table table;
 
-        public TableSiteNode(Table table) {
-            this.table = table;
-        }
+    //**************************************************************************
+    // NavigationNode implementation
+    //**************************************************************************
 
-        public String getUrl() {
-            return Util.getAbsoluteUrl(
-                    MessageFormat.format("/model/{0}/TableData.action",
-                            table.getQualifiedName()));
-        }
+    public String getUrl() {
+        return url;
+    }
 
-        public String getTitle() {
-            return table.getQualifiedName();
-        }
+    public String getTitle() {
+        return siteNode.getTitle();
+    }
 
-        public String getDescription() {
-            return "Table data view: " + table.getQualifiedName();
-        }
+    public String getDescription() {
+        return siteNode.getDescription();
+    }
 
-        public List<SiteNode> getChildNodes() {
-            return null;
-        }
+    public List<NavigationNode> getChildNodes() {
+        return childNodes;
     }
 }

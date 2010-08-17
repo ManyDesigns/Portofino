@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.io.ModelParser;
 import junit.framework.TestCase;
 
@@ -177,8 +178,8 @@ public class DBParserTest extends TestCase {
     private void checkReference(List<Reference> references, int idx,
                                 String fromColumn, String toColumn) {
         Reference ref = references.get(0);
-        assertEquals(fromColumn, ref.fromColumn.getColumnName());
-        assertEquals(toColumn, ref.toColumn.getColumnName());
+        assertEquals(fromColumn, ref.getFromColumn().getColumnName());
+        assertEquals(toColumn, ref.getToColumn().getColumnName());
     }
 
     private void checkRelationships(List<Relationship> relationships, int idx, String name,

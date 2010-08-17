@@ -34,7 +34,7 @@ import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformManager;
-import com.manydesigns.portofino.model.Database;
+import com.manydesigns.portofino.model.datamodel.Database;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

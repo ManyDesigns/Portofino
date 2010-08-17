@@ -33,10 +33,10 @@ import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.Type;
-import com.manydesigns.portofino.model.Database;
-import com.manydesigns.portofino.model.Reference;
-import com.manydesigns.portofino.model.Relationship;
-import com.manydesigns.portofino.model.Schema;
+import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.datamodel.Reference;
+import com.manydesigns.portofino.model.datamodel.Relationship;
+import com.manydesigns.portofino.model.datamodel.Schema;
 import org.hibernate.FetchMode;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Mappings;
@@ -82,7 +82,7 @@ public class HibernateConfig {
 
             Mappings mappings = configuration.createMappings();
             for (Schema schema : database.getSchemas()) {
-                for (com.manydesigns.portofino.model.Table aTable :
+                for (com.manydesigns.portofino.model.datamodel.Table aTable :
                         schema.getTables()) {
                     RootClass clazz = createTableMapping(configuration,
                             mappings, aTable);
@@ -95,7 +95,7 @@ public class HibernateConfig {
             }
 
             for (Schema schema : database.getSchemas()) {
-                for (com.manydesigns.portofino.model.Table aTable :
+                for (com.manydesigns.portofino.model.datamodel.Table aTable :
                         schema.getTables()) {
                     for (Relationship rel : aTable.getOneToManyRelationships()) {
                         createO2M(configuration, mappings, rel);
@@ -113,7 +113,7 @@ public class HibernateConfig {
     }
 
     protected RootClass createTableMapping(Configuration conf, Mappings mappings,
-                                           com.manydesigns.portofino.model.Table aTable) {
+                                           com.manydesigns.portofino.model.datamodel.Table aTable) {
 
 
         RootClass clazz = new RootClass();
@@ -128,12 +128,12 @@ public class HibernateConfig {
         clazz.setTable(tab);
         clazz.setNodeName(aTable.getTableName());
 
-        final List<com.manydesigns.portofino.model.Column> columnList =
-                new ArrayList<com.manydesigns.portofino.model.Column>();
+        final List<com.manydesigns.portofino.model.datamodel.Column> columnList =
+                new ArrayList<com.manydesigns.portofino.model.datamodel.Column>();
         columnList.addAll(aTable.getColumns());
 
         //Primary keys
-        List<com.manydesigns.portofino.model.Column> columnPKList
+        List<com.manydesigns.portofino.model.datamodel.Column> columnPKList
                 = aTable.getPrimaryKey().getColumns();
 
         if (columnPKList.size() > 1) {
@@ -147,7 +147,7 @@ public class HibernateConfig {
         //Other columns
         columnList.removeAll(columnPKList);
 
-        for (com.manydesigns.portofino.model.Column column
+        for (com.manydesigns.portofino.model.datamodel.Column column
                 : columnList) {
             createColumn(mappings, clazz, tab, column);
 
@@ -158,7 +158,7 @@ public class HibernateConfig {
 
     protected void createColumn(Mappings mappings, RootClass clazz,
                                 Table tab,
-                                com.manydesigns.portofino.model.Column column) {
+                                com.manydesigns.portofino.model.datamodel.Column column) {
         Column col = new Column();
         col.setName(column.getColumnName());
         col.setLength(column.getLength());
@@ -187,10 +187,10 @@ public class HibernateConfig {
     }
 
     protected void createPKComposite(Configuration cfg, Mappings mappings,
-                                     com.manydesigns.portofino.model.Table mdTable,
+                                     com.manydesigns.portofino.model.datamodel.Table mdTable,
                                      String pkName, RootClass clazz,
                                      Table tab,
-                                     List<com.manydesigns.portofino.model.Column> columnPKList) {
+                                     List<com.manydesigns.portofino.model.datamodel.Column> columnPKList) {
 
         clazz.setEmbeddedIdentifier(true);
         final PrimaryKey primaryKey = new PrimaryKey();
@@ -206,7 +206,7 @@ public class HibernateConfig {
         component.setKey(true);
         component.setNullValue("undefined");
 
-        for (com.manydesigns.portofino.model.Column
+        for (com.manydesigns.portofino.model.datamodel.Column
                 column : columnPKList) {
             Column col = new Column();
             col.setName(column.getColumnName());
@@ -242,11 +242,11 @@ public class HibernateConfig {
 
 
     protected void createPKSingle(Configuration cfg, Mappings mappings,
-                                  com.manydesigns.portofino.model.Table mdTable,
+                                  com.manydesigns.portofino.model.datamodel.Table mdTable,
                                   String pkName, RootClass clazz,
                                   Table tab,
-                                  List<com.manydesigns.portofino.model.Column> columnPKList) {
-        com.manydesigns.portofino.model.Column
+                                  List<com.manydesigns.portofino.model.datamodel.Column> columnPKList) {
+        com.manydesigns.portofino.model.datamodel.Column
                 column = columnPKList.get(0);
         SimpleValue id = new SimpleValue(tab);
         final PrimaryKey primaryKey = new PrimaryKey();
@@ -310,9 +310,9 @@ public class HibernateConfig {
             Configuration config,
             Mappings mappings,
             Relationship relationship) {
-        com.manydesigns.portofino.model.Table manyTable
+        com.manydesigns.portofino.model.datamodel.Table manyTable
                 = relationship.getFromTable();
-        com.manydesigns.portofino.model.Table oneTable
+        com.manydesigns.portofino.model.datamodel.Table oneTable
                 = relationship.getToTable();
 
 
@@ -414,7 +414,7 @@ public class HibernateConfig {
     protected void createFKReference(Configuration config, RootClass clazz,
                                      Table tab,
                                      Relationship relationship,
-                                     List<com.manydesigns.portofino.model.Column> cols) {
+                                     List<com.manydesigns.portofino.model.datamodel.Column> cols) {
 
 
         ManyToOne m2o = new ManyToOne(tab);
@@ -425,7 +425,7 @@ public class HibernateConfig {
                 config.getClassMapping(relationship.getToTable().getQualifiedName()));
         m2o.setReferencedEntityName(relationship.getToTable().getQualifiedName());
         m2o.createPropertyRefConstraints(persistentClasses);
-        for (com.manydesigns.portofino.model.Column column : cols) {
+        for (com.manydesigns.portofino.model.datamodel.Column column : cols) {
             Column col = new Column();
             col.setName(column.getColumnName());
             m2o.addColumn(col);

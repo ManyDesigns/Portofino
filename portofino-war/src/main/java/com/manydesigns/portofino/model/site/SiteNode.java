@@ -27,13 +27,9 @@
  *
  */
 
-package com.manydesigns.portofino.reflection;
+package com.manydesigns.portofino.model.site;
 
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.model.datamodel.Column;
-import com.manydesigns.portofino.model.datamodel.Table;
-
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -41,61 +37,70 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableAccessor implements ClassAccessor {
+public class SiteNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
 
     //**************************************************************************
     // Fields
     //**************************************************************************
 
-    protected final Table table;
-    protected final ColumnAccessor[] columnAccessors;
-
+    protected String type;
+    protected String url;
+    protected String title;
+    protected String description;
+    protected final ArrayList<SiteNode> childNodes;
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public TableAccessor(Table table) {
-        this.table = table;
-        List<Column> columns = table.getColumns();
-        List<Column> pkColumns = table.getPrimaryKey().getColumns();
-        columnAccessors = new ColumnAccessor[columns.size()];
-        int i = 0;
-        for (Column current : columns) {
-            boolean inPk = pkColumns.contains(current);
-            columnAccessors[i] = new ColumnAccessor(current, inPk);
-            i++;
-        }
+    public SiteNode(String type, String url, String title, String description) {
+        this.type = type;
+        this.url = url;
+        this.title = title;
+        this.description = description;
+        childNodes = new ArrayList<SiteNode>();
     }
 
-
     //**************************************************************************
-    // ClassAccessor implementation
+    // Getters/Setters
     //**************************************************************************
 
-    public PropertyAccessor getProperty(String fieldName)
-            throws NoSuchFieldException {
-        for (ColumnAccessor current : columnAccessors) {
-            if (current.getName().equals(fieldName)) {
-                return current;
-            }
-        }
-
-        throw new NoSuchFieldException(fieldName);
+    public String getType() {
+        return type;
     }
 
-    public PropertyAccessor[] getProperties() {
-        return columnAccessors.clone();
+    public void setType(String type) {
+        this.type = type;
     }
 
+    public String getUrl() {
+        return url;
+    }
 
-    //**************************************************************************
-    // Getters/setters
-    //**************************************************************************
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-    public Table getTable() {
-        return table;
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<SiteNode> getChildNodes() {
+        return childNodes;
     }
 }

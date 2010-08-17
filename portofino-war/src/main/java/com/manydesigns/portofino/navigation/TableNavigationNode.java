@@ -27,11 +27,12 @@
  *
  */
 
-package com.manydesigns.portofino.site;
+package com.manydesigns.portofino.navigation;
 
 import com.manydesigns.elements.Util;
+import com.manydesigns.portofino.model.datamodel.Table;
 
-import java.util.ArrayList;
+import java.text.MessageFormat;
 import java.util.List;
 
 /*
@@ -39,7 +40,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SimpleSiteNode implements SiteNode {
+public class TableNavigationNode implements NavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -47,33 +48,38 @@ public class SimpleSiteNode implements SiteNode {
     // Fields
     //**************************************************************************
 
-    protected String url;
-    protected String title;
-    protected String description;
-    protected final ArrayList<SiteNode> childNodes;
+    protected final Table table;
+    protected final String url;
+    protected final String title;
+    protected final String description;
+
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public SimpleSiteNode() {
-        this(null, null, null);
-    }
-
-    public SimpleSiteNode(String url, String title, String description) {
-        this.url = url;
-        this.title = title;
-        this.description = description;
-        childNodes = new ArrayList<SiteNode>();
+    public TableNavigationNode(Table table,
+                               String urlFormat,
+                               String titleFormat,
+                               String descriptionFormat) {
+        this.table = table;
+        this.url =
+                Util.getAbsoluteUrl(
+                        MessageFormat.format(
+                                urlFormat, table.getQualifiedName()));
+        this.title = MessageFormat.format(
+                titleFormat, table.getQualifiedName());
+        this.description = MessageFormat.format(
+                descriptionFormat, table.getQualifiedName());
     }
 
 
     //**************************************************************************
-    // Page implementation
+    // NavigationNode implementation
     //**************************************************************************
 
     public String getUrl() {
-        return Util.getAbsoluteUrl(url);
+        return url;
     }
 
     public String getTitle() {
@@ -84,24 +90,7 @@ public class SimpleSiteNode implements SiteNode {
         return description;
     }
 
-    public List<SiteNode> getChildNodes() {
-        return childNodes;
+    public List<NavigationNode> getChildNodes() {
+        return null;
     }
-
-    //**************************************************************************
-    // Setters
-    //**************************************************************************
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
 }

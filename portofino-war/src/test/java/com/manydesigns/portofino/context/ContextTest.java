@@ -1,7 +1,11 @@
 package com.manydesigns.portofino.context;
 
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
-import com.manydesigns.portofino.model.*;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.Column;
+import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.datamodel.Schema;
+import com.manydesigns.portofino.model.datamodel.Table;
 import junit.framework.TestCase;
 
 /**

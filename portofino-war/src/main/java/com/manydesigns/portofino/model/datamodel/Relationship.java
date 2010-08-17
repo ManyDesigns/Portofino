@@ -27,13 +27,9 @@
  *
  */
 
-package com.manydesigns.portofino.reflection;
+package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.model.datamodel.Column;
-import com.manydesigns.portofino.model.datamodel.Table;
-
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -41,61 +37,88 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableAccessor implements ClassAccessor {
+public class Relationship {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // Fields
+    // Constants
     //**************************************************************************
 
-    protected final Table table;
-    protected final ColumnAccessor[] columnAccessors;
+    public static final String RULE_NO_ACTION = "NO ACTION";
+    public static final String RULE_CASCADE = "CASCADE";
+    public static final String RULE_SET_NULL = "SET NULL";
+    public static final String RULE_SET_DEFAULT = "SET DEFAULT";
+    
+
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+    protected Table fromTable;
+    protected Table toTable;
+    protected String relationshipName;
+    protected String onUpdate;
+    protected String onDelete;
+
+    protected final List<Reference>references;
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public TableAccessor(Table table) {
-        this.table = table;
-        List<Column> columns = table.getColumns();
-        List<Column> pkColumns = table.getPrimaryKey().getColumns();
-        columnAccessors = new ColumnAccessor[columns.size()];
-        int i = 0;
-        for (Column current : columns) {
-            boolean inPk = pkColumns.contains(current);
-            columnAccessors[i] = new ColumnAccessor(current, inPk);
-            i++;
-        }
+    public Relationship(String relationshipName, String onUpdate, String onDelete) {
+        this.relationshipName = relationshipName;
+        this.onUpdate = onUpdate;
+        this.onDelete = onDelete;
+        references = new ArrayList<Reference>();
     }
 
-
     //**************************************************************************
-    // ClassAccessor implementation
+    // Getters/setter
     //**************************************************************************
 
-    public PropertyAccessor getProperty(String fieldName)
-            throws NoSuchFieldException {
-        for (ColumnAccessor current : columnAccessors) {
-            if (current.getName().equals(fieldName)) {
-                return current;
-            }
-        }
-
-        throw new NoSuchFieldException(fieldName);
+    public String getRelationshipName() {
+        return relationshipName;
     }
 
-    public PropertyAccessor[] getProperties() {
-        return columnAccessors.clone();
+    public void setRelationshipName(String relationshipName) {
+        this.relationshipName = relationshipName;
     }
 
+    public String getOnUpdate() {
+        return onUpdate;
+    }
 
-    //**************************************************************************
-    // Getters/setters
-    //**************************************************************************
+    public void setOnUpdate(String onUpdate) {
+        this.onUpdate = onUpdate;
+    }
 
-    public Table getTable() {
-        return table;
+    public String getOnDelete() {
+        return onDelete;
+    }
+
+    public void setOnDelete(String onDelete) {
+        this.onDelete = onDelete;
+    }
+
+    public List<Reference> getReferences() {
+        return references;
+    }
+
+    public Table getToTable() {
+        return toTable;
+    }
+
+    public void setToTable(Table toTable) {
+        this.toTable = toTable;
+    }
+
+    public Table getFromTable() {
+        return fromTable;
+    }
+
+    public void setFromTable(Table fromTable) {
+        this.fromTable = fromTable;
     }
 }

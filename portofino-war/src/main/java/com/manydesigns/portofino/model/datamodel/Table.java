@@ -27,9 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.model;
+package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Schema {
+public class Table {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -51,19 +52,26 @@ public class Schema {
 
     protected String databaseName;
     protected String schemaName;
-    protected final List<Table> tables;
+    protected String tableName;
+    protected final List<Column> columns;
+    protected final List<Relationship> manyToOneRelationships;
+    protected final List<Relationship> oneToManyRelationships;
+    protected PrimaryKey primaryKey;
 
-    public static final Logger logger = LogUtil.getLogger(Schema.class);
+    public static final Logger logger = LogUtil.getLogger(Table.class);
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
-    public Schema(String databaseName, String schemaName) {
+    public Table(String databaseName, String schemaName, String tableName) {
         this.databaseName = databaseName;
         this.schemaName = schemaName;
-        this.tables = new ArrayList<Table>();
-    }
+        this.tableName = tableName;
+        this.columns = new ArrayList<Column>();
+        this.manyToOneRelationships = new ArrayList<Relationship>();
+        this.oneToManyRelationships = new ArrayList<Relationship>();
+     }
 
     //**************************************************************************
     // Getters/setter
@@ -85,72 +93,64 @@ public class Schema {
         this.schemaName = schemaName;
     }
 
-    public List<Table> getTables() {
-        return tables;
+    public String getTableName() {
+        return tableName;
     }
 
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public List<Column> getColumns() {
+        return columns;
+    }
+
+    public List<Relationship> getManyToOneRelationships() {
+        return manyToOneRelationships;
+    }
+
+    public List<Relationship> getOneToManyRelationships() {
+        return oneToManyRelationships;
+    }
+
+    public PrimaryKey getPrimaryKey() {
+        return primaryKey;
+    }
+
+    public void setPrimaryKey(PrimaryKey primaryKey) {
+        this.primaryKey = primaryKey;
+    }
 
     public String getQualifiedName() {
-        return MessageFormat.format("{0}.{1}", databaseName, schemaName);
-    }
-
-        //**************************************************************************
-    // Get all objects of a certain kind
-    //**************************************************************************
-
-    public List<Column> getAllColumns() {
-        List<Column> result = new ArrayList<Column>();
-        for (Table table : tables) {
-            for (Column column : table.getColumns()) {
-                result.add(column);
-            }
-        }
-        return result;
+        return MessageFormat.format("{0}.{1}.{2}",
+                databaseName, schemaName, tableName);
     }
 
     //**************************************************************************
     // Search objects of a certain kind
     //**************************************************************************
 
-    public Table findTableByQualifiedName(String qualifiedTableName) {
-        int lastDot = qualifiedTableName.lastIndexOf(".");
-        String tableName = qualifiedTableName.substring(lastDot + 1);
-        for (Table table : tables) {
-            if (table.getTableName().equals(tableName)) {
-                return table;
+    public Column findColumnByName(String columnName) {
+        for (Column column : columns) {
+            if (column.getColumnName().equals(columnName)) {
+                return column;
             }
         }
-        LogUtil.fineMF(logger, "Table not found: {0}", qualifiedTableName);
+        LogUtil.fineMF(logger, "Column not found: {0}", columnName);
         return null;
     }
 
-    public Column findColumnByQualifiedName(String qualifiedColumnName) {
-        int lastDot = qualifiedColumnName.lastIndexOf(".");
-        String qualifiedTableName = qualifiedColumnName.substring(0, lastDot);
-        String columnName = qualifiedColumnName.substring(lastDot + 1);
-        Table table = findTableByQualifiedName(qualifiedTableName);
-        if (table != null) {
-            for (Column column : table.getColumns()) {
-                if (column.getColumnName().equals(columnName)) {
-                    return column;
-                }
-            }
-        }
-        LogUtil.fineMF(logger, "Column not found: {0}", qualifiedColumnName);
-        return null;
-    }
 
-    public Relationship findOneToManyRelationship(String qualifiedTableName,
-                                                  String relationshipName) {
-        Table table = findTableByQualifiedName(qualifiedTableName);
-        if (table != null) {
-            for (Relationship relationship : table.getOneToManyRelationships()) {
-                if (relationship.getRelationshipName().equals(relationshipName)) {
-                    return relationship;
-                }
-            }
-        }
-        LogUtil.fineMF(logger, "Relationship not found: {0}", relationshipName);
-        return null;
+    //**************************************************************************
+    // toString()
+    //**************************************************************************
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("databaseName", databaseName)
+                .append("schemaName", schemaName)
+                .append("tableName", tableName)
+                .toString();
     }
 }

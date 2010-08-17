@@ -144,12 +144,12 @@
         </database>
     </databases>
     <siteNodes>
-        <siteNode url="/Homepage.action" title="Homepage" description="Homepage"/>
+        <siteNode type="simple" url="/Homepage.action" title="Homepage" description="Homepage"/>
         <siteNode url="/model/Index.action" title="Model" description="Model">
             <childNodes>
                 <siteNode url="/model/ConnectionProviders.action" title="Connection providers" description="Connection providers"/>
-                <siteNode class="com.manydesigns.portofino.site.TableDataSiteNode" url="/model/TableData.action" title="Table data" description="Table data"/>
-                <siteNode class="com.manydesigns.portofino.site.TableDesignSiteNode" url="/model/TableDesign.action" title="Table design" description="Table design"/>
+                <siteNode type="table-data" url="/model/TableData.action" title="Table data" description="Table data"/>
+                <siteNode type="table-design" url="/model/TableDesign.action" title="Table design" description="Table design"/>
                 <siteNode url="/model/PrintModel.action" title="Print model" description="Print model"/>
                 <siteNode url="/model/SelfTest.action" title="Self test" description="Self test"/>
                 <siteNode url="/model/SiteMap.action" title="Site map" description="Site map"/>
