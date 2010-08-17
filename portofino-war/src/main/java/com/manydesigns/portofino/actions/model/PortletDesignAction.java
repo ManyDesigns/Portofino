@@ -137,7 +137,7 @@ public class PortletDesignAction extends PortofinoAction {
         setupPortlet();
 
         form = new FormBuilder(Portlet.class)
-                .configFields("name", "title", "database", "sql")
+                .configFields("name", "title", "legend", "database", "sql")
                 .build();
         form.setMode(Mode.VIEW);
         form.readFromObject(portlet);
