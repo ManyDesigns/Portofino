@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
     <databases>
+        <database name="portofino">
+            <schemas>
+                <schema name="public">
+                    <tables>
+                        <table name="user">
+                            <columns>
+                                <column name="userid"
+                                        autoincrement="true"
+                                        columnType="serial"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"/>
+                                <column name="emailaddress"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="75"
+                                        scale="0"
+                                        nullable="false"/>
+                                <column name="pwd"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="75"
+                                        scale="0"
+                                        nullable="false"/>
+                                </columns>                            
+                                <primaryKey name="pk_lineitem">
+                                    <column name="userid"/>
+                                </primaryKey>
+
+                        </table>
+                    </tables>
+                </schema>
+            </schemas>
+        </database>
         <database name="jpetstore">
             <schemas>
                 <schema name="public">

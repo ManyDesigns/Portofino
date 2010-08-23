@@ -204,3 +204,9 @@ span.disabled {
     font-weight: bold;
 }
 
+
+/* login */
+div#login table td tr {
+    border: 0pt;
+    background-color: #65a7db;
+}

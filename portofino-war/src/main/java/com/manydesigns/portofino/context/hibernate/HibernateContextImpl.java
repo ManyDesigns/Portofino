@@ -38,6 +38,7 @@ import com.manydesigns.portofino.model.io.ConnectionsParser;
 import com.manydesigns.portofino.model.io.ModelParser;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.search.HibernateCriteriaAdapter;
+import com.manydesigns.portofino.users.User;
 import org.apache.commons.lang.time.StopWatch;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -49,10 +50,7 @@ import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 
 import java.io.Serializable;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 /*
@@ -72,6 +70,7 @@ public class HibernateContextImpl implements Context {
     protected Model model;
     protected Map<String, HibernateDatabaseSetup> setups;
     protected final ThreadLocal<StopWatch> stopWatches;
+    protected final ThreadLocal<User> threadUsers;
     protected final List<SiteNode> siteNodes;
 
     public static final Logger logger =
@@ -84,6 +83,7 @@ public class HibernateContextImpl implements Context {
     public HibernateContextImpl() {
         stopWatches = new ThreadLocal<StopWatch>();
         siteNodes = new ArrayList<SiteNode>();
+        threadUsers = new ThreadLocal<User>();
     }
 
     //**************************************************************************
@@ -365,9 +365,7 @@ public class HibernateContextImpl implements Context {
             Configuration conf = setup.getConfiguration();
             String[] ddls = conf.generateSchemaCreationScript
                     (getDialect(getConnectionProvider(db.getDatabaseName())));
-            for (int i=0; i < ddls.length;i++) {
-                result.add(ddls[i]);
-            }
+            result.addAll(Arrays.asList(ddls));
 
         }
         return result;
@@ -379,7 +377,7 @@ public class HibernateContextImpl implements Context {
 
         for (Database db : model.getDatabases()){
             HibernateDatabaseSetup setup = setups.get(db.getDatabaseName());
-            DatabaseMetadata databaseMetadata = null;
+            DatabaseMetadata databaseMetadata;
             ConnectionProvider provider= null;
             Connection conn = null;
             try {
@@ -395,9 +393,7 @@ public class HibernateContextImpl implements Context {
             Configuration conf = setup.getConfiguration();
             String[] ddls = conf.generateSchemaUpdateScript(
                     getDialect(provider), databaseMetadata);
-            for (int i=0; i < ddls.length;i++) {
-                result.add(ddls[i]);
-            }
+                result.addAll(Arrays.asList(ddls));
 
             } catch (Throwable e) {
               //TODO
@@ -408,6 +404,40 @@ public class HibernateContextImpl implements Context {
         }
         return result;
     }
+
+    //**************************************************************************
+    // User
+    //**************************************************************************
+    public User authenticate(String email, String password) {
+        Session session = setups.get("portofino").getThreadSession();
+        Criteria criteria = session.createCriteria("portofino.public.user");
+        criteria.add(Restrictions.eq( "emailaddress", email ));
+        criteria.add(Restrictions.eq( "pwd", password ));
+        startTimer();
+        //noinspection unchecked
+        List<Map<String, Object>> result = criteria.list();
+        stopTimer();
+
+        if (result.size()==1){
+            User authUser = new User();
+            authUser.setUserid((Integer) result.get(0).get("userid"));
+            authUser.setEmail((String) result.get(0).get("emailaddress"));
+            authUser.setPassword((String) result.get(0).get("pwd"));
+            setCurrentUser(authUser);
+            return authUser;
+        } else {
+            return null;
+        }
+    }
+
+    public User getCurrentUser() {
+        return threadUsers.get();
+    }
+
+    public void setCurrentUser(User user) {
+        threadUsers.set(user);
+    }
+
 
     //**************************************************************************
     // Timers

@@ -9,6 +9,7 @@
     -->
 
     <package name="portofino-default" extends="struts-default" abstract="true">
+
         <interceptors>
             <interceptor name="elements-struts2"
                          class="com.manydesigns.elements.struts2.ElementsInterceptor" />
@@ -37,6 +38,10 @@
             <result name="500" type="httpheader">
                 <param name="error">500</param>
                 <param name="errorMessage">${errorMessage}</param>
+            </result>
+            <result name="login" type="redirectAction">
+                <param name="actionName">Login</param>
+                <param name="namespace">/user</param>  
             </result>
         </global-results>
     </package>
@@ -263,6 +268,17 @@
 
         <action name="Help" class="com.manydesigns.portofino.actions.user.HelpAction">
             <result name="success">/skins/default/user/help.jsp</result>
+        </action>
+        <action name="Login" class="com.manydesigns.portofino.actions.user.LoginAction">
+            <result name="input">/skins/default/user/login.jsp</result>
+            <result name="success" type="redirectAction">
+                <param name="actionName">Homepage</param>
+                <param name="namespace">/</param>
+            </result>
+            <result name="cancel" type="redirectAction">
+                <param name="actionName">Homepage</param>
+                <param name="namespace">/</param>                
+            </result>
         </action>
     </package>
 

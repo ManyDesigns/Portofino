@@ -33,12 +33,15 @@
     <s:url var="profileUrl" namespace="/user" action="Profile"/>
     <s:url var="settingsUrl" namespace="/user" action="Settings"/>
     <s:url var="helpUrl" namespace="/user" action="Help"/>
+    <s:url var="loginUrl" namespace="/user" action="Login"/>
     <s:url var="logoutUrl" namespace="/" action="Homepage"/>
+
     <div id="hd">
         <div id="globalLinks">
             Welcome, <s:a href="%{#profileUrl}">User Name</s:a> -
             <s:a href="%{#settingsUrl}">Settings</s:a> -
             <s:a href="%{#helpUrl}">Help</s:a> -
+            <s:a href="%{#loginUrl}">Log in</s:a> - 
             <s:a href="%{#logoutUrl}">Log out</s:a>
         </div>
         <div style="position: absolute; left: 20em;">

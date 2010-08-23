@@ -32,6 +32,7 @@ package com.manydesigns.portofino.context;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.users.User;
 
 import java.util.HashMap;
 import java.util.List;
@@ -108,4 +109,15 @@ public interface Context {
     public List<String> getDDLCreate();
 
     public List<String> getDDLUpdate();
+
+    //**************************************************************************
+    // User
+    //**************************************************************************
+
+    public User authenticate (String email, String password);
+
+    public User getCurrentUser();
+
+    public void setCurrentUser(User user);
+
 }

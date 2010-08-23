@@ -19,4 +19,14 @@
             includeSchemas=".*"
             excludeSchemas=""
             />
+    <connection
+            databaseName="portofino"
+            type="jdbc"
+            driver="org.postgresql.Driver"
+            url="jdbc:postgresql://127.0.0.1:5432/portofino4"
+            username="manydesigns"
+            password="manydesigns"
+            includeSchemas=".*"
+            excludeSchemas=""
+            />
 </connections>

@@ -338,7 +338,10 @@ public class HibernateConfig {
         //Riferimenti alle colonne
 
         DependantValue dv;
-        
+        Table tableMany = clazzMany.getTable();
+        Table tableOne = clazzOne.getTable();
+        List<Column> oneColumns = new ArrayList<Column>();
+        List<Column> manyColumns = new ArrayList<Column>();
         //Chiave multipla
         final List<Reference> refs = relationship.getReferences();
         if (refs.size()>1) {
@@ -354,19 +357,30 @@ public class HibernateConfig {
             for (Reference ref : relationship.getReferences()) {
                 String colToName = ref.getToColumn().getColumnName();
                 String colFromName = ref.getFromColumn().getColumnName();
-                Iterator it = clazzMany.getTable().getColumnIterator();
+                Iterator it = tableMany.getColumnIterator();
                 while (it.hasNext()) {
                     Column col = (Column) it.next();
                     if (col.getName().equals(colFromName)) {
                         dv.addColumn(col);
+                        manyColumns.add(col);
                         break;
                     }
                 }
 
+                Iterator it2 = tableOne.getColumnIterator();
+                while (it2.hasNext()) {
+                    Column col = (Column) it.next();
+                    if (col.getName().equals(colToName)) {
+                        oneColumns.add(col);
+                        break;
+                    }
+                }
                 Property refProp;
                 refProp = getRefProperty(clazzOne, colToName);
                 component.addProperty(refProp);
             }
+
+
 
         } else {  //chiave straniera singola
             Property refProp;
@@ -384,10 +398,25 @@ public class HibernateConfig {
                 Column col = (Column) it.next();
                 if (col.getName().equals(colFromName)) {
                     dv.addColumn(col);
+                    manyColumns.add(col);
                     break;
                 }
             }
+
+            Iterator it2 = tableOne.getColumnIterator();
+                while (it2.hasNext()) {
+                    Column col = (Column) it2.next();
+                    if (col.getName().equals(colToName)) {
+                        oneColumns.add(col);
+                        break;
+                    }
+            }
         }
+
+       tableMany.createForeignKey(relationship.getRelationshipName(),
+                manyColumns,
+                oneTable.getQualifiedName(),
+                oneColumns  );
         set.setKey(dv);
         mappings.addCollection(set);
 

@@ -90,7 +90,13 @@ public class PortofinoInterceptor implements Interceptor {
         try {
             context.resetDbTimer();
             context.openSession();
-            result = invocation.invoke();
+            if (context.getCurrentUser()!=null
+                    || "com.manydesigns.portofino.actions.user.LoginAction"
+                    .equals(invocation.getAction().getClass().getName())) {
+                result = invocation.invoke();
+            } else {
+                return "login";
+            }
         } finally {
             context.closeSession();
         }
