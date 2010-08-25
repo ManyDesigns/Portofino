@@ -33,6 +33,7 @@ import com.manydesigns.elements.Util;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.servlets.PortofinoListener;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
@@ -90,13 +91,18 @@ public class PortofinoInterceptor implements Interceptor {
         try {
             context.resetDbTimer();
             context.openSession();
-            if (context.getCurrentUser()!=null
-                    || "com.manydesigns.portofino.actions.user.LoginAction"
-                    .equals(invocation.getAction().getClass().getName())) {
-                result = invocation.invoke();
-            } else {
+
+            boolean userEnabled = Boolean.parseBoolean((String)
+                    PortofinoProperties.getProperties()
+                    .get("user.enabled"));
+            if (userEnabled &&
+                    context.getCurrentUser()==null
+                    && !("com.manydesigns.portofino.actions.user.LoginAction"
+                    .equals(invocation.getAction().getClass().getName()))) {
                 return "login";
             }
+            result = invocation.invoke();
+
         } finally {
             context.closeSession();
         }

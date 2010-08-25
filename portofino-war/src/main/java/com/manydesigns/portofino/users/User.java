@@ -43,7 +43,7 @@ public class User {
     @Password
     String password;
 
-
+    
     public String getEmail() {
         return email;
     }
@@ -52,7 +52,7 @@ public class User {
         this.email = email;
     }
 
-
+    @Password
     public String getPassword() {
         return password;
     }

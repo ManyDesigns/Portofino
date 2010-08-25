@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.text.MessageFormat;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -140,6 +141,10 @@ public class ModelParser extends XmlParser {
                     new Table(currentSchema.getDatabaseName(),
                             currentSchema.getSchemaName(),
                             attributes.get("name"));
+            String m2m = attributes.get("manyToMany");
+            if (m2m!=null) {
+                currentTable.setM2m(Boolean.parseBoolean(m2m));
+            }
             currentSchema.getTables().add(currentTable);
             expectElement(COLUMNS, 1, 1, new ColumnsCallback());
             expectElement(PRIMARY_KEY, 1, 1, new PrimaryKeyCallback());
@@ -359,7 +364,7 @@ public class ModelParser extends XmlParser {
             }
 
         }
-        throw new Error("Tabella non presente");
+        throw new Error(MessageFormat.format("Tabella {0} non presente", tableName));
 
     }
 

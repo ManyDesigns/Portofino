@@ -410,11 +410,11 @@ public class HibernateContextImpl implements Context {
     //**************************************************************************
     public User authenticate(String email, String password) {
         Session session = setups.get("portofino").getThreadSession();
-        Criteria criteria = session.createCriteria("portofino.public.user");
+        Criteria criteria = session.createCriteria("portofino.public.user_");
         criteria.add(Restrictions.eq( "emailaddress", email ));
         criteria.add(Restrictions.eq( "pwd", password ));
         startTimer();
-        //noinspection unchecked
+        
         List<Map<String, Object>> result = criteria.list();
         stopTimer();
 

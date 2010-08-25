@@ -56,6 +56,7 @@ public class HibernateConfig {
 
     protected final ConnectionProvider connectionProvider;
 
+
     public HibernateConfig(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
     }
@@ -84,7 +85,7 @@ public class HibernateConfig {
             for (Schema schema : database.getSchemas()) {
                 for (com.manydesigns.portofino.model.datamodel.Table aTable :
                         schema.getTables()) {
-                    RootClass clazz = createTableMapping(configuration,
+                    RootClass clazz = createTableMapping(
                             mappings, aTable);
                     mappings.addClass(clazz);
                     mappings.addImport(clazz.getEntityName(),
@@ -98,7 +99,15 @@ public class HibernateConfig {
                 for (com.manydesigns.portofino.model.datamodel.Table aTable :
                         schema.getTables()) {
                     for (Relationship rel : aTable.getOneToManyRelationships()) {
-                        createO2M(configuration, mappings, rel);
+                            createO2M(configuration, mappings, rel);
+                    }
+                }
+            }
+            for (Schema schema : database.getSchemas()) {
+                for (com.manydesigns.portofino.model.datamodel.Table aTable :
+                        schema.getTables()) {
+                    if (aTable.isM2m()) {
+                        createM2M(configuration, mappings, aTable);
                     }
                 }
             }
@@ -112,23 +121,29 @@ public class HibernateConfig {
         }
     }
 
-    protected RootClass createTableMapping(Configuration conf, Mappings mappings,
+    protected RootClass createTableMapping( Mappings mappings,
                                            com.manydesigns.portofino.model.datamodel.Table aTable) {
 
 
-        RootClass clazz = new RootClass();
-        clazz.setEntityName(aTable.getQualifiedName());
-        clazz.setLazy(true);
         Table tab = mappings.addTable(aTable.getSchemaName(), null,
                 aTable.getTableName(), null, false);
         tab.setName(aTable.getTableName());
         tab.setSchema(aTable.getSchemaName());
         mappings.addTableBinding(aTable.getSchemaName(), null,
                 aTable.getTableName(), aTable.getTableName(), null);
+
+        RootClass clazz = null;
+
+
+        clazz = new RootClass();
+        clazz.setEntityName(aTable.getQualifiedName());
+            clazz.setLazy(true);
         clazz.setTable(tab);
         clazz.setNodeName(aTable.getTableName());
 
-        final List<com.manydesigns.portofino.model.datamodel.Column> columnList =
+
+
+        List<com.manydesigns.portofino.model.datamodel.Column> columnList =
                 new ArrayList<com.manydesigns.portofino.model.datamodel.Column>();
         columnList.addAll(aTable.getColumns());
 
@@ -137,10 +152,10 @@ public class HibernateConfig {
                 = aTable.getPrimaryKey().getColumns();
 
         if (columnPKList.size() > 1) {
-            createPKComposite(conf, mappings, aTable, aTable.getPrimaryKey().getPkName(),
+            createPKComposite(mappings, aTable, aTable.getPrimaryKey().getPkName(),
                     clazz, tab, columnPKList);
         } else {
-            createPKSingle(conf, mappings, aTable, aTable.getPrimaryKey().getPkName(),
+            createPKSingle(mappings, aTable, aTable.getPrimaryKey().getPkName(),
                     clazz, tab, columnPKList);
         }
 
@@ -168,7 +183,7 @@ public class HibernateConfig {
         String columnType = column.getColumnType();
         Type type = connectionProvider.getTypeByName(columnType);
         col.setSqlTypeCode(type.getJdbcType());
-
+        tab.addColumn(col);
 
         Property prop = new Property();
         prop.setName(column.getColumnName());
@@ -179,25 +194,26 @@ public class HibernateConfig {
                 DbUtil.getHibernateType(type.getJdbcType());
         value.setTypeName(hibernateType.getName());
         value.addColumn(col);
-        tab.addColumn(col);
-        prop.setValue(value);
         clazz.addProperty(prop);
+        prop.setValue(value);
+
         mappings.addColumnBinding(column.getColumnName(),
                 col, tab);
     }
 
-    protected void createPKComposite(Configuration cfg, Mappings mappings,
+    protected void createPKComposite(Mappings mappings,
                                      com.manydesigns.portofino.model.datamodel.Table mdTable,
                                      String pkName, RootClass clazz,
                                      Table tab,
                                      List<com.manydesigns.portofino.model.datamodel.Column> columnPKList) {
 
-        clazz.setEmbeddedIdentifier(true);
+
         final PrimaryKey primaryKey = new PrimaryKey();
         primaryKey.setName(pkName);
         primaryKey.setTable(tab);
         tab.setPrimaryKey(primaryKey);
 
+        clazz.setEmbeddedIdentifier(true);
         Component component = new Component(clazz);
         component.setDynamic(true);
         component.setRoleName(mdTable.getQualifiedName() + ".id");
@@ -241,7 +257,7 @@ public class HibernateConfig {
     }
 
 
-    protected void createPKSingle(Configuration cfg, Mappings mappings,
+    protected void createPKSingle( Mappings mappings,
                                   com.manydesigns.portofino.model.datamodel.Table mdTable,
                                   String pkName, RootClass clazz,
                                   Table tab,
@@ -427,44 +443,82 @@ public class HibernateConfig {
         clazzOne.addProperty(prop);
     }
 
+    protected void createM2M(
+            Configuration config,
+            Mappings mappings, com.manydesigns.portofino.model.datamodel.Table m2mTable){
+
+       /*
+        List<Relationship> relationships= m2mTable.getManyToOneRelationships();
+
+
+        //solo molti a molti con 2 elementi
+        //TODO portare a m2m con più elementi
+        if (relationships.size()!=2)
+            throw new Error("Cannot manage m2m with more than 2 tables");
+
+        Relationship rel1 = relationships.get(0);
+        Relationship rel2 = relationships.get(1);
+
+        com.manydesigns.portofino.model.datamodel.Table manyTable1
+                = rel1.getToTable();
+        com.manydesigns.portofino.model.datamodel.Table manyTable2
+                = rel2.getToTable();
+
+
+        PersistentClass clazzOne = config.getClassMapping
+                (m2mTable.getQualifiedName());
+        PersistentClass clazzMany1 = config.getClassMapping
+                (manyTable1.getQualifiedName());
+        PersistentClass clazzMany2 = config.getClassMapping
+                (manyTable2.getQualifiedName());
+
+        Bag collection = new Bag(clazzMany1);
+        collection.setLazy(true);
+        String roleName = manyTable1.getQualifiedName() + "."
+                + manyTable2.getTableName();
+        collection.setRole(roleName);
+        collection.setNodeName(roleName);
+        collection.setCollectionTable(clazzOne.getTable());
+
+        ManyToOne element =  new ManyToOne(collection.getCollectionTable() );
+        collection.setElement( element );
+        element.setFetchMode(FetchMode.JOIN);
+        element.setReferencedEntityName(clazzMany2.getEntityName());
+        element.setEmbedded(false);
+
+        DependantValue dv = new DependantValue(clazzOne.getTable(),
+                clazzMany2.getKey());
+        Iterator it = clazzOne.getTable().getColumnIterator();
+        //TODO aggiustare il Dependant Value
+        while (it.hasNext()) {
+            Column col = (Column) it.next();
+            for (Reference ref : rel2.getReferences() ){
+                if (col.getName().equals(ref.getToColumn().getColumnName())) {
+                    dv.addColumn(col);
+                }
+            }
+        }
+
+        collection.setKey(dv);
+        mappings.addCollection(collection);
+
+        Property prop = new Property();
+        prop.setName(rel1.getRelationshipName());
+        prop.setNodeName(rel1.getRelationshipName());
+        prop.setValue(collection);
+        clazzOne.addProperty(prop); */
+    }
+
     private Property getRefProperty(PersistentClass clazzOne, String colToName) {
         Property refProp;
         if (null != clazzOne.getIdentifierProperty()) {
             refProp = clazzOne.getIdentifierProperty();
-        } else if (null != clazzOne.getProperty(colToName)) {
-            refProp = clazzOne.getProperty(colToName);
-        } else {
+        }  else  if (null != clazzOne.getIdentifier()) {
             refProp = ((Component) clazzOne.getIdentifier())
                     .getProperty(colToName);
+        } else   {
+            refProp = clazzOne.getProperty(colToName);
         }
         return refProp;
     }
-
-    protected void createFKReference(Configuration config, RootClass clazz,
-                                     Table tab,
-                                     Relationship relationship,
-                                     List<com.manydesigns.portofino.model.datamodel.Column> cols) {
-
-
-        ManyToOne m2o = new ManyToOne(tab);
-        m2o.createForeignKey();
-        final HashMap<String, PersistentClass> persistentClasses =
-                new HashMap<String, PersistentClass>();
-        persistentClasses.put(relationship.getToTable().getQualifiedName(),
-                config.getClassMapping(relationship.getToTable().getQualifiedName()));
-        m2o.setReferencedEntityName(relationship.getToTable().getQualifiedName());
-        m2o.createPropertyRefConstraints(persistentClasses);
-        for (com.manydesigns.portofino.model.datamodel.Column column : cols) {
-            Column col = new Column();
-            col.setName(column.getColumnName());
-            m2o.addColumn(col);
-        }
-
-        Property prop = new Property();
-        prop.setName(relationship.getRelationshipName());
-        prop.setValue(m2o);
-        clazz.addProperty(prop);
-
-    }
-
 }

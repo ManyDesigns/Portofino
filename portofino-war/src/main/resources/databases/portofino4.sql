@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Started on 2010-08-23 11:48:59 CEST
+-- Started on 2010-08-25 11:01:45 CEST
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -125,10 +125,10 @@ SELECT pg_catalog.setval('emailstate_id_seq', 1, false);
 --
 -- TOC entry 1523 (class 1259 OID 386697)
 -- Dependencies: 5
--- Name: group; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: group_; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE "group" (
+CREATE TABLE group_ (
     groupid integer NOT NULL,
     creatorid bigint,
     parentgroupid bigint,
@@ -159,7 +159,7 @@ CREATE SEQUENCE group_groupid_seq
 -- Name: group_groupid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE group_groupid_seq OWNED BY "group".groupid;
+ALTER SEQUENCE group_groupid_seq OWNED BY group_.groupid;
 
 
 --
@@ -315,12 +315,11 @@ SELECT pg_catalog.setval('oldpwd_id_seq', 1, false);
 --
 -- TOC entry 1519 (class 1259 OID 386678)
 -- Dependencies: 5
--- Name: user; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE "user" (
+CREATE TABLE user_ (
     userid integer NOT NULL,
-    createdate timestamp without time zone NOT NULL,
     deldate timestamp without time zone,
     modifieddate timestamp without time zone,
     defaultuser boolean,
@@ -351,7 +350,8 @@ CREATE TABLE "user" (
     lockoutdate timestamp without time zone,
     agreedtoterms boolean,
     active boolean,
-    state integer NOT NULL
+    state integer NOT NULL,
+    createdate timestamp without time zone
 );
 
 
@@ -375,7 +375,7 @@ CREATE SEQUENCE user_userid_seq
 -- Name: user_userid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_userid_seq OWNED BY "user".userid;
+ALTER SEQUENCE user_userid_seq OWNED BY user_.userid;
 
 
 --
@@ -384,7 +384,7 @@ ALTER SEQUENCE user_userid_seq OWNED BY "user".userid;
 -- Name: user_userid_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('user_userid_seq', 1, false);
+SELECT pg_catalog.setval('user_userid_seq', 4, true);
 
 
 --
@@ -397,7 +397,7 @@ CREATE TABLE users_groups (
     groupid bigint NOT NULL,
     userid bigint NOT NULL,
     creationdate timestamp without time zone NOT NULL,
-    deletiondate timestamp without time zone NOT NULL
+    deletiondate timestamp without time zone
 );
 
 
@@ -470,7 +470,7 @@ ALTER TABLE emailstate ALTER COLUMN id SET DEFAULT nextval('emailstate_id_seq'::
 -- Name: groupid; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE "group" ALTER COLUMN groupid SET DEFAULT nextval('group_groupid_seq'::regclass);
+ALTER TABLE group_ ALTER COLUMN groupid SET DEFAULT nextval('group_groupid_seq'::regclass);
 
 
 --
@@ -506,7 +506,7 @@ ALTER TABLE oldpwd ALTER COLUMN id SET DEFAULT nextval('oldpwd_id_seq'::regclass
 -- Name: userid; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE "user" ALTER COLUMN userid SET DEFAULT nextval('user_userid_seq'::regclass);
+ALTER TABLE user_ ALTER COLUMN userid SET DEFAULT nextval('user_userid_seq'::regclass);
 
 
 --
@@ -537,9 +537,11 @@ ALTER TABLE userstate ALTER COLUMN id SET DEFAULT nextval('userstate_id_seq'::re
 --
 -- TOC entry 1848 (class 0 OID 386697)
 -- Dependencies: 1523
--- Data for Name: group; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: group_; Type: TABLE DATA; Schema: public; Owner: -
 --
 
+INSERT INTO group_ (groupid, creatorid, parentgroupid, name, description, active, deldate) VALUES (1, 1, NULL, 'admin', 'admin', true, NULL);
+INSERT INTO group_ (groupid, creatorid, parentgroupid, name, description, active, deldate) VALUES (2, 1, NULL, 'users', 'user', true, NULL);
 
 
 --
@@ -569,9 +571,10 @@ ALTER TABLE userstate ALTER COLUMN id SET DEFAULT nextval('userstate_id_seq'::re
 --
 -- TOC entry 1846 (class 0 OID 386678)
 -- Dependencies: 1519
--- Data for Name: user; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: user_; Type: TABLE DATA; Schema: public; Owner: -
 --
 
+INSERT INTO user_ (userid, deldate, modifieddate, defaultuser, extauth, pwd, pwdencrypted, pwdreset, pwdmoddate, digest, remquestion, remans, gracelogincount, screenname, emailaddress, greeting, comments, firstname, middlename, lastname, jobtitle, logindate, loginip, lastlogindate, lastloginip, lastfailedlogindate, failedloginattempts, lockout, lockoutdate, agreedtoterms, active, state, createdate) VALUES (1, NULL, NULL, NULL, NULL, 'admin', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'admin@manydesigns.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL);
 
 
 --
@@ -580,6 +583,8 @@ ALTER TABLE userstate ALTER COLUMN id SET DEFAULT nextval('userstate_id_seq'::re
 -- Data for Name: users_groups; Type: TABLE DATA; Schema: public; Owner: -
 --
 
+INSERT INTO users_groups (groupid, userid, creationdate, deletiondate) VALUES (2, 1, '2010-08-24 00:00:00', NULL);
+INSERT INTO users_groups (groupid, userid, creationdate, deletiondate) VALUES (1, 1, '2010-08-24 00:00:00', NULL);
 
 
 --
@@ -588,6 +593,7 @@ ALTER TABLE userstate ALTER COLUMN id SET DEFAULT nextval('userstate_id_seq'::re
 -- Data for Name: userstate; Type: TABLE DATA; Schema: public; Owner: -
 --
 
+INSERT INTO userstate (id, name, description) VALUES (1, 'active', NULL);
 
 
 --
@@ -626,7 +632,7 @@ ALTER TABLE ONLY emailstate
 -- Name: group_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY "group"
+ALTER TABLE ONLY group_
     ADD CONSTRAINT group_pkey PRIMARY KEY (groupid);
 
 
@@ -656,7 +662,7 @@ ALTER TABLE ONLY msgstate
 -- Name: user_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY "user"
+ALTER TABLE ONLY user_
     ADD CONSTRAINT user_pkey PRIMARY KEY (userid);
 
 
@@ -696,8 +702,8 @@ ALTER TABLE ONLY emailqueue
 -- Name: fk_group_1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "group"
-    ADD CONSTRAINT fk_group_1 FOREIGN KEY (creatorid) REFERENCES "user"(userid) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY group_
+    ADD CONSTRAINT fk_group_1 FOREIGN KEY (creatorid) REFERENCES user_(userid) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -717,7 +723,7 @@ ALTER TABLE ONLY msg
 --
 
 ALTER TABLE ONLY msg
-    ADD CONSTRAINT fk_msg_2 FOREIGN KEY (add_userid) REFERENCES "user"(userid) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT fk_msg_2 FOREIGN KEY (add_userid) REFERENCES user_(userid) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -727,7 +733,7 @@ ALTER TABLE ONLY msg
 --
 
 ALTER TABLE ONLY msg
-    ADD CONSTRAINT fk_msg_3 FOREIGN KEY (sender_userid) REFERENCES "user"(userid) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT fk_msg_3 FOREIGN KEY (sender_userid) REFERENCES user_(userid) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -737,7 +743,7 @@ ALTER TABLE ONLY msg
 --
 
 ALTER TABLE ONLY oldpwd
-    ADD CONSTRAINT fk_oldpwd_1 FOREIGN KEY (userid) REFERENCES "user"(userid) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT fk_oldpwd_1 FOREIGN KEY (userid) REFERENCES user_(userid) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -746,7 +752,7 @@ ALTER TABLE ONLY oldpwd
 -- Name: fk_user_1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "user"
+ALTER TABLE ONLY user_
     ADD CONSTRAINT fk_user_1 FOREIGN KEY (state) REFERENCES userstate(id) DEFERRABLE INITIALLY DEFERRED;
 
 
@@ -757,10 +763,10 @@ ALTER TABLE ONLY "user"
 --
 
 ALTER TABLE ONLY users_groups
-    ADD CONSTRAINT fk_usersgroups_1 FOREIGN KEY (userid) REFERENCES "user"(userid) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT fk_usersgroups_1 FOREIGN KEY (userid) REFERENCES user_(userid) DEFERRABLE INITIALLY DEFERRED;
 
 
--- Completed on 2010-08-23 11:48:59 CEST
+-- Completed on 2010-08-25 11:01:45 CEST
 
 --
 -- PostgreSQL database dump complete

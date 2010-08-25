@@ -53,10 +53,11 @@ public class Table {
     protected String databaseName;
     protected String schemaName;
     protected String tableName;
-    protected final List<Column> columns;
+    protected List<Column> columns;
     protected final List<Relationship> manyToOneRelationships;
     protected final List<Relationship> oneToManyRelationships;
     protected PrimaryKey primaryKey;
+    protected boolean m2m;
 
     public static final Logger logger = LogUtil.getLogger(Table.class);
 
@@ -71,8 +72,10 @@ public class Table {
         this.columns = new ArrayList<Column>();
         this.manyToOneRelationships = new ArrayList<Relationship>();
         this.oneToManyRelationships = new ArrayList<Relationship>();
-     }
+        this.m2m = false;
+    }
 
+    
     //**************************************************************************
     // Getters/setter
     //**************************************************************************
@@ -119,6 +122,14 @@ public class Table {
 
     public void setPrimaryKey(PrimaryKey primaryKey) {
         this.primaryKey = primaryKey;
+    }
+
+    public boolean isM2m() {
+        return m2m;
+    }
+
+    public void setM2m(boolean m2m) {
+        this.m2m = m2m;
     }
 
     public String getQualifiedName() {
