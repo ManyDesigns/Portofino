@@ -32,6 +32,8 @@ package com.manydesigns.elements;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,19 +44,27 @@ public class Util {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+
+    static Pattern pattern = Pattern.compile("\\p{Alpha}*:");
+
     public static String getAbsoluteLink(HttpServletRequest req,
-                                         String link) {
+                                         String url) {
         StringBuilder sb = new StringBuilder();
+
+        Matcher matcher = pattern.matcher(url);
+        if (matcher.lookingAt()) {
+            return url;
+        }
 
         if (!"/".equals(req.getContextPath())) {
             sb.append(req.getContextPath());
         }
 
-        if (!link.startsWith("/")) {
+        if (!url.startsWith("/")) {
             sb.append("/");
         }
 
-        sb.append(link);
+        sb.append(url);
 
         return sb.toString();
     }

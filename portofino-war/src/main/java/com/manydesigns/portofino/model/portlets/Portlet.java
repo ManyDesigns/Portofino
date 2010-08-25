@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.model.portlets;
 
+import com.manydesigns.elements.annotations.Label;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -38,38 +40,81 @@ public class Portlet {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    protected final String name;
-    protected final String title;
-    protected final String legend;
-    protected final String database;
-    protected final String sql;
+    protected String name;
+    protected String type;
+    protected String title;
+    protected String legend;
+    protected String database;
+    protected String sql;
+    protected String urlExpression;
 
-    public Portlet(String name, String title, String legend,
-                   String database, String sql) {
+    public Portlet(String name, String type, String title, String legend,
+                   String database, String sql, String urlExpression) {
         this.name = name;
+        this.type = type;
         this.title = title;
         this.legend = legend;
         this.database = database;
         this.sql = sql;
+        this.urlExpression = urlExpression;
     }
 
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getTitle() {
         return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getLegend() {
         return legend;
     }
 
+    public void setLegend(String legend) {
+        this.legend = legend;
+    }
+
     public String getDatabase() {
         return database;
     }
 
+    public void setDatabase(String database) {
+        this.database = database;
+    }
+
+    @Label("SQL")
     public String getSql() {
         return sql;
     }
+
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
+
+    @Label("URL expression")
+    public String getUrlExpression() {
+        return urlExpression;
+    }
+
+    public void setUrlExpression(String urlExpression) {
+        this.urlExpression = urlExpression;
+    }
+    
 }

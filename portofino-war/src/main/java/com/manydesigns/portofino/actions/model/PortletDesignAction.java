@@ -30,8 +30,10 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.Util;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.jfreechart.JBla;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.PortofinoAction;
@@ -40,13 +42,13 @@ import com.manydesigns.portofino.model.portlets.Portlet;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
 import com.manydesigns.portofino.util.TempFiles;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.DrawingSupplier;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.chart.title.Title;
+import org.jfree.chart.urls.PieURLGenerator;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.ui.HorizontalAlignment;
 import org.jfree.ui.RectangleEdge;
@@ -58,6 +60,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.logging.Logger;
 
 /*
@@ -74,7 +77,6 @@ public class PortletDesignAction extends PortofinoAction {
     //**************************************************************************
 
     public static final String CHART_FILENAME_FORMAT = "chart-{0}.png";
-
 
     //**************************************************************************
     // Web parameters
@@ -110,6 +112,7 @@ public class PortletDesignAction extends PortofinoAction {
     public Form form;
     public Form displayForm;
     public JFreeChart chart;
+    public JBla bla;
     public String fileName;
     public InputStream inputStream;
 
@@ -137,7 +140,8 @@ public class PortletDesignAction extends PortofinoAction {
         setupPortlet();
 
         form = new FormBuilder(Portlet.class)
-                .configFields("name", "title", "legend", "database", "sql")
+                .configFields("name", "title", "legend", "database",
+                        "sql", "urlExpression")
                 .build();
         form.setMode(Mode.VIEW);
         form.readFromObject(portlet);
@@ -150,13 +154,19 @@ public class PortletDesignAction extends PortofinoAction {
 
         // Run/generate the chart
         generateChart();
-        setGraphicalElements();
 
         chartId = TempFiles.generateRandomCode();
+
+        String portletUrl = Util.getAbsoluteUrl(
+                MessageFormat.format(
+                        "/model/{0}/PortletDesign!chart.action?chartId={1}",
+                        portletName, chartId));
+
         try {
             File file = TempFiles.getTempFile(CHART_FILENAME_FORMAT, chartId);
             fileName = file.getName();
-            ChartUtilities.saveChartAsPNG(file, chart, width, height);
+
+            bla = new JBla(chart, file, width, height, portletUrl);
         } catch (java.io.IOException e) {
             LogUtil.warning(logger, "Could not save portlet", e);
             SessionMessages.addErrorMessage(e.getMessage());
@@ -182,10 +192,8 @@ public class PortletDesignAction extends PortofinoAction {
         }
 
         chart = ChartFactory.createPieChart(portlet.getTitle(), dataset,
-                                true, false, false);
-    }
+                                true, true, true);
 
-    private void setGraphicalElements() {
         chart.setAntiAlias(antiAlias);
 
         // impostiamo il bordo invisibile
@@ -200,7 +208,11 @@ public class PortletDesignAction extends PortofinoAction {
         // ottieni il Plot
         PiePlot plot = (PiePlot) chart.getPlot();
 
-//        plot.setURLGenerator(urlGenerator);
+        PieURLGenerator urlGenerator =
+                new PortletPieUrlGenerator(portlet.getUrlExpression());
+        plot.setURLGenerator(urlGenerator);
+
+
         // il plot ha sfondo e bordo trasparente
         // (quindi si vede il colore del chart)
         plot.setBackgroundPaint(transparentColor);
@@ -240,7 +252,7 @@ public class PortletDesignAction extends PortofinoAction {
         legend.setMargin(0.0, legendMargin, legendMargin, legendMargin);
         legend.setBackgroundPaint(transparentColor);
 
-        // adesso che sappaimo l'altezza impostiamo un gradiente orizzontale
+        // impostiamo un gradiente orizzontale
         Paint chartBgPaint = new GradientPaint(0, 0, new Color(255, 253, 240),
                 0, height, Color.WHITE);
         chart.setBackgroundPaint(chartBgPaint);
