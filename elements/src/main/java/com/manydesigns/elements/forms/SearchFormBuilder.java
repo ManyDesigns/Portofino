@@ -29,12 +29,12 @@
 
 package com.manydesigns.elements.forms;
 
-import com.manydesigns.elements.fields.helpers.FieldHelperManager;
+import com.manydesigns.elements.fields.helpers.FieldManager;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -65,8 +65,10 @@ public class SearchFormBuilder {
     // Constructors
     //**************************************************************************
 
-    public SearchFormBuilder(Class clazz) {
-        this(new JavaClassAccessor(clazz));
+    public SearchFormBuilder(Object aClass) {
+        this(ClassAccessorManager
+                .getManager()
+                .tryToInstantiateFromClass(aClass));
     }
 
     public SearchFormBuilder(ClassAccessor classAccessor) {
@@ -134,7 +136,7 @@ public class SearchFormBuilder {
         LogUtil.entering(logger, "build");
 
         SearchForm searchForm = new SearchForm();
-        FieldHelperManager manager = FieldHelperManager.getManager();
+        FieldManager manager = FieldManager.getManager();
 
         if (propertyAccessors == null) {
             configReflectiveFields();

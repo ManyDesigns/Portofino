@@ -29,14 +29,17 @@
 
 package com.manydesigns.elements.text;
 
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.JavaClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
-import org.apache.commons.beanutils.ConvertUtils;
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.Util;
+import com.manydesigns.elements.logging.LogUtil;
+import ognl.Ognl;
+import ognl.OgnlException;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,29 +56,21 @@ public class ExpressionGenerator implements Generator {
     // Fields
     //**************************************************************************
 
-    public final Pattern pattern = Pattern.compile("\\{[^\\}]*\\}");
+    public static final Pattern pattern = Pattern.compile("%\\{[^\\}]*\\}");
 
     protected final String parsedExpression;
-    protected final List<PropertyAccessor> propertyAccessors;
+    protected final Object[] ognlExpressions;
+    protected boolean url = false;
 
+    public static final Logger logger =
+            LogUtil.getLogger(ExpressionGenerator.class);
 
     //**************************************************************************
-    // Constructors
+    // Static initialization/methods
     //**************************************************************************
 
-    public ExpressionGenerator(Class clazz, String expression) {
-        this(new JavaClassAccessor(clazz), expression);
-    }
-
-    public ExpressionGenerator(ClassAccessor classAccessor, String expression) {
-        propertyAccessors = new ArrayList<PropertyAccessor>();
-        parsedExpression =
-                parseExpression(classAccessor, expression, propertyAccessors);
-    }
-
-    protected String parseExpression(ClassAccessor classAccessor,
-                                   String expression,
-                                   List<PropertyAccessor> propertyAccessors) {
+    public static ExpressionGenerator create(String expression) {
+        List<Object> ognlExpressions = new ArrayList<Object>();
         Matcher m = pattern.matcher(expression);
         int previousEnd = 0;
         StringBuilder sb = new StringBuilder();
@@ -88,42 +83,90 @@ public class ExpressionGenerator implements Generator {
             sb.append("}");
             int end = m.end();
             String group = m.group();
-            String name = group.substring(1, group.length()-1);
-            PropertyAccessor propertyAccessor;
+            String ognlString = group.substring(2, group.length()-1);
             try {
-                propertyAccessor = classAccessor.getProperty(name);
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
+                Object ognlExpression = Ognl.parseExpression(ognlString);
+                ognlExpressions.add(ognlExpression);
+            } catch (OgnlException e) {
+                LogUtil.warningMF(logger,
+                        "Could not parse: {0}", e , ognlString);
                 return null;
             }
-            propertyAccessors.add(propertyAccessor);
             previousEnd = end;
             index++;
         }
         sb.append(expression.substring(previousEnd, expression.length()));
-        return sb.toString();
+
+        String parsedExpression = sb.toString();
+
+        Object[] ognlExpressionsArray = new Object[ognlExpressions.size()];
+        ognlExpressions.toArray(ognlExpressionsArray);
+
+        return new ExpressionGenerator(parsedExpression, ognlExpressionsArray);
     }
 
+    public static String generate(String expression, Object root) {
+        return create(expression).generate(root);
+    }
+
+    //**************************************************************************
+    // Constructors
+    //**************************************************************************
+
+    public ExpressionGenerator(String parsedExpression,
+                               Object[] ognlExpressions) {
+        this.parsedExpression = parsedExpression;
+        this.ognlExpressions = ognlExpressions;
+    }
 
     //**************************************************************************
     // Generator implementation
     //**************************************************************************
 
-    public String generate(Object obj) {
-        if (obj == null) {
-            return null;
-        }
+    public String generate(Object root) {
+        Map ognlContext = ElementsThreadLocals.getOgnlContext();
         try {
-            String[] args = new String[propertyAccessors.size()];
+            String[] args = new String[ognlExpressions.length];
             for (int i = 0; i < args.length; i++) {
-                Object value = propertyAccessors.get(i).get(obj);
-                String stringValue = ConvertUtils.convert(value);
-                args[i] = stringValue;
+                Object ognlExpression = ognlExpressions[i];
+                String value;
+                if (ognlContext == null) {
+                    value = (String) Ognl.getValue(
+                            ognlExpression, root, String.class);
+                } else {
+                    value = (String) Ognl.getValue(
+                            ognlExpression, ognlContext, root, String.class);
+                }
+                args[i] = url ? Util.urlencode(value) : value;
             }
-            return MessageFormat.format(parsedExpression, args);
+            String result = MessageFormat.format(parsedExpression, args);
+            if (url) {
+                result = Util.getAbsoluteUrl(result);
+            }
+            return result;
         } catch (Throwable e) {
+            LogUtil.warning(logger, "Error during expression generation", e);
             return null;
         }
     }
 
+    //**************************************************************************
+    // Getters and setters
+    //**************************************************************************
+
+    public boolean isUrl() {
+        return url;
+    }
+
+    public void setUrl(boolean url) {
+        this.url = url;
+    }
+
+    public String getParsedExpression() {
+        return parsedExpression;
+    }
+
+    public Object[] getOgnlExpressions() {
+        return ognlExpressions;
+    }
 }

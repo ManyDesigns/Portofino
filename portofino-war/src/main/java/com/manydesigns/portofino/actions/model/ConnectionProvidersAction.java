@@ -35,8 +35,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.text.Generator;
-import com.manydesigns.elements.text.HrefExpressionGenerator;
+import com.manydesigns.elements.text.ExpressionGenerator;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
@@ -80,10 +79,11 @@ public class ConnectionProvidersAction extends PortofinoAction {
     public String search() {
         connectionProviders = context.getConnectionProviders();
 
-        Generator hrefGenerator =
-                new HrefExpressionGenerator(ConnectionProvider.class,
+        ExpressionGenerator hrefGenerator =
+                ExpressionGenerator.create(
                         "/model/ConnectionProviders.action?" +
-                                "databaseName={databaseName}");
+                                "databaseName=%{databaseName}");
+        hrefGenerator.setUrl(true);
 
         tableForm = new TableFormBuilder(ConnectionProvider.class)
                 .configFields("databaseName", "description", "status")

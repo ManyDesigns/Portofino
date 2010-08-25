@@ -32,6 +32,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>ognl</groupId>
+            <artifactId>ognl</artifactId>
+            <version>${ognl.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
             <version>${jsp.api.version}</version>

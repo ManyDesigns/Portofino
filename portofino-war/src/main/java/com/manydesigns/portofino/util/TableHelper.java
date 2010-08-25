@@ -33,7 +33,6 @@ import com.manydesigns.elements.text.ExpressionGenerator;
 import com.manydesigns.elements.text.Generator;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -58,12 +57,11 @@ public class TableHelper {
             } else {
                 sb.append(",");
             }
-            sb.append("{");
+            sb.append("%{");
             sb.append(column.getColumnName());
             sb.append("}");
         }
-        TableAccessor accessor = new TableAccessor(table);
-        return new ExpressionGenerator(accessor, sb.toString());
+        return ExpressionGenerator.create(sb.toString());
     }
 
     public HashMap<String, Object> parsePkString(Table table, String pkString) {

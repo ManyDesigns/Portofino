@@ -13,6 +13,7 @@
         <servlet.api.version>2.4</servlet.api.version>
         <jsp.api.version>2.1</jsp.api.version>
         <struts.version>2.1.8.1</struts.version>
+        <ognl.version>2.7.3</ognl.version>
         <hibernate.version>3.5.1-Final</hibernate.version>
         <commons.lang.version>2.4</commons.lang.version>
         <commons.beanutils.version>1.8.0</commons.beanutils.version>

@@ -30,11 +30,11 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.helpers.FieldHelperManager;
+import com.manydesigns.elements.fields.helpers.FieldManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 import com.manydesigns.elements.text.Generator;
 import org.apache.commons.lang.StringUtils;
 
@@ -72,8 +72,10 @@ public class TableFormBuilder {
     // Constructors
     //**************************************************************************
 
-    public TableFormBuilder(Class clazz) {
-        this(new JavaClassAccessor(clazz));
+    public TableFormBuilder(Object aClass) {
+        this(ClassAccessorManager
+                .getManager()
+                .tryToInstantiateFromClass(aClass));
     }
 
     public TableFormBuilder(ClassAccessor classAccessor) {
@@ -141,7 +143,7 @@ public class TableFormBuilder {
 
     public TableForm build() {
         TableForm tableForm = new TableForm(nRows);
-        FieldHelperManager manager = FieldHelperManager.getManager();
+        FieldManager manager = FieldManager.getManager();
 
         if (propertyAccessors == null) {
             configReflectiveFields();

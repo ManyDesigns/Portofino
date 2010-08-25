@@ -47,39 +47,59 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class FieldHelperManager implements FieldHelper {
+public class FieldManager implements FieldHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //**************************************************************************
+    // Static fields
+    //**************************************************************************
+
     protected static final Properties elementsProperties;
-    protected static final FieldHelperManager manager;
+    protected static final FieldManager manager;
 
     public static final Logger logger =
-            LogUtil.getLogger(FieldHelperManager.class);
+            LogUtil.getLogger(FieldManager.class);
 
-    protected ArrayList<FieldHelper> fieldHelperList;
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
+    protected final ClassLoader cl;
+    protected final ArrayList<FieldHelper> helperList;
+
+
+    //**************************************************************************
+    // Static initialization and methods
+    //**************************************************************************
 
     static {
         elementsProperties = ElementsProperties.getProperties();
         String managerClassName =
                 elementsProperties.getProperty(
-                        ElementsProperties.FIELDS_HELPERS_MANAGER_PROPERTY);
-        InstanceBuilder<FieldHelperManager> builder =
-                new InstanceBuilder<FieldHelperManager>(
-                        FieldHelperManager.class,
-                        FieldHelperManager.class,
+                        ElementsProperties.FIELD_MANAGER_PROPERTY);
+        InstanceBuilder<FieldManager> builder =
+                new InstanceBuilder<FieldManager>(
+                        FieldManager.class,
+                        FieldManager.class,
                         logger);
         manager = builder.createInstance(managerClassName);
     }
 
-    public static FieldHelperManager getManager() {
+    public static FieldManager getManager() {
         return manager;
     }
 
-    public FieldHelperManager() {
-        fieldHelperList = new ArrayList<FieldHelper>();
+
+    //**************************************************************************
+    // Constructors and initialization
+    //**************************************************************************
+
+    public FieldManager() {
+        cl = FieldManager.class.getClassLoader();
+        helperList = new ArrayList<FieldHelper>();
         String listString = elementsProperties.getProperty(
-                ElementsProperties.FIELDS_HELPERS_LIST_PROPERTY);
+                ElementsProperties.FIELD_HELPERS_LIST_PROPERTY);
         if (listString == null) {
             logger.finer("Empty list");
             return;
@@ -91,8 +111,8 @@ public class FieldHelperManager implements FieldHelper {
         }
     }
 
-    protected void addFieldHelper(String fieldHelperClassName) {
-        ClassLoader cl = FieldHelperManager.class.getClassLoader();
+    public void addFieldHelper(String fieldHelperClassName) {
+        ClassLoader cl = FieldManager.class.getClassLoader();
 
         String helperClassName = fieldHelperClassName.trim();
         LogUtil.finerMF(logger,
@@ -101,17 +121,21 @@ public class FieldHelperManager implements FieldHelper {
             Class helperClass = cl.loadClass(helperClassName);
             Constructor constructor = helperClass.getConstructor();
             FieldHelper helper = (FieldHelper)constructor.newInstance();
-            fieldHelperList.add(helper);
+            helperList.add(helper);
         } catch (Throwable e) {
             LogUtil.warningMF(logger, "Cannot load or instanciate: {0}", e,
                     helperClassName);
         }
     }
 
+    //**************************************************************************
+    // FieldHelper implementation
+    //**************************************************************************
+
     public Field tryToInstantiateField(ClassAccessor classAccessor,
                                   PropertyAccessor propertyAccessor,
                                   String prefix) {
-        for (FieldHelper current : fieldHelperList) {
+        for (FieldHelper current : helperList) {
             Field result = current.tryToInstantiateField(classAccessor,
                     propertyAccessor, prefix);
             if (result != null) {
@@ -125,7 +149,7 @@ public class FieldHelperManager implements FieldHelper {
             ClassAccessor classAccessor,
             PropertyAccessor propertyAccessor,
             String prefix) {
-        for (FieldHelper current : fieldHelperList) {
+        for (FieldHelper current : helperList) {
             SearchField result =
                     current.tryToInstantiateSearchField(
                             classAccessor, propertyAccessor, prefix);

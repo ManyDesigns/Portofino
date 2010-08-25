@@ -30,26 +30,23 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.Util;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.text.Generator;
-import com.manydesigns.elements.text.HrefExpressionGenerator;
+import com.manydesigns.elements.text.ExpressionGenerator;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RelatedTableForm;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.Relationship;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.TableHelper;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,8 +98,6 @@ public class TableDataAction extends PortofinoAction
     //**************************************************************************
 
     public Table table;
-    public TableAccessor tableAccessor;
-
 
     //**************************************************************************
     // Model objects
@@ -155,7 +150,6 @@ public class TableDataAction extends PortofinoAction
         if (table == null) {
             throw new ModelObjectNotFoundError(qualifiedTableName);
         }
-        tableAccessor = new TableAccessor(table);
     }
 
     //**************************************************************************
@@ -166,7 +160,7 @@ public class TableDataAction extends PortofinoAction
         setupTable();
 
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
+                new SearchFormBuilder(table);
         searchForm = searchFormBuilder.build();
         configureSearchFormFromString();
 
@@ -198,7 +192,7 @@ public class TableDataAction extends PortofinoAction
         setupTable();
 
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
+                new SearchFormBuilder(table);
         searchForm = searchFormBuilder.build();
         searchForm.readFromRequest(req);
 
@@ -216,11 +210,12 @@ public class TableDataAction extends PortofinoAction
         objects = context.getObjects(criteria);
 
         String readLinkExpression = getReadLinkExpression();
-        Generator hrefGenerator =
-                new HrefExpressionGenerator(tableAccessor, readLinkExpression);
+        ExpressionGenerator hrefGenerator =
+                ExpressionGenerator.create(readLinkExpression);
+        hrefGenerator.setUrl(true);
 
         TableFormBuilder tableFormBuilder =
-                new TableFormBuilder(tableAccessor)
+                new TableFormBuilder(table)
                         .configNRows(objects.size());
 
         // ogni colonna chiave primaria sarà clickabile
@@ -238,19 +233,6 @@ public class TableDataAction extends PortofinoAction
         return SEARCH;
     }
 
-    public String urlencode(String s) {
-        if (s == null) {
-            return null;
-        } else {
-            try {
-                return URLEncoder.encode(s, "ISO-8859-1");
-            } catch (UnsupportedEncodingException e) {
-                throw new Error(e);
-            }
-        }
-    }
-
-
 
     public String getReadLinkExpression() {
         StringBuilder sb = new StringBuilder("/model/");
@@ -263,13 +245,13 @@ public class TableDataAction extends PortofinoAction
             } else {
                 sb.append(",");
             }
-            sb.append("{");
+            sb.append("%{");
             sb.append(column.getColumnName());
             sb.append("}");
         }
         if (searchString != null) {
             sb.append("&searchString=");
-            sb.append(urlencode(searchString));
+            sb.append(Util.urlencode(searchString));
         }
         return sb.toString();
     }
@@ -292,7 +274,7 @@ public class TableDataAction extends PortofinoAction
         HashMap<String, Object> pkMap = tableHelper.parsePkString(table, pk);
 
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
+                new SearchFormBuilder(table);
         searchForm = searchFormBuilder.build();
         configureSearchFormFromString();
 
@@ -301,8 +283,7 @@ public class TableDataAction extends PortofinoAction
         objects = context.getObjects(criteria);
 
         object = context.getObjectByPk(qualifiedTableName, pkMap);
-        FormBuilder formBuilder =
-                new FormBuilder(tableAccessor);
+        FormBuilder formBuilder = new FormBuilder(table);
         form = formBuilder.build();
         form.setMode(Mode.VIEW);
         form.readFromObject(object);
@@ -322,7 +303,7 @@ public class TableDataAction extends PortofinoAction
 
         Table relatedTable = relationship.getFromTable();
         TableFormBuilder tableFormBuilder =
-                new TableFormBuilder(new TableAccessor(relatedTable));
+                new TableFormBuilder(relatedTable);
         tableFormBuilder.configNRows(relatedObjects.size());
         TableForm tableForm = tableFormBuilder.build();
         tableForm.setMode(Mode.VIEW);
@@ -340,7 +321,7 @@ public class TableDataAction extends PortofinoAction
     public String create() {
         setupTable();
 
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
+        FormBuilder formBuilder = new FormBuilder(table);
         form = formBuilder.build();
         form.setMode(Mode.CREATE);
 
@@ -350,7 +331,7 @@ public class TableDataAction extends PortofinoAction
     public String save() {
         setupTable();
 
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
+        FormBuilder formBuilder = new FormBuilder(table);
         form = formBuilder.build();
         form.setMode(Mode.CREATE);
 
@@ -378,7 +359,7 @@ public class TableDataAction extends PortofinoAction
 
         object = context.getObjectByPk(qualifiedTableName, pkMap);
 
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
+        FormBuilder formBuilder = new FormBuilder(table);
         form = formBuilder.build();
         form.setMode(Mode.EDIT);
 
@@ -391,7 +372,7 @@ public class TableDataAction extends PortofinoAction
         setupTable();
         HashMap<String, Object> pkMap = tableHelper.parsePkString(table, pk);
 
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
+        FormBuilder formBuilder = new FormBuilder(table);
         form = formBuilder.build();
         form.setMode(Mode.EDIT);
 
@@ -422,7 +403,7 @@ public class TableDataAction extends PortofinoAction
 
         setupTable();
 
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
+        FormBuilder formBuilder = new FormBuilder(table);
         form = formBuilder.build();
         form.setMode(Mode.BULK_EDIT);
 
@@ -432,7 +413,7 @@ public class TableDataAction extends PortofinoAction
     public String bulkUpdate() {
         setupTable();
 
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
+        FormBuilder formBuilder = new FormBuilder(table);
         form = formBuilder.build();
         form.setMode(Mode.BULK_EDIT);
         form.readFromRequest(req);

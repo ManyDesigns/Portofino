@@ -32,6 +32,7 @@ package com.manydesigns.elements;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -46,6 +47,7 @@ public class ElementsContext {
     protected HttpServletRequest httpServletRequest;
     protected HttpServletResponse httpServletResponse;
     protected ServletContext servletContext;
+    protected Map ognlContext;
 
     //**************************************************************************
     // Constructors
@@ -86,5 +88,13 @@ public class ElementsContext {
 
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
+    }
+
+    public Map getOgnlContext() {
+        return ognlContext;
+    }
+
+    public void setOgnlContext(Map ognlContext) {
+        this.ognlContext = ognlContext;
     }
 }

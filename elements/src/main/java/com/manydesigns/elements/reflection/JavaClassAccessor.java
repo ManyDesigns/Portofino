@@ -29,6 +29,8 @@
 
 package com.manydesigns.elements.reflection;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -103,5 +105,12 @@ public class JavaClassAccessor implements ClassAccessor {
 
     public Class getJavaClass() {
         return javaClass;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("javaClass", javaClass)
+                .toString();
     }
 }

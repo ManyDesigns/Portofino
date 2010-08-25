@@ -39,7 +39,6 @@ import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.reflection.TableAccessor;
 
 import java.util.logging.Logger;
 
@@ -72,7 +71,6 @@ public class TableDesignAction extends PortofinoAction {
     //**************************************************************************
 
     public Table table;
-    public TableAccessor tableAccessor;
 
 
     //**************************************************************************

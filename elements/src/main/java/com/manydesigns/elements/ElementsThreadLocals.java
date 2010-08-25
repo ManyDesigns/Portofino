@@ -32,6 +32,7 @@ package com.manydesigns.elements;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -97,6 +98,16 @@ public final class ElementsThreadLocals {
     public static void setServletContext(ServletContext servletContext) {
         getElementsContext().setServletContext(servletContext);
     }
+
+    public static Map getOgnlContext() {
+        return getElementsContext().getOgnlContext();
+    }
+
+    public static void setOgnlContext(Map context) {
+        getElementsContext().setOgnlContext(context);
+    }
+
+
 
     //**************************************************************************
     // i18n

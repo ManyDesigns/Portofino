@@ -27,17 +27,29 @@
  *
  */
 
-package com.manydesigns.elements.text;
+package com.manydesigns.elements.reflection.helpers;
+
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface Generator {
+public class JavaClassAccessorHelper implements ClassAccessorHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public String generate(Object root);
+    public ClassAccessor tryToInstantiateFromClass(Object aClass) {
+        if (aClass instanceof Class) {
+            return new JavaClassAccessor((Class)aClass);
+        } else {
+            return null;
+        }
+    }
 
+    public ClassAccessor tryToInstantiateObject(Object object) {
+        return tryToInstantiateFromClass(object.getClass());
+    }
 }

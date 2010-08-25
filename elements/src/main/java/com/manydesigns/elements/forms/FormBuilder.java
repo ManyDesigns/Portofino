@@ -31,11 +31,11 @@ package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.annotations.FieldSet;
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.helpers.FieldHelperManager;
+import com.manydesigns.elements.fields.helpers.FieldManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -72,8 +72,10 @@ public class FormBuilder {
     // Constructors
     //**************************************************************************
 
-    public FormBuilder(Class clazz) {
-        this(new JavaClassAccessor(clazz));
+    public FormBuilder(Object aClass) {
+        this(ClassAccessorManager
+                .getManager()
+                .tryToInstantiateFromClass(aClass));
     }
 
     public FormBuilder(ClassAccessor classAccessor) {
@@ -187,7 +189,7 @@ public class FormBuilder {
         LogUtil.entering(logger, "build");
 
         Form form = new Form();
-        FieldHelperManager manager = FieldHelperManager.getManager();
+        FieldManager manager = FieldManager.getManager();
 
 
         if (groupedPropertyAccessors == null) {

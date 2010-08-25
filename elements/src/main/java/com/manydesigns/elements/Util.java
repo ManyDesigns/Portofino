@@ -30,6 +30,8 @@
 package com.manydesigns.elements;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -85,4 +87,15 @@ public class Util {
     }
 
 
+    public static String urlencode(String s) {
+        if (s == null) {
+            return null;
+        } else {
+            try {
+                return URLEncoder.encode(s, "ISO-8859-1");
+            } catch (UnsupportedEncodingException e) {
+                throw new Error(e);
+            }
+        }
+    }
 }

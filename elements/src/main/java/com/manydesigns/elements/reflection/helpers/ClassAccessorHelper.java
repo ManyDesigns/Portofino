@@ -27,9 +27,8 @@
  *
  */
 
-package com.manydesigns.elements.text;
+package com.manydesigns.elements.reflection.helpers;
 
-import com.manydesigns.elements.Util;
 import com.manydesigns.elements.reflection.ClassAccessor;
 
 /*
@@ -37,20 +36,10 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class HrefExpressionGenerator extends ExpressionGenerator {
+public interface ClassAccessorHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public HrefExpressionGenerator(Class clazz, String expression) {
-        super(clazz, expression);
-    }
-
-    public HrefExpressionGenerator(ClassAccessor classAccessor, String expression) {
-        super(classAccessor, expression);
-    }
-
-    @Override
-    public String generate(Object obj) {
-        return Util.getAbsoluteUrl(super.generate(obj));
-    }
+    ClassAccessor tryToInstantiateFromClass(Object aClass);
+    ClassAccessor tryToInstantiateObject(Object object);
 }
