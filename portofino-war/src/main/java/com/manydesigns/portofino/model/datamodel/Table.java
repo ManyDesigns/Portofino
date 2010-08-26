@@ -58,6 +58,7 @@ public class Table {
     protected final List<Relationship> oneToManyRelationships;
     protected PrimaryKey primaryKey;
     protected boolean m2m;
+    protected String className;
 
     public static final Logger logger = LogUtil.getLogger(Table.class);
 
@@ -135,6 +136,14 @@ public class Table {
     public String getQualifiedName() {
         return MessageFormat.format("{0}.{1}.{2}",
                 databaseName, schemaName, tableName);
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
     }
 
     //**************************************************************************

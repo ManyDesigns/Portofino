@@ -420,9 +420,9 @@ public class HibernateContextImpl implements Context {
 
         if (result.size()==1){
             User authUser = new User();
-            authUser.setUserid((Integer) result.get(0).get("userid"));
+            authUser.setUuid((Integer) result.get(0).get("userid"));
             authUser.setEmail((String) result.get(0).get("emailaddress"));
-            authUser.setPassword((String) result.get(0).get("pwd"));
+            authUser.setPwd((String) result.get(0).get("pwd"));
             setCurrentUser(authUser);
             return authUser;
         } else {

@@ -59,6 +59,7 @@ public class Relationship {
     protected String relationshipName;
     protected String onUpdate;
     protected String onDelete;
+    protected String classManyProperty;
 
     protected final List<Reference>references;
 
@@ -120,5 +121,13 @@ public class Relationship {
 
     public void setFromTable(Table fromTable) {
         this.fromTable = fromTable;
+    }
+
+    public String getClassManyProperty() {
+        return classManyProperty;
+    }
+
+    public void setClassManyProperty(String classManyProperty) {
+        this.classManyProperty = classManyProperty;
     }
 }
