@@ -49,7 +49,4 @@ public class JavaClassAccessorHelper implements ClassAccessorHelper {
         }
     }
 
-    public ClassAccessor tryToInstantiateObject(Object object) {
-        return tryToInstantiateFromClass(object.getClass());
-    }
 }

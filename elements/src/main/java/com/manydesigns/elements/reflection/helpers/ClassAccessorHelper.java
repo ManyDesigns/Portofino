@@ -41,5 +41,4 @@ public interface ClassAccessorHelper {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     ClassAccessor tryToInstantiateFromClass(Object aClass);
-    ClassAccessor tryToInstantiateObject(Object object);
 }

@@ -50,8 +50,4 @@ public class TableAccessorHelper implements ClassAccessorHelper {
         }
     }
 
-    public ClassAccessor tryToInstantiateObject(Object object) {
-        return null;
-    }
-
 }

@@ -157,16 +157,6 @@ public class ClassAccessorManager implements ClassAccessorHelper {
         return null;
     }
 
-    public ClassAccessor tryToInstantiateObject(Object object) {
-        for (ClassAccessorHelper current : helperList) {
-            ClassAccessor result = current.tryToInstantiateObject(object);
-            if (result != null) {
-                return result;
-            }
-        }
-        return null;
-    }
-
     //**************************************************************************
     // Getters and setters
     //**************************************************************************
