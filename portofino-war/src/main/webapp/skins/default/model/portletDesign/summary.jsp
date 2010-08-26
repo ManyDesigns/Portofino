@@ -9,17 +9,7 @@
         <h1>Portlet design summary: <s:property value="portlet.name"/></h1>
         <mdes:write value="form"/>
         <s:hidden name="cancelReturnUrl" value="%{cancelReturnUrl}"/>
-        <s:url var="imageUrl"
-               namespace="/model"
-               action="%{portletName}/PortletDesign"
-               method="chart"
-               escapeAmp="false">
-            <s:param name="chartId" value="%{chartId}"/>
-        </s:url>
-        <img src="<s:property value="#imageUrl"/>"
-             alt="Chart"
-             width="<s:property value="width"/>" 
-             height="<s:property value="height"/>"/>
+        <mdes:write value="bla"/>
         <h2>Display paramaters</h2>
         <mdes:write value="displayForm"/>
         <s:submit name="refresh" value="Refresh"/>

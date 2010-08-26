@@ -278,6 +278,13 @@
         </siteNode>
     </siteNodes>
     <portlets>
-        <portlet name="portlet1" title="Title 1" legend="category" database="jpetstore" sql="select category, count(*) from product group by category order by category"/>
+        <portlet name="portlet1"
+                 type="pieChart"
+                 title="Title 1"
+                 legend="category"
+                 database="jpetstore"
+                 sql="select category, count(*) from product group by category order by category"
+                 urlExpression="http://www.google.com/search?q=%{key}"
+                />
     </portlets>
 </model>

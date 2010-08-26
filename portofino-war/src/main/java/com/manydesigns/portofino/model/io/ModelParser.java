@@ -12,10 +12,10 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.text.MessageFormat;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -329,13 +329,18 @@ public class ModelParser extends XmlParser {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             checkRequiredAttributes(attributes,
-                    "name", "title", "legend", "database", "sql");
+                    "name", "type", "title", "legend", "database",
+                    "sql", "urlExpression");
             String name = attributes.get("name");
+            String type = attributes.get("type");
             String title = attributes.get("title");
             String legend = attributes.get("legend");
             String database = attributes.get("database");
             String sql = attributes.get("sql");
-            Portlet portlet = new Portlet(name, title, legend, database, sql);
+            String urlExpression = attributes.get("urlExpression");
+            Portlet portlet =
+                    new Portlet(name, type, title, legend, database,
+                            sql, urlExpression);
             model.getPortlets().add(portlet);
         }
     }
