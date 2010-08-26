@@ -31,6 +31,7 @@ package com.manydesigns.portofino.reflection;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.Table;
 
@@ -51,6 +52,7 @@ public class TableAccessor implements ClassAccessor {
 
     protected final Table table;
     protected final ColumnAccessor[] columnAccessors;
+    protected ClassAccessor javaClassAccessor = null;
 
 
     //**************************************************************************
@@ -58,6 +60,20 @@ public class TableAccessor implements ClassAccessor {
     //**************************************************************************
 
     public TableAccessor(Table table) {
+        String className = table.getClassName();
+        if (className != null) {
+            ClassLoader classLoader = TableAccessor.class.getClassLoader();
+            try {
+                Class clazz = classLoader.loadClass(className);
+                javaClassAccessor =
+                        ClassAccessorManager
+                                .getManager()
+                                .tryToInstantiateFromClass(clazz);
+            } catch (ClassNotFoundException e) {
+                // TODO:
+            }
+        }
+
         this.table = table;
         List<Column> columns = table.getColumns();
         List<Column> pkColumns = table.getPrimaryKey().getColumns();
@@ -65,7 +81,21 @@ public class TableAccessor implements ClassAccessor {
         int i = 0;
         for (Column current : columns) {
             boolean inPk = pkColumns.contains(current);
-            columnAccessors[i] = new ColumnAccessor(current, inPk);
+            PropertyAccessor nestedPropertyAccessor = null;
+            if (javaClassAccessor != null) {
+                String propertyName = current.getColumnName();
+                if (current.getClassProperty() != null) {
+                    propertyName = current.getClassProperty();
+                }
+                try {
+                    nestedPropertyAccessor =
+                            javaClassAccessor.getProperty(propertyName);
+                } catch (NoSuchFieldException e) {
+                    // TODO:
+                }
+            }
+            columnAccessors[i] =
+                    new ColumnAccessor(current, inPk, nestedPropertyAccessor);
             i++;
         }
     }

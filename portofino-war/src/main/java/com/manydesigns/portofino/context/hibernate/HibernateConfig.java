@@ -9,8 +9,8 @@
  * it under the terms of the GNU General Public License version 3 as published by
  * the Free Software Foundation.
  *
- * There are special exceptions to the terms and conditions of the GPL 
- * as it is applied to this software. View the full text of the 
+ * There are special exceptions to the terms and conditions of the GPL
+ * as it is applied to this software. View the full text of the
  * exception in file OPEN-SOURCE-LICENSE.txt in the directory of this
  * software distribution.
  *
@@ -106,9 +106,12 @@ public class HibernateConfig {
             for (Schema schema : database.getSchemas()) {
                 for (com.manydesigns.portofino.model.datamodel.Table aTable :
                         schema.getTables()) {
-                    if (aTable.isM2m()) {
-                        createM2M(configuration, mappings, aTable);
+                    for (Relationship rel : aTable.getOneToManyRelationships()) {
+                        if (aTable.isM2m()) {
+                            createM2O(configuration, mappings, rel);
+                        }
                     }
+
                 }
             }
             return configuration;
@@ -554,5 +557,38 @@ public class HibernateConfig {
             refProp = clazzOne.getProperty(colToName);
         }
         return refProp;
+    }
+
+    protected void createM2O(Configuration config, Mappings mappings,
+                             Relationship relationship) {
+        RootClass clazz = (RootClass) mappings.getClass(
+                relationship.getFromTable().getQualifiedName());
+        Table tab = clazz.getTable();
+        List<com.manydesigns.portofino.model.datamodel.Column> cols =
+                new ArrayList<com.manydesigns.portofino.model.datamodel.Column>();
+
+        for (Reference ref : relationship.getReferences()) {
+            cols.add(ref.getFromColumn());
+        }
+
+        ManyToOne m2o = new ManyToOne(tab);
+
+        final HashMap<String, PersistentClass> persistentClasses =
+                new HashMap<String, PersistentClass>();
+        persistentClasses.put(relationship.getToTable().getQualifiedName(),
+                config.getClassMapping(relationship.getToTable().getQualifiedName()));
+        m2o.setReferencedEntityName(relationship.getToTable().getQualifiedName());
+        m2o.createPropertyRefConstraints(persistentClasses);
+        for (com.manydesigns.portofino.model.datamodel.Column column : cols) {
+            Column col = new Column();
+            col.setName(column.getColumnName());
+            m2o.addColumn(col);
+        }
+
+        Property prop = new Property();
+        prop.setName(relationship.getRelationshipName());
+        prop.setValue(m2o);
+        clazz.addProperty(prop);
+
     }
 }

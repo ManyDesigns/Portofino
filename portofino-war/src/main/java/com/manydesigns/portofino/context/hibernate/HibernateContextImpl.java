@@ -33,7 +33,8 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.datamodel.*;
+import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.io.ConnectionsParser;
 import com.manydesigns.portofino.model.io.ModelParser;
 import com.manydesigns.portofino.model.site.SiteNode;
@@ -52,6 +53,7 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.util.*;
 import java.util.logging.Logger;
+import java.lang.reflect.Constructor;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -72,6 +74,7 @@ public class HibernateContextImpl implements Context {
     protected final ThreadLocal<StopWatch> stopWatches;
     protected final ThreadLocal<User> threadUsers;
     protected final List<SiteNode> siteNodes;
+    protected final ClassLoader classLoader;
 
     public static final Logger logger =
             LogUtil.getLogger(HibernateContextImpl.class);
@@ -84,6 +87,7 @@ public class HibernateContextImpl implements Context {
         stopWatches = new ThreadLocal<StopWatch>();
         siteNodes = new ArrayList<SiteNode>();
         threadUsers = new ThreadLocal<User>();
+        classLoader = HibernateContextImpl.class.getClassLoader();
     }
 
     //**************************************************************************
@@ -191,45 +195,54 @@ public class HibernateContextImpl implements Context {
     // Persistance
     //**************************************************************************
 
-    public Map<String, Object> getObjectByPk(String qualifiedTableName,
+    public Object getObjectByPk(String qualifiedTableName,
                                              Object... pk) {
         throw new UnsupportedOperationException();
     }
     
-    public Map<String, Object> getObjectByPk(String qualifiedTableName,
-                                             HashMap<String, Object> pk) {
+    public Object getObjectByPk(String qualifiedTableName,
+                                             Object pk) {
         Session session = getSession(qualifiedTableName);
 
-        if (pk.size()>2){
-            startTimer();
-            @SuppressWarnings({"unchecked"}) Map<String, Object> result =
-                    (Map<String, Object>)session.load(qualifiedTableName, pk);
-            stopTimer();
-            return result;
-        } else {
-            startTimer();
-            for (Map.Entry entry : pk.entrySet()){
-                if (((String)entry.getKey()).startsWith("$")) {
-                    continue;
-                }
+        if (pk instanceof HashMap) {
+            HashMap<String, Object> key = (HashMap<String, Object>) pk;
+            if (key.size()>2){
+                startTimer();
                 @SuppressWarnings({"unchecked"}) Map<String, Object> result =
-                        (Map<String, Object>)session.load(qualifiedTableName,
-                                (Serializable) entry.getValue());
+                        (Map<String, Object>)session.load(qualifiedTableName, key);
                 stopTimer();
                 return result;
+            } else {
+                startTimer();
+                for (Map.Entry entry : key.entrySet()){
+                    if (((String)entry.getKey()).startsWith("$")) {
+                        continue;
+                    }
+                    @SuppressWarnings({"unchecked"}) Map<String, Object> result =
+                            (Map<String, Object>)session.load(qualifiedTableName,
+                                    (Serializable) entry.getValue());
+                    stopTimer();
+                    return result;
+                }
             }
-            return null;
+        } else {
+            startTimer();
+            Object result =  session.load(qualifiedTableName, (Serializable) pk);
+            stopTimer();
+            return result;
         }
+
+        return null;
     }
 
 
-    public List<Map<String, Object>> getAllObjects(String qualifiedTableName) {
+    public List<Object> getAllObjects(String qualifiedTableName) {
         Session session = getSession(qualifiedTableName);
 
         Criteria hibernateCriteria = session.createCriteria(qualifiedTableName);
         startTimer();
         //noinspection unchecked
-        List<Map<String, Object>> result = hibernateCriteria.list();
+        List<Object> result = hibernateCriteria.list();
         stopTimer();
         return result;
     }
@@ -247,7 +260,7 @@ public class HibernateContextImpl implements Context {
         return new HibernateCriteriaAdapter(hibernateCriteria);
     }
 
-    public List<Map<String, Object>> getObjects(
+    public List<Object> getObjects(
             com.manydesigns.elements.fields.search.Criteria criteria) {
         HibernateCriteriaAdapter hibernateCriteriaAdapter =
                 (HibernateCriteriaAdapter)criteria;
@@ -255,41 +268,61 @@ public class HibernateContextImpl implements Context {
                 hibernateCriteriaAdapter.getHibernateCriteria();
         startTimer();
         //noinspection unchecked
-        List<Map<String, Object>> result = hibernateCriteria.list();
+        List<Object> result = hibernateCriteria.list();
         stopTimer();
         return result;
     }
 
-    public void saveOrUpdateObject(Map<String, Object> obj) {
-        Session session = getSession((String) obj.get("$type$"));
+    public void saveOrUpdateObject(String qualifiedTableName, Object obj) {
+        Session session = getSession(qualifiedTableName);
         session.beginTransaction();
-        session.saveOrUpdate((String) obj.get("$type$"), obj);
+        session.saveOrUpdate(qualifiedTableName, obj);
         session.getTransaction().commit();
     }
 
-    public void saveObject(Map<String, Object> obj) {
-        Session session = getSession((String) obj.get("$type$"));
+    public void saveObject(String qualifiedTableName, Object obj) {
+        Session session = getSession(qualifiedTableName);
         session.beginTransaction();
         startTimer();
-        session.save((String) obj.get("$type$"), obj);
+        session.save(qualifiedTableName, obj);
         stopTimer();
         session.getTransaction().commit();
     }
 
-    public void updateObject(Map<String, Object> obj) {
-        Session session = getSession((String) obj.get("$type$"));
+    public Object createNewObject(String qualifiedTableName) {
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        String className = table.getClassName();
+        if (className==null){
+            HashMap<String, Object> obj =  new HashMap<String, Object>();
+            obj.put("$type$", qualifiedTableName);
+            return obj;                                                   
+        } else {
+            try {
+                Class clazz = classLoader.loadClass(className);
+                Constructor constructor = clazz.getConstructor();
+                return constructor.newInstance();
+            } catch (Throwable e) {
+                LogUtil.warningMF(logger,
+                        "Could not instanciate: {0}", e, className);
+                return null;
+            }
+        }
+    }
+
+    public void updateObject(String qualifiedTableName, Object obj) {
+        Session session = getSession(qualifiedTableName);
         session.beginTransaction();
         startTimer();
-        session.update((String) obj.get("$type$"), obj);
+        session.update(qualifiedTableName, obj);
         stopTimer();
         session.getTransaction().commit();
     }
 
-    public void deleteObject(Map<String, Object> obj) {
-        Session session = getSession((String) obj.get("$type$"));
+    public void deleteObject(String qualifiedTableName, Object obj) {
+        Session session = getSession(qualifiedTableName);
         session.beginTransaction();
         startTimer();
-        session.delete((String) obj.get("$type$"), obj);
+        session.delete(qualifiedTableName, obj);
         stopTimer();
         session.getTransaction().commit();
 
@@ -324,33 +357,63 @@ public class HibernateContextImpl implements Context {
     }
 
     @SuppressWarnings({"unchecked"})
-    public List<Map<String, Object>> getRelatedObjects(
-            Map<String, Object> obj, String oneToManyRelationshipName) {
-        if (obj.get(oneToManyRelationshipName) instanceof List){
-            return (List<Map<String, Object>>)
-                    obj.get(oneToManyRelationshipName);
-        }
-        String qualifiedTableName = (String)obj.get("$type$");
-        Relationship relationship =
-                model.findOneToManyRelationship(
-                        qualifiedTableName, oneToManyRelationshipName);
-        Table fromTable = relationship.getFromTable();
+    public List<Object> getRelatedObjects(String qualifiedTableName,
+            Object obj, String oneToManyRelationshipName) {
+        /*if (obj instanceof HashMap){
+            HashMap<String, Object> objHM = (HashMap<String, Object>) obj;
+            if (objHM.get(oneToManyRelationshipName) instanceof List){
+                return (List<Object>)
+                        objHM.get(oneToManyRelationshipName);
+            }
 
-        Session session =
-                setups.get(fromTable.getDatabaseName()).getThreadSession();
-        Criteria criteria =
-                session.createCriteria(fromTable.getQualifiedName());
-        for (Reference reference : relationship.getReferences()) {
-            Column fromColumn = reference.getFromColumn();
-            Column toColumn = reference.getToColumn();
-            criteria.add(Restrictions.eq(fromColumn.getColumnName(),
-                    obj.get(toColumn.getColumnName())));
-        }
-        startTimer();
-        //noinspection unchecked
-        List<Map<String, Object>> result = criteria.list();
-        stopTimer();
-        return result;
+            Relationship relationship =
+                    model.findOneToManyRelationship(
+                            qualifiedTableName, oneToManyRelationshipName);
+            Table fromTable = relationship.getFromTable();
+
+            Session session =
+                    setups.get(fromTable.getDatabaseName()).getThreadSession();
+            Criteria criteria =
+                    session.createCriteria(fromTable.getQualifiedName());
+            for (Reference reference : relationship.getReferences()) {
+                Column fromColumn = reference.getFromColumn();
+                Column toColumn = reference.getToColumn();
+                criteria.add(Restrictions.eq(fromColumn.getColumnName(),
+                        objHM.get(toColumn.getColumnName())));
+            }
+            startTimer();
+            //noinspection unchecked
+            List<Object> result = criteria.list();
+            stopTimer();
+            return result;
+        } else {
+               if (obj.get(oneToManyRelationshipName) instanceof List){
+                    return (List<Object>)
+                            obj.get(oneToManyRelationshipName);
+                }
+
+                Relationship relationship =
+                        model.findOneToManyRelationship(
+                                qualifiedTableName, oneToManyRelationshipName);
+                Table fromTable = relationship.getFromTable();
+
+                Session session =
+                        setups.get(fromTable.getDatabaseName()).getThreadSession();
+                Criteria criteria =
+                        session.createCriteria(fromTable.getQualifiedName());
+                for (Reference reference : relationship.getReferences()) {
+                    Column fromColumn = reference.getFromColumn();
+                    Column toColumn = reference.getToColumn();
+                    criteria.add(Restrictions.eq(fromColumn.getColumnName(),
+                            obj.get(toColumn.getColumnName())));
+                }
+                startTimer();
+                //noinspection unchecked
+                List<Object> result = criteria.list();
+                stopTimer();
+                return result;
+        } */
+        return null;
     }
 
     //**************************************************************************
@@ -409,20 +472,18 @@ public class HibernateContextImpl implements Context {
     // User
     //**************************************************************************
     public User authenticate(String email, String password) {
-        Session session = setups.get("portofino").getThreadSession();
-        Criteria criteria = session.createCriteria("portofino.public.user_");
+        String qualifiedTableName = "portofino.public.user_";
+        Session session = getSession(qualifiedTableName);
+        Criteria criteria = session.createCriteria(qualifiedTableName);
         criteria.add(Restrictions.eq( "emailaddress", email ));
         criteria.add(Restrictions.eq( "pwd", password ));
         startTimer();
         
-        List<Map<String, Object>> result = criteria.list();
+        List<Object> result = criteria.list();
         stopTimer();
 
         if (result.size()==1){
-            User authUser = new User();
-            authUser.setUuid((Integer) result.get(0).get("userid"));
-            authUser.setEmail((String) result.get(0).get("emailaddress"));
-            authUser.setPwd((String) result.get(0).get("pwd"));
+            User authUser = (User) result.get(0);
             setCurrentUser(authUser);
             return authUser;
         } else {
