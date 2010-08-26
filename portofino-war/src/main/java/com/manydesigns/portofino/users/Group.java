@@ -28,9 +28,6 @@
  */
 package com.manydesigns.portofino.users;
 
-import com.manydesigns.elements.annotations.Password;
-import com.manydesigns.elements.annotations.Email;
-
 import java.util.List;
 import java.util.ArrayList;
 
@@ -39,52 +36,33 @@ import java.util.ArrayList;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class User {
-    Integer uuid;
-    String email;
-    String pwd;
-    Integer state;
-    List<UsersGroups> groups = new ArrayList<UsersGroups>();
+public class Group {
+    Integer groupId;
+    String name;
+    List<User> users = new ArrayList<User>();
 
-    public Integer getUuid() {
-        return uuid;
+    public Integer getGroupId() {
+        return groupId;
     }
 
-    public void setUuid(Integer uuid) {
-        this.uuid = uuid;
+    public void setGroupId(Integer groupId) {
+        this.groupId = groupId;
     }
 
-    public String getEmail() {
-        return email;
+    public String getName() {
+        return name;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    @Password
-    public String getPwd() {
-        return pwd;
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setPwd(String pwd) {
-        this.pwd = pwd;
-    }
-
-    public List<UsersGroups> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(List<UsersGroups> groups) {
-        this.groups = groups;
-    }
-
-    public Integer getState() {
-        return state;
-    }
-
-    public void setState(Integer state) {
-        this.state = state;
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 
     @Override
@@ -92,15 +70,13 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        User user = (User) o;
+        Group group = (Group) o;
 
-        if (email != null ? !email.equals(user.email) : user.email != null)
+        if (groupId != null ? !groupId.equals(group.groupId) : group.groupId != null)
             return false;
-        if (groups != null ? !groups.equals(user.groups) : user.groups != null)
+        if (name != null ? !name.equals(group.name) : group.name != null)
             return false;
-        if (pwd != null ? !pwd.equals(user.pwd) : user.pwd != null)
-            return false;
-        if (uuid != null ? !uuid.equals(user.uuid) : user.uuid != null)
+        if (users != null ? !users.equals(group.users) : group.users != null)
             return false;
 
         return true;
@@ -108,10 +84,10 @@ public class User {
 
     @Override
     public int hashCode() {
-        int result = uuid != null ? uuid.hashCode() : 0;
-        result = 31 * result + (email != null ? email.hashCode() : 0);
-        result = 31 * result + (pwd != null ? pwd.hashCode() : 0);
-        result = 31 * result + (groups != null ? groups.hashCode() : 0);
+        int result = groupId != null ? groupId.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (users != null ? users.hashCode() : 0);
         return result;
     }
 }
+

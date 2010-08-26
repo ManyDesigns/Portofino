@@ -33,7 +33,6 @@ import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.portofino.model.datamodel.Relationship;
 
 import java.util.List;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -46,11 +45,11 @@ public class RelatedTableForm {
 
     public Relationship relationship;
     public TableForm tableForm;
-    public List<Map<String, Object>> objects;
+    public List<Object> objects;
 
     public RelatedTableForm(Relationship relationship,
                           TableForm tableForm,
-                          List<Map<String, Object>> objects) {
+                          List<Object> objects) {
         this.relationship = relationship;
         this.tableForm = tableForm;
         this.objects = objects;

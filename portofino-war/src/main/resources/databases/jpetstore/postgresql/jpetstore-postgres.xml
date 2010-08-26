@@ -5,7 +5,7 @@
             <schemas>
                 <schema name="public">
                     <tables>
-                        <table name="user_">
+                        <table name="user_" class="com.manydesigns.portofino.users.User">
                             <columns>
                                 <column name="userid"
                                         autoincrement="true"
@@ -13,13 +13,15 @@
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
-                                        nullable="false"/>
+                                        nullable="false"
+                                        classProperty="uuid"/>
                                 <column name="emailaddress"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
                                         scale="0"
-                                        nullable="false"/>
+                                        nullable="false"
+                                        classProperty="email"/>
                                 <column name="pwd"
                                         columnType="varchar"
                                         javaType="java.lang.String"
@@ -30,7 +32,6 @@
                                 <primaryKey name="pk_user">
                                     <column name="userid"/>
                                 </primaryKey>
-
                         </table>
                         <table name="group_">
                             <columns>
@@ -85,7 +86,8 @@
                                               toSchema="public"
                                               toTable="user_"
                                               onUpdate="NO ACTION"
-                                              onDelete="NO ACTION">
+                                              onDelete="NO ACTION"
+                                              classManyProperty="groups">
                                     <reference fromColumn="userid"
                                                toColumn="userid"/>
                                 </relationship>
@@ -93,7 +95,8 @@
                                               toSchema="public"
                                               toTable="group_"
                                               onUpdate="NO ACTION"
-                                              onDelete="NO ACTION">
+                                              onDelete="NO ACTION"
+                                              classManyProperty="users">
                                     <reference fromColumn="groupid"
                                                toColumn="groupid"/>
                                 </relationship>

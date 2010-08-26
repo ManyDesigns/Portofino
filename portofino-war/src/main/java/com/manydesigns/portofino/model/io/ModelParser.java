@@ -145,6 +145,10 @@ public class ModelParser extends XmlParser {
             if (m2m!=null) {
                 currentTable.setM2m(Boolean.parseBoolean(m2m));
             }
+            String className = attributes.get("class");
+            if (className!=null){
+                currentTable.setClassName(className);
+            }
             currentSchema.getTables().add(currentTable);
             expectElement(COLUMNS, 1, 1, new ColumnsCallback());
             expectElement(PRIMARY_KEY, 1, 1, new PrimaryKeyCallback());
@@ -175,6 +179,10 @@ public class ModelParser extends XmlParser {
                             Integer.parseInt(attributes.get("length")),
                             Integer.parseInt(attributes.get("scale"))
                             );
+            String classProperty = attributes.get("classProperty");
+            if (classProperty!=null){
+                column.setClassProperty(classProperty);
+            }
             try {
                 Class javatype = Class.forName(attributes.get("javaType"));
                 column.setJavaType(javatype);
@@ -232,6 +240,10 @@ public class ModelParser extends XmlParser {
                             attributes.get("name"),
                             attributes.get("onUpdate"),
                             attributes.get("onDelete"));
+            String classManyProperty = attributes.get("classManyProperty");
+            if (classManyProperty!=null){
+                rel.setClassManyProperty(classManyProperty);
+            }
             relationships.add(rel);
             expectElement(REFERENCE, 1, null, new ReferenceCallback());
         }
@@ -346,6 +358,7 @@ public class ModelParser extends XmlParser {
             final Table toTable = getTable(relPre.getToSchema(), relPre.getToTable());
             rel.setFromTable(fromTable);
             rel.setToTable(toTable);
+            rel.setClassManyProperty(relPre.getClassManyProperty());
             fromTable.getManyToOneRelationships().add(rel);
             toTable.getOneToManyRelationships().add(rel);
 
@@ -379,7 +392,7 @@ public class ModelParser extends XmlParser {
                 return col;
             }
         }
-        throw new Error("Colonna non presente");
+        throw new Error(MessageFormat.format("Colonna {0} non presente", attValue));
     }
 }
 

@@ -59,7 +59,7 @@ public class HibernateTest extends TestCase {
     }
 
     public void testReadProdotti() {
-        List<Map<String, Object>> resultProd =
+        List<Object> resultProd =
                 context.getAllObjects("jpetstore.public.product");
 
         int sizePrd = resultProd.size();
@@ -68,31 +68,31 @@ public class HibernateTest extends TestCase {
     }
 
     public void testReadCategorieProdotti() {
-        List<Map<String, Object>> resultCat =
+        List<Object> resultCat =
                 context.getAllObjects("jpetstore.public.category");
 
         int sizeCat = resultCat.size();
         assertEquals("categorie", 5, sizeCat);
 
 
-        Map categoria0 = resultCat.get(0);
+        Map categoria0 = (Map<String, Object>) resultCat.get(0);
         assertEquals("jpetstore.public.category", categoria0.get("$type$"));
         assertEquals("Fish", categoria0.get("name"));
-        Map categoria1 = resultCat.get(1);
+        Map categoria1 = (Map<String, Object>)resultCat.get(1);
         assertEquals("Dogs", categoria1.get("name"));
-        Map categoria2 = resultCat.get(2);
+        Map categoria2 = (Map<String, Object>)resultCat.get(2);
         assertEquals("Reptiles", categoria2.get("name"));
-        Map categoria3 = resultCat.get(3);
+        Map categoria3 = (Map<String, Object>)resultCat.get(3);
         assertEquals("Cats", categoria3.get("name"));
-        Map categoria4 = resultCat.get(4);
+        Map categoria4 = (Map<String, Object>)resultCat.get(4);
         assertEquals("Birds", categoria4.get("name"));
 
-        List<Map<String, Object>> resultProd =
+        List<Object> resultProd =
                 context.getAllObjects("jpetstore.public.product");
 
         int sizePrd = resultProd.size();
         assertEquals("prodotti", sizePrd, 16);
-        Map prd0 = resultProd.get(0);
+        Map prd0 = (Map<String, Object>)resultProd.get(0);
         assertEquals("FI-SW-01", prd0.get("productid") );
         assertEquals("Angelfish", prd0.get("name"));
     }
@@ -106,7 +106,7 @@ public class HibernateTest extends TestCase {
         worms.put("descn",
           "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
                   "Worms</font>");
-        context.saveObject(worms);
+        context.saveObject("jpetstore.public.category",worms);
     }
 
     public void testSaveLineItem() {
@@ -120,9 +120,9 @@ public class HibernateTest extends TestCase {
         lineItem.put("quantity", 20);
         lineItem.put("unitprice", new BigDecimal(10.80));
 
-        context.saveObject(lineItem);
+        context.saveObject("jpetstore.public.lineitem", lineItem);
         //e ora cancello
-        context.deleteObject(lineItem);
+        context.deleteObject("jpetstore.public.lineitem", lineItem);
     }
 
 
@@ -133,7 +133,7 @@ public class HibernateTest extends TestCase {
             testItem.put("$type$", "hibernatetest.public.table1");
             testItem.put("testo", "esempio");
             //salvo
-            context.saveObject(testItem);
+            context.saveObject("hibernatetest.public.table1", testItem);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -153,7 +153,7 @@ public class HibernateTest extends TestCase {
         worms.put("descn",
           "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
                   "Worms</font>");
-        context.deleteObject(worms);
+        context.deleteObject("jpetstore.public.category", worms);
     }
 }
 

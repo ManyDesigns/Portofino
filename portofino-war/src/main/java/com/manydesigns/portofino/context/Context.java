@@ -33,10 +33,8 @@ import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.users.User;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -73,25 +71,27 @@ public interface Context {
     // Persistance
     //**************************************************************************
 
-    Map<String, Object> getObjectByPk(String qualifiedTableName,
+    Object getObjectByPk(String qualifiedTableName,
                                       Object... pk);
 
-    Map<String, Object> getObjectByPk(String qualifiedTableName,
-                                      HashMap<String, Object> pk);
+    Object getObjectByPk(String qualifiedTableName,
+                                      Object pk);
 
-    List<Map<String, Object>> getAllObjects(String qualifiedTableName);
+    List<Object> getAllObjects(String qualifiedTableName);
 
     Criteria createCriteria(String qualifiedTableName);
 
-    List<Map<String, Object>> getObjects(Criteria criteria);
+    List<Object> getObjects(Criteria criteria);
 
-    void saveOrUpdateObject(Map<String, Object> obj);
+    void saveOrUpdateObject(String qualifiedTableName, Object obj);
 
-    void saveObject(Map<String, Object> obj);
+    void saveObject(String qualifiedTableName, Object obj);
 
-    void updateObject(Map<String, Object> obj);
+    Object createNewObject (String qualifiedTableName);
 
-    void deleteObject(Map<String, Object> obj);
+    void updateObject(String qualifiedTableName, Object obj);
+
+    void deleteObject(String qualifiedTableName, Object obj);
 
     List<Object[]> runSql(String databaseName, String sql);
 
@@ -99,8 +99,8 @@ public interface Context {
 
     void closeSession();
 
-    List<Map<String, Object>> getRelatedObjects(
-            Map<String, Object> obj, String oneToManyRelationshipName);
+    List<Object> getRelatedObjects(String qualifiedTableName, 
+            Object obj, String oneToManyRelationshipName);
 
     void resetDbTimer();
 

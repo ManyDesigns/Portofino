@@ -29,6 +29,9 @@
 
 package com.manydesigns.portofino.util;
 
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 import com.manydesigns.elements.text.ExpressionGenerator;
 import com.manydesigns.elements.text.Generator;
 import com.manydesigns.portofino.model.datamodel.Column;
@@ -37,7 +40,6 @@ import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -83,7 +85,9 @@ public class TableHelper {
         return pkMap;
     }
 
-    public String generatePkString(Table table, Map<String, Object> map) {
+    public String generatePkString(Table table, Object object) {
+        ClassAccessor classAccessor =
+                ClassAccessorManager.getManager().tryToInstantiateFromClass(table);
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for(Column column : table.getPrimaryKey().getColumns() ) {
@@ -92,9 +96,15 @@ public class TableHelper {
             } else {
                 sb.append(",");
             }
-            Object value = map.get(column.getColumnName());
-            String stringValue = ConvertUtils.convert(value);
-            sb.append(stringValue);
+            try {
+                PropertyAccessor propertyAccessor =
+                        classAccessor.getProperty(column.getColumnName());
+                Object value = propertyAccessor.get(object);
+                String stringValue = ConvertUtils.convert(value);
+                sb.append(stringValue);
+            } catch (Throwable e) {
+                e.printStackTrace();  // TODO: sistemare
+            }
         }
         return sb.toString();
     }

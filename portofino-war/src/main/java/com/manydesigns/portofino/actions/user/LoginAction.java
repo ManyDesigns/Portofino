@@ -86,9 +86,9 @@ public class LoginAction extends PortofinoAction
         User user = new User();
         form.writeToObject(user);
         final String email = user.getEmail();
-        final String password = user.getPassword();
+        final String password = user.getPwd();
         user = context.authenticate(email, password);
-        if (null!=user && user.getUserid()!=null) {
+        if (null!=user && user.getUuid()!=null) {
             return SUCCESS;
         } else {
             String errMsg = MessageFormat.format("FAILED AUTH for user {0}", email);

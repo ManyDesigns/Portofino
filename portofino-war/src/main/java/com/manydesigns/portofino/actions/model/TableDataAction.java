@@ -51,7 +51,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -103,8 +102,8 @@ public class TableDataAction extends PortofinoAction
     // Model objects
     //**************************************************************************
 
-    public Map<String, Object> object;
-    public List<Map<String, Object>> objects;
+    public Object object;
+    public List<Object> objects;
 
 
     //**************************************************************************
@@ -246,7 +245,9 @@ public class TableDataAction extends PortofinoAction
                 sb.append(",");
             }
             sb.append("%{");
-            sb.append(column.getColumnName());
+            sb.append((column.getClassProperty()==null)
+                    ?column.getColumnName()
+                    :column.getClassProperty());
             sb.append("}");
         }
         if (searchString != null) {
@@ -297,8 +298,8 @@ public class TableDataAction extends PortofinoAction
     }
 
     public void setupRelatedTableForm(Relationship relationship) {
-        List<Map<String, Object>> relatedObjects =
-                context.getRelatedObjects(object,
+        List<Object> relatedObjects =
+                context.getRelatedObjects(qualifiedTableName, object,
                         relationship.getRelationshipName());
 
         Table relatedTable = relationship.getFromTable();
@@ -337,10 +338,9 @@ public class TableDataAction extends PortofinoAction
 
         form.readFromRequest(req);
         if (form.validate()) {
-            object = new HashMap<String, Object>();
-            object.put("$type$", table.getQualifiedName());
+            object = context.createNewObject(qualifiedTableName);
             form.writeToObject(object);
-            context.saveObject(object);
+            context.saveObject(qualifiedTableName, object);
             pk = tableHelper.generatePkString(table, object);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
             return SAVE;
@@ -381,7 +381,7 @@ public class TableDataAction extends PortofinoAction
         form.readFromRequest(req);
         if (form.validate()) {
             form.writeToObject(object);
-            context.updateObject(object);
+            context.updateObject(qualifiedTableName, object);
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
             return UPDATE;
         } else {
@@ -425,7 +425,7 @@ public class TableDataAction extends PortofinoAction
                 form.writeToObject(object);
             }
             form.writeToObject(object);
-            context.updateObject(object);
+            context.updateObject(qualifiedTableName, object);
             SessionMessages.addInfoMessage(MessageFormat.format(
                     "UPDATE di {0} oggetti avvenuto con successo", selection.length));
             return BULK_UPDATE;
@@ -441,7 +441,7 @@ public class TableDataAction extends PortofinoAction
     public String delete() {
         setupTable();
         HashMap<String, Object> pkMap = tableHelper.parsePkString(table, pk);
-        context.deleteObject(pkMap);
+        context.deleteObject(qualifiedTableName, pkMap);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
         return DELETE;
     }
@@ -456,7 +456,7 @@ public class TableDataAction extends PortofinoAction
         for (String current : selection) {
             HashMap<String, Object> pkMap =
                     tableHelper.parsePkString(table, current);
-            context.deleteObject(pkMap);
+            context.deleteObject(qualifiedTableName, pkMap);
         }
         SessionMessages.addInfoMessage(MessageFormat.format(
                 "DELETE di {0} oggetti avvenuto con successo", selection.length));
