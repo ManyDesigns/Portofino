@@ -36,10 +36,8 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertiesAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.opensymphony.xwork2.ActionSupport;
-import org.apache.struts2.util.ServletContextAware;
+import com.manydesigns.portofino.actions.PortofinoAction;
 
-import javax.servlet.ServletContext;
 import java.util.Properties;
 
 /*
@@ -47,26 +45,37 @@ import java.util.Properties;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ConfigurationPropertiesAction extends ActionSupport
-        implements ServletContextAware {
+public class ConfigurationPropertiesAction extends PortofinoAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Properties portofinoProperties;
-    public Form portofinoForm;
-
-    public Properties elementsProperties;
-    public Form elementsForm;
+    public Properties properties;
+    public Form form;
 
     @Override
     public String execute() {
-        portofinoProperties = PortofinoProperties.getProperties();
-        portofinoForm = configureForm(portofinoProperties);
+        return portofinoProperties();
+    }
 
-        elementsProperties = ElementsProperties.getProperties();
-        elementsForm = configureForm(elementsProperties);
+    public String portofinoProperties() {
+        properties = PortofinoProperties.getProperties();
+        form = configureForm(properties);
 
-        return SUCCESS;
+        return "portofinoProperties";
+    }
+
+    public String elementsProperties() {
+        properties = ElementsProperties.getProperties();
+        form = configureForm(properties);
+
+        return "elementsProperties";
+    }
+
+    public String systemProperties() {
+        properties = System.getProperties();
+        form = configureForm(properties);
+
+        return "systemProperties";
     }
 
     private Form configureForm(Properties properties) {
@@ -75,12 +84,6 @@ public class ConfigurationPropertiesAction extends ActionSupport
         form.setMode(Mode.VIEW);
         form.readFromObject(properties);
         return form;
-    }
-
-    public ServletContext servletContext;
-
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
     }
 
 }

@@ -64,15 +64,6 @@ public class ServerInfo {
     protected final int servletApiMinor;
     protected final String servletApiVersion;
 
-    protected final String javaRuntimeName;
-    protected final String javaRuntimeVersion;
-    protected final String javaVmName;
-    protected final String javaVmVersion;
-    protected final String javaVmVendor;
-    protected final String osName;
-    protected final String userLanguage;
-    protected final String userRegion;
-
     protected final Runtime runTime;
 
     public ServerInfo(ServletContext servletContext) {
@@ -106,31 +97,7 @@ public class ServerInfo {
         contextPath = tmp;
         LogUtil.finerMF(logger, "Context path: {0}", contextPath);
 
-        javaRuntimeName = System.getProperty("java.runtime.name");
-        LogUtil.finerMF(logger, "java.runtime.name: {0}", javaRuntimeName);
-
-        javaRuntimeVersion = System.getProperty("java.runtime.version");
-        LogUtil.finerMF(logger, "java.runtime.version: {0}", javaRuntimeVersion);
-
-        javaVmName = System.getProperty("java.vm.name");
-        LogUtil.finerMF(logger, "java.vm.name: {0}", javaVmName);
-
-        javaVmVersion = System.getProperty("java.vm.version");
-        LogUtil.finerMF(logger, "java.vm.version: {0}", javaVmVersion);
-
-        javaVmVendor = System.getProperty("java.vm.vendor");
-        LogUtil.finerMF(logger, "java.vm.vendor: {0}", javaVmVendor);
-
-        osName = System.getProperty("os.name");
-        LogUtil.finerMF(logger, "os.name: {0}", osName);
-
-        userLanguage = System.getProperty("user.language");
-        LogUtil.finerMF(logger, "user.language: {0}", userLanguage);
-
-        userRegion = System.getProperty("user.region");
-        LogUtil.finerMF(logger, "user.region: {0}", userRegion);
-
-        runTime = Runtime.getRuntime();        
+        runTime = Runtime.getRuntime();
     }
 
 
@@ -167,42 +134,6 @@ public class ServerInfo {
     @Label("servlet API version")
     public String getServletApiVersion() {
         return servletApiVersion;
-    }
-
-    public String getJavaRuntimeName() {
-        return javaRuntimeName;
-    }
-
-    public String getJavaRuntimeVersion() {
-        return javaRuntimeVersion;
-    }
-
-    @Label("Java VM name")
-    public String getJavaVmName() {
-        return javaVmName;
-    }
-
-    @Label("Java VM version")
-    public String getJavaVmVersion() {
-        return javaVmVersion;
-    }
-
-    @Label("Java VM vendor")
-    public String getJavaVmVendor() {
-        return javaVmVendor;
-    }
-
-    @Label("OS name")
-    public String getOsName() {
-        return osName;
-    }
-
-    public String getUserLanguage() {
-        return userLanguage;
-    }
-
-    public String getUserRegion() {
-        return userRegion;
     }
 
     @Memory

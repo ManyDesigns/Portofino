@@ -55,6 +55,7 @@ public class Navigation implements XhtmlFragment {
 
     protected final Context context;
     protected final String requestUrl;
+    protected final String normalizedRequestUrl;
     protected final List<NavigationNode> foundPath;
     protected final List<NavigationNode> rootNodes;
 
@@ -67,6 +68,15 @@ public class Navigation implements XhtmlFragment {
     public Navigation(Context context, String requestUrl) {
         this.context = context;
         this.requestUrl = requestUrl;
+        int i = requestUrl.lastIndexOf("!");
+        int j = requestUrl.lastIndexOf(".");
+        if (i >= 0 && j > i) {
+            normalizedRequestUrl =
+                    requestUrl.substring(0, i) +
+                            requestUrl.substring(j, requestUrl.length());
+        } else {
+            normalizedRequestUrl = requestUrl;
+        }
         Stack<NavigationNode> stack = new Stack<NavigationNode>();
         foundPath = new ArrayList<NavigationNode>();
         rootNodes = new ArrayList<NavigationNode>();
@@ -110,7 +120,7 @@ public class Navigation implements XhtmlFragment {
             boolean found;
             stack.push(current);
             String nodeUrl = current.getUrl();
-            if (requestUrl.equals(nodeUrl)) {
+            if (normalizedRequestUrl.equals(nodeUrl)) {
                 foundPath.clear();
                 foundPath.addAll(stack);
                 found = true;
@@ -142,7 +152,7 @@ public class Navigation implements XhtmlFragment {
         for (NavigationNode current : nodes) {
             xb.openElement("li");
             String nodeUrl = current.getUrl();
-            if (requestUrl.equals(nodeUrl)) {
+            if (normalizedRequestUrl.equals(nodeUrl)) {
                 xb.addAttribute("class", "selected");
                 expand = current.getChildNodes();
             } else if (foundPath != null && foundPath.contains(current)) {

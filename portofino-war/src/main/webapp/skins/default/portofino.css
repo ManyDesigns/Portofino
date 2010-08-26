@@ -1,16 +1,6 @@
-div#hd {
-    height: 3em;
-/*    color: white; */
-/*    background-color: #166bbf; */
-/*    background-color: #65a7db;*/
-/*    background: #65a7db url("images/gradient.png") repeat-y; */
-}
-
-div#ft {
-    padding-top: .5em;
-    border-top: 1px solid gray;
-    margin-top: 1em;
-}
+/*******************************************************************************
+Links
+*******************************************************************************/
 
 a, a:visited {
     color: blue;
@@ -21,9 +11,31 @@ a:hover {
     text-decoration: underline;
 }
 
+/*******************************************************************************
+Header / footer
+*******************************************************************************/
+
+div#hd {
+    height: 3em;
+}
+
+div#ft {
+    padding-top: .5em;
+    border-top: 1px solid gray;
+    margin-top: 1em;
+}
+
 div#hd h1 a {
     color: #166bbf;
 }
+
+div#responseTime, div#globalLinks {
+    float: right;
+}
+
+/*******************************************************************************
+Body and content layout
+*******************************************************************************/
 
 .yui-t2 #yui-main div#content {
     margin-left: 13.8461em;
@@ -33,6 +45,11 @@ div#hd h1 a {
 div#inner-content {
     padding: 0 1em;
 }
+
+
+/*******************************************************************************
+Side bar
+*******************************************************************************/
 
 div#sidebar ul {
     margin: 0.5em 0 0 0;
@@ -48,33 +65,72 @@ div#sidebar ul a {
     color: black;
 }
 
-ul li.selected, div#sidebar ul li.selected a {
+div#sidebar ul li.selected, div#sidebar ul li.selected a {
     color: white;
     background-color: #65a7db;
     font-weight: bold;
 }
 
-ul li.path, div#sidebar ul li.path a {
+div#sidebar ul li.path, div#sidebar ul li.path a {
     margin-right: 1em;
     color: black;
     background-color: #eef;
     font-weight: bold;
 }
 
-div.buttons-bar-top, div.buttons-bar-bottom {
+
+/*******************************************************************************
+Tabs bar
+*******************************************************************************/
+
+.tabs-bar-top {
+    padding:0.5em 1em;
+    background-color: #ffe;
+    border-bottom: 1px solid gray;
+}
+
+ul.tabs {
+    display: block;
+    padding: 0.25em 0 0 0;
+    margin: 0;
+}
+
+ul.tabs li {
+    display: inline;
+    padding: 0.5em 0.5em;
+    margin: 0 1em 0 0;
+}
+
+ul.tabs li.selected {
+    font-weight: bold;
+    background-color: #eed;
+    border: 1px solid gray;
+    border-bottom-width: 0;
+}
+
+/*******************************************************************************
+Buttons bar
+*******************************************************************************/
+
+.buttons-bar-top, .buttons-bar-bottom {
     background-color: #eef;
     padding: 0.5em;
     clear: both;
 }
 
-div.buttons-bar-top {
+.buttons-bar-top {
     border-bottom: 1px solid gray;
 }
 
-div.buttons-bar-bottom {
+.buttons-bar-bottom {
     border-top: 1px solid gray;
     margin-top: 1em;
 }
+
+
+/*******************************************************************************
+Error/warning/info messages
+*******************************************************************************/
 
 ul.errorMessages, ul.warningMessages, ul.infoMessages {
     margin: 0;
@@ -103,6 +159,11 @@ ul.infoMessages {
     background-color: #f0fff0;
 }
 
+
+/*******************************************************************************
+Inline form errors
+*******************************************************************************/
+
 ul.errors {
     display: inline;
     padding: 5px 0;
@@ -120,12 +181,12 @@ ul.errors li {
 }
 
 
-div#responseTime, div#globalLinks {
-    float: right;
-}
 
+/*******************************************************************************
+Search form
+*******************************************************************************/
 
-div.search_form {
+.search_form {
     float: right;
     width: 250px;
     background-color: #f0f0f0;
@@ -136,59 +197,61 @@ div.search_form {
 
 }
 
-div.search_form ul {
-    margin: 0px;
-    padding: 0px;
-    border: 0px none;
+.search_form ul {
+    margin: 0;
+    padding: 0;
+    border: 0 none;
 }
 
-div.search_form ul li {
+.search_form ul li {
     display: block;
     list-style: none;
     margin-bottom: 6px;
     padding-bottom: 6px;
-    border: 0px none;
+    border: 0 none;
     border-bottom: 1px solid #888;
 }
 
-div.search_form ul li.advanced-hide {
-    display: none;
+.search_form fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0 none;
 }
 
-div.search_form fieldset {
-    margin: 0px;
-    padding: 0px;
-    border: 0px none;
-}
-
-div.search_form legend.attr_name, div.search_form label.attr_name {
-    margin: 0px;
-    padding: 0px;
-    border: 0px none;
+.search_form legend.attr_name, .search_form label.attr_name {
+    margin: 0;
+    padding: 0;
+    border: 0 none;
     font-weight: bold;
     font-size: 1em;
 }
 
-div.search_form label.attr_name {
+.search_form label.attr_name {
     display: block;
 }
 
-table.range {
+
+.search_form table.range {
     border-collapse: collapse;
 }
 
-table.range th {
+.search_form table.range th {
     text-align: left;
     font-weight: normal;
 }
 
-label.match_mode, label.rel_name {
+.search_form label.match_mode, label.rel_name {
     display: none;
 }
 
-span.disabled {
+.search_form span.disabled {
     color: gray;
 }
+
+
+/*******************************************************************************
+General
+*******************************************************************************/
 
 /* status */
 .status_red {
@@ -205,7 +268,10 @@ span.disabled {
 }
 
 
-/* login */
+/*******************************************************************************
+Login
+*******************************************************************************/
+
 div#login table td tr {
     border: 0pt;
     background-color: #65a7db;

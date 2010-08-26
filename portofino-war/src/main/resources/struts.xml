@@ -237,7 +237,9 @@
         </action>
         <action name="ConfigurationProperties"
                 class="com.manydesigns.portofino.actions.systemadmin.ConfigurationPropertiesAction">
-            <result name="success">/skins/default/system-admin/configurationProperties.jsp</result>
+            <result name="portofinoProperties">/skins/default/system-admin/portofinoProperties.jsp</result>
+            <result name="elementsProperties">/skins/default/system-admin/elementsProperties.jsp</result>
+            <result name="systemProperties">/skins/default/system-admin/systemProperties.jsp</result>
         </action>
         <action name="Logs"
                 class="com.manydesigns.portofino.actions.systemadmin.LogsAction">

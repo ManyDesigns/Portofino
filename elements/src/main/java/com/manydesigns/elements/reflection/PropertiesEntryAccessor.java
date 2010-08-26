@@ -29,6 +29,9 @@
 
 package com.manydesigns.elements.reflection;
 
+import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.impl.LabelImpl;
+
 import java.lang.annotation.Annotation;
 import java.util.Properties;
 
@@ -42,9 +45,11 @@ public class PropertiesEntryAccessor implements PropertyAccessor {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     protected final String name;
+    protected final Label labelAnnotation;
 
     public PropertiesEntryAccessor(String name) {
         this.name = name;
+        labelAnnotation = new LabelImpl(name);
     }
 
     public String getName() {
@@ -60,10 +65,14 @@ public class PropertiesEntryAccessor implements PropertyAccessor {
     }
 
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-        return false;
+        return getAnnotation(annotationClass) != null;
     }
 
     public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+        if (annotationClass == Label.class) {
+            //noinspection unchecked
+            return (T) labelAnnotation;
+        }
         return null;
     }
 
