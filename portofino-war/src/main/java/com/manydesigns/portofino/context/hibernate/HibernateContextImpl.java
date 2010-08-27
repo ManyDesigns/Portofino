@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.context.hibernate;
 
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.Model;
@@ -285,18 +284,6 @@ public class HibernateContextImpl implements Context {
         session.save(qualifiedTableName, obj);
         stopTimer();
         session.getTransaction().commit();
-    }
-
-    public Object createNewObject(String qualifiedTableName) {
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
-        String className = table.getClassName();
-        if (className==null){
-            HashMap<String, Object> obj =  new HashMap<String, Object>();
-            obj.put("$type$", qualifiedTableName);
-            return obj;                                                   
-        } else {
-            return ReflectionUtil.newInstance(className);
-        }
     }
 
     public void updateObject(String qualifiedTableName, Object obj) {

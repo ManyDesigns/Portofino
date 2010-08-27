@@ -14,13 +14,13 @@
             <s:if test="#position > 0">
                 <s:url var="firstUrl" namespace="/model" action="%{qualifiedTableName}/TableData">
                     <s:param name="pk"
-                             value="%{tableHelper.generatePkString(table, objects.get(0))}" />
+                             value="%{pkHelper.generatePkString(objects.get(0))}" />
                     <s:param name="searchString" value="%{searchString}" />
                 </s:url>
                 <s:a id="first" href="%{#firstUrl}">first</s:a>
                 <s:url var="previousUrl" namespace="/model" action="%{qualifiedTableName}/TableData">
                     <s:param name="pk"
-                             value="%{tableHelper.generatePkString(table, objects.get(#position-1))}" />
+                             value="%{pkHelper.generatePkString(objects.get(#position-1))}" />
                     <s:param name="searchString" value="%{searchString}" />
                 </s:url>
                 <s:a id="previous" href="%{#previousUrl}">previous</s:a>
@@ -31,13 +31,13 @@
             <s:if test="#position < #size-1">
                 <s:url var="nextUrl" namespace="/model" action="%{qualifiedTableName}/TableData">
                     <s:param name="pk"
-                             value="%{tableHelper.generatePkString(table, objects.get(#position+1))}" />
+                             value="%{pkHelper.generatePkString(objects.get(#position+1))}" />
                     <s:param name="searchString" value="%{searchString}" />
                 </s:url>
                 <s:a id="next" href="%{#nextUrl}">next</s:a>
                 <s:url var="lastUrl" namespace="/model" action="%{qualifiedTableName}/TableData">
                     <s:param name="pk"
-                             value="%{tableHelper.generatePkString(table, objects.get(#size - 1))}" />
+                             value="%{pkHelper.generatePkString(objects.get(#size - 1))}" />
                     <s:param name="searchString" value="%{searchString}" />
                 </s:url>
                 <s:a id="last" href="%{#lastUrl}">last</s:a>

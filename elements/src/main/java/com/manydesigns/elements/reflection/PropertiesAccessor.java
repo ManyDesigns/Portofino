@@ -63,6 +63,10 @@ public class PropertiesAccessor implements ClassAccessor {
         });
     }
 
+    public String getName() {
+        return null;
+    }
+
     public PropertyAccessor getProperty(String propertyName) throws NoSuchFieldException {
         for (PropertiesEntryAccessor current : accessors) {
             if (current.getName().equals(propertyName)) {
@@ -74,5 +78,14 @@ public class PropertiesAccessor implements ClassAccessor {
 
     public PropertyAccessor[] getProperties() {
         return accessors.clone();
+    }
+
+
+    public PropertyAccessor[] getKeyProperties() {
+        return new PropertyAccessor[0];
+    }
+
+    public Object newInstance() {
+        return null;
     }
 }

@@ -38,7 +38,11 @@ public interface ClassAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    public String getName();
     public PropertyAccessor getProperty(String propertyName)
             throws NoSuchFieldException;
     public PropertyAccessor[] getProperties();
+    public PropertyAccessor[] getKeyProperties();
+
+    public Object newInstance();
 }

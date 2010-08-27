@@ -34,22 +34,23 @@ import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 import com.manydesigns.elements.text.ExpressionGenerator;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RelatedTableForm;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
-import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.Relationship;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
-import com.manydesigns.portofino.util.TableHelper;
+import com.manydesigns.portofino.util.PkHelper;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -97,6 +98,7 @@ public class TableDataAction extends PortofinoAction
     //**************************************************************************
 
     public Table table;
+    public ClassAccessor tableAccessor;
 
     //**************************************************************************
     // Model objects
@@ -119,7 +121,7 @@ public class TableDataAction extends PortofinoAction
     // Other objects
     //**************************************************************************
 
-    public TableHelper tableHelper = new TableHelper();
+    public PkHelper pkHelper;
 
     public static final Logger logger =
             LogUtil.getLogger(TableDataAction.class);
@@ -146,7 +148,10 @@ public class TableDataAction extends PortofinoAction
 
     public void setupTable() {
         table = model.findTableByQualifiedName(qualifiedTableName);
-        if (table == null) {
+        tableAccessor = ClassAccessorManager.getManager()
+                .tryToInstantiateFromClass(table);
+        pkHelper = new PkHelper(tableAccessor);
+        if (table == null || tableAccessor == null) {
             throw new ModelObjectNotFoundError(qualifiedTableName);
         }
     }
@@ -159,7 +164,7 @@ public class TableDataAction extends PortofinoAction
         setupTable();
 
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(table);
+                new SearchFormBuilder(tableAccessor);
         searchForm = searchFormBuilder.build();
         configureSearchFormFromString();
 
@@ -191,7 +196,7 @@ public class TableDataAction extends PortofinoAction
         setupTable();
 
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(table);
+                new SearchFormBuilder(tableAccessor);
         searchForm = searchFormBuilder.build();
         searchForm.readFromRequest(req);
 
@@ -214,17 +219,17 @@ public class TableDataAction extends PortofinoAction
         hrefGenerator.setUrl(true);
 
         TableFormBuilder tableFormBuilder =
-                new TableFormBuilder(table)
+                new TableFormBuilder(tableAccessor)
                         .configNRows(objects.size());
 
         // ogni colonna chiave primaria sarà clickabile
-        for (Column column : table.getPrimaryKey().getColumns()) {
+        for (PropertyAccessor property : tableAccessor.getKeyProperties()) {
             tableFormBuilder.configHyperlinkGenerators(
-                    column.getColumnName(), hrefGenerator, null);
+                    property.getName(), hrefGenerator, null);
         }
 
         tableForm = tableFormBuilder.build();
-        tableForm.setKeyGenerator(tableHelper.createKeyGenerator(table));
+        tableForm.setKeyGenerator(pkHelper.createPkGenerator());
         tableForm.setMode(Mode.VIEW);
         tableForm.setSelectable(true);
         tableForm.readFromObject(objects);
@@ -235,17 +240,17 @@ public class TableDataAction extends PortofinoAction
 
     public String getReadLinkExpression() {
         StringBuilder sb = new StringBuilder("/model/");
-        sb.append(table.getQualifiedName());
+        sb.append(tableAccessor.getName());
         sb.append("/TableData.action?pk=");
         boolean first = true;
-        for (Column column : table.getPrimaryKey().getColumns()) {
+        for (PropertyAccessor property : tableAccessor.getKeyProperties()) {
             if (first) {
                 first = false;
             } else {
                 sb.append(",");
             }
             sb.append("%{");
-            sb.append(column.getPropertyName());
+            sb.append(property.getName());
             sb.append("}");
         }
         if (searchString != null) {
@@ -270,10 +275,10 @@ public class TableDataAction extends PortofinoAction
 
     public String read() {
         setupTable();
-        HashMap<String, Object> pkMap = tableHelper.parsePkString(table, pk);
+        Object pkObject = pkHelper.parsePkString(pk);
 
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(table);
+                new SearchFormBuilder(tableAccessor);
         searchForm = searchFormBuilder.build();
         configureSearchFormFromString();
 
@@ -281,8 +286,8 @@ public class TableDataAction extends PortofinoAction
         searchForm.configureCriteria(criteria);
         objects = context.getObjects(criteria);
 
-        object = context.getObjectByPk(qualifiedTableName, pkMap);
-        FormBuilder formBuilder = new FormBuilder(table);
+        object = context.getObjectByPk(qualifiedTableName, pkObject);
+        FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
         form.setMode(Mode.VIEW);
         form.readFromObject(object);
@@ -320,7 +325,7 @@ public class TableDataAction extends PortofinoAction
     public String create() {
         setupTable();
 
-        FormBuilder formBuilder = new FormBuilder(table);
+        FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
         form.setMode(Mode.CREATE);
 
@@ -330,16 +335,16 @@ public class TableDataAction extends PortofinoAction
     public String save() {
         setupTable();
 
-        FormBuilder formBuilder = new FormBuilder(table);
+        FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
         form.setMode(Mode.CREATE);
 
         form.readFromRequest(req);
         if (form.validate()) {
-            object = context.createNewObject(qualifiedTableName);
+            object = tableAccessor.newInstance();
             form.writeToObject(object);
             context.saveObject(qualifiedTableName, object);
-            pk = tableHelper.generatePkString(table, object);
+            pk = pkHelper.generatePkString(object);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
             return SAVE;
         } else {
@@ -353,11 +358,11 @@ public class TableDataAction extends PortofinoAction
 
     public String edit() {
         setupTable();
-        HashMap<String, Object> pkMap = tableHelper.parsePkString(table, pk);
+        Object pkObject = pkHelper.parsePkString(pk);
 
-        object = context.getObjectByPk(qualifiedTableName, pkMap);
+        object = context.getObjectByPk(qualifiedTableName, pkObject);
 
-        FormBuilder formBuilder = new FormBuilder(table);
+        FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
         form.setMode(Mode.EDIT);
 
@@ -368,13 +373,13 @@ public class TableDataAction extends PortofinoAction
 
     public String update() {
         setupTable();
-        HashMap<String, Object> pkMap = tableHelper.parsePkString(table, pk);
+        Object pkObject = pkHelper.parsePkString(pk);
 
-        FormBuilder formBuilder = new FormBuilder(table);
+        FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
         form.setMode(Mode.EDIT);
 
-        object = context.getObjectByPk(qualifiedTableName, pkMap);
+        object = context.getObjectByPk(qualifiedTableName, pkObject);
         form.readFromObject(object);
         form.readFromRequest(req);
         if (form.validate()) {
@@ -401,7 +406,7 @@ public class TableDataAction extends PortofinoAction
 
         setupTable();
 
-        FormBuilder formBuilder = new FormBuilder(table);
+        FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
         form.setMode(Mode.BULK_EDIT);
 
@@ -411,15 +416,14 @@ public class TableDataAction extends PortofinoAction
     public String bulkUpdate() {
         setupTable();
 
-        FormBuilder formBuilder = new FormBuilder(table);
+        FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
         form.setMode(Mode.BULK_EDIT);
         form.readFromRequest(req);
         if (form.validate()) {
             for (String current : selection) {
-                HashMap<String, Object> pkMap =
-                        tableHelper.parsePkString(table, current);
-                object = context.getObjectByPk(qualifiedTableName, pkMap);
+                Object pkObject = pkHelper.parsePkString(current);
+                object = context.getObjectByPk(qualifiedTableName, pkObject);
                 form.writeToObject(object);
             }
             form.writeToObject(object);
@@ -438,8 +442,8 @@ public class TableDataAction extends PortofinoAction
 
     public String delete() {
         setupTable();
-        HashMap<String, Object> pkMap = tableHelper.parsePkString(table, pk);
-        context.deleteObject(qualifiedTableName, pkMap);
+        Object pkObject = pkHelper.parsePkString(pk);
+        context.deleteObject(qualifiedTableName, pkObject);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
         return DELETE;
     }
@@ -452,9 +456,8 @@ public class TableDataAction extends PortofinoAction
             return CANCEL;
         }
         for (String current : selection) {
-            HashMap<String, Object> pkMap =
-                    tableHelper.parsePkString(table, current);
-            context.deleteObject(qualifiedTableName, pkMap);
+            Object pkObject = pkHelper.parsePkString(current);
+            context.deleteObject(qualifiedTableName, pkObject);
         }
         SessionMessages.addInfoMessage(MessageFormat.format(
                 "DELETE di {0} oggetti avvenuto con successo", selection.length));

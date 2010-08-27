@@ -33,6 +33,7 @@ import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.users.User;
+
 import java.util.List;
 
 
@@ -86,8 +87,6 @@ public interface Context {
     void saveOrUpdateObject(String qualifiedTableName, Object obj);
 
     void saveObject(String qualifiedTableName, Object obj);
-
-    Object createNewObject (String qualifiedTableName);
 
     void updateObject(String qualifiedTableName, Object obj);
 

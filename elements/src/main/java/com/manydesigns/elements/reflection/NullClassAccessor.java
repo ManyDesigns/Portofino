@@ -42,6 +42,10 @@ public final class NullClassAccessor implements ClassAccessor {
 
     private NullClassAccessor() {}
 
+    public String getName() {
+        return null;
+    }
+
     public PropertyAccessor getProperty(String fieldName)
             throws NoSuchFieldException {
         throw new NoSuchFieldException(fieldName);
@@ -49,5 +53,13 @@ public final class NullClassAccessor implements ClassAccessor {
 
     public PropertyAccessor[] getProperties() {
         return new PropertyAccessor[0];
+    }
+
+    public PropertyAccessor[] getKeyProperties() {
+        return new PropertyAccessor[0];
+    }
+
+    public Object newInstance() {
+        return null;
     }
 }

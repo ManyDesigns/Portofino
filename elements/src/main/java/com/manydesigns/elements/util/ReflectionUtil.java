@@ -69,7 +69,7 @@ public class ReflectionUtil {
                     "Loaded class: {0}", aClass);
             return aClass;
         } catch (Throwable e) {
-            LogUtil.fineMF(logger,
+            LogUtil.warningMF(logger,
                     "Could not load class: {0}", e, className);
             return null;
         }
@@ -86,7 +86,7 @@ public class ReflectionUtil {
                     "Found constructor: {0}", constructor);
             return constructor;
         } catch (Throwable e) {
-            LogUtil.fineMF(logger,
+            LogUtil.warningMF(logger,
                     "Could not find empty construtor for class: {0}",
                     e, aClass);
             return null;
@@ -102,7 +102,7 @@ public class ReflectionUtil {
         try {
             return constructor.newInstance();
         } catch (Throwable e) {
-            LogUtil.fineMF(logger,
+            LogUtil.warningMF(logger,
                     "Could not instanciate class: {0}", e, aClass);
             return null;
         }
