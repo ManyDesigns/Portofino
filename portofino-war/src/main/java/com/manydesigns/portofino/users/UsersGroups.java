@@ -29,7 +29,6 @@
 package com.manydesigns.portofino.users;
 
 import java.util.Date;
-import java.io.Serializable;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,28 +40,7 @@ public class UsersGroups {
     User user;
     Date creationDate;
 
-    public static class Id implements Serializable {
-        private Long uuid;
-        private Long groupId;
-
-        public Id() {}
-        public Id(Long uuid, Long groupId) {
-            this.uuid = uuid;
-            this.groupId = groupId;
-        }
-        public boolean equals(Object o) {
-            if (o != null && o instanceof Id) {
-                Id that = (Id)o;
-                return this.uuid.equals(that.uuid) &&
-                this.groupId.equals(that.groupId);
-            } else {
-                return false;
-            }
-        }
-        public int hashCode() {
-            return uuid.hashCode() + groupId.hashCode();
-        }
-    }
+    
 
     private Id id = new Id();
 
@@ -96,6 +74,22 @@ public class UsersGroups {
 
     public void setId(Id id) {
         this.id = id;
+    }
+
+    public void setUserid(int uuid){
+        this.id.setUserid(uuid);
+    }
+
+    public void setGroupid(int groupId){
+        this.id.setGroupid(groupId);
+    }
+
+    public Integer getUserid(){
+        return this.id.getUserid();
+    }
+
+    public Integer getGroupid(){
+        return this.id.getGroupid();
     }
 }
 

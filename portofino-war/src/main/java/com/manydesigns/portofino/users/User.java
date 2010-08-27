@@ -29,10 +29,9 @@
 package com.manydesigns.portofino.users;
 
 import com.manydesigns.elements.annotations.Password;
-import com.manydesigns.elements.annotations.Email;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -94,13 +93,14 @@ public class User {
 
         User user = (User) o;
 
+        if (uuid != user.uuid) return false;
         if (email != null ? !email.equals(user.email) : user.email != null)
             return false;
         if (groups != null ? !groups.equals(user.groups) : user.groups != null)
             return false;
         if (pwd != null ? !pwd.equals(user.pwd) : user.pwd != null)
             return false;
-        if (uuid != null ? !uuid.equals(user.uuid) : user.uuid != null)
+        if (state != null ? !state.equals(user.state) : user.state != null)
             return false;
 
         return true;
@@ -108,9 +108,10 @@ public class User {
 
     @Override
     public int hashCode() {
-        int result = uuid != null ? uuid.hashCode() : 0;
+        Integer result = uuid;
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (pwd != null ? pwd.hashCode() : 0);
+        result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (groups != null ? groups.hashCode() : 0);
         return result;
     }

@@ -28,18 +28,17 @@
  */
 package com.manydesigns.portofino.actions.user;
 
-import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.users.User;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.users.User;
+import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.logging.Logger;
 import java.text.MessageFormat;
-
-import org.apache.struts2.interceptor.ServletRequestAware;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -88,7 +87,7 @@ public class LoginAction extends PortofinoAction
         final String email = user.getEmail();
         final String password = user.getPwd();
         user = context.authenticate(email, password);
-        if (null!=user && user.getUuid()!=null) {
+        if (null!=user && user.getUuid()!=0) {
             return SUCCESS;
         } else {
             String errMsg = MessageFormat.format("FAILED AUTH for user {0}", email);

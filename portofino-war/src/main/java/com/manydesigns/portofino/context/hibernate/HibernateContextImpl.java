@@ -239,7 +239,16 @@ public class HibernateContextImpl implements Context {
     public List<Object> getAllObjects(String qualifiedTableName) {
         Session session = getSession(qualifiedTableName);
 
-        Criteria hibernateCriteria = session.createCriteria(qualifiedTableName);
+        Criteria hibernateCriteria;
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+
+        if (table.getClassName()==null) {
+            hibernateCriteria = session.createCriteria(qualifiedTableName);
+        } else {
+            hibernateCriteria = session.createCriteria
+                    (ReflectionUtil.loadClass(table.getClassName()));
+        }
+
         startTimer();
         //noinspection unchecked
         List<Object> result = hibernateCriteria.list();
@@ -403,7 +412,7 @@ public class HibernateContextImpl implements Context {
                     Column fromColumn = reference.getFromColumn();
                     Column toColumn = reference.getToColumn();
                     PropertyAccessor propertyAccessor2
-                        = classAccessor.getProperty(toColumn.getClassProperty());
+                        = classAccessor.getProperty(toColumn.getPropertyName());
                     Object critObj = propertyAccessor2.get(obj);
 
                     criteria.add(Restrictions.eq(fromColumn.getColumnName(),

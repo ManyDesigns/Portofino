@@ -48,6 +48,7 @@ public class PrimaryKey {
     protected String schemaName;
     protected String tableName;
     protected String pkName;
+    protected String className;
     protected final List<Column> columns;
 
 
@@ -102,5 +103,13 @@ public class PrimaryKey {
 
     public List<Column> getColumns() {
         return columns;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
     }
 }

@@ -200,6 +200,7 @@ public class ModelParser extends XmlParser {
                             currentTable.getTableName(),
                             attributes.get("name"));
             currentTable.setPrimaryKey(pk);
+            pk.setClassName(attributes.get("className"));
             expectElement(COLUMN, 1, null, new PrimaryKeyColumnCallback());
         }
     }

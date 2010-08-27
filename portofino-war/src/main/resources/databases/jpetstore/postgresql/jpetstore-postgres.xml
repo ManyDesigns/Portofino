@@ -5,7 +5,8 @@
             <schemas>
                 <schema name="public">
                     <tables>
-                        <table name="user_" class="com.manydesigns.portofino.users.User">
+                        <table name="user_"
+                               class="com.manydesigns.portofino.users.User">
                             <columns>
                                 <column name="userid"
                                         autoincrement="true"
@@ -33,7 +34,8 @@
                                     <column name="userid"/>
                                 </primaryKey>
                         </table>
-                        <table name="group_">
+                        <table name="group_"
+                               class="com.manydesigns.portofino.users.Group">
                             <columns>
                                 <column name="groupid"
                                         autoincrement="true"
@@ -41,7 +43,8 @@
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
-                                        nullable="false"/>
+                                        nullable="false"
+                                        propertyName="groupId"/>
                                 <column name="name"
                                         columnType="varchar"
                                         javaType="java.lang.String"
@@ -59,7 +62,8 @@
                                     <column name="groupid"/>
                                 </primaryKey>
                         </table>
-                        <table name="users_groups" manyToMany="true">
+                        <table name="users_groups" manyToMany="true"
+                               class="com.manydesigns.portofino.users.UsersGroups">
                             <columns>
                                 <column name="userid"
                                         autoincrement="true"
@@ -67,17 +71,18 @@
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
-                                        nullable="false"/>
+                                        nullable="false" />
                                 <column name="groupid"
                                         autoincrement="true"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
-                                        nullable="false"/>
+                                        nullable="false" />
 
                                 </columns>
-                                <primaryKey name="pk_group">
+                                <primaryKey name="pk_group"
+                                            className="com.manydesigns.portofino.users.Id">
                                     <column name="userid"/>
                                     <column name="groupid"/>
                                 </primaryKey>
@@ -96,7 +101,7 @@
                                               toTable="group_"
                                               onUpdate="NO ACTION"
                                               onDelete="NO ACTION"
-                                              classManyProperty="users">
+                                              manyPropertyName="users">
                                     <reference fromColumn="groupid"
                                                toColumn="groupid"/>
                                 </relationship>

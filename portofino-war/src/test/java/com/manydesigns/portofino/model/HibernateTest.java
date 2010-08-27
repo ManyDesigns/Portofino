@@ -30,6 +30,9 @@ package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
+import com.manydesigns.portofino.users.User;
+import com.manydesigns.portofino.users.UsersGroups;
+import com.manydesigns.portofino.users.Group;
 import junit.framework.TestCase;
 
 import java.math.BigDecimal;
@@ -66,10 +69,23 @@ public class HibernateTest extends TestCase {
 
     }
 
-    public void testReadUsers() {
-        List<Object> resultProd =
+    public void testUsers() {
+        List<Object> groupList =
+                context.getAllObjects("portofino.public.group_");
+        assertEquals( 2, groupList.size());
+
+        List<Object> usergroups =
+                context.getAllObjects("portofino.public.users_groups");
+        assertEquals( 2, usergroups.size());
+
+        List<Object> users =
                 context.getAllObjects("portofino.public.user_");
-        assertEquals("prodotti", 1, resultProd.size());
+        assertEquals("numero utenti", 1, users.size());
+        User admin = (User) users.get(0);
+        List<UsersGroups> groups = admin.getGroups();
+        assertEquals("numero gruppi per admin", 2, groups.size());
+        UsersGroups ug1 = groups.get(0);
+        Group g1 = ug1.getGroup();
 
     }
     public void testReadCategorieProdotti() {
