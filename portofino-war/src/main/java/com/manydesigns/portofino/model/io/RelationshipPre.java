@@ -45,7 +45,7 @@ class RelationshipPre {
     public String relationshipName;
     public String onUpdate;
     public String onDelete;
-    public String classManyProperty;
+    public String manyPropertyName;
     List<ReferencePre> references = new ArrayList<ReferencePre>();
 
     RelationshipPre(String fromDB, String toDB,
@@ -144,11 +144,11 @@ class RelationshipPre {
         this.toSchema = toSchema;
     }
 
-    public String getClassManyProperty() {
-        return classManyProperty;
+    public String getManyPropertyName() {
+        return manyPropertyName;
     }
 
-    public void setClassManyProperty(String classManyProperty) {
-        this.classManyProperty = classManyProperty;
+    public void setManyPropertyName(String manyPropertyName) {
+        this.manyPropertyName = manyPropertyName;
     }
 }

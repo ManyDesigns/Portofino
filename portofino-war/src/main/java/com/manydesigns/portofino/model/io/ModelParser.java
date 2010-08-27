@@ -177,7 +177,7 @@ public class ModelParser extends XmlParser {
                             Integer.parseInt(attributes.get("length")),
                             Integer.parseInt(attributes.get("scale"))
                             );
-            
+
             String propertyName = attributes.get("propertyName");
             if (propertyName == null) {
                 propertyName = columnName;
@@ -237,10 +237,13 @@ public class ModelParser extends XmlParser {
                             attributes.get("name"),
                             attributes.get("onUpdate"),
                             attributes.get("onDelete"));
-            String classManyProperty = attributes.get("classManyProperty");
-            if (classManyProperty!=null){
-                rel.setClassManyProperty(classManyProperty);
+            
+            String propertyName = attributes.get("manyPropertyName");
+            if (propertyName == null) {
+                propertyName = rel.getRelationshipName();
             }
+            rel.setManyPropertyName(propertyName);
+
             relationships.add(rel);
             expectElement(REFERENCE, 1, null, new ReferenceCallback());
         }
@@ -355,7 +358,7 @@ public class ModelParser extends XmlParser {
             final Table toTable = getTable(relPre.getToSchema(), relPre.getToTable());
             rel.setFromTable(fromTable);
             rel.setToTable(toTable);
-            rel.setClassManyProperty(relPre.getClassManyProperty());
+            rel.setClassManyProperty(relPre.getManyPropertyName());
             fromTable.getManyToOneRelationships().add(rel);
             toTable.getOneToManyRelationships().add(rel);
 

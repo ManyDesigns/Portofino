@@ -30,12 +30,13 @@
 package com.manydesigns.portofino.context.hibernate;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.io.ConnectionsParser;
 import com.manydesigns.portofino.model.io.ModelParser;
 import com.manydesigns.portofino.model.site.SiteNode;
@@ -194,30 +195,31 @@ public class HibernateContextImpl implements Context {
     //**************************************************************************
 
     public Object getObjectByPk(String qualifiedTableName,
-                                             Object... pk) {
+                                Object... pk) {
         throw new UnsupportedOperationException();
     }
-    
+
     public Object getObjectByPk(String qualifiedTableName,
-                                             Object pk) {
+                                Object pk) {
         Session session = getSession(qualifiedTableName);
 
         if (pk instanceof HashMap) {
             HashMap<String, Object> key = (HashMap<String, Object>) pk;
-            if (key.size()>2){
+            if (key.size() > 2) {
                 startTimer();
                 @SuppressWarnings({"unchecked"}) Map<String, Object> result =
-                        (Map<String, Object>)session.load(qualifiedTableName, key);
+                        (Map<String, Object>)
+                                session.load(qualifiedTableName, key);
                 stopTimer();
                 return result;
             } else {
                 startTimer();
-                for (Map.Entry entry : key.entrySet()){
-                    if (((String)entry.getKey()).startsWith("$")) {
+                for (Map.Entry entry : key.entrySet()) {
+                    if (((String) entry.getKey()).startsWith("$")) {
                         continue;
                     }
                     @SuppressWarnings({"unchecked"}) Map<String, Object> result =
-                            (Map<String, Object>)session.load(qualifiedTableName,
+                            (Map<String, Object>) session.load(qualifiedTableName,
                                     (Serializable) entry.getValue());
                     stopTimer();
                     return result;
@@ -225,7 +227,7 @@ public class HibernateContextImpl implements Context {
             }
         } else {
             startTimer();
-            Object result =  session.load(qualifiedTableName, (Serializable) pk);
+            Object result = session.load(qualifiedTableName, (Serializable) pk);
             stopTimer();
             return result;
         }
@@ -261,7 +263,7 @@ public class HibernateContextImpl implements Context {
     public List<Object> getObjects(
             com.manydesigns.elements.fields.search.Criteria criteria) {
         HibernateCriteriaAdapter hibernateCriteriaAdapter =
-                (HibernateCriteriaAdapter)criteria;
+                (HibernateCriteriaAdapter) criteria;
         Criteria hibernateCriteria =
                 hibernateCriteriaAdapter.getHibernateCriteria();
         startTimer();
@@ -290,10 +292,10 @@ public class HibernateContextImpl implements Context {
     public Object createNewObject(String qualifiedTableName) {
         Table table = model.findTableByQualifiedName(qualifiedTableName);
         String className = table.getClassName();
-        if (className==null){
-            HashMap<String, Object> obj =  new HashMap<String, Object>();
+        if (className == null) {
+            HashMap<String, Object> obj = new HashMap<String, Object>();
             obj.put("$type$", qualifiedTableName);
-            return obj;                                                   
+            return obj;
         } else {
             return ReflectionUtil.newInstance(className);
         }
@@ -328,7 +330,7 @@ public class HibernateContextImpl implements Context {
     }
 
     public void openSession() {
-        for (HibernateDatabaseSetup current: setups.values()) {
+        for (HibernateDatabaseSetup current : setups.values()) {
             SessionFactory sessionFactory = current.getSessionFactory();
             Session session = sessionFactory.openSession();
             current.setThreadSession(session);
@@ -337,7 +339,7 @@ public class HibernateContextImpl implements Context {
 
 
     public void closeSession() {
-        for (HibernateDatabaseSetup current: setups.values()) {
+        for (HibernateDatabaseSetup current : setups.values()) {
             Session session = current.getThreadSession();
             if (session != null) {
                 session.close();
@@ -348,18 +350,23 @@ public class HibernateContextImpl implements Context {
 
     @SuppressWarnings({"unchecked"})
     public List<Object> getRelatedObjects(String qualifiedTableName,
-            Object obj, String oneToManyRelationshipName) {
-        /*if (obj instanceof HashMap){
-            HashMap<String, Object> objHM = (HashMap<String, Object>) obj;
-            if (objHM.get(oneToManyRelationshipName) instanceof List){
+                                          Object obj,
+                                          String oneToManyRelationshipName) {
+        Relationship relationship =
+                model.findOneToManyRelationship(
+                        qualifiedTableName, oneToManyRelationshipName);
+        Table fromTable = relationship.getFromTable();
+
+        Class clazz = obj.getClass();
+
+
+        if (obj instanceof HashMap) {
+            HashMap<String, Object> map = (HashMap<String, Object>) obj;
+            if (map.get(oneToManyRelationshipName) instanceof List) {
                 return (List<Object>)
-                        objHM.get(oneToManyRelationshipName);
+                        map.get(oneToManyRelationshipName);
             }
 
-            Relationship relationship =
-                    model.findOneToManyRelationship(
-                            qualifiedTableName, oneToManyRelationshipName);
-            Table fromTable = relationship.getFromTable();
 
             Session session =
                     setups.get(fromTable.getDatabaseName()).getThreadSession();
@@ -369,7 +376,7 @@ public class HibernateContextImpl implements Context {
                 Column fromColumn = reference.getFromColumn();
                 Column toColumn = reference.getToColumn();
                 criteria.add(Restrictions.eq(fromColumn.getColumnName(),
-                        objHM.get(toColumn.getColumnName())));
+                        map.get(toColumn.getColumnName())));
             }
             startTimer();
             //noinspection unchecked
@@ -377,16 +384,17 @@ public class HibernateContextImpl implements Context {
             stopTimer();
             return result;
         } else {
-               if (obj.get(oneToManyRelationshipName) instanceof List){
-                    return (List<Object>)
-                            obj.get(oneToManyRelationshipName);
+            JavaClassAccessor classAccessor = new JavaClassAccessor(clazz);
+                String propertyName = relationship.getClassManyProperty();
+            try {
+
+                PropertyAccessor propertyAccessor
+                        = classAccessor.getProperty(propertyName);
+                Object list = propertyAccessor.get(obj);
+
+                if (list instanceof List) {
+                    return (List<Object>) list;
                 }
-
-                Relationship relationship =
-                        model.findOneToManyRelationship(
-                                qualifiedTableName, oneToManyRelationshipName);
-                Table fromTable = relationship.getFromTable();
-
                 Session session =
                         setups.get(fromTable.getDatabaseName()).getThreadSession();
                 Criteria criteria =
@@ -394,15 +402,24 @@ public class HibernateContextImpl implements Context {
                 for (Reference reference : relationship.getReferences()) {
                     Column fromColumn = reference.getFromColumn();
                     Column toColumn = reference.getToColumn();
+                    PropertyAccessor propertyAccessor2
+                        = classAccessor.getProperty(toColumn.getClassProperty());
+                    Object critObj = propertyAccessor2.get(obj);
+
                     criteria.add(Restrictions.eq(fromColumn.getColumnName(),
-                            obj.get(toColumn.getColumnName())));
+                            critObj));
                 }
                 startTimer();
                 //noinspection unchecked
                 List<Object> result = criteria.list();
                 stopTimer();
                 return result;
-        } */
+            } catch (Throwable e) {
+                LogUtil.warningMF(logger,
+                        "Cannot invoke property accessor for {0} on class {1}",
+                        e, propertyName, clazz.getName());
+            }
+        }
         return null;
     }
 
@@ -412,7 +429,7 @@ public class HibernateContextImpl implements Context {
 
     public List<String> getDDLCreate() {
         List<String> result = new ArrayList<String>();
-        for (Database db : model.getDatabases()){
+        for (Database db : model.getDatabases()) {
             result.add("-- DB: " + db.getDatabaseName());
             HibernateDatabaseSetup setup = setups.get(db.getDatabaseName());
             Configuration conf = setup.getConfiguration();
@@ -428,30 +445,30 @@ public class HibernateContextImpl implements Context {
         List<String> result = new ArrayList<String>();
 
 
-        for (Database db : model.getDatabases()){
+        for (Database db : model.getDatabases()) {
             HibernateDatabaseSetup setup = setups.get(db.getDatabaseName());
             DatabaseMetadata databaseMetadata;
-            ConnectionProvider provider= null;
+            ConnectionProvider provider = null;
             Connection conn = null;
             try {
-                provider =  getConnectionProvider(db.getDatabaseName());
+                provider = getConnectionProvider(db.getDatabaseName());
                 conn = provider.acquireConnection();
 
                 databaseMetadata = new DatabaseMetadata(
                         conn,
                         getDialect(provider));
 
-            result.add("-- DB: " + db.getDatabaseName());
+                result.add("-- DB: " + db.getDatabaseName());
 
-            Configuration conf = setup.getConfiguration();
-            String[] ddls = conf.generateSchemaUpdateScript(
-                    getDialect(provider), databaseMetadata);
+                Configuration conf = setup.getConfiguration();
+                String[] ddls = conf.generateSchemaUpdateScript(
+                        getDialect(provider), databaseMetadata);
                 result.addAll(Arrays.asList(ddls));
 
             } catch (Throwable e) {
-              //TODO
+                //TODO
             } finally {
-              provider.releaseConnection(conn);  
+                provider.releaseConnection(conn);
             }
 
         }
@@ -465,14 +482,14 @@ public class HibernateContextImpl implements Context {
         String qualifiedTableName = "portofino.public.user_";
         Session session = getSession(qualifiedTableName);
         Criteria criteria = session.createCriteria(qualifiedTableName);
-        criteria.add(Restrictions.eq( "emailaddress", email ));
-        criteria.add(Restrictions.eq( "pwd", password ));
+        criteria.add(Restrictions.eq("emailaddress", email));
+        criteria.add(Restrictions.eq("pwd", password));
         startTimer();
-        
+
         List<Object> result = criteria.list();
         stopTimer();
 
-        if (result.size()==1){
+        if (result.size() == 1) {
             User authUser = (User) result.get(0);
             setCurrentUser(authUser);
             return authUser;
@@ -524,20 +541,20 @@ public class HibernateContextImpl implements Context {
         }
     }
 
-    private Dialect getDialect (ConnectionProvider provider) {
+    private Dialect getDialect(ConnectionProvider provider) {
         String vendor = provider.getDatabaseProductName();
         if (vendor.toLowerCase().contains("derby"))
-            return  new DerbyDialect();
+            return new DerbyDialect();
         if (vendor.toLowerCase().contains("postgres"))
-            return  new PostgreSQLDialect();
+            return new PostgreSQLDialect();
         if (vendor.toLowerCase().contains("db2"))
-            return  new DB2Dialect();
+            return new DB2Dialect();
         if (vendor.toLowerCase().contains("mysql"))
-            return  new MySQL5Dialect();
+            return new MySQL5Dialect();
         if (vendor.toLowerCase().contains("microsoft sql"))
-            return  new SQLServerDialect();
+            return new SQLServerDialect();
         if (vendor.toLowerCase().contains("oracle"))
-            return  new Oracle9iDialect();
+            return new Oracle9iDialect();
         return null;
     }
 }

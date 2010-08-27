@@ -87,7 +87,7 @@
                                               toTable="user_"
                                               onUpdate="NO ACTION"
                                               onDelete="NO ACTION"
-                                              classManyProperty="groups">
+                                              manyPropertyName="groups">
                                     <reference fromColumn="userid"
                                                toColumn="userid"/>
                                 </relationship>

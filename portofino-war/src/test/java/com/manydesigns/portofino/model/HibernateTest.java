@@ -61,12 +61,17 @@ public class HibernateTest extends TestCase {
     public void testReadProdotti() {
         List<Object> resultProd =
                 context.getAllObjects("jpetstore.public.product");
-
         int sizePrd = resultProd.size();
         assertEquals("prodotti", 16, sizePrd);
 
     }
 
+    public void testReadUsers() {
+        List<Object> resultProd =
+                context.getAllObjects("portofino.public.user_");
+        assertEquals("prodotti", 1, resultProd.size());
+
+    }
     public void testReadCategorieProdotti() {
         List<Object> resultCat =
                 context.getAllObjects("jpetstore.public.category");
