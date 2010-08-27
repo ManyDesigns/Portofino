@@ -73,9 +73,6 @@ public interface Context {
     //**************************************************************************
 
     Object getObjectByPk(String qualifiedTableName,
-                                      Object... pk);
-
-    Object getObjectByPk(String qualifiedTableName,
                                       Object pk);
 
     List<Object> getAllObjects(String qualifiedTableName);
@@ -83,6 +80,8 @@ public interface Context {
     Criteria createCriteria(String qualifiedTableName);
 
     List<Object> getObjects(Criteria criteria);
+
+    List<Object> getObjects(Criteria criteria, String filter);
 
     void saveOrUpdateObject(String qualifiedTableName, Object obj);
 

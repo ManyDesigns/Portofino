@@ -287,4 +287,11 @@
                  urlExpression="http://www.google.com/search?q=%{key}"
                 />
     </portlets>
+    <useCases>
+        <useCase name="usecase1"
+                 title="Use case 1"
+                 table="jpetstore.public.product"
+                 filter="category = 'FISH'"
+                 />
+    </useCases>
 </model>

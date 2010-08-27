@@ -65,6 +65,54 @@
                 class="com.manydesigns.portofino.actions.HomepageAction">
             <result name="success">/skins/default/homepage.jsp</result>
         </action>
+
+        <action name="*/UseCase"
+                class="com.manydesigns.portofino.actions.UseCaseAction">
+            <param name="skin">default</param>
+            <param name="useCaseName">{1}</param>
+
+            <result name="search">/skins/default/useCase/search.jsp</result>
+
+            <result name="read">/skins/default/useCase/read.jsp</result>
+
+            <result name="create">/skins/default/useCase/create.jsp</result>
+
+            <result name="save" type="redirectAction">
+                <param name="actionName">%{useCaseName}/UseCase</param>
+                <param name="pk">%{pk}</param>
+            </result>
+
+            <result name="edit">/skins/default/useCase/edit.jsp</result>
+
+            <result name="update" type="redirectAction">
+                <param name="actionName">%{useCaseName}/UseCase</param>
+                <param name="pk">%{pk}</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="bulkEdit">/skins/default/useCase/bulkEdit.jsp</result>
+
+            <result name="bulkUpdate" type="redirectAction">
+                <param name="actionName">%{useCaseName}/UseCase</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="returnToSearch" type="redirectAction">
+                <param name="actionName">%{useCaseName}/UseCase</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="delete" type="redirectAction">
+                <param name="actionName">%{useCaseName}/UseCase</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="cancel" type="redirect">
+                <param name="location">${cancelReturnUrl}</param>
+                <param name="prependServletContext">false</param>
+            </result>
+        </action>
+
     </package>
 
 

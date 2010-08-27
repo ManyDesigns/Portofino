@@ -44,6 +44,7 @@ import org.apache.commons.lang.time.StopWatch;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Query;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.dialect.*;
@@ -193,11 +194,6 @@ public class HibernateContextImpl implements Context {
     //**************************************************************************
 
     public Object getObjectByPk(String qualifiedTableName,
-                                             Object... pk) {
-        throw new UnsupportedOperationException();
-    }
-    
-    public Object getObjectByPk(String qualifiedTableName,
                                              Object pk) {
         Session session = getSession(qualifiedTableName);
 
@@ -254,7 +250,7 @@ public class HibernateContextImpl implements Context {
     createCriteria(String qualifiedTableName) {
         Session session = getSession(qualifiedTableName);
         Criteria hibernateCriteria = session.createCriteria(qualifiedTableName);
-        return new HibernateCriteriaAdapter(hibernateCriteria);
+        return new HibernateCriteriaAdapter(session, hibernateCriteria);
     }
 
     public List<Object> getObjects(
@@ -268,6 +264,24 @@ public class HibernateContextImpl implements Context {
         List<Object> result = hibernateCriteria.list();
         stopTimer();
         return result;
+    }
+
+    public List<Object> getObjects(
+            com.manydesigns.elements.fields.search.Criteria criteria,
+            String filter) {
+        HibernateCriteriaAdapter hibernateCriteriaAdapter =
+                (HibernateCriteriaAdapter)criteria;
+        Criteria hibernateCriteria =
+                hibernateCriteriaAdapter.getHibernateCriteria();
+        Session session = hibernateCriteriaAdapter.getHibernateSession();
+        startTimer();
+        //noinspection unchecked
+//        List<Object> result1 = hibernateCriteria.list();
+        Query query = session.createFilter(hibernateCriteria.list(), filter);
+        //noinspection unchecked
+        List<Object> result2 = query.list();
+        stopTimer();
+        return result2;
     }
 
     public void saveOrUpdateObject(String qualifiedTableName, Object obj) {

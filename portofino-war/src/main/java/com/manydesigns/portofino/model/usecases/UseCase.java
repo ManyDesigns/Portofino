@@ -27,37 +27,58 @@
  *
  */
 
-package com.manydesigns.elements.fields.search;
-
-import com.manydesigns.elements.reflection.PropertyAccessor;
+package com.manydesigns.portofino.model.usecases;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface Criteria {
+public class UseCase {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public void eq(PropertyAccessor accessor, Object value);
-    public void ne(PropertyAccessor accessor, Object value);
+    protected String name;
+    protected String title;
+    protected String table;
+    protected String filter;
 
-    public void between(PropertyAccessor accessor, Object min, Object max);
+    public UseCase(String name, String title, String table, String filter) {
+        this.name = name;
+        this.title = title;
+        this.table = table;
+        this.filter = filter;
+    }
 
-    public void gt(PropertyAccessor accessor, Object value);
-    public void ge(PropertyAccessor accessor, Object value);
+    public String getName() {
+        return name;
+    }
 
-    public void lt(PropertyAccessor accessor, Object value);
-    public void le(PropertyAccessor accessor, Object value);
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public void like(PropertyAccessor accessor, String value);
-    public void like(PropertyAccessor accessor, String value,
-                     TextMatchMode textMatchMode);
+    public String getTitle() {
+        return title;
+    }
 
-    public void ilike(PropertyAccessor accessor, String value);
-    public void ilike(PropertyAccessor accessor, String value,
-                     TextMatchMode textMatchMode);
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    void sqlRestriction(String sql);
+    public String getTable() {
+        return table;
+    }
+
+    public void setTable(String table) {
+        this.table = table;
+    }
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
 }
