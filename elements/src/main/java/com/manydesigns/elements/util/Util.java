@@ -27,7 +27,9 @@
  *
  */
 
-package com.manydesigns.elements;
+package com.manydesigns.elements.util;
+
+import com.manydesigns.elements.ElementsThreadLocals;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;

@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
@@ -56,7 +57,6 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     //**************************************************************************
 
     protected String status;
-    protected ClassLoader cl;
     public static final Logger logger =
             LogUtil.getLogger(AbstractDatabasePlatform.class);
 
@@ -65,7 +65,6 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     //**************************************************************************
 
     public AbstractDatabasePlatform() {
-        cl = AbstractDatabasePlatform.class.getClassLoader();
         status = STATUS_CREATED;
     }
 
@@ -74,11 +73,12 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     //**************************************************************************
 
     public void test() {
-        try {
-            cl.loadClass(getStandardDriverClassName());
-            status = STATUS_OK;
-        } catch (Throwable e) {
+        Class driverClass =
+                ReflectionUtil.loadClass(getStandardDriverClassName());
+        if (driverClass == null) {
             status = STATUS_DRIVER_NOT_FOUND;
+        } else {
+            status = STATUS_OK;
         }
     }
 

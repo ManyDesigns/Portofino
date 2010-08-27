@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.model.io;
 
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.portlets.Portlet;
@@ -46,23 +47,19 @@ public class ModelParser extends XmlParser {
     private static final String PORTLET = "portlet";
 
     private List<RelationshipPre> relationships;
-    protected ClassLoader classLoader;
 
     Model model;
     Database currentDatabase;
     Schema currentSchema;
     Table currentTable;
 
-    public ModelParser() {
-        classLoader = this.getClass().getClassLoader();
-    }
+    public ModelParser() {}
 
     public Model parse(String fileName) throws Exception {
         model = new Model();
         relationships = new ArrayList<RelationshipPre>();
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-        ClassLoader cl = this.getClass().getClassLoader();
-        InputStream input = cl.getResourceAsStream(fileName);
+        InputStream input = ReflectionUtil.getResourceAsStream(fileName);
         XMLStreamReader xmlStreamReader = inputFactory.createXMLStreamReader(input);
         initParser(xmlStreamReader);
         expectDocument(new ModelDocumentCallback());
@@ -168,27 +165,27 @@ public class ModelParser extends XmlParser {
                 throws XMLStreamException {
             checkRequiredAttributes(attributes,
                     "name", "columnType", "length", "scale", "nullable");
+            String columnName = attributes.get("name");
             Column column =
                     new Column(currentTable.getDatabaseName(),
                             currentTable.getSchemaName(),
                             currentTable.getTableName(),
-                            attributes.get("name"),
+                            columnName,
                             attributes.get("columnType"),
                             Boolean.parseBoolean(attributes.get("nullable")),
                             Boolean.parseBoolean(attributes.get("autoincrement")),
                             Integer.parseInt(attributes.get("length")),
                             Integer.parseInt(attributes.get("scale"))
                             );
-            String classProperty = attributes.get("classProperty");
-            if (classProperty!=null){
-                column.setClassProperty(classProperty);
+            
+            String propertyName = attributes.get("propertyName");
+            if (propertyName == null) {
+                propertyName = columnName;
             }
-            try {
-                Class javatype = Class.forName(attributes.get("javaType"));
-                column.setJavaType(javatype);
-            } catch (ClassNotFoundException e) {
-                throw new Error(e);
-            }
+            column.setPropertyName(propertyName);
+
+            Class javatype = ReflectionUtil.loadClass(attributes.get("javaType"));
+            column.setJavaType(javatype);
 
             currentTable.getColumns().add(column);
         }

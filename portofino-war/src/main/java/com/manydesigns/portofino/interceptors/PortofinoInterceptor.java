@@ -29,11 +29,11 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.elements.Util;
+import com.manydesigns.elements.util.Util;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.servlets.PortofinoListener;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;

@@ -32,6 +32,7 @@ package com.manydesigns.portofino.reflection;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.Table;
 
@@ -62,15 +63,11 @@ public class TableAccessor implements ClassAccessor {
     public TableAccessor(Table table) {
         String className = table.getClassName();
         if (className != null) {
-            ClassLoader classLoader = TableAccessor.class.getClassLoader();
-            try {
-                Class clazz = classLoader.loadClass(className);
+            Class clazz = ReflectionUtil.loadClass(className);
+            if (clazz != null) {
                 javaClassAccessor =
-                        ClassAccessorManager
-                                .getManager()
+                        ClassAccessorManager.getManager()
                                 .tryToInstantiateFromClass(clazz);
-            } catch (ClassNotFoundException e) {
-                // TODO:
             }
         }
 
@@ -84,8 +81,8 @@ public class TableAccessor implements ClassAccessor {
             PropertyAccessor nestedPropertyAccessor = null;
             if (javaClassAccessor != null) {
                 String propertyName = current.getColumnName();
-                if (current.getClassProperty() != null) {
-                    propertyName = current.getClassProperty();
+                if (current.getPropertyName() != null) {
+                    propertyName = current.getPropertyName();
                 }
                 try {
                     nestedPropertyAccessor =

@@ -30,6 +30,7 @@
 package com.manydesigns.elements;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.util.ReflectionUtil;
 
 import java.io.InputStream;
 import java.util.Properties;
@@ -86,8 +87,7 @@ public final class ElementsProperties {
     }
 
     private static void loadProperties(String resource) {
-        ClassLoader cl = ElementsProperties.class.getClassLoader();
-        InputStream stream = cl.getResourceAsStream(resource);
+        InputStream stream = ReflectionUtil.getResourceAsStream(resource);
         if (stream == null) {
             LogUtil.infoMF(logger, "Properties resource not found: {0}",
                     resource);

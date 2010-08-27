@@ -31,10 +31,10 @@ package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.InstanceBuilder;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.database.ConnectionProvider;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -58,7 +58,6 @@ public class DatabasePlatformManager {
     public static final Logger logger =
             LogUtil.getLogger(DatabasePlatformManager.class);
 
-    protected ClassLoader cl;
     protected ArrayList<DatabasePlatform> databasePlatformList;
 
     //**************************************************************************
@@ -87,7 +86,6 @@ public class DatabasePlatformManager {
     //**************************************************************************
 
     public DatabasePlatformManager() {
-        cl = DatabasePlatformManager.class.getClassLoader();
         databasePlatformList = new ArrayList<DatabasePlatform>();
         String listString = portofinoProperties.getProperty(
                 PortofinoProperties.DATABASE_PLATFORM_LIST_PROPERTY);
@@ -106,21 +104,20 @@ public class DatabasePlatformManager {
         databasePlatformClassName = databasePlatformClassName.trim();
         LogUtil.finerMF(logger,
                     "Adding database platform: {0}", databasePlatformClassName);
-        try {
-            Class helperClass = cl.loadClass(databasePlatformClassName);
-            Constructor constructor = helperClass.getConstructor();
-            DatabasePlatform databasePlatform =
-                    (DatabasePlatform)constructor.newInstance();
+        DatabasePlatform databasePlatform =
+                (DatabasePlatform)ReflectionUtil
+                        .newInstance(databasePlatformClassName);
+        if (databasePlatform == null) {
+            LogUtil.warningMF(logger, "Cannot load or instanciate: {0}",
+                    databasePlatformClassName);
+        } else {
             databasePlatform.test();
             databasePlatformList.add(databasePlatform);
-        } catch (Throwable e) {
-            LogUtil.warningMF(logger, "Cannot load or instanciate: {0}", e,
-                    databasePlatformClassName);
         }
     }
 
     //**************************************************************************
-    // Methdos
+    // Methods
     //**************************************************************************
 
     public DatabasePlatform findApplicableAbstraction(

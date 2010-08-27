@@ -36,8 +36,8 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.InstanceBuilder;
+import com.manydesigns.elements.util.ReflectionUtil;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -65,7 +65,6 @@ public class FieldManager implements FieldHelper {
     // Fields
     //**************************************************************************
 
-    protected final ClassLoader cl;
     protected final ArrayList<FieldHelper> helperList;
 
 
@@ -96,7 +95,6 @@ public class FieldManager implements FieldHelper {
     //**************************************************************************
 
     public FieldManager() {
-        cl = FieldManager.class.getClassLoader();
         helperList = new ArrayList<FieldHelper>();
         String listString = elementsProperties.getProperty(
                 ElementsProperties.FIELD_HELPERS_LIST_PROPERTY);
@@ -112,19 +110,18 @@ public class FieldManager implements FieldHelper {
     }
 
     public void addFieldHelper(String fieldHelperClassName) {
-        ClassLoader cl = FieldManager.class.getClassLoader();
-
         String helperClassName = fieldHelperClassName.trim();
         LogUtil.finerMF(logger,
                     "Adding field helper: {0}", helperClassName);
-        try {
-            Class helperClass = cl.loadClass(helperClassName);
-            Constructor constructor = helperClass.getConstructor();
-            FieldHelper helper = (FieldHelper)constructor.newInstance();
+        FieldHelper helper =
+                (FieldHelper) ReflectionUtil.newInstance(helperClassName);
+        if (helper == null) {
+            LogUtil.warningMF(logger,
+                        "Failed to add field helper: {0}", helperClassName);
+        } else {
             helperList.add(helper);
-        } catch (Throwable e) {
-            LogUtil.warningMF(logger, "Cannot load or instanciate: {0}", e,
-                    helperClassName);
+            LogUtil.finerMF(logger,
+                        "Added field helper: {0}", helper);
         }
     }
 

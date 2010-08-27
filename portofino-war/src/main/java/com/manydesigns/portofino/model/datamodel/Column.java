@@ -49,7 +49,6 @@ public class Column {
     protected String tableName;
     protected String columnName;
     protected String columnType;
-    protected String classProperty;
     protected boolean nullable;
     protected boolean autoincrement;
     protected int length;
@@ -60,6 +59,7 @@ public class Column {
     //**************************************************************************
 
     protected Class javaType;
+    protected String propertyName;
 
     //**************************************************************************
     // Constructors
@@ -169,12 +169,12 @@ public class Column {
                 databaseName, schemaName, tableName, columnName);
     }
 
-    public String getClassProperty() {
-        return classProperty;
+    public String getPropertyName() {
+        return propertyName;
     }
 
-    public void setClassProperty(String classProperty) {
-        this.classProperty = classProperty;
+    public void setPropertyName(String propertyName) {
+        this.propertyName = propertyName;
     }
 
     @Override
@@ -188,7 +188,7 @@ public class Column {
         if (length != column.length) return false;
         if (nullable != column.nullable) return false;
         if (scale != column.scale) return false;
-        if (classProperty != null ? !classProperty.equals(column.classProperty) : column.classProperty != null)
+        if (propertyName != null ? !propertyName.equals(column.propertyName) : column.propertyName != null)
             return false;
         if (columnName != null ? !columnName.equals(column.columnName) : column.columnName != null)
             return false;
@@ -213,7 +213,7 @@ public class Column {
         result = 31 * result + (tableName != null ? tableName.hashCode() : 0);
         result = 31 * result + (columnName != null ? columnName.hashCode() : 0);
         result = 31 * result + (columnType != null ? columnType.hashCode() : 0);
-        result = 31 * result + (classProperty != null ? classProperty.hashCode() : 0);
+        result = 31 * result + (propertyName != null ? propertyName.hashCode() : 0);
         result = 31 * result + (nullable ? 1 : 0);
         result = 31 * result + (autoincrement ? 1 : 0);
         result = 31 * result + length;

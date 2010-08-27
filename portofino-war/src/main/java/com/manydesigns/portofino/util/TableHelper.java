@@ -60,7 +60,7 @@ public class TableHelper {
                 sb.append(",");
             }
             sb.append("%{");
-            sb.append(column.getColumnName());
+            sb.append(column.getPropertyName());
             sb.append("}");
         }
         return ExpressionGenerator.create(sb.toString());
@@ -78,7 +78,7 @@ public class TableHelper {
             String stringValue = pkList[i];
             Object value = ConvertUtils.convert(
                     stringValue, column.getJavaType());
-            pkMap.put(column.getColumnName(), value);
+            pkMap.put(column.getPropertyName(), value);
             i++;
         }
 
@@ -98,7 +98,7 @@ public class TableHelper {
             }
             try {
                 PropertyAccessor propertyAccessor =
-                        classAccessor.getProperty(column.getColumnName());
+                        classAccessor.getProperty(column.getPropertyName());
                 Object value = propertyAccessor.get(object);
                 String stringValue = ConvertUtils.convert(value);
                 sb.append(stringValue);

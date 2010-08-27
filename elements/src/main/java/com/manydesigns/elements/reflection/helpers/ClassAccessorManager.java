@@ -33,8 +33,8 @@ import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.util.InstanceBuilder;
+import com.manydesigns.elements.util.ReflectionUtil;
 
-import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -61,7 +61,6 @@ public class ClassAccessorManager implements ClassAccessorHelper {
     // Fields
     //**************************************************************************
 
-    protected final ClassLoader cl;
     protected final List<ClassAccessorHelper> helperList;
     protected final Map<Object, ClassAccessor> classCache;
     protected boolean classCacheEnabled = true;
@@ -94,7 +93,6 @@ public class ClassAccessorManager implements ClassAccessorHelper {
     //**************************************************************************
 
     public ClassAccessorManager() {
-        cl = ClassAccessorManager.class.getClassLoader();
         helperList = new ArrayList<ClassAccessorHelper>();
         classCache = new WeakHashMap<Object, ClassAccessor>();
 
@@ -113,16 +111,17 @@ public class ClassAccessorManager implements ClassAccessorHelper {
 
     public void addFieldHelper(String helperClassName) {
         LogUtil.finerMF(logger,
-                    "Adding field helper: {0}", helperClassName);
-        try {
-            Class helperClass = cl.loadClass(helperClassName);
-            Constructor constructor = helperClass.getConstructor();
-            ClassAccessorHelper helper =
-                    (ClassAccessorHelper)constructor.newInstance();
+                "Adding class accessor helper: {0}", helperClassName);
+        ClassAccessorHelper helper =
+                (ClassAccessorHelper)ReflectionUtil
+                        .newInstance(helperClassName);
+        if (helper == null) {
+            LogUtil.warningMF(logger,
+                    "Failed to add class accessor helper: {0}", helperClassName);
+        } else {
             helperList.add(helper);
-        } catch (Throwable e) {
-            LogUtil.warningMF(logger, "Cannot load or instanciate: {0}", e,
-                    helperClassName);
+            LogUtil.finerMF(logger,
+                    "Added class accessor helper: {0}", helper);
         }
     }
 

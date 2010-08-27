@@ -14,14 +14,14 @@
                                         length="8"
                                         scale="0"
                                         nullable="false"
-                                        classProperty="uuid"/>
+                                        propertyName="uuid"/>
                                 <column name="emailaddress"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
                                         scale="0"
                                         nullable="false"
-                                        classProperty="email"/>
+                                        propertyName="email"/>
                                 <column name="pwd"
                                         columnType="varchar"
                                         javaType="java.lang.String"

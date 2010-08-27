@@ -30,13 +30,13 @@
 package com.manydesigns.elements.fields.search;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.Util;
 import com.manydesigns.elements.annotations.Id;
 import com.manydesigns.elements.annotations.InputName;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;

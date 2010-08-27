@@ -31,14 +31,13 @@ package com.manydesigns.elements.jfreechart;
 
 import com.manydesigns.elements.Element;
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.Util;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
-
-import javax.servlet.http.HttpServletRequest;
-
+import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.data.general.Dataset;
 import org.jfree.data.general.DefaultPieDataset;
-import org.jfree.chart.ChartRenderingInfo;
+
+import javax.servlet.http.HttpServletRequest;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

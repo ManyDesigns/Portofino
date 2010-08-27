@@ -29,6 +29,8 @@
 
 package com.manydesigns.elements.logging;
 
+import com.manydesigns.elements.util.ReflectionUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
@@ -55,8 +57,8 @@ public class LogUtil {
     public static void initializeLoggingSystem() {
         LogManager manager = LogManager.getLogManager();
         Logger logger = getLogger(LogUtil.class);
-        ClassLoader cl = LogUtil.class.getClassLoader();
-        InputStream is = cl.getResourceAsStream("logging.properties");
+        InputStream is =
+                ReflectionUtil.getResourceAsStream("logging.properties");
         try {
             manager.reset();
             manager.readConfiguration(is);

@@ -192,9 +192,9 @@ public class HibernateConfig {
         tab.addColumn(col);
 
         Property prop = new Property();
-        if (column.getClassProperty() != null) {
-            prop.setName(column.getClassProperty());
-            prop.setNodeName(column.getClassProperty());
+        if (column.getPropertyName() != null) {
+            prop.setName(column.getPropertyName());
+            prop.setNodeName(column.getPropertyName());
         } else {
             prop.setName(column.getColumnName());
             prop.setNodeName(column.getColumnName());
@@ -306,9 +306,9 @@ public class HibernateConfig {
         id.addColumn(col);
 
         Property prop = new Property();
-        if (column.getClassProperty() != null) {
-            prop.setName(column.getClassProperty());
-            prop.setNodeName(column.getClassProperty());
+        if (column.getPropertyName() != null) {
+            prop.setName(column.getPropertyName());
+            prop.setNodeName(column.getPropertyName());
         } else {
             prop.setName(column.getColumnName());
             prop.setNodeName(column.getColumnName());

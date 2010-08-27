@@ -30,12 +30,12 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.Util;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.jfreechart.JBla;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.portlets.Portlet;

@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.navigation;
 
-import com.manydesigns.elements.Util;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.portlets.Portlet;
 import com.manydesigns.portofino.model.site.SiteNode;

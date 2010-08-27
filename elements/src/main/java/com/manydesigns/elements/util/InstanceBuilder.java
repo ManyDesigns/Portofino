@@ -32,7 +32,6 @@ package com.manydesigns.elements.util;
 import com.manydesigns.elements.fields.helpers.FieldManager;
 import com.manydesigns.elements.logging.LogUtil;
 
-import java.lang.reflect.Constructor;
 import java.util.logging.Logger;
 
 /*
@@ -59,44 +58,37 @@ public class InstanceBuilder<T> {
 
     @SuppressWarnings({"unchecked"})
     public T createInstance(String managerClassName) {
-        ClassLoader cl = InstanceBuilder.class.getClassLoader();
-        Class managerClass;
-        try {
-            managerClass = cl.loadClass(managerClassName);
-            if (!clazz.isAssignableFrom(managerClass)) {
-                LogUtil.warningMF(logger,
-                        "Cannot use as {0}: {1}",
-                        clazz.getName(),
-                        managerClassName);
-                managerClass = defaultImplClass;
-            }
-        } catch (Throwable e) {
-            LogUtil.warningMF(logger, "Cannot load class: {0}", e,
+        Class managerClass = ReflectionUtil.loadClass(managerClassName);
+        if (managerClass == null) {
+            LogUtil.warningMF(logger,
+                    "Cannot load class: {0}", managerClassName);
+            managerClass = defaultImplClass;
+        }
+
+        if (!clazz.isAssignableFrom(managerClass)) {
+            LogUtil.warningMF(logger,
+                    "Cannot use as {0}: {1}",
+                    clazz.getName(),
                     managerClassName);
             managerClass = defaultImplClass;
         }
         LogUtil.finerMF(logger,
                 "Using class: {0}", managerClass.getName());
 
-        T instance;
-        try {
-            Constructor constructor = managerClass.getConstructor();
-            instance = (T)constructor.newInstance();
-        } catch (Throwable e) {
+        T instance = (T)ReflectionUtil.newInstance(managerClass);
+        if (instance == null) {
             LogUtil.warningMF(logger,
-                    "Cannot instanciate: {0}. Fall back to default: {1}.", e,
+                    "Cannot instanciate: {0}. Fall back to default: {1}.",
                     managerClass.getName(),
                     FieldManager.class.getName());
-            try {
-                Constructor constructor = defaultImplClass.getConstructor();
-                instance = (T)constructor.newInstance();
-            } catch (Throwable e1) {
+            instance = (T)ReflectionUtil.newInstance(defaultImplClass);
+            if (instance == null) {
                 LogUtil.severeMF(logger,
-                        "Cannot instanciate: {0}", e,
+                        "Cannot instanciate: {0}",
                         defaultImplClass.getName());
-                instance = null;
             }
         }
+
         LogUtil.finerMF(logger, "Installed {0}: {1}",
                 clazz.getName(), instance);
         return instance;

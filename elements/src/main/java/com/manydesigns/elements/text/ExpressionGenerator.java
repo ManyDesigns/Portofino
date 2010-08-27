@@ -30,8 +30,8 @@
 package com.manydesigns.elements.text;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.Util;
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.util.Util;
 import ognl.Ognl;
 import ognl.OgnlException;
 

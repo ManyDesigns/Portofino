@@ -30,12 +30,12 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.Util;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.text.ExpressionGenerator;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RelatedTableForm;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
@@ -245,9 +245,7 @@ public class TableDataAction extends PortofinoAction
                 sb.append(",");
             }
             sb.append("%{");
-            sb.append((column.getClassProperty()==null)
-                    ?column.getColumnName()
-                    :column.getClassProperty());
+            sb.append(column.getPropertyName());
             sb.append("}");
         }
         if (searchString != null) {

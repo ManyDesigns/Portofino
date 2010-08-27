@@ -30,8 +30,8 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.Util;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringEscapeUtils;
 

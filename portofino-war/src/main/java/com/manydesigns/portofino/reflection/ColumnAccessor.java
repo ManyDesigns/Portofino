@@ -40,8 +40,8 @@ import com.manydesigns.portofino.model.datamodel.Column;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 
 /*
@@ -98,7 +98,7 @@ public class ColumnAccessor implements PropertyAccessor {
     //**************************************************************************
 
     public String getName() {
-        return column.getColumnName();
+        return column.getPropertyName();
     }
 
     public Class getType() {

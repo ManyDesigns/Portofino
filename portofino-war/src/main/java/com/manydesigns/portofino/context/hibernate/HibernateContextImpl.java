@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.context.hibernate;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.Model;
@@ -53,7 +54,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.util.*;
 import java.util.logging.Logger;
-import java.lang.reflect.Constructor;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -74,7 +74,6 @@ public class HibernateContextImpl implements Context {
     protected final ThreadLocal<StopWatch> stopWatches;
     protected final ThreadLocal<User> threadUsers;
     protected final List<SiteNode> siteNodes;
-    protected final ClassLoader classLoader;
 
     public static final Logger logger =
             LogUtil.getLogger(HibernateContextImpl.class);
@@ -87,7 +86,6 @@ public class HibernateContextImpl implements Context {
         stopWatches = new ThreadLocal<StopWatch>();
         siteNodes = new ArrayList<SiteNode>();
         threadUsers = new ThreadLocal<User>();
-        classLoader = HibernateContextImpl.class.getClassLoader();
     }
 
     //**************************************************************************
@@ -297,15 +295,7 @@ public class HibernateContextImpl implements Context {
             obj.put("$type$", qualifiedTableName);
             return obj;                                                   
         } else {
-            try {
-                Class clazz = classLoader.loadClass(className);
-                Constructor constructor = clazz.getConstructor();
-                return constructor.newInstance();
-            } catch (Throwable e) {
-                LogUtil.warningMF(logger,
-                        "Could not instanciate: {0}", e, className);
-                return null;
-            }
+            return ReflectionUtil.newInstance(className);
         }
     }
 

@@ -31,11 +31,11 @@ package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.Element;
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.Util;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.Generator;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 import javax.servlet.http.HttpServletRequest;

@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model.io;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.xml.DocumentCallback;
@@ -64,8 +65,7 @@ public class ConnectionsParser extends XmlParser {
     public List<ConnectionProvider> parse(String resourceName) throws Exception {
         connections = new ArrayList<ConnectionProvider>();
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-        ClassLoader cl = this.getClass().getClassLoader();
-        InputStream input = cl.getResourceAsStream(resourceName);
+        InputStream input = ReflectionUtil.getResourceAsStream(resourceName);
         xmlStreamReader = inputFactory.createXMLStreamReader(input);
         initParser(xmlStreamReader);
         expectDocument(new ConnectionsDocumentCallback());
