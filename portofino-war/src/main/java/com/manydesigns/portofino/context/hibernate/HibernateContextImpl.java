@@ -201,25 +201,33 @@ public class HibernateContextImpl implements Context {
                                 Object pk) {
         Session session = getSession(qualifiedTableName);
         Table table = model.findTableByQualifiedName(qualifiedTableName);
-        HashMap<String, Object> key = (HashMap<String, Object>) pk;
-        if (key.size() > 2) {
-            startTimer();
-            @SuppressWarnings({"unchecked"}) Map<String, Object> result =
-                    (Map<String, Object>)
-                            session.load(qualifiedTableName, key);
-            stopTimer();
-            return result;
-        } else {
-            startTimer();
-            for (Map.Entry entry : key.entrySet()) {
-                if (((String) entry.getKey()).startsWith("$")) {
-                    continue;
-                }
+        if (pk instanceof  Map){
+            HashMap<String, Object> key = (HashMap<String, Object>) pk;
+            int size = key.size();
+            //due include anche $type$
+            if (key.get("$type$")!=null){
+                size=size-1;
+            }
+
+            if (size > 1) {
+                startTimer();
                 @SuppressWarnings({"unchecked"}) Map<String, Object> result =
-                        (Map<String, Object>) session.load(qualifiedTableName,
-                                (Serializable) entry.getValue());
+                        (Map<String, Object>)
+                                session.load(qualifiedTableName, key);
                 stopTimer();
                 return result;
+            } else {
+                startTimer();
+                for (Map.Entry entry : key.entrySet()) {
+                    if (((String) entry.getKey()).startsWith("$")) {
+                        continue;
+                    }
+                    @SuppressWarnings({"unchecked"}) Map<String, Object> result =
+                            (Map<String, Object>) session.load(qualifiedTableName,
+                                    (Serializable) entry.getValue());
+                    stopTimer();
+                    return result;
+                }
             }
         }
         return null;
@@ -323,19 +331,6 @@ public class HibernateContextImpl implements Context {
     }
 
 
-    public Object createNewObject(String qualifiedTableName) {
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
-        String className = table.getClassName();
-        if (className == null) {
-            HashMap<String, Object> obj = new HashMap<String, Object>();
-            obj.put("$type$", qualifiedTableName);
-            return obj;
-        } else {
-            return ReflectionUtil.newInstance(className);
-        }
-    }
-
-
     public void updateObject(String qualifiedTableName, Object obj) {
         Session session = getSession(qualifiedTableName);
         session.beginTransaction();
@@ -407,8 +402,8 @@ public class HibernateContextImpl implements Context {
         Class clazz = obj.getClass();
 
 
-        if (obj instanceof HashMap) {
-            HashMap<String, Object> map = (HashMap<String, Object>) obj;
+        if (obj instanceof Map) {
+            Map<String, Object> map = (Map<String, Object>) obj;
             if (map.get(oneToManyRelationshipName) instanceof List) {
                 return (List<Object>)
                         map.get(oneToManyRelationshipName);

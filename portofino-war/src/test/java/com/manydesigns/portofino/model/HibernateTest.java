@@ -28,12 +28,16 @@
  */
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
+import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.users.Group;
 import com.manydesigns.portofino.users.User;
 import com.manydesigns.portofino.users.UsersGroups;
-import com.manydesigns.portofino.users.Group;
 import junit.framework.TestCase;
+import org.hibernate.proxy.map.MapProxy;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -88,7 +92,7 @@ public class HibernateTest extends TestCase {
         Group g1 = ug1.getGroup();
 
     }
-    public void testReadCategorieProdotti() {
+    public void testSearchAndReadCategorieProdotti() {
         List<Object> resultCat =
                 context.getAllObjects("jpetstore.public.category");
 
@@ -98,24 +102,75 @@ public class HibernateTest extends TestCase {
 
         Map categoria0 = (Map<String, Object>) resultCat.get(0);
         assertEquals("jpetstore.public.category", categoria0.get("$type$"));
-        assertEquals("Fish", categoria0.get("name"));
+        assertNotNull(categoria0.get("name"));
         Map categoria1 = (Map<String, Object>)resultCat.get(1);
-        assertEquals("Dogs", categoria1.get("name"));
+        assertNotNull(categoria0.get("name"));
         Map categoria2 = (Map<String, Object>)resultCat.get(2);
-        assertEquals("Reptiles", categoria2.get("name"));
+        assertNotNull(categoria0.get("name"));
         Map categoria3 = (Map<String, Object>)resultCat.get(3);
-        assertEquals("Cats", categoria3.get("name"));
+        assertNotNull(categoria0.get("name"));
         Map categoria4 = (Map<String, Object>)resultCat.get(4);
-        assertEquals("Birds", categoria4.get("name"));
+        assertNotNull(categoria0.get("name"));
 
         List<Object> resultProd =
                 context.getAllObjects("jpetstore.public.product");
+
+        Table table = context.getModel()
+                .findTableByQualifiedName("jpetstore.public.category");
+        TableAccessor tableAccessor = new TableAccessor(table);
+        Criteria criteria = context.createCriteria("jpetstore.public.category");
+        HashMap category= findCategory(tableAccessor, criteria);
 
         int sizePrd = resultProd.size();
         assertEquals("prodotti", sizePrd, 16);
         Map prd0 = (Map<String, Object>)resultProd.get(0);
         assertEquals("FI-SW-01", prd0.get("productid") );
         assertEquals("Angelfish", prd0.get("name"));
+    }
+
+    private HashMap findCategory(TableAccessor tableAccessor, Criteria criteria) {
+        HashMap category=null;
+        try {
+            criteria.eq(tableAccessor.getProperty("catid"), "FISH");
+            List<Object> listObjs = context.getObjects(criteria);
+            assertEquals(1, listObjs.size());
+            category = (HashMap) listObjs.get(0);
+            String catid = (String) category.get("catid");
+            assertEquals("FISH", catid);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+            fail();
+        }
+        return category;
+    }
+
+    public void testSearchAndUpdateCategorie() {
+        context.openSession();
+        Table table = context.getModel()
+                .findTableByQualifiedName("jpetstore.public.category");
+        TableAccessor tableAccessor = new TableAccessor(table);
+        Criteria criteria = context.createCriteria("jpetstore.public.category");
+
+        List<Object> resultCat =
+                context.getAllObjects("jpetstore.public.category");
+        int sizeCat = resultCat.size();
+        assertEquals("categorie", 5, sizeCat);
+        Map categoria0 =  findCategory(tableAccessor, criteria);
+        assertEquals("jpetstore.public.category", categoria0.get("$type$"));
+        assertEquals("Fish", categoria0.get("name"));
+        categoria0.put("name", "Pesciu");
+        context.updateObject("jpetstore.public.category", categoria0);
+        context.closeSession();
+
+        //Controllo l'aggiornamento e riporto le cose come stavano
+        context.openSession();
+        criteria = context.createCriteria("jpetstore.public.category");
+        categoria0 =  findCategory(tableAccessor, criteria);
+        assertEquals("jpetstore.public.category", categoria0.get("$type$"));
+        assertEquals("Pesciu", categoria0.get("name"));
+        categoria0.put("name", "Fish");
+        context.saveOrUpdateObject("jpetstore.public.category", categoria0);
+        context.closeSession();
     }
 
     public void testSaveCategoria() {
@@ -142,8 +197,12 @@ public class HibernateTest extends TestCase {
         lineItem.put("unitprice", new BigDecimal(10.80));
 
         context.saveObject("jpetstore.public.lineitem", lineItem);
+        context.closeSession();
+
         //e ora cancello
+        context.openSession();
         context.deleteObject("jpetstore.public.lineitem", lineItem);
+        context.closeSession();
     }
 
 
@@ -162,9 +221,6 @@ public class HibernateTest extends TestCase {
         }
     }
 
-
-
-
     public void testDeleteCategoria() {
         context.openSession();
         Map<String, Object> worms = new HashMap<String, Object>();
@@ -176,6 +232,86 @@ public class HibernateTest extends TestCase {
                   "Worms</font>");
         context.deleteObject("jpetstore.public.category", worms);
     }
+
+        public void testSpaccaSession(){
+        context.openSession();
+
+        try {
+            //Inserisco un valore troppo grande per email
+            // e pwd in modo tale da rompere la insert
+            User user = new User();
+            user.setEmail("123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890");
+            user.setPwd("123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901234567890123456789012345678901234567890");
+
+            context.saveObject("portofino.public.user_", user);
+
+            fail();
+        } catch (Exception e) {
+            //corretto
+        }
+        context.closeSession();
+        context.openSession();
+
+        //Faccio una seconda operazione
+        try{
+            List<Object> users= context.getAllObjects("portofino.public.user_");
+        }catch (Exception e){
+            e.printStackTrace();
+            fail("La sessione è spaccata");
+        }
+    }
+
+    public void testGetObjByPk(){
+        //Test Chiave singola
+        HashMap<String, Object> pk = new HashMap<String, Object>();
+        pk.put("catid", "BIRDS");
+        Object bird = (Object) context.getObjectByPk
+                ("jpetstore.public.category", pk);
+        assertEquals("Birds", ((MapProxy) bird).get("name"));
+
+        //Test Chiave composta
+        pk = new HashMap<String, Object>();
+        pk.put("orderid", 1);
+        pk.put("linenum", 1);
+        Map lineItem = (Map) context.getObjectByPk
+                ("jpetstore.public.lineitem", pk);
+        assertEquals("test2", lineItem.get("itemid"));
+    }
+
+    public void testGetRelatedObjects(){
+
+        HashMap<String, Object> pk = new HashMap<String, Object>();
+        pk.put("catid", "BIRDS");
+        Object bird = (Object) context.getObjectByPk
+                ("jpetstore.public.category", pk);
+        assertEquals("Birds", ((MapProxy) bird).get("name"));
+
+        List objs = context.getRelatedObjects("jpetstore.public.category",
+                bird, "fk_product_1");
+        assertTrue(objs.size()>0);
+
+    }
+
 }
 
 
