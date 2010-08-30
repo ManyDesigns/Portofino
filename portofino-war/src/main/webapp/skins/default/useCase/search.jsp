@@ -6,7 +6,7 @@
 <s:form method="post">
     <s:include value="/skins/default/model/tableData/searchButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1>Search: <s:property value="qualifiedTableName"/></h1>
+        <h1>Search: <s:property value="useCaseName"/></h1>
         <div class="search_form">
             <mdes:write value="searchForm"/>
             <s:submit method="search" value="Search"/>

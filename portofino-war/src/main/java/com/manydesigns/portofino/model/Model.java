@@ -33,6 +33,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.portlets.Portlet;
 import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.usecases.UseCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +55,7 @@ public class Model {
     protected final ArrayList<Database> databases;
     protected final ArrayList<SiteNode> siteNodes;
     protected final ArrayList<Portlet> portlets;
+    protected final ArrayList<UseCase> useCases;
 
     public static final Logger logger = LogUtil.getLogger(Model.class);
 
@@ -65,6 +67,7 @@ public class Model {
         this.databases = new ArrayList<Database>();
         this.siteNodes = new ArrayList<SiteNode>();
         this.portlets = new ArrayList<Portlet>();
+        this.useCases = new ArrayList<UseCase>();
     }
 
     //**************************************************************************
@@ -202,4 +205,18 @@ public class Model {
         }
         return null;
     }
+
+    public ArrayList<UseCase> getUseCases() {
+        return useCases;
+    }
+
+    public UseCase findUseCaseByName(String useCaseName) {
+        for (UseCase current : useCases) {
+            if (current.getName().equals(useCaseName)) {
+                return current;
+            }
+        }
+        return null;
+    }
+
 }

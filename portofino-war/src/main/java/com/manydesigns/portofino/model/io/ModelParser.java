@@ -5,6 +5,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.portlets.Portlet;
 import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.usecases.UseCase;
 import com.manydesigns.portofino.xml.DocumentCallback;
 import com.manydesigns.portofino.xml.ElementCallback;
 import com.manydesigns.portofino.xml.XmlParser;
@@ -46,6 +47,9 @@ public class ModelParser extends XmlParser {
     private static final String PORTLETS = "portlets";
     private static final String PORTLET = "portlet";
 
+    private static final String USECASES = "useCases";
+    private static final String USECASE = "useCase";
+
     private List<RelationshipPre> relationships;
 
     Model model;
@@ -79,6 +83,7 @@ public class ModelParser extends XmlParser {
             expectElement(DATABASES, 1, 1, new DatabasesCallback());
             expectElement(SITENODES, 1, 1, new SiteNodesCallback());
             expectElement(PORTLETS, 0, 1, new PortletsCallback());
+            expectElement(USECASES, 0, 1, new UseCasesCallback());
         }
     }
 
@@ -343,6 +348,34 @@ public class ModelParser extends XmlParser {
                     new Portlet(name, type, title, legend, database,
                             sql, urlExpression);
             model.getPortlets().add(portlet);
+        }
+    }
+
+
+
+    //**************************************************************************
+    // Use cases
+    //**************************************************************************
+
+    private class UseCasesCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(USECASE, 0, null, new UseCaseCallback());
+        }
+    }
+
+    private class UseCaseCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            checkRequiredAttributes(attributes,
+                    "name", "title", "table", "filter");
+            String name = attributes.get("name");
+            String title = attributes.get("title");
+            String table = attributes.get("table");
+            String filter = attributes.get("filter");
+            UseCase useCase =
+                    new UseCase(name, title, table, filter);
+            model.getUseCases().add(useCase);
         }
     }
 

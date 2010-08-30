@@ -36,6 +36,7 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.Table;
 
+import java.util.HashMap;
 import java.util.List;
 
 /*
@@ -53,6 +54,7 @@ public class TableAccessor implements ClassAccessor {
 
     protected final Table table;
     protected final ColumnAccessor[] columnAccessors;
+    protected final ColumnAccessor[] keyColumnAccessors;
     protected ClassAccessor javaClassAccessor = null;
 
 
@@ -75,6 +77,7 @@ public class TableAccessor implements ClassAccessor {
         List<Column> columns = table.getColumns();
         List<Column> pkColumns = table.getPrimaryKey().getColumns();
         columnAccessors = new ColumnAccessor[columns.size()];
+        keyColumnAccessors = new ColumnAccessor[pkColumns.size()];
         int i = 0;
         for (Column current : columns) {
             boolean inPk = pkColumns.contains(current);
@@ -91,8 +94,18 @@ public class TableAccessor implements ClassAccessor {
                     // TODO:
                 }
             }
-            columnAccessors[i] =
+            ColumnAccessor columnAccessor =
                     new ColumnAccessor(current, inPk, nestedPropertyAccessor);
+            columnAccessors[i] = columnAccessor;
+            i++;
+        }
+
+        // key column accessors
+        i = 0;
+        for (Column current : pkColumns) {
+            int index = columns.indexOf(current);
+            ColumnAccessor columnAccessor = columnAccessors[index];
+            keyColumnAccessors[i] = columnAccessor;
             i++;
         }
     }
@@ -101,6 +114,10 @@ public class TableAccessor implements ClassAccessor {
     //**************************************************************************
     // ClassAccessor implementation
     //**************************************************************************
+
+    public String getName() {
+        return table.getQualifiedName();
+    }
 
     public PropertyAccessor getProperty(String fieldName)
             throws NoSuchFieldException {
@@ -113,10 +130,25 @@ public class TableAccessor implements ClassAccessor {
         throw new NoSuchFieldException(fieldName);
     }
 
+    
     public PropertyAccessor[] getProperties() {
         return columnAccessors.clone();
     }
 
+
+    public PropertyAccessor[] getKeyProperties() {
+        return keyColumnAccessors.clone();
+    }
+
+    public Object newInstance() {
+        if (javaClassAccessor == null) {
+            HashMap<String, Object> obj =  new HashMap<String, Object>();
+            obj.put("$type$", table.getQualifiedName());
+            return obj;
+        } else {
+            return javaClassAccessor.newInstance();
+        }
+    }
 
     //**************************************************************************
     // Getters/setters

@@ -58,4 +58,6 @@ public interface Criteria {
     public void ilike(PropertyAccessor accessor, String value);
     public void ilike(PropertyAccessor accessor, String value,
                      TextMatchMode textMatchMode);
+
+    void sqlRestriction(String sql);
 }

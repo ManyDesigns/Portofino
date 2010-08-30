@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.reflection;
 
+import com.manydesigns.elements.util.ReflectionUtil;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.beans.BeanInfo;
@@ -89,6 +90,10 @@ public class JavaClassAccessor implements ClassAccessor {
         return false;
     }
 
+    public String getName() {
+        return javaClass.getName();
+    }
+
     public PropertyAccessor getProperty(String propertyName)
             throws NoSuchFieldException {
         for (PropertyAccessor current : propertyAccessors) {
@@ -101,6 +106,14 @@ public class JavaClassAccessor implements ClassAccessor {
 
     public PropertyAccessor[] getProperties() {
         return propertyAccessors.clone();
+    }
+
+    public PropertyAccessor[] getKeyProperties() {
+        return new PropertyAccessor[0];
+    }
+
+    public Object newInstance() {
+        return ReflectionUtil.newInstance(javaClass);
     }
 
     public Class getJavaClass() {

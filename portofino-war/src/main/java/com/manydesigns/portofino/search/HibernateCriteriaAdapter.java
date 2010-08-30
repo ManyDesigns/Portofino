@@ -32,8 +32,10 @@ package com.manydesigns.portofino.search;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.fields.search.TextMatchMode;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
+
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -44,9 +46,12 @@ public class HibernateCriteriaAdapter implements Criteria {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    protected final Session hibernateSession;
     protected final org.hibernate.Criteria hibernateCriteria;
 
-    public HibernateCriteriaAdapter(org.hibernate.Criteria hibernateCriteria) {
+    public HibernateCriteriaAdapter(Session hibernateSession,
+                                    org.hibernate.Criteria hibernateCriteria) {
+        this.hibernateSession = hibernateSession;
         this.hibernateCriteria = hibernateCriteria;
     }
 
@@ -121,6 +126,13 @@ public class HibernateCriteriaAdapter implements Criteria {
         return hibernateMatchMode;
     }
 
+    public void sqlRestriction(String sql) {
+        hibernateCriteria.add(Restrictions.sqlRestriction(sql));
+    }
+
+    public Session getHibernateSession() {
+        return hibernateSession;
+    }
 
     public org.hibernate.Criteria getHibernateCriteria() {
         return hibernateCriteria;

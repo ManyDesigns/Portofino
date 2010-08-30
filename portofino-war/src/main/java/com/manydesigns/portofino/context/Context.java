@@ -33,6 +33,7 @@ import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.users.User;
+
 import java.util.List;
 
 
@@ -72,9 +73,6 @@ public interface Context {
     //**************************************************************************
 
     Object getObjectByPk(String qualifiedTableName,
-                                      Object... pk);
-
-    Object getObjectByPk(String qualifiedTableName,
                                       Object pk);
 
     List<Object> getAllObjects(String qualifiedTableName);
@@ -83,11 +81,11 @@ public interface Context {
 
     List<Object> getObjects(Criteria criteria);
 
+    List<Object> getObjects(Criteria criteria, String filter);
+
     void saveOrUpdateObject(String qualifiedTableName, Object obj);
 
     void saveObject(String qualifiedTableName, Object obj);
-
-    Object createNewObject (String qualifiedTableName);
 
     void updateObject(String qualifiedTableName, Object obj);
 

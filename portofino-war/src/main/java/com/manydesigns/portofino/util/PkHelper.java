@@ -29,81 +29,103 @@
 
 package com.manydesigns.portofino.util;
 
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 import com.manydesigns.elements.text.ExpressionGenerator;
 import com.manydesigns.elements.text.Generator;
-import com.manydesigns.portofino.model.datamodel.Column;
-import com.manydesigns.portofino.model.datamodel.Table;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.HashMap;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableHelper {
+public class PkHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Generator createKeyGenerator(Table table) {
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
+    public final static Logger logger = LogUtil.getLogger(PkHelper.class);
+
+    protected final ClassAccessor classAccessor;
+
+
+    //**************************************************************************
+    // Constructor
+    //**************************************************************************
+
+    public PkHelper(ClassAccessor classAccessor) {
+        this.classAccessor = classAccessor;
+    }
+
+
+    //**************************************************************************
+    // Methods
+    //**************************************************************************
+
+    public Generator createPkGenerator() {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
-        for (Column column : table.getPrimaryKey().getColumns()) {
+        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
             if (first) {
                 first = false;
             } else {
                 sb.append(",");
             }
             sb.append("%{");
-            sb.append(column.getPropertyName());
+            sb.append(property.getName());
             sb.append("}");
         }
         return ExpressionGenerator.create(sb.toString());
     }
 
-    public HashMap<String, Object> parsePkString(Table table, String pkString) {
-        String[] pkList = StringUtils.split(pkString,",");
+    public Object parsePkString(String pkString) {
+        String[] pkList = StringUtils.split(pkString, ",");
 
         int i = 0;
-        HashMap<String, Object> pkMap = new HashMap<String, Object>();
+        Object result = classAccessor.newInstance();
 
-        pkMap.put("$type$", table.getQualifiedName());
-
-        for(Column column : table.getPrimaryKey().getColumns() ) {
+        for(PropertyAccessor property : classAccessor.getKeyProperties()) {
             String stringValue = pkList[i];
             Object value = ConvertUtils.convert(
-                    stringValue, column.getJavaType());
-            pkMap.put(column.getPropertyName(), value);
+                    stringValue, property.getType());
+            try {
+                property.set(result, value);
+            } catch (Throwable e) {
+                LogUtil.warningMF(logger,
+                        "Could not set property: {0}", e, property);
+                return null;
+            }
             i++;
         }
 
-        return pkMap;
+        return result;
     }
 
-    public String generatePkString(Table table, Object object) {
-        ClassAccessor classAccessor =
-                ClassAccessorManager.getManager().tryToInstantiateFromClass(table);
+    public String generatePkString(Object object) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
-        for(Column column : table.getPrimaryKey().getColumns() ) {
+        for(PropertyAccessor property : classAccessor.getKeyProperties()) {
             if (first) {
                 first = false;
             } else {
                 sb.append(",");
             }
             try {
-                PropertyAccessor propertyAccessor =
-                        classAccessor.getProperty(column.getPropertyName());
-                Object value = propertyAccessor.get(object);
+                Object value = property.get(object);
                 String stringValue = ConvertUtils.convert(value);
                 sb.append(stringValue);
             } catch (Throwable e) {
-                e.printStackTrace();  // TODO: sistemare
+                LogUtil.warningMF(logger,
+                        "Could not get property: {0}", e, property);
+                return null;
             }
         }
         return sb.toString();

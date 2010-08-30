@@ -6,7 +6,7 @@
 <s:form method="post">
     <s:include value="/skins/default/model/tableData/readButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1>Read: <s:property value="table.qualifiedName"/></h1>
+        <h1>Read: <s:property value="qualifiedTableName"/></h1>
         <mdes:write value="form"/>
         <s:iterator var="current" value="relatedTableFormList">
             <s:set name="rel" value="#current.relationship"/>

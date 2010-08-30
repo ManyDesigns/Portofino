@@ -27,39 +27,58 @@
  *
  */
 
-package com.manydesigns.elements.reflection;
+package com.manydesigns.portofino.model.usecases;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public final class NullClassAccessor implements ClassAccessor {
+public class UseCase {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public static final NullClassAccessor SINGLETON = new NullClassAccessor();
+    protected String name;
+    protected String title;
+    protected String table;
+    protected String filter;
 
-    private NullClassAccessor() {}
+    public UseCase(String name, String title, String table, String filter) {
+        this.name = name;
+        this.title = title;
+        this.table = table;
+        this.filter = filter;
+    }
 
     public String getName() {
-        return null;
+        return name;
     }
 
-    public PropertyAccessor getProperty(String fieldName)
-            throws NoSuchFieldException {
-        throw new NoSuchFieldException(fieldName);
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public PropertyAccessor[] getProperties() {
-        return new PropertyAccessor[0];
+    public String getTitle() {
+        return title;
     }
 
-    public PropertyAccessor[] getKeyProperties() {
-        return new PropertyAccessor[0];
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public Object newInstance() {
-        return null;
+    public String getTable() {
+        return table;
+    }
+
+    public void setTable(String table) {
+        this.table = table;
+    }
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
     }
 }

@@ -12,13 +12,13 @@
     <s:if test="#position >= 0">
         <div style="float: right;">
             <s:if test="#position > 0">
-                <s:url var="firstUrl" namespace="/model" action="%{qualifiedTableName}/TableData">
+                <s:url var="firstUrl" namespace="/" action="%{useCaseName}/UseCase">
                     <s:param name="pk"
                              value="%{pkHelper.generatePkString(objects.get(0))}" />
                     <s:param name="searchString" value="%{searchString}" />
                 </s:url>
                 <s:a id="first" href="%{#firstUrl}">first</s:a>
-                <s:url var="previousUrl" namespace="/model" action="%{qualifiedTableName}/TableData">
+                <s:url var="previousUrl" namespace="/" action="%{useCaseName}/UseCase">
                     <s:param name="pk"
                              value="%{pkHelper.generatePkString(objects.get(#position-1))}" />
                     <s:param name="searchString" value="%{searchString}" />
@@ -29,13 +29,13 @@
             </s:else>
             <s:property value="#position+1"/> of <s:property value="objects.size()"/>
             <s:if test="#position < #size-1">
-                <s:url var="nextUrl" namespace="/model" action="%{qualifiedTableName}/TableData">
+                <s:url var="nextUrl" namespace="/" action="%{useCaseName}/UseCase">
                     <s:param name="pk"
                              value="%{pkHelper.generatePkString(objects.get(#position+1))}" />
                     <s:param name="searchString" value="%{searchString}" />
                 </s:url>
                 <s:a id="next" href="%{#nextUrl}">next</s:a>
-                <s:url var="lastUrl" namespace="/model" action="%{qualifiedTableName}/TableData">
+                <s:url var="lastUrl" namespace="/" action="%{useCaseName}/UseCase">
                     <s:param name="pk"
                              value="%{pkHelper.generatePkString(objects.get(#size - 1))}" />
                     <s:param name="searchString" value="%{searchString}" />
