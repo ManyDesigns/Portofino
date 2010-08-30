@@ -29,6 +29,12 @@
                                         length="75"
                                         scale="0"
                                         nullable="false"/>
+                                <column name="state"
+                                        columnType="int4"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"/>
                                 </columns>                            
                                 <primaryKey name="pk_user">
                                     <column name="userid"/>

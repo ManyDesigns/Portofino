@@ -79,6 +79,8 @@ public class User {
     }
 
     public Integer getState() {
+        //TODO eliminare lo stato fisso
+        state=1;
         return state;
     }
 

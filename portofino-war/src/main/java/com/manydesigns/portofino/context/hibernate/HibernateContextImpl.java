@@ -43,9 +43,7 @@ import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.search.HibernateCriteriaAdapter;
 import com.manydesigns.portofino.users.User;
 import org.apache.commons.lang.time.StopWatch;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.dialect.*;
@@ -202,36 +200,28 @@ public class HibernateContextImpl implements Context {
     public Object getObjectByPk(String qualifiedTableName,
                                 Object pk) {
         Session session = getSession(qualifiedTableName);
-
-        if (pk instanceof HashMap) {
-            HashMap<String, Object> key = (HashMap<String, Object>) pk;
-            if (key.size() > 2) {
-                startTimer();
-                @SuppressWarnings({"unchecked"}) Map<String, Object> result =
-                        (Map<String, Object>)
-                                session.load(qualifiedTableName, key);
-                stopTimer();
-                return result;
-            } else {
-                startTimer();
-                for (Map.Entry entry : key.entrySet()) {
-                    if (((String) entry.getKey()).startsWith("$")) {
-                        continue;
-                    }
-                    @SuppressWarnings({"unchecked"}) Map<String, Object> result =
-                            (Map<String, Object>) session.load(qualifiedTableName,
-                                    (Serializable) entry.getValue());
-                    stopTimer();
-                    return result;
-                }
-            }
-        } else {
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        HashMap<String, Object> key = (HashMap<String, Object>) pk;
+        if (key.size() > 2) {
             startTimer();
-            Object result = session.load(qualifiedTableName, (Serializable) pk);
+            @SuppressWarnings({"unchecked"}) Map<String, Object> result =
+                    (Map<String, Object>)
+                            session.load(qualifiedTableName, key);
             stopTimer();
             return result;
+        } else {
+            startTimer();
+            for (Map.Entry entry : key.entrySet()) {
+                if (((String) entry.getKey()).startsWith("$")) {
+                    continue;
+                }
+                @SuppressWarnings({"unchecked"}) Map<String, Object> result =
+                        (Map<String, Object>) session.load(qualifiedTableName,
+                                (Serializable) entry.getValue());
+                stopTimer();
+                return result;
+            }
         }
-
         return null;
     }
 
@@ -284,18 +274,34 @@ public class HibernateContextImpl implements Context {
 
     public void saveOrUpdateObject(String qualifiedTableName, Object obj) {
         Session session = getSession(qualifiedTableName);
-        session.beginTransaction();
-        session.saveOrUpdate(qualifiedTableName, obj);
-        session.getTransaction().commit();
+
+        try {
+            startTimer();
+            session.beginTransaction();
+            session.saveOrUpdate(qualifiedTableName, obj);
+            session.getTransaction().commit();
+        } catch (HibernateException e) {
+            session.getTransaction().rollback();
+            throw e;
+        }finally {
+            stopTimer();
+        }
     }
 
     public void saveObject(String qualifiedTableName, Object obj) {
         Session session = getSession(qualifiedTableName);
         session.beginTransaction();
-        startTimer();
-        session.save(qualifiedTableName, obj);
-        stopTimer();
-        session.getTransaction().commit();
+
+        try {
+            startTimer();
+            session.save(qualifiedTableName, obj);
+            session.getTransaction().commit();
+        } catch (HibernateException e) {
+            session.getTransaction().rollback();
+            throw e;
+        } finally {
+            stopTimer();
+        }
     }
 
     public Object createNewObject(String qualifiedTableName) {
@@ -313,19 +319,31 @@ public class HibernateContextImpl implements Context {
     public void updateObject(String qualifiedTableName, Object obj) {
         Session session = getSession(qualifiedTableName);
         session.beginTransaction();
-        startTimer();
-        session.update(qualifiedTableName, obj);
-        stopTimer();
-        session.getTransaction().commit();
+        try {
+            startTimer();
+            session.update(qualifiedTableName, obj);
+            session.getTransaction().commit();
+        } catch (HibernateException e) {
+            session.getTransaction().rollback();
+            throw e;
+        }finally {
+            stopTimer();
+        }
     }
 
     public void deleteObject(String qualifiedTableName, Object obj) {
         Session session = getSession(qualifiedTableName);
         session.beginTransaction();
-        startTimer();
-        session.delete(qualifiedTableName, obj);
-        stopTimer();
-        session.getTransaction().commit();
+        try {
+            startTimer();
+            session.delete(qualifiedTableName, obj);
+            session.getTransaction().commit();
+        } catch (HibernateException e) {
+            session.getTransaction().rollback();
+            throw e;
+        }finally{
+            stopTimer();
+        }
 
     }
 
@@ -539,7 +557,7 @@ public class HibernateContextImpl implements Context {
             stopWatches.set(stopWatch);
             stopWatch.start();
         } else {
-            stopWatch.resume();
+            stopWatch.resume();           
         }
     }
 
