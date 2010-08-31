@@ -26,12 +26,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils-core</artifactId>
-            <version>${commons.beanutils.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>ognl</groupId>
             <artifactId>ognl</artifactId>
             <version>${ognl.version}</version>

@@ -29,10 +29,11 @@
 
 package com.manydesigns.elements;
 
+import ognl.OgnlContext;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -99,11 +100,11 @@ public final class ElementsThreadLocals {
         getElementsContext().setServletContext(servletContext);
     }
 
-    public static Map getOgnlContext() {
+    public static OgnlContext getOgnlContext() {
         return getElementsContext().getOgnlContext();
     }
 
-    public static void setOgnlContext(Map context) {
+    public static void setOgnlContext(OgnlContext context) {
         getElementsContext().setOgnlContext(context);
     }
 

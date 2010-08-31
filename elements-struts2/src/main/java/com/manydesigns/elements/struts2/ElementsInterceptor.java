@@ -34,12 +34,12 @@ import com.manydesigns.elements.TextProvider;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
+import ognl.OgnlContext;
 import org.apache.struts2.StrutsStatics;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -64,7 +64,7 @@ public class ElementsInterceptor implements Interceptor {
                 (HttpServletResponse)context.get(StrutsStatics.HTTP_RESPONSE);
         ServletContext servletContext =
                 (ServletContext)context.get(StrutsStatics.SERVLET_CONTEXT);
-        Map ognlContext = context.getContextMap();
+        OgnlContext ognlContext = (OgnlContext)context.getContextMap();
 
         HttpServletRequest oldReq =
                 ElementsThreadLocals.getHttpServletRequest();
@@ -74,7 +74,7 @@ public class ElementsInterceptor implements Interceptor {
                 ElementsThreadLocals.getServletContext();
         TextProvider oldTextProvider =
                 ElementsThreadLocals.getTextProvider();
-        Map oldOgnlContext =
+        OgnlContext oldOgnlContext =
                 ElementsThreadLocals.getOgnlContext();
 
         try {
