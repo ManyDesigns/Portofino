@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.reflection;
 
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
@@ -38,6 +39,7 @@ import com.manydesigns.portofino.model.datamodel.Table;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -57,6 +59,7 @@ public class TableAccessor implements ClassAccessor {
     protected final ColumnAccessor[] keyColumnAccessors;
     protected ClassAccessor javaClassAccessor = null;
 
+    public final static Logger logger = LogUtil.getLogger(TableAccessor.class);
 
     //**************************************************************************
     // Constructors
@@ -81,8 +84,10 @@ public class TableAccessor implements ClassAccessor {
         int i = 0;
         for (Column current : columns) {
             boolean inPk = pkColumns.contains(current);
-            PropertyAccessor nestedPropertyAccessor = null;
-            if (javaClassAccessor != null) {
+            PropertyAccessor nestedPropertyAccessor;
+            if (javaClassAccessor == null) {
+                nestedPropertyAccessor = null;
+            } else {
                 String propertyName = current.getColumnName();
                 if (current.getPropertyName() != null) {
                     propertyName = current.getPropertyName();
@@ -91,11 +96,15 @@ public class TableAccessor implements ClassAccessor {
                     nestedPropertyAccessor =
                             javaClassAccessor.getProperty(propertyName);
                 } catch (NoSuchFieldException e) {
-                    // TODO:
+                    nestedPropertyAccessor = null;
+                    LogUtil.severeMF(logger,
+                            "Could not access nested property: {0}",
+                            e, propertyName);
                 }
             }
             ColumnAccessor columnAccessor =
-                    new ColumnAccessor(current, inPk, nestedPropertyAccessor);
+                    new ColumnAccessor(current,
+                            inPk, nestedPropertyAccessor);
             columnAccessors[i] = columnAccessor;
             i++;
         }
@@ -119,15 +128,15 @@ public class TableAccessor implements ClassAccessor {
         return table.getQualifiedName();
     }
 
-    public PropertyAccessor getProperty(String fieldName)
+    public PropertyAccessor getProperty(String propertyName)
             throws NoSuchFieldException {
         for (ColumnAccessor current : columnAccessors) {
-            if (current.getName().equals(fieldName)) {
+            if (current.getName().equals(propertyName)) {
                 return current;
             }
         }
 
-        throw new NoSuchFieldException(fieldName);
+        throw new NoSuchFieldException(propertyName);
     }
 
     

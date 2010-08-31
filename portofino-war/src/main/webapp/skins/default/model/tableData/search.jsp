@@ -7,11 +7,13 @@
     <s:include value="/skins/default/model/tableData/searchButtonsBar.jsp"/>
     <div id="inner-content">
         <h1>Search: <s:property value="qualifiedTableName"/></h1>
-        <div class="search_form">
-            <mdes:write value="searchForm"/>
-            <s:submit method="search" value="Search"/>
-            <s:reset value="Reset form"/>
-        </div>
+        <s:if test="!searchForm.isEmpty()">
+            <div class="search_form">
+                <mdes:write value="searchForm"/>
+                <s:submit method="search" value="Search"/>
+                <s:reset value="Reset form"/>
+            </div>
+        </s:if>
         <mdes:write value="tableForm"/>
         <s:if test="searchString != null">
             <s:hidden name="searchString" value="%{searchString}"/>

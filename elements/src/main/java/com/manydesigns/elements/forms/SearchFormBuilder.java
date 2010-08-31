@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.forms;
 
+import com.manydesigns.elements.annotations.Searchable;
 import com.manydesigns.elements.fields.helpers.FieldManager;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.logging.LogUtil;
@@ -116,8 +117,16 @@ public class SearchFormBuilder {
         propertyAccessors = new ArrayList<PropertyAccessor>();
 
         for (PropertyAccessor current : classAccessor.getProperties()) {
+            // check if field is static
             if (Modifier.isStatic(current.getModifiers())) {
                 logger.finer("Skipping static field: " + current.getName());
+                continue;
+            }
+
+            // check if field is searchable
+            Searchable searchableAnnotation = current.getAnnotation(Searchable.class);
+            if (searchableAnnotation == null || !searchableAnnotation.value()) {
+                logger.finer("Skipping non-searchable field: " + current.getName());
                 continue;
             }
 

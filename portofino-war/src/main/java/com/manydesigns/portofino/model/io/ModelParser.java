@@ -5,7 +5,9 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.portlets.Portlet;
 import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.usecases.Access;
 import com.manydesigns.portofino.model.usecases.UseCase;
+import com.manydesigns.portofino.model.usecases.UseCaseProperty;
 import com.manydesigns.portofino.xml.DocumentCallback;
 import com.manydesigns.portofino.xml.ElementCallback;
 import com.manydesigns.portofino.xml.XmlParser;
@@ -49,6 +51,8 @@ public class ModelParser extends XmlParser {
 
     private static final String USECASES = "useCases";
     private static final String USECASE = "useCase";
+    private static final String PROPERTIES = "properties";
+    private static final String PROPERTY = "property";
 
     private List<RelationshipPre> relationships;
 
@@ -56,6 +60,7 @@ public class ModelParser extends XmlParser {
     Database currentDatabase;
     Schema currentSchema;
     Table currentTable;
+    UseCase currentUseCase;
 
     public ModelParser() {}
 
@@ -371,11 +376,41 @@ public class ModelParser extends XmlParser {
                     "name", "title", "table", "filter");
             String name = attributes.get("name");
             String title = attributes.get("title");
-            String table = attributes.get("table");
+            String tableName = attributes.get("table");
             String filter = attributes.get("filter");
-            UseCase useCase =
-                    new UseCase(name, title, table, filter);
-            model.getUseCases().add(useCase);
+            currentUseCase = new UseCase(name, title, tableName, filter);
+            Table table = model.findTableByQualifiedName(tableName);
+            currentUseCase.setTable(table);
+            model.getUseCases().add(currentUseCase);
+            expectElement(PROPERTIES, 0, 1, new PropertiesCallback());
+        }
+    }
+
+    private class PropertiesCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(PROPERTY, 0, null, new PropertyCallback());
+        }
+    }
+
+    private class PropertyCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            checkRequiredAttributes(attributes,
+                    "name", "inSummary", "searchable", "access");
+            String name = attributes.get("name");
+            String inSummary = attributes.get("inSummary");
+            String searchable = attributes.get("searchable");
+            String access = attributes.get("access");
+            UseCaseProperty useCaseProperty =
+                    new UseCaseProperty(
+                            name,
+                            Boolean.parseBoolean(inSummary),
+                            Boolean.parseBoolean(searchable),
+                            Access.parseAccess(access));
+            String label = attributes.get("label");
+            useCaseProperty.setLabel(label);
+            currentUseCase.getProperties().add(useCaseProperty);
         }
     }
 

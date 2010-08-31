@@ -65,6 +65,13 @@ public class UseCaseAction extends PortofinoAction
     //**************************************************************************
     // ServletRequestAware implementation
     //**************************************************************************
+
+    public final static String REDIRECT_TO_USE_CASE = "redirectToUseCase";
+    public final static String NO_USE_CASES = "noUseCases";
+
+    //**************************************************************************
+    // ServletRequestAware implementation
+    //**************************************************************************
     public HttpServletRequest req;
 
     public void setServletRequest(HttpServletRequest req) {
@@ -95,6 +102,7 @@ public class UseCaseAction extends PortofinoAction
 
     public UseCase useCase;
     public ClassAccessor useCaseAccessor;
+    public Table table;
 
     //**************************************************************************
     // Model objects
@@ -111,6 +119,7 @@ public class UseCaseAction extends PortofinoAction
     public TableForm tableForm;
     public Form form;
     public SearchForm searchForm;
+    public String errorMessage;
 
     //**************************************************************************
     // Other objects
@@ -126,6 +135,15 @@ public class UseCaseAction extends PortofinoAction
     //**************************************************************************
 
     public String execute() {
+        if (useCaseName == null) {
+            List<UseCase> useCases = model.getUseCases();
+            if (useCases.isEmpty()) {
+                return NO_USE_CASES;
+            } else {
+                useCaseName = useCases.get(0).getName();
+                return "redirectToUseCase";
+            }
+        }
         if (pk == null) {
             return searchFromString();
         } else {
@@ -139,9 +157,9 @@ public class UseCaseAction extends PortofinoAction
 
     public void setupUseCase() {
         useCase = model.findUseCaseByName(useCaseName);
-        Table table = model.findTableByQualifiedName(useCase.getTable());
         useCaseAccessor = ClassAccessorManager.getManager()
-                .tryToInstantiateFromClass(table);
+                .tryToInstantiateFromClass(useCase);
+        table = useCase.getTable();
         pkHelper = new PkHelper(useCaseAccessor);
         if (useCase == null || useCaseAccessor == null) {
             throw new ModelObjectNotFoundError(useCaseName);
@@ -228,7 +246,7 @@ public class UseCaseAction extends PortofinoAction
     }
 
     private void setupCriteria() {
-        Criteria criteria = context.createCriteria(useCase.getTable());
+        Criteria criteria = context.createCriteria(useCase.getTableName());
         searchForm.configureCriteria(criteria);
         criteria.sqlRestriction(useCase.getFilter());
         objects = context.getObjects(criteria);
@@ -281,9 +299,10 @@ public class UseCaseAction extends PortofinoAction
 
         setupCriteria();
 
-        object = context.getObjectByPk(useCaseAccessor.getName(), pkObject);
+        object = context.getObjectByPk(table.getQualifiedName(), pkObject);
         if (!objects.contains(object)) {
-            throw new Error("Object not in use case!!!");
+            errorMessage = "Object not found";
+            return STATUS_404;
         }
         FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
         form = formBuilder.build();

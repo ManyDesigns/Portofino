@@ -27,11 +27,12 @@
  *
  */
 
-package com.manydesigns.portofino.model.usecases;
+package com.manydesigns.portofino.navigation;
 
-import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.elements.util.Util;
+import com.manydesigns.portofino.model.usecases.UseCase;
 
-import java.util.ArrayList;
+import java.text.MessageFormat;
 import java.util.List;
 
 /*
@@ -39,81 +40,57 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCase {
+public class UseCaseNavigationNode implements NavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-    
 
     //**************************************************************************
     // Fields
     //**************************************************************************
 
-    protected String name;
-    protected String title;
-    protected String tableName;
-    protected Table table;
-    protected String filter;
-    protected final List<UseCaseProperty> properties;
+    protected final UseCase useCase;
+    protected final String url;
+    protected final String title;
+    protected final String description;
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public UseCase(String name, String title, String tableName, String filter) {
-        this.name = name;
-        this.title = title;
-        this.tableName = tableName;
-        this.filter = filter;
-        properties = new ArrayList<UseCaseProperty>();
+    public UseCaseNavigationNode(UseCase useCase,
+                                 String urlFormat,
+                                 String titleFormat,
+                                 String descriptionFormat) {
+        this.useCase = useCase;
+        this.url =
+                Util.getAbsoluteUrl(
+                        MessageFormat.format(
+                                urlFormat, useCase.getName()));
+        this.title = MessageFormat.format(
+                titleFormat, useCase.getName());
+        this.description = MessageFormat.format(
+                descriptionFormat, useCase.getName());
     }
 
 
     //**************************************************************************
-    // Getters/setters
+    // NavigationNode implementation
     //**************************************************************************
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public String getUrl() {
+        return url;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public String getDescription() {
+        return description;
     }
 
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
-
-    public Table getTable() {
-        return table;
-    }
-
-    public void setTable(Table table) {
-        this.table = table;
-    }
-
-    public String getFilter() {
-        return filter;
-    }
-
-    public void setFilter(String filter) {
-        this.filter = filter;
-    }
-
-    public List<UseCaseProperty> getProperties() {
-        return properties;
+    public List<NavigationNode> getChildNodes() {
+        return null;
     }
 }

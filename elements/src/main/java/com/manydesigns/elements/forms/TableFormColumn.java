@@ -37,6 +37,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.Generator;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Array;
@@ -191,7 +192,7 @@ public class TableFormColumn implements Element {
     }
 
     public void labelToXhtml(XhtmlBuffer xb) {
-        xb.write(label);
+        xb.write(StringUtils.capitalize(label));
     }
 
     public void valueToXhtml(XhtmlBuffer xb, int rowIndex) {

@@ -4,7 +4,7 @@
 %><%@taglib prefix="mdes" uri="/manydesigns-elements-struts2"
 %><s:include value="/skins/default/header.jsp"/>
 <s:form method="post">
-    <s:include value="/skins/default/model/tableData/searchButtonsBar.jsp"/>
+    <s:include value="/skins/default/useCase/searchButtonsBar.jsp"/>
     <div id="inner-content">
         <h1>Search: <s:property value="useCaseName"/></h1>
         <div class="search_form">
@@ -24,6 +24,6 @@
         </s:url>
         <s:hidden name="cancelReturnUrl" value="%{#cancelReturnUrl}"/>
     </div>
-    <s:include value="/skins/default/model/tableData/searchButtonsBar.jsp"/>
+    <s:include value="/skins/default/useCase/searchButtonsBar.jsp"/>
 </s:form>
 <s:include value="/skins/default/footer.jsp"/>

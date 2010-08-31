@@ -27,23 +27,37 @@
  *
  */
 
-package com.manydesigns.elements.annotations;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.manydesigns.portofino.model.usecases;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
-public @interface Required {
+public enum Access {
+    NONE("none"),
+    READ("read"),
+    WRITE("write");
+
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    boolean value() default true;
+    private final String name;
+
+    Access(String name) {
+        this.name = name;
+    }
+
+    public static Access parseAccess(String s) {
+        for (Access current : values()) {
+            if (current.getName().equals(s)) {
+                return current;
+            }
+        }
+        throw new IllegalArgumentException("Invalid access format: " + s);
+    }
+
+    public String getName() {
+        return name;
+    }
 }

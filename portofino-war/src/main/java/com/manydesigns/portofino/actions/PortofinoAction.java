@@ -50,6 +50,12 @@ public class PortofinoAction extends ActionSupport
     // Common action results
     //**************************************************************************
 
+    public final static String UNAUTHORIZED = "unauthorized";
+    public final static String STATUS_400 = "400";
+    public final static String STATUS_403 = "403";
+    public final static String STATUS_404 = "404";
+    public final static String STATUS_500 = "500";
+
     public final static String SEARCH = "search";
     public final static String LIST = "list";
     public final static String RETURN_TO_SEARCH = "returnToSearch";

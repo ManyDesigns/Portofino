@@ -35,6 +35,10 @@
                 <param name="error">403</param>
                 <param name="errorMessage">${errorMessage}</param>
             </result>
+            <result name="404" type="httpheader">
+                <param name="error">404</param>
+                <param name="errorMessage">${errorMessage}</param>
+            </result>
             <result name="500" type="httpheader">
                 <param name="error">500</param>
                 <param name="errorMessage">${errorMessage}</param>
@@ -64,6 +68,14 @@
         <action name="Homepage"
                 class="com.manydesigns.portofino.actions.HomepageAction">
             <result name="success">/skins/default/homepage.jsp</result>
+        </action>
+
+        <action name="UseCase"
+                class="com.manydesigns.portofino.actions.UseCaseAction">
+            <result name="redirectToUseCase" type="redirectAction">
+                <param name="actionName">%{useCaseName}/UseCase</param>
+            </result>
+            <result name="noUseCases">/skins/default/useCase/noUseCases.jsp</result>
         </action>
 
         <action name="*/UseCase"

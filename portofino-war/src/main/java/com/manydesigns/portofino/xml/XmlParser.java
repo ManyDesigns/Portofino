@@ -147,25 +147,18 @@ public class XmlParser {
                                ElementCallback callback) throws XMLStreamException {
         int counter = 0;
         while (true) {
-            if (_event == XMLStreamConstants.CHARACTERS
-                    && _text.trim().length() == 0) {
-                next();
-                continue;
-            }
-            if (_event == XMLStreamConstants.SPACE) {
-                next();
-                continue;
-            }
+            skipSpacesAndComments();
             if (_event == XMLStreamConstants.START_ELEMENT
                     && _localName.equals(elementName)) {
                 Map<String, String> callbackAttributes = _attributes;
                 next();
                 callback.doElement(callbackAttributes);
+                skipSpacesAndComments();
                 if (_event == XMLStreamConstants.END_ELEMENT
                         && _localName.equals(elementName)) {
                     next();
                 } else {
-                    throw new Error("Closing tag not found for: "  + elementName);
+                    throw new Error("Closing tag not found for: " + elementName);
                 }
             } else {
                 break;
@@ -181,6 +174,25 @@ public class XmlParser {
             throw new Error(MessageFormat.format(
                     "Element {0} expected max: {1}  actual: {2}",
                     elementName, max, counter));
+        }
+    }
+
+    protected void skipSpacesAndComments() throws XMLStreamException {
+        while (true) {
+            if (_event == XMLStreamConstants.CHARACTERS
+                    && _text.trim().length() == 0) {
+                next();
+                continue;
+            }
+            if (_event == XMLStreamConstants.SPACE) {
+                next();
+                continue;
+            }
+            if (_event == XMLStreamConstants.COMMENT) {
+                next();
+                continue;
+            }
+            break;
         }
     }
 

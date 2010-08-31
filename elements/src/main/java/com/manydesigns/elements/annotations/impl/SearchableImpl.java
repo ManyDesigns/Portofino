@@ -27,23 +27,33 @@
  *
  */
 
-package com.manydesigns.elements.annotations;
+package com.manydesigns.elements.annotations.impl;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.manydesigns.elements.annotations.Searchable;
+
+import java.lang.annotation.Annotation;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
-public @interface Required {
+@SuppressWarnings({"ClassExplicitlyAnnotation"})
+public class SearchableImpl implements Searchable {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    boolean value() default true;
+    private boolean value;
+
+    public SearchableImpl(boolean value) {
+        this.value = value;
+    }
+
+    public boolean value() {
+        return value;
+    }
+    
+    public Class<? extends Annotation> annotationType() {
+        return Searchable.class;
+    }
 }

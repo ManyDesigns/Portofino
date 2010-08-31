@@ -27,23 +27,27 @@
  *
  */
 
-package com.manydesigns.elements.annotations;
+package com.manydesigns.portofino.reflection;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.helpers.ClassAccessorHelper;
+import com.manydesigns.portofino.model.usecases.UseCase;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
-public @interface Required {
+public class UseCaseAccessorHelper implements ClassAccessorHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    boolean value() default true;
+    public ClassAccessor tryToInstantiateFromClass(Object aClass) {
+        if (aClass instanceof UseCase) {
+            return new UseCaseAccessor((UseCase)aClass);
+        } else {
+            return null;
+        }
+    }
+
 }

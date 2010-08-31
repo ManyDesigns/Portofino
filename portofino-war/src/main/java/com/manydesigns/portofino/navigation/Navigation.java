@@ -102,6 +102,9 @@ public class Navigation implements XhtmlFragment {
             } else if ("portlet-design".equals(type)) {
                 navigationNode =
                         new PortletDesignNavigationNode(context, siteNode);
+            } else if ("use-cases".equals(type)) {
+                navigationNode =
+                        new UseCasesNavigationNode(context, siteNode);
             } else {
                 LogUtil.warningMF(logger,
                         "Unrecognized site node type: {0}", type);

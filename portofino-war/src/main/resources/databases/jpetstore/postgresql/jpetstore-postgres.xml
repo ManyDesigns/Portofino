@@ -261,6 +261,7 @@
     </databases>
     <siteNodes>
         <siteNode type="simple" url="/Homepage.action" title="Homepage" description="Homepage"/>
+        <siteNode type="use-cases" url="/UseCase.action" title="Use cases" description="Use cases"/>
         <siteNode url="/model/Index.action" title="Model" description="Model">
             <childNodes>
                 <siteNode url="/model/ConnectionProviders.action" title="Connection providers" description="Connection providers"/>
@@ -302,7 +303,13 @@
         <useCase name="usecase1"
                  title="Use case 1"
                  table="jpetstore.public.product"
-                 filter="category = 'FISH'"
-                 />
+                 filter="category = 'FISH'">
+            <properties>
+                <property name="productid" label="product id" inSummary="true" searchable="true" access="write"/>
+                <property name="category" inSummary="true" searchable="true" access="read"/>
+                <property name="name" inSummary="true" searchable="true" access="write"/>
+                <property name="descn" inSummary="true" searchable="false" access="write"/>
+            </properties>
+        </useCase>
     </useCases>
 </model>

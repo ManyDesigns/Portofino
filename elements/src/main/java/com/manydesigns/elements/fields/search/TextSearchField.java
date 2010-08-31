@@ -73,7 +73,7 @@ public class TextSearchField extends AbstractSearchField {
     //**************************************************************************
 
     public void toXhtml(XhtmlBuffer xb) {
-        xb.writeLabel(StringUtils.capitalize(accessor.getName()),
+        xb.writeLabel(StringUtils.capitalize(label),
                 id, "attr_name");
         String matchModeLabel = "Match mode";
         xb.writeLabel(matchModeLabel, matchModeId, "match_mode");
