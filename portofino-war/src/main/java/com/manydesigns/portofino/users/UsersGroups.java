@@ -29,27 +29,27 @@
 package com.manydesigns.portofino.users;
 
 import java.util.Date;
+import java.io.Serializable;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UsersGroups {
-    Group group;
-    User user;
+public class UsersGroups implements Serializable {
+    Group users;
+    User groups;
     Date creationDate;
+    Integer userid;
+    Integer groupid;
 
-    
 
-    private Id id = new Id();
-
-    public Group getGroup() {
-        return group;
+    public Group getUsers() {
+        return users;
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
+    public void setUsers(Group users) {
+        this.users = users;
     }
 
     public Date getCreationDate() {
@@ -60,36 +60,29 @@ public class UsersGroups {
         this.creationDate = creationDate;
     }
 
-    public User getUser() {
-        return user;
+    public User getGroups() {
+        return groups;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setGroups(User groups) {
+        this.groups = groups;
     }
 
-    public Id getId() {
-        return id;
+    public Integer getUserid() {
+        return userid;
     }
 
-    public void setId(Id id) {
-        this.id = id;
+    public void setUserid(Integer userid) {
+        this.userid = userid;
     }
 
-    public void setUserid(int uuid){
-        this.id.setUserid(uuid);
+    public Integer getGroupid() {
+        return groupid;
     }
 
-    public void setGroupid(int groupId){
-        this.id.setGroupid(groupId);
-    }
-
-    public Integer getUserid(){
-        return this.id.getUserid();
-    }
-
-    public Integer getGroupid(){
-        return this.id.getGroupid();
+    public void setGroupid(Integer groupid) {
+        this.groupid = groupid;
     }
 }
+
 

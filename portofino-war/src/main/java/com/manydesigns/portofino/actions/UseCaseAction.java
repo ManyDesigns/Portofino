@@ -46,6 +46,7 @@ import com.manydesigns.portofino.util.PkHelper;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -271,7 +272,7 @@ public class UseCaseAction extends PortofinoAction
 
     public String read() {
         setupUseCase();
-        Object pkObject = pkHelper.parsePkString(pk);
+        Serializable pkObject = pkHelper.parsePkString(pk);
 
         SearchFormBuilder searchFormBuilder =
                 new SearchFormBuilder(useCaseAccessor);

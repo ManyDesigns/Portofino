@@ -89,7 +89,7 @@ public class HibernateTest extends TestCase {
         List<UsersGroups> groups = admin.getGroups();
         assertEquals("numero gruppi per admin", 2, groups.size());
         UsersGroups ug1 = groups.get(0);
-        Group g1 = ug1.getGroup();
+        Group g1 = ug1.getUsers();
 
     }
     public void testSearchAndReadCategorieProdotti() {

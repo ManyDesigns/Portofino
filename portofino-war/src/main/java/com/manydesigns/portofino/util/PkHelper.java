@@ -38,6 +38,7 @@ import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.logging.Logger;
+import java.io.Serializable;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -86,11 +87,11 @@ public class PkHelper {
         return ExpressionGenerator.create(sb.toString());
     }
 
-    public Object parsePkString(String pkString) {
+    public Serializable parsePkString(String pkString) {
         String[] pkList = StringUtils.split(pkString, ",");
 
         int i = 0;
-        Object result = classAccessor.newInstance();
+        Serializable result = (Serializable)classAccessor.newInstance();
 
         for(PropertyAccessor property : classAccessor.getKeyProperties()) {
             String stringValue = pkList[i];

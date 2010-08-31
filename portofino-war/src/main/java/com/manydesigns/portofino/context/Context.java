@@ -34,6 +34,7 @@ import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.users.User;
 
+import java.io.Serializable;
 import java.util.List;
 
 
@@ -72,8 +73,7 @@ public interface Context {
     // Persistance
     //**************************************************************************
 
-    Object getObjectByPk(String qualifiedTableName,
-                                      Object pk);
+    Object getObjectByPk(String qualifiedTableName, Serializable pk);
 
     List<Object> getAllObjects(String qualifiedTableName);
 

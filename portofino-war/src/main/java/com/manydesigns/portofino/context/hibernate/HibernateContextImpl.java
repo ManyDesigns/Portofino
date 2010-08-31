@@ -30,8 +30,10 @@
 package com.manydesigns.portofino.context.hibernate;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.database.ConnectionProvider;
@@ -193,22 +195,13 @@ public class HibernateContextImpl implements Context {
     //**************************************************************************
 
     public Object getObjectByPk(String qualifiedTableName,
-                               Object... pk) {
-        throw new UnsupportedOperationException();
-    }
-
-    public Object getObjectByPk(String qualifiedTableName,
-                                Object pk) {
+                                Serializable pk) {
         Session session = getSession(qualifiedTableName);
         Table table = model.findTableByQualifiedName(qualifiedTableName);
+
+        int size = table.getPrimaryKey().getColumns().size();
         if (pk instanceof  Map){
             HashMap<String, Object> key = (HashMap<String, Object>) pk;
-            int size = key.size();
-            //due include anche $type$
-            if (key.get("$type$")!=null){
-                size=size-1;
-            }
-
             if (size > 1) {
                 startTimer();
                 @SuppressWarnings({"unchecked"}) Map<String, Object> result =
@@ -229,6 +222,29 @@ public class HibernateContextImpl implements Context {
                     return result;
                 }
             }
+        } else {
+            @SuppressWarnings({"unchecked"}) Object result;
+            startTimer();
+            result=null;
+            if (size>1) {
+                result = session.load(qualifiedTableName, pk);
+            } else {
+                String propertyName =
+                        table.getPrimaryKey().getColumns().get(0).getPropertyName();
+                ClassAccessor accessor = ClassAccessorManager.getManager()
+                    .tryToInstantiateFromClass(table);
+                try {
+                    Serializable key = (Serializable) accessor.getProperty(propertyName).get(pk);
+                    result = session.load(qualifiedTableName, key);
+                } catch (Throwable e) {
+                   LogUtil.warningMF(logger,
+                        "Cannot invoke property accessor for {0} on class {1}",
+                        e, propertyName, table.getClassName());
+                }
+            }
+            stopTimer();
+            return result;
+
         }
         return null;
     }

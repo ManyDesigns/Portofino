@@ -32,13 +32,14 @@ import com.manydesigns.elements.annotations.Password;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.Serializable;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class User {
+public class User implements Serializable{
     Integer uuid;
     String email;
     String pwd;

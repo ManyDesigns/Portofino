@@ -30,13 +30,14 @@ package com.manydesigns.portofino.users;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.io.Serializable;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Group {
+public class Group implements Serializable{
     Integer groupId;
     String name;
     String description;

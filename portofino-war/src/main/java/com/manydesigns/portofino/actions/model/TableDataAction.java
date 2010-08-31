@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.io.Serializable;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -275,7 +276,7 @@ public class TableDataAction extends PortofinoAction
 
     public String read() {
         setupTable();
-        Object pkObject = pkHelper.parsePkString(pk);
+        Serializable pkObject = pkHelper.parsePkString(pk);
 
         SearchFormBuilder searchFormBuilder =
                 new SearchFormBuilder(tableAccessor);
@@ -358,7 +359,7 @@ public class TableDataAction extends PortofinoAction
 
     public String edit() {
         setupTable();
-        Object pkObject = pkHelper.parsePkString(pk);
+        Serializable pkObject = pkHelper.parsePkString(pk);
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
 
@@ -373,7 +374,7 @@ public class TableDataAction extends PortofinoAction
 
     public String update() {
         setupTable();
-        Object pkObject = pkHelper.parsePkString(pk);
+        Serializable pkObject = pkHelper.parsePkString(pk);
 
         FormBuilder formBuilder = new FormBuilder(tableAccessor);
         form = formBuilder.build();
@@ -422,7 +423,7 @@ public class TableDataAction extends PortofinoAction
         form.readFromRequest(req);
         if (form.validate()) {
             for (String current : selection) {
-                Object pkObject = pkHelper.parsePkString(current);
+                Serializable pkObject = pkHelper.parsePkString(current);
                 object = context.getObjectByPk(qualifiedTableName, pkObject);
                 form.writeToObject(object);
             }
