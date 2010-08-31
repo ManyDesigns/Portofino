@@ -392,13 +392,13 @@ public class HibernateConfig {
         Bag set = new Bag(clazzOne);
         set.setLazy(true);
         //Mettere Lazy in debug a false per ottenere subito eventuali errori
-        if (relationship.getClassManyProperty() == null) {
+        if (relationship.getManyPropertyName() == null) {
             set.setRole(manyTable.getQualifiedName() + "."
                     + relationship.getRelationshipName());
             set.setNodeName(relationship.getRelationshipName());
         } else {
-            set.setRole(relationship.getClassManyProperty());
-            set.setNodeName(relationship.getClassManyProperty());
+            set.setRole(relationship.getManyPropertyName());
+            set.setNodeName(relationship.getManyPropertyName());
         }
         set.setCollectionTable(clazzMany.getTable());
         OneToMany oneToMany = new OneToMany(set.getOwner());
@@ -496,13 +496,13 @@ public class HibernateConfig {
         mappings.addCollection(set);
 
         Property prop = new Property();
-        if (relationship.getClassManyProperty() == null) {
+        if (relationship.getManyPropertyName() == null) {
             prop.setName(manyTable.getQualifiedName() + "."
                     + relationship.getRelationshipName());
             prop.setNodeName(relationship.getRelationshipName());
         } else {
-            prop.setName(relationship.getClassManyProperty());
-            prop.setNodeName(relationship.getClassManyProperty());
+            prop.setName(relationship.getManyPropertyName());
+            prop.setNodeName(relationship.getManyPropertyName());
         }
         prop.setValue(set);
         clazzOne.addProperty(prop);
@@ -548,8 +548,8 @@ public class HibernateConfig {
         }
 
         Property prop = new Property();
-        prop.setName(relationship.getClassManyProperty());
-        prop.setNodeName(relationship.getClassManyProperty());
+        prop.setName(relationship.getOnePropertyName());
+        prop.setNodeName(relationship.getOnePropertyName());
         prop.setValue(m2o);
         prop.setInsertable(false);
         prop.setUpdateable(false);

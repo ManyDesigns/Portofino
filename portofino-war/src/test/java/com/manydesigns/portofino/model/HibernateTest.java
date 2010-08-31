@@ -69,7 +69,7 @@ public class HibernateTest extends TestCase {
         List<Object> resultProd =
                 context.getAllObjects("jpetstore.public.product");
         int sizePrd = resultProd.size();
-        assertEquals("prodotti", 16, sizePrd);
+        assertEquals("prodotti", 17, sizePrd);
 
     }
 
@@ -89,7 +89,7 @@ public class HibernateTest extends TestCase {
         List<UsersGroups> groups = admin.getGroups();
         assertEquals("numero gruppi per admin", 2, groups.size());
         UsersGroups ug1 = groups.get(0);
-        Group g1 = ug1.getUsers();
+        Group g1 = ug1.getGroup();
 
     }
     public void testSearchAndReadCategorieProdotti() {
@@ -122,7 +122,7 @@ public class HibernateTest extends TestCase {
         HashMap category= findCategory(tableAccessor, criteria);
 
         int sizePrd = resultProd.size();
-        assertEquals("prodotti", sizePrd, 16);
+        assertEquals("prodotti", sizePrd, 17);
         Map prd0 = (Map<String, Object>)resultProd.get(0);
         assertEquals("FI-SW-01", prd0.get("productid") );
         assertEquals("Angelfish", prd0.get("name"));
@@ -201,7 +201,12 @@ public class HibernateTest extends TestCase {
 
         //e ora cancello
         context.openSession();
-        context.deleteObject("jpetstore.public.lineitem", lineItem);
+        try {
+            context.deleteObject("jpetstore.public.lineitem", lineItem);
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            fail();
+        }
         context.closeSession();
     }
 
