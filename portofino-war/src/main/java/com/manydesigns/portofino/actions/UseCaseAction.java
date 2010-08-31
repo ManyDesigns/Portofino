@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.logging.LogUtil;
@@ -51,6 +52,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -311,5 +313,161 @@ public class UseCaseAction extends PortofinoAction
 
         return READ;
     }
+
+
+    //**************************************************************************
+    // Create/Save
+    //**************************************************************************
+
+    public String create() {
+        setupUseCase();
+
+        FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
+        form = formBuilder.build();
+        form.setMode(Mode.CREATE);
+
+        return CREATE;
+    }
+
+    public String save() {
+        setupUseCase();
+
+        FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
+        form = formBuilder.build();
+        form.setMode(Mode.CREATE);
+
+        form.readFromRequest(req);
+        if (form.validate()) {
+            object = useCaseAccessor.newInstance();
+            form.writeToObject(object);
+            context.saveObject(table.getQualifiedName(), object);
+            pk = pkHelper.generatePkString(object);
+            SessionMessages.addInfoMessage("SAVE avvenuto con successo");
+            return SAVE;
+        } else {
+            return CREATE;
+        }
+    }
+
+    //**************************************************************************
+    // Edit/Update
+    //**************************************************************************
+
+    public String edit() {
+        setupUseCase();
+        Serializable pkObject = pkHelper.parsePkString(pk);
+
+        object = context.getObjectByPk(table.getQualifiedName(), pkObject);
+
+        FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
+        form = formBuilder.build();
+        form.setMode(Mode.EDIT);
+
+        form.readFromObject(object);
+
+        return EDIT;
+    }
+
+    public String update() {
+        setupUseCase();
+        Serializable pkObject = pkHelper.parsePkString(pk);
+
+        FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
+        form = formBuilder.build();
+        form.setMode(Mode.EDIT);
+
+        object = context.getObjectByPk(table.getQualifiedName(), pkObject);
+        form.readFromObject(object);
+        form.readFromRequest(req);
+        if (form.validate()) {
+            form.writeToObject(object);
+            context.updateObject(table.getQualifiedName(), object);
+            SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
+            return UPDATE;
+        } else {
+            return EDIT;
+        }
+    }
+
+    public String bulkEdit() {
+        if (selection == null || selection.length == 0) {
+            SessionMessages.addWarningMessage(
+                    "Nessun oggetto selezionato");
+            return CANCEL;
+        }
+
+        if (selection.length == 1) {
+            pk = selection[0];
+            return edit();
+        }
+
+        setupUseCase();
+
+        FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
+        form = formBuilder.build();
+        form.setMode(Mode.BULK_EDIT);
+
+        return BULK_EDIT;
+    }
+
+    public String bulkUpdate() {
+        setupUseCase();
+
+        FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
+        form = formBuilder.build();
+        form.setMode(Mode.BULK_EDIT);
+        form.readFromRequest(req);
+        if (form.validate()) {
+            for (String current : selection) {
+                Serializable pkObject = pkHelper.parsePkString(current);
+                object = context.getObjectByPk(table.getQualifiedName(), pkObject);
+                form.writeToObject(object);
+            }
+            form.writeToObject(object);
+            context.updateObject(table.getQualifiedName(), object);
+            SessionMessages.addInfoMessage(MessageFormat.format(
+                    "UPDATE di {0} oggetti avvenuto con successo", selection.length));
+            return BULK_UPDATE;
+        } else {
+            return BULK_EDIT;
+        }
+    }
+
+    //**************************************************************************
+    // Delete
+    //**************************************************************************
+
+    public String delete() {
+        setupUseCase();
+        Object pkObject = pkHelper.parsePkString(pk);
+        context.deleteObject(table.getQualifiedName(), pkObject);
+        SessionMessages.addInfoMessage("DELETE avvenuto con successo");
+        return DELETE;
+    }
+
+    public String bulkDelete() {
+        setupUseCase();
+        if (selection == null) {
+            SessionMessages.addWarningMessage(
+                    "DELETE non avvenuto: nessun oggetto selezionato");
+            return CANCEL;
+        }
+        for (String current : selection) {
+            Object pkObject = pkHelper.parsePkString(current);
+            context.deleteObject(table.getQualifiedName(), pkObject);
+        }
+        SessionMessages.addInfoMessage(MessageFormat.format(
+                "DELETE di {0} oggetti avvenuto con successo", selection.length));
+        return DELETE;
+    }
+
+    //**************************************************************************
+    // Cancel
+    //**************************************************************************
+
+    public String cancel() {
+        return CANCEL;
+    }
+
 
 }

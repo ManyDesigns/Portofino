@@ -125,8 +125,9 @@ public class SearchFormBuilder {
 
             // check if field is searchable
             Searchable searchableAnnotation = current.getAnnotation(Searchable.class);
-            if (searchableAnnotation == null || !searchableAnnotation.value()) {
-                logger.finer("Skipping non-searchable field: " + current.getName());
+            if (searchableAnnotation != null && !searchableAnnotation.value()) {
+                LogUtil.finerMF(logger, "Skipping non-searchable field: {0}",
+                        current.getName());
                 continue;
             }
 

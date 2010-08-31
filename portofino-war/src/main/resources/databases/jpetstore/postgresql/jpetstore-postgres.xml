@@ -324,14 +324,14 @@
     </portlets>
     <useCases>
         <useCase name="usecase1"
-                 title="Use case 1"
+                 title="Products in category: FISH"
                  table="jpetstore.public.product"
                  filter="category = 'FISH'">
             <properties>
                 <property name="productid" label="product id" inSummary="true" searchable="true" access="write"/>
-                <property name="category" inSummary="true" searchable="true" access="read"/>
+                <property name="category" inSummary="false" searchable="false" access="read"/>
                 <property name="name" inSummary="true" searchable="true" access="write"/>
-                <property name="descn" inSummary="true" searchable="false" access="write"/>
+                <property name="descn" label="description" inSummary="true" searchable="false" access="write"/>
             </properties>
         </useCase>
     </useCases>

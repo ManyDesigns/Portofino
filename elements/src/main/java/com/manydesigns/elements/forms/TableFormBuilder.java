@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.forms;
 
+import com.manydesigns.elements.annotations.InSummary;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.helpers.FieldManager;
 import com.manydesigns.elements.logging.LogUtil;
@@ -125,6 +126,16 @@ public class TableFormBuilder {
             if (blackList.contains(current.getName())) {
                 continue;
             }
+
+            // check if field is in summary
+            InSummary inSummaryAnnotation =
+                    current.getAnnotation(InSummary.class);
+            if (inSummaryAnnotation != null && !inSummaryAnnotation.value()) {
+                LogUtil.finerMF(logger, "Skipping non-in-summary field: {0}",
+                        current.getName());
+                continue;
+            }
+
             propertyAccessors.add(current);
         }
     }

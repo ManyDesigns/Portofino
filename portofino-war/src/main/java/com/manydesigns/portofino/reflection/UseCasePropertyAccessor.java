@@ -29,8 +29,10 @@
 
 package com.manydesigns.portofino.reflection;
 
+import com.manydesigns.elements.annotations.InSummary;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Searchable;
+import com.manydesigns.elements.annotations.impl.InSummaryImpl;
 import com.manydesigns.elements.annotations.impl.LabelImpl;
 import com.manydesigns.elements.annotations.impl.SearchableImpl;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -53,6 +55,7 @@ public class UseCasePropertyAccessor implements PropertyAccessor {
 
     protected final Label labelAnnotation;
     protected final Searchable searchableAnnotation;
+    protected final InSummary inSummaryAnnotation;
 
     public UseCasePropertyAccessor(UseCaseProperty useCaseProperty,
                                    PropertyAccessor nestedAccessor) {
@@ -64,9 +67,12 @@ public class UseCasePropertyAccessor implements PropertyAccessor {
         } else {
             labelAnnotation = new LabelImpl(useCaseProperty.getLabel());
         }
-        
+
         searchableAnnotation =
                 new SearchableImpl(useCaseProperty.isSearchable());
+
+        inSummaryAnnotation =
+                new InSummaryImpl(useCaseProperty.isInSummary());
     }
 
     public String getName() {
@@ -91,6 +97,8 @@ public class UseCasePropertyAccessor implements PropertyAccessor {
             return (T)labelAnnotation;
         } else if (annotationClass == Searchable.class) {
             return (T)searchableAnnotation;
+        } else if (annotationClass == InSummary.class) {
+            return (T)inSummaryAnnotation;
         }
         return nestedAccessor.getAnnotation(annotationClass);
     }
