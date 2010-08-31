@@ -37,19 +37,19 @@ import java.io.Serializable;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class UsersGroups implements Serializable {
-    Group users;
-    User groups;
+    Group group;
+    User user;
     Date creationDate;
     Integer userid;
     Integer groupid;
 
 
-    public Group getUsers() {
-        return users;
+    public Group getGroup() {
+        return group;
     }
 
-    public void setUsers(Group users) {
-        this.users = users;
+    public void setGroup(Group group) {
+        this.group = group;
     }
 
     public Date getCreationDate() {
@@ -60,12 +60,12 @@ public class UsersGroups implements Serializable {
         this.creationDate = creationDate;
     }
 
-    public User getGroups() {
-        return groups;
+    public User getUser() {
+        return user;
     }
 
-    public void setGroups(User groups) {
-        this.groups = groups;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Integer getUserid() {

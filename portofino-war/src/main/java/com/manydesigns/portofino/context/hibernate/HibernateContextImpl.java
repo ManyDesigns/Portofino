@@ -443,7 +443,7 @@ public class HibernateContextImpl implements Context {
             return result;
         } else {
             JavaClassAccessor classAccessor = new JavaClassAccessor(clazz);
-                String propertyName = relationship.getClassManyProperty();
+                String propertyName = relationship.getManyPropertyName();
             try {
 
                 PropertyAccessor propertyAccessor

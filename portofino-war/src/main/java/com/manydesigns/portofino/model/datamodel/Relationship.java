@@ -59,7 +59,8 @@ public class Relationship {
     protected String relationshipName;
     protected String onUpdate;
     protected String onDelete;
-    protected String classManyProperty;
+    protected String manyPropertyName;
+    protected String onePropertyName;
 
     protected final List<Reference>references;
 
@@ -123,11 +124,19 @@ public class Relationship {
         this.fromTable = fromTable;
     }
 
-    public String getClassManyProperty() {
-        return classManyProperty;
+    public String getManyPropertyName() {
+        return manyPropertyName;
     }
 
-    public void setClassManyProperty(String classManyProperty) {
-        this.classManyProperty = classManyProperty;
+    public void setManyPropertyName(String manyPropertyName) {
+        this.manyPropertyName = manyPropertyName;
+    }
+
+    public String getOnePropertyName() {
+        return onePropertyName;
+    }
+
+    public void setOnePropertyName(String onePropertyName) {
+        this.onePropertyName = onePropertyName;
     }
 }
