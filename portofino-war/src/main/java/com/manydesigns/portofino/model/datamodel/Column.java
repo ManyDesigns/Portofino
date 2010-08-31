@@ -53,6 +53,7 @@ public class Column {
     protected boolean autoincrement;
     protected int length;
     protected int scale;
+    protected boolean searchable;
 
     //**************************************************************************
     // Fields: logical (Java)
@@ -66,9 +67,11 @@ public class Column {
     //**************************************************************************
     public Column(String databaseName, String schemaName,
                   String tableName, String columnName,
-                  String columnType, boolean nullable,
-                  boolean autoincrement, int length,
-                  int scale) {
+                  String columnType,
+                  boolean nullable,
+                  boolean autoincrement,
+                  int length, int scale,
+                  boolean searchable) {
         this.databaseName = databaseName;
         this.schemaName = schemaName;
         this.tableName = tableName;
@@ -78,6 +81,7 @@ public class Column {
         this.autoincrement = autoincrement;
         this.length = length;
         this.scale = scale;
+        this.searchable = searchable;
     }
 
     //**************************************************************************
@@ -177,6 +181,14 @@ public class Column {
         this.propertyName = propertyName;
     }
 
+    public boolean isSearchable() {
+        return searchable;
+    }
+
+    public void setSearchable(boolean searchable) {
+        this.searchable = searchable;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -188,8 +200,7 @@ public class Column {
         if (length != column.length) return false;
         if (nullable != column.nullable) return false;
         if (scale != column.scale) return false;
-        if (propertyName != null ? !propertyName.equals(column.propertyName) : column.propertyName != null)
-            return false;
+        if (searchable != column.searchable) return false;
         if (columnName != null ? !columnName.equals(column.columnName) : column.columnName != null)
             return false;
         if (columnType != null ? !columnType.equals(column.columnType) : column.columnType != null)
@@ -197,6 +208,8 @@ public class Column {
         if (databaseName != null ? !databaseName.equals(column.databaseName) : column.databaseName != null)
             return false;
         if (javaType != null ? !javaType.equals(column.javaType) : column.javaType != null)
+            return false;
+        if (propertyName != null ? !propertyName.equals(column.propertyName) : column.propertyName != null)
             return false;
         if (schemaName != null ? !schemaName.equals(column.schemaName) : column.schemaName != null)
             return false;
@@ -213,12 +226,13 @@ public class Column {
         result = 31 * result + (tableName != null ? tableName.hashCode() : 0);
         result = 31 * result + (columnName != null ? columnName.hashCode() : 0);
         result = 31 * result + (columnType != null ? columnType.hashCode() : 0);
-        result = 31 * result + (propertyName != null ? propertyName.hashCode() : 0);
         result = 31 * result + (nullable ? 1 : 0);
         result = 31 * result + (autoincrement ? 1 : 0);
         result = 31 * result + length;
         result = 31 * result + scale;
+        result = 31 * result + (searchable ? 1 : 0);
         result = 31 * result + (javaType != null ? javaType.hashCode() : 0);
+        result = 31 * result + (propertyName != null ? propertyName.hashCode() : 0);
         return result;
     }
 }

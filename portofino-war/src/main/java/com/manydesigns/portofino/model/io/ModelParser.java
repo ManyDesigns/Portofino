@@ -174,7 +174,8 @@ public class ModelParser extends XmlParser {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             checkRequiredAttributes(attributes,
-                    "name", "columnType", "length", "scale", "nullable");
+                    "name", "columnType", "length", "scale",
+                    "nullable", "searchable");
             String columnName = attributes.get("name");
             Column column =
                     new Column(currentTable.getDatabaseName(),
@@ -185,7 +186,8 @@ public class ModelParser extends XmlParser {
                             Boolean.parseBoolean(attributes.get("nullable")),
                             Boolean.parseBoolean(attributes.get("autoincrement")),
                             Integer.parseInt(attributes.get("length")),
-                            Integer.parseInt(attributes.get("scale"))
+                            Integer.parseInt(attributes.get("scale")),
+                            Boolean.parseBoolean(attributes.get("searchable"))
                             );
 
             String propertyName = attributes.get("propertyName");

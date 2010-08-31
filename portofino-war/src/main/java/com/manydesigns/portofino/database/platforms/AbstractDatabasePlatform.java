@@ -239,7 +239,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                         expectedSchemaName, expectedTableName,
                         columnName, columnType,
                         nullable, type.isAutoincrement(),
-                        length, scale);
+                        length, scale, type.isSearchable());
                 LogUtil.fineMF(logger, "Found column: {0} of type {1}",
                         column.getQualifiedName(),
                         column.getColumnType());
