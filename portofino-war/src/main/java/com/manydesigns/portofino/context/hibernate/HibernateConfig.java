@@ -77,8 +77,8 @@ public class HibernateConfig {
                     .setProperty("hibernate.connection.password",
                             jdbcConnectionProvider.getPassword())
                     .setProperty("hibernate.current_session_context_class",
-                            "org.hibernate.context.ThreadLocalSessionContext")
-                    .setProperty("hibernate.show_sql", "true");
+                            "org.hibernate.context.ThreadLocalSessionContext");
+            configuration.setProperty("hibernate.show_sql", "true");
 
 
             Mappings mappings = configuration.createMappings();

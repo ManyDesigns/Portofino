@@ -210,7 +210,7 @@ public class TableDataAction extends PortofinoAction
             searchString = null;
         }
 
-        Criteria criteria = context.createCriteria(qualifiedTableName);
+        Criteria criteria = new Criteria();
         searchForm.configureCriteria(criteria);
         objects = context.getObjects(criteria);
 
@@ -283,7 +283,7 @@ public class TableDataAction extends PortofinoAction
         searchForm = searchFormBuilder.build();
         configureSearchFormFromString();
 
-        Criteria criteria = context.createCriteria(qualifiedTableName);
+        Criteria criteria = new Criteria();
         searchForm.configureCriteria(criteria);
         objects = context.getObjects(criteria);
 

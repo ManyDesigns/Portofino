@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.context.hibernate;
 
+import com.manydesigns.elements.fields.search.Criteria;
+import com.manydesigns.elements.fields.search.TextMatchMode;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
@@ -37,22 +39,29 @@ import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.database.ConnectionProvider;
+import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.io.ConnectionsParser;
 import com.manydesigns.portofino.model.io.ModelParser;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.search.HibernateCriteriaAdapter;
+import com.manydesigns.portofino.reflection.ColumnAccessor;
 import com.manydesigns.portofino.users.User;
 import org.apache.commons.lang.time.StopWatch;
-import org.hibernate.*;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Settings;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.dialect.*;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 
 import java.io.Serializable;
 import java.sql.Connection;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -140,8 +149,10 @@ public class HibernateContextImpl implements Context {
                             new HibernateConfig(connectionProvider);
                     Configuration configuration =
                             builder.buildSessionFactory(database);
-                    SessionFactory sessionFactory =
-                            configuration.buildSessionFactory();
+                    SessionFactoryImpl sessionFactory =
+                            (SessionFactoryImpl) configuration
+                                    .buildSessionFactory();
+                    Settings settings = sessionFactory.getSettings();
 
                     HibernateDatabaseSetup setup =
                             new HibernateDatabaseSetup(
@@ -253,7 +264,7 @@ public class HibernateContextImpl implements Context {
     public List<Object> getAllObjects(String qualifiedTableName) {
         Session session = getSession(qualifiedTableName);
 
-        Criteria hibernateCriteria;
+        org.hibernate.Criteria hibernateCriteria;
         Table table = model.findTableByQualifiedName(qualifiedTableName);
 
         if (table.getClassName()==null) {
@@ -276,42 +287,120 @@ public class HibernateContextImpl implements Context {
         return setups.get(databaseName).getThreadSession();
     }
 
-    public com.manydesigns.elements.fields.search.Criteria
-    createCriteria(String qualifiedTableName) {
-        Session session = getSession(qualifiedTableName);
-        Criteria hibernateCriteria = session.createCriteria(qualifiedTableName);
-        return new HibernateCriteriaAdapter(session, hibernateCriteria);
+    public Query getQueryForCriteria(Criteria criteria) {
+        ArrayList<Object> parameters = new ArrayList<Object>();
+        StringBuilder sb = new StringBuilder();
+        for (Criteria.Criterion criterion : criteria) {
+            ColumnAccessor accessor =
+                    (ColumnAccessor)criterion.getPropertyAccessor();
+            String hqlFormat;
+            if (criterion instanceof Criteria.EqCriterion) {
+                Criteria.EqCriterion eqCriterion =
+                        (Criteria.EqCriterion)criterion;
+                Object value = eqCriterion.getValue();
+                hqlFormat = "{0} = ?";
+            } else if (criterion instanceof Criteria.NeCriterion) {
+                Criteria.NeCriterion neCriterion =
+                        (Criteria.NeCriterion)criterion;
+                Object value = neCriterion.getValue();
+                hqlFormat = "{0} <> ?";
+            } else if (criterion instanceof Criteria.BetweenCriterion) {
+                Criteria.BetweenCriterion betweenCriterion =
+                        (Criteria.BetweenCriterion)criterion;
+                Object min = betweenCriterion.getMin();
+                Object max = betweenCriterion.getMax();
+                hqlFormat = "{0} >= ? AND < {0} <= ?";
+            } else if (criterion instanceof Criteria.GtCriterion) {
+                Criteria.GtCriterion gtCriterion =
+                        (Criteria.GtCriterion)criterion;
+                Object value = gtCriterion.getValue();
+                hqlFormat = "{0} > ?";
+            } else if (criterion instanceof Criteria.GeCriterion) {
+                Criteria.GeCriterion gtCriterion =
+                        (Criteria.GeCriterion)criterion;
+                Object value = gtCriterion.getValue();
+                hqlFormat = "{0} >= ?";
+            } else if (criterion instanceof Criteria.LtCriterion) {
+                Criteria.LtCriterion ltCriterion =
+                        (Criteria.LtCriterion)criterion;
+                Object value = ltCriterion.getValue();
+                hqlFormat = "{0} < ?";
+            } else if (criterion instanceof Criteria.LeCriterion) {
+                Criteria.LeCriterion leCriterion =
+                        (Criteria.LeCriterion)criterion;
+                Object value = leCriterion.getValue();
+                hqlFormat = "{0} <= ?";
+            } else if (criterion instanceof Criteria.LikeCriterion) {
+                Criteria.LikeCriterion likeCriterion =
+                        (Criteria.LikeCriterion)criterion;
+                Object value = likeCriterion.getValue();
+                TextMatchMode textMatchMode = likeCriterion.getTextMatchMode();
+                hqlFormat = "{0} like ?";
+            } else if (criterion instanceof Criteria.IlikeCriterion) {
+                Criteria.IlikeCriterion ilikeCriterion =
+                        (Criteria.IlikeCriterion)criterion;
+                Object value = ilikeCriterion.getValue();
+                TextMatchMode textMatchMode = ilikeCriterion.getTextMatchMode();
+                hqlFormat = "lower({0}) like lower(?)";
+            } else {
+                LogUtil.severeMF(logger, "Unrecognized criterion: ", criterion);
+                throw new InternalError("Unrecognied criterion");
+            }
+
+            String hql = MessageFormat.format(hqlFormat,
+                    accessor.getColumn().getColumnName());
+
+            if (sb.length() > 0) {
+                sb.append(" AND ");
+            }
+            sb.append(hql);
+        }
     }
 
-    public List<Object> getObjects(
-            com.manydesigns.elements.fields.search.Criteria criteria) {
-        HibernateCriteriaAdapter hibernateCriteriaAdapter =
-                (HibernateCriteriaAdapter) criteria;
-        Criteria hibernateCriteria =
-                hibernateCriteriaAdapter.getHibernateCriteria();
+
+    public List<Object> getObjects(Criteria criteria) {
+        Query query = getQueryForCriteria(criteria);
+
         startTimer();
         //noinspection unchecked
-        List<Object> result = hibernateCriteria.list();
+        List<Object> result = query.list();
         stopTimer();
         return result;
     }
 
-    public List<Object> getObjects(
-            com.manydesigns.elements.fields.search.Criteria criteria,
-            String filter) {
-        HibernateCriteriaAdapter hibernateCriteriaAdapter =
-                (HibernateCriteriaAdapter)criteria;
-        Criteria hibernateCriteria =
-                hibernateCriteriaAdapter.getHibernateCriteria();
-        Session session = hibernateCriteriaAdapter.getHibernateSession();
+    public List<Object> getObjects(String qualifiedTableName, String query) {
+        Session session = getSession(qualifiedTableName);
+
         startTimer();
         //noinspection unchecked
-//        List<Object> result1 = hibernateCriteria.list();
-        Query query = session.createFilter(hibernateCriteria.list(), filter);
-        //noinspection unchecked
-        List<Object> result2 = query.list();
+        List<Object> result = session.createQuery(query).list();
         stopTimer();
-        return result2;
+        return result;
+    }
+
+    public List<Object> getObjects(String queryString, Criteria criteria) {
+        SessionFactoryImpl factory =
+                (SessionFactoryImpl) session.getSessionFactory();
+        String alias = "product";
+
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(queryString);
+        if (criteriaWhereCondition.length() > 0) {
+            sb.append(" AND ");
+            sb.append(criteriaWhereCondition);
+        }
+        String fullQueryString = sb.toString();
+        Query query = session.createQuery(fullQueryString);
+        query.setParameters(
+                criteriaQueryParameters.getPositionalParameterValues(),
+                criteriaQueryParameters.getPositionalParameterTypes());
+
+        startTimer();
+        //noinspection unchecked
+        List<Object> result = query.list();
+        stopTimer();
+        return result;
     }
 
     public void saveOrUpdateObject(String qualifiedTableName, Object obj) {
@@ -428,7 +517,7 @@ public class HibernateContextImpl implements Context {
 
             Session session =
                     setups.get(fromTable.getDatabaseName()).getThreadSession();
-            Criteria criteria =
+            org.hibernate.Criteria criteria =
                     session.createCriteria(fromTable.getQualifiedName());
             for (Reference reference : relationship.getReferences()) {
                 Column fromColumn = reference.getFromColumn();
@@ -455,7 +544,7 @@ public class HibernateContextImpl implements Context {
                 }
                 Session session =
                         setups.get(fromTable.getDatabaseName()).getThreadSession();
-                Criteria criteria =
+                org.hibernate.Criteria criteria =
                         session.createCriteria(fromTable.getQualifiedName());
                 for (Reference reference : relationship.getReferences()) {
                     Column fromColumn = reference.getFromColumn();
@@ -490,9 +579,12 @@ public class HibernateContextImpl implements Context {
         for (Database db : model.getDatabases()) {
             result.add("-- DB: " + db.getDatabaseName());
             HibernateDatabaseSetup setup = setups.get(db.getDatabaseName());
+            ConnectionProvider connectionProvider =
+                    getConnectionProvider(db.getDatabaseName());
+            DatabasePlatform platform = connectionProvider.getDatabasePlatform();
+            Dialect dialect = platform.getHibernateDialect();
             Configuration conf = setup.getConfiguration();
-            String[] ddls = conf.generateSchemaCreationScript
-                    (getDialect(getConnectionProvider(db.getDatabaseName())));
+            String[] ddls = conf.generateSchemaCreationScript(dialect);
             result.addAll(Arrays.asList(ddls));
 
         }
@@ -506,21 +598,21 @@ public class HibernateContextImpl implements Context {
         for (Database db : model.getDatabases()) {
             HibernateDatabaseSetup setup = setups.get(db.getDatabaseName());
             DatabaseMetadata databaseMetadata;
-            ConnectionProvider provider = null;
+            ConnectionProvider provider =
+                    getConnectionProvider(db.getDatabaseName());
+            DatabasePlatform platform = provider.getDatabasePlatform();
+            Dialect dialect = platform.getHibernateDialect();
             Connection conn = null;
             try {
-                provider = getConnectionProvider(db.getDatabaseName());
                 conn = provider.acquireConnection();
 
-                databaseMetadata = new DatabaseMetadata(
-                        conn,
-                        getDialect(provider));
+                databaseMetadata = new DatabaseMetadata(conn, dialect);
 
                 result.add("-- DB: " + db.getDatabaseName());
 
                 Configuration conf = setup.getConfiguration();
                 String[] ddls = conf.generateSchemaUpdateScript(
-                        getDialect(provider), databaseMetadata);
+                        dialect, databaseMetadata);
                 result.addAll(Arrays.asList(ddls));
 
             } catch (Throwable e) {
@@ -539,7 +631,7 @@ public class HibernateContextImpl implements Context {
     public User authenticate(String email, String password) {
         String qualifiedTableName = "portofino.public.user_";
         Session session = getSession(qualifiedTableName);
-        Criteria criteria = session.createCriteria(qualifiedTableName);
+        org.hibernate.Criteria criteria = session.createCriteria(qualifiedTableName);
         criteria.add(Restrictions.eq("emailaddress", email));
         criteria.add(Restrictions.eq("pwd", password));
         startTimer();
@@ -599,20 +691,4 @@ public class HibernateContextImpl implements Context {
         }
     }
 
-    private Dialect getDialect(ConnectionProvider provider) {
-        String vendor = provider.getDatabaseProductName();
-        if (vendor.toLowerCase().contains("derby"))
-            return new DerbyDialect();
-        if (vendor.toLowerCase().contains("postgres"))
-            return new PostgreSQLDialect();
-        if (vendor.toLowerCase().contains("db2"))
-            return new DB2Dialect();
-        if (vendor.toLowerCase().contains("mysql"))
-            return new MySQL5Dialect();
-        if (vendor.toLowerCase().contains("microsoft sql"))
-            return new SQLServerDialect();
-        if (vendor.toLowerCase().contains("oracle"))
-            return new Oracle9iDialect();
-        return null;
-    }
 }

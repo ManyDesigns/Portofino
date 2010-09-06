@@ -31,33 +31,204 @@ package com.manydesigns.elements.fields.search;
 
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
+import java.util.ArrayList;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface Criteria {
+public class Criteria extends ArrayList<Criteria.Criterion> {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public void eq(PropertyAccessor accessor, Object value);
-    public void ne(PropertyAccessor accessor, Object value);
+    public void eq(PropertyAccessor accessor, Object value) {
+        add(new EqCriterion(accessor, value));
+    }
+    public void ne(PropertyAccessor accessor, Object value) {
+        add(new NeCriterion(accessor, value));
+    }
 
-    public void between(PropertyAccessor accessor, Object min, Object max);
+    public void between(PropertyAccessor accessor, Object min, Object max) {
+        add(new BetweenCriterion(accessor, min, max));
+    }
 
-    public void gt(PropertyAccessor accessor, Object value);
-    public void ge(PropertyAccessor accessor, Object value);
+    public void gt(PropertyAccessor accessor, Object value) {
+        add(new GtCriterion(accessor, value));
+    }
+    public void ge(PropertyAccessor accessor, Object value) {
+        add(new GeCriterion(accessor, value));
+    }
 
-    public void lt(PropertyAccessor accessor, Object value);
-    public void le(PropertyAccessor accessor, Object value);
+    public void lt(PropertyAccessor accessor, Object value) {
+        add(new LtCriterion(accessor, value));
 
-    public void like(PropertyAccessor accessor, String value);
+    }
+    public void le(PropertyAccessor accessor, Object value) {
+        add(new LeCriterion(accessor, value));
+    }
+
     public void like(PropertyAccessor accessor, String value,
-                     TextMatchMode textMatchMode);
+                     TextMatchMode textMatchMode) {
+        add(new LikeCriterion(accessor, value, textMatchMode));
+    }
 
-    public void ilike(PropertyAccessor accessor, String value);
     public void ilike(PropertyAccessor accessor, String value,
-                     TextMatchMode textMatchMode);
+                     TextMatchMode textMatchMode) {
+        add(new IlikeCriterion(accessor, value, textMatchMode));
+    }
 
-    void sqlRestriction(String sql);
+    public static interface Criterion {
+        public PropertyAccessor getPropertyAccessor();
+    }
+
+    public static abstract class AbstractCriterion implements Criterion {
+        protected final PropertyAccessor accessor;
+
+        public AbstractCriterion(PropertyAccessor accessor) {
+            this.accessor = accessor;
+        }
+
+        public PropertyAccessor getPropertyAccessor() {
+            return accessor;
+        }
+    }
+
+    public static class EqCriterion extends AbstractCriterion {
+        protected final Object value;
+
+        public EqCriterion(PropertyAccessor accessor, Object value) {
+            super(accessor);
+            this.value = value;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+    }
+
+    public static class NeCriterion extends AbstractCriterion {
+        protected final Object value;
+
+        public NeCriterion(PropertyAccessor accessor, Object value) {
+            super(accessor);
+            this.value = value;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+    }
+
+    public static class BetweenCriterion extends AbstractCriterion {
+        protected final Object min;
+        protected final Object max;
+
+        public BetweenCriterion(PropertyAccessor accessor,
+                                Object min, Object max) {
+            super(accessor);
+            this.min = min;
+            this.max = max;
+        }
+
+        public Object getMin() {
+            return min;
+        }
+
+        public Object getMax() {
+            return max;
+        }
+    }
+
+    public static class GtCriterion extends AbstractCriterion {
+        protected final Object value;
+
+        public GtCriterion(PropertyAccessor accessor, Object value) {
+            super(accessor);
+            this.value = value;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+    }
+
+    public static class GeCriterion extends AbstractCriterion {
+        protected final Object value;
+
+        public GeCriterion(PropertyAccessor accessor, Object value) {
+            super(accessor);
+            this.value = value;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+    }
+
+    public static class LtCriterion extends AbstractCriterion {
+        protected final Object value;
+
+        public LtCriterion(PropertyAccessor accessor, Object value) {
+            super(accessor);
+            this.value = value;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+    }
+
+    public static class LeCriterion extends AbstractCriterion {
+        protected final Object value;
+
+        public LeCriterion(PropertyAccessor accessor, Object value) {
+            super(accessor);
+            this.value = value;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+    }
+
+    public static class LikeCriterion extends AbstractCriterion {
+        protected final Object value;
+        protected final TextMatchMode textMatchMode;
+
+        public LikeCriterion(PropertyAccessor accessor, Object value,
+                             TextMatchMode textMatchMode) {
+            super(accessor);
+            this.value = value;
+            this.textMatchMode = textMatchMode;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public TextMatchMode getTextMatchMode() {
+            return textMatchMode;
+        }
+    }
+
+    public static class IlikeCriterion extends AbstractCriterion {
+        protected final Object value;
+        protected final TextMatchMode textMatchMode;
+
+        public IlikeCriterion(PropertyAccessor accessor, Object value,
+                              TextMatchMode textMatchMode) {
+            super(accessor);
+            this.value = value;
+            this.textMatchMode = textMatchMode;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public TextMatchMode getTextMatchMode() {
+            return textMatchMode;
+        }
+    }
 }

@@ -32,6 +32,7 @@ package com.manydesigns.portofino.database.platforms;
 import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
+import org.hibernate.dialect.Dialect;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -48,6 +49,7 @@ public interface DatabasePlatform {
 
     String getDescription();
     String getStandardDriverClassName();
+    Dialect getHibernateDialect();
 
     @Status(red={}, amber={STATUS_CREATED, STATUS_DRIVER_NOT_FOUND}, green={STATUS_OK})
     String getStatus();

@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.database.ConnectionProvider;
+import org.hibernate.dialect.SQLServerDialect;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,7 +50,7 @@ public class MSSqlServerDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public MSSqlServerDatabasePlatform() {
-        super();
+        super(new SQLServerDialect());
     }
 
     //**************************************************************************
@@ -65,6 +66,8 @@ public class MSSqlServerDatabasePlatform extends AbstractDatabasePlatform {
     }
 
     public boolean isApplicable(ConnectionProvider connectionProvider) {
-        return "Microsoft SQL Server".equals(connectionProvider.getDatabaseProductName());
+        return connectionProvider
+                .getDatabaseProductName()
+                .startsWith("Microsoft SQL Server");
     }
 }

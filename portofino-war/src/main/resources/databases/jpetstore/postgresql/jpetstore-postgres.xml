@@ -39,7 +39,7 @@
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                </columns>                            
+                                </columns>
                                 <primaryKey name="pk_user">
                                     <column name="userid"/>
                                 </primaryKey>
@@ -286,6 +286,7 @@
     </databases>
     <siteNodes>
         <siteNode type="simple" url="/Homepage.action" title="Homepage" description="Homepage"/>
+        <siteNode type="use-cases" url="/UseCase.action" title="Use cases" description="Use cases"/>
         <siteNode url="/model/Index.action" title="Model" description="Model">
             <childNodes>
                 <siteNode url="/model/ConnectionProviders.action" title="Connection providers" description="Connection providers"/>
@@ -323,4 +324,17 @@
                  urlExpression="http://www.google.com/search?q=%{key}"
                 />
     </portlets>
+    <useCases>
+        <useCase name="usecase1"
+                 title="Products in category: FISH"
+                 table="jpetstore.public.product"
+                 filter="from jpetstore.public.product product where product.category = 'FISH'">
+            <properties>
+                <property name="productid" label="product id" inSummary="true" searchable="true" access="write"/>
+                <property name="category" inSummary="false" searchable="false" access="read"/>
+                <property name="name" inSummary="true" searchable="true" access="write"/>
+                <property name="descn" label="description" inSummary="true" searchable="false" access="write"/>
+            </properties>
+        </useCase>
+    </useCases>
 </model>

@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.database.ConnectionProvider;
+import org.hibernate.dialect.Oracle9iDialect;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,7 +50,7 @@ public class OracleDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public OracleDatabasePlatform() {
-        super();
+        super(new Oracle9iDialect());
     }
 
     //**************************************************************************

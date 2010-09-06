@@ -77,11 +77,11 @@ public interface Context {
 
     List<Object> getAllObjects(String qualifiedTableName);
 
-    Criteria createCriteria(String qualifiedTableName);
-
     List<Object> getObjects(Criteria criteria);
 
-    List<Object> getObjects(Criteria criteria, String filter);
+    List<Object> getObjects(String qualifiedTableName, String query);
+
+    List<Object> getObjects(String query, Criteria criteria);
 
     void saveOrUpdateObject(String qualifiedTableName, Object obj);
 

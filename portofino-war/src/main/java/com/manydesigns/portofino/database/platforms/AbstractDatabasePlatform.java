@@ -35,6 +35,7 @@ import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.datamodel.*;
+import org.hibernate.dialect.Dialect;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -57,6 +58,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     //**************************************************************************
 
     protected String status;
+    protected Dialect hibernateDialect;
     public static final Logger logger =
             LogUtil.getLogger(AbstractDatabasePlatform.class);
 
@@ -64,7 +66,8 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     // Constructors
     //**************************************************************************
 
-    public AbstractDatabasePlatform() {
+    public AbstractDatabasePlatform(Dialect hibernateDialect) {
+        this.hibernateDialect = hibernateDialect;
         status = STATUS_CREATED;
     }
 
@@ -84,6 +87,10 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
 
     public String getStatus() {
         return status;
+    }
+
+    public Dialect getHibernateDialect() {
+        return hibernateDialect;
     }
 
     //**************************************************************************

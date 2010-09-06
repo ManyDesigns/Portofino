@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.database.ConnectionProvider;
+import org.hibernate.dialect.DB2Dialect;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,7 +50,7 @@ public class IbmDb2DatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public IbmDb2DatabasePlatform() {
-        super();
+        super(new DB2Dialect());
     }
 
     //**************************************************************************

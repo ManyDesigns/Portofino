@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.database.ConnectionProvider;
+import org.hibernate.dialect.MySQLDialect;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,7 +50,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public MySql5DatabasePlatform() {
-        super();
+        super(new MySQLDialect());
     }
 
     //**************************************************************************

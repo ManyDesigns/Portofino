@@ -248,10 +248,9 @@ public class UseCaseAction extends PortofinoAction
     }
 
     private void setupCriteria() {
-        Criteria criteria = context.createCriteria(useCase.getTableName());
+        Criteria criteria = new Criteria();
         searchForm.configureCriteria(criteria);
-        criteria.sqlRestriction(useCase.getFilter());
-        objects = context.getObjects(criteria);
+        objects = context.getObjects(useCase.getFilter(), criteria);
     }
 
 
