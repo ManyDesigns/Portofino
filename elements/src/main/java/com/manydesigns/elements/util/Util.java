@@ -34,6 +34,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -110,4 +111,13 @@ public class Util {
             }
         }
     }
+
+    public static void printMatcher(Matcher matcher) {
+        for (int i = 0; i <= matcher.groupCount(); i++) {
+            System.out.println(MessageFormat.format(
+                    "group {0}: {1}", i, matcher.group(i)));
+        }
+    }
+
+
 }

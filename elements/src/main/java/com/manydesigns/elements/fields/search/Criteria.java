@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.fields.search;
 
+import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
 import java.util.ArrayList;
@@ -38,49 +39,85 @@ import java.util.ArrayList;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Criteria extends ArrayList<Criteria.Criterion> {
+public class Criteria extends ArrayList<Criterion> {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public void eq(PropertyAccessor accessor, Object value) {
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
+    protected final ClassAccessor classAccessor;
+
+
+    //**************************************************************************
+    // Constructor
+    //**************************************************************************
+
+    public Criteria(ClassAccessor classAccessor) {
+        this.classAccessor = classAccessor;
+    }
+
+
+    //**************************************************************************
+    // Criteria building
+    //**************************************************************************
+
+    public Criteria eq(PropertyAccessor accessor, Object value) {
         add(new EqCriterion(accessor, value));
+        return this;
     }
-    public void ne(PropertyAccessor accessor, Object value) {
+    public Criteria ne(PropertyAccessor accessor, Object value) {
         add(new NeCriterion(accessor, value));
+        return this;
     }
 
-    public void between(PropertyAccessor accessor, Object min, Object max) {
+    public Criteria between(PropertyAccessor accessor, Object min, Object max) {
         add(new BetweenCriterion(accessor, min, max));
+        return this;
     }
 
-    public void gt(PropertyAccessor accessor, Object value) {
+    public Criteria gt(PropertyAccessor accessor, Object value) {
         add(new GtCriterion(accessor, value));
+        return this;
     }
-    public void ge(PropertyAccessor accessor, Object value) {
+    public Criteria ge(PropertyAccessor accessor, Object value) {
         add(new GeCriterion(accessor, value));
+        return this;
     }
 
-    public void lt(PropertyAccessor accessor, Object value) {
+    public Criteria lt(PropertyAccessor accessor, Object value) {
         add(new LtCriterion(accessor, value));
-
+        return this;
     }
-    public void le(PropertyAccessor accessor, Object value) {
+    public Criteria le(PropertyAccessor accessor, Object value) {
         add(new LeCriterion(accessor, value));
+        return this;
     }
 
-    public void like(PropertyAccessor accessor, String value,
+    public Criteria like(PropertyAccessor accessor, String value,
                      TextMatchMode textMatchMode) {
         add(new LikeCriterion(accessor, value, textMatchMode));
+        return this;
     }
 
-    public void ilike(PropertyAccessor accessor, String value,
+    public Criteria ilike(PropertyAccessor accessor, String value,
                      TextMatchMode textMatchMode) {
         add(new IlikeCriterion(accessor, value, textMatchMode));
+        return this;
     }
 
-    public static interface Criterion {
-        public PropertyAccessor getPropertyAccessor();
+    //**************************************************************************
+    // Getter/setters
+    //**************************************************************************
+
+    public ClassAccessor getClassAccessor() {
+        return classAccessor;
     }
+
+    //**************************************************************************
+    // Criterion implementation classes
+    //**************************************************************************
 
     public static abstract class AbstractCriterion implements Criterion {
         protected final PropertyAccessor accessor;

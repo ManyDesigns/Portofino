@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.context.hibernate;
 
 import com.manydesigns.elements.fields.search.Criteria;
+import com.manydesigns.elements.fields.search.Criterion;
 import com.manydesigns.elements.fields.search.TextMatchMode;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -45,17 +46,13 @@ import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.io.ConnectionsParser;
 import com.manydesigns.portofino.model.io.ModelParser;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.reflection.ColumnAccessor;
 import com.manydesigns.portofino.users.User;
 import org.apache.commons.lang.time.StopWatch;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Settings;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.impl.QueryImpl;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 
@@ -64,6 +61,8 @@ import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -73,6 +72,11 @@ import java.util.logging.Logger;
 public class HibernateContextImpl implements Context {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    protected static final String WHERE_STRING = " WHERE ";
+    protected static final Pattern FROM_PATTERN =
+            Pattern.compile("[fF][rR][oO][mM]\\s+(\\S+\\.\\S+\\.\\S+).*");
+
 
     //**************************************************************************
     // Fields
@@ -152,7 +156,6 @@ public class HibernateContextImpl implements Context {
                     SessionFactoryImpl sessionFactory =
                             (SessionFactoryImpl) configuration
                                     .buildSessionFactory();
-                    Settings settings = sessionFactory.getSettings();
 
                     HibernateDatabaseSetup setup =
                             new HibernateDatabaseSetup(
@@ -287,115 +290,195 @@ public class HibernateContextImpl implements Context {
         return setups.get(databaseName).getThreadSession();
     }
 
-    public Query getQueryForCriteria(Criteria criteria) {
+    public QueryImpl getQueryForCriteria(Criteria criteria) {
+        ClassAccessor classAccessor = criteria.getClassAccessor();
+        String qualifiedTableName = classAccessor.getName();
+        Session session = getSession(qualifiedTableName);
+
         ArrayList<Object> parameters = new ArrayList<Object>();
-        StringBuilder sb = new StringBuilder();
-        for (Criteria.Criterion criterion : criteria) {
-            ColumnAccessor accessor =
-                    (ColumnAccessor)criterion.getPropertyAccessor();
+        StringBuilder whereBuilder = new StringBuilder();
+        for (Criterion criterion : criteria) {
+            PropertyAccessor accessor = criterion.getPropertyAccessor();
             String hqlFormat;
             if (criterion instanceof Criteria.EqCriterion) {
                 Criteria.EqCriterion eqCriterion =
                         (Criteria.EqCriterion)criterion;
                 Object value = eqCriterion.getValue();
                 hqlFormat = "{0} = ?";
+                parameters.add(value);
             } else if (criterion instanceof Criteria.NeCriterion) {
                 Criteria.NeCriterion neCriterion =
                         (Criteria.NeCriterion)criterion;
                 Object value = neCriterion.getValue();
                 hqlFormat = "{0} <> ?";
+                parameters.add(value);
             } else if (criterion instanceof Criteria.BetweenCriterion) {
                 Criteria.BetweenCriterion betweenCriterion =
                         (Criteria.BetweenCriterion)criterion;
                 Object min = betweenCriterion.getMin();
                 Object max = betweenCriterion.getMax();
                 hqlFormat = "{0} >= ? AND < {0} <= ?";
+                parameters.add(min);
+                parameters.add(max);
             } else if (criterion instanceof Criteria.GtCriterion) {
                 Criteria.GtCriterion gtCriterion =
                         (Criteria.GtCriterion)criterion;
                 Object value = gtCriterion.getValue();
                 hqlFormat = "{0} > ?";
+                parameters.add(value);
             } else if (criterion instanceof Criteria.GeCriterion) {
                 Criteria.GeCriterion gtCriterion =
                         (Criteria.GeCriterion)criterion;
                 Object value = gtCriterion.getValue();
                 hqlFormat = "{0} >= ?";
+                parameters.add(value);
             } else if (criterion instanceof Criteria.LtCriterion) {
                 Criteria.LtCriterion ltCriterion =
                         (Criteria.LtCriterion)criterion;
                 Object value = ltCriterion.getValue();
                 hqlFormat = "{0} < ?";
+                parameters.add(value);
             } else if (criterion instanceof Criteria.LeCriterion) {
                 Criteria.LeCriterion leCriterion =
                         (Criteria.LeCriterion)criterion;
                 Object value = leCriterion.getValue();
                 hqlFormat = "{0} <= ?";
+                parameters.add(value);
             } else if (criterion instanceof Criteria.LikeCriterion) {
                 Criteria.LikeCriterion likeCriterion =
                         (Criteria.LikeCriterion)criterion;
-                Object value = likeCriterion.getValue();
-                TextMatchMode textMatchMode = likeCriterion.getTextMatchMode();
+                String value = (String) likeCriterion.getValue();
+                String pattern = processTextMatchMode(
+                        likeCriterion.getTextMatchMode(), value);
                 hqlFormat = "{0} like ?";
+                parameters.add(pattern);
             } else if (criterion instanceof Criteria.IlikeCriterion) {
                 Criteria.IlikeCriterion ilikeCriterion =
                         (Criteria.IlikeCriterion)criterion;
-                Object value = ilikeCriterion.getValue();
-                TextMatchMode textMatchMode = ilikeCriterion.getTextMatchMode();
+                String value = (String) ilikeCriterion.getValue();
+                String pattern = processTextMatchMode(
+                        ilikeCriterion.getTextMatchMode(), value);
                 hqlFormat = "lower({0}) like lower(?)";
+                parameters.add(pattern);
             } else {
                 LogUtil.severeMF(logger, "Unrecognized criterion: ", criterion);
                 throw new InternalError("Unrecognied criterion");
             }
 
             String hql = MessageFormat.format(hqlFormat,
-                    accessor.getColumn().getColumnName());
+                    accessor.getName());
 
-            if (sb.length() > 0) {
-                sb.append(" AND ");
+            if (whereBuilder.length() > 0) {
+                whereBuilder.append(" AND ");
             }
-            sb.append(hql);
+            whereBuilder.append(hql);
         }
+        String whereClause = whereBuilder.toString();
+        String queryString;
+        if (whereClause.length() > 0) {
+            queryString = MessageFormat.format(
+                    "FROM {0}" + WHERE_STRING + "{1}",
+                    qualifiedTableName,
+                    whereClause);
+        } else {
+            queryString = MessageFormat.format(
+                    "FROM {0}",
+                    qualifiedTableName);
+        }
+
+        QueryImpl result = (QueryImpl)session.createQuery(queryString);
+        for (int i = 0; i < parameters.size(); i++) {
+            Object value = parameters.get(i);
+            result.setParameter(i, value);
+        }
+        return result;
     }
 
+    protected String processTextMatchMode(TextMatchMode textMatchMode,
+                                        String value) {
+        String pattern;
+        switch (textMatchMode) {
+            case EQUALS:
+                pattern = value;
+                break;
+            case CONTAINS:
+                pattern = "%" + value + "%";
+                break;
+            case STARTS_WITH:
+                pattern = value + "%";
+                break;
+            case ENDS_WITH:
+                pattern = "%" + value;
+                break;
+            default:
+                String msg = MessageFormat.format(
+                        "Unrecognized text match mode: {0}",
+                        textMatchMode);
+                logger.severe(msg);
+                throw new InternalError(msg);
+        }
+        return pattern;
+    }
 
     public List<Object> getObjects(Criteria criteria) {
         Query query = getQueryForCriteria(criteria);
 
-        startTimer();
-        //noinspection unchecked
-        List<Object> result = query.list();
-        stopTimer();
-        return result;
+        return runQuery(query);
     }
 
-    public List<Object> getObjects(String qualifiedTableName, String query) {
+
+
+    public List<Object> getObjects(String queryString) {
+        String qualifiedTableName =
+                getQualifiedTableNameFromQueryString(queryString);
         Session session = getSession(qualifiedTableName);
 
-        startTimer();
-        //noinspection unchecked
-        List<Object> result = session.createQuery(query).list();
-        stopTimer();
-        return result;
+        return runQuery(session.createQuery(queryString));
+    }
+
+    protected String getQualifiedTableNameFromQueryString(String queryString) {
+        Matcher matcher = FROM_PATTERN.matcher(queryString);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        } else {
+            return null;
+        }
     }
 
     public List<Object> getObjects(String queryString, Criteria criteria) {
-        SessionFactoryImpl factory =
-                (SessionFactoryImpl) session.getSessionFactory();
-        String alias = "product";
+        String qualifiedTableName =
+                getQualifiedTableNameFromQueryString(queryString);
+        Session session = getSession(qualifiedTableName);
 
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(queryString);
-        if (criteriaWhereCondition.length() > 0) {
-            sb.append(" AND ");
-            sb.append(criteriaWhereCondition);
+        QueryImpl criteriaQuery = getQueryForCriteria(criteria);
+        String criteriaQueryString = criteriaQuery.getQueryString();
+        int whereIndex = criteriaQueryString.indexOf(WHERE_STRING);
+        String criteriaWhereClause;
+        if (whereIndex >= 0) {
+            criteriaWhereClause =
+                    criteriaQueryString.substring(
+                            whereIndex + WHERE_STRING.length());
+        } else {
+            criteriaWhereClause = "";
         }
-        String fullQueryString = sb.toString();
-        Query query = session.createQuery(fullQueryString);
-        query.setParameters(
-                criteriaQueryParameters.getPositionalParameterValues(),
-                criteriaQueryParameters.getPositionalParameterTypes());
 
+        String fullQueryString;
+        if (criteriaWhereClause.length() > 0) {
+            fullQueryString = MessageFormat.format(
+                    "{0} AND {1}",
+                    queryString,
+                    criteriaWhereClause);
+        } else {
+            fullQueryString = queryString;
+        }
+        Query query = session.createQuery(fullQueryString);
+        query.setParameters(criteriaQuery.valueArray(),
+                criteriaQuery.typeArray());
+
+        return runQuery(query);
+    }
+
+    private List<Object> runQuery(Query query) {
         startTimer();
         //noinspection unchecked
         List<Object> result = query.list();
@@ -469,10 +552,13 @@ public class HibernateContextImpl implements Context {
 
     public List<Object[]> runSql(String databaseName, String sql) {
         Session session = setups.get(databaseName).getThreadSession();
+        SQLQuery query = session.createSQLQuery(sql);
+
         startTimer();
         //noinspection unchecked
-        List<Object[]> result = session.createSQLQuery(sql).list();
+        List<Object[]> result = query.list();
         stopTimer();
+
         return result;
     }
 

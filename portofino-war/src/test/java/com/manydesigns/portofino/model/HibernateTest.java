@@ -118,7 +118,7 @@ public class HibernateTest extends TestCase {
         Table table = context.getModel()
                 .findTableByQualifiedName("jpetstore.public.category");
         TableAccessor tableAccessor = new TableAccessor(table);
-        Criteria criteria = context.createCriteria("jpetstore.public.category");
+        Criteria criteria = new Criteria(tableAccessor);
         HashMap category= findCategory(tableAccessor, criteria);
 
         int sizePrd = resultProd.size();
@@ -149,7 +149,7 @@ public class HibernateTest extends TestCase {
         Table table = context.getModel()
                 .findTableByQualifiedName("jpetstore.public.category");
         TableAccessor tableAccessor = new TableAccessor(table);
-        Criteria criteria = context.createCriteria("jpetstore.public.category");
+        Criteria criteria = new Criteria(tableAccessor);
 
         List<Object> resultCat =
                 context.getAllObjects("jpetstore.public.category");
@@ -164,7 +164,7 @@ public class HibernateTest extends TestCase {
 
         //Controllo l'aggiornamento e riporto le cose come stavano
         context.openSession();
-        criteria = context.createCriteria("jpetstore.public.category");
+        criteria = new Criteria(tableAccessor);
         categoria0 =  findCategory(tableAccessor, criteria);
         assertEquals("jpetstore.public.category", categoria0.get("$type$"));
         assertEquals("Pesciu", categoria0.get("name"));

@@ -30,10 +30,10 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
@@ -48,11 +48,11 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -105,6 +105,7 @@ public class UseCaseAction extends PortofinoAction
     public UseCase useCase;
     public ClassAccessor useCaseAccessor;
     public Table table;
+    public ClassAccessor tableAccessor;
 
     //**************************************************************************
     // Model objects
@@ -162,6 +163,8 @@ public class UseCaseAction extends PortofinoAction
         useCaseAccessor = ClassAccessorManager.getManager()
                 .tryToInstantiateFromClass(useCase);
         table = useCase.getTable();
+        tableAccessor = ClassAccessorManager.getManager()
+                .tryToInstantiateFromClass(table);
         pkHelper = new PkHelper(useCaseAccessor);
         if (useCase == null || useCaseAccessor == null) {
             throw new ModelObjectNotFoundError(useCaseName);
@@ -248,7 +251,7 @@ public class UseCaseAction extends PortofinoAction
     }
 
     private void setupCriteria() {
-        Criteria criteria = new Criteria();
+        Criteria criteria = new Criteria(tableAccessor);
         searchForm.configureCriteria(criteria);
         objects = context.getObjects(useCase.getFilter(), criteria);
     }

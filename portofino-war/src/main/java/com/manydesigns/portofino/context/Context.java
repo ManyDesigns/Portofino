@@ -79,9 +79,9 @@ public interface Context {
 
     List<Object> getObjects(Criteria criteria);
 
-    List<Object> getObjects(String qualifiedTableName, String query);
+    List<Object> getObjects(String queryString);
 
-    List<Object> getObjects(String query, Criteria criteria);
+    List<Object> getObjects(String queryString, Criteria criteria);
 
     void saveOrUpdateObject(String qualifiedTableName, Object obj);
 

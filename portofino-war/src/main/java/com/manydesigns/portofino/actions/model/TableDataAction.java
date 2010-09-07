@@ -49,13 +49,13 @@ import com.manydesigns.portofino.util.PkHelper;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.io.Serializable;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -210,7 +210,7 @@ public class TableDataAction extends PortofinoAction
             searchString = null;
         }
 
-        Criteria criteria = new Criteria();
+        Criteria criteria = new Criteria(tableAccessor);
         searchForm.configureCriteria(criteria);
         objects = context.getObjects(criteria);
 
@@ -283,7 +283,7 @@ public class TableDataAction extends PortofinoAction
         searchForm = searchFormBuilder.build();
         configureSearchFormFromString();
 
-        Criteria criteria = new Criteria();
+        Criteria criteria = new Criteria(tableAccessor);
         searchForm.configureCriteria(criteria);
         objects = context.getObjects(criteria);
 
