@@ -34,7 +34,7 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.text.Generator;
+import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
@@ -59,8 +59,8 @@ public class TableFormColumn implements Element {
     protected Mode mode = Mode.EDIT;
 
     protected String label;
-    protected Generator hrefGenerator;
-    protected Generator altGenerator;
+    protected TextFormat hrefTextFormat;
+    protected TextFormat altTextFormat;
 
     //**************************************************************************
     // Costruttori
@@ -141,10 +141,10 @@ public class TableFormColumn implements Element {
 
     protected void readFromObject(int rowIndex, Object obj) {
         Field field = fields[rowIndex];
-        if (hrefGenerator != null) {
-            field.setHref(hrefGenerator.generate(obj));
-            if (altGenerator != null) {
-                field.setAlt(altGenerator.generate(obj));
+        if (hrefTextFormat != null) {
+            field.setHref(hrefTextFormat.format(obj));
+            if (altTextFormat != null) {
+                field.setAlt(altTextFormat.format(obj));
             }
         }
         field.readFromObject(obj);
@@ -205,20 +205,20 @@ public class TableFormColumn implements Element {
         return field.getErrors();
     }
 
-    public Generator getHrefGenerator() {
-        return hrefGenerator;
+    public TextFormat getHrefGenerator() {
+        return hrefTextFormat;
     }
 
-    public void setHrefGenerator(Generator hrefGenerator) {
-        this.hrefGenerator = hrefGenerator;
+    public void setHrefGenerator(TextFormat hrefTextFormat) {
+        this.hrefTextFormat = hrefTextFormat;
     }
 
-    public Generator getAltGenerator() {
-        return altGenerator;
+    public TextFormat getAltGenerator() {
+        return altTextFormat;
     }
 
-    public void setAltGenerator(Generator altGenerator) {
-        this.altGenerator = altGenerator;
+    public void setAltGenerator(TextFormat altTextFormat) {
+        this.altTextFormat = altTextFormat;
     }
 
     public Field[] getFields() {

@@ -37,7 +37,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
-import com.manydesigns.elements.text.ExpressionGenerator;
+import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.datamodel.Table;
@@ -227,9 +227,9 @@ public class UseCaseAction extends PortofinoAction
         setupCriteria();
 
         String readLinkExpression = getReadLinkExpression();
-        ExpressionGenerator hrefGenerator =
-                ExpressionGenerator.create(readLinkExpression);
-        hrefGenerator.setUrl(true);
+        OgnlTextFormat hrefFormat =
+                OgnlTextFormat.create(readLinkExpression);
+        hrefFormat.setUrl(true);
 
         TableFormBuilder tableFormBuilder =
                 new TableFormBuilder(useCaseAccessor)
@@ -238,7 +238,7 @@ public class UseCaseAction extends PortofinoAction
         // ogni colonna chiave primaria sarà clickabile
         for (PropertyAccessor property : useCaseAccessor.getKeyProperties()) {
             tableFormBuilder.configHyperlinkGenerators(
-                    property.getName(), hrefGenerator, null);
+                    property.getName(), hrefFormat, null);
         }
 
         tableForm = tableFormBuilder.build();

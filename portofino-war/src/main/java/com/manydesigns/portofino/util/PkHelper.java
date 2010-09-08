@@ -33,8 +33,8 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.text.ExpressionGenerator;
-import com.manydesigns.elements.text.Generator;
+import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.elements.text.TextFormat;
 import ognl.OgnlContext;
 import ognl.TypeConverter;
 import org.apache.commons.lang.StringUtils;
@@ -73,7 +73,7 @@ public class PkHelper {
     // Methods
     //**************************************************************************
 
-    public Generator createPkGenerator() {
+    public TextFormat createPkGenerator() {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (PropertyAccessor property : classAccessor.getKeyProperties()) {
@@ -86,7 +86,7 @@ public class PkHelper {
             sb.append(property.getName());
             sb.append("}");
         }
-        return ExpressionGenerator.create(sb.toString());
+        return OgnlTextFormat.create(sb.toString());
     }
 
     public Serializable parsePkString(String pkString) {

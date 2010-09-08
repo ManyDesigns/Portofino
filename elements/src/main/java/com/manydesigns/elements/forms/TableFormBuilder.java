@@ -36,7 +36,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
-import com.manydesigns.elements.text.Generator;
+import com.manydesigns.elements.text.TextFormat;
 import org.apache.commons.lang.StringUtils;
 
 import java.lang.reflect.Modifier;
@@ -59,8 +59,8 @@ public class TableFormBuilder {
     //**************************************************************************
 
     protected final ClassAccessor classAccessor;
-    protected final Map<String, Generator> hrefGenerators;
-    protected final Map<String, Generator> altGenerators;
+    protected final Map<String, TextFormat> hrefGenerators;
+    protected final Map<String, TextFormat> altGenerators;
 
     protected List<PropertyAccessor> propertyAccessors;
     protected String prefix;
@@ -81,8 +81,8 @@ public class TableFormBuilder {
 
     public TableFormBuilder(ClassAccessor classAccessor) {
         this.classAccessor = classAccessor;
-        hrefGenerators = new HashMap<String, Generator>();
-        altGenerators = new HashMap<String, Generator>();
+        hrefGenerators = new HashMap<String, TextFormat>();
+        altGenerators = new HashMap<String, TextFormat>();
     }
 
 
@@ -141,9 +141,9 @@ public class TableFormBuilder {
     }
 
     public TableFormBuilder configHyperlinkGenerators(
-            String fieldName, Generator hrefGenerator, Generator altGenerator) {
-        hrefGenerators.put(fieldName, hrefGenerator);
-        altGenerators.put(fieldName, altGenerator);
+            String fieldName, TextFormat hrefTextFormat, TextFormat altTextFormat) {
+        hrefGenerators.put(fieldName, hrefTextFormat);
+        altGenerators.put(fieldName, altTextFormat);
         return this;
     }
 

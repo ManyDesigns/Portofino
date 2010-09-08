@@ -320,7 +320,7 @@
                  title="Title 1"
                  legend="category"
                  database="jpetstore"
-                 sql="select category, count(*) from product group by category order by category"
+                 sql="select category, count(*) from product where %{'pippo'} is not null group by category order by category"
                  urlExpression="http://www.google.com/search?q=%{key}"
                 />
     </portlets>
@@ -328,7 +328,7 @@
         <useCase name="usecase1"
                  title="Products in category: FISH"
                  table="jpetstore.public.product"
-                 filter="from jpetstore.public.product product where product.category = 'FISH'">
+                 filter="from jpetstore.public.product product where product.category = %{'FISH'}">
             <properties>
                 <property name="productid" label="product id" inSummary="true" searchable="true" access="write"/>
                 <property name="category" inSummary="false" searchable="false" access="read"/>

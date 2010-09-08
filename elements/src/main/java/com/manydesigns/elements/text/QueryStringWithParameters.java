@@ -34,10 +34,23 @@ package com.manydesigns.elements.text;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface Generator {
+public class QueryStringWithParameters {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public String generate(Object root);
+    protected final String queryString;
+    protected final Object[] paramaters;
 
+    public QueryStringWithParameters(String queryString, Object[] paramaters) {
+        this.queryString = queryString;
+        this.paramaters = paramaters;
+    }
+
+    public String getQueryString() {
+        return queryString;
+    }
+
+    public Object[] getParamaters() {
+        return paramaters;
+    }
 }

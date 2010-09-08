@@ -30,7 +30,7 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.AbstractCompositeElement;
-import com.manydesigns.elements.text.Generator;
+import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 import java.lang.reflect.Array;
@@ -52,7 +52,7 @@ public class TableForm extends AbstractCompositeElement<TableFormColumn> {
     protected boolean selectable = false;
     protected final String[] rowKeys;
     protected final boolean[] selected;
-    protected Generator keyGenerator;
+    protected TextFormat keyTextFormat;
 
     //**************************************************************************
     // Costruttori
@@ -154,8 +154,8 @@ public class TableForm extends AbstractCompositeElement<TableFormColumn> {
 
     protected void readFromObject(int index, Object obj) {
         String key = Integer.toString(index);
-        if (keyGenerator != null) {
-            key = keyGenerator.generate(obj);
+        if (keyTextFormat != null) {
+            key = keyTextFormat.format(obj);
         }
         rowKeys[index] = key;
     }
@@ -176,12 +176,12 @@ public class TableForm extends AbstractCompositeElement<TableFormColumn> {
         return nRows;
     }
 
-    public Generator getKeyGenerator() {
-        return keyGenerator;
+    public TextFormat getKeyGenerator() {
+        return keyTextFormat;
     }
 
-    public void setKeyGenerator(Generator keyGenerator) {
-        this.keyGenerator = keyGenerator;
+    public void setKeyGenerator(TextFormat keyTextFormat) {
+        this.keyTextFormat = keyTextFormat;
     }
 
     public boolean isSelectable() {

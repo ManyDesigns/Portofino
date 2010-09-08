@@ -27,36 +27,17 @@
  *
  */
 
-package com.manydesigns.portofino.actions.model;
+package com.manydesigns.elements.text;
 
-import com.manydesigns.elements.text.OgnlTextFormat;
-import org.jfree.chart.urls.PieURLGenerator;
-import org.jfree.data.general.PieDataset;
-
-public class PortletPieUrlGenerator implements PieURLGenerator {
+/*
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+*/
+public interface TextFormat {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    protected final OgnlTextFormat format;
-    protected final PieURLGeneratorValue value;
+    public String format(Object root);
 
-    PortletPieUrlGenerator(String expression) {
-        format = OgnlTextFormat.create(expression);
-        format.setUrl(true);
-        value = new PieURLGeneratorValue();
-    }
-
-    public String generateURL(PieDataset dataset,
-                              Comparable key, int index) {
-        value.dataset = dataset;
-        value.key = key;
-        value.index = index;
-        return format.format(value);
-    }
-
-    static class PieURLGeneratorValue {
-        public PieDataset dataset;
-        public Comparable key;
-        public int index;
-    }
 }

@@ -35,7 +35,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.text.ExpressionGenerator;
+import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
@@ -79,16 +79,16 @@ public class ConnectionProvidersAction extends PortofinoAction {
     public String search() {
         connectionProviders = context.getConnectionProviders();
 
-        ExpressionGenerator hrefGenerator =
-                ExpressionGenerator.create(
+        OgnlTextFormat hrefFormat =
+                OgnlTextFormat.create(
                         "/model/ConnectionProviders.action?" +
                                 "databaseName=%{databaseName}");
-        hrefGenerator.setUrl(true);
+        hrefFormat.setUrl(true);
 
         tableForm = new TableFormBuilder(ConnectionProvider.class)
                 .configFields("databaseName", "description", "status")
                 .configNRows(connectionProviders.size())
-                .configHyperlinkGenerators("databaseName", hrefGenerator, null)
+                .configHyperlinkGenerators("databaseName", hrefFormat, null)
                 .build();
         tableForm.setMode(Mode.VIEW);
         tableForm.readFromObject(connectionProviders);
