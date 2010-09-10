@@ -69,7 +69,7 @@ public class HibernateTest extends TestCase {
         List<Object> resultProd =
                 context.getAllObjects("jpetstore.public.product");
         int sizePrd = resultProd.size();
-        assertEquals("prodotti", 17, sizePrd);
+        assertEquals("prodotti", 16, sizePrd);
 
     }
 
@@ -90,6 +90,7 @@ public class HibernateTest extends TestCase {
         assertEquals("numero gruppi per admin", 2, groups.size());
         UsersGroups ug1 = groups.get(0);
         Group g1 = ug1.getGroup();
+        assertNotNull(g1);
 
     }
     public void testSearchAndReadCategorieProdotti() {
@@ -97,7 +98,7 @@ public class HibernateTest extends TestCase {
                 context.getAllObjects("jpetstore.public.category");
 
         int sizeCat = resultCat.size();
-        assertEquals("categorie", 5, sizeCat);
+        assertTrue("categorie", sizeCat>0);
 
 
         Map categoria0 = (Map<String, Object>) resultCat.get(0);
@@ -119,23 +120,23 @@ public class HibernateTest extends TestCase {
                 .findTableByQualifiedName("jpetstore.public.category");
         TableAccessor tableAccessor = new TableAccessor(table);
         Criteria criteria = new Criteria(tableAccessor);
-        HashMap category= findCategory(tableAccessor, criteria);
+        HashMap<String, String> category= findCategory(tableAccessor, criteria);
 
         int sizePrd = resultProd.size();
-        assertEquals("prodotti", sizePrd, 17);
+        assertEquals("prodotti", sizePrd, 16);
         Map prd0 = (Map<String, Object>)resultProd.get(0);
         assertEquals("FI-SW-01", prd0.get("productid") );
         assertEquals("Angelfish", prd0.get("name"));
     }
 
-    private HashMap findCategory(TableAccessor tableAccessor, Criteria criteria) {
-        HashMap category=null;
+    private HashMap<String, String> findCategory(TableAccessor tableAccessor, Criteria criteria) {
+        HashMap<String, String> category=null;
         try {
             criteria.eq(tableAccessor.getProperty("catid"), "FISH");
             List<Object> listObjs = context.getObjects(criteria);
             assertEquals(1, listObjs.size());
-            category = (HashMap) listObjs.get(0);
-            String catid = (String) category.get("catid");
+            category = (HashMap<String, String>) listObjs.get(0);
+            String catid = category.get("catid");
             assertEquals("FISH", catid);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
@@ -154,8 +155,8 @@ public class HibernateTest extends TestCase {
         List<Object> resultCat =
                 context.getAllObjects("jpetstore.public.category");
         int sizeCat = resultCat.size();
-        assertEquals("categorie", 5, sizeCat);
-        Map categoria0 =  findCategory(tableAccessor, criteria);
+        assertTrue("categorie", sizeCat>0);
+        Map<String, String> categoria0 =  findCategory(tableAccessor, criteria);
         assertEquals("jpetstore.public.category", categoria0.get("$type$"));
         assertEquals("Fish", categoria0.get("name"));
         categoria0.put("name", "Pesciu");
@@ -235,7 +236,9 @@ public class HibernateTest extends TestCase {
         worms.put("descn",
           "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
                   "Worms</font>");
+        context.saveOrUpdateObject("jpetstore.public.category", worms);
         context.deleteObject("jpetstore.public.category", worms);
+
     }
 
         public void testSpaccaSession(){
@@ -280,6 +283,7 @@ public class HibernateTest extends TestCase {
         //Faccio una seconda operazione
         try{
             List<Object> users= context.getAllObjects("portofino.public.user_");
+            assertNotNull(users);
         }catch (Exception e){
             e.printStackTrace();
             fail("La sessione è spaccata");
@@ -290,7 +294,7 @@ public class HibernateTest extends TestCase {
         //Test Chiave singola
         HashMap<String, Object> pk = new HashMap<String, Object>();
         pk.put("catid", "BIRDS");
-        Object bird = (Object) context.getObjectByPk
+        Object bird =  context.getObjectByPk
                 ("jpetstore.public.category", pk);
         assertEquals("Birds", ((MapProxy) bird).get("name"));
 
@@ -304,17 +308,39 @@ public class HibernateTest extends TestCase {
     }
 
     public void testGetRelatedObjects(){
-
         HashMap<String, Object> pk = new HashMap<String, Object>();
         pk.put("catid", "BIRDS");
-        Object bird = (Object) context.getObjectByPk
+        Object bird = context.getObjectByPk
                 ("jpetstore.public.category", pk);
         assertEquals("Birds", ((MapProxy) bird).get("name"));
 
         List objs = context.getRelatedObjects("jpetstore.public.category",
                 bird, "fk_product_1");
         assertTrue(objs.size()>0);
+    }
 
+    public void testFkComposite(){
+        List<Object> list1 =
+                context.getAllObjects("hibernatetest.public.table1");
+        List<Object> list2 =
+                context.getAllObjects("hibernatetest.public.table2");
+        HashMap map = (HashMap)list2.get(0);
+        List obj =  (List) map.get("fk_tb_2");
+        assertNotNull(obj);
+        assertTrue(obj.size()>0);
+        Map obj2 = (Map) ((Map)obj.get(0)).get("fk_tb_2");
+        assertNotNull(obj2);
+        assertEquals(5, obj2.keySet().size());
+        List<Object> list3 =
+                context.getAllObjects("hibernatetest.public.table3");
+
+
+        List<Object> listu =
+                context.getAllObjects("portofino.public.user_");
+        List<Object> listg =
+                context.getAllObjects("portofino.public.group_");
+        List<Object> listug =
+                context.getAllObjects("portofino.public.users_groups");
     }
 
 }

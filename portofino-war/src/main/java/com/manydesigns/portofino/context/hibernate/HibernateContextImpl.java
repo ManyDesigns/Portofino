@@ -213,55 +213,29 @@ public class HibernateContextImpl implements Context {
                                 Serializable pk) {
         Session session = getSession(qualifiedTableName);
         Table table = model.findTableByQualifiedName(qualifiedTableName);
-
+        Object result = null;
         int size = table.getPrimaryKey().getColumns().size();
-        if (pk instanceof  Map){
-            HashMap<String, Object> key = (HashMap<String, Object>) pk;
-            if (size > 1) {
-                startTimer();
-                @SuppressWarnings({"unchecked"}) Map<String, Object> result =
-                        (Map<String, Object>)
-                                session.load(qualifiedTableName, key);
-                stopTimer();
-                return result;
-            } else {
-                startTimer();
-                for (Map.Entry entry : key.entrySet()) {
-                    if (((String) entry.getKey()).startsWith("$")) {
-                        continue;
-                    }
-                    @SuppressWarnings({"unchecked"}) Map<String, Object> result =
-                            (Map<String, Object>) session.load(qualifiedTableName,
-                                    (Serializable) entry.getValue());
-                    stopTimer();
-                    return result;
-                }
-            }
-        } else {
-            @SuppressWarnings({"unchecked"}) Object result;
+        if (size > 1) {
             startTimer();
-            result=null;
-            if (size>1) {
-                result = session.load(qualifiedTableName, pk);
-            } else {
-                String propertyName =
-                        table.getPrimaryKey().getColumns().get(0).getPropertyName();
-                ClassAccessor accessor = ClassAccessorManager.getManager()
-                    .tryToInstantiateFromClass(table);
-                try {
-                    Serializable key = (Serializable) accessor.getProperty(propertyName).get(pk);
-                    result = session.load(qualifiedTableName, key);
-                } catch (Throwable e) {
-                   LogUtil.warningMF(logger,
-                        "Cannot invoke property accessor for {0} on class {1}",
-                        e, propertyName, table.getClassName());
-                }
-            }
+            result = session.load(qualifiedTableName, pk);
             stopTimer();
             return result;
-
         }
-        return null;
+        startTimer();
+        String propertyName =
+                table.getPrimaryKey().getColumns().get(0).getPropertyName();
+        ClassAccessor accessor = ClassAccessorManager.getManager()
+                .tryToInstantiateFromClass(table);
+        try {
+            Serializable key = (Serializable) accessor.getProperty(propertyName).get(pk);
+            result = session.load(qualifiedTableName, key);
+        } catch (Throwable e) {
+            LogUtil.warningMF(logger,
+                    "Cannot invoke property accessor for {0} on class {1}",
+                    e, propertyName, table.getClassName());
+        }
+        stopTimer();
+        return result;
     }
 
 
@@ -271,7 +245,7 @@ public class HibernateContextImpl implements Context {
         org.hibernate.Criteria hibernateCriteria;
         Table table = model.findTableByQualifiedName(qualifiedTableName);
 
-        if (table.getClassName()==null) {
+        if (table.getClassName() == null) {
             hibernateCriteria = session.createCriteria(qualifiedTableName);
         } else {
             hibernateCriteria = session.createCriteria
@@ -303,19 +277,19 @@ public class HibernateContextImpl implements Context {
             String hqlFormat;
             if (criterion instanceof Criteria.EqCriterion) {
                 Criteria.EqCriterion eqCriterion =
-                        (Criteria.EqCriterion)criterion;
+                        (Criteria.EqCriterion) criterion;
                 Object value = eqCriterion.getValue();
                 hqlFormat = "{0} = ?";
                 parametersList.add(value);
             } else if (criterion instanceof Criteria.NeCriterion) {
                 Criteria.NeCriterion neCriterion =
-                        (Criteria.NeCriterion)criterion;
+                        (Criteria.NeCriterion) criterion;
                 Object value = neCriterion.getValue();
                 hqlFormat = "{0} <> ?";
                 parametersList.add(value);
             } else if (criterion instanceof Criteria.BetweenCriterion) {
                 Criteria.BetweenCriterion betweenCriterion =
-                        (Criteria.BetweenCriterion)criterion;
+                        (Criteria.BetweenCriterion) criterion;
                 Object min = betweenCriterion.getMin();
                 Object max = betweenCriterion.getMax();
                 hqlFormat = "{0} >= ? AND < {0} <= ?";
@@ -323,31 +297,31 @@ public class HibernateContextImpl implements Context {
                 parametersList.add(max);
             } else if (criterion instanceof Criteria.GtCriterion) {
                 Criteria.GtCriterion gtCriterion =
-                        (Criteria.GtCriterion)criterion;
+                        (Criteria.GtCriterion) criterion;
                 Object value = gtCriterion.getValue();
                 hqlFormat = "{0} > ?";
                 parametersList.add(value);
             } else if (criterion instanceof Criteria.GeCriterion) {
                 Criteria.GeCriterion gtCriterion =
-                        (Criteria.GeCriterion)criterion;
+                        (Criteria.GeCriterion) criterion;
                 Object value = gtCriterion.getValue();
                 hqlFormat = "{0} >= ?";
                 parametersList.add(value);
             } else if (criterion instanceof Criteria.LtCriterion) {
                 Criteria.LtCriterion ltCriterion =
-                        (Criteria.LtCriterion)criterion;
+                        (Criteria.LtCriterion) criterion;
                 Object value = ltCriterion.getValue();
                 hqlFormat = "{0} < ?";
                 parametersList.add(value);
             } else if (criterion instanceof Criteria.LeCriterion) {
                 Criteria.LeCriterion leCriterion =
-                        (Criteria.LeCriterion)criterion;
+                        (Criteria.LeCriterion) criterion;
                 Object value = leCriterion.getValue();
                 hqlFormat = "{0} <= ?";
                 parametersList.add(value);
             } else if (criterion instanceof Criteria.LikeCriterion) {
                 Criteria.LikeCriterion likeCriterion =
-                        (Criteria.LikeCriterion)criterion;
+                        (Criteria.LikeCriterion) criterion;
                 String value = (String) likeCriterion.getValue();
                 String pattern = processTextMatchMode(
                         likeCriterion.getTextMatchMode(), value);
@@ -355,7 +329,7 @@ public class HibernateContextImpl implements Context {
                 parametersList.add(pattern);
             } else if (criterion instanceof Criteria.IlikeCriterion) {
                 Criteria.IlikeCriterion ilikeCriterion =
-                        (Criteria.IlikeCriterion)criterion;
+                        (Criteria.IlikeCriterion) criterion;
                 String value = (String) ilikeCriterion.getValue();
                 String pattern = processTextMatchMode(
                         ilikeCriterion.getTextMatchMode(), value);
@@ -394,7 +368,7 @@ public class HibernateContextImpl implements Context {
     }
 
     protected String processTextMatchMode(TextMatchMode textMatchMode,
-                                        String value) {
+                                          String value) {
         String pattern;
         switch (textMatchMode) {
             case EQUALS:
@@ -427,7 +401,6 @@ public class HibernateContextImpl implements Context {
                 queryStringWithParameters.getQueryString(),
                 queryStringWithParameters.getParamaters());
     }
-
 
 
     public List<Object> getObjects(String queryString) {
@@ -516,7 +489,7 @@ public class HibernateContextImpl implements Context {
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
-        }finally {
+        } finally {
             stopTimer();
         }
     }
@@ -548,7 +521,7 @@ public class HibernateContextImpl implements Context {
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
-        }finally {
+        } finally {
             stopTimer();
         }
     }
@@ -557,16 +530,16 @@ public class HibernateContextImpl implements Context {
         Session session = getSession(qualifiedTableName);
         session.beginTransaction();
         try {
+            Object obj2 = getObjectByPk(qualifiedTableName, (Serializable) obj);
             startTimer();
-            session.delete(qualifiedTableName, obj);
+            session.delete(qualifiedTableName, obj2);
             session.getTransaction().commit();
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
-        }finally{
+        } finally {
             stopTimer();
         }
-
     }
 
     public List<Object[]> runSql(String databaseName, String sql) {
@@ -615,10 +588,11 @@ public class HibernateContextImpl implements Context {
                 model.findOneToManyRelationship(
                         qualifiedTableName, oneToManyRelationshipName);
         Table fromTable = relationship.getFromTable();
-
         Class clazz = obj.getClass();
+        Session session =
+                setups.get(fromTable.getDatabaseName()).getThreadSession();
 
-
+        ClassAccessor accessor;
         if (obj instanceof Map) {
             Map<String, Object> map = (Map<String, Object>) obj;
             if (map.get(oneToManyRelationshipName) instanceof List) {
@@ -626,9 +600,6 @@ public class HibernateContextImpl implements Context {
                         map.get(oneToManyRelationshipName);
             }
 
-
-            Session session =
-                    setups.get(fromTable.getDatabaseName()).getThreadSession();
             org.hibernate.Criteria criteria =
                     session.createCriteria(fromTable.getQualifiedName());
             for (Reference reference : relationship.getReferences()) {
@@ -643,26 +614,25 @@ public class HibernateContextImpl implements Context {
             stopTimer();
             return result;
         } else {
-            JavaClassAccessor classAccessor = new JavaClassAccessor(clazz);
-                String propertyName = relationship.getManyPropertyName();
+            accessor = new JavaClassAccessor(clazz);
+            String propertyName = relationship.getManyPropertyName();
             try {
 
                 PropertyAccessor propertyAccessor
-                        = classAccessor.getProperty(propertyName);
+                        = accessor.getProperty(propertyName);
                 Object list = propertyAccessor.get(obj);
 
                 if (list instanceof List) {
                     return (List<Object>) list;
                 }
-                Session session =
-                        setups.get(fromTable.getDatabaseName()).getThreadSession();
+
                 org.hibernate.Criteria criteria =
                         session.createCriteria(fromTable.getQualifiedName());
                 for (Reference reference : relationship.getReferences()) {
                     Column fromColumn = reference.getFromColumn();
                     Column toColumn = reference.getToColumn();
                     PropertyAccessor propertyAccessor2
-                        = classAccessor.getProperty(toColumn.getPropertyName());
+                            = accessor.getProperty(toColumn.getPropertyName());
                     Object critObj = propertyAccessor2.get(obj);
 
                     criteria.add(Restrictions.eq(fromColumn.getColumnName(),
@@ -748,7 +718,8 @@ public class HibernateContextImpl implements Context {
         criteria.add(Restrictions.eq("pwd", password));
         startTimer();
 
-        List<Object> result = criteria.list();
+        @SuppressWarnings({"unchecked"})
+        List<Object> result = (List<Object>) criteria.list();
         stopTimer();
 
         if (result.size() == 1) {
@@ -792,7 +763,7 @@ public class HibernateContextImpl implements Context {
             stopWatches.set(stopWatch);
             stopWatch.start();
         } else {
-            stopWatch.resume();           
+            stopWatch.resume();
         }
     }
 

@@ -459,7 +459,8 @@ public class ModelParser extends XmlParser {
             }
 
         }
-        throw new Error(MessageFormat.format("Tabella {0} non presente", tableName));
+        throw new Error(MessageFormat.format("Tabella {0} non presente " +
+                "nello schema {1}", tableName, schemaName));
 
     }
 
@@ -469,7 +470,8 @@ public class ModelParser extends XmlParser {
                 return col;
             }
         }
-        throw new Error(MessageFormat.format("Colonna {0} non presente", attValue));
+        throw new Error(MessageFormat.format("Colonna {0} non presente " +
+                "nella tabella {1}", attValue, table.getQualifiedName()));
     }
 }
 
