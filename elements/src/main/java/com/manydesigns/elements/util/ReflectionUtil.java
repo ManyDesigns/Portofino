@@ -75,19 +75,21 @@ public class ReflectionUtil {
         }
     }
 
-    public static Constructor getConstructor(String className) {
-        return getConstructor(loadClass(className));
+    public static Constructor getConstructor(String className,
+                                             Class... argClasses) {
+        return getConstructor(loadClass(className), argClasses);
     }
 
-    public static Constructor getConstructor(Class aClass) {
+    public static Constructor getConstructor(Class aClass,
+                                             Class... argClasses) {
         try {
-            Constructor constructor = aClass.getConstructor();
+            Constructor constructor = aClass.getConstructor(argClasses);
             LogUtil.finerMF(logger,
                     "Found constructor: {0}", constructor);
             return constructor;
         } catch (Throwable e) {
             LogUtil.fineMF(logger,
-                    "Could not find empty construtor for class: {0}",
+                    "Could not find construtor for class: {0}",
                     e, aClass);
             return null;
         }
@@ -99,11 +101,16 @@ public class ReflectionUtil {
 
     public static Object newInstance(Class aClass) {
         Constructor constructor = getConstructor(aClass);
+        return newInstance(constructor);
+    }
+
+    public static Object newInstance(Constructor constructor, Object... args) {
         try {
-            return constructor.newInstance();
+            return constructor.newInstance(args);
         } catch (Throwable e) {
             LogUtil.fineMF(logger,
-                    "Could not instanciate class: {0}", e, aClass);
+                    "Could not instanciate class constructor: {0}",
+                    e, constructor);
             return null;
         }
     }

@@ -330,10 +330,36 @@
                  table="jpetstore.public.product"
                  filter="from jpetstore.public.product product where product.category = %{'FISH'}">
             <properties>
-                <property name="productid" label="product id" inSummary="true" searchable="true" access="write"/>
-                <property name="category" inSummary="false" searchable="false" access="read"/>
-                <property name="name" inSummary="true" searchable="true" access="write"/>
-                <property name="descn" label="description" inSummary="true" searchable="false" access="write"/>
+                <property name="productid">
+                    <annotations>
+                        <annotation type="com.manydesigns.elements.annotations.Label" value="product id"/>
+                        <annotation type="com.manydesigns.elements.annotations.InSummary" value="true"/>
+                        <annotation type="com.manydesigns.elements.annotations.Searchable" value="true"/>
+                        <annotation type="com.manydesigns.elements.annotations.Access" value="write"/>
+                    </annotations>
+                </property>
+                <property name="category">
+                    <annotations>
+                        <annotation type="com.manydesigns.elements.annotations.InSummary" value="false"/>
+                        <annotation type="com.manydesigns.elements.annotations.Searchable" value="false"/>
+                        <annotation type="com.manydesigns.elements.annotations.Access" value="read"/>
+                    </annotations>
+                </property>
+                <property name="name">
+                    <annotations>
+                        <annotation type="com.manydesigns.elements.annotations.InSummary" value="true"/>
+                        <annotation type="com.manydesigns.elements.annotations.Searchable" value="true"/>
+                        <annotation type="com.manydesigns.elements.annotations.Access" value="write"/>
+                    </annotations>
+                </property>
+                <property name="descn">
+                    <annotations>
+                        <annotation type="com.manydesigns.elements.annotations.Label" value="description"/>
+                        <annotation type="com.manydesigns.elements.annotations.InSummary" value="true"/>
+                        <annotation type="com.manydesigns.elements.annotations.Searchable" value="true"/>
+                        <annotation type="com.manydesigns.elements.annotations.Access" value="write"/>
+                    </annotations>
+                </property>
             </properties>
         </useCase>
     </useCases>

@@ -2,10 +2,10 @@ package com.manydesigns.portofino.model.io;
 
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.portlets.Portlet;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.usecases.Access;
 import com.manydesigns.portofino.model.usecases.UseCase;
 import com.manydesigns.portofino.model.usecases.UseCaseProperty;
 import com.manydesigns.portofino.xml.DocumentCallback;
@@ -54,6 +54,9 @@ public class ModelParser extends XmlParser {
     private static final String PROPERTIES = "properties";
     private static final String PROPERTY = "property";
 
+    private static final String ANNOTATIONS = "annotations";
+    private static final String ANNOTATION = "annotation";
+
     private List<RelationshipPre> relationships;
 
     Model model;
@@ -61,6 +64,7 @@ public class ModelParser extends XmlParser {
     Schema currentSchema;
     Table currentTable;
     UseCase currentUseCase;
+    UseCaseProperty currentUseCaseProperty;
 
     public ModelParser() {}
 
@@ -403,21 +407,29 @@ public class ModelParser extends XmlParser {
     private class PropertyCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            checkRequiredAttributes(attributes,
-                    "name", "inSummary", "searchable", "access");
+            checkRequiredAttributes(attributes, "name");
             String name = attributes.get("name");
-            String inSummary = attributes.get("inSummary");
-            String searchable = attributes.get("searchable");
-            String access = attributes.get("access");
-            UseCaseProperty useCaseProperty =
-                    new UseCaseProperty(
-                            name,
-                            Boolean.parseBoolean(inSummary),
-                            Boolean.parseBoolean(searchable),
-                            Access.parseAccess(access));
-            String label = attributes.get("label");
-            useCaseProperty.setLabel(label);
-            currentUseCase.getProperties().add(useCaseProperty);
+            currentUseCaseProperty = new UseCaseProperty(name);
+            currentUseCase.getProperties().add(currentUseCaseProperty);
+            expectElement(ANNOTATIONS, 0, 1, new PropertyAnnotationsCallback());
+        }
+    }
+
+    private class PropertyAnnotationsCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(ANNOTATION, 0, null, new PropertyAnnotationCallback());
+        }
+    }
+
+    private class PropertyAnnotationCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            checkRequiredAttributes(attributes, "type", "value");
+            String type = attributes.get("type");
+            String value = attributes.get("value");
+            Annotation annotation = new Annotation(type, value);
+            currentUseCaseProperty.getAnnotations().add(annotation);
         }
     }
 

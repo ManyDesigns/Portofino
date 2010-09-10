@@ -27,54 +27,38 @@
  *
  */
 
-package com.manydesigns.portofino.model.usecases;
-
-import com.manydesigns.portofino.model.annotations.Annotation;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.manydesigns.portofino.model.annotations;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCaseProperty {
+public class Annotation {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    protected String type;
+    protected String value;
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    protected String name;
-    protected List<Annotation> annotations;
-
-
-    //**************************************************************************
-    // Constructors
-    //**************************************************************************
-
-    public UseCaseProperty(String name) {
-        this.name = name;
-        annotations = new ArrayList<Annotation>();
+    public Annotation(String type, String value) {
+        this.type = type;
+        this.value = value;
     }
 
-
-    //**************************************************************************
-    // Getters/setters
-    //**************************************************************************
-
-    public String getName() {
-        return name;
+    public String getType() {
+        return type;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public List<Annotation> getAnnotations() {
-        return annotations;
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }

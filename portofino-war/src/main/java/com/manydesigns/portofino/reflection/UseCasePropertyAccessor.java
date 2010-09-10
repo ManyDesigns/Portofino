@@ -29,17 +29,21 @@
 
 package com.manydesigns.portofino.reflection;
 
-import com.manydesigns.elements.annotations.InSummary;
-import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.Searchable;
-import com.manydesigns.elements.annotations.impl.InSummaryImpl;
-import com.manydesigns.elements.annotations.impl.LabelImpl;
-import com.manydesigns.elements.annotations.impl.SearchableImpl;
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.annotations.AnnotationsManager;
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.usecases.UseCaseProperty;
+import ognl.OgnlContext;
+import ognl.TypeConverter;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -53,26 +57,85 @@ public class UseCasePropertyAccessor implements PropertyAccessor {
     protected final UseCaseProperty useCaseProperty;
     protected final PropertyAccessor nestedAccessor;
 
-    protected final Label labelAnnotation;
-    protected final Searchable searchableAnnotation;
-    protected final InSummary inSummaryAnnotation;
+    protected final Map<Class, Annotation> annotations;
+
+    public static final Logger logger =
+            LogUtil.getLogger(UseCasePropertyAccessor.class);
 
     public UseCasePropertyAccessor(UseCaseProperty useCaseProperty,
                                    PropertyAccessor nestedAccessor) {
         this.useCaseProperty = useCaseProperty;
         this.nestedAccessor = nestedAccessor;
 
-        if (useCaseProperty.getLabel() == null) {
-            labelAnnotation = nestedAccessor.getAnnotation(Label.class);
-        } else {
-            labelAnnotation = new LabelImpl(useCaseProperty.getLabel());
+        annotations = new HashMap<Class, Annotation>();
+        AnnotationsManager manager = AnnotationsManager.getManager();
+
+        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+        TypeConverter typeConverter = ognlContext.getTypeConverter();
+
+        for (com.manydesigns.portofino.model.annotations.Annotation
+                propertyAnnotation : useCaseProperty.getAnnotations()) {
+            instanciateOneAnnotation(manager, ognlContext,
+                    typeConverter, propertyAnnotation);
+        }
+    }
+
+    private void instanciateOneAnnotation(AnnotationsManager manager,
+                                          OgnlContext ognlContext,
+                                          TypeConverter typeConverter,
+                                          com.manydesigns.portofino.model.annotations.Annotation propertyAnnotation) {
+        String type = propertyAnnotation.getType();
+
+        Class annotationClass = ReflectionUtil.loadClass(type);
+        if (annotationClass == null) {
+            LogUtil.warningMF(logger,
+                    "Cannot load annotation class: {0}", type);
+            return;
         }
 
-        searchableAnnotation =
-                new SearchableImpl(useCaseProperty.isSearchable());
+        Class annotationImplClass =
+                manager.getAnnotationImplementationClass(
+                        annotationClass);
+        if (annotationImplClass == null) {
+            LogUtil.warningMF(logger,
+                    "Cannot find implementation for annotation class: {0}",
+                    type);
+            return;
+        }
 
-        inSummaryAnnotation =
-                new InSummaryImpl(useCaseProperty.isInSummary());
+        Constructor annotationConstructor = null;
+        Constructor[] constructors =
+                annotationImplClass.getConstructors();
+        for (Constructor candidateConstructor : constructors) {
+            Class[] parameterTypes =
+                    candidateConstructor.getParameterTypes();
+            if (parameterTypes.length != 1) {
+                continue;
+            }
+            annotationConstructor = candidateConstructor;
+        }
+        if (annotationConstructor == null) {
+            LogUtil.warningMF(logger,
+                    "Cannot find constructor for annotation class: {0}",
+                    type);
+            return;
+        }
+
+        Class parameterType = annotationConstructor.getParameterTypes()[0];
+        Object value = typeConverter.convertValue(
+                ognlContext, null, null, null,
+                propertyAnnotation.getValue(), parameterType);
+
+        Annotation annotation =
+                (Annotation) ReflectionUtil.newInstance(
+                        annotationConstructor, value);
+        if (annotation == null) {
+            LogUtil.warningMF(logger,
+                    "Cannot instanciate annotation: {0}", type);
+            return;
+        }
+
+        annotations.put(annotationClass, annotation);
     }
 
     public String getName() {
@@ -93,12 +156,9 @@ public class UseCasePropertyAccessor implements PropertyAccessor {
 
     @SuppressWarnings({"unchecked"})
     public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-        if (annotationClass == Label.class) {
-            return (T)labelAnnotation;
-        } else if (annotationClass == Searchable.class) {
-            return (T)searchableAnnotation;
-        } else if (annotationClass == InSummary.class) {
-            return (T)inSummaryAnnotation;
+        T annotation = (T) annotations.get(annotationClass);
+        if (annotation != null) {
+            return annotation;
         }
         return nestedAccessor.getAnnotation(annotationClass);
     }

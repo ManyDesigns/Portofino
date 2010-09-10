@@ -69,6 +69,10 @@ public final class ElementsProperties {
     public static final String CLASS_ACCESSOR_HELPERS_LIST_PROPERTY =
             "elements.class.accessor.helpers.list";
 
+    public static final String ANNOTATIONS_MANAGER_PROPERTY =
+            "annotations.manager";
+    public static final String ANNOTATIONS_IMPLEMENTATION_LIST_PROPERTY =
+            "annotations.implementation.list";
 
     //**************************************************************************
     // Static fields, singleton initialization and retrieval
