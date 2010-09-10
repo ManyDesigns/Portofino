@@ -279,6 +279,138 @@
                                 <column name="id"/>
                             </primaryKey>
                         </table>
+                        <table name="table4">
+                            <columns>
+                                <column name="id"
+                                        columnType="serial"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="true"
+                                        searchable="true"/>
+                                <column name="testo"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="15"
+                                        scale="0"
+                                        nullable="true"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey name="pk_table4">
+                                <column name="id"/>
+                            </primaryKey>
+                        </table>
+                        <table name="table2">
+                            <columns>
+                                <column name="id1"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="3"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column name="id2"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="3"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column name="testo"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="15"
+                                        scale="0"
+                                        nullable="true"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey name="pk_table2">
+                                <column name="id1"/>
+                                <column name="id2"/>
+                            </primaryKey>
+                        </table>
+                        <table name="table3" manyToMany="true">
+                            <columns>
+                                <column name="id"
+                                        columnType="serial"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="true"
+                                        searchable="true"/>
+                                <column name="t2_id1"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="3"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column name="t2_id2"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="3"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column name="tb1_id"
+                                        columnType="int4"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column name="tb4_id"
+                                        columnType="int4"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey name="pk_table3">
+                                <column name="id"/>
+                            </primaryKey>
+                            <relationships>
+                                <relationship name="fk_tb_2"
+                                              toSchema="public"
+                                              toTable="table2"
+                                              onUpdate="NO ACTION"
+                                              onDelete="NO ACTION"
+                                              >
+                                    <reference fromColumn="t2_id1"
+                                               toColumn="id1"/>
+                                    <reference fromColumn="t2_id2"
+                                               toColumn="id2"/>
+                                </relationship>
+                                <relationship name="fk_tb_1"
+                                              toSchema="public"
+                                              toTable="table1"
+                                              onUpdate="NO ACTION"
+                                              onDelete="NO ACTION"
+                                              >                                    
+                                    <reference fromColumn="tb1_id"
+                                               toColumn="id"/>
+                                </relationship>
+                                <relationship name="fk_tb_4"
+                                              toSchema="public"
+                                              toTable="table4"
+                                              onUpdate="NO ACTION"
+                                              onDelete="NO ACTION"
+                                              >
+                                    <reference fromColumn="tb4_id"
+                                               toColumn="id"/>
+
+                                </relationship>
+                            </relationships>
+                        </table>
                     </tables>
                 </schema>
             </schemas>

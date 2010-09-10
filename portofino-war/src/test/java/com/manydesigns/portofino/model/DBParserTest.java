@@ -177,7 +177,7 @@ public class DBParserTest extends TestCase {
 
     private void checkReference(List<Reference> references, int idx,
                                 String fromColumn, String toColumn) {
-        Reference ref = references.get(0);
+        Reference ref = references.get(idx);
         assertEquals(fromColumn, ref.getFromColumn().getColumnName());
         assertEquals(toColumn, ref.getToColumn().getColumnName());
     }
@@ -190,7 +190,7 @@ public class DBParserTest extends TestCase {
         assertEquals(toSchema, rel.getToTable().getSchemaName());
         assertEquals(toTable, rel.getToTable().getTableName());
         assertEquals(onUpdate, rel.getOnUpdate());
-        assertEquals(onUpdate, rel.getOnDelete());
+        assertEquals(onDelete, rel.getOnDelete());
 
     }
 
