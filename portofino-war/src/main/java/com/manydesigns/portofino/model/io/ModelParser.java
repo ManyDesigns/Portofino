@@ -64,7 +64,7 @@ public class ModelParser extends XmlParser {
     Schema currentSchema;
     Table currentTable;
     UseCase currentUseCase;
-    UseCaseProperty currentUseCaseProperty;
+    List<Annotation> currentAnnotations;
 
     public ModelParser() {}
 
@@ -204,6 +204,9 @@ public class ModelParser extends XmlParser {
             column.setJavaType(javatype);
 
             currentTable.getColumns().add(column);
+
+            currentAnnotations = column.getAnnotations();
+            expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
         }
     }
 
@@ -409,27 +412,28 @@ public class ModelParser extends XmlParser {
                 throws XMLStreamException {
             checkRequiredAttributes(attributes, "name");
             String name = attributes.get("name");
-            currentUseCaseProperty = new UseCaseProperty(name);
-            currentUseCase.getProperties().add(currentUseCaseProperty);
-            expectElement(ANNOTATIONS, 0, 1, new PropertyAnnotationsCallback());
+            UseCaseProperty useCaseProperty = new UseCaseProperty(name);
+            currentUseCase.getProperties().add(useCaseProperty);
+            currentAnnotations = useCaseProperty.getAnnotations();
+            expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
         }
     }
 
-    private class PropertyAnnotationsCallback implements ElementCallback {
+    private class AnnotationsCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(ANNOTATION, 0, null, new PropertyAnnotationCallback());
+            expectElement(ANNOTATION, 0, null, new AnnotationCallback());
         }
     }
 
-    private class PropertyAnnotationCallback implements ElementCallback {
+    private class AnnotationCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             checkRequiredAttributes(attributes, "type", "value");
             String type = attributes.get("type");
             String value = attributes.get("value");
             Annotation annotation = new Annotation(type, value);
-            currentUseCaseProperty.getAnnotations().add(annotation);
+            currentAnnotations.add(annotation);
         }
     }
 

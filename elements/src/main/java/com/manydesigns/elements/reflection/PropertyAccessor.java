@@ -50,6 +50,8 @@ public interface PropertyAccessor {
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass);
     <T extends Annotation> T getAnnotation(Class<T> annotationClass);
 
-    public Object get(Object obj) throws IllegalAccessException, InvocationTargetException;
-    public void set(Object obj, Object value) throws IllegalAccessException, InvocationTargetException;
+    public Object get(Object obj)
+            throws IllegalAccessException, InvocationTargetException;
+    public void set(Object obj, Object value)
+            throws IllegalAccessException, InvocationTargetException;
 }

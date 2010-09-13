@@ -49,7 +49,7 @@ public class UseCaseProperty {
     //**************************************************************************
 
     protected String name;
-    protected List<Annotation> annotations;
+    protected final List<Annotation> annotations;
 
 
     //**************************************************************************

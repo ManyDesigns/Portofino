@@ -29,7 +29,11 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
+import com.manydesigns.portofino.model.annotations.Annotation;
+
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -61,6 +65,8 @@ public class Column {
 
     protected Class javaType;
     protected String propertyName;
+    protected final List<Annotation> annotations;
+
 
     //**************************************************************************
     // Constructors
@@ -82,6 +88,7 @@ public class Column {
         this.length = length;
         this.scale = scale;
         this.searchable = searchable;
+        annotations = new ArrayList<Annotation>();
     }
 
     //**************************************************************************
@@ -187,6 +194,10 @@ public class Column {
 
     public void setSearchable(boolean searchable) {
         this.searchable = searchable;
+    }
+
+    public List<Annotation> getAnnotations() {
+        return annotations;
     }
 
     @Override

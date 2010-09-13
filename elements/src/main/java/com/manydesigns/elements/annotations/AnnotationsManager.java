@@ -161,4 +161,5 @@ public class AnnotationsManager {
     public Class getAnnotationImplementationClass(Class annotationClass) {
         return annotationClassMap.get(annotationClass);
     }
+
 }

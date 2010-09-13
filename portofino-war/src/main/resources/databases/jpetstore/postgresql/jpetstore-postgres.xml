@@ -232,7 +232,12 @@
                                         length="255"
                                         scale="0"
                                         nullable="true"
-                                        searchable="true"/>
+                                        searchable="true">
+                                    <annotations>
+                                        <annotation type="com.manydesigns.elements.annotations.Label"
+                                                    value="description"/>
+                                    </annotations>
+                                </column>
                             </columns>
                             <primaryKey name="pk_category">
                                 <column name="productid"/>
@@ -486,7 +491,6 @@
                 </property>
                 <property name="descn">
                     <annotations>
-                        <annotation type="com.manydesigns.elements.annotations.Label" value="description"/>
                         <annotation type="com.manydesigns.elements.annotations.InSummary" value="true"/>
                         <annotation type="com.manydesigns.elements.annotations.Searchable" value="true"/>
                         <annotation type="com.manydesigns.elements.annotations.Access" value="write"/>
