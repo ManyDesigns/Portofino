@@ -38,11 +38,26 @@ public interface ClassAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+
+    //**************************************************************************
+    // Class description
+    //**************************************************************************
+
     public String getName();
+
+
+    //**************************************************************************
+    // Properties management
+    //**************************************************************************
+
     public PropertyAccessor getProperty(String propertyName)
             throws NoSuchFieldException;
     public PropertyAccessor[] getProperties();
     public PropertyAccessor[] getKeyProperties();
+
+    //**************************************************************************
+    // Instance management
+    //**************************************************************************
 
     public Object newInstance();
 }

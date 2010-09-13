@@ -36,7 +36,6 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
@@ -44,6 +43,7 @@ import com.manydesigns.portofino.actions.RelatedTableForm;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.datamodel.Relationship;
 import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -98,7 +98,6 @@ public class TableDataAction extends PortofinoAction
     // Model metadata
     //**************************************************************************
 
-    public Table table;
     public ClassAccessor tableAccessor;
 
     //**************************************************************************
@@ -148,11 +147,9 @@ public class TableDataAction extends PortofinoAction
     //**************************************************************************
 
     public void setupTable() {
-        table = model.findTableByQualifiedName(qualifiedTableName);
-        tableAccessor = ClassAccessorManager.getManager()
-                .tryToInstantiateFromClass(table);
+        tableAccessor = context.getTableAccessor(qualifiedTableName);
         pkHelper = new PkHelper(tableAccessor);
-        if (table == null || tableAccessor == null) {
+        if (tableAccessor == null) {
             throw new ModelObjectNotFoundError(qualifiedTableName);
         }
     }
@@ -294,6 +291,9 @@ public class TableDataAction extends PortofinoAction
         form.readFromObject(object);
 
         relatedTableFormList = new ArrayList<RelatedTableForm>();
+
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        
         for (Relationship relationship : table.getOneToManyRelationships()) {
             setupRelatedTableForm(relationship);
         }
@@ -307,8 +307,10 @@ public class TableDataAction extends PortofinoAction
                         relationship.getRelationshipName());
 
         Table relatedTable = relationship.getFromTable();
+        TableAccessor relatedTableAccessor =
+                context.getTableAccessor(relatedTable.getQualifiedName());
         TableFormBuilder tableFormBuilder =
-                new TableFormBuilder(relatedTable);
+                new TableFormBuilder(relatedTableAccessor);
         tableFormBuilder.configNRows(relatedObjects.size());
         TableForm tableForm = tableFormBuilder.build();
         tableForm.setMode(Mode.VIEW);

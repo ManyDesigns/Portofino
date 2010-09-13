@@ -32,8 +32,6 @@ package com.manydesigns.portofino.reflection;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
-import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.usecases.UseCase;
 import com.manydesigns.portofino.model.usecases.UseCaseProperty;
 
@@ -66,11 +64,9 @@ public class UseCaseAccessor implements ClassAccessor {
     // Constructors
     //**************************************************************************
 
-    public UseCaseAccessor(UseCase useCase) {
+    public UseCaseAccessor(UseCase useCase, TableAccessor tableAccessor) {
         this.useCase = useCase;
-        Table table = useCase.getTable();
-        tableAccessor = ClassAccessorManager.getManager()
-                .tryToInstantiateFromClass(table);
+        this.tableAccessor = tableAccessor;
         List<UseCaseProperty> properties = useCase.getProperties();
         PropertyAccessor[] keyColumnAccessors = tableAccessor.getKeyProperties();
 

@@ -36,7 +36,6 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.util.ReflectionUtil;
@@ -48,6 +47,9 @@ import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.io.ConnectionsParser;
 import com.manydesigns.portofino.model.io.ModelParser;
 import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.usecases.UseCase;
+import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.reflection.UseCaseAccessor;
 import com.manydesigns.portofino.users.User;
 import org.apache.commons.lang.time.StopWatch;
 import org.hibernate.*;
@@ -212,9 +214,10 @@ public class HibernateContextImpl implements Context {
     public Object getObjectByPk(String qualifiedTableName,
                                 Serializable pk) {
         Session session = getSession(qualifiedTableName);
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        TableAccessor table = getTableAccessor(qualifiedTableName);
         Object result = null;
-        int size = table.getPrimaryKey().getColumns().size();
+        PropertyAccessor[] keyProperties = table.getKeyProperties();
+        int size = keyProperties.length;
         if (size > 1) {
             startTimer();
             result = session.load(qualifiedTableName, pk);
@@ -222,17 +225,14 @@ public class HibernateContextImpl implements Context {
             return result;
         }
         startTimer();
-        String propertyName =
-                table.getPrimaryKey().getColumns().get(0).getPropertyName();
-        ClassAccessor accessor = ClassAccessorManager.getManager()
-                .tryToInstantiateFromClass(table);
+        PropertyAccessor propertyAccessor = keyProperties[0];
         try {
-            Serializable key = (Serializable) accessor.getProperty(propertyName).get(pk);
+            Serializable key = (Serializable) propertyAccessor.get(pk);
             result = session.load(qualifiedTableName, key);
         } catch (Throwable e) {
             LogUtil.warningMF(logger,
                     "Cannot invoke property accessor for {0} on class {1}",
-                    e, propertyName, table.getClassName());
+                    e, propertyAccessor.getName(), table.getName());
         }
         stopTimer();
         return result;
@@ -587,56 +587,25 @@ public class HibernateContextImpl implements Context {
         Relationship relationship =
                 model.findOneToManyRelationship(
                         qualifiedTableName, oneToManyRelationshipName);
+        Table toTable = relationship.getToTable();
         Table fromTable = relationship.getFromTable();
-        Class clazz = obj.getClass();
-        Session session =
-                setups.get(fromTable.getDatabaseName()).getThreadSession();
+        Session session = getSession(qualifiedTableName);
 
-        ClassAccessor accessor;
-        if (obj instanceof Map) {
-            Map<String, Object> map = (Map<String, Object>) obj;
-            if (map.get(oneToManyRelationshipName) instanceof List) {
-                return (List<Object>)
-                        map.get(oneToManyRelationshipName);
-            }
-
-            org.hibernate.Criteria criteria =
-                    session.createCriteria(fromTable.getQualifiedName());
-            for (Reference reference : relationship.getReferences()) {
-                Column fromColumn = reference.getFromColumn();
-                Column toColumn = reference.getToColumn();
-                criteria.add(Restrictions.eq(fromColumn.getColumnName(),
-                        map.get(toColumn.getColumnName())));
-            }
-            startTimer();
-            //noinspection unchecked
-            List<Object> result = criteria.list();
-            stopTimer();
-            return result;
-        } else {
-            accessor = new JavaClassAccessor(clazz);
-            String propertyName = relationship.getManyPropertyName();
+        ClassAccessor toAccessor = getTableAccessor(qualifiedTableName);
+        
+        boolean virtualRelationship = true;
+        if (virtualRelationship) {
             try {
-
-                PropertyAccessor propertyAccessor
-                        = accessor.getProperty(propertyName);
-                Object list = propertyAccessor.get(obj);
-
-                if (list instanceof List) {
-                    return (List<Object>) list;
-                }
-
                 org.hibernate.Criteria criteria =
                         session.createCriteria(fromTable.getQualifiedName());
                 for (Reference reference : relationship.getReferences()) {
                     Column fromColumn = reference.getFromColumn();
                     Column toColumn = reference.getToColumn();
-                    PropertyAccessor propertyAccessor2
-                            = accessor.getProperty(toColumn.getPropertyName());
-                    Object critObj = propertyAccessor2.get(obj);
-
+                    PropertyAccessor toPropertyAccessor
+                            = toAccessor.getProperty(toColumn.getPropertyName());
+                    Object toValue = toPropertyAccessor.get(obj);
                     criteria.add(Restrictions.eq(fromColumn.getColumnName(),
-                            critObj));
+                            toValue));
                 }
                 startTimer();
                 //noinspection unchecked
@@ -645,8 +614,28 @@ public class HibernateContextImpl implements Context {
                 return result;
             } catch (Throwable e) {
                 LogUtil.warningMF(logger,
-                        "Cannot invoke property accessor for {0} on class {1}",
-                        e, propertyName, clazz.getName());
+                        "Cannot access relationship {0} on table {1}",
+                        e, oneToManyRelationshipName, qualifiedTableName);
+            }
+        } else {
+            String manyPropertyName = relationship.getManyPropertyName();
+
+            Class clazz = toTable.getClass();
+            try {
+                if (clazz == null) {
+                    Map<String, Object> map = (Map<String, Object>) obj;
+                    return (List<Object>) map.get(oneToManyRelationshipName);
+                } else {
+                    ClassAccessor accessor2 =
+                            JavaClassAccessor.getClassAccessor(clazz);
+                        PropertyAccessor propertyAccessor
+                                = accessor2.getProperty(manyPropertyName);
+                        return (List<Object>) propertyAccessor.get(obj);
+                }
+            } catch (Throwable e) {
+                LogUtil.warningMF(logger,
+                        "Cannot access relationship {0} on table {1}",
+                        e, oneToManyRelationshipName, qualifiedTableName);
             }
         }
         return null;
@@ -705,6 +694,18 @@ public class HibernateContextImpl implements Context {
 
         }
         return result;
+    }
+
+    public TableAccessor getTableAccessor(String qualifiedTableName) {
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        return new TableAccessor(table);
+    }
+
+    public UseCaseAccessor getUseCaseAccessor(String useCaseName) {
+        UseCase useCase = model.findUseCaseByName(useCaseName);
+        String qualifiedTableName = useCase.getTableName();
+        TableAccessor tableAccessor = getTableAccessor(qualifiedTableName);
+        return new UseCaseAccessor(useCase, tableAccessor);
     }
 
     //**************************************************************************

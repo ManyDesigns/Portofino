@@ -34,8 +34,8 @@ import com.manydesigns.elements.fields.helpers.FieldManager;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -66,10 +66,8 @@ public class SearchFormBuilder {
     // Constructors
     //**************************************************************************
 
-    public SearchFormBuilder(Object aClass) {
-        this(ClassAccessorManager
-                .getManager()
-                .tryToInstantiateFromClass(aClass));
+    public SearchFormBuilder(Class aClass) {
+        this(JavaClassAccessor.getClassAccessor(aClass));
     }
 
     public SearchFormBuilder(ClassAccessor classAccessor) {

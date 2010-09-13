@@ -31,8 +31,8 @@ package com.manydesigns.portofino.reflection;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.Table;
@@ -62,7 +62,7 @@ public class TableAccessor implements ClassAccessor {
     public final static Logger logger = LogUtil.getLogger(TableAccessor.class);
 
     //**************************************************************************
-    // Constructors
+    // Constructors and initialization
     //**************************************************************************
 
     public TableAccessor(Table table) {
@@ -70,9 +70,7 @@ public class TableAccessor implements ClassAccessor {
         if (className != null) {
             Class clazz = ReflectionUtil.loadClass(className);
             if (clazz != null) {
-                javaClassAccessor =
-                        ClassAccessorManager.getManager()
-                                .tryToInstantiateFromClass(clazz);
+                javaClassAccessor = JavaClassAccessor.getClassAccessor(clazz);
             }
         }
 
@@ -81,6 +79,12 @@ public class TableAccessor implements ClassAccessor {
         List<Column> pkColumns = table.getPrimaryKey().getColumns();
         columnAccessors = new ColumnAccessor[columns.size()];
         keyColumnAccessors = new ColumnAccessor[pkColumns.size()];
+
+        setupColumns(columns, pkColumns);
+        setupKeyColumns(columns, pkColumns);
+    }
+
+    private void setupColumns(List<Column> columns, List<Column> pkColumns) {
         int i = 0;
         for (Column current : columns) {
             boolean inPk = pkColumns.contains(current);
@@ -108,9 +112,10 @@ public class TableAccessor implements ClassAccessor {
             columnAccessors[i] = columnAccessor;
             i++;
         }
+    }
 
-        // key column accessors
-        i = 0;
+    private void setupKeyColumns(List<Column> columns, List<Column> pkColumns) {
+        int i = 0;
         for (Column current : pkColumns) {
             int index = columns.indexOf(current);
             ColumnAccessor columnAccessor = columnAccessors[index];

@@ -32,6 +32,8 @@ package com.manydesigns.portofino.context;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.reflection.UseCaseAccessor;
 import com.manydesigns.portofino.users.User;
 
 import java.io.Serializable;
@@ -104,18 +106,25 @@ public interface Context {
 
     long getDbTime();
 
-    public List<String> getDDLCreate();
+    List<String> getDDLCreate();
 
-    public List<String> getDDLUpdate();
+    List<String> getDDLUpdate();
+
+    //**************************************************************************
+    // ClassAccessors management
+    //**************************************************************************
+
+    public TableAccessor getTableAccessor(String qualifiedTableName);
+    public UseCaseAccessor getUseCaseAccessor(String useCaseName);
 
     //**************************************************************************
     // User
     //**************************************************************************
 
-    public User authenticate (String email, String password);
+    User authenticate (String email, String password);
 
-    public User getCurrentUser();
+    User getCurrentUser();
 
-    public void setCurrentUser(User user);
+    void setCurrentUser(User user);
 
 }

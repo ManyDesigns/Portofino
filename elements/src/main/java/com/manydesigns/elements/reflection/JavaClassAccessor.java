@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.reflection;
 
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -38,7 +39,10 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,10 +53,46 @@ public class JavaClassAccessor implements ClassAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
     protected final Class javaClass;
     protected final PropertyAccessor[] propertyAccessors;
 
-    public JavaClassAccessor(Class javaClass) {
+    //**************************************************************************
+    // Static fields and methods
+    //**************************************************************************
+
+    protected static final Map<Class, JavaClassAccessor> classAccessorCache;
+    public static final Logger logger =
+                LogUtil.getLogger(JavaClassAccessor.class);
+
+    static {
+        classAccessorCache = new HashMap<Class, JavaClassAccessor>();
+    }
+
+    public static JavaClassAccessor getClassAccessor(Class javaClass) {
+        JavaClassAccessor cachedResult = classAccessorCache.get(javaClass);
+        if (cachedResult == null) {
+            LogUtil.finerMF(logger, "Cache miss for: {0}", javaClass);
+            cachedResult = new JavaClassAccessor(javaClass);
+            LogUtil.finerMF(logger, "Caching key: {0} - Value: {1}",
+                    javaClass, cachedResult);
+            classAccessorCache.put(javaClass, cachedResult);
+        } else {
+            LogUtil.finerMF(logger, "Cache hit for: {0} - Value: {1}",
+                    javaClass, cachedResult);
+        }
+        return cachedResult;
+    }
+
+
+    //**************************************************************************
+    // Constructors and initialization
+    //**************************************************************************
+
+    protected JavaClassAccessor(Class javaClass) {
         this.javaClass = javaClass;
 
         List<PropertyAccessor> accessorList =
@@ -81,7 +121,8 @@ public class JavaClassAccessor implements ClassAccessor {
         accessorList.toArray(propertyAccessors);
     }
 
-    private boolean isPropertyPresent(List<PropertyAccessor> accessorList, String name) {
+    private boolean isPropertyPresent(List<PropertyAccessor> accessorList,
+                                      String name) {
         for (PropertyAccessor current : accessorList) {
             if (current.getName().equals(name)) {
                 return true;
@@ -89,6 +130,11 @@ public class JavaClassAccessor implements ClassAccessor {
         }
         return false;
     }
+
+    
+    //**************************************************************************
+    // ClassAccessor implementation
+    //**************************************************************************
 
     public String getName() {
         return javaClass.getName();

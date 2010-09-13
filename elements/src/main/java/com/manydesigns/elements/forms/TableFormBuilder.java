@@ -34,8 +34,8 @@ import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.helpers.FieldManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 import com.manydesigns.elements.text.TextFormat;
 import org.apache.commons.lang.StringUtils;
 
@@ -66,17 +66,16 @@ public class TableFormBuilder {
     protected String prefix;
     protected int nRows = DEFAULT_N_ROWS;
 
-    public static final Logger logger = LogUtil.getLogger(TableFormBuilder.class);
+    public static final Logger logger =
+            LogUtil.getLogger(TableFormBuilder.class);
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public TableFormBuilder(Object aClass) {
-        this(ClassAccessorManager
-                .getManager()
-                .tryToInstantiateFromClass(aClass));
+    public TableFormBuilder(Class aClass) {
+        this(JavaClassAccessor.getClassAccessor(aClass));
     }
 
     public TableFormBuilder(ClassAccessor classAccessor) {

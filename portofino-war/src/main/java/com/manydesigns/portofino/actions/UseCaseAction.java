@@ -36,12 +36,11 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.reflection.helpers.ClassAccessorManager;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
-import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.usecases.UseCase;
+import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -104,8 +103,6 @@ public class UseCaseAction extends PortofinoAction
 
     public UseCase useCase;
     public ClassAccessor useCaseAccessor;
-    public Table table;
-    public ClassAccessor tableAccessor;
 
     //**************************************************************************
     // Model objects
@@ -160,11 +157,7 @@ public class UseCaseAction extends PortofinoAction
 
     public void setupUseCase() {
         useCase = model.findUseCaseByName(useCaseName);
-        useCaseAccessor = ClassAccessorManager.getManager()
-                .tryToInstantiateFromClass(useCase);
-        table = useCase.getTable();
-        tableAccessor = ClassAccessorManager.getManager()
-                .tryToInstantiateFromClass(table);
+        useCaseAccessor = context.getUseCaseAccessor(useCaseName);
         pkHelper = new PkHelper(useCaseAccessor);
         if (useCase == null || useCaseAccessor == null) {
             throw new ModelObjectNotFoundError(useCaseName);
@@ -251,6 +244,8 @@ public class UseCaseAction extends PortofinoAction
     }
 
     private void setupCriteria() {
+        TableAccessor tableAccessor =
+                context.getTableAccessor(useCase.getTableName());
         Criteria criteria = new Criteria(tableAccessor);
         searchForm.configureCriteria(criteria);
         objects = context.getObjects(useCase.getFilter(), criteria);
@@ -303,7 +298,7 @@ public class UseCaseAction extends PortofinoAction
 
         setupCriteria();
 
-        object = context.getObjectByPk(table.getQualifiedName(), pkObject);
+        object = context.getObjectByPk(useCase.getTableName(), pkObject);
         if (!objects.contains(object)) {
             errorMessage = "Object not found";
             return STATUS_404;
@@ -342,7 +337,7 @@ public class UseCaseAction extends PortofinoAction
         if (form.validate()) {
             object = useCaseAccessor.newInstance();
             form.writeToObject(object);
-            context.saveObject(table.getQualifiedName(), object);
+            context.saveObject(useCase.getTableName(), object);
             pk = pkHelper.generatePkString(object);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
             return SAVE;
@@ -359,7 +354,7 @@ public class UseCaseAction extends PortofinoAction
         setupUseCase();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
-        object = context.getObjectByPk(table.getQualifiedName(), pkObject);
+        object = context.getObjectByPk(useCase.getTableName(), pkObject);
 
         FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
         form = formBuilder.build();
@@ -378,12 +373,12 @@ public class UseCaseAction extends PortofinoAction
         form = formBuilder.build();
         form.setMode(Mode.EDIT);
 
-        object = context.getObjectByPk(table.getQualifiedName(), pkObject);
+        object = context.getObjectByPk(useCase.getTableName(), pkObject);
         form.readFromObject(object);
         form.readFromRequest(req);
         if (form.validate()) {
             form.writeToObject(object);
-            context.updateObject(table.getQualifiedName(), object);
+            context.updateObject(useCase.getTableName(), object);
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
             return UPDATE;
         } else {
@@ -422,11 +417,11 @@ public class UseCaseAction extends PortofinoAction
         if (form.validate()) {
             for (String current : selection) {
                 Serializable pkObject = pkHelper.parsePkString(current);
-                object = context.getObjectByPk(table.getQualifiedName(), pkObject);
+                object = context.getObjectByPk(useCase.getTableName(), pkObject);
                 form.writeToObject(object);
             }
             form.writeToObject(object);
-            context.updateObject(table.getQualifiedName(), object);
+            context.updateObject(useCase.getTableName(), object);
             SessionMessages.addInfoMessage(MessageFormat.format(
                     "UPDATE di {0} oggetti avvenuto con successo", selection.length));
             return BULK_UPDATE;
@@ -442,7 +437,7 @@ public class UseCaseAction extends PortofinoAction
     public String delete() {
         setupUseCase();
         Object pkObject = pkHelper.parsePkString(pk);
-        context.deleteObject(table.getQualifiedName(), pkObject);
+        context.deleteObject(useCase.getTableName(), pkObject);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
         return DELETE;
     }
@@ -456,7 +451,7 @@ public class UseCaseAction extends PortofinoAction
         }
         for (String current : selection) {
             Object pkObject = pkHelper.parsePkString(current);
-            context.deleteObject(table.getQualifiedName(), pkObject);
+            context.deleteObject(useCase.getTableName(), pkObject);
         }
         SessionMessages.addInfoMessage(MessageFormat.format(
                 "DELETE di {0} oggetti avvenuto con successo", selection.length));
