@@ -347,6 +347,10 @@ public class TableDataAction extends PortofinoAction
             object = tableAccessor.newInstance();
             form.writeToObject(object);
             context.saveObject(qualifiedTableName, object);
+            String databaseName = model
+                    .findTableByQualifiedName(qualifiedTableName)
+                    .getDatabaseName();
+            context.commit(databaseName);
             pk = pkHelper.generatePkString(object);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
             return SAVE;
@@ -388,6 +392,9 @@ public class TableDataAction extends PortofinoAction
         if (form.validate()) {
             form.writeToObject(object);
             context.updateObject(qualifiedTableName, object);
+            String databaseName = model
+                    .findTableByQualifiedName(qualifiedTableName).getDatabaseName();
+            context.commit(databaseName);
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
             return UPDATE;
         } else {
@@ -431,6 +438,9 @@ public class TableDataAction extends PortofinoAction
             }
             form.writeToObject(object);
             context.updateObject(qualifiedTableName, object);
+            String databaseName = model.findTableByQualifiedName(qualifiedTableName)
+                    .getDatabaseName();
+            context.commit(databaseName);
             SessionMessages.addInfoMessage(MessageFormat.format(
                     "UPDATE di {0} oggetti avvenuto con successo", selection.length));
             return BULK_UPDATE;
@@ -447,6 +457,9 @@ public class TableDataAction extends PortofinoAction
         setupTable();
         Object pkObject = pkHelper.parsePkString(pk);
         context.deleteObject(qualifiedTableName, pkObject);
+        String databaseName = model.findTableByQualifiedName(qualifiedTableName)
+                .getDatabaseName();
+        context.commit(databaseName);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
         return DELETE;
     }
@@ -462,6 +475,9 @@ public class TableDataAction extends PortofinoAction
             Object pkObject = pkHelper.parsePkString(current);
             context.deleteObject(qualifiedTableName, pkObject);
         }
+        String databaseName = model.findTableByQualifiedName(qualifiedTableName)
+                .getDatabaseName();
+        context.commit(databaseName);
         SessionMessages.addInfoMessage(MessageFormat.format(
                 "DELETE di {0} oggetti avvenuto con successo", selection.length));
         return DELETE;

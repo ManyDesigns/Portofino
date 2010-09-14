@@ -99,6 +99,10 @@ public interface Context {
 
     void closeSession();
 
+    void commit(String databaseName);
+
+    void rollback(String databaseName);
+
     List<Object> getRelatedObjects(String qualifiedTableName, 
             Object obj, String oneToManyRelationshipName);
 
@@ -121,7 +125,9 @@ public interface Context {
     // User
     //**************************************************************************
 
-    User authenticate (String email, String password);
+    User login(String email, String password);
+
+    void logout();
 
     User getCurrentUser();
 

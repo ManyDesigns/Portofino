@@ -6,13 +6,13 @@
 <s:form method="post" action="Login.action">
 
     <div id="inner-content">
-        <h1>Login </h1>
+
         <div id="login">
+            <h1>Login</h1>
+            <p/>
             <mdes:write value="form"/>
-            <s:submit id="loginButton" method="login" value="Login"/>
-            <s:submit id="cancelButton" method="cancel" value="Cancel"/>
+            <s:submit id="loginButton" method="login" value="Login" />
         </div>
-        <s:hidden name="cancelReturnUrl" value="%{cancelReturnUrl}"/>
         <s:hidden name="successReturnUrl" value="%{successReturnUrl}"/>
     </div>
 

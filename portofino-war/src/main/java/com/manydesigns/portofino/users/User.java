@@ -28,11 +28,12 @@
  */
 package com.manydesigns.portofino.users;
 
+import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Password;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.Serializable;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -63,6 +64,7 @@ public class User implements Serializable{
     }
 
     @Password
+    @Label(value = "password")
     public String getPwd() {
         return pwd;
     }

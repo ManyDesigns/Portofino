@@ -71,9 +71,10 @@ public class LoginAction extends PortofinoAction
     public LoginAction(){
         FormBuilder builder =
             new FormBuilder(User.class);
-        builder.configFields("email", "password");
+        builder.configFields("email", "pwd");
 
         form = builder.build();
+        
     }
 
     public String execute () {
@@ -86,7 +87,7 @@ public class LoginAction extends PortofinoAction
         form.writeToObject(user);
         final String email = user.getEmail();
         final String password = user.getPwd();
-        user = context.authenticate(email, password);
+        user = context.login(email, password);
         if (null!=user && user.getUuid()!=0) {
             return SUCCESS;
         } else {
@@ -95,11 +96,12 @@ public class LoginAction extends PortofinoAction
             logger.warning(errMsg);
             return INPUT;
         }
-
     }
 
-    public String cancel(){
-        return CANCEL;
-
+    public String logout(){
+        context.logout();
+        return INPUT;
     }
+
+
 }

@@ -31,7 +31,8 @@
                                         length="75"
                                         scale="0"
                                         nullable="false"
-                                        searchable="true"/>
+                                        searchable="true"
+                                        />
                                 <column name="state"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
@@ -75,11 +76,10 @@
                                     <column name="groupid"/>
                                 </primaryKey>
                         </table>
-                        <table name="users_groups" manyToMany="true"
-                               class="com.manydesigns.portofino.users.UsersGroups">
+                        <table name="users_groups" manyToMany="true" class="com.manydesigns.portofino.users.UsersGroups"
+                               >
                             <columns>
                                 <column name="userid"
-                                        autoincrement="true"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
@@ -87,7 +87,6 @@
                                         nullable="false"
                                         searchable="true"/>
                                 <column name="groupid"
-                                        autoincrement="true"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"

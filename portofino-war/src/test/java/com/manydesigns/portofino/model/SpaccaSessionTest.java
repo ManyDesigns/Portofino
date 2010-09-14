@@ -85,6 +85,7 @@ public class SpaccaSessionTest extends TestCase {
             user.setPwd(wrongPwd);
 
             context.saveObject("portofino.public.user_", user);
+            context.commit("portofino");
 
             fail();
         } catch (Exception e) {

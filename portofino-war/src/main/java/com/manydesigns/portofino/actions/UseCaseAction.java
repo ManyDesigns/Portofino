@@ -338,6 +338,8 @@ public class UseCaseAction extends PortofinoAction
             object = useCaseAccessor.newInstance();
             form.writeToObject(object);
             context.saveObject(useCase.getTableName(), object);
+            String databaseName = useCase.getTable().getDatabaseName();
+            context.commit(databaseName);
             pk = pkHelper.generatePkString(object);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
             return SAVE;
@@ -379,6 +381,8 @@ public class UseCaseAction extends PortofinoAction
         if (form.validate()) {
             form.writeToObject(object);
             context.updateObject(useCase.getTableName(), object);
+            String databaseName = useCase.getTable().getDatabaseName();
+            context.commit(databaseName);
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
             return UPDATE;
         } else {
@@ -422,6 +426,8 @@ public class UseCaseAction extends PortofinoAction
             }
             form.writeToObject(object);
             context.updateObject(useCase.getTableName(), object);
+            String databaseName = useCase.getTable().getDatabaseName();
+            context.commit(databaseName);
             SessionMessages.addInfoMessage(MessageFormat.format(
                     "UPDATE di {0} oggetti avvenuto con successo", selection.length));
             return BULK_UPDATE;
@@ -438,6 +444,8 @@ public class UseCaseAction extends PortofinoAction
         setupUseCase();
         Object pkObject = pkHelper.parsePkString(pk);
         context.deleteObject(useCase.getTableName(), pkObject);
+        String databaseName = useCase.getTable().getDatabaseName();
+        context.commit(databaseName);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
         return DELETE;
     }
@@ -453,6 +461,8 @@ public class UseCaseAction extends PortofinoAction
             Object pkObject = pkHelper.parsePkString(current);
             context.deleteObject(useCase.getTableName(), pkObject);
         }
+        String databaseName = useCase.getTable().getDatabaseName();
+        context.commit(databaseName);
         SessionMessages.addInfoMessage(MessageFormat.format(
                 "DELETE di {0} oggetti avvenuto con successo", selection.length));
         return DELETE;

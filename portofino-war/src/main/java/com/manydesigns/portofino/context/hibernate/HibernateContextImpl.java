@@ -265,6 +265,8 @@ public class HibernateContextImpl implements Context {
         return setups.get(databaseName).getThreadSession();
     }
 
+
+
     public QueryStringWithParameters getQueryStringWithParametersForCriteria(
             Criteria criteria) {
         ClassAccessor classAccessor = criteria.getClassAccessor();
@@ -485,7 +487,7 @@ public class HibernateContextImpl implements Context {
             startTimer();
             session.beginTransaction();
             session.saveOrUpdate(qualifiedTableName, obj);
-            session.getTransaction().commit();
+            //session.getTransaction().commit();
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
@@ -501,7 +503,7 @@ public class HibernateContextImpl implements Context {
         try {
             startTimer();
             session.save(qualifiedTableName, obj);
-            session.getTransaction().commit();
+            //session.getTransaction().commit();
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
@@ -517,7 +519,7 @@ public class HibernateContextImpl implements Context {
         try {
             startTimer();
             session.update(qualifiedTableName, obj);
-            session.getTransaction().commit();
+            //session.getTransaction().commit();
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
@@ -533,7 +535,7 @@ public class HibernateContextImpl implements Context {
             Object obj2 = getObjectByPk(qualifiedTableName, (Serializable) obj);
             startTimer();
             session.delete(qualifiedTableName, obj2);
-            session.getTransaction().commit();
+            //session.getTransaction().commit();
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
@@ -578,6 +580,21 @@ public class HibernateContextImpl implements Context {
             }
             current.setThreadSession(null);
         }
+    }
+
+    public void commit(String databaseName) {
+        Session session = setups.get(databaseName).getThreadSession();
+        try {
+            session.getTransaction().commit();
+        } catch (HibernateException e) {
+            session.getTransaction().rollback();
+            throw e;
+        }
+    }
+
+    public void rollback(String databaseName) {
+        Session session = setups.get(databaseName).getThreadSession();
+        session.getTransaction().rollback();
     }
 
     @SuppressWarnings({"unchecked"})
@@ -687,7 +704,9 @@ public class HibernateContextImpl implements Context {
                 result.addAll(Arrays.asList(ddls));
 
             } catch (Throwable e) {
-                //TODO
+                LogUtil.warningMF(logger,
+                        "Cannot retrieve DDLs for update DB for DB: {0}",
+                        e, db.getDatabaseName());
             } finally {
                 provider.releaseConnection(conn);
             }
@@ -711,11 +730,11 @@ public class HibernateContextImpl implements Context {
     //**************************************************************************
     // User
     //**************************************************************************
-    public User authenticate(String email, String password) {
+    public User login(String email, String password) {
         String qualifiedTableName = "portofino.public.user_";
         Session session = getSession(qualifiedTableName);
         org.hibernate.Criteria criteria = session.createCriteria(qualifiedTableName);
-        criteria.add(Restrictions.eq("emailaddress", email));
+        criteria.add(Restrictions.eq("email", email));
         criteria.add(Restrictions.eq("pwd", password));
         startTimer();
 
@@ -730,6 +749,10 @@ public class HibernateContextImpl implements Context {
         } else {
             return null;
         }
+    }
+
+    public void logout() {
+       setCurrentUser(null);
     }
 
     public User getCurrentUser() {

@@ -34,15 +34,28 @@
     <s:url var="settingsUrl" namespace="/user" action="Settings"/>
     <s:url var="helpUrl" namespace="/user" action="Help"/>
     <s:url var="loginUrl" namespace="/user" action="Login"/>
-    <s:url var="logoutUrl" namespace="/" action="Homepage"/>
+    <s:url var="logoutUrl" namespace="/user" action="Login" method="logout"/>
+
 
     <div id="hd">
         <div id="globalLinks">
-            Welcome, <s:a href="%{#profileUrl}">User Name</s:a> -
+
+            <s:if test="#application.portofinoProperties['user.enabled'].equals('true') 
+            && #application.context.getCurrentUser() != null">
+                Welcome, <s:a href="%{#profileUrl}">
+                <s:property value="#application.context.getCurrentUser().getEmail()"/></s:a> -
+            </s:if>
             <s:a href="%{#settingsUrl}">Settings</s:a> -
-            <s:a href="%{#helpUrl}">Help</s:a> -
-            <s:a href="%{#loginUrl}">Log in</s:a> - 
-            <s:a href="%{#logoutUrl}">Log out</s:a>
+            <s:a href="%{#helpUrl}">Help</s:a>
+            <s:if test="#application.portofinoProperties['user.enabled'].equals('true')
+            && #application.context.getCurrentUser() == null">
+              - <s:a href="%{#loginUrl}">Log in</s:a>
+            </s:if>
+            <s:if test="#application.portofinoProperties['user.enabled'].equals('true')
+            && #application.context.getCurrentUser() != null">
+                - <s:a href="%{#logoutUrl}">Log out</s:a>    
+            </s:if>
+
         </div>
         <div style="position: absolute; left: 20em;">
             <mdes:sessionMessages/>

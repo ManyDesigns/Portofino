@@ -31,6 +31,7 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.servlets.PortofinoListener;
@@ -54,6 +55,7 @@ public class PortofinoInterceptor implements Interceptor {
 
     public final static String STOP_WATCH_ATTRIBUTE = "stopWatch";
     public final static String NAVIGATION_ATTRIBUTE = "navigation";
+    private static final String LOGIN_ACTION = "login";
 
     public void destroy() {}
 
@@ -97,9 +99,8 @@ public class PortofinoInterceptor implements Interceptor {
                     .get("user.enabled"));
             if (userEnabled &&
                     context.getCurrentUser()==null
-                    && !("com.manydesigns.portofino.actions.user.LoginAction"
-                    .equals(invocation.getAction().getClass().getName()))) {
-                return "login";
+                    && !(invocation.getAction() instanceof LoginAction)) {
+                return LOGIN_ACTION;
             }
             result = invocation.invoke();
 

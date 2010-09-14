@@ -337,10 +337,6 @@
                 <param name="actionName">Homepage</param>
                 <param name="namespace">/</param>
             </result>
-            <result name="cancel" type="redirectAction">
-                <param name="actionName">Homepage</param>
-                <param name="namespace">/</param>                
-            </result>
         </action>
     </package>
 
