@@ -29,6 +29,9 @@
 
 package com.manydesigns.portofino.model.annotations;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -39,11 +42,11 @@ public class Annotation {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     protected String type;
-    protected String value;
+    protected final List<String> values;
 
-    public Annotation(String type, String value) {
+    public Annotation(String type) {
         this.type = type;
-        this.value = value;
+        values = new ArrayList<String>();
     }
 
     public String getType() {
@@ -54,11 +57,7 @@ public class Annotation {
         this.type = type;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
+    public List<String> getValues() {
+        return values;
     }
 }

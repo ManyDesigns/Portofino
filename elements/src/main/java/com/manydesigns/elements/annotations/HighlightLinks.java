@@ -45,4 +45,5 @@ public @interface HighlightLinks {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    boolean value() default true;
 }

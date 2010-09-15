@@ -43,8 +43,16 @@ public class MultilineImpl implements Multiline {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public MultilineImpl() {}
+    private boolean value;
 
+    public MultilineImpl(boolean value) {
+        this.value = value;
+    }
+
+    public boolean value() {
+        return value;
+    }
+    
     public Class<? extends Annotation> annotationType() {
         return Multiline.class;
     }
