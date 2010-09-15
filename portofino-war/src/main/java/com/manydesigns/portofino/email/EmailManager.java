@@ -58,8 +58,8 @@ public class EmailManager {
         Map email = new HashMap();
         email.put("subject", subject);
         email.put("body", body);
-        email.put("addresse", addressee);
-        email.put("sender", sender);
+        email.put("to", addressee);
+        email.put("from", sender);
         email.put("createdate", createdate);
         email.put("state", state);
         return email;

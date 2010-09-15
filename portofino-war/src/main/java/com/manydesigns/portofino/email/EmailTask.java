@@ -28,9 +28,9 @@
  */
 package com.manydesigns.portofino.email;
 
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TimerTask;
+import com.manydesigns.portofino.context.Context;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,16 +50,16 @@ public class EmailTask extends TimerTask {
     public static final int N_THREADS=5;
     private static ExecutorService outbox = Executors.newFixedThreadPool
             (N_THREADS);
-    protected static final ConcurrentLinkedQueue<Email> successQueue
-            = new ConcurrentLinkedQueue<Email>();
-    protected static final ConcurrentLinkedQueue<Email> rejectedQueue
-            = new ConcurrentLinkedQueue<Email>();
+    protected static final ConcurrentLinkedQueue<EmailSender> successQueue
+            = new ConcurrentLinkedQueue<EmailSender>();
+    protected static final ConcurrentLinkedQueue<EmailSender> rejectedQueue
+            = new ConcurrentLinkedQueue<EmailSender>();
     private final POP3Client client;
+    private final Context context;
 
-    public EmailTask() {
-
-            client = null;
-
+    public EmailTask(Context context) {
+        this.context=context;
+        client = null;
     }
 
     public static void stop() {
@@ -77,9 +77,12 @@ public class EmailTask extends TimerTask {
     }
 
     public synchronized void createQueue() {
-        Email email = new Email(new HashMap());
-        outbox.submit(email);
-
+        List<Object> emails = context.getAllObjects("portofino.emailqueue");
+        for (Object obj : emails) {
+            Map email = (Map) obj;
+            EmailSender emailSender = new EmailSender(email);
+        outbox.submit(emailSender);
+        }
     }
 
 
@@ -93,7 +96,7 @@ public class EmailTask extends TimerTask {
             }
 
         while (!rejectedQueue.isEmpty()) {
-            Email email = rejectedQueue.poll();
+            EmailSender email = rejectedQueue.poll();
 
             outbox.submit(email);
         }

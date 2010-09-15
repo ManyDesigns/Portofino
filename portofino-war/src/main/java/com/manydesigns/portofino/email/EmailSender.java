@@ -29,33 +29,29 @@
 package com.manydesigns.portofino.email;
 
 import com.manydesigns.portofino.PortofinoProperties;
+import org.apache.commons.mail.*;
 
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import java.util.Map;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Email implements Runnable{
+public class EmailSender implements Runnable{
 
     private final boolean ssl;
     private final String login;
     private final String password;
     private final String server;
     private final int port;
-    private final Map email;
-
+    private final Map emailMap;
 
 
     //Costruttore con proprietà da inserire
-    public Email(String server, Map email, int port, boolean ssl,
+    public EmailSender(String server, Map emailMap, int port, boolean ssl,
                  String login, String password) {
-        this.email = email;
+        this.emailMap = emailMap;
         this.server = server;
         this.port = port;
         this.ssl = ssl;
@@ -64,9 +60,9 @@ public class Email implements Runnable{
     }
 
     //Costruttore che prende le proprietà dal portofino.properties
-    public Email(Map email) {
+    public EmailSender(Map emailMap) {
 
-        this.email = email;
+        this.emailMap = emailMap;
         this.server = (String) PortofinoProperties.getProperties()
                     .get("mail.smtp.host");
         this.port = (Integer) PortofinoProperties.getProperties()
@@ -91,17 +87,36 @@ public class Email implements Runnable{
     public synchronized void run() {
 
         try {
-            Session s = getSession();
-            InternetAddress from = new InternetAddress((String) email.get("sender"));
-            InternetAddress to = new InternetAddress((String) email.get("addresse"));
-            MimeMessage message = new MimeMessage(s);
-            message.setFrom(from);
-            message.addRecipient(Message.RecipientType.TO, to);
-            message.setReplyTo(new Address[]{to});
-            message.setSubject((String) email.get("subject"), "UTF-8");
-            message.setText((String) email.get("body"), "UTF-8");
-            Transport.send(message);
-            EmailTask.successQueue.add(this);
+
+            String attachmentPath = (String)emailMap.get("attachmentPath");
+            String attachmentDescription = (String)emailMap.get("attachmentDescription");
+            String attachmentName = (String)emailMap.get("attachmentName");
+            if(null == attachmentPath) {
+                Email email = new SimpleEmail();
+                email.setSmtpPort(port);
+                if (null!=login && null!=password ) {
+                    email.setAuthenticator(new DefaultAuthenticator(login, password));
+                }
+                email.setHostName(server);
+                email.setFrom((String) emailMap.get("from"));
+                email.setSubject((String) emailMap.get("subject"));
+                email.setMsg((String) emailMap.get("body"));
+                email.addTo((String) emailMap.get("to"));
+                email.setTLS(true);
+
+
+                email.send();
+            } else {
+                MultiPartEmail email =  new MultiPartEmail();
+                EmailAttachment attachment = new EmailAttachment();
+                attachment.setPath(attachmentPath);
+                attachment.setDisposition(EmailAttachment.ATTACHMENT);
+                attachment.setDescription(attachmentDescription);
+                attachment.setName(attachmentName);
+                email.attach(attachment);
+                email.send();
+            }
+
 
         } catch (Throwable e) {
             e.printStackTrace();
@@ -110,41 +125,5 @@ public class Email implements Runnable{
         }
     }
 
-    private Session getSession() {
-		Properties properties = new Properties();
-        properties.setProperty("mail.smtp.host", this.getServer());
-		properties.setProperty("mail.smtp.port", ""+this.getPort());
-        Authenticator authenticator = null;
-        if (login!=null && password!=null)
-        {
-            authenticator = new Authenticator(login, password);
-            properties.setProperty("mail.smtp.submitter", authenticator.getPasswordAuthentication().getUserName());
-		    properties.setProperty("mail.smtp.auth", "true");
-        }
-
-        if (ssl)
-        {
-            properties.put("mail.smtp.socketFactory.port", port);
-            properties.put("mail.smtp.socketFactory.class",
-                    "javax.net.ssl.SSLSocketFactory");
-            properties.put("mail.smtp.socketFactory.fallback", "false");
-            properties.setProperty("mail.smtp.quitwait", "false");
-
-        }
-        return Session.getInstance(properties, authenticator);
-	}
-
-	private class Authenticator extends javax.mail.Authenticator {
-
-		private PasswordAuthentication authentication;
-
-		public Authenticator(String login, String password) {
-
-			authentication = new PasswordAuthentication(login, password);
-		}
-
-		protected PasswordAuthentication getPasswordAuthentication() {
-			return authentication;
-		}
-	}
+    
 }
