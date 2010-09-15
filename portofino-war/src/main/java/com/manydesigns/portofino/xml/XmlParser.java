@@ -224,5 +224,4 @@ public class XmlParser {
             LogUtil.fineMF(logger, "Attribute {0} = {1}", attrName, attrvalue);
         }
     }
-
 }

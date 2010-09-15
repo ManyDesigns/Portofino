@@ -440,6 +440,104 @@
                                 </relationship>
                             </relationships>
                         </table>
+
+                        <table name="emailstate">
+                            <columns>
+                                <column name="id"
+                                        columnType="serial"
+                                        javaType="java.lang.Integer"
+                                        length="10"
+                                        scale="0"
+                                        nullable="false"
+                                        searchable="false"
+                                        />
+                                <column name="name"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="75"
+                                        scale="0"
+                                        nullable="false"
+                                        searchable="true"
+                                        />
+                                <column name="description"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        nullable="true"
+                                        searchable="true"
+                                        />
+                            </columns>
+                            <primaryKey name="emailstate_pkey">
+                                <column name="id"/>
+                            </primaryKey>
+                        </table>
+                        <table name="emailqueue">
+                            <columns>
+                                <column name="id"
+                                        columnType="serial"
+                                        javaType="java.lang.Integer"
+                                        length="10"
+                                        scale="0"
+                                        nullable="false"
+                                        searchable="false"/>
+                                <column name="subject"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="100"
+                                        scale="0"
+                                        nullable="true"
+                                        searchable="true"/>
+                                <column name="body"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="4000"
+                                        scale="0"
+                                        nullable="true"
+                                        searchable="true"/>
+                                <column name="addressee"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="100"
+                                        scale="0"
+                                        nullable="true"
+                                        searchable="true"/>
+                                <column name="sender"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="100"
+                                        scale="0"
+                                        nullable="true"
+                                        searchable="true"/>
+                                <column name="createdate"
+                                        columnType="date"
+                                        javaType="java.util.Date"
+                                        length="13"
+                                        scale="0"
+                                        nullable="true"
+                                        searchable="true"/>
+                                <column name="state"
+                                        columnType="int4"
+                                        javaType="java.lang.Integer"
+                                        length="10"
+                                        scale="0"
+                                        nullable="true"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey name="pk_emailqueue">
+                                    <column name="id"/>
+                            </primaryKey>
+                            <relationships>
+                                <relationship name="fk_emailqueue_1"
+                                              toTable="emailstate"
+                                              toSchema="public"
+                                              onDelete="NO ACTION"
+                                              onUpdate="NO ACTION">
+                                    <reference fromColumn="state"
+                                               toColumn="id"/>
+                                </relationship>
+                            </relationships>
+                            </table>
                     </tables>
                 </schema>
             </schemas>
@@ -758,6 +856,12 @@
                 <siteNode url="/system-admin/ServerInfo.action" title="Server info" description="Server info"/>
                 <siteNode url="/system-admin/ConfigurationProperties.action" title="Configuration properties" description="Configuration properties"/>
                 <siteNode url="/system-admin/Logs.action" title="Logs" description="Logs"/>
+                <siteNode url="/system-admin/Logs.action" title="Users" description="Users">
+                    <childNodes>
+                        <siteNode url="/system-admin/Logs.action" title="User Management" description="User Management"/>
+                        <siteNode url="/system-admin/Logs.action" title="Group Management" description="Group management"/>
+                    </childNodes>
+                </siteNode>
             </childNodes>
         </siteNode>
         <siteNode url="/user/Index.action" title="Personal area" description="Personal area">
