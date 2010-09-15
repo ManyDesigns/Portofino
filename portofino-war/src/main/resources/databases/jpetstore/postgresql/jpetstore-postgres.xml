@@ -46,15 +46,7 @@
                                         length="8"
                                         scale="0"
                                         nullable="false"
-                                        searchable="true">
-                                    <annotations>
-                                        <annotation type="com.manydesigns.elements.annotations.Status">
-                                            <value>{"red1", "red2"}</value>
-                                            <value>ambers</value>
-                                            <value>greens</value>
-                                        </annotation>
-                                    </annotations>
-                                </column>
+                                        searchable="true"/>
                             </columns>
                             <primaryKey name="pk_user">
                                 <column name="userid"/>
@@ -85,7 +77,15 @@
                                         length="255"
                                         scale="0"
                                         nullable="true"
-                                        searchable="true"/>
+                                        searchable="true">
+                                    <annotations>
+                                        <annotation type="com.manydesigns.elements.annotations.Status">
+                                            <value>{"admin", "cippa"}</value>
+                                            <value>lippa</value>
+                                            <value>user</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
                                 </columns>
                                 <primaryKey name="pk_group">
                                     <column name="groupid"/>
