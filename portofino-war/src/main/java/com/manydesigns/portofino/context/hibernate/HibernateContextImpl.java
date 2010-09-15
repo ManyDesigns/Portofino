@@ -596,6 +596,35 @@ public class HibernateContextImpl implements Context {
         Session session = setups.get(databaseName).getThreadSession();
         session.getTransaction().rollback();
     }
+    
+   public void commit() {
+        for (HibernateDatabaseSetup current : setups.values()) {
+            Session session = current.getThreadSession();
+            if (session != null) {
+                Transaction tx = session.getTransaction();
+                if (null != tx && tx.isActive()) {
+                    try {
+                        tx.commit();
+                    } catch (HibernateException e) {
+                        tx.rollback();
+                        throw e;
+                    }
+                }
+            }
+        }
+    }
+
+    public void rollback() {
+        for (HibernateDatabaseSetup current : setups.values()) {
+            Session session = current.getThreadSession();
+            if (session != null) {
+                Transaction tx = session.getTransaction();
+                if (null != tx && tx.isActive()) {
+                    tx.rollback();
+                }
+            }
+        }
+    }
 
     @SuppressWarnings({"unchecked"})
     public List<Object> getRelatedObjects(String qualifiedTableName,

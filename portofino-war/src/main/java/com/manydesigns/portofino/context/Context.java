@@ -103,6 +103,10 @@ public interface Context {
 
     void rollback(String databaseName);
 
+    void commit();
+
+    void rollback();
+
     List<Object> getRelatedObjects(String qualifiedTableName, 
             Object obj, String oneToManyRelationshipName);
 

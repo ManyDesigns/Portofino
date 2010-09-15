@@ -32,8 +32,8 @@ import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Password;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /*
@@ -47,16 +47,16 @@ public class User implements Serializable{
     String email;
     String pwd;
     Integer state;
-    //Integer graceLoginCount;
 
-    Timestamp delDate;
-    Timestamp modifieDate;
-    Timestamp pwdModdate;
-    Timestamp loginDate;
-    Timestamp lastLoginDate;
-    Timestamp lastFailedLoginDate;
-    Timestamp lockoutDate;
-    Timestamp createDate;
+
+    Date delDate;
+    Date modifiedDate;
+    Date pwdModDate;
+    Date loginDate;
+    Date lastLoginDate;
+    Date lastFailedLoginDate;
+    Date lockoutDate;
+    Date createDate;
 
     Boolean defaultUser;
     Boolean extAuth;
@@ -80,6 +80,7 @@ public class User implements Serializable{
     String lastLoginIp;
 
     Integer failedLoginAttempts;
+    Integer graceLoginCount;
 
 
 
@@ -130,31 +131,31 @@ public class User implements Serializable{
         this.state = state;
     }
 
-    public Timestamp getDelDate() {
+    public Date getDelDate() {
         return delDate;
     }
 
-    public void setDelDate(Timestamp delDate) {
+    public void setDelDate(Date delDate) {
         this.delDate = delDate;
     }
 
-    public Timestamp getModifieDate() {
-        return modifieDate;
+    public Date getModifiedDate() {
+        return modifiedDate;
     }
 
-    public void setModifieDate(Timestamp modifieDate) {
-        this.modifieDate = modifieDate;
+    public void setModifiedDate(Date modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 
-    public Boolean isDefaultUser() {
+    public Boolean getDefaultUser() {
         return defaultUser;
     }
 
     public void setDefaultUser(Boolean defaultUser) {
-        this.defaultUser = defaultUser;
+            this.defaultUser = defaultUser;
     }
 
-    public Boolean isExtAuth() {
+    public Boolean getExtAuth() {
         return extAuth;
     }
 
@@ -162,7 +163,7 @@ public class User implements Serializable{
         this.extAuth = extAuth;
     }
 
-    public Boolean isPwdEncrypted() {
+    public Boolean getPwdEncrypted() {
         return pwdEncrypted;
     }
 
@@ -170,7 +171,7 @@ public class User implements Serializable{
         this.pwdEncrypted = pwdEncrypted;
     }
 
-    public Boolean isPwdReset() {
+    public Boolean getPwdReset() {
         return pwdReset;
     }
 
@@ -178,12 +179,12 @@ public class User implements Serializable{
         this.pwdReset = pwdReset;
     }
 
-    public Timestamp getPwdModdate() {
-        return pwdModdate;
+    public Date getPwdModDate() {
+        return pwdModDate;
     }
 
-    public void setPwdModdate(Timestamp pwdModdate) {
-        this.pwdModdate = pwdModdate;
+    public void setPwdModDate(Date pwdModDate) {
+        this.pwdModDate = pwdModDate;
     }
 
     public String getDigest() {
@@ -274,11 +275,11 @@ public class User implements Serializable{
         this.jobTitle = jobTitle;
     }
 
-    public Timestamp getLoginDate() {
+    public Date getLoginDate() {
         return loginDate;
     }
 
-    public void setLoginDate(Timestamp loginDate) {
+    public void setLoginDate(Date loginDate) {
         this.loginDate = loginDate;
     }
 
@@ -290,11 +291,11 @@ public class User implements Serializable{
         this.loginIp = loginIp;
     }
 
-    public Timestamp getLastLoginDate() {
+    public Date getLastLoginDate() {
         return lastLoginDate;
     }
 
-    public void setLastLoginDate(Timestamp lastLoginDate) {
+    public void setLastLoginDate(Date lastLoginDate) {
         this.lastLoginDate = lastLoginDate;
     }
 
@@ -306,11 +307,11 @@ public class User implements Serializable{
         this.lastLoginIp = lastLoginIp;
     }
 
-    public Timestamp getLastFailedLoginDate() {
+    public Date getLastFailedLoginDate() {
         return lastFailedLoginDate;
     }
 
-    public void setLastFailedLoginDate(Timestamp lastFailedLoginDate) {
+    public void setLastFailedLoginDate(Date lastFailedLoginDate) {
         this.lastFailedLoginDate = lastFailedLoginDate;
     }
 
@@ -322,7 +323,7 @@ public class User implements Serializable{
         this.failedLoginAttempts = failedLoginAttempts;
     }
 
-    public Boolean isLockout() {
+    public Boolean getLockout() {
         return lockout;
     }
 
@@ -330,15 +331,15 @@ public class User implements Serializable{
         this.lockout = lockout;
     }
 
-    public Timestamp getLockoutDate() {
+    public Date getLockoutDate() {
         return lockoutDate;
     }
 
-    public void setLockoutDate(Timestamp lockoutDate) {
+    public void setLockoutDate(Date lockoutDate) {
         this.lockoutDate = lockoutDate;
     }
 
-    public Boolean isAgreedToTerms() {
+    public Boolean getAgreedToTerms() {
         return agreedToTerms;
     }
 
@@ -346,7 +347,7 @@ public class User implements Serializable{
         this.agreedToTerms = agreedToTerms;
     }
 
-    public Boolean isActive() {
+    public Boolean getActive() {
         return active;
     }
 
@@ -354,125 +355,19 @@ public class User implements Serializable{
         this.active = active;
     }
 
-    public Timestamp getCreateDate() {
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Timestamp createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        User user = (User) o;
-
-        if (active != null ? !active.equals(user.active) : user.active != null)
-            return false;
-        if (agreedToTerms != null ? !agreedToTerms.equals(user.agreedToTerms) : user.agreedToTerms != null)
-            return false;
-        if (comments != null ? !comments.equals(user.comments) : user.comments != null)
-            return false;
-        if (createDate != null ? !createDate.equals(user.createDate) : user.createDate != null)
-            return false;
-        if (defaultUser != null ? !defaultUser.equals(user.defaultUser) : user.defaultUser != null)
-            return false;
-        if (delDate != null ? !delDate.equals(user.delDate) : user.delDate != null)
-            return false;
-        if (digest != null ? !digest.equals(user.digest) : user.digest != null)
-            return false;
-        if (!email.equals(user.email)) return false;
-        if (extAuth != null ? !extAuth.equals(user.extAuth) : user.extAuth != null)
-            return false;
-        if (failedLoginAttempts != null ? !failedLoginAttempts.equals(user.failedLoginAttempts) : user.failedLoginAttempts != null)
-            return false;
-        if (firstName != null ? !firstName.equals(user.firstName) : user.firstName != null)
-            return false;
-        //if (graceLoginCount != null ? !graceLoginCount.equals(user.graceLoginCount) : user.graceLoginCount != null)
-        //    return false;
-        if (greeting != null ? !greeting.equals(user.greeting) : user.greeting != null)
-            return false;
-        if (groups != null ? !groups.equals(user.groups) : user.groups != null)
-            return false;
-        if (jobTitle != null ? !jobTitle.equals(user.jobTitle) : user.jobTitle != null)
-            return false;
-        if (lastFailedLoginDate != null ? !lastFailedLoginDate.equals(user.lastFailedLoginDate) : user.lastFailedLoginDate != null)
-            return false;
-        if (lastLoginDate != null ? !lastLoginDate.equals(user.lastLoginDate) : user.lastLoginDate != null)
-            return false;
-        if (lastLoginIp != null ? !lastLoginIp.equals(user.lastLoginIp) : user.lastLoginIp != null)
-            return false;
-        if (lastName != null ? !lastName.equals(user.lastName) : user.lastName != null)
-            return false;
-        if (lockout != null ? !lockout.equals(user.lockout) : user.lockout != null)
-            return false;
-        if (lockoutDate != null ? !lockoutDate.equals(user.lockoutDate) : user.lockoutDate != null)
-            return false;
-        if (loginDate != null ? !loginDate.equals(user.loginDate) : user.loginDate != null)
-            return false;
-        if (loginIp != null ? !loginIp.equals(user.loginIp) : user.loginIp != null)
-            return false;
-        if (middleName != null ? !middleName.equals(user.middleName) : user.middleName != null)
-            return false;
-        if (modifieDate != null ? !modifieDate.equals(user.modifieDate) : user.modifieDate != null)
-            return false;
-        if (!pwd.equals(user.pwd)) return false;
-        if (pwdEncrypted != null ? !pwdEncrypted.equals(user.pwdEncrypted) : user.pwdEncrypted != null)
-            return false;
-        if (pwdModdate != null ? !pwdModdate.equals(user.pwdModdate) : user.pwdModdate != null)
-            return false;
-        if (pwdReset != null ? !pwdReset.equals(user.pwdReset) : user.pwdReset != null)
-            return false;
-        if (remQuestion != null ? !remQuestion.equals(user.remQuestion) : user.remQuestion != null)
-            return false;
-        if (remans != null ? !remans.equals(user.remans) : user.remans != null)
-            return false;
-        if (screenName != null ? !screenName.equals(user.screenName) : user.screenName != null)
-            return false;
-        if (!state.equals(user.state)) return false;
-        if (!uuid.equals(user.uuid)) return false;
-
-        return true;
+    public Integer getGraceLoginCount() {
+        return graceLoginCount;
     }
 
-    @Override
-    public int hashCode() {
-        int result = uuid != null ? uuid.hashCode() : 0;
-        result = 31 * result + (email != null ? email.hashCode() : 0);
-        result = 31 * result + (pwd != null ? pwd.hashCode() : 0);
-        result = 31 * result + (state != null ? state.hashCode() : 0);
-//        result = 31 * result + (graceLoginCount != null ? graceLoginCount.hashCode() : 0);
-        result = 31 * result + (delDate != null ? delDate.hashCode() : 0);
-        result = 31 * result + (modifieDate != null ? modifieDate.hashCode() : 0);
-        result = 31 * result + (pwdModdate != null ? pwdModdate.hashCode() : 0);
-        result = 31 * result + (loginDate != null ? loginDate.hashCode() : 0);
-        result = 31 * result + (lastLoginDate != null ? lastLoginDate.hashCode() : 0);
-        result = 31 * result + (lastFailedLoginDate != null ? lastFailedLoginDate.hashCode() : 0);
-        result = 31 * result + (lockoutDate != null ? lockoutDate.hashCode() : 0);
-        result = 31 * result + (createDate != null ? createDate.hashCode() : 0);
-        result = 31 * result + (defaultUser != null ? defaultUser.hashCode() : 0);
-        result = 31 * result + (extAuth != null ? extAuth.hashCode() : 0);
-        result = 31 * result + (pwdEncrypted != null ? pwdEncrypted.hashCode() : 0);
-        result = 31 * result + (pwdReset != null ? pwdReset.hashCode() : 0);
-        result = 31 * result + (lockout != null ? lockout.hashCode() : 0);
-        result = 31 * result + (agreedToTerms != null ? agreedToTerms.hashCode() : 0);
-        result = 31 * result + (active != null ? active.hashCode() : 0);
-        result = 31 * result + (digest != null ? digest.hashCode() : 0);
-        result = 31 * result + (remQuestion != null ? remQuestion.hashCode() : 0);
-        result = 31 * result + (remans != null ? remans.hashCode() : 0);
-        result = 31 * result + (screenName != null ? screenName.hashCode() : 0);
-        result = 31 * result + (greeting != null ? greeting.hashCode() : 0);
-        result = 31 * result + (comments != null ? comments.hashCode() : 0);
-        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
-        result = 31 * result + (middleName != null ? middleName.hashCode() : 0);
-        result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
-        result = 31 * result + (jobTitle != null ? jobTitle.hashCode() : 0);
-        result = 31 * result + (loginIp != null ? loginIp.hashCode() : 0);
-        result = 31 * result + (lastLoginIp != null ? lastLoginIp.hashCode() : 0);
-        result = 31 * result + (failedLoginAttempts != null ? failedLoginAttempts.hashCode() : 0);
-        result = 31 * result + (groups != null ? groups.hashCode() : 0);
-        return result;
+    public void setGraceLoginCount(Integer graceLoginCount) {
+        this.graceLoginCount = graceLoginCount;
     }
 }

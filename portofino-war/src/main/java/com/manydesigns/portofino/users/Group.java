@@ -28,9 +28,10 @@
  */
 package com.manydesigns.portofino.users;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,6 +42,11 @@ public class Group implements Serializable{
     Integer groupId;
     String name;
     String description;
+    Long creatorId;
+    Long parentGroupId;
+    Date delDate;
+    Boolean active;
+    
     List<User> users = new ArrayList<User>();
 
     public Integer getGroupId() {
@@ -73,6 +79,38 @@ public class Group implements Serializable{
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Long getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(Long creatorId) {
+        this.creatorId = creatorId;
+    }
+
+    public Long getParentGroupId() {
+        return parentGroupId;
+    }
+
+    public void setParentGroupId(Long parentGroupId) {
+        this.parentGroupId = parentGroupId;
+    }
+
+    public Date getDelDate() {
+        return delDate;
+    }
+
+    public void setDelDate(Date delDate) {
+        this.delDate = delDate;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }
 

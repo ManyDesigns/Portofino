@@ -80,14 +80,14 @@ public class HibernateTest extends TestCase {
 
         List<Object> usergroups =
                 context.getAllObjects("portofino.public.users_groups");
-        assertEquals( 2, usergroups.size());
+        assertEquals( 3, usergroups.size());
 
         List<Object> users =
                 context.getAllObjects("portofino.public.user_");
-        assertEquals("numero utenti", 1, users.size());
+        assertEquals("numero utenti", 2, users.size());
         User admin = (User) users.get(0);
         List<UsersGroups> groups = admin.getGroups();
-        assertEquals("numero gruppi per admin", 2, groups.size());
+        assertEquals("numero gruppi per admin", 1, groups.size());
         UsersGroups ug1 = groups.get(0);
         Group g1 = ug1.getGroup();
         assertNotNull(g1);
@@ -234,18 +234,24 @@ public class HibernateTest extends TestCase {
     }
 
     public void testDeleteCategoria() {
-        context.openSession();
-        Map<String, Object> worms = new HashMap<String, Object>();
-        worms.put("$type$", "jpetstore.public.category");
-        worms.put("catid", "VERMI");
-        worms.put("name", "worms");
-        worms.put("descn",
+        try {
+            context.openSession();
+            Map<String, Object> worms = new HashMap<String, Object>();
+            worms.put("$type$", "jpetstore.public.category");
+            worms.put("catid", "VERMI");
+            worms.put("name", "worms");
+            worms.put("descn",
           "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
-                  "Worms</font>");
-        context.saveOrUpdateObject("jpetstore.public.category", worms);
-        context.commit("jpetstore");
-        context.deleteObject("jpetstore.public.category", worms);
-        context.commit("jpetstore");
+                      "Worms</font>");
+            context.saveOrUpdateObject("jpetstore.public.category", worms);
+            context.commit("jpetstore");
+            context.deleteObject("jpetstore.public.category", worms);
+            //test commit globale
+            context.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
 
     }
 

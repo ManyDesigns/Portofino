@@ -40,6 +40,7 @@ public class UsersGroups implements Serializable {
     Group group;
     User user;
     Date creationDate;
+    Date deletionDate;
     Integer userid;
     Integer groupid;
 
@@ -83,6 +84,16 @@ public class UsersGroups implements Serializable {
     public void setGroupid(Integer groupid) {
         this.groupid = groupid;
     }
+
+    public Date getDeletionDate() {
+        return deletionDate;
+    }
+
+    public void setDeletionDate(Date deletionDate) {
+        this.deletionDate = deletionDate;
+    }
+
+    
 }
 
 

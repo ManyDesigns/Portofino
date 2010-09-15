@@ -29,6 +29,7 @@
 package com.manydesigns.portofino.context.hibernate;
 
 
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
@@ -45,6 +46,7 @@ import org.hibernate.mapping.*;
 
 import java.util.*;
 import java.util.List;
+import java.util.logging.Logger;
 
 
 /**
@@ -56,6 +58,8 @@ public class HibernateConfig {
 
     protected final ConnectionProvider connectionProvider;
     private static final String SHOW_SQL = "true";
+    public static final Logger logger =
+            LogUtil.getLogger(HibernateConfig.class);
 
 
     public HibernateConfig(ConnectionProvider connectionProvider) {
@@ -203,6 +207,11 @@ public class HibernateConfig {
         col.setNullable(column.isNullable());
         String columnType = column.getColumnType();
         Type type = connectionProvider.getTypeByName(columnType);
+        if (type==null) {
+            LogUtil.severeMF(logger, "Cannot find JDBC type for table {0}," +
+                    " column {1}, type {2}", tab.getName(), column.getColumnName(), columnType);
+        }
+
         col.setSqlTypeCode(type.getJdbcType());
         tab.addColumn(col);
 

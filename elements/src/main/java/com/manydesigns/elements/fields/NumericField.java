@@ -204,7 +204,9 @@ public class NumericField extends AbstractTextField {
             } else {
                 Object value = accessor.get(obj);
                 Class type = accessor.getType();
-                if (type == BigDecimal.class) {
+                if (null==value){
+                    decimalValue=null;
+                }else if (type == BigDecimal.class) {
                     decimalValue = (BigDecimal)value;
                 } else if (type == Byte.class || type == Byte.TYPE) {
                     decimalValue = new BigDecimal((Byte)value);
