@@ -8,6 +8,7 @@ import com.manydesigns.portofino.model.portlets.Portlet;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.usecases.UseCase;
 import com.manydesigns.portofino.model.usecases.UseCaseProperty;
+import com.manydesigns.portofino.xml.CharactersCallback;
 import com.manydesigns.portofino.xml.DocumentCallback;
 import com.manydesigns.portofino.xml.ElementCallback;
 import com.manydesigns.portofino.xml.XmlParser;
@@ -56,6 +57,7 @@ public class ModelParser extends XmlParser {
 
     private static final String ANNOTATIONS = "annotations";
     private static final String ANNOTATION = "annotation";
+    private static final String VALUE = "value";
 
     private List<RelationshipPre> relationships;
 
@@ -63,8 +65,10 @@ public class ModelParser extends XmlParser {
     Database currentDatabase;
     Schema currentSchema;
     Table currentTable;
+    Column currentColumn;
     UseCase currentUseCase;
     List<Annotation> currentAnnotations;
+    Annotation currentAnnotation;
 
     public ModelParser() {}
 
@@ -181,31 +185,30 @@ public class ModelParser extends XmlParser {
                     "name", "columnType", "length", "scale",
                     "nullable", "searchable");
             String columnName = attributes.get("name");
-            Column column =
-                    new Column(currentTable.getDatabaseName(),
-                            currentTable.getSchemaName(),
-                            currentTable.getTableName(),
-                            columnName,
-                            attributes.get("columnType"),
-                            Boolean.parseBoolean(attributes.get("nullable")),
-                            Boolean.parseBoolean(attributes.get("autoincrement")),
-                            Integer.parseInt(attributes.get("length")),
-                            Integer.parseInt(attributes.get("scale")),
-                            Boolean.parseBoolean(attributes.get("searchable"))
-                            );
+            currentColumn = new Column(currentTable.getDatabaseName(),
+                    currentTable.getSchemaName(),
+                    currentTable.getTableName(),
+                    columnName,
+                    attributes.get("columnType"),
+                    Boolean.parseBoolean(attributes.get("nullable")),
+                    Boolean.parseBoolean(attributes.get("autoincrement")),
+                    Integer.parseInt(attributes.get("length")),
+                    Integer.parseInt(attributes.get("scale")),
+                    Boolean.parseBoolean(attributes.get("searchable"))
+                    );
 
             String propertyName = attributes.get("propertyName");
             if (propertyName == null) {
                 propertyName = columnName;
             }
-            column.setPropertyName(propertyName);
+            currentColumn.setPropertyName(propertyName);
 
             Class javatype = ReflectionUtil.loadClass(attributes.get("javaType"));
-            column.setJavaType(javatype);
+            currentColumn.setJavaType(javatype);
 
-            currentTable.getColumns().add(column);
+            currentTable.getColumns().add(currentColumn);
 
-            currentAnnotations = column.getAnnotations();
+            currentAnnotations = currentColumn.getAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
         }
     }
@@ -429,11 +432,25 @@ public class ModelParser extends XmlParser {
     private class AnnotationCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            checkRequiredAttributes(attributes, "type", "value");
+            checkRequiredAttributes(attributes, "type");
             String type = attributes.get("type");
-            String value = attributes.get("value");
-            Annotation annotation = new Annotation(type, value);
-            currentAnnotations.add(annotation);
+            currentAnnotation = new Annotation(type);
+            currentAnnotations.add(currentAnnotation);
+            expectElement(VALUE, 0, null, new AnnotationValueCallback());
+        }
+    }
+
+    private class AnnotationValueCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectCharacters(new AnnotationValueCharactersCallback());
+        }
+    }
+
+    private class AnnotationValueCharactersCallback
+            implements CharactersCallback {
+        public void doCharacters(String text) throws XMLStreamException {
+            currentAnnotation.getValues().add(text);
         }
     }
 

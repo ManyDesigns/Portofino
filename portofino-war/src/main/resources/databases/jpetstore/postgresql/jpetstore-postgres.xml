@@ -24,25 +24,41 @@
                                         scale="0"
                                         nullable="false"
                                         propertyName="email"
-                                        searchable="true"/>
+                                        searchable="true">
+                                    <annotations>
+                                        <annotation type="com.manydesigns.elements.annotations.Email"/>
+                                    </annotations>
+                                </column>
                                 <column name="pwd"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
                                         scale="0"
                                         nullable="false"
-                                        searchable="true"/>
+                                        searchable="true">
+                                    <annotations>
+                                        <annotation type="com.manydesigns.elements.annotations.Password"/>
+                                    </annotations>
+                                </column>
                                 <column name="state"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
                                         nullable="false"
-                                        searchable="true"/>
-                                </columns>
-                                <primaryKey name="pk_user">
-                                    <column name="userid"/>
-                                </primaryKey>
+                                        searchable="true">
+                                    <annotations>
+                                        <annotation type="com.manydesigns.elements.annotations.Status">
+                                            <value>{"red1", "red2"}</value>
+                                            <value>ambers</value>
+                                            <value>greens</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                            </columns>
+                            <primaryKey name="pk_user">
+                                <column name="userid"/>
+                            </primaryKey>
                         </table>
                         <table name="group_"
                                class="com.manydesigns.portofino.users.Group">
@@ -234,8 +250,9 @@
                                         nullable="true"
                                         searchable="true">
                                     <annotations>
-                                        <annotation type="com.manydesigns.elements.annotations.Label"
-                                                    value="description"/>
+                                        <annotation type="com.manydesigns.elements.annotations.Label">
+                                            <value>description</value>
+                                        </annotation>
                                     </annotations>
                                 </column>
                             </columns>
@@ -469,31 +486,57 @@
             <properties>
                 <property name="productid">
                     <annotations>
-                        <annotation type="com.manydesigns.elements.annotations.Label" value="product id"/>
-                        <annotation type="com.manydesigns.elements.annotations.InSummary" value="true"/>
-                        <annotation type="com.manydesigns.elements.annotations.Searchable" value="true"/>
-                        <annotation type="com.manydesigns.elements.annotations.Access" value="write"/>
+                        <annotation type="com.manydesigns.elements.annotations.Label">
+                            <value>product id</value>
+                        </annotation>
+                        <annotation type="com.manydesigns.elements.annotations.InSummary">
+                            <value>true</value>
+                        </annotation>
+                        <annotation type="com.manydesigns.elements.annotations.Searchable">
+                            <value>true</value>
+                        </annotation>
+                        <annotation type="com.manydesigns.elements.annotations.Access">
+                            <value>write</value>
+                        </annotation>
                     </annotations>
                 </property>
                 <property name="category">
                     <annotations>
-                        <annotation type="com.manydesigns.elements.annotations.InSummary" value="false"/>
-                        <annotation type="com.manydesigns.elements.annotations.Searchable" value="false"/>
-                        <annotation type="com.manydesigns.elements.annotations.Access" value="read"/>
+                        <annotation type="com.manydesigns.elements.annotations.InSummary">
+                            <value>false</value>
+                        </annotation>
+                        <annotation type="com.manydesigns.elements.annotations.Searchable">
+                            <value>false</value>
+                        </annotation>
+                        <annotation type="com.manydesigns.elements.annotations.Access">
+                            <value>read</value>
+                        </annotation>
                     </annotations>
                 </property>
                 <property name="name">
                     <annotations>
-                        <annotation type="com.manydesigns.elements.annotations.InSummary" value="true"/>
-                        <annotation type="com.manydesigns.elements.annotations.Searchable" value="true"/>
-                        <annotation type="com.manydesigns.elements.annotations.Access" value="write"/>
+                        <annotation type="com.manydesigns.elements.annotations.InSummary">
+                            <value>true</value>
+                        </annotation>
+                        <annotation type="com.manydesigns.elements.annotations.Searchable">
+                            <value>true</value>
+                        </annotation>
+                        <annotation type="com.manydesigns.elements.annotations.Access">
+                            <value>write</value>
+                        </annotation>
                     </annotations>
                 </property>
                 <property name="descn">
                     <annotations>
-                        <annotation type="com.manydesigns.elements.annotations.InSummary" value="true"/>
-                        <annotation type="com.manydesigns.elements.annotations.Searchable" value="true"/>
-                        <annotation type="com.manydesigns.elements.annotations.Access" value="write"/>
+                        <annotation type="com.manydesigns.elements.annotations.InSummary">
+                            <value>true</value>
+                        </annotation>
+                        <annotation type="com.manydesigns.elements.annotations.Searchable">
+                            <value>true</value>
+                        </annotation>
+                        <annotation type="com.manydesigns.elements.annotations.Access">
+                            <value>write</value>
+                        </annotation>
                     </annotations>
                 </property>
             </properties>

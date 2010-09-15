@@ -32,6 +32,7 @@ package com.manydesigns.elements.fields;
 import com.manydesigns.elements.annotations.HighlightLinks;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Status;
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.ArrayUtils;
@@ -74,12 +75,24 @@ public class TextField extends AbstractTextField {
 
     public TextField(PropertyAccessor accessor, String prefix) {
         super(accessor, prefix);
-        if (accessor.isAnnotationPresent(HighlightLinks.class)) {
-            setHighlightLinks(true);
+
+        HighlightLinks highlightLinksAnnotation =
+                accessor.getAnnotation(HighlightLinks.class);
+        if (highlightLinksAnnotation != null) {
+            highlightLinks = highlightLinksAnnotation.value();
+            LogUtil.finerMF(logger,
+                    "HighlightLinks annotation present with value: {0}",
+                    highlightLinks);
         }
-        if (accessor.isAnnotationPresent(Multiline.class)) {
-            setMultiline(true);
+
+        Multiline multilineAnnotation = accessor.getAnnotation(Multiline.class);
+        if (multilineAnnotation != null) {
+            multiline = multilineAnnotation.value();
+            LogUtil.finerMF(logger,
+                    "Multiline annotation present with value: {0}",
+                    multiline);
         }
+        
         if (accessor.isAnnotationPresent(Status.class)) {
             Status annotation = accessor.getAnnotation(Status.class);
             red = annotation.red();

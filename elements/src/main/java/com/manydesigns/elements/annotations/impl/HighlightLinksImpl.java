@@ -43,6 +43,16 @@ public class HighlightLinksImpl implements HighlightLinks {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    private boolean value;
+
+    public HighlightLinksImpl(boolean value) {
+        this.value = value;
+    }
+
+    public boolean value() {
+        return value;
+    }
+
     public Class<? extends Annotation> annotationType() {
         return HighlightLinks.class;
     }

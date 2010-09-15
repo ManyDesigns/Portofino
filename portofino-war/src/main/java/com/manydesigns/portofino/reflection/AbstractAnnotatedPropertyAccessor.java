@@ -41,6 +41,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -86,13 +87,13 @@ public abstract class AbstractAnnotatedPropertyAccessor
 
             Annotation annotation = instanciateOneAnnotation(
                     annotationClass,
-                    propertyAnnotation.getValue());
+                    propertyAnnotation.getValues());
             annotations.put(annotationClass, annotation);
         }
     }
 
     public Annotation instanciateOneAnnotation(Class annotationClass,
-                                               String value) {
+                                               List<String> values) {
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
         TypeConverter typeConverter = ognlContext.getTypeConverter();
         AnnotationsManager annotationsManager =
@@ -108,32 +109,35 @@ public abstract class AbstractAnnotatedPropertyAccessor
             return null;
         }
 
-        Constructor annotationConstructor = null;
+        Annotation annotation = null;
         Constructor[] constructors =
                 annotationImplClass.getConstructors();
         for (Constructor candidateConstructor : constructors) {
             Class[] parameterTypes =
                     candidateConstructor.getParameterTypes();
-            if (parameterTypes.length != 1) {
+            if (parameterTypes.length != values.size()) {
                 continue;
             }
-            annotationConstructor = candidateConstructor;
-        }
-        if (annotationConstructor == null) {
-            LogUtil.warningMF(logger,
-                    "Cannot find constructor for annotation class: {0}",
-                    annotationClass);
-            return null;
+
+            try {
+                Object castValues[] = new Object[parameterTypes.length];
+                for (int i = 0; i < parameterTypes.length; i++) {
+                    Class parameterType = parameterTypes[i];
+                    String stringValue = values.get(i);
+                    Object castValue = typeConverter.convertValue(
+                            ognlContext, null, null, null,
+                            stringValue, parameterType);
+                    castValues[i] = castValue;
+                }
+
+                annotation = (Annotation) ReflectionUtil.newInstance(
+                        candidateConstructor, castValues);
+            } catch (Throwable e) {
+                LogUtil.finerMF(logger, "Failed to use constructor: {0}", e,
+                        candidateConstructor);
+            }
         }
 
-        Class parameterType = annotationConstructor.getParameterTypes()[0];
-        Object castValue = typeConverter.convertValue(
-                ognlContext, null, null, null,
-                value, parameterType);
-
-        Annotation annotation =
-                (Annotation) ReflectionUtil.newInstance(
-                        annotationConstructor, castValue);
         if (annotation == null) {
             LogUtil.warningMF(logger,
                     "Cannot instanciate annotation: {0}", annotationClass);

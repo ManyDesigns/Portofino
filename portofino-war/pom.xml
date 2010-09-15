@@ -34,12 +34,12 @@
         <dependency>
             <groupId>stax</groupId>
             <artifactId>stax</artifactId>
-            <version>1.2.0</version>
+            <version>${stax.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-            <version>1.4</version>
+            <version>${javax.mail.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -51,13 +51,13 @@
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
-            <version>1.2.1</version>
+            <version>${commons.fileupload.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>1.4</version>
+            <version>${commons.io.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -70,6 +70,12 @@
             <groupId>org.apache.struts</groupId>
             <artifactId>struts2-core</artifactId>
             <version>${struts.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${javassist.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -93,7 +99,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
-            <version>1.5.8</version>
+            <version>${slf4j.version}</version>
             <scope>compile</scope>
         </dependency>
         <!-- stuff for testing -->
