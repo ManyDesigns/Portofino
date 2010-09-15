@@ -80,9 +80,9 @@
                                         searchable="true">
                                     <annotations>
                                         <annotation type="com.manydesigns.elements.annotations.Status">
-                                            <value>{"admin", "cippa"}</value>
-                                            <value>lippa</value>
-                                            <value>user</value>
+                                            <value>admin</value>
+                                            <value/>
+                                            <value/>
                                         </annotation>
                                     </annotations>
                                 </column>

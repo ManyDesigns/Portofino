@@ -34,6 +34,7 @@ import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.elements.util.Util;
 import ognl.OgnlContext;
 import ognl.TypeConverter;
 
@@ -125,23 +126,8 @@ public abstract class AbstractAnnotatedPropertyAccessor
                     Class parameterType = parameterTypes[i];
                     String stringValue = values.get(i);
                     Object value;
-                    if (parameterType.isArray()
-                            && stringValue.startsWith("{")
-                            && stringValue.endsWith("}")) {
-                        String arrayString = stringValue
-                                .substring(1, stringValue.length()-1)
-                                .trim();
-                        String[] stringArray = arrayString.split(",");
-                        String[] valueArray = new String[stringArray.length];
-                        for (int j = 0; j < stringArray.length; j++) {
-                            String current = stringArray[j].trim();
-                            // unwrap quotes
-                            if (current.startsWith("\"") && current.endsWith("\"")) {
-                                current = current.substring(1, current.length()-1);
-                            }
-                            valueArray[j] = current;
-                        }
-                        value = valueArray;
+                    if (parameterType.isArray()) {
+                        value = Util.matchStringArray(stringValue);
                     } else {
                         value = stringValue;
                     }

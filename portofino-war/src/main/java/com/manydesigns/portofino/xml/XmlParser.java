@@ -203,7 +203,7 @@ public class XmlParser {
             next();
             callback.doCharacters(callbackText);
         } else {
-            throw new Error("Characters expected but not found");
+            callback.doCharacters(null);
         }
     }
 
