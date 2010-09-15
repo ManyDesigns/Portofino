@@ -30,6 +30,7 @@
 package com.manydesigns.elements.util;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import org.apache.commons.lang.text.StrTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -47,8 +48,16 @@ public class Util {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    protected final static String STRING_PATTERN = "\"(([^\"\\\\]|\\\\.)*)\"";
 
-    static Pattern pattern = Pattern.compile("\\p{Alpha}*:");
+    protected final static Pattern stringPattern =
+            Pattern.compile(STRING_PATTERN);
+
+    protected final static Pattern stringArrayPattern =
+            Pattern.compile("\\s*\\{\\s*(" + STRING_PATTERN +
+                    "\\s*(,\\s*" + STRING_PATTERN + "\\s*)*)?\\}\\s*");
+
+    protected final static Pattern pattern = Pattern.compile("\\p{Alpha}*:");
 
     public static String getAbsoluteLink(HttpServletRequest req,
                                          String url) {
@@ -120,4 +129,8 @@ public class Util {
     }
 
 
+    public static String[] matchStringArray(String text) {
+        StrTokenizer strTokenizer = StrTokenizer.getCSVInstance(text);
+        return strTokenizer.getTokenArray();
+    }
 }

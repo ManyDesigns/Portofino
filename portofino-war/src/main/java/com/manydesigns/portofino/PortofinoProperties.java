@@ -59,20 +59,20 @@ public class PortofinoProperties {
     // Property names
     //**************************************************************************
 
-    public static final String VERSION_PROPERTY =
+    public static final String PORTOFINO_VERSION_PROPERTY =
             "portofino.version";
     public static final String CONNECTIONS_LOCATION_PROPERTY =
-            "portofino.connections.location";
+            "connections.location";
     public static final String MODEL_LOCATION_PROPERTY =
-            "portofino.model.location";
+            "model.location";
     public static final String CONTEXT_CLASS_PROPERTY =
-            "portofino.context.class";
+            "context.class";
     public static final String APPLICATION_NAME_PROPERTY =
             "application.name";
-    public static final String DATABASE_PLATFORM_MANAGER_PROPERTY =
-            "portofino.database.platform.manager";
-    public static final String DATABASE_PLATFORM_LIST_PROPERTY =
-            "portofino.database.platform.list";
+    public static final String DATABASE_PLATFORMS_MANAGER_PROPERTY =
+            "database.platforms.manager";
+    public static final String DATABASE_PLATFORMS_LIST_PROPERTY =
+            "database.platforms.list";
     public static final String RANDOM_CODE_LENGTH_PROPERTY =
             "random.code.length";
 

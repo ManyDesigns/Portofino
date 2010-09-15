@@ -41,7 +41,7 @@ import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 
 import java.util.List;
 
@@ -94,7 +94,7 @@ public class ConnectionProvidersAction extends PortofinoAction {
         tableForm.readFromObject(connectionProviders);
 
         // database platforms
-        DatabasePlatformManager manager = DatabasePlatformManager.getManager();
+        DatabasePlatformsManager manager = DatabasePlatformsManager.getManager();
         databasePlatforms = manager.getDatabasePlatforms();
         databasePlatformsTableForm =
                 new TableFormBuilder(DatabasePlatform.class)

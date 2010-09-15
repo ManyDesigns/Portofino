@@ -33,7 +33,7 @@ import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.datamodel.Database;
 
 import java.sql.Connection;
@@ -172,8 +172,8 @@ public abstract class AbstractConnectionProvider implements ConnectionProvider {
             typeList.toArray(types);
             Arrays.sort(types, new TypeComparator());
 
-            DatabasePlatformManager manager =
-                    DatabasePlatformManager.getManager();
+            DatabasePlatformsManager manager =
+                    DatabasePlatformsManager.getManager();
             databasePlatform = manager.findApplicableAbstraction(this);
             if (databasePlatform == null) {
                 status = STATUS_ERROR;

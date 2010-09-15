@@ -34,6 +34,7 @@ import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.elements.util.Util;
 import ognl.OgnlContext;
 import ognl.TypeConverter;
 
@@ -124,9 +125,15 @@ public abstract class AbstractAnnotatedPropertyAccessor
                 for (int i = 0; i < parameterTypes.length; i++) {
                     Class parameterType = parameterTypes[i];
                     String stringValue = values.get(i);
+                    Object value;
+                    if (parameterType.isArray()) {
+                        value = Util.matchStringArray(stringValue);
+                    } else {
+                        value = stringValue;
+                    }
                     Object castValue = typeConverter.convertValue(
                             ognlContext, null, null, null,
-                            stringValue, parameterType);
+                            value, parameterType);
                     castValues[i] = castValue;
                 }
 

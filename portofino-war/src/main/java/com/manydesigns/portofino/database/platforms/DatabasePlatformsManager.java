@@ -44,7 +44,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DatabasePlatformManager {
+public class DatabasePlatformsManager {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -53,10 +53,10 @@ public class DatabasePlatformManager {
     //**************************************************************************
 
     protected static final Properties portofinoProperties;
-    protected static final DatabasePlatformManager manager;
+    protected static final DatabasePlatformsManager manager;
 
     public static final Logger logger =
-            LogUtil.getLogger(DatabasePlatformManager.class);
+            LogUtil.getLogger(DatabasePlatformsManager.class);
 
     protected ArrayList<DatabasePlatform> databasePlatformList;
 
@@ -68,16 +68,16 @@ public class DatabasePlatformManager {
         portofinoProperties = PortofinoProperties.getProperties();
         String managerClassName =
                 portofinoProperties.getProperty(
-                        PortofinoProperties.DATABASE_PLATFORM_MANAGER_PROPERTY);
-        InstanceBuilder<DatabasePlatformManager> builder =
-                new InstanceBuilder<DatabasePlatformManager>(
-                        DatabasePlatformManager.class,
-                        DatabasePlatformManager.class,
+                        PortofinoProperties.DATABASE_PLATFORMS_MANAGER_PROPERTY);
+        InstanceBuilder<DatabasePlatformsManager> builder =
+                new InstanceBuilder<DatabasePlatformsManager>(
+                        DatabasePlatformsManager.class,
+                        DatabasePlatformsManager.class,
                         logger);
         manager = builder.createInstance(managerClassName);
     }
 
-    public static DatabasePlatformManager getManager() {
+    public static DatabasePlatformsManager getManager() {
         return manager;
     }
 
@@ -85,10 +85,10 @@ public class DatabasePlatformManager {
     // Constructors / building
     //**************************************************************************
 
-    public DatabasePlatformManager() {
+    public DatabasePlatformsManager() {
         databasePlatformList = new ArrayList<DatabasePlatform>();
         String listString = portofinoProperties.getProperty(
-                PortofinoProperties.DATABASE_PLATFORM_LIST_PROPERTY);
+                PortofinoProperties.DATABASE_PLATFORMS_LIST_PROPERTY);
         if (listString == null) {
             logger.finer("Empty list");
             return;

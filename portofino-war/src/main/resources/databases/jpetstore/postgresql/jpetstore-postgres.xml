@@ -49,7 +49,6 @@
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-
                                 <column name="digest"
                                         columnType="varchar"
                                         javaType="java.lang.String"
@@ -336,9 +335,9 @@
                                         searchable="true">
                                     <annotations>
                                         <annotation type="com.manydesigns.elements.annotations.Status">
-                                            <value>{"red1", "red2"}</value>
-                                            <value>ambers</value>
-                                            <value>greens</value>
+                                            <value>admin</value>
+                                            <value/>
+                                            <value/>
                                         </annotation>
                                     </annotations>
                                 </column>
@@ -373,7 +372,6 @@
                                         nullable="true"
                                         searchable="true"
                                         propertyName="delDate"/>
-
                                 </columns>
                                 <primaryKey name="pk_group">
                                     <column name="groupid"/>
