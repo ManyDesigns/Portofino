@@ -29,7 +29,7 @@
 
 package com.manydesigns.elements.util;
 
-import com.manydesigns.elements.fields.helpers.FieldManager;
+import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.logging.LogUtil;
 
 import java.util.logging.Logger;
@@ -80,7 +80,7 @@ public class InstanceBuilder<T> {
             LogUtil.warningMF(logger,
                     "Cannot instanciate: {0}. Fall back to default: {1}.",
                     managerClass.getName(),
-                    FieldManager.class.getName());
+                    FieldsManager.class.getName());
             instance = (T)ReflectionUtil.newInstance(defaultImplClass);
             if (instance == null) {
                 LogUtil.severeMF(logger,

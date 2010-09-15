@@ -30,7 +30,7 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.annotations.Searchable;
-import com.manydesigns.elements.fields.helpers.FieldManager;
+import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -144,7 +144,7 @@ public class SearchFormBuilder {
         LogUtil.entering(logger, "build");
 
         SearchForm searchForm = new SearchForm();
-        FieldManager manager = FieldManager.getManager();
+        FieldsManager manager = FieldsManager.getManager();
 
         if (propertyAccessors == null) {
             configReflectiveFields();

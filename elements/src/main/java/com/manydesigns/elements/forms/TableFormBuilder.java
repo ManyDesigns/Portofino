@@ -31,7 +31,7 @@ package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.annotations.InSummary;
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.helpers.FieldManager;
+import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
@@ -153,7 +153,7 @@ public class TableFormBuilder {
 
     public TableForm build() {
         TableForm tableForm = new TableForm(nRows);
-        FieldManager manager = FieldManager.getManager();
+        FieldsManager manager = FieldsManager.getManager();
 
         if (propertyAccessors == null) {
             configReflectiveFields();

@@ -110,7 +110,7 @@ public class PortofinoListener
                 "\n--- Real path: {2}" +
                 "\n" + SEPARATOR,
                 portofinoProperties.getProperty(
-                        PortofinoProperties.VERSION_PROPERTY),
+                        PortofinoProperties.PORTOFINO_VERSION_PROPERTY),
                 serverInfo.getContextPath(),
                 serverInfo.getRealPath()
         );

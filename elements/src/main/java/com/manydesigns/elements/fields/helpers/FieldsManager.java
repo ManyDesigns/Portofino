@@ -47,7 +47,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class FieldManager implements FieldHelper {
+public class FieldsManager implements FieldHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -56,10 +56,10 @@ public class FieldManager implements FieldHelper {
     //**************************************************************************
 
     protected static final Properties elementsProperties;
-    protected static final FieldManager manager;
+    protected static final FieldsManager manager;
 
     public static final Logger logger =
-            LogUtil.getLogger(FieldManager.class);
+            LogUtil.getLogger(FieldsManager.class);
 
     //**************************************************************************
     // Fields
@@ -76,16 +76,16 @@ public class FieldManager implements FieldHelper {
         elementsProperties = ElementsProperties.getProperties();
         String managerClassName =
                 elementsProperties.getProperty(
-                        ElementsProperties.FIELD_MANAGER_PROPERTY);
-        InstanceBuilder<FieldManager> builder =
-                new InstanceBuilder<FieldManager>(
-                        FieldManager.class,
-                        FieldManager.class,
+                        ElementsProperties.FIELDS_MANAGER_PROPERTY);
+        InstanceBuilder<FieldsManager> builder =
+                new InstanceBuilder<FieldsManager>(
+                        FieldsManager.class,
+                        FieldsManager.class,
                         logger);
         manager = builder.createInstance(managerClassName);
     }
 
-    public static FieldManager getManager() {
+    public static FieldsManager getManager() {
         return manager;
     }
 
@@ -94,10 +94,10 @@ public class FieldManager implements FieldHelper {
     // Constructors and initialization
     //**************************************************************************
 
-    public FieldManager() {
+    public FieldsManager() {
         helperList = new ArrayList<FieldHelper>();
         String listString = elementsProperties.getProperty(
-                ElementsProperties.FIELD_HELPERS_LIST_PROPERTY);
+                ElementsProperties.FIELDS_LIST_PROPERTY);
         if (listString == null) {
             logger.finer("Empty list");
             return;
