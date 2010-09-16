@@ -29,11 +29,8 @@
 
 package com.manydesigns.elements.text;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.Util;
-import ognl.OgnlContext;
-import ognl.TypeConverter;
 
 import java.text.MessageFormat;
 import java.util.logging.Logger;
@@ -83,17 +80,11 @@ public class OgnlTextFormat
     //**************************************************************************
 
     public String format(Object root) {
-        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        TypeConverter typeConverter = ognlContext.getTypeConverter();
-
         Object[] args = evaluateOgnlExpressions(root);
         String[] argStrings = new String[args.length];
         for (int i = 0; i < args.length; i++) {
             Object arg = args[i];
-            String argString =
-                    (String)typeConverter.convertValue(
-                            ognlContext, null, null, null,
-                            arg, String.class);
+            String argString = (String)Util.convertValue(arg, String.class);
             argStrings[i] = url ? Util.urlencode(argString) : argString;
         }
 

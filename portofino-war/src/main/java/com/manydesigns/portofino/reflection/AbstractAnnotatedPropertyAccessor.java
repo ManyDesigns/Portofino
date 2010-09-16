@@ -29,14 +29,11 @@
 
 package com.manydesigns.portofino.reflection;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
-import ognl.OgnlContext;
-import ognl.TypeConverter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -95,8 +92,6 @@ public abstract class AbstractAnnotatedPropertyAccessor
 
     public Annotation instanciateOneAnnotation(Class annotationClass,
                                                List<String> values) {
-        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        TypeConverter typeConverter = ognlContext.getTypeConverter();
         AnnotationsManager annotationsManager =
                 AnnotationsManager.getManager();
 
@@ -131,10 +126,7 @@ public abstract class AbstractAnnotatedPropertyAccessor
                     } else {
                         value = stringValue;
                     }
-                    Object castValue = typeConverter.convertValue(
-                            ognlContext, null, null, null,
-                            value, parameterType);
-                    castValues[i] = castValue;
+                    castValues[i] = Util.convertValue(value, parameterType);
                 }
 
                 annotation = (Annotation) ReflectionUtil.newInstance(

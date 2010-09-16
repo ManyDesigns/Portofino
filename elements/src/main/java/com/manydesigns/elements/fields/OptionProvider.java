@@ -29,7 +29,7 @@
 
 package com.manydesigns.elements.fields;
 
-import java.util.Collection;
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -40,6 +40,15 @@ public interface OptionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    Collection<SelectFieldOption> getOptions();
-    SelectFieldOption getOption(String value);
+    int getFieldCount();
+
+    void resetValues();
+
+    void setValue(int index, Object value);
+    Object getValue(int index);
+
+    boolean validate();
+
+    String getLabel(int index);
+    Map<Object, String> getOptions(int index);
 }
