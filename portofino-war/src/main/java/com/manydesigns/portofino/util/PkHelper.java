@@ -29,14 +29,12 @@
 
 package com.manydesigns.portofino.util;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
-import ognl.OgnlContext;
-import ognl.TypeConverter;
+import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
@@ -95,14 +93,9 @@ public class PkHelper {
         int i = 0;
         Serializable result = (Serializable)classAccessor.newInstance();
 
-        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        TypeConverter typeConverter = ognlContext.getTypeConverter();
-
         for(PropertyAccessor property : classAccessor.getKeyProperties()) {
             String stringValue = pkList[i];
-            Object value =
-                    typeConverter.convertValue(ognlContext, null, null, null,
-                            stringValue, property.getType());
+            Object value = Util.convertValue(stringValue, property.getType());
             try {
                 property.set(result, value);
             } catch (Throwable e) {
@@ -120,9 +113,6 @@ public class PkHelper {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
 
-        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        TypeConverter typeConverter = ognlContext.getTypeConverter();
-
         for(PropertyAccessor property : classAccessor.getKeyProperties()) {
             if (first) {
                 first = false;
@@ -132,9 +122,7 @@ public class PkHelper {
             try {
                 Object value = property.get(object);
                 String stringValue =
-                        (String)typeConverter.convertValue(
-                                ognlContext, null, null, null,
-                                value, String.class);
+                        (String) Util.convertValue(value, String.class);
                 sb.append(stringValue);
             } catch (Throwable e) {
                 LogUtil.warningMF(logger,

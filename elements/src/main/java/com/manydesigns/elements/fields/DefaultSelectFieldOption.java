@@ -29,6 +29,8 @@
 
 package com.manydesigns.elements.fields;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import java.util.ArrayList;
 
 /*
@@ -42,18 +44,18 @@ public final class DefaultSelectFieldOption
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final String value;
+    private final Object value;
     private final String label;
     private final String url;
 
-    public DefaultSelectFieldOption(String value, String label, String url) {
+    public DefaultSelectFieldOption(Object value, String label, String url) {
         super(0); // save some memory
         this.value = value;
         this.label = label;
         this.url = url;
     }
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
@@ -66,6 +68,10 @@ public final class DefaultSelectFieldOption
     }
 
     public String toString() {
-        return label;
+        return new ToStringBuilder(this)
+                .append("value", value)
+                .append("label", label)
+                .append("url", url)
+                .toString();
     }
 }

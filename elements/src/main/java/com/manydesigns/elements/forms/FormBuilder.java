@@ -31,16 +31,17 @@ package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.annotations.FieldSet;
 import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.OptionProvider;
+import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 /*
@@ -63,6 +64,7 @@ public class FormBuilder {
 
     protected List<ArrayList<PropertyAccessor>> groupedPropertyAccessors;
     protected List<String> fieldSetNames;
+    protected final Map<String[], OptionProvider> optionProviders;
     protected String prefix;
     protected int nColumns = DEFAULT_N_COLUMNS;
 
@@ -80,6 +82,7 @@ public class FormBuilder {
         LogUtil.entering(logger, "FormBuilder", classAccessor);
 
         this.classAccessor = classAccessor;
+        optionProviders = new HashMap<String[], OptionProvider>();
 
         LogUtil.exiting(logger, "FormBuilder");
     }
@@ -142,6 +145,12 @@ public class FormBuilder {
         return this;
     }
 
+    public FormBuilder configOptionProvider(OptionProvider optionProvider,
+                                            String... fieldNames) {
+        optionProviders.put(fieldNames, optionProvider);
+        return this;
+    }
+
     public FormBuilder configReflectiveFields() {
         LogUtil.entering(logger, "configReflectiveFields");
 
@@ -189,6 +198,9 @@ public class FormBuilder {
         Form form = new Form();
         FieldsManager manager = FieldsManager.getManager();
 
+        // add all option providers
+        form.getOptionProviders().addAll(optionProviders.values());
+
 
         if (groupedPropertyAccessors == null) {
             configReflectiveFields();
@@ -207,8 +219,25 @@ public class FormBuilder {
                             fieldSetName, nColumns);
             form.add(fieldSet);
             for (PropertyAccessor propertyAccessor : group) {
-                Field field = manager.tryToInstantiateField(
-                        classAccessor, propertyAccessor, prefix);
+                Field field = null;
+                for (Map.Entry<String[],OptionProvider> current
+                        : optionProviders.entrySet()) {
+                    String[] fieldNames = current.getKey();
+                    int index = ArrayUtils.indexOf(fieldNames,
+                            propertyAccessor.getName());
+                    if (index >= 0) {
+                        SelectField selectField =
+                                new SelectField(propertyAccessor, prefix);
+                        selectField.setOptionProvider(current.getValue());
+                        selectField.setOptionProviderIndex(index);
+                        field = selectField;
+                        break;
+                    }
+                }
+                if (field == null) {
+                    field = manager.tryToInstantiateField(
+                            classAccessor, propertyAccessor, prefix);
+                }
 
                 if (field == null) {
                     LogUtil.warningMF(logger,

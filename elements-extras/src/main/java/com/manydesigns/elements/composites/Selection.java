@@ -30,15 +30,12 @@
 package com.manydesigns.elements.composites;
 
 import com.manydesigns.elements.Element;
-import com.manydesigns.elements.fields.OptionProvider;
 import com.manydesigns.elements.fields.SelectField;
-import com.manydesigns.elements.fields.SelectFieldOption;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Iterator;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -102,6 +99,7 @@ public class Selection extends AbstractReflectiveCompositeElement {
     }
 
     public void toXhtml(XhtmlBuffer xb) {
+        /*
         if (_mode.isEdit() || _mode.isPreview() || _mode.isView()) {
             xb.openElement("fieldset");
             xb.addAttribute("class", "group");
@@ -156,9 +154,11 @@ public class Selection extends AbstractReflectiveCompositeElement {
         } else {
             throw new IllegalStateException("Unknown mode:" + _mode);
         }
+        */
     }
 
     public Integer findIndexOfSelection() {
+        /*
         OptionProvider optionProvider = _selectField.getOptionProvider();
         int index = 0;
         String stringValue = _selectField.getStringValue();
@@ -168,6 +168,7 @@ public class Selection extends AbstractReflectiveCompositeElement {
             }
             index++;
         }
+        */
         return null;
     }
 }

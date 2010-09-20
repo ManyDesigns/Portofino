@@ -29,14 +29,11 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -60,29 +57,6 @@ public class RadioField extends AbstractField {
 
     public RadioField(PropertyAccessor accessor, String prefix) {
         super(accessor, prefix);
-        Select annotation =
-                accessor.getAnnotation(Select.class);
-        if (annotation != null) {
-            int i = 0;
-            ArrayList<SelectFieldOption> options =
-                    new ArrayList<SelectFieldOption>();
-            for (String value : annotation.values()) {
-                String label = annotation.labels()[i];
-                String link;
-                try {
-                    link = annotation.urls()[i];
-                } catch (Exception e) { // link list may be empy
-                    link = null;
-                }
-
-                DefaultSelectFieldOption option =
-                        new DefaultSelectFieldOption(value, label, link);
-                options.add(option);
-
-                i++;
-            }
-            optionProvider = new DefaultOptionProvider(options);
-        }
     }
 
     //**************************************************************************
@@ -101,30 +75,6 @@ public class RadioField extends AbstractField {
             return;
         }
 
-        Collection<SelectFieldOption> options = optionProvider.getOptions();
-        String reqValue = req.getParameter(inputName);
-        if (reqValue == null) {
-            if (required && options.size() == 1 ) {
-                stringValue = options.iterator().next().getValue();
-            }
-            return;
-        }
-
-
-
-        stringValue = reqValue;
-
-        boolean found = false;
-        for (SelectFieldOption option : options) {
-            String optionValue = option.getValue();
-            if (optionValue.equals(stringValue)) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            stringValue = null;
-        }
     }
 
     public boolean validate() {
@@ -176,7 +126,7 @@ public class RadioField extends AbstractField {
         xb.openElement("div");
         xb.addAttribute("id", id);
         int index = 0;
-
+/*
         if (optionProvider != null) {
             for (SelectFieldOption option : optionProvider.getOptions()) {
                 // il separatore deve essere "_" e non "." perché il "."
@@ -195,6 +145,7 @@ public class RadioField extends AbstractField {
             }
         }
         xb.closeElement("div");
+        */
     }
 
     public void valueToXhtmlPreview(XhtmlBuffer xb) {
@@ -205,10 +156,12 @@ public class RadioField extends AbstractField {
     private void valueToXhtmlHidden(XhtmlBuffer xb) {
         String localValue = null;
         if (optionProvider != null) {
+            /*
             SelectFieldOption option = optionProvider.getOption(stringValue);
             if (option != null) {
                 localValue = option.getValue();
             }
+            */
         }
         xb.writeInputHidden(inputName, localValue);
     }
@@ -217,6 +170,7 @@ public class RadioField extends AbstractField {
         xb.openElement("div");
         xb.addAttribute("class", "value");
         xb.addAttribute("id", id);
+        /*
         SelectFieldOption option = optionProvider.getOption(stringValue);
         if (option != null) {
             String optionLabel = option.getLabel();
@@ -228,6 +182,7 @@ public class RadioField extends AbstractField {
                 xb.write(optionLabel);
             }
         }
+        */
         xb.closeElement("div");
     }
 

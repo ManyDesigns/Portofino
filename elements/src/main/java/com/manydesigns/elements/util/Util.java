@@ -30,6 +30,8 @@
 package com.manydesigns.elements.util;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import ognl.OgnlContext;
+import ognl.TypeConverter;
 import org.apache.commons.lang.text.StrTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -132,5 +134,13 @@ public class Util {
     public static String[] matchStringArray(String text) {
         StrTokenizer strTokenizer = StrTokenizer.getCSVInstance(text);
         return strTokenizer.getTokenArray();
+    }
+
+    public static Object convertValue(Object value, Class toType) {
+        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+        TypeConverter typeConverter = ognlContext.getTypeConverter();
+
+        return typeConverter.convertValue(
+                ognlContext, null, null, null, value, toType);
     }
 }

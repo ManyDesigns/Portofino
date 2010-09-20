@@ -29,14 +29,13 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Map;
 
 /*
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -48,8 +47,8 @@ public class SelectField extends AbstractField {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     protected OptionProvider optionProvider;
+    protected int optionProviderIndex;
 
-    protected String stringValue;
     protected String comboLabel;
 
 
@@ -62,30 +61,6 @@ public class SelectField extends AbstractField {
 
     public SelectField(PropertyAccessor accessor, String prefix) {
         super(accessor, prefix);
-
-        Select annotation =
-                accessor.getAnnotation(Select.class);
-        if (annotation != null) {
-            int i = 0;
-            ArrayList<SelectFieldOption> options =
-                    new ArrayList<SelectFieldOption>();
-            for (String value : annotation.values()) {
-                String label = annotation.labels()[i];
-                String link;
-                try {
-                    link = annotation.urls()[i];
-                } catch (Exception e) { // link list may be empy
-                    link = null;
-                }
-
-                DefaultSelectFieldOption option =
-                        new DefaultSelectFieldOption(value, label, link);
-                options.add(option);
-
-                i++;
-            }
-            optionProvider = new DefaultOptionProvider(options);
-        }
     }
 
     //**************************************************************************
@@ -98,35 +73,9 @@ public class SelectField extends AbstractField {
             return;
         }
 
-        if (optionProvider == null) {
-            stringValue = null;
-            return;
-        }
-
-        Collection<SelectFieldOption> options = optionProvider.getOptions();
-        String reqValue = req.getParameter(inputName);
-        if (reqValue == null) {
-            if (required && options.size() == 1 ) {
-                stringValue = options.iterator().next().getValue();
-            }
-            return;
-        }
-
-
-
-        stringValue = reqValue;
-
-        boolean found = false;
-        for (SelectFieldOption option : options) {
-            String optionValue = option.getValue();
-            if (optionValue.equals(stringValue)) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            stringValue = null;
-        }
+        String stringValue = req.getParameter(inputName);
+        Object value = Util.convertValue(stringValue, accessor.getType());
+        optionProvider.setValue(optionProviderIndex, value);
     }
 
     public boolean validate() {
@@ -134,7 +83,8 @@ public class SelectField extends AbstractField {
             return true;
         }
 
-        if (required && stringValue == null) {
+        Object value = optionProvider.getValue(optionProviderIndex);
+        if (required && value == null) {
             errors.add(getText("elements.error.field.required"));
             return false;
         }
@@ -144,11 +94,13 @@ public class SelectField extends AbstractField {
     public void readFromObject(Object obj) {
         super.readFromObject(obj);
         try {
+            Object value;
             if (obj == null) {
-                stringValue = null;
+                value = null;
             } else {
-                stringValue = (String)accessor.get(obj);
+                value = accessor.get(obj);
             }
+            optionProvider.setValue(optionProviderIndex, value);
         } catch (IllegalAccessException e) {
             throw new Error(e);
         } catch (InvocationTargetException e) {
@@ -157,7 +109,8 @@ public class SelectField extends AbstractField {
     }
 
     public void writeToObject(Object obj) {
-        writeToObject(obj, stringValue);
+        Object value = optionProvider.getValue(optionProviderIndex);
+        writeToObject(obj, value);
     }
 
     public void valueToXhtml(XhtmlBuffer xb) {
@@ -179,15 +132,20 @@ public class SelectField extends AbstractField {
         xb.addAttribute("id", id);
         xb.addAttribute("name", inputName);
 
-        boolean checked = (stringValue == null || stringValue.length() == 0);
+        Object objectValue = optionProvider.getValue(optionProviderIndex);
+
+        boolean checked = (objectValue == null);
         xb.writeOption("", checked, comboLabel);
 
         if (optionProvider != null) {
-            for (SelectFieldOption option : optionProvider.getOptions()) {
-                String optionValue = option.getValue();
-                String optionLabel = option.getLabel();
-                checked = optionValue.equals(stringValue);
-                xb.writeOption(optionValue, checked, optionLabel);
+            for (Map.Entry<Object, String> option :
+                    optionProvider.getOptions(optionProviderIndex).entrySet()) {
+                Object optionValue = option.getKey();
+                String optionStringValue =
+                        (String) Util.convertValue(optionValue, String.class);
+                String optionLabel = option.getValue();
+                checked =  optionValue.equals(objectValue);
+                xb.writeOption(optionStringValue, checked, optionLabel);
             }
         }
         xb.closeElement("select");
@@ -199,30 +157,21 @@ public class SelectField extends AbstractField {
     }
 
     private void valueToXhtmlHidden(XhtmlBuffer xb) {
-        String localValue = null;
-        if (optionProvider != null) {
-            SelectFieldOption option = optionProvider.getOption(stringValue);
-            if (option != null) {
-                localValue = option.getValue();
-            }
-        }
-        xb.writeInputHidden(inputName, localValue);
+        Object value = optionProvider.getValue(optionProviderIndex);
+        String stringValue = (String) Util.convertValue(value, String.class);
+        xb.writeInputHidden(inputName, stringValue);
     }
 
     public void valueToXhtmlView(XhtmlBuffer xb) {
         xb.openElement("div");
         xb.addAttribute("class", "value");
         xb.addAttribute("id", id);
-        SelectFieldOption option = optionProvider.getOption(stringValue);
-        if (option != null) {
-            String optionLabel = option.getLabel();
-            String optionUrl = option.getUrl();
-
-            if (optionUrl != null) {
-                xb.writeAnchor(optionUrl, optionLabel);
-            } else {
-                xb.write(optionLabel);
-            }
+        String optionLabel = optionProvider.getLabel(optionProviderIndex);
+        String optionUrl = "TODO";
+        if (optionUrl != null) {
+            xb.writeAnchor(optionUrl, optionLabel);
+        } else {
+            xb.write(optionLabel);
         }
         xb.closeElement("div");
     }
@@ -239,12 +188,12 @@ public class SelectField extends AbstractField {
         this.optionProvider = optionProvider;
     }
 
-    public String getStringValue() {
-        return stringValue;
+    public int getOptionProviderIndex() {
+        return optionProviderIndex;
     }
 
-    public void setStringValue(String stringValue) {
-        this.stringValue = stringValue;
+    public void setOptionProviderIndex(int optionProviderIndex) {
+        this.optionProviderIndex = optionProviderIndex;
     }
 
     public String getComboLabel() {
