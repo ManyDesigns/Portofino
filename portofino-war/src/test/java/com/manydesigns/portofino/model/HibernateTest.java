@@ -33,9 +33,9 @@ import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.users.Group;
-import com.manydesigns.portofino.users.User;
-import com.manydesigns.portofino.users.UsersGroups;
+import com.manydesigns.portofino.systemModel.users.Group;
+import com.manydesigns.portofino.systemModel.users.User;
+import com.manydesigns.portofino.systemModel.users.UsersGroups;
 import junit.framework.TestCase;
 import org.hibernate.proxy.map.MapProxy;
 

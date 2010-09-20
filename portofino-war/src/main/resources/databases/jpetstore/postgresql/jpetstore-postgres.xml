@@ -6,7 +6,7 @@
                 <schema name="public">
                     <tables>
                         <table name="user_"
-                               class="com.manydesigns.portofino.users.User">
+                               class="com.manydesigns.portofino.systemModel.users.User">
                             <columns>
                                 <column name="userid"
                                         autoincrement="true"
@@ -49,7 +49,7 @@
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="digest"
+                                <column name="token"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="255"
@@ -302,13 +302,22 @@
                                         searchable="true"
                                         propertyName="graceLoginCount"
                                         />
+                                <column name="bounced"
+                                        columnType="int4"
+                                        javaType="java.lang.Integer"
+                                        length="10"
+                                        scale="0"
+                                        nullable="true"
+                                        searchable="true"
+                                        propertyName="bounced"
+                                        />
                                 </columns>
                                 <primaryKey name="pk_user">
                                     <column name="userid"/>
                                 </primaryKey>
                         </table>
                         <table name="group_"
-                               class="com.manydesigns.portofino.users.Group">
+                               class="com.manydesigns.portofino.systemModel.users.Group">
                             <columns>
                                 <column name="groupid"
                                         autoincrement="true"
@@ -377,7 +386,7 @@
                                     <column name="groupid"/>
                                 </primaryKey>
                         </table>
-                        <table name="users_groups" manyToMany="true" class="com.manydesigns.portofino.users.UsersGroups"
+                        <table name="users_groups" manyToMany="true" class="com.manydesigns.portofino.systemModel.users.UsersGroups"
                                >
                             <columns>
                                 <column name="userid"
@@ -470,7 +479,7 @@
                                 <column name="id"/>
                             </primaryKey>
                         </table>
-                        <table name="emailqueue">
+                        <table name="emailqueue" class="com.manydesigns.portofino.systemModel.email.EmailBean">
                             <columns>
                                 <column name="id"
                                         columnType="serial"
@@ -499,7 +508,8 @@
                                         length="100"
                                         scale="0"
                                         nullable="true"
-                                        searchable="true"/>
+                                        searchable="true"
+                                        propertyName="to"/>
                                 <column name="attachmentpath"
                                         columnType="varchar"
                                         javaType="java.lang.String"
@@ -530,7 +540,8 @@
                                         length="100"
                                         scale="0"
                                         nullable="true"
-                                        searchable="true"/>
+                                        searchable="true"
+                                        propertyName="from"/>
                                 <column name="createdate"
                                         columnType="date"
                                         javaType="java.util.Date"
@@ -881,10 +892,6 @@
                 <siteNode url="/system-admin/ConfigurationProperties.action" title="Configuration properties" description="Configuration properties"/>
                 <siteNode url="/system-admin/Logs.action" title="Logs" description="Logs"/>
                 <siteNode url="/system-admin/Logs.action" title="Users" description="Users">
-                    <childNodes>
-                        <siteNode url="/system-admin/Logs.action" title="User Management" description="User Management"/>
-                        <siteNode url="/system-admin/Logs.action" title="Group Management" description="Group management"/>
-                    </childNodes>
                 </siteNode>
             </childNodes>
         </siteNode>

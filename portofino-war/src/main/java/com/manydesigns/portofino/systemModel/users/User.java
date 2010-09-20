@@ -26,12 +26,15 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.users;
+package com.manydesigns.portofino.systemModel.users;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Password;
+import org.apache.commons.lang.RandomStringUtils;
+import sun.misc.BASE64Encoder;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -66,7 +69,7 @@ public class User implements Serializable{
     Boolean agreedToTerms;
     Boolean active;
 
-    String digest;
+    String token;
     String remQuestion;
     String remans;
     String screenName;
@@ -80,6 +83,7 @@ public class User implements Serializable{
     String lastLoginIp;
 
     Integer failedLoginAttempts;
+    Integer bounced;
     Integer graceLoginCount;
 
 
@@ -187,12 +191,12 @@ public class User implements Serializable{
         this.pwdModDate = pwdModDate;
     }
 
-    public String getDigest() {
-        return digest;
+    public String getToken() {
+        return token;
     }
 
-    public void setDigest(String digest) {
-        this.digest = digest;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getRemQuestion() {
@@ -369,5 +373,43 @@ public class User implements Serializable{
 
     public void setGraceLoginCount(Integer graceLoginCount) {
         this.graceLoginCount = graceLoginCount;
+    }
+
+    public Integer getBounced() {
+        return bounced;
+    }
+
+    public void setBounced(Integer bounced) {
+        this.bounced = bounced;
+    }
+
+    public void setPwdEncrypted(String pwd) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+            md.update(pwd.getBytes("UTF-8"));
+            byte raw[] = md.digest(); //step 4
+            setPwd((new BASE64Encoder()).encode(raw));
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
+
+    public void setPwdEncrypted() {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+            md.update(pwd.getBytes("UTF-8"));
+            byte raw[] = md.digest(); //step 4
+            setPwd((new BASE64Encoder()).encode(raw));
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
+
+    public synchronized  String tokenGenerator() {
+        return RandomStringUtils.random(30, true, true);
+    }
+
+    public synchronized String passwordGenerator(int len) {
+        return RandomStringUtils.random(len, true, true);
     }
 }

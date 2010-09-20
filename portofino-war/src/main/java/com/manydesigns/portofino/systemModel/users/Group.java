@@ -26,7 +26,7 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.users;
+package com.manydesigns.portofino.systemModel.users;
 
 import java.io.Serializable;
 import java.util.ArrayList;

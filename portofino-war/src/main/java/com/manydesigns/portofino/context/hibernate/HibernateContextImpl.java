@@ -50,7 +50,7 @@ import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.UseCaseAccessor;
-import com.manydesigns.portofino.users.User;
+import com.manydesigns.portofino.systemModel.users.User;
 import org.apache.commons.lang.time.StopWatch;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
@@ -337,6 +337,10 @@ public class HibernateContextImpl implements Context {
                         ilikeCriterion.getTextMatchMode(), value);
                 hqlFormat = "lower({0}) like lower(?)";
                 parametersList.add(pattern);
+            } else if (criterion instanceof Criteria.IsNullCriterion) {
+                hqlFormat = "{0} is null";
+            } else if (criterion instanceof Criteria.IsNotNullCriterion) {
+                hqlFormat = "{0} is not null";
             } else {
                 LogUtil.severeMF(logger, "Unrecognized criterion: ", criterion);
                 throw new InternalError("Unrecognied criterion");

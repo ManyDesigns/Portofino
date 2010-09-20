@@ -52,7 +52,7 @@ public abstract class POP3Client {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
     final String host;
-    final String provider;
+    final String protocol;
     final int port;
     final String username;
     final String password;
@@ -64,8 +64,8 @@ public abstract class POP3Client {
         return host;
     }
 
-    public String getProvider() {
-        return provider;
+    public String getProtocol() {
+        return protocol;
     }
 
     public int getPort() {
@@ -84,10 +84,10 @@ public abstract class POP3Client {
         return pop3Props;
     }
 
-    public POP3Client(String host, String provider, int port, String username,
+    public POP3Client(String host, String protocol, int port, String username,
                       String password) {
         this.host = host;
-        this.provider = provider;
+        this.protocol = protocol;
         this.port = port;
         this.username = username;
         this.password = password;

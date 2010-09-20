@@ -107,6 +107,15 @@ public class Criteria extends ArrayList<Criterion> {
         return this;
     }
 
+    public Criteria isNull(PropertyAccessor accessor) {
+        add(new IsNullCriterion(accessor));
+        return this;
+    }
+    public Criteria isNotNull(PropertyAccessor accessor) {
+        add(new IsNotNullCriterion(accessor));
+        return this;
+    }
+
     //**************************************************************************
     // Getter/setters
     //**************************************************************************
@@ -266,6 +275,22 @@ public class Criteria extends ArrayList<Criterion> {
 
         public TextMatchMode getTextMatchMode() {
             return textMatchMode;
+        }
+    }
+
+    public static class IsNullCriterion extends AbstractCriterion {
+
+
+        public IsNullCriterion(PropertyAccessor accessor) {
+            super(accessor);
+        }
+    }
+
+    public static class IsNotNullCriterion extends AbstractCriterion {
+
+
+        public IsNotNullCriterion(PropertyAccessor accessor) {
+            super(accessor);
         }
     }
 }

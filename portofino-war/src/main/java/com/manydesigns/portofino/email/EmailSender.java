@@ -28,10 +28,12 @@
  */
 package com.manydesigns.portofino.email;
 
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.systemModel.email.EmailBean;
 import org.apache.commons.mail.*;
 
-import java.util.Map;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,13 +47,15 @@ public class EmailSender implements Runnable{
     private final String password;
     private final String server;
     private final int port;
-    private final Map emailMap;
+    private final EmailBean emailBean;
+    protected static final Logger logger =
+            LogUtil.getLogger(EmailSender.class);
 
 
     //Costruttore con proprietà da inserire
-    public EmailSender(String server, Map emailMap, int port, boolean ssl,
+    public EmailSender(String server, EmailBean emailBean, int port, boolean ssl,
                  String login, String password) {
-        this.emailMap = emailMap;
+        this.emailBean = emailBean;
         this.server = server;
         this.port = port;
         this.ssl = ssl;
@@ -60,9 +64,8 @@ public class EmailSender implements Runnable{
     }
 
     //Costruttore che prende le proprietà dal portofino.properties
-    public EmailSender(Map emailMap) {
-
-        this.emailMap = emailMap;
+    public EmailSender(EmailBean emailBean) {
+        this.emailBean = emailBean;
         this.server = (String) PortofinoProperties.getProperties()
                     .get("mail.smtp.host");
         this.port = (Integer) PortofinoProperties.getProperties()
@@ -75,55 +78,45 @@ public class EmailSender implements Runnable{
                     .get("mail.smtp.password");
     }
 
-    public String getServer() {
-        return server;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-
     public synchronized void run() {
 
         try {
 
-            String attachmentPath = (String)emailMap.get("attachmentPath");
-            String attachmentDescription = (String)emailMap.get("attachmentDescription");
-            String attachmentName = (String)emailMap.get("attachmentName");
-            if(null == attachmentPath) {
-                Email email = new SimpleEmail();
-                email.setSmtpPort(port);
+            Email email;
+            if(null == emailBean.getAttachmentPath()) {
+                email = new SimpleEmail();                
+            } else {
+                email =  new MultiPartEmail();
+                EmailAttachment attachment = new EmailAttachment();
+                attachment.setPath(emailBean.getAttachmentPath());
+                attachment.setDisposition(EmailAttachment.ATTACHMENT);
+                attachment.setDescription(emailBean.getAttachmentDescription());
+                attachment.setName(emailBean.getAttachmentName());
+                ((MultiPartEmail) email).attach(attachment);
+            }
+            email.setSmtpPort(port);
                 if (null!=login && null!=password ) {
                     email.setAuthenticator(new DefaultAuthenticator(login, password));
                 }
-                email.setHostName(server);
-                email.setFrom((String) emailMap.get("from"));
-                email.setSubject((String) emailMap.get("subject"));
-                email.setMsg((String) emailMap.get("body"));
-                email.addTo((String) emailMap.get("to"));
-                email.setTLS(true);
-
-
-                email.send();
-            } else {
-                MultiPartEmail email =  new MultiPartEmail();
-                EmailAttachment attachment = new EmailAttachment();
-                attachment.setPath(attachmentPath);
-                attachment.setDisposition(EmailAttachment.ATTACHMENT);
-                attachment.setDescription(attachmentDescription);
-                attachment.setName(attachmentName);
-                email.attach(attachment);
-                email.send();
-            }
-
+            email.setHostName(server);
+            email.setFrom(emailBean.getFrom());
+            email.setSubject(emailBean.getSubject());
+            email.setMsg(emailBean.getBody());
+            email.addTo(emailBean.getTo());
+            email.setTLS(ssl);
+            email.send();
+            emailBean.setState(EmailManager.SENT);
+            EmailTask.successQueue.add(this);
 
         } catch (Throwable e) {
-            e.printStackTrace();
+            LogUtil.warningMF(logger, "Cannot send email with id {0}", e,
+                    emailBean.getId());
+            emailBean.setState(EmailManager.REJECTED);
             EmailTask.rejectedQueue.add(this);
-
         }
     }
 
-    
+    public EmailBean getEmailBean() {
+        return emailBean;
+    }
 }

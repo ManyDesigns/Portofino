@@ -40,8 +40,28 @@ import java.util.Map;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class EmailManager {
+
+    //STATI POSSIBILI DELLA MAIL
+    public static final int TOBESENT  = 0;
+    public static final int SENT  = 1;
+    public static final int REJECTED  = 2;
+    public static final int BOUNCED  = 3;
+
+
+    public static final String EMAILQUEUE_TABLE = "portofino.emailqueue";
+    public static final String SUBJECT = "subject";
+    public static final String BODY = "body";
+    public static final String TO = "to";
+    public static final String FROM = "from";
+    public static final String CREATEDATE = "createdate";
+    public static final String STATE = "state";
+    public static final String ID = "id";
+    public static final String ATTACHMENT_PATH = "attachmentPath";
+    public static final String ATTACHMENT_DESCRIPTION = "attachmentDescription";
+    public static final String ATTACHMENT_NAME = "attachmentName";
+
     public static synchronized void addEmail(Context context, Map email) {
-        context.saveObject("portofino.emailqueue", email);
+        context.saveObject(EMAILQUEUE_TABLE, email);
     }
 
     public static synchronized void addEmail(Context context, String subject, String body,
@@ -49,19 +69,19 @@ public class EmailManager {
     Integer state) {
         Map email = createEmail(subject, body, addressee,
                 sender, createdate, state);
-        context.saveObject("portofino.emailqueue", email);
+        context.saveObject(EMAILQUEUE_TABLE, email);
     }
     
     public static Map createEmail (String subject, String body,
     String addressee, String sender, Date createdate,
     Integer state) {
         Map email = new HashMap();
-        email.put("subject", subject);
-        email.put("body", body);
-        email.put("to", addressee);
-        email.put("from", sender);
-        email.put("createdate", createdate);
-        email.put("state", state);
+        email.put(SUBJECT, subject);
+        email.put(BODY, body);
+        email.put(TO, addressee);
+        email.put(FROM, sender);
+        email.put(CREATEDATE, createdate);
+        email.put(STATE, state);
         return email;
     }
 }

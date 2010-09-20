@@ -28,12 +28,22 @@
  */
 package com.manydesigns.portofino.email;
 
+import com.manydesigns.elements.fields.search.Criteria;
+import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.systemModel.email.EmailBean;
+import com.manydesigns.portofino.systemModel.users.User;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 
 /*
@@ -47,19 +57,50 @@ public class EmailTask extends TimerTask {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public static final int N_THREADS=5;
-    private static ExecutorService outbox = Executors.newFixedThreadPool
+    protected static final int N_THREADS=5;
+    protected static ExecutorService outbox = Executors.newFixedThreadPool
             (N_THREADS);
     protected static final ConcurrentLinkedQueue<EmailSender> successQueue
             = new ConcurrentLinkedQueue<EmailSender>();
     protected static final ConcurrentLinkedQueue<EmailSender> rejectedQueue
             = new ConcurrentLinkedQueue<EmailSender>();
-    private final POP3Client client;
-    private final Context context;
+    protected final POP3Client client;
+    protected static final Logger logger =
+            LogUtil.getLogger(TimerTask.class);
+    protected final Context context;
+
 
     public EmailTask(Context context) {
-        this.context=context;
-        client = null;
+        this.context = context;
+
+        //Setto il client smtp per il bouncing
+        String smtpHost = PortofinoProperties.getProperties()
+                .getProperty("mail.smtp.host", "127.0.0.1");
+        String smtpProtocol = PortofinoProperties.getProperties()
+                .getProperty("mail.smtp.protocol", "pop3");
+        int smtpPort = Integer.parseInt(PortofinoProperties.getProperties()
+                .getProperty("mail.smtp.port", "25"));
+        String smtpLogin = PortofinoProperties.getProperties()
+                .getProperty("mail.smtp.login");
+        String smtpPassword = PortofinoProperties.getProperties()
+                .getProperty("mail.smtp.password");
+        boolean bounceEnabled = Boolean.parseBoolean(PortofinoProperties.getProperties()
+                .getProperty("mail.bounce.enabled", "false"));
+        boolean sslEnabled = Boolean.parseBoolean(PortofinoProperties.getProperties()
+                .getProperty("mail.smtp.ssl.enabled", "false"));
+        if (bounceEnabled &&
+                smtpHost != null && smtpProtocol != null && smtpLogin != null
+                && smtpPassword != null) {
+            if (sslEnabled) {
+                client = new POP3SSLClient(smtpHost, smtpProtocol, smtpPort, smtpLogin,
+                        smtpPassword);
+            } else {
+                client = new POP3SimpleClient(smtpHost, smtpProtocol, smtpPort, smtpLogin,
+                        smtpPassword);
+            }
+        } else {
+            client = null;
+        }
     }
 
     public static void stop() {
@@ -77,48 +118,72 @@ public class EmailTask extends TimerTask {
     }
 
     public synchronized void createQueue() {
-        List<Object> emails = context.getAllObjects("portofino.emailqueue");
-        for (Object obj : emails) {
-            Map email = (Map) obj;
-            EmailSender emailSender = new EmailSender(email);
-        outbox.submit(emailSender);
+        try {
+            ClassAccessor accessor = context.getTableAccessor(
+                    EmailManager.EMAILQUEUE_TABLE);
+            Criteria criteria = new Criteria(accessor);
+            List<Object> emails = context.getObjects(
+                    criteria.eq(accessor.getProperty("state"),
+                            EmailManager.TOBESENT));
+            for (Object obj : emails) {
+
+                EmailSender emailSender = new EmailSender((EmailBean) obj);
+            outbox.submit(emailSender);
+            }
+        } catch (NoSuchFieldException e) {
+            LogUtil.warning(logger,"No state field in emailQueue",e);
         }
     }
 
 
     private synchronized void manageSuccessAndRejected() {
 
-
-
-        while (!successQueue.isEmpty()) {
-
-
+            while (!successQueue.isEmpty()) {
+                EmailSender email = successQueue.poll();
+                context.deleteObject(EmailManager.EMAILQUEUE_TABLE,
+                        email.getEmailBean());
+                context.commit("portofino");
             }
+
 
         while (!rejectedQueue.isEmpty()) {
             EmailSender email = rejectedQueue.poll();
-
+            LogUtil.finestMF(logger, "Adding reject mail with id:"
+                    + email.getEmailBean().getId());
             outbox.submit(email);
         }
     }
 
-
-    public static synchronized void resetOutbox()
-            throws Exception {
-    }
-
-    
-
     private synchronized void checkBounce() {
         if (client != null) {
             Set<String> emails = client.read();
-
             for (String email : emails) {
-                //incrementBounce(email);
+                incrementBounce(email);
             }
-
         }
     }
 
-
+    private void incrementBounce(String email) {
+        try {
+            ClassAccessor accessor = JavaClassAccessor.getClassAccessor(User.class);
+            Criteria criteria = new Criteria(accessor);
+            List<Object> users = context.getObjects(
+                    criteria.gt(accessor.getProperty("email"), email));
+            if (users.size()==0){
+                LogUtil.warningMF(logger,"no user found for email {0}", email);
+                return;
+            }
+            User user = (User) users.get(0);
+            Integer value = user.getBounced();
+            if (null==value){
+                value = 1;
+            } else {
+                value++;
+            }
+            user.setBounced(value);
+            context.saveObject("portofino.user_", user);
+        } catch (NoSuchFieldException e) {
+            LogUtil.warning(logger,"cannot increment bounce for user", e);
+        }
+    }
 }

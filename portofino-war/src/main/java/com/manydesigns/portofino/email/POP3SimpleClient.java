@@ -50,7 +50,7 @@ public class POP3SimpleClient extends POP3Client {
         Store store = null;
         try {
             Session session = Session.getDefaultInstance(pop3Props, null);
-            store = session.getStore(provider);
+            store = session.getStore(protocol);
             store.connect(host, username, password);
 
             inbox = store.getFolder("INBOX");

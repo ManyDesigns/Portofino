@@ -42,15 +42,15 @@ public class POP3SSLClient extends POP3Client {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public POP3SSLClient(String host, String provider, int port,
+    public POP3SSLClient(String host, String protocol, int port,
                          String username, String password) {
-        super(host, provider, port, username, password);
+        super(host, protocol, port, username, password);
     }
 
 
     public Set<String> read() {
         emails.clear();
-        URLName url = new URLName(provider, host, port, "",
+        URLName url = new URLName(protocol, host, port, "",
                 username, password);
         Folder inbox = null;
         Store store = null;
@@ -100,12 +100,12 @@ public class POP3SSLClient extends POP3Client {
     public static void main (String[] args)
     {
         String host = "pop.gmail.com";
-        String provider = "pop3";
+        String protocol = "pop3";
         int port = 995;
         String username = "test@manydesigns.com";
         String password = "MDtestMD";
 
-        POP3SSLClient client = new POP3SSLClient(host, provider, port, username, password);
+        POP3SSLClient client = new POP3SSLClient(host, protocol, port, username, password);
         client.read();
     }
 

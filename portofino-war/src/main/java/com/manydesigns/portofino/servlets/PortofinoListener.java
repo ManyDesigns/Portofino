@@ -36,6 +36,8 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
+import com.manydesigns.portofino.email.EmailTask;
+import com.manydesigns.portofino.email.PasswordGenerator;
 import org.apache.commons.lang.time.StopWatch;
 
 import javax.servlet.ServletContext;
@@ -45,6 +47,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.util.Properties;
+import java.util.Timer;
 import java.util.logging.Logger;
 
 
@@ -84,9 +87,13 @@ public class PortofinoListener
     protected ServletContext servletContext;
     protected ServerInfo serverInfo;
     protected Context context;
+    protected Timer scheduler;
 
     public static final Logger logger =
             LogUtil.getLogger(PortofinoListener.class);
+    private static final int PERIOD = 5000;
+    private static final int DELAY = 5000;
+    private static final int DELAY2 = 5300;
 
     //**************************************************************************
     // ServletContextListener implementation
@@ -134,11 +141,38 @@ public class PortofinoListener
                     serverInfo.getServletApiVersion());
             success = false;
         }
-
         if (success) {
             createContext();
         }
+        if (success) {
+            String securityType = (String) portofinoProperties
+                    .get("security.type");
+            String mailHost = (String) portofinoProperties
+                    .get("mail.smtp.host");
+            String mailSender = (String) portofinoProperties
+                    .get("mail.sender");
+            if ("application".equals(securityType))
+            {
+                if (null==mailSender
+                        || null == mailHost ) {
+                    LogUtil.infoMF(logger, "User admin email or smtp server not set in" +
+                            " portofino-custom.properties");
+                } else {
+                    scheduler = new java.util.Timer(true);
+                    //Password generator
+                    scheduler.schedule(new PasswordGenerator(context), DELAY, PERIOD);
+                    try {
 
+                        //Invio mail
+                        scheduler.schedule(new EmailTask(context),
+                                DELAY2, PERIOD);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        LogUtil.severe(logger, "Problems in starting schedulers", e);
+                    }
+                }
+            }
+        }
         stopWatch.stop();
         if (success) {
             LogUtil.infoMF(logger,
