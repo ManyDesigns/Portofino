@@ -29,7 +29,7 @@
 
 package com.manydesigns.elements.fields;
 
-import java.util.Map;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,13 +42,8 @@ public interface OptionProvider {
 
     int getFieldCount();
 
-    void resetValues();
-
     void setValue(int index, Object value);
     Object getValue(int index);
 
-    boolean validate();
-
-    String getLabel(int index);
-    Map<Object, String> getOptions(int index);
+    List<Object> getOptions(int index);
 }

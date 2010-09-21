@@ -31,7 +31,7 @@ package com.manydesigns.elements.fields;
 
 import junit.framework.TestCase;
 
-import java.util.Map;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,22 +42,16 @@ public class ArrayOptionProviderTest extends TestCase {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    Object[][] valuesArray = {
-            {1},
-            {2},
-            {3}
-    };
-
-    String[][] labelsArray = {
+    String[][] valuesArray = {
             {"qui"},
             {"quo"},
             {"qua"}
     };
 
-    ArrayOptionProvider optionProvider;
+    DefaultOptionProvider optionProvider;
 
     public void setUp() {
-        optionProvider = new ArrayOptionProvider(1, valuesArray, labelsArray);
+        optionProvider = new DefaultOptionProvider(1, valuesArray);
     }
 
     public void testArrayOptionsProvider1() {
@@ -66,49 +60,32 @@ public class ArrayOptionProviderTest extends TestCase {
 
     public void testArrayOptionsProvider2() {
         assertNull(optionProvider.getValue(0));
-        assertTrue(optionProvider.validate());
-        Map<Object, String> options1 = optionProvider.getOptions(0);
-        checkAllPresent(options1);
+        checkAllPresent();
     }
 
 
     public void testArrayOptionsProvider3() {
-        optionProvider.setValue(0, 2);
+        optionProvider.setValue(0, "qua");
         Object value = optionProvider.getValue(0);
         assertNotNull(value);
-        assertEquals(2, value);
+        assertEquals("qua", value);
 
-        assertTrue(optionProvider.validate());
-
-        String label = optionProvider.getLabel(0);
-        assertNotNull(label);
-        assertEquals("quo", label);
-
-        Map<Object, String> options1 = optionProvider.getOptions(0);
-        assertEquals(1, options1.size());
-        assertTrue(options1.containsKey(2));
-        assertEquals("quo", options1.get(2));
+        checkAllPresent();
     }
 
     public void testArrayOptionsProvider4() {
-        optionProvider.setValue(0, 4);
+        optionProvider.setValue(0, "pippo");
         Object value = optionProvider.getValue(0);
-        assertNotNull(value);
-        assertEquals(4, value);
+        assertNull(value);
 
-        assertFalse(optionProvider.validate());
-
-        Map<Object, String> options1 = optionProvider.getOptions(0);
-        checkAllPresent(options1);
+        checkAllPresent();
     }
 
-    private void checkAllPresent(Map<Object, String> options1) {
-        assertEquals(3, options1.size());
-        assertTrue(options1.containsKey(1));
-        assertTrue(options1.containsKey(2));
-        assertTrue(options1.containsKey(3));
-        assertEquals("qui", options1.get(1));
-        assertEquals("quo", options1.get(2));
-        assertEquals("qua", options1.get(3));
+    private void checkAllPresent() {
+        List<Object> options = optionProvider.getOptions(0);
+        assertEquals(3, options.size());
+        assertTrue(options.contains("qui"));
+        assertTrue(options.contains("quo"));
+        assertTrue(options.contains("qua"));
     }
 }

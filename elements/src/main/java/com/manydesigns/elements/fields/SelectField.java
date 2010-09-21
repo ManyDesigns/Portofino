@@ -35,7 +35,6 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 
 /*
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -137,16 +136,11 @@ public class SelectField extends AbstractField {
         boolean checked = (objectValue == null);
         xb.writeOption("", checked, comboLabel);
 
-        if (optionProvider != null) {
-            for (Map.Entry<Object, String> option :
-                    optionProvider.getOptions(optionProviderIndex).entrySet()) {
-                Object optionValue = option.getKey();
-                String optionStringValue =
-                        (String) Util.convertValue(optionValue, String.class);
-                String optionLabel = option.getValue();
-                checked =  optionValue.equals(objectValue);
-                xb.writeOption(optionStringValue, checked, optionLabel);
-            }
+        for (Object option : optionProvider.getOptions(optionProviderIndex)) {
+            String optionString =
+                    (String) Util.convertValue(option, String.class);
+            checked =  option.equals(objectValue);
+            xb.writeOption(optionString, checked, optionString);
         }
         xb.closeElement("select");
     }
@@ -166,13 +160,9 @@ public class SelectField extends AbstractField {
         xb.openElement("div");
         xb.addAttribute("class", "value");
         xb.addAttribute("id", id);
-        String optionLabel = optionProvider.getLabel(optionProviderIndex);
-        String optionUrl = "TODO";
-        if (optionUrl != null) {
-            xb.writeAnchor(optionUrl, optionLabel);
-        } else {
-            xb.write(optionLabel);
-        }
+        Object value = optionProvider.getValue(optionProviderIndex);
+        String stringValue = (String) Util.convertValue(value, String.class);
+        xb.write(stringValue);
         xb.closeElement("div");
     }
 

@@ -29,12 +29,15 @@
 
 package com.manydesigns.elements.fields;
 
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.text.BasicTextProvider;
 import junit.framework.TestCase;
 
-import java.util.Collection;
+import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,28 +48,23 @@ public class SelectFieldTest extends TestCase {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    Object[][] valuesArray = {
-            {1, 1},
-            {1, 2},
-            {1, 3},
-            {2, 4}
-    };
-
-    String[][] labelsArray = {
+    String[][] valuesArray = {
             {"paperino", "qui"},
             {"paperino", "quo"},
             {"paperino", "qua"},
             {"cip", "ciop"}
     };
 
-    ArrayOptionProvider optionProvider;
+    DefaultOptionProvider optionProvider;
 
     Form form;
     SelectField selectField1;
     SelectField selectField2;
 
     public void setUp() {
-        optionProvider = new ArrayOptionProvider(2, valuesArray, labelsArray);
+        ElementsThreadLocals.setTextProvider(new BasicTextProvider(Locale.ENGLISH));
+
+        optionProvider = new DefaultOptionProvider(2, valuesArray);
 
         form = new FormBuilder(Bean.class)
                 .configOptionProvider(optionProvider, "p1", "p2")
@@ -77,11 +75,6 @@ public class SelectFieldTest extends TestCase {
     }
 
     public void testSelectField1() {
-        Collection<OptionProvider> formOptionProviders =
-                form.getOptionProviders();
-        assertEquals(1, formOptionProviders.size());
-        assertTrue(formOptionProviders.contains(optionProvider));
-        
         assertEquals(optionProvider, selectField1.getOptionProvider());
         assertEquals(0, selectField1.getOptionProviderIndex());
 
@@ -92,25 +85,25 @@ public class SelectFieldTest extends TestCase {
     public void testSelectField2() {
         Bean bean = new Bean(null, null);
         form.readFromObject(bean);
-        assertTrue(form.validate());
+        assertFalse(form.validate());
 
         assertNull(optionProvider.getValue(0));
         assertNull(optionProvider.getValue(1));
     }
 
     public void testSelectField3() {
-        Bean bean = new Bean(1, null);
+        Bean bean = new Bean("cip", null);
         form.readFromObject(bean);
-        assertTrue(form.validate());
+        assertFalse(form.validate());
 
         assertNotNull(optionProvider.getValue(0));
-        assertEquals(1, optionProvider.getValue(0));
+        assertEquals("cip", optionProvider.getValue(0));
         assertNull(optionProvider.getValue(1));
     }
 
 
     public void testSelectField4() {
-        Bean bean = new Bean(null, 1);
+        Bean bean = new Bean(null, "quo");
         form.readFromObject(bean);
         assertFalse(form.validate());
 
@@ -118,11 +111,41 @@ public class SelectFieldTest extends TestCase {
         assertNull(optionProvider.getValue(1));
     }
 
-    public static class Bean {
-        public Integer p1;
-        public Integer p2;
+    public void testSelectField5() {
+        Bean bean = new Bean("bla", "qui");
+        form.readFromObject(bean);
+        assertFalse(form.validate());
 
-        public Bean(Integer p1, Integer p2) {
+        assertNull(optionProvider.getValue(0));
+        assertNull(optionProvider.getValue(1));
+    }
+
+    public void testSelectField6() {
+        Bean bean = new Bean("paperino", "ciop");
+        form.readFromObject(bean);
+        assertFalse(form.validate());
+
+        assertEquals(null, optionProvider.getValue(0));
+        assertEquals(null, optionProvider.getValue(1));
+    }
+
+    public void testSelectField7() {
+        Bean bean = new Bean("paperino", "qua");
+        form.readFromObject(bean);
+        assertTrue(form.validate());
+
+        assertEquals("paperino", optionProvider.getValue(0));
+        assertEquals("qua", optionProvider.getValue(1));
+    }
+
+    public static class Bean {
+        @Required
+        public String p1;
+
+        @Required
+        public String p2;
+
+        public Bean(String p1, String p2) {
             this.p1 = p1;
             this.p2 = p2;
         }
