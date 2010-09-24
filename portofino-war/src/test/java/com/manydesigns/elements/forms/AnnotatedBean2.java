@@ -27,23 +27,29 @@
  *
  */
 
-package com.manydesigns.elements.fields;
+package com.manydesigns.elements.forms;
 
-import java.util.Map;
+import com.manydesigns.elements.annotations.ColSpan;
+import com.manydesigns.elements.annotations.ForceNewRow;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface OptionProvider {
+public class AnnotatedBean2 {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    int getFieldCount();
+    public String s1;
+    public String s2;
+    public String s3;
 
-    void setValue(int index, Object value);
-    Object getValue(int index);
+    @ColSpan(2)
+    public String s4;
 
-    Map<Object,String> getOptions(int index);
+    @ForceNewRow
+    public String s5;
+    public String s6;
+    public String s7;
 }

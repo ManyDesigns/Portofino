@@ -48,11 +48,9 @@ public class BooleanFieldHelper implements FieldHelper {
                                   PropertyAccessor propertyAccessor,
                                   String prefix) {
         Field result;
-        if (Boolean.class.isAssignableFrom(propertyAccessor.getType())) {
+        Class type = propertyAccessor.getType();
+        if (type == Boolean.class || type == Boolean.TYPE) {
             result = new BooleanField(propertyAccessor, prefix);
-        } else if (Boolean.TYPE.isAssignableFrom(propertyAccessor.getType())) {
-            result = new BooleanField(propertyAccessor, prefix);
-            result.setRequired(true);
         } else {
             result = null;
         }

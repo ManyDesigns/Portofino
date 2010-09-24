@@ -509,7 +509,7 @@ public class TableDataAction extends PortofinoAction
             List<Object> relatedObjects =
                     context.getAllObjects(relatedTable.getQualifiedName());
             OptionProvider optionProvider =
-                    DefaultOptionProvider.create(classAccessor, relatedObjects);
+                    DefaultOptionProvider.create(relatedObjects, classAccessor);
             formBuilder.configOptionProvider(optionProvider, fields);
         }
 

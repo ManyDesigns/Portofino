@@ -27,72 +27,57 @@
  *
  */
 
-package com.manydesigns.elements.fields;
+package com.manydesigns.elements.xml;
 
-import junit.framework.TestCase;
-
-import java.util.Map;
+import com.manydesigns.elements.AbstractElementsTest;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ArrayOptionProviderTest extends TestCase {
+public class WellFormedTest extends AbstractElementsTest {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    Object[][] valuesArray = {
-            {1},
-            {2},
-            {3}
-    };
-
-    String[][] labelsArray = {
-            {"qui"},
-            {"quo"},
-            {"qua"}
-    };
-
-    DefaultOptionProvider optionProvider;
-
-    public void setUp() {
-        optionProvider = DefaultOptionProvider.create(
-                1, valuesArray, labelsArray);
+    public void testUnderflow() {
+        XmlBuffer xb = new XmlBuffer();
+        try {
+            xb.openElement("bla");
+            xb.closeElement("bla");
+            xb.closeElement("bla");
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("Stack underflow: <bla></bla>", e.getMessage());
+        }
     }
 
-    public void testArrayOptionsProvider1() {
-        assertEquals(1, optionProvider.getFieldCount());
+    public void testNoCheckWellFormed() {
+        XmlBuffer.checkWellFormed = false;
+        XmlBuffer xb = new XmlBuffer();
+        xb.openElement("bla");
+        xb.closeElement("bla");
+        xb.closeElement("bla");
+    }
+    public void testMismatch() {
+        XmlBuffer xb = new XmlBuffer();
+        try {
+            xb.openElement("foo");
+            xb.closeElement("bar");
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("Expected: foo - Actual: bar\n<foo", e.getMessage());
+        }
     }
 
-    public void testArrayOptionsProvider2() {
-        assertNull(optionProvider.getValue(0));
-        checkAllPresent();
-    }
-
-
-    public void testArrayOptionsProvider3() {
-        optionProvider.setValue(0, 2);
-        Object value = optionProvider.getValue(0);
-        assertNotNull(value);
-        assertEquals(2, value);
-
-        checkAllPresent();
-    }
-
-    public void testArrayOptionsProvider4() {
-        optionProvider.setValue(0, 4);
-        Object value = optionProvider.getValue(0);
-        assertNull(value);
-
-        checkAllPresent();
-    }
-
-    private void checkAllPresent() {
-        Map<Object,String> options = optionProvider.getOptions(0);
-        assertEquals(3, options.size());
-        assertEquals("qui", options.get(1));
-        assertEquals("quo", options.get(2));
-        assertEquals("qua", options.get(3));
+    public void testUnclosed() {
+        try {
+            XmlBuffer xb = new XmlBuffer();
+            xb.openElement("foo");
+            xb.toString();
+//            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("Stack not empty: <foo", e.getMessage());
+        }
     }
 }

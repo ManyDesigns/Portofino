@@ -29,125 +29,346 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.elements.forms.FieldSet;
-import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.text.BasicTextProvider;
-import junit.framework.TestCase;
-
-import java.util.Locale;
+import com.manydesigns.elements.AbstractElementsTest;
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SelectFieldTest extends TestCase {
+public class SelectFieldTest extends AbstractElementsTest {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    String[][] valuesArray = {
-            {"paperino", "qui"},
-            {"paperino", "quo"},
-            {"paperino", "qua"},
-            {"cip", "ciop"}
+    public String myText;
+
+    private SelectField selectField;
+    private SelectField selectField2;
+
+    private String[][] valuesArray = {
+            {"value1"},
+            {"value2"},
+            {"value3"}
+    };
+    private String[][] labelsArray = {
+            {"label1"},
+            {"label2"},
+            {"label3"}
     };
 
-    DefaultOptionProvider optionProvider;
+    private String[][] valuesArray2 = {
+            {"value1"}
+    };
+    private String[][] labelsArray2 = {
+            {"label1"}
+    };
 
-    Form form;
-    SelectField selectField1;
-    SelectField selectField2;
+    private OptionProvider optionProvider;
+    private OptionProvider optionProvider2;
 
-    public void setUp() {
-        ElementsThreadLocals.setTextProvider(new BasicTextProvider(Locale.ENGLISH));
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
 
-        optionProvider = new DefaultOptionProvider(2, valuesArray);
+        myText = null;
 
-        form = new FormBuilder(Bean.class)
-                .configOptionProvider(optionProvider, "p1", "p2")
-                .build();
-        FieldSet fieldSet = form.get(0);
-        selectField1 = (SelectField) fieldSet.get(0);
-        selectField2 = (SelectField) fieldSet.get(1);
+        // impostiamo selectField
+        ClassAccessor classAccessor =
+                JavaClassAccessor.getClassAccessor(this.getClass());
+        PropertyAccessor myPropertyAccessor =
+                classAccessor.getProperty("myText");
+        selectField = new SelectField(myPropertyAccessor);
+
+        optionProvider = DefaultOptionProvider.create(
+                1, valuesArray, labelsArray);
+        selectField.setOptionProvider(optionProvider);
+
+        // impostiamo selectField2
+        selectField2 = new SelectField(myPropertyAccessor);
+
+        optionProvider2 = DefaultOptionProvider.create(
+                1, valuesArray2, labelsArray2);
+        selectField2.setOptionProvider(optionProvider2);
     }
 
-    public void testSelectField1() {
-        assertEquals(optionProvider, selectField1.getOptionProvider());
-        assertEquals(0, selectField1.getOptionProviderIndex());
-
-        assertEquals(optionProvider, selectField2.getOptionProvider());
-        assertEquals(1, selectField2.getOptionProviderIndex());
+    public void testSimple() {
+        assertNull(selectField.getComboLabel());
+        assertEquals(optionProvider, selectField.getOptionProvider());
+        assertEquals(optionProvider2, selectField2.getOptionProvider());
+        assertNull(selectField.getValue());
+        assertNotNull(selectField.getErrors());
+        assertEquals(0, selectField.getErrors().size());
+        assertNull(selectField.getHelp());
+        assertEquals("myText", selectField.getId());
+        assertEquals("myText", selectField.getInputName());
+        assertEquals("My text", selectField.getLabel());
+        assertEquals(Mode.EDIT, selectField.getMode());
+        assertFalse(selectField.isRequired());
+        assertEquals(3, optionProvider.getOptions(0).size());
+        assertEquals(1, optionProvider2.getOptions(0).size());
     }
 
-    public void testSelectField2() {
-        Bean bean = new Bean(null, null);
-        form.readFromObject(bean);
-        assertFalse(form.validate());
+    //--------------------------------------------------------------------------
+    // Mode.EDIT
+    //--------------------------------------------------------------------------
 
-        assertNull(optionProvider.getValue(0));
-        assertNull(optionProvider.getValue(1));
+    public void testEditNull() {
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+                "</label></th><td><select id=\"myText\" name=\"myText\">" +
+                "<option value=\"\" selected=\"selected\"></option>" +
+                "<option value=\"value1\">label1</option>" +
+                "<option value=\"value2\">label2</option>" +
+                "<option value=\"value3\">label3</option>" +
+                "</select></td>", text);
     }
 
-    public void testSelectField3() {
-        Bean bean = new Bean("cip", null);
-        form.readFromObject(bean);
-        assertFalse(form.validate());
+    public void testEditNullRequired() {
+        selectField.setRequired(true);
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">" +
+                "<span class=\"required\">*</span>&nbsp;My text:" +
+                "</label></th><td><select id=\"myText\" name=\"myText\">" +
+                "<option value=\"\" selected=\"selected\"></option>" +
+                "<option value=\"value1\">label1</option>" +
+                "<option value=\"value2\">label2</option>" +
+                "<option value=\"value3\">label3</option>" +
+                "</select></td>", text);
 
-        assertNotNull(optionProvider.getValue(0));
-        assertEquals("cip", optionProvider.getValue(0));
-        assertNull(optionProvider.getValue(1));
+        assertFalse(selectField.validate());
+        text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">" +
+                "<span class=\"required\">*</span>&nbsp;My text:" +
+                "</label></th><td><select id=\"myText\" name=\"myText\">" +
+                "<option value=\"\" selected=\"selected\"></option>" +
+                "<option value=\"value1\">label1</option>" +
+                "<option value=\"value2\">label2</option>" +
+                "<option value=\"value3\">label3</option>" +
+                "</select><ul class=\"errors\">" +
+                "<li>Required field" +
+                "</li></ul></td>", text);
+    }
+
+    public void testEditNullWithComboLabel() {
+        selectField.setComboLabel("-- Scegli opzione --");
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+                "</label></th><td><select id=\"myText\" name=\"myText\">" +
+                "<option value=\"\" selected=\"selected\">-- Scegli opzione --</option>" +
+                "<option value=\"value1\">label1</option>" +
+                "<option value=\"value2\">label2</option>" +
+                "<option value=\"value3\">label3</option>" +
+                "</select></td>", text);
+        assertEquals("-- Scegli opzione --", selectField.getComboLabel());
+    }
+
+    public void testEditValidSelection() {
+        selectField.setValue("value1");
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+                "</label></th><td><select id=\"myText\" name=\"myText\">" +
+                "<option value=\"\"></option>" +
+                "<option value=\"value1\" selected=\"selected\">label1</option>" +
+                "<option value=\"value2\">label2</option>" +
+                "<option value=\"value3\">label3</option>" +
+                "</select></td>", text);
+    }
+
+    public void testEditInvalidSelection() {
+        selectField.setValue("value4");
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+                "</label></th><td><select id=\"myText\" name=\"myText\">" +
+                "<option value=\"\" selected=\"selected\"></option>" +
+                "<option value=\"value1\">label1</option>" +
+                "<option value=\"value2\">label2</option>" +
+                "<option value=\"value3\">label3</option>" +
+                "</select></td>", text);
+    }
+
+    //--------------------------------------------------------------------------
+    // Mode.VIEW
+    //--------------------------------------------------------------------------
+
+    public void testViewNull() {
+        selectField.setMode(Mode.VIEW);
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+                "</label></th><td>" +
+                "<div class=\"value\" id=\"myText\"></div>" +
+                "</td>", text);
+    }
+
+    public void testViewValidSelection() {
+        selectField.setMode(Mode.VIEW);
+        selectField.setValue("value1");
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+                "</label></th><td>" +
+                "<div class=\"value\" id=\"myText\">label1</div>" +
+                "</td>", text);
+    }
+
+    public void testViewValidSelectionNoUrl() {
+        selectField.setMode(Mode.VIEW);
+        selectField.setValue("value3");
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+                "</label></th><td>" +
+                "<div class=\"value\" id=\"myText\">label3</div>" +
+                "</td>", text);
+    }
+
+    public void testViewInvalidSelection() {
+        selectField.setMode(Mode.VIEW);
+        selectField.setValue("value4");
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+                "</label></th><td>" +
+                "<div class=\"value\" id=\"myText\"></div>" +
+                "</td>", text);
+    }
+
+    //--------------------------------------------------------------------------
+    // Mode.PREVIEW
+    //--------------------------------------------------------------------------
+
+    public void testPreviewNull() {
+        selectField.setMode(Mode.PREVIEW);
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+                "</label></th><td>" +
+                "<div class=\"value\" id=\"myText\"></div>" +
+                "<input type=\"hidden\" name=\"myText\"></input>" +
+                "</td>", text);
+    }
+
+    public void testPreviewValidSelection() {
+        selectField.setMode(Mode.PREVIEW);
+        selectField.setValue("value1");
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+                "</label></th><td>" +
+                "<div class=\"value\" id=\"myText\">label1</div>" +
+                "<input type=\"hidden\" name=\"myText\" value=\"value1\"></input>" +
+                "</td>", text);
+    }
+
+    public void testPreviewValidSelectionNoUrl() {
+        selectField.setMode(Mode.PREVIEW);
+        selectField.setValue("value3");
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+                "</label></th><td>" +
+                "<div class=\"value\" id=\"myText\">label3</div>" +
+                "<input type=\"hidden\" name=\"myText\" value=\"value3\"></input>" +
+                "</td>", text);
+    }
+
+    public void testPreviewInvalidSelection() {
+        selectField.setMode(Mode.PREVIEW);
+        selectField.setValue("value4");
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+                "</label></th><td>" +
+                "<div class=\"value\" id=\"myText\"></div>" +
+                "<input type=\"hidden\" name=\"myText\"></input>" +
+                "</td>", text);
     }
 
 
-    public void testSelectField4() {
-        Bean bean = new Bean(null, "quo");
-        form.readFromObject(bean);
-        assertFalse(form.validate());
+    //--------------------------------------------------------------------------
+    // Mode.HIDDEN
+    //--------------------------------------------------------------------------
 
-        assertNull(optionProvider.getValue(0));
-        assertNull(optionProvider.getValue(1));
+    public void testHiddenNull() {
+        selectField.setMode(Mode.HIDDEN);
+        String text = elementToString(selectField);
+        assertEquals("<input type=\"hidden\" name=\"myText\"></input>", text);
     }
 
-    public void testSelectField5() {
-        Bean bean = new Bean("bla", "qui");
-        form.readFromObject(bean);
-        assertFalse(form.validate());
-
-        assertNull(optionProvider.getValue(0));
-        assertNull(optionProvider.getValue(1));
+    public void testHiddenValidSelection() {
+        selectField.setMode(Mode.HIDDEN);
+        selectField.setValue("value1");
+        String text = elementToString(selectField);
+        assertEquals("<input type=\"hidden\" name=\"myText\" value=\"value1\"></input>", text);
     }
 
-    public void testSelectField6() {
-        Bean bean = new Bean("paperino", "ciop");
-        form.readFromObject(bean);
-        assertFalse(form.validate());
-
-        assertEquals(null, optionProvider.getValue(0));
-        assertEquals(null, optionProvider.getValue(1));
+    public void testHiddenValidSelectionNoUrl() {
+        selectField.setMode(Mode.HIDDEN);
+        selectField.setValue("value3");
+        String text = elementToString(selectField);
+        assertEquals("<input type=\"hidden\" name=\"myText\" value=\"value3\"></input>", text);
     }
 
-    public void testSelectField7() {
-        Bean bean = new Bean("paperino", "qua");
-        form.readFromObject(bean);
-        assertTrue(form.validate());
-
-        assertEquals("paperino", optionProvider.getValue(0));
-        assertEquals("qua", optionProvider.getValue(1));
+    public void testHiddenInvalidSelection() {
+        selectField.setMode(Mode.HIDDEN);
+        selectField.setValue("value4");
+        String text = elementToString(selectField);
+        assertEquals("<input type=\"hidden\" name=\"myText\"></input>", text);
     }
 
-    public static class Bean {
-        @Required
-        public String p1;
+    //--------------------------------------------------------------------------
+    // metodi di Element
+    //--------------------------------------------------------------------------
 
-        @Required
-        public String p2;
+    public void testReadFromRequestWrongValue() {
+        assertFalse(selectField.isRequired());
 
-        public Bean(String p1, String p2) {
-            this.p1 = p1;
-            this.p2 = p2;
-        }
+        req.setParameter("myText", "wrongValue");
+        assertNull(selectField.getValue());
+        selectField.readFromRequest(req);
+        assertNull(selectField.getValue());
+    }
+
+    public void testReadFromRequest() {
+        assertFalse(selectField.isRequired());
+
+        req.setParameter("myText", "value1");
+        assertNull(selectField.getValue());
+        selectField.readFromRequest(req);
+        assertEquals("value1", selectField.getValue());
+    }
+
+    public void testReadFromRequestRequired() {
+        assertEquals(1, optionProvider2.getOptions(0).size());
+        selectField2.setRequired(true);
+
+        assertNull(selectField2.getValue());
+        selectField2.readFromRequest(req);
+        String text = elementToString(selectField2);
+        assertEquals("<th><label for=\"myText\" class=\"field\">" +
+                "<span class=\"required\">*</span>&nbsp;My text:" +
+                "</label></th><td><select id=\"myText\" name=\"myText\">" +
+                "<option value=\"\"></option>" +
+                "<option value=\"value1\" selected=\"selected\">label1</option>" +
+                "</select></td>", text);
+    }
+
+    public void testReadFromRequestNotRequired() {
+        assertFalse(selectField.isRequired());
+        assertEquals(1, optionProvider2.getOptions(0).size());
+
+        assertNull(selectField2.getValue());
+        selectField2.readFromRequest(req);
+        assertNull(selectField2.getValue());
+    }
+
+    public void testReadFromObject() {
+        assertNull(selectField.getValue());
+        myText = "value2";
+        selectField.readFromObject(this);
+        assertEquals("value2", selectField.getValue());
+    }
+
+    public void testWriteToObject() {
+        assertNull(myText);
+        selectField.setValue("value2");
+        selectField.writeToObject(this);
+        assertEquals("value2", myText);
     }
 }

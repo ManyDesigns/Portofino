@@ -80,6 +80,10 @@ public class NumericField extends AbstractTextField {
             minValue = new BigDecimal(Long.MIN_VALUE);
             maxValue = new BigDecimal(Long.MAX_VALUE);
         }
+        if (type.isPrimitive()) {
+            setRequired(true);
+        }
+
         if (accessor.isAnnotationPresent(PrecisionScale.class)) {
             PrecisionScale annotation =
                     accessor.getAnnotation(PrecisionScale.class);

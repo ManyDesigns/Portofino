@@ -27,51 +27,16 @@
  *
  */
 
-package com.manydesigns.elements.fields;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-
-import java.util.ArrayList;
+package com.manydesigns.elements.forms;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public final class DefaultSelectFieldOption
-        extends ArrayList<SelectFieldOption>
-        implements SelectFieldOption {
+public class ChildBean1 extends ParentBean1 {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final Object value;
-    private final String label;
-    private final String url;
-
-    public DefaultSelectFieldOption(Object value, String label, String url) {
-        super(0); // save some memory
-        this.value = value;
-        this.label = label;
-        this.url = url;
-    }
-
-    public Object getValue() {
-        return value;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("value", value)
-                .append("label", label)
-                .append("url", url)
-                .toString();
-    }
+    public String childText;
 }

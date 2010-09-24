@@ -27,23 +27,36 @@
  *
  */
 
-package com.manydesigns.elements.fields;
+package com.manydesigns.elements.forms;
 
-import java.util.Map;
+import com.manydesigns.elements.annotations.FieldSet;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface OptionProvider {
+public class AnnotatedBean1 {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    int getFieldCount();
+    public boolean boolean1;
+    
+    public boolean boolean2;
 
-    void setValue(int index, Object value);
-    Object getValue(int index);
+    @FieldSet("foo")
+    public Date date;
 
-    Map<Object,String> getOptions(int index);
+    @FieldSet("foo")
+    public BigDecimal decimal;
+
+    public int anInt;
+
+    @FieldSet("bar")
+    public Integer anInteger;
+
+    public String text;
 }

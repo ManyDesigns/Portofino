@@ -60,6 +60,10 @@ public class BooleanField extends AbstractField {
 
     public BooleanField(PropertyAccessor accessor, String prefix) {
         super(accessor, prefix);
+        Class type = accessor.getType();
+        if (type.isPrimitive()) {
+            setRequired(true);
+        }
     }
 
     //**************************************************************************

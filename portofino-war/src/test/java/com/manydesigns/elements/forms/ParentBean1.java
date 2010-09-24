@@ -27,23 +27,18 @@
  *
  */
 
-package com.manydesigns.elements.fields;
-
-import java.util.Map;
+package com.manydesigns.elements.forms;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface OptionProvider {
+public class ParentBean1 {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    int getFieldCount();
+    public String anotherParentText; // for lexicographic ordering
 
-    void setValue(int index, Object value);
-    Object getValue(int index);
-
-    Map<Object,String> getOptions(int index);
+    public String parentText;
 }
