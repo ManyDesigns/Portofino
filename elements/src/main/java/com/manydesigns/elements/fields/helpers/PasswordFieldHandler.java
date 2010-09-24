@@ -46,8 +46,8 @@ public class PasswordFieldHandler implements FieldHelper {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public Field tryToInstantiateField(ClassAccessor classAccessor,
-                                  PropertyAccessor propertyAccessor,
-                                  String prefix) {
+                                       PropertyAccessor propertyAccessor,
+                                       String prefix) {
         if (String.class.isAssignableFrom(propertyAccessor.getType())
                 && propertyAccessor.isAnnotationPresent(Password.class)) {
                 return new PasswordField(propertyAccessor, prefix);
@@ -55,7 +55,9 @@ public class PasswordFieldHandler implements FieldHelper {
         return null;
     }
 
-    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor, PropertyAccessor propertyAccessor, String prefix) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
+                                                   PropertyAccessor propertyAccessor,
+                                                   String prefix) {
+        return null;
     }
 }

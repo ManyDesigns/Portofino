@@ -94,7 +94,7 @@ public abstract class AbstractTextField extends AbstractField {
         } else if (mode.isPreview()) {
             valueToXhtmlPreview(xb);
         } else if (mode.isHidden()) {
-            xb.writeInputHidden(inputName, stringValue);
+            xb.writeInputHidden(id, inputName, stringValue);
         } else {
             throw new IllegalStateException("Unknown mode: " + mode);
         }
