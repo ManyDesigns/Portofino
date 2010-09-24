@@ -105,8 +105,8 @@ public class PasswordGenerator extends TimerTask {
             String msg =
              "user "+ user.getEmail()+" "+ user.getPwd();
             EmailTask em = new EmailTask(context);
-            EmailManager.addEmail(context, "subject", msg,
-                user.getEmail(), sender, new Date(), EmailManager.TOBESENT);
+            EmailHandler.addEmail(context, "subject", msg,
+                user.getEmail(), sender, new Date(), EmailHandler.TOBESENT);
             context.saveObject("portofino.user_", user);
             context.commit("portofino");
         } catch (Throwable e) {

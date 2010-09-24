@@ -38,6 +38,7 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.logging.Logger;
 
 /*
@@ -46,7 +47,7 @@ import java.util.logging.Logger;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class LoginAction extends PortofinoAction
-        implements ServletRequestAware {
+        implements ServletRequestAware, LoginUnAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -89,19 +90,42 @@ public class LoginAction extends PortofinoAction
         final String password = user.getPwd();
         user = context.login(email, password);
         if (null!=user && user.getUuid()!=0) {
+            LogUtil.fineMF(logger, "User {0} login", user.getEmail());
+            updateUser(user);
             return SUCCESS;
         } else {
             String errMsg = MessageFormat.format("FAILED AUTH for user {0}", email);
             SessionMessages.addInfoMessage(errMsg);            
-            logger.warning(errMsg);
+            LogUtil.warningMF(logger, errMsg);
+            updateFailedUser(email);
             return INPUT;
         }
+    }
+
+    private void updateFailedUser(String email) {
+        User user;
+        user = context.findUserByEmail(email);
+        if (user == null) {
+            return;
+        }
+        user.setLastFailedLoginDate(new Date());
+        int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
+        user.setFailedLoginAttempts(failedAttempts+1);
+        context.updateObject("portofino.public.user_", user);
+        context.commit("portofino");
+    }
+
+    private void updateUser(User user) {
+        user.setFailedLoginAttempts(0);
+        user.setLastLoginDate(new Date());
+        user.setLoginIp(req.getRemoteHost());
+        user.setToken(null);
+        context.updateObject("portofino.public.user_", user);
+        context.commit("portofino");
     }
 
     public String logout(){
         context.logout();
         return INPUT;
     }
-
-
 }

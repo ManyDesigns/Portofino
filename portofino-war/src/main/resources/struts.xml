@@ -321,9 +321,19 @@
             </result>
         </action>
         <action name="Profile" class="com.manydesigns.portofino.actions.user.ProfileAction">
-            <result name="success">/skins/default/user/profile.jsp</result>
+            <result name="success">
+                /skins/default/user/profile.jsp
+            </result>
         </action>
-
+        <action name="PwdRecovery" class="com.manydesigns.portofino.actions.user.PwdRecoveryAction">
+            <result name="input">
+                /skins/default/user/passwordRecovery.jsp
+            </result>
+            <result name="success" type="redirectAction">
+                <param name="actionName">Login</param>
+                <param name="namespace">/</param>
+            </result>
+        </action>
         <action name="Settings" class="com.manydesigns.portofino.actions.user.SettingsAction">
             <result name="success">/skins/default/user/settings.jsp</result>
         </action>

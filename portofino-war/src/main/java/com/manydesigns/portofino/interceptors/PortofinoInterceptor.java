@@ -31,7 +31,7 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.user.LoginAction;
+import com.manydesigns.portofino.actions.user.LoginUnAware;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.servlets.PortofinoListener;
@@ -99,7 +99,7 @@ public class PortofinoInterceptor implements Interceptor {
                     .get("user.enabled"));
             if (userEnabled &&
                     context.getCurrentUser()==null
-                    && !(invocation.getAction() instanceof LoginAction)) {
+                    && !(invocation.getAction() instanceof LoginUnAware)) {
                 return LOGIN_ACTION;
             }
             result = invocation.invoke();

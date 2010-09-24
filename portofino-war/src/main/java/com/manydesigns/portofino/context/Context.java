@@ -131,6 +131,8 @@ public interface Context {
 
     User login(String email, String password);
 
+    public User findUserByEmail(String email);
+
     void logout();
 
     User getCurrentUser();

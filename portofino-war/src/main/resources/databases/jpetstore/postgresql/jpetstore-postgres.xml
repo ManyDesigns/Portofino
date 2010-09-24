@@ -862,7 +862,6 @@
                                               >
                                     <reference fromColumn="tb4_id"
                                                toColumn="id"/>
-
                                 </relationship>
                             </relationships>
                         </table>

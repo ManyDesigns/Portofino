@@ -11,7 +11,11 @@
             <h1>Login</h1>
             <p/>
             <mdes:write value="form"/>
+
             <s:submit id="loginButton" method="login" value="Login" />
+            <p>
+            Hai dimenticato la password? <a href="PwdRecovery.action">recupera password</a>
+            </p>
         </div>
         <s:hidden name="successReturnUrl" value="%{successReturnUrl}"/>
     </div>

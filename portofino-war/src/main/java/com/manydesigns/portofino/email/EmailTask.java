@@ -120,11 +120,11 @@ public class EmailTask extends TimerTask {
     public synchronized void createQueue() {
         try {
             ClassAccessor accessor = context.getTableAccessor(
-                    EmailManager.EMAILQUEUE_TABLE);
+                    EmailHandler.EMAILQUEUE_TABLE);
             Criteria criteria = new Criteria(accessor);
             List<Object> emails = context.getObjects(
                     criteria.eq(accessor.getProperty("state"),
-                            EmailManager.TOBESENT));
+                            EmailHandler.TOBESENT));
             for (Object obj : emails) {
 
                 EmailSender emailSender = new EmailSender((EmailBean) obj);
@@ -140,7 +140,7 @@ public class EmailTask extends TimerTask {
 
             while (!successQueue.isEmpty()) {
                 EmailSender email = successQueue.poll();
-                context.deleteObject(EmailManager.EMAILQUEUE_TABLE,
+                context.deleteObject(EmailHandler.EMAILQUEUE_TABLE,
                         email.getEmailBean());
                 context.commit("portofino");
             }

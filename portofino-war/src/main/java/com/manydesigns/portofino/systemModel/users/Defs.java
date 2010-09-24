@@ -26,7 +26,7 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.systemModel;
+package com.manydesigns.portofino.systemModel.users;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

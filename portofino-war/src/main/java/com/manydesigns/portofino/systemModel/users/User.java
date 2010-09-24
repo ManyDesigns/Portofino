@@ -405,11 +405,11 @@ public class User implements Serializable{
         }
     }
 
-    public synchronized  String tokenGenerator() {
-        return RandomStringUtils.random(30, true, true);
+    public synchronized  void tokenGenerator() {
+        setToken(RandomStringUtils.random(30, true, true));
     }
 
-    public synchronized String passwordGenerator(int len) {
-        return RandomStringUtils.random(len, true, true);
+    public synchronized void passwordGenerator(int len) {
+        setPwd(RandomStringUtils.random(len, true, true));
     }
 }

@@ -29,17 +29,16 @@
 package com.manydesigns.portofino.email;
 
 import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.systemModel.email.EmailBean;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class EmailManager {
+public class EmailHandler {
 
     //STATI POSSIBILI DELLA MAIL
     public static final int TOBESENT  = 0;
@@ -60,28 +59,24 @@ public class EmailManager {
     public static final String ATTACHMENT_DESCRIPTION = "attachmentDescription";
     public static final String ATTACHMENT_NAME = "attachmentName";
 
-    public static synchronized void addEmail(Context context, Map email) {
+    public static synchronized void addEmail(Context context, EmailBean email) {
         context.saveObject(EMAILQUEUE_TABLE, email);
     }
 
     public static synchronized void addEmail(Context context, String subject, String body,
-    String addressee, String sender, Date createdate,
-    Integer state) {
-        Map email = createEmail(subject, body, addressee,
-                sender, createdate, state);
+    String addressee, String sender) {
+        EmailBean email = createEmail(subject, body, addressee,
+                sender);
         context.saveObject(EMAILQUEUE_TABLE, email);
     }
     
-    public static Map createEmail (String subject, String body,
-    String addressee, String sender, Date createdate,
-    Integer state) {
-        Map email = new HashMap();
-        email.put(SUBJECT, subject);
-        email.put(BODY, body);
-        email.put(TO, addressee);
-        email.put(FROM, sender);
-        email.put(CREATEDATE, createdate);
-        email.put(STATE, state);
+    public static EmailBean createEmail (String subject, String body,
+    String to, String from) {
+
+        EmailBean email = new EmailBean( subject,  body,  to,  from,
+                new Date());
+        email.setState(TOBESENT);
+
         return email;
     }
 }

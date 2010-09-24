@@ -48,6 +48,17 @@ public class EmailBean {
     String attachmentDescription;
     String attachmentName;
 
+    public EmailBean() {
+    }
+
+    public EmailBean(String subject, String body, String to, String from, Date createDate) {
+        this.subject = subject;
+        this.body = body;
+        this.to = to;
+        this.from = from;
+        this.createDate = createDate;
+    }
+
     public Integer getId() {
         return id;
     }
