@@ -35,9 +35,7 @@ import com.manydesigns.elements.fields.search.NumericSearchField;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import com.manydesigns.elements.util.Util;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,7 +50,7 @@ public class NumericFieldHelper implements FieldHelper {
                                        PropertyAccessor propertyAccessor,
                                        String prefix) {
         Class type = propertyAccessor.getType();
-        if (isNumericType(type)) {
+        if (Util.isNumericType(type)) {
             return new NumericField(propertyAccessor, prefix);
         }
 
@@ -63,23 +61,10 @@ public class NumericFieldHelper implements FieldHelper {
                                                    PropertyAccessor propertyAccessor,
                                                    String prefix) {
         Class type = propertyAccessor.getType();
-        if (isNumericType(type)) {
+        if (Util.isNumericType(type)) {
             return new NumericSearchField(propertyAccessor, prefix);
         }
 
         return null;
-    }
-
-    protected boolean isNumericType(Class type) {
-        return type == BigDecimal.class
-                || type == BigInteger.class
-                || type == Byte.class
-                || type == Byte.TYPE
-                || type == Short.class
-                || type == Short.TYPE
-                || type == Integer.class
-                || type == Integer.TYPE
-                || type == Long.class
-                || type == Long.TYPE;
     }
 }

@@ -136,6 +136,10 @@ public class Util {
         return strTokenizer.getTokenArray();
     }
 
+    public static String convertValueToString(Object value) {
+        return (String) convertValue(value, String.class);
+    }
+
     public static Object convertValue(Object value, Class toType) {
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
         TypeConverter typeConverter = ognlContext.getTypeConverter();
@@ -143,4 +147,16 @@ public class Util {
         return typeConverter.convertValue(
                 ognlContext, null, null, null, value, toType);
     }
+
+
+    public static boolean isNumericType(Class type) {
+        return Number.class.isAssignableFrom(type)
+                || type == Integer.TYPE
+                || type == Byte.TYPE
+                || type == Short.TYPE
+                || type == Long.TYPE
+                || type == Float.TYPE
+                || type == Double.TYPE;
+    }
+
 }

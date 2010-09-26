@@ -74,7 +74,7 @@ public class TextSearchField extends AbstractSearchField {
 
     public void toXhtml(XhtmlBuffer xb) {
         xb.writeLabel(StringUtils.capitalize(label),
-                id, "attr_name");
+                id, ATTR_NAME_HTML_CLASS);
         String matchModeLabel = "Match mode";
         xb.writeLabel(matchModeLabel, matchModeId, "match_mode");
         xb.openElement("select");
@@ -114,12 +114,7 @@ public class TextSearchField extends AbstractSearchField {
 
     public void toSearchString(StringBuilder sb) {
         if (value != null) {
-            if (sb.length() > 0) {
-                sb.append(",");
-            }
-            sb.append(inputName);
-            sb.append("=");
-            sb.append(value);
+            appendToSearchString(sb, inputName, value);
         }
     }
 

@@ -292,7 +292,7 @@ public class HibernateContextImpl implements Context {
                         (Criteria.BetweenCriterion) criterion;
                 Object min = betweenCriterion.getMin();
                 Object max = betweenCriterion.getMax();
-                hqlFormat = "{0} >= ? AND < {0} <= ?";
+                hqlFormat = "{0} >= ? AND {0} <= ?";
                 parametersList.add(min);
                 parametersList.add(max);
             } else if (criterion instanceof Criteria.GtCriterion) {

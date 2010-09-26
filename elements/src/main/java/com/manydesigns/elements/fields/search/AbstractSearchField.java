@@ -59,6 +59,7 @@ public abstract class AbstractSearchField implements SearchField {
 
     public static final Logger logger =
             LogUtil.getLogger(AbstractSearchField.class);
+    public static final String ATTR_NAME_HTML_CLASS = "attr_name";
 
     //**************************************************************************
     // Costruttori
@@ -158,4 +159,12 @@ public abstract class AbstractSearchField implements SearchField {
         this.inputName = inputName;
     }
 
+    protected void appendToSearchString(StringBuilder sb, String name, String value) {
+        if (sb.length() > 0) {
+            sb.append(",");
+        }
+        sb.append(name);
+        sb.append("=");
+        sb.append(value);
+    }
 }
