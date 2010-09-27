@@ -104,7 +104,6 @@ public class EmailTask extends TimerTask {
 
     public static void stop() {
         outbox.shutdownNow();
-      
     }
 
 
@@ -130,7 +129,15 @@ public class EmailTask extends TimerTask {
             for (Object obj : emails) {
 
                 EmailSender emailSender = new EmailSender((EmailBean) obj);
-            outbox.submit(emailSender);
+                EmailBean email = emailSender.getEmailBean();
+                try{
+                    email.setState(EmailHandler.SENDING);
+                    context.saveObject("portofino.public.emailqueue", email);
+                    context.commit("portofino.public.emailqueue");
+                } catch (Throwable e) {
+                    LogUtil.warning(logger, "cannot store email state", e);
+                }
+                outbox.submit(emailSender);                
             }
         } catch (NoSuchFieldException e) {
             LogUtil.warning(logger,"No state field in emailQueue",e);
@@ -142,12 +149,18 @@ public class EmailTask extends TimerTask {
 
             while (!successQueue.isEmpty()) {
                 EmailSender email = successQueue.poll();
-                context.deleteObject(EmailHandler.EMAILQUEUE_TABLE,
+                if ("true".equals(PortofinoProperties.getProperties()
+                        .getProperty(PortofinoProperties.KEEP_SENT))){
+                    continue;
+                }
+                try {
+                    context.deleteObject(EmailHandler.EMAILQUEUE_TABLE,
                         email.getEmailBean());
-                context.commit("portofino");
+                    context.commit("portofino");
+                } catch (Throwable e) {
+                    LogUtil.warning(logger, "Cannot delete email", e);
+                }
             }
-
-
         while (!rejectedQueue.isEmpty()) {
             EmailSender email = rejectedQueue.poll();
             LogUtil.finestMF(logger, "Adding reject mail with id:"

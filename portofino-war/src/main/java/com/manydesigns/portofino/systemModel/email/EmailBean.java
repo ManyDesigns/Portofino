@@ -49,15 +49,21 @@ public class EmailBean implements Serializable{
     String attachmentDescription;
     String attachmentName;
 
+    public static final int TOBESENT  = 1;
+    public static final int SENT  = 2;
+    public static final int REJECTED  = 3;
+    public static final int BOUNCED  = 4;
+
     public EmailBean() {
     }
 
-    public EmailBean(String subject, String body, String to, String from, Date createDate) {
+    public EmailBean(String subject, String body, String to, String from) {
         this.subject = subject;
         this.body = body;
         this.to = to;
         this.from = from;
-        this.createDate = createDate;
+        this.createDate = new Date();
+        this.setState(TOBESENT);
     }
 
     public Integer getId() {

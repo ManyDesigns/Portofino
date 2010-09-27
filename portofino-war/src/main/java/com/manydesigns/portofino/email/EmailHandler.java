@@ -31,8 +31,6 @@ package com.manydesigns.portofino.email;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.systemModel.email.EmailBean;
 
-import java.util.Date;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -41,6 +39,7 @@ import java.util.Date;
 public class EmailHandler {
 
     //STATI POSSIBILI DELLA MAIL
+    public static final int SENDING  = 0;
     public static final int TOBESENT  = 1;
     public static final int SENT  = 2;
     public static final int REJECTED  = 3;
@@ -65,18 +64,10 @@ public class EmailHandler {
 
     public static synchronized void addEmail(Context context, String subject, String body,
     String addressee, String sender) {
-        EmailBean email = createEmail(subject, body, addressee,
+        EmailBean email = new EmailBean(subject, body, addressee,
                 sender);
         context.saveObject(EMAILQUEUE_TABLE, email);
     }
     
-    public static EmailBean createEmail (String subject, String body,
-    String to, String from) {
-
-        EmailBean email = new EmailBean( subject,  body,  to,  from,
-                new Date());
-        email.setState(TOBESENT);
-
-        return email;
-    }
+    
 }

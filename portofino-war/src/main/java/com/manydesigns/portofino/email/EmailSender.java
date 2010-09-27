@@ -68,15 +68,15 @@ public class EmailSender implements Runnable{
     public EmailSender(EmailBean emailBean) {
         this.emailBean = emailBean;
         this.server = (String) PortofinoProperties.getProperties()
-                    .get(PortofinoProperties.MAIL_SMTP_HOST);
+                    .getProperty(PortofinoProperties.MAIL_SMTP_HOST);
         this.port = Integer.parseInt((String)PortofinoProperties.getProperties()
-                    .get(PortofinoProperties.MAIL_SMTP_PORT));
+                    .getProperty(PortofinoProperties.MAIL_SMTP_PORT, "25"));
         this.ssl = Boolean.parseBoolean((String) PortofinoProperties.getProperties()
-                    .get(PortofinoProperties.MAIL_SMTP_SSL_ENABLED));
+                    .getProperty(PortofinoProperties.MAIL_SMTP_SSL_ENABLED));
         this.login = (String) PortofinoProperties.getProperties()
-                    .get(PortofinoProperties.MAIL_SMTP_LOGIN);
+                    .getProperty(PortofinoProperties.MAIL_SMTP_LOGIN);
         this.password = (String) PortofinoProperties.getProperties()
-                    .get(PortofinoProperties.MAIL_SMTP_PASSWORD);
+                    .getProperty(PortofinoProperties.MAIL_SMTP_PASSWORD);
     }
 
     public void run() {
