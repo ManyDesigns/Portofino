@@ -41,13 +41,13 @@ import java.util.Date;
 public class EmailHandler {
 
     //STATI POSSIBILI DELLA MAIL
-    public static final int TOBESENT  = 0;
-    public static final int SENT  = 1;
-    public static final int REJECTED  = 2;
-    public static final int BOUNCED  = 3;
+    public static final int TOBESENT  = 1;
+    public static final int SENT  = 2;
+    public static final int REJECTED  = 3;
+    public static final int BOUNCED  = 4;
 
 
-    public static final String EMAILQUEUE_TABLE = "portofino.emailqueue";
+    public static final String EMAILQUEUE_TABLE = "portofino.public.emailqueue";
     public static final String SUBJECT = "subject";
     public static final String BODY = "body";
     public static final String TO = "to";

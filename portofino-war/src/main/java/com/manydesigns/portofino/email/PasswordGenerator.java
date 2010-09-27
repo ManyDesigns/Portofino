@@ -31,7 +31,6 @@ package com.manydesigns.portofino.email;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.systemModel.users.User;
@@ -63,31 +62,35 @@ public class PasswordGenerator extends TimerTask {
     public PasswordGenerator(Context context) {
         this.context = context;
         this.server = (String) PortofinoProperties.getProperties()
-                    .getProperty("mail.smtp.host");
+                    .getProperty(PortofinoProperties.MAIL_SMTP_HOST);
         this.port = Integer.parseInt(PortofinoProperties.getProperties()
-                    .getProperty("mail.smtp.port"));
+                    .getProperty(PortofinoProperties.MAIL_SMTP_PORT, "25"));
         this.ssl = Boolean.parseBoolean(PortofinoProperties.getProperties()
-                    .getProperty("mail.smtp.ssl.enabled"));
+                    .getProperty(PortofinoProperties.MAIL_SMTP_SSL_ENABLED));
         this.login = (String) PortofinoProperties.getProperties()
-                    .getProperty("mail.smtp.login");
+                    .getProperty(PortofinoProperties.MAIL_SMTP_LOGIN);
         this.password = (String) PortofinoProperties.getProperties()
-                    .getProperty("mail.smtp.password");
+                    .getProperty(PortofinoProperties.MAIL_SMTP_PASSWORD);
         this.sender = (String) PortofinoProperties.getProperties()
-                    .getProperty("mail.sender");
+                    .getProperty(PortofinoProperties.MAIL_SMTP_SENDER);
     }
 
     public void run() {
         try {
-            ClassAccessor accessor = JavaClassAccessor
-                    .getClassAccessor(User.class);
+            
+            context.openSession();
+            ClassAccessor accessor = context
+                    .getTableAccessor("portofino.public.user_");
             Criteria criteria = new Criteria(accessor);
             List<Object> users = context.getObjects(
-                    criteria.isNull(accessor.getProperty("password")));
+                    criteria.isNull(accessor.getProperty("pwd")));
             for (Object obj : users) {
                  mailGenerator(context, (User) obj);
             }
         } catch (Exception e) {
             LogUtil.warning(logger, "Cannot generate  password", e);
+        }finally{
+            context.closeSession();
         }
     }
 
@@ -104,7 +107,9 @@ public class PasswordGenerator extends TimerTask {
             EmailTask em = new EmailTask(context);
             EmailHandler.addEmail(context, "subject", msg,
                 user.getEmail(), sender);
-            context.saveObject("portofino.user_", user);
+            context.saveObject("portofino.public.user_", user);
             context.commit("portofino");
     }
+
+
 }

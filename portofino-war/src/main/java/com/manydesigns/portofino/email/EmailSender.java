@@ -52,6 +52,7 @@ public class EmailSender implements Runnable{
             LogUtil.getLogger(EmailSender.class);
 
 
+
     //Costruttore con proprietà da inserire
     public EmailSender(String server, EmailBean emailBean, int port, boolean ssl,
                  String login, String password) {
@@ -67,18 +68,18 @@ public class EmailSender implements Runnable{
     public EmailSender(EmailBean emailBean) {
         this.emailBean = emailBean;
         this.server = (String) PortofinoProperties.getProperties()
-                    .get("mail.smtp.host");
-        this.port = (Integer) PortofinoProperties.getProperties()
-                    .get("mail.smtp.port");
-        this.ssl = (Boolean) PortofinoProperties.getProperties()
-                    .get("mail.smtp.ssl.enabled");
+                    .get(PortofinoProperties.MAIL_SMTP_HOST);
+        this.port = Integer.parseInt((String)PortofinoProperties.getProperties()
+                    .get(PortofinoProperties.MAIL_SMTP_PORT));
+        this.ssl = Boolean.parseBoolean((String) PortofinoProperties.getProperties()
+                    .get(PortofinoProperties.MAIL_SMTP_SSL_ENABLED));
         this.login = (String) PortofinoProperties.getProperties()
-                    .get("mail.smtp.login");
+                    .get(PortofinoProperties.MAIL_SMTP_LOGIN);
         this.password = (String) PortofinoProperties.getProperties()
-                    .get("mail.smtp.password");
+                    .get(PortofinoProperties.MAIL_SMTP_PASSWORD);
     }
 
-    public synchronized void run() {
+    public void run() {
 
         try {
 
@@ -94,11 +95,12 @@ public class EmailSender implements Runnable{
                 attachment.setName(emailBean.getAttachmentName());
                 ((MultiPartEmail) email).attach(attachment);
             }
-            email.setSmtpPort(port);
+            
                 if (null!=login && null!=password ) {
                     email.setAuthenticator(new DefaultAuthenticator(login, password));
                 }
             email.setHostName(server);
+            email.setSmtpPort(port);
             email.setFrom(emailBean.getFrom());
             email.setSubject(emailBean.getSubject());
             email.setMsg(emailBean.getBody());

@@ -31,7 +31,6 @@ package com.manydesigns.portofino.email;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.systemModel.email.EmailBean;
@@ -74,29 +73,29 @@ public class EmailTask extends TimerTask {
         this.context = context;
 
         //Setto il client smtp per il bouncing
-        String smtpHost = PortofinoProperties.getProperties()
-                .getProperty("mail.smtp.host", "127.0.0.1");
-        String smtpProtocol = PortofinoProperties.getProperties()
-                .getProperty("mail.smtp.protocol", "pop3");
-        int smtpPort = Integer.parseInt(PortofinoProperties.getProperties()
-                .getProperty("mail.smtp.port", "25"));
-        String smtpLogin = PortofinoProperties.getProperties()
-                .getProperty("mail.smtp.login");
-        String smtpPassword = PortofinoProperties.getProperties()
-                .getProperty("mail.smtp.password");
+        String popHost = PortofinoProperties.getProperties()
+                .getProperty(PortofinoProperties.MAIL_POP3_HOST, "127.0.0.1");
+        String protocol = PortofinoProperties.getProperties()
+                .getProperty(PortofinoProperties.MAIL_POP3_PROTOCOL, "pop3");
+        int popPort = Integer.parseInt(PortofinoProperties.getProperties()
+                .getProperty(PortofinoProperties.MAIL_POP3_PORT, "25"));
+        String popLogin = PortofinoProperties.getProperties()
+                .getProperty(PortofinoProperties.MAIL_POP3_LOGIN);
+        String popPassword = PortofinoProperties.getProperties()
+                .getProperty(PortofinoProperties.MAIL_POP3_PASSWORD);
         boolean bounceEnabled = Boolean.parseBoolean(PortofinoProperties.getProperties()
-                .getProperty("mail.bounce.enabled", "false"));
+                .getProperty(PortofinoProperties.MAIL_BOUNCE_ENABLED, "false"));
         boolean sslEnabled = Boolean.parseBoolean(PortofinoProperties.getProperties()
-                .getProperty("mail.smtp.ssl.enabled", "false"));
+                .getProperty(PortofinoProperties.MAIL_POP3_SSL_ENABLED, "false"));
         if (bounceEnabled &&
-                smtpHost != null && smtpProtocol != null && smtpLogin != null
-                && smtpPassword != null) {
+                popHost != null && protocol != null && popLogin != null
+                && popPassword != null) {
             if (sslEnabled) {
-                client = new POP3SSLClient(smtpHost, smtpProtocol, smtpPort, smtpLogin,
-                        smtpPassword);
+                client = new POP3SSLClient(popHost, protocol, popPort, popLogin,
+                        popPassword);
             } else {
-                client = new POP3SimpleClient(smtpHost, smtpProtocol, smtpPort, smtpLogin,
-                        smtpPassword);
+                client = new POP3SimpleClient(popHost, protocol, popPort, popLogin,
+                        popPassword);
             }
         } else {
             client = null;
@@ -105,15 +104,18 @@ public class EmailTask extends TimerTask {
 
     public static void stop() {
         outbox.shutdownNow();
+      
     }
 
 
     public void run() {
-
-        synchronized (this) {
+        try{
+            context.openSession();
             createQueue();
             checkBounce();
             manageSuccessAndRejected();
+        } finally {
+            context.closeSession();
         }
     }
 
@@ -165,7 +167,7 @@ public class EmailTask extends TimerTask {
 
     private void incrementBounce(String email) {
         try {
-            ClassAccessor accessor = JavaClassAccessor.getClassAccessor(User.class);
+            ClassAccessor accessor = context.getTableAccessor("portofino.public.user_");
             Criteria criteria = new Criteria(accessor);
             List<Object> users = context.getObjects(
                     criteria.gt(accessor.getProperty("email"), email));

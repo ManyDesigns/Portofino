@@ -29,6 +29,7 @@
 package com.manydesigns.portofino.systemModel.email;
 
 import java.util.Date;
+import java.io.Serializable;
 
 
 /*
@@ -36,7 +37,7 @@ import java.util.Date;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class EmailBean {
+public class EmailBean implements Serializable{
     Integer id;
     String subject;
     String body;

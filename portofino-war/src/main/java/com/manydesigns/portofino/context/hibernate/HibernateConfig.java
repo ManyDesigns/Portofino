@@ -47,6 +47,7 @@ import org.hibernate.mapping.*;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Logger;
+import java.text.MessageFormat;
 
 
 /**
@@ -108,6 +109,8 @@ public class HibernateConfig {
         for (Schema schema : database.getSchemas()) {
             for (com.manydesigns.portofino.model.datamodel.Table aTable :
                     schema.getTables()) {
+                LogUtil.finestMF(logger, MessageFormat.format("Class - {0} ",
+                                aTable.getQualifiedName()));
                 RootClass clazz = createTableMapping(
                         mappings, aTable);
                 mappings.addClass(clazz);
@@ -125,7 +128,8 @@ public class HibernateConfig {
                     schema.getTables()) {
                 for (Relationship rel : aTable.getManyToOneRelationships()) {
                     if (aTable.isM2m()) {
-                        System.out.println(aTable+" "+rel.getRelationshipName());
+                        LogUtil.finestMF(logger, MessageFormat.format("Many to one - {0} {1}",
+                                aTable.getQualifiedName(), rel.getRelationshipName()));
                         createM2O(configuration, mappings, rel);
                     }
                 }
@@ -138,6 +142,8 @@ public class HibernateConfig {
             for (com.manydesigns.portofino.model.datamodel.Table aTable :
                     schema.getTables()) {
                 for (Relationship rel : aTable.getOneToManyRelationships()) {
+                     LogUtil.finestMF(logger, MessageFormat.format("One to many - {0} {1}",
+                                aTable.getQualifiedName(), rel.getRelationshipName()));
                     createO2M(configuration, mappings, rel);
                 }
             }

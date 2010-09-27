@@ -76,6 +76,21 @@ public class PortofinoProperties {
     public static final String RANDOM_CODE_LENGTH_PROPERTY =
             "random.code.length";
 
+    //Email properties
+    public static final String MAIL_SMTP_SENDER = "mail.smtp.sender";
+    public static final String MAIL_SMTP_HOST = "mail.smtp.host";
+    public static final String MAIL_SMTP_PORT = "mail.smtp.port";
+    public static final String MAIL_SMTP_SSL_ENABLED = "mail.smtp.ssl.enabled";
+    public static final String MAIL_SMTP_LOGIN = "mail.smtp.login";
+    public static final String MAIL_SMTP_PASSWORD = "mail.smtp.password";
+    public static final String MAIL_POP3_HOST = "mail.pop3.host";
+    public static final String MAIL_POP3_PROTOCOL = "mail.pop3.protocol";
+    public static final String MAIL_POP3_PORT = "mail.pop3.port";
+    public static final String MAIL_POP3_LOGIN = "mail.pop3.login";
+    public static final String MAIL_POP3_PASSWORD = "mail.pop3.password";
+    public static final String MAIL_BOUNCE_ENABLED = "mail.bounce.enabled";
+    public static final String MAIL_POP3_SSL_ENABLED = "mail.pop3.ssl.enabled";
+
 
     //**************************************************************************
     // Static fields, singleton initialization and retrieval
@@ -84,6 +99,7 @@ public class PortofinoProperties {
     private static final Properties properties;
     public static final Logger logger =
             LogUtil.getLogger(PortofinoProperties.class);
+
 
     static {
         properties = new Properties();

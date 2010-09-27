@@ -28,18 +28,18 @@
  */
 package com.manydesigns.portofino.email;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.manydesigns.elements.logging.LogUtil;
 
-import javax.mail.Part;
-import javax.mail.Multipart;
 import javax.mail.BodyPart;
+import javax.mail.Multipart;
+import javax.mail.Part;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.StringTokenizer;
-import java.util.regex.Pattern;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -57,7 +57,9 @@ public abstract class POP3Client {
     protected final String username;
     protected final String password;
     protected final Properties pop3Props;
-    protected final Log log;
+      public static final Logger logger =
+            LogUtil.getLogger(POP3Client.class);
+
     protected Set<String> emails;
 
     public String getHost() {
@@ -97,7 +99,6 @@ public abstract class POP3Client {
         pop3Props.setProperty("mail.pop3.socketFactory.class", SSL_FACTORY);
         pop3Props.setProperty("mail.pop3.socketFactory.fallback", "false");
         pop3Props.setProperty("mail.pop3.socketFactory.port", "" + port);
-        this.log = LogFactory.getLog(POP3Client.class);
         this.emails = new HashSet<String>();
     }
 

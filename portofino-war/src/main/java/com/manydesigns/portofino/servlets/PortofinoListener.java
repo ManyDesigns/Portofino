@@ -146,11 +146,11 @@ public class PortofinoListener
         }
         if (success) {
             String securityType = (String) portofinoProperties
-                    .get("security.type");
+                    .getProperty("security.type", "application");
             String mailHost = (String) portofinoProperties
-                    .get("mail.smtp.host");
+                    .getProperty("mail.smtp.host");
             String mailSender = (String) portofinoProperties
-                    .get("mail.sender");
+                    .getProperty("mail.smtp.sender");
             if ("application".equals(securityType))
             {
                 if (null==mailSender
@@ -185,6 +185,12 @@ public class PortofinoListener
 
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         logger.info("ManyDesigns Portofino stopping...");
+
+        if (scheduler!=null) {
+            logger.info("Terminating the scheduler...");
+            scheduler.cancel();
+            EmailTask.stop();
+        }
 
         servletContext.removeAttribute(CONTEXT_ATTRIBUTE);
         servletContext.removeAttribute(SERVER_INFO_ATTRIBUTE);

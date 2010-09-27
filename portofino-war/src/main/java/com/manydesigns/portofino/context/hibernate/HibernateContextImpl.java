@@ -707,7 +707,6 @@ public class HibernateContextImpl implements Context {
             Configuration conf = setup.getConfiguration();
             String[] ddls = conf.generateSchemaCreationScript(dialect);
             result.addAll(Arrays.asList(ddls));
-
         }
         return result;
     }

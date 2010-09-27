@@ -102,7 +102,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
             return UNAUTHORIZED;
         }
 
-        ClassAccessor accessor = JavaClassAccessor.getClassAccessor(User.class);
+        ClassAccessor accessor = context.getTableAccessor("portofino.public.user_");
         FormBuilder formBuilder = new FormBuilder(accessor);
         formBuilder.configFields("email", "screenName", "firstName",
                 "middleName", "lastName", "createDate");
@@ -117,7 +117,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
         if (setUser()) {
             return UNAUTHORIZED;
         }
-        ClassAccessor accessor = JavaClassAccessor.getClassAccessor(User.class);
+        ClassAccessor accessor = context.getTableAccessor("portofino.public.user_");
         FormBuilder formBuilder = new FormBuilder(accessor);
         formBuilder.configFields("email", "screenName", "firstName",
                 "middleName", "lastName");
@@ -132,7 +132,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
         if (setUser()) {
             return UNAUTHORIZED;
         }
-        ClassAccessor accessor = JavaClassAccessor.getClassAccessor(User.class);
+        ClassAccessor accessor = context.getTableAccessor("portofino.public.user_");
         FormBuilder formBuilder = new FormBuilder(accessor);
         formBuilder.configFields("email", "screenName", "firstName",
                 "middleName", "lastName");
@@ -195,8 +195,8 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
         form = new Form();
         ClassAccessor pwdAccessor = JavaClassAccessor
                 .getClassAccessor(Password.class);
-        ClassAccessor userAccessor = JavaClassAccessor
-                .getClassAccessor(User.class);
+        ClassAccessor userAccessor =
+                context.getTableAccessor("portofino.public.user_");
         FormBuilder userBuilder = new FormBuilder(userAccessor);
 
         FieldSet fs = new FieldSet("passwordField", 1);

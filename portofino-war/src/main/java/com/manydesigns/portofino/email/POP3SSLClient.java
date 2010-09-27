@@ -28,6 +28,7 @@
  */
 package com.manydesigns.portofino.email;
 
+import com.manydesigns.elements.logging.LogUtil;
 import com.sun.mail.pop3.POP3SSLStore;
 
 import javax.mail.*;
@@ -41,6 +42,7 @@ import java.util.Set;
 public class POP3SSLClient extends POP3Client {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
 
     public POP3SSLClient(String host, String protocol, int port,
                          String username, String password) {
@@ -61,7 +63,7 @@ public class POP3SSLClient extends POP3Client {
 
             inbox = store.getFolder("INBOX");
             if (inbox == null) {
-                log.error("No INBOX");
+                LogUtil.warningMF(logger,"No INBOX");
                 return null;
             }
             inbox.open(Folder.READ_ONLY);
@@ -80,14 +82,14 @@ public class POP3SSLClient extends POP3Client {
                 try {
                     inbox.close(false);
                 } catch (MessagingException e) {
-                     log.error(e);
+                     LogUtil.warningMF(logger, "cannot close INBOX",e);
                 }
             }
             if (store != null) {
                 try {
                     store.close();
                 } catch (MessagingException e) {
-                    log.error(e);
+                    LogUtil.warningMF(logger, "cannot close Store",e);
                 }
             }
         }
