@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Started on 2010-09-13 17:15:40 CEST
+-- Started on 2010-09-27 09:14:37 CEST
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -66,7 +66,7 @@ ALTER SEQUENCE table1_id_seq OWNED BY table1.id;
 -- Name: table1_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('table1_id_seq', 63, true);
+SELECT pg_catalog.setval('table1_id_seq', 71, true);
 
 
 --
@@ -209,6 +209,14 @@ ALTER TABLE table4 ALTER COLUMN id SET DEFAULT nextval('table4_id_seq'::regclass
 INSERT INTO table1 (id, testo) VALUES (1, 'esempio');
 INSERT INTO table1 (id, testo) VALUES (2, 'esempio');
 INSERT INTO table1 (id, testo) VALUES (3, 'esempio');
+INSERT INTO table1 (id, testo) VALUES (64, 'esempio');
+INSERT INTO table1 (id, testo) VALUES (65, 'esempio');
+INSERT INTO table1 (id, testo) VALUES (66, 'esempio');
+INSERT INTO table1 (id, testo) VALUES (67, 'esempio');
+INSERT INTO table1 (id, testo) VALUES (68, 'esempio');
+INSERT INTO table1 (id, testo) VALUES (69, 'esempio');
+INSERT INTO table1 (id, testo) VALUES (70, 'esempio');
+INSERT INTO table1 (id, testo) VALUES (71, 'esempio');
 
 
 --
@@ -324,7 +332,7 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2010-09-13 17:15:41 CEST
+-- Completed on 2010-09-27 09:14:37 CEST
 
 --
 -- PostgreSQL database dump complete
