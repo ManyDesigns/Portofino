@@ -865,6 +865,108 @@
                                 </relationship>
                             </relationships>
                         </table>
+                        <table name="comune">
+                            <columns>
+                                <column name="regione"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column name="provincia"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column name="comune"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey name="comune_pk">
+                                <column name="regione"/>
+                                <column name="provincia"/>
+                                <column name="comune"/>
+                            </primaryKey>
+                        </table>
+                        <table name="domanda">
+                            <columns>
+                                <column name="protocollo"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="20"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column name="richiedente"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column name="regione"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column name="provincia"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column name="comune"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column name="data"
+                                        columnType="date"
+                                        javaType="java.util.Date"
+                                        length="29"
+                                        scale="6"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey name="domanda_pkey">
+                                <column name="protocollo"/>
+                            </primaryKey>
+                            <relationships>
+                                <relationship name="domanda_regione_fkey"
+                                              toSchema="public"
+                                              toTable="comune"
+                                              onDelete="NO ACTION"
+                                              onUpdate="NO ACTION">
+                                    <reference fromColumn="regione"
+                                               toColumn="regione"/>
+                                    <reference fromColumn="provincia"
+                                               toColumn="provincia"/>
+                                    <reference fromColumn="comune"
+                                               toColumn="comune"/>
+                                </relationship>
+                            </relationships>
+                        </table>
                     </tables>
                 </schema>
             </schemas>

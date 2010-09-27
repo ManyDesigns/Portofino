@@ -197,7 +197,8 @@ public abstract class AbstractField implements Field {
         } else if (mode.isEdit()) {
             if (mode.isBulk()) {
                 xb.openElement("td");
-                xb.writeInputCheckbox(null, bulkCheckboxName, "checked", false);
+                xb.writeInputCheckbox(null, bulkCheckboxName,
+                        "checked", bulkChecked);
                 xb.closeElement("td");
             }
 

@@ -166,7 +166,7 @@ public class NumericSearchField extends AbstractSearchField {
 
     public void configureCriteria(Criteria criteria) {
         if (searchNullValue) {
-//TODO:            criteria.isNull(accessor);
+            criteria.isNull(accessor);
         } else if (minValue != null && maxValue != null) {
             criteria.between(accessor, minValue, maxValue);
         } else if (minValue != null) {

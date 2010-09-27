@@ -16,3 +16,5 @@ syntax: glob
 *.iws
 *~
 *.bak
+*.orig
+

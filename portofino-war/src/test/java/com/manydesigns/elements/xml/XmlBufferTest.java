@@ -60,7 +60,7 @@ public class XmlBufferTest extends TestCase {
         xb1.write((String)null);
         assertEquals("", xb1.toString());
 
-        xb1.writeNoHtmlEscape((String)null);
+        xb1.writeNoHtmlEscape(null);
         assertEquals("", xb1.toString());
 
         xb1.write((XmlBuffer)null);
