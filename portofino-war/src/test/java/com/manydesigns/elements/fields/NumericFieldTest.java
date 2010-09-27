@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DecimalFieldTest extends AbstractElementsTest {
+public class NumericFieldTest extends AbstractElementsTest {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 

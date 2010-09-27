@@ -147,7 +147,7 @@ public class SelectFieldTest2 extends AbstractElementsTest {
         form.readFromObject(bean);
         assertFalse(form.validate());
 
-        assertEquals(null, optionProvider.getValue(0));
+        assertEquals(1, optionProvider.getValue(0));
         assertEquals(null, optionProvider.getValue(1));
 
         checkOptions2();

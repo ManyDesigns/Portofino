@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsProperties;
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.portofino.PortofinoProperties;
@@ -46,6 +47,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
+import java.lang.reflect.Field;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.logging.Logger;
@@ -192,12 +194,48 @@ public class PortofinoListener
             EmailTask.stop();
         }
 
+        // clean up ThreadLocals and possible memory leaks
+        ElementsThreadLocals.destroy();
+        setFieldValue("org.apache.commons.lang.builder.ToStringStyle", "registry", null, null);
+        setFieldValue("org.apache.struts2.config.Settings", "settingsImpl", null, null);
+        setFieldValue("org.apache.struts2.config.Settings", "defaultImpl", null, null);
+        setFieldValue("org.apache.struts2.dispatcher.Dispatcher", "instance", null, null);
+        setFieldValue("org.apache.struts2.dispatcher.Dispatcher", "dispatcherListeners", null, null);
+        setFieldValue("com.opensymphony.xwork2.ActionContext", "actionContext", null, null);
+        System.gc();
+
+        // remove attributes from application context
         servletContext.removeAttribute(CONTEXT_ATTRIBUTE);
         servletContext.removeAttribute(SERVER_INFO_ATTRIBUTE);
         servletContext.removeAttribute(PORTOFINO_PROPERTIES_ATTRIBUTE);
         servletContext.removeAttribute(ELEMENTS_PROPERTIES_ATTRIBUTE);
 
         logger.info("ManyDesigns Portofino stopped.");
+    }
+
+    public void setFieldValue(String className, String fieldName, Object obj, Object fieldValue) {
+        Field field = getFieldByReflection(className, fieldName);
+        if (field == null) {
+            return;
+        }
+        try {
+            field.set(null, fieldValue);
+        } catch (Throwable e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+    public Field getFieldByReflection(String className, String fieldName) {
+        try {
+            ClassLoader cl = getClass().getClassLoader();
+            Class aClass = cl.loadClass(className);
+            Field field = aClass.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field;
+        } catch (Throwable e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            return null;
+        }
     }
 
     

@@ -221,37 +221,33 @@ public class DefaultOptionProvider implements OptionProvider {
             }
         }
 
-        boolean atLeastOneMatching = false;
+        int maxMatchingIndex = -1;
         for (int i = 0; i < valuesArray.length; i++) {
             Object[] currentValueRow = valuesArray[i];
             String[] currentLabelRow = labelsArray[i];
-            Object previousValue = null;
             boolean matching = true;
             for (int j = 0; j < getFieldCount(); j++) {
                 Object cellValue = currentValueRow[j];
                 String cellLabel = currentLabelRow[j];
                 Object value = values[j];
-                if (value != null && !value.equals(cellValue)) {
+
+                Map<Object, String> options = optionsArray[j];
+                if (matching) {
+                    options.put(cellValue, cellLabel);
+                }
+
+                if (matching && value != null && value.equals(cellValue)) {
+                    if (j > maxMatchingIndex) {
+                        maxMatchingIndex = j;
+                    }
+                } else {
                     matching = false;
                 }
-                Map<Object, String> options = optionsArray[j];
-                if (j == 0) {
-                    options.put(cellValue, cellLabel);
-                } else { // j > 0
-                    Object constrainedValue = values[j - 1];
-                    if (constrainedValue != null
-                            && constrainedValue.equals(previousValue)) {
-                        options.put(cellValue, cellLabel);
-                    }
-                }
-                previousValue = cellValue;
-            }
-            if (matching) {
-                atLeastOneMatching = true;
             }
         }
-        if (!atLeastOneMatching) {
-            resetValues();
+
+        for (int i = maxMatchingIndex + 1; i < getFieldCount(); i++) {
+            values[i] = null;
         }
     }
 
@@ -260,11 +256,4 @@ public class DefaultOptionProvider implements OptionProvider {
             optionsArray[i].clear();
         }
     }
-
-    public void resetValues() {
-        for (int i = 0; i < values.length; i++) {
-            values[i] = null;
-        }
-    }
-
 }

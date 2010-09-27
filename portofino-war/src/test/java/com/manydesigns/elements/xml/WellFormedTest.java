@@ -75,7 +75,7 @@ public class WellFormedTest extends AbstractElementsTest {
             XmlBuffer xb = new XmlBuffer();
             xb.openElement("foo");
             xb.toString();
-//            fail();
+            fail();
         } catch (IllegalStateException e) {
             assertEquals("Stack not empty: <foo", e.getMessage());
         }

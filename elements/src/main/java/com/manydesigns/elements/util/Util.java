@@ -30,6 +30,7 @@
 package com.manydesigns.elements.util;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.logging.LogUtil;
 import ognl.OgnlContext;
 import ognl.TypeConverter;
 import org.apache.commons.lang.text.StrTokenizer;
@@ -37,7 +38,7 @@ import org.apache.commons.lang.text.StrTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.text.MessageFormat;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,6 +61,8 @@ public class Util {
                     "\\s*(,\\s*" + STRING_PATTERN + "\\s*)*)?\\}\\s*");
 
     protected final static Pattern pattern = Pattern.compile("\\p{Alpha}*:");
+
+    public static final Logger logger = LogUtil.getLogger(Util.class);
 
     public static String getAbsoluteLink(HttpServletRequest req,
                                          String url) {
@@ -125,8 +128,7 @@ public class Util {
 
     public static void printMatcher(Matcher matcher) {
         for (int i = 0; i <= matcher.groupCount(); i++) {
-            System.out.println(MessageFormat.format(
-                    "group {0}: {1}", i, matcher.group(i)));
+            LogUtil.fineMF(logger, "group {0}: {1}", i, matcher.group(i));
         }
     }
 
