@@ -36,7 +36,6 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.systemModel.users.User;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimerTask;
@@ -50,13 +49,13 @@ import java.util.logging.Logger;
 public class PasswordGenerator extends TimerTask {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-    private final Context context;
-    private final boolean ssl;
-    private final String login;
-    private final String password;
-    private final String server;
-    private final String sender;
-    private final int port;
+    protected final Context context;
+    protected final boolean ssl;
+    protected final String login;
+    protected final String password;
+    protected final String server;
+    protected final String sender;
+    protected final int port;
     public static final Logger logger =
             LogUtil.getLogger(PasswordGenerator.class);
 
@@ -96,17 +95,17 @@ public class PasswordGenerator extends TimerTask {
                                             User user) {
         try {
             Properties props = PortofinoProperties.getProperties();
-            String pwd = user.passwordGenerator(
+
+            //Aggiorno password
+            user.passwordGenerator(
                             Integer.parseInt(props.getProperty
                                     ("users.pwd.minlength", "6")));
-            //Aggiorno password
-            user.setPwdEncrypted(pwd);
             //salvo la mail per l'utente
             String msg =
              "user "+ user.getEmail()+" "+ user.getPwd();
             EmailTask em = new EmailTask(context);
             EmailHandler.addEmail(context, "subject", msg,
-                user.getEmail(), sender, new Date(), EmailHandler.TOBESENT);
+                user.getEmail(), sender);
             context.saveObject("portofino.user_", user);
             context.commit("portofino");
         } catch (Throwable e) {
