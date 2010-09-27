@@ -93,9 +93,7 @@ public class PasswordGenerator extends TimerTask {
 
     private synchronized void mailGenerator(Context context,
                                             User user) {
-        try {
             Properties props = PortofinoProperties.getProperties();
-
             //Aggiorno password
             user.passwordGenerator(
                             Integer.parseInt(props.getProperty
@@ -108,8 +106,5 @@ public class PasswordGenerator extends TimerTask {
                 user.getEmail(), sender);
             context.saveObject("portofino.user_", user);
             context.commit("portofino");
-        } catch (Throwable e) {
-            logger.warning("error sending email");
-        }
     }
 }

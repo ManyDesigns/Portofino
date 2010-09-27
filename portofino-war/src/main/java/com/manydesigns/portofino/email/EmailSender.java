@@ -42,12 +42,12 @@ import java.util.logging.Logger;
 */
 public class EmailSender implements Runnable{
 
-    private final boolean ssl;
-    private final String login;
-    private final String password;
-    private final String server;
-    private final int port;
-    private final EmailBean emailBean;
+    protected final boolean ssl;
+    protected final String login;
+    protected final String password;
+    protected final String server;
+    protected final int port;
+    protected final EmailBean emailBean;
     protected static final Logger logger =
             LogUtil.getLogger(EmailSender.class);
 

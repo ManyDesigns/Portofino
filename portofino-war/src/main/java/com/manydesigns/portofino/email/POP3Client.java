@@ -51,13 +51,13 @@ public abstract class POP3Client {
             "delivery status notification";
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-    final String host;
-    final String protocol;
-    final int port;
-    final String username;
-    final String password;
-    final Properties pop3Props;
-    final Log log;
+    protected final String host;
+    protected final String protocol;
+    protected final int port;
+    protected final String username;
+    protected final String password;
+    protected final Properties pop3Props;
+    protected final Log log;
     protected Set<String> emails;
 
     public String getHost() {

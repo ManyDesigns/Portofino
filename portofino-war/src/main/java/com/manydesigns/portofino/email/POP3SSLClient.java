@@ -85,9 +85,7 @@ public class POP3SSLClient extends POP3Client {
             }
             if (store != null) {
                 try {
-
                     store.close();
-
                 } catch (MessagingException e) {
                     log.error(e);
                 }

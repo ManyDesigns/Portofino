@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Started on 2010-08-25 11:01:45 CEST
+-- Started on 2010-09-27 09:27:34 CEST
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -26,7 +26,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- TOC entry 1526 (class 1259 OID 386710)
+-- TOC entry 1525 (class 1259 OID 386710)
 -- Dependencies: 5
 -- Name: emailqueue; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
@@ -35,19 +35,19 @@ CREATE TABLE emailqueue (
     id integer NOT NULL,
     subject character varying(100),
     body character varying(4000),
-    addressee character varying(100),
-    sender character varying(100),
-    date date,
+    to_ character varying(100),
+    from_ character varying(100),
     createdate date,
-    failedattempts bigint,
-    send boolean,
-    state integer
+    state integer,
+    attachmentpath character varying(255),
+    attachmentdescription character varying(255),
+    attachmentname character varying(255)
 );
 
 
 --
--- TOC entry 1525 (class 1259 OID 386708)
--- Dependencies: 1526 5
+-- TOC entry 1524 (class 1259 OID 386708)
+-- Dependencies: 1525 5
 -- Name: emailqueue_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -61,7 +61,7 @@ CREATE SEQUENCE emailqueue_id_seq
 
 --
 -- TOC entry 1858 (class 0 OID 0)
--- Dependencies: 1525
+-- Dependencies: 1524
 -- Name: emailqueue_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -70,7 +70,7 @@ ALTER SEQUENCE emailqueue_id_seq OWNED BY emailqueue.id;
 
 --
 -- TOC entry 1859 (class 0 OID 0)
--- Dependencies: 1525
+-- Dependencies: 1524
 -- Name: emailqueue_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -78,7 +78,7 @@ SELECT pg_catalog.setval('emailqueue_id_seq', 1, false);
 
 
 --
--- TOC entry 1528 (class 1259 OID 386721)
+-- TOC entry 1527 (class 1259 OID 386721)
 -- Dependencies: 5
 -- Name: emailstate; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
@@ -91,8 +91,8 @@ CREATE TABLE emailstate (
 
 
 --
--- TOC entry 1527 (class 1259 OID 386719)
--- Dependencies: 1528 5
+-- TOC entry 1526 (class 1259 OID 386719)
+-- Dependencies: 1527 5
 -- Name: emailstate_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -106,7 +106,7 @@ CREATE SEQUENCE emailstate_id_seq
 
 --
 -- TOC entry 1860 (class 0 OID 0)
--- Dependencies: 1527
+-- Dependencies: 1526
 -- Name: emailstate_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -115,7 +115,7 @@ ALTER SEQUENCE emailstate_id_seq OWNED BY emailstate.id;
 
 --
 -- TOC entry 1861 (class 0 OID 0)
--- Dependencies: 1527
+-- Dependencies: 1526
 -- Name: emailstate_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -172,7 +172,7 @@ SELECT pg_catalog.setval('group_groupid_seq', 1, false);
 
 
 --
--- TOC entry 1532 (class 1259 OID 386737)
+-- TOC entry 1531 (class 1259 OID 386737)
 -- Dependencies: 5
 -- Name: msg; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
@@ -190,8 +190,8 @@ CREATE TABLE msg (
 
 
 --
--- TOC entry 1531 (class 1259 OID 386735)
--- Dependencies: 5 1532
+-- TOC entry 1530 (class 1259 OID 386735)
+-- Dependencies: 1531 5
 -- Name: msg_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -205,7 +205,7 @@ CREATE SEQUENCE msg_id_seq
 
 --
 -- TOC entry 1864 (class 0 OID 0)
--- Dependencies: 1531
+-- Dependencies: 1530
 -- Name: msg_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -214,7 +214,7 @@ ALTER SEQUENCE msg_id_seq OWNED BY msg.id;
 
 --
 -- TOC entry 1865 (class 0 OID 0)
--- Dependencies: 1531
+-- Dependencies: 1530
 -- Name: msg_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -222,7 +222,7 @@ SELECT pg_catalog.setval('msg_id_seq', 1, false);
 
 
 --
--- TOC entry 1534 (class 1259 OID 386748)
+-- TOC entry 1533 (class 1259 OID 386748)
 -- Dependencies: 5
 -- Name: msgstate; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
@@ -235,8 +235,8 @@ CREATE TABLE msgstate (
 
 
 --
--- TOC entry 1533 (class 1259 OID 386746)
--- Dependencies: 1534 5
+-- TOC entry 1532 (class 1259 OID 386746)
+-- Dependencies: 5 1533
 -- Name: msgstate_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -250,7 +250,7 @@ CREATE SEQUENCE msgstate_id_seq
 
 --
 -- TOC entry 1866 (class 0 OID 0)
--- Dependencies: 1533
+-- Dependencies: 1532
 -- Name: msgstate_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -259,7 +259,7 @@ ALTER SEQUENCE msgstate_id_seq OWNED BY msgstate.id;
 
 --
 -- TOC entry 1867 (class 0 OID 0)
--- Dependencies: 1533
+-- Dependencies: 1532
 -- Name: msgstate_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -267,7 +267,7 @@ SELECT pg_catalog.setval('msgstate_id_seq', 1, false);
 
 
 --
--- TOC entry 1530 (class 1259 OID 386729)
+-- TOC entry 1529 (class 1259 OID 386729)
 -- Dependencies: 5
 -- Name: oldpwd; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
@@ -281,8 +281,8 @@ CREATE TABLE oldpwd (
 
 
 --
--- TOC entry 1529 (class 1259 OID 386727)
--- Dependencies: 1530 5
+-- TOC entry 1528 (class 1259 OID 386727)
+-- Dependencies: 1529 5
 -- Name: oldpwd_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -296,7 +296,7 @@ CREATE SEQUENCE oldpwd_id_seq
 
 --
 -- TOC entry 1868 (class 0 OID 0)
--- Dependencies: 1529
+-- Dependencies: 1528
 -- Name: oldpwd_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -305,7 +305,7 @@ ALTER SEQUENCE oldpwd_id_seq OWNED BY oldpwd.id;
 
 --
 -- TOC entry 1869 (class 0 OID 0)
--- Dependencies: 1529
+-- Dependencies: 1528
 -- Name: oldpwd_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -328,7 +328,7 @@ CREATE TABLE user_ (
     pwdencrypted boolean,
     pwdreset boolean,
     pwdmoddate timestamp without time zone,
-    digest character varying(255),
+    token character varying(255),
     remquestion character varying(75),
     remans character varying(75),
     gracelogincount integer,
@@ -351,13 +351,14 @@ CREATE TABLE user_ (
     agreedtoterms boolean,
     active boolean,
     state integer NOT NULL,
-    createdate timestamp without time zone
+    createdate timestamp without time zone,
+    bounced integer
 );
 
 
 --
 -- TOC entry 1518 (class 1259 OID 386676)
--- Dependencies: 1519 5
+-- Dependencies: 5 1519
 -- Name: user_userid_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -384,20 +385,20 @@ ALTER SEQUENCE user_userid_seq OWNED BY user_.userid;
 -- Name: user_userid_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('user_userid_seq', 4, true);
+SELECT pg_catalog.setval('user_userid_seq', 13, true);
 
 
 --
--- TOC entry 1524 (class 1259 OID 386703)
+-- TOC entry 1534 (class 1259 OID 386815)
 -- Dependencies: 5
 -- Name: users_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE users_groups (
-    groupid bigint NOT NULL,
-    userid bigint NOT NULL,
-    creationdate timestamp without time zone NOT NULL,
-    deletiondate timestamp without time zone
+    groupid integer NOT NULL,
+    userid integer NOT NULL,
+    deletiondate timestamp without time zone,
+    creationdate timestamp without time zone
 );
 
 
@@ -448,7 +449,7 @@ SELECT pg_catalog.setval('userstate_id_seq', 1, false);
 
 --
 -- TOC entry 1815 (class 2604 OID 386713)
--- Dependencies: 1526 1525 1526
+-- Dependencies: 1524 1525 1525
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -457,7 +458,7 @@ ALTER TABLE emailqueue ALTER COLUMN id SET DEFAULT nextval('emailqueue_id_seq'::
 
 --
 -- TOC entry 1816 (class 2604 OID 386724)
--- Dependencies: 1527 1528 1528
+-- Dependencies: 1527 1526 1527
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -466,7 +467,7 @@ ALTER TABLE emailstate ALTER COLUMN id SET DEFAULT nextval('emailstate_id_seq'::
 
 --
 -- TOC entry 1814 (class 2604 OID 386700)
--- Dependencies: 1522 1523 1523
+-- Dependencies: 1523 1522 1523
 -- Name: groupid; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -475,7 +476,7 @@ ALTER TABLE group_ ALTER COLUMN groupid SET DEFAULT nextval('group_groupid_seq':
 
 --
 -- TOC entry 1818 (class 2604 OID 386740)
--- Dependencies: 1531 1532 1532
+-- Dependencies: 1531 1530 1531
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -484,7 +485,7 @@ ALTER TABLE msg ALTER COLUMN id SET DEFAULT nextval('msg_id_seq'::regclass);
 
 --
 -- TOC entry 1819 (class 2604 OID 386751)
--- Dependencies: 1533 1534 1534
+-- Dependencies: 1533 1532 1533
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -493,7 +494,7 @@ ALTER TABLE msgstate ALTER COLUMN id SET DEFAULT nextval('msgstate_id_seq'::regc
 
 --
 -- TOC entry 1817 (class 2604 OID 386732)
--- Dependencies: 1530 1529 1530
+-- Dependencies: 1529 1528 1529
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -502,7 +503,7 @@ ALTER TABLE oldpwd ALTER COLUMN id SET DEFAULT nextval('oldpwd_id_seq'::regclass
 
 --
 -- TOC entry 1812 (class 2604 OID 386681)
--- Dependencies: 1519 1518 1519
+-- Dependencies: 1518 1519 1519
 -- Name: userid; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -519,16 +520,16 @@ ALTER TABLE userstate ALTER COLUMN id SET DEFAULT nextval('userstate_id_seq'::re
 
 
 --
--- TOC entry 1850 (class 0 OID 386710)
--- Dependencies: 1526
+-- TOC entry 1849 (class 0 OID 386710)
+-- Dependencies: 1525
 -- Data for Name: emailqueue; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 1851 (class 0 OID 386721)
--- Dependencies: 1528
+-- TOC entry 1850 (class 0 OID 386721)
+-- Dependencies: 1527
 -- Data for Name: emailstate; Type: TABLE DATA; Schema: public; Owner: -
 --
 
@@ -540,29 +541,29 @@ ALTER TABLE userstate ALTER COLUMN id SET DEFAULT nextval('userstate_id_seq'::re
 -- Data for Name: group_; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO group_ (groupid, creatorid, parentgroupid, name, description, active, deldate) VALUES (1, 1, NULL, 'admin', 'admin', true, NULL);
 INSERT INTO group_ (groupid, creatorid, parentgroupid, name, description, active, deldate) VALUES (2, 1, NULL, 'users', 'user', true, NULL);
+INSERT INTO group_ (groupid, creatorid, parentgroupid, name, description, active, deldate) VALUES (1, 1, NULL, 'admin', 'admin', true, NULL);
 
 
 --
--- TOC entry 1853 (class 0 OID 386737)
--- Dependencies: 1532
+-- TOC entry 1852 (class 0 OID 386737)
+-- Dependencies: 1531
 -- Data for Name: msg; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 1854 (class 0 OID 386748)
--- Dependencies: 1534
+-- TOC entry 1853 (class 0 OID 386748)
+-- Dependencies: 1533
 -- Data for Name: msgstate; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 1852 (class 0 OID 386729)
--- Dependencies: 1530
+-- TOC entry 1851 (class 0 OID 386729)
+-- Dependencies: 1529
 -- Data for Name: oldpwd; Type: TABLE DATA; Schema: public; Owner: -
 --
 
@@ -574,17 +575,19 @@ INSERT INTO group_ (groupid, creatorid, parentgroupid, name, description, active
 -- Data for Name: user_; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO user_ (userid, deldate, modifieddate, defaultuser, extauth, pwd, pwdencrypted, pwdreset, pwdmoddate, digest, remquestion, remans, gracelogincount, screenname, emailaddress, greeting, comments, firstname, middlename, lastname, jobtitle, logindate, loginip, lastlogindate, lastloginip, lastfailedlogindate, failedloginattempts, lockout, lockoutdate, agreedtoterms, active, state, createdate) VALUES (1, NULL, NULL, NULL, NULL, 'admin', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'admin@manydesigns.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL);
+INSERT INTO user_ (userid, deldate, modifieddate, defaultuser, extauth, pwd, pwdencrypted, pwdreset, pwdmoddate, token, remquestion, remans, gracelogincount, screenname, emailaddress, greeting, comments, firstname, middlename, lastname, jobtitle, logindate, loginip, lastlogindate, lastloginip, lastfailedlogindate, failedloginattempts, lockout, lockoutdate, agreedtoterms, active, state, createdate, bounced) VALUES (11, NULL, NULL, NULL, NULL, 'piero74', NULL, NULL, NULL, '', '', '', NULL, 'giampi', 'granatella@gmail.com', '', '-', '', '', '', '', NULL, '', NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL);
+INSERT INTO user_ (userid, deldate, modifieddate, defaultuser, extauth, pwd, pwdencrypted, pwdreset, pwdmoddate, token, remquestion, remans, gracelogincount, screenname, emailaddress, greeting, comments, firstname, middlename, lastname, jobtitle, logindate, loginip, lastlogindate, lastloginip, lastfailedlogindate, failedloginattempts, lockout, lockoutdate, agreedtoterms, active, state, createdate, bounced) VALUES (1, NULL, '2010-08-12 00:00:00', false, false, 'admin', false, false, '2010-09-24 15:48:09.458', NULL, '', NULL, 3, 'admin', 'admin@manydesigns.com', '', '', 'Giampiero', 'GG', 'Granatella', 'Ing.', NULL, '0:0:0:0:0:0:0:1%0', '2010-09-24 15:47:42.121', '', '2010-09-24 15:47:38.475', 0, false, NULL, false, true, 1, '2009-09-29 00:00:00', NULL);
 
 
 --
--- TOC entry 1849 (class 0 OID 386703)
--- Dependencies: 1524
+-- TOC entry 1854 (class 0 OID 386815)
+-- Dependencies: 1534
 -- Data for Name: users_groups; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO users_groups (groupid, userid, creationdate, deletiondate) VALUES (2, 1, '2010-08-24 00:00:00', NULL);
-INSERT INTO users_groups (groupid, userid, creationdate, deletiondate) VALUES (1, 1, '2010-08-24 00:00:00', NULL);
+INSERT INTO users_groups (groupid, userid, deletiondate, creationdate) VALUES (2, 1, NULL, NULL);
+INSERT INTO users_groups (groupid, userid, deletiondate, creationdate) VALUES (1, 11, NULL, NULL);
+INSERT INTO users_groups (groupid, userid, deletiondate, creationdate) VALUES (1, 1, NULL, '2010-09-14 00:00:00');
 
 
 --
@@ -597,8 +600,8 @@ INSERT INTO userstate (id, name, description) VALUES (1, 'active', NULL);
 
 
 --
--- TOC entry 1829 (class 2606 OID 386718)
--- Dependencies: 1526 1526
+-- TOC entry 1827 (class 2606 OID 386718)
+-- Dependencies: 1525 1525
 -- Name: EmailQueue_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -607,8 +610,8 @@ ALTER TABLE ONLY emailqueue
 
 
 --
--- TOC entry 1833 (class 2606 OID 386734)
--- Dependencies: 1530 1530
+-- TOC entry 1831 (class 2606 OID 386734)
+-- Dependencies: 1529 1529
 -- Name: OldPwd_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -617,8 +620,8 @@ ALTER TABLE ONLY oldpwd
 
 
 --
--- TOC entry 1831 (class 2606 OID 386726)
--- Dependencies: 1528 1528
+-- TOC entry 1829 (class 2606 OID 386726)
+-- Dependencies: 1527 1527
 -- Name: emailstate_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -637,8 +640,8 @@ ALTER TABLE ONLY group_
 
 
 --
--- TOC entry 1835 (class 2606 OID 386745)
--- Dependencies: 1532 1532
+-- TOC entry 1833 (class 2606 OID 386745)
+-- Dependencies: 1531 1531
 -- Name: msg_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -647,8 +650,8 @@ ALTER TABLE ONLY msg
 
 
 --
--- TOC entry 1837 (class 2606 OID 386753)
--- Dependencies: 1534 1534
+-- TOC entry 1835 (class 2606 OID 386753)
+-- Dependencies: 1533 1533
 -- Name: msgstate_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -667,8 +670,8 @@ ALTER TABLE ONLY user_
 
 
 --
--- TOC entry 1827 (class 2606 OID 386707)
--- Dependencies: 1524 1524 1524
+-- TOC entry 1837 (class 2606 OID 386819)
+-- Dependencies: 1534 1534 1534
 -- Name: users_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -687,8 +690,8 @@ ALTER TABLE ONLY userstate
 
 
 --
--- TOC entry 1841 (class 2606 OID 386774)
--- Dependencies: 1526 1830 1528
+-- TOC entry 1840 (class 2606 OID 386774)
+-- Dependencies: 1525 1527 1828
 -- Name: fk_emailqueue_1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -698,7 +701,7 @@ ALTER TABLE ONLY emailqueue
 
 --
 -- TOC entry 1839 (class 2606 OID 386784)
--- Dependencies: 1523 1820 1519
+-- Dependencies: 1820 1523 1519
 -- Name: fk_group_1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -707,8 +710,8 @@ ALTER TABLE ONLY group_
 
 
 --
--- TOC entry 1843 (class 2606 OID 386754)
--- Dependencies: 1836 1534 1532
+-- TOC entry 1842 (class 2606 OID 386754)
+-- Dependencies: 1531 1533 1834
 -- Name: fk_msg_1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -717,8 +720,8 @@ ALTER TABLE ONLY msg
 
 
 --
--- TOC entry 1844 (class 2606 OID 386759)
--- Dependencies: 1532 1519 1820
+-- TOC entry 1843 (class 2606 OID 386759)
+-- Dependencies: 1820 1519 1531
 -- Name: fk_msg_2; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -727,8 +730,8 @@ ALTER TABLE ONLY msg
 
 
 --
--- TOC entry 1845 (class 2606 OID 386764)
--- Dependencies: 1532 1820 1519
+-- TOC entry 1844 (class 2606 OID 386764)
+-- Dependencies: 1531 1820 1519
 -- Name: fk_msg_3; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -737,8 +740,8 @@ ALTER TABLE ONLY msg
 
 
 --
--- TOC entry 1842 (class 2606 OID 386769)
--- Dependencies: 1820 1519 1530
+-- TOC entry 1841 (class 2606 OID 386769)
+-- Dependencies: 1820 1529 1519
 -- Name: fk_oldpwd_1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -748,7 +751,7 @@ ALTER TABLE ONLY oldpwd
 
 --
 -- TOC entry 1838 (class 2606 OID 386789)
--- Dependencies: 1521 1822 1519
+-- Dependencies: 1822 1521 1519
 -- Name: fk_user_1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -757,8 +760,8 @@ ALTER TABLE ONLY user_
 
 
 --
--- TOC entry 1840 (class 2606 OID 386779)
--- Dependencies: 1820 1524 1519
+-- TOC entry 1845 (class 2606 OID 386820)
+-- Dependencies: 1534 1820 1519
 -- Name: fk_usersgroups_1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -766,7 +769,7 @@ ALTER TABLE ONLY users_groups
     ADD CONSTRAINT fk_usersgroups_1 FOREIGN KEY (userid) REFERENCES user_(userid) DEFERRABLE INITIALLY DEFERRED;
 
 
--- Completed on 2010-08-25 11:01:45 CEST
+-- Completed on 2010-09-27 09:27:34 CEST
 
 --
 -- PostgreSQL database dump complete
