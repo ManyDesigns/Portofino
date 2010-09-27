@@ -156,4 +156,12 @@ public class FieldsManager implements FieldHelper {
         }
         return null;
     }
+
+    //**************************************************************************
+    // FieldHelper implementation
+    //**************************************************************************
+
+    public ArrayList<FieldHelper> getHelperList() {
+        return helperList;
+    }
 }

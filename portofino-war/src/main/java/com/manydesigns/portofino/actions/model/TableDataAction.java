@@ -30,6 +30,8 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.fields.DefaultOptionProvider;
+import com.manydesigns.elements.fields.OptionProvider;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.logging.LogUtil;
@@ -41,6 +43,7 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RelatedTableForm;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
+import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Relationship;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -66,6 +69,13 @@ public class TableDataAction extends PortofinoAction
         implements ServletRequestAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    //**************************************************************************
+    // Constants
+    //**************************************************************************
+
+    public final static String REDIRECT_TO_TABLE = "redirectToTable";
+    public final static String NO_TABLES = "noTables";
 
     //**************************************************************************
     // ServletRequestAware implementation
@@ -132,25 +142,18 @@ public class TableDataAction extends PortofinoAction
 
     public String execute() {
         if (qualifiedTableName == null) {
-            qualifiedTableName = model.getAllTables().get(0).getQualifiedName();
-            return "redirectToTable";
+            List<Table> tables = model.getAllTables();
+            if (tables.isEmpty()) {
+                return NO_TABLES;
+            } else {
+                qualifiedTableName = tables.get(0).getQualifiedName();
+                return REDIRECT_TO_TABLE;
+            }
         }
         if (pk == null) {
             return searchFromString();
         } else {
             return read();
-        }
-    }
-
-    //**************************************************************************
-    // Common methods
-    //**************************************************************************
-
-    public void setupTable() {
-        tableAccessor = context.getTableAccessor(qualifiedTableName);
-        pkHelper = new PkHelper(tableAccessor);
-        if (tableAccessor == null) {
-            throw new ModelObjectNotFoundError(qualifiedTableName);
         }
     }
 
@@ -169,7 +172,7 @@ public class TableDataAction extends PortofinoAction
         return commonSearch();
     }
 
-    private void configureSearchFormFromString() {
+    protected void configureSearchFormFromString() {
         if (searchString != null) {
             DummyHttpServletRequest dummyRequest =
                     new DummyHttpServletRequest();
@@ -201,7 +204,7 @@ public class TableDataAction extends PortofinoAction
         return commonSearch();
     }
 
-    private String commonSearch() {
+    protected String commonSearch() {
         searchString = searchForm.toSearchString();
         if (searchString.length() == 0) {
             searchString = null;
@@ -301,7 +304,7 @@ public class TableDataAction extends PortofinoAction
         return READ;
     }
 
-    public void setupRelatedTableForm(Relationship relationship) {
+    protected void setupRelatedTableForm(Relationship relationship) {
         List<Object> relatedObjects =
                 context.getRelatedObjects(qualifiedTableName, object,
                         relationship.getRelationshipName());
@@ -328,8 +331,7 @@ public class TableDataAction extends PortofinoAction
     public String create() {
         setupTable();
 
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
-        form = formBuilder.build();
+        setupFormWithOptionProviders();
         form.setMode(Mode.CREATE);
 
         return CREATE;
@@ -338,8 +340,7 @@ public class TableDataAction extends PortofinoAction
     public String save() {
         setupTable();
 
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
-        form = formBuilder.build();
+        setupFormWithOptionProviders();
         form.setMode(Mode.CREATE);
 
         form.readFromRequest(req);
@@ -369,8 +370,7 @@ public class TableDataAction extends PortofinoAction
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
 
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
-        form = formBuilder.build();
+        setupFormWithOptionProviders();
         form.setMode(Mode.EDIT);
 
         form.readFromObject(object);
@@ -382,8 +382,7 @@ public class TableDataAction extends PortofinoAction
         setupTable();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
-        form = formBuilder.build();
+        setupFormWithOptionProviders();
         form.setMode(Mode.EDIT);
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
@@ -402,6 +401,10 @@ public class TableDataAction extends PortofinoAction
         }
     }
 
+    //**************************************************************************
+    // Bulk Edit/Update
+    //**************************************************************************
+
     public String bulkEdit() {
         if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage(
@@ -416,8 +419,7 @@ public class TableDataAction extends PortofinoAction
 
         setupTable();
 
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
-        form = formBuilder.build();
+        setupFormWithOptionProviders();
         form.setMode(Mode.BULK_EDIT);
 
         return BULK_EDIT;
@@ -426,8 +428,7 @@ public class TableDataAction extends PortofinoAction
     public String bulkUpdate() {
         setupTable();
 
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
-        form = formBuilder.build();
+        setupFormWithOptionProviders();
         form.setMode(Mode.BULK_EDIT);
         form.readFromRequest(req);
         if (form.validate()) {
@@ -489,6 +490,46 @@ public class TableDataAction extends PortofinoAction
 
     public String cancel() {
         return CANCEL;
+    }
+
+    //**************************************************************************
+    // Utility methods
+    //**************************************************************************
+
+    public void setupTable() {
+        tableAccessor = context.getTableAccessor(qualifiedTableName);
+        pkHelper = new PkHelper(tableAccessor);
+        if (tableAccessor == null) {
+            throw new ModelObjectNotFoundError(qualifiedTableName);
+        }
+    }
+
+    private void setupFormWithOptionProviders() {
+        FormBuilder formBuilder = new FormBuilder(tableAccessor);
+
+        // setup relationship lookups
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        for (Relationship rel : table.getManyToOneRelationships()) {
+            List<Reference> references = rel.getReferences();
+            String[] fields = new String[references.size()];
+            int i = 0;
+            for (Reference reference : references) {
+                fields[i] = reference.getFromColumn().getPropertyName();
+                i++;
+            }
+
+            // retrieve the related objects
+            Table relatedTable = rel.getToTable();
+            ClassAccessor classAccessor =
+                    context.getTableAccessor(relatedTable.getQualifiedName());
+            List<Object> relatedObjects =
+                    context.getAllObjects(relatedTable.getQualifiedName());
+            OptionProvider optionProvider =
+                    DefaultOptionProvider.create(relatedObjects, classAccessor);
+            formBuilder.configOptionProvider(optionProvider, fields);
+        }
+
+        form = formBuilder.build();
     }
 
 }

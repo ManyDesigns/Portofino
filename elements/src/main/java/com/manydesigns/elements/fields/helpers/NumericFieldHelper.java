@@ -31,12 +31,11 @@ package com.manydesigns.elements.fields.helpers;
 
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.NumericField;
+import com.manydesigns.elements.fields.search.NumericSearchField;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import com.manydesigns.elements.util.Util;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -48,27 +47,24 @@ public class NumericFieldHelper implements FieldHelper {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public Field tryToInstantiateField(ClassAccessor classAccessor,
-                                  PropertyAccessor propertyAccessor,
-                                  String prefix) {
+                                       PropertyAccessor propertyAccessor,
+                                       String prefix) {
         Class type = propertyAccessor.getType();
-        if (type == BigDecimal.class
-                || type == BigInteger.class
-                || type == Byte.class
-                || type == Byte.TYPE
-                || type == Short.class
-                || type == Short.TYPE
-                || type == Integer.class
-                || type == Integer.TYPE
-                || type == Long.class
-                || type == Long.TYPE
-                ) {
+        if (Util.isNumericType(type)) {
             return new NumericField(propertyAccessor, prefix);
         }
 
         return null;
     }
 
-    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor, PropertyAccessor propertyAccessor, String prefix) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
+                                                   PropertyAccessor propertyAccessor,
+                                                   String prefix) {
+        Class type = propertyAccessor.getType();
+        if (Util.isNumericType(type)) {
+            return new NumericSearchField(propertyAccessor, prefix);
+        }
+
+        return null;
     }
 }

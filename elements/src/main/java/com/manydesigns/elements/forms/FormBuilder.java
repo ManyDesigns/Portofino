@@ -198,10 +198,6 @@ public class FormBuilder {
         Form form = new Form();
         FieldsManager manager = FieldsManager.getManager();
 
-        // add all option providers
-        form.getOptionProviders().addAll(optionProviders.values());
-
-
         if (groupedPropertyAccessors == null) {
             configReflectiveFields();
         }

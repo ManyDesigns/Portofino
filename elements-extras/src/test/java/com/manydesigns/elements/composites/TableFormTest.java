@@ -90,19 +90,19 @@ public class TableFormTest extends AbstractElementsTest {
                 "<tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row0.id\" name=\"row0.id\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row0.nome\" name=\"row0.nome\"></input></td>" +
-                "<td><input id=\"row0.attivo\" type=\"checkbox\" name=\"row0.attivo\" value=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"row0.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"row0.attivo\" type=\"checkbox\" name=\"row0.attivo\" value=\"true\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_row0.attivo\" value=\"true\"></input></td>" +
                 "</tr><tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row1.id\" name=\"row1.id\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row1.nome\" name=\"row1.nome\"></input></td>" +
-                "<td><input id=\"row1.attivo\" type=\"checkbox\" name=\"row1.attivo\" value=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"row1.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"row1.attivo\" type=\"checkbox\" name=\"row1.attivo\" value=\"true\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_row1.attivo\" value=\"true\"></input></td>" +
                 "</tr><tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row2.id\" name=\"row2.id\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row2.nome\" name=\"row2.nome\"></input></td>" +
-                "<td><input id=\"row2.attivo\" type=\"checkbox\" name=\"row2.attivo\" value=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"row2.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"row2.attivo\" type=\"checkbox\" name=\"row2.attivo\" value=\"true\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_row2.attivo\" value=\"true\"></input></td>" +
                 "</tr><tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row3.id\" name=\"row3.id\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row3.nome\" name=\"row3.nome\"></input></td>" +
-                "<td><input id=\"row3.attivo\" type=\"checkbox\" name=\"row3.attivo\" value=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"row3.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"row3.attivo\" type=\"checkbox\" name=\"row3.attivo\" value=\"true\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_row3.attivo\" value=\"true\"></input></td>" +
                 "</tr>" +
                 "</tbody></table>", text);
     }
@@ -116,19 +116,19 @@ public class TableFormTest extends AbstractElementsTest {
                 "<tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"prova.row0.id\" name=\"prova.row0.id\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"prova.row0.nome\" name=\"prova.row0.nome\"></input></td>" +
-                "<td><input id=\"prova.row0.attivo\" type=\"checkbox\" name=\"prova.row0.attivo\" value=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"prova.row0.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"prova.row0.attivo\" type=\"checkbox\" name=\"prova.row0.attivo\" value=\"true\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_prova.row0.attivo\" value=\"true\"></input></td>" +
                 "</tr><tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"prova.row1.id\" name=\"prova.row1.id\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"prova.row1.nome\" name=\"prova.row1.nome\"></input></td>" +
-                "<td><input id=\"prova.row1.attivo\" type=\"checkbox\" name=\"prova.row1.attivo\" value=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"prova.row1.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"prova.row1.attivo\" type=\"checkbox\" name=\"prova.row1.attivo\" value=\"true\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_prova.row1.attivo\" value=\"true\"></input></td>" +
                 "</tr><tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"prova.row2.id\" name=\"prova.row2.id\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"prova.row2.nome\" name=\"prova.row2.nome\"></input></td>" +
-                "<td><input id=\"prova.row2.attivo\" type=\"checkbox\" name=\"prova.row2.attivo\" value=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"prova.row2.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"prova.row2.attivo\" type=\"checkbox\" name=\"prova.row2.attivo\" value=\"true\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_prova.row2.attivo\" value=\"true\"></input></td>" +
                 "</tr><tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"prova.row3.id\" name=\"prova.row3.id\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"prova.row3.nome\" name=\"prova.row3.nome\"></input></td>" +
-                "<td><input id=\"prova.row3.attivo\" type=\"checkbox\" name=\"prova.row3.attivo\" value=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"prova.row3.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"prova.row3.attivo\" type=\"checkbox\" name=\"prova.row3.attivo\" value=\"true\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_prova.row3.attivo\" value=\"true\"></input></td>" +
                 "</tr>" +
                 "</tbody></table>", text);
     }
@@ -174,19 +174,19 @@ public class TableFormTest extends AbstractElementsTest {
                 "<tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row0.id\" name=\"row0.id\" value=\"1\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row0.nome\" name=\"row0.nome\" value=\"qui\"></input></td>" +
-                "<td><input id=\"row0.attivo\" type=\"checkbox\" name=\"row0.attivo\" value=\"checked\" checked=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"row0.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"row0.attivo\" type=\"checkbox\" name=\"row0.attivo\" value=\"true\" checked=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_row0.attivo\" value=\"true\"></input></td>" +
                 "</tr><tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row1.id\" name=\"row1.id\" value=\"2\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row1.nome\" name=\"row1.nome\" value=\"quo\"></input></td>" +
-                "<td><input id=\"row1.attivo\" type=\"checkbox\" name=\"row1.attivo\" value=\"checked\" checked=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"row1.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"row1.attivo\" type=\"checkbox\" name=\"row1.attivo\" value=\"true\" checked=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_row1.attivo\" value=\"true\"></input></td>" +
                 "</tr><tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row2.id\" name=\"row2.id\" value=\"3\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row2.nome\" name=\"row2.nome\" value=\"qua\"></input></td>" +
-                "<td><input id=\"row2.attivo\" type=\"checkbox\" name=\"row2.attivo\" value=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"row2.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"row2.attivo\" type=\"checkbox\" name=\"row2.attivo\" value=\"true\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_row2.attivo\" value=\"true\"></input></td>" +
                 "</tr><tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row3.id\" name=\"row3.id\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row3.nome\" name=\"row3.nome\"></input></td>" +
-                "<td><input id=\"row3.attivo\" type=\"checkbox\" name=\"row3.attivo\" value=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"row3.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"row3.attivo\" type=\"checkbox\" name=\"row3.attivo\" value=\"true\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_row3.attivo\" value=\"true\"></input></td>" +
                 "</tr>" +
                 "</tbody></table>", text);
     }
@@ -194,11 +194,11 @@ public class TableFormTest extends AbstractElementsTest {
     public void testReadFromRequestAndWriteToObject() {
         req.setParameter("row0.id", "10");
         req.setParameter("row0.nome", "bla");
-        req.setParameter("row0.attivo_chk", "");
+        req.setParameter("__checkbox_row0.attivo", "true");
         req.setParameter("row1.id", "11");
         req.setParameter("row1.nome", "blabla");
-        req.setParameter("row1.attivo", "checked");
-        req.setParameter("row1.attivo_chk", "");
+        req.setParameter("row1.attivo", "true");
+        req.setParameter("__checkbox_row1.attivo", "true");
         tableForm.readFromRequest(req);
         String text = elementToString(tableForm);
         assertEquals("<table><thead><tr><th>Id</th><th>Nome</th><th>Attivo</th>" +
@@ -206,19 +206,19 @@ public class TableFormTest extends AbstractElementsTest {
                 "<tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row0.id\" name=\"row0.id\" value=\"10\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row0.nome\" name=\"row0.nome\" value=\"bla\"></input></td>" +
-                "<td><input id=\"row0.attivo\" type=\"checkbox\" name=\"row0.attivo\" value=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"row0.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"row0.attivo\" type=\"checkbox\" name=\"row0.attivo\" value=\"true\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_row0.attivo\" value=\"true\"></input></td>" +
                 "</tr><tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row1.id\" name=\"row1.id\" value=\"11\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row1.nome\" name=\"row1.nome\" value=\"blabla\"></input></td>" +
-                "<td><input id=\"row1.attivo\" type=\"checkbox\" name=\"row1.attivo\" value=\"checked\" checked=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"row1.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"row1.attivo\" type=\"checkbox\" name=\"row1.attivo\" value=\"true\" checked=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_row1.attivo\" value=\"true\"></input></td>" +
                 "</tr><tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row2.id\" name=\"row2.id\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row2.nome\" name=\"row2.nome\"></input></td>" +
-                "<td><input id=\"row2.attivo\" type=\"checkbox\" name=\"row2.attivo\" value=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"row2.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"row2.attivo\" type=\"checkbox\" name=\"row2.attivo\" value=\"true\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_row2.attivo\" value=\"true\"></input></td>" +
                 "</tr><tr>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row3.id\" name=\"row3.id\"></input></td>" +
                 "<td><input type=\"text\" class=\"text\" id=\"row3.nome\" name=\"row3.nome\"></input></td>" +
-                "<td><input id=\"row3.attivo\" type=\"checkbox\" name=\"row3.attivo\" value=\"checked\" class=\"checkbox\"></input><input type=\"hidden\" name=\"row3.attivo_chk\" value=\"\"></input></td>" +
+                "<td><input id=\"row3.attivo\" type=\"checkbox\" name=\"row3.attivo\" value=\"true\" class=\"checkbox\"></input><input type=\"hidden\" name=\"__checkbox_row3.attivo\" value=\"true\"></input></td>" +
                 "</tr>" +
                 "</tbody></table>", text);
 

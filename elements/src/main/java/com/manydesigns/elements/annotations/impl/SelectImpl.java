@@ -45,12 +45,10 @@ public class SelectImpl implements Select {
 
     private String[] values;
     private String[] labels;
-    private String[] urls;
 
-    public SelectImpl(String[] values, String[] labels, String[] urls) {
+    public SelectImpl(String[] values, String[] labels) {
         this.values = values;
         this.labels = labels;
-        this.urls = urls;
     }
 
     public String[] values() {
@@ -59,10 +57,6 @@ public class SelectImpl implements Select {
 
     public String[] labels() {
         return labels;
-    }
-
-    public String[] urls() {
-        return urls;
     }
 
     public Class<? extends Annotation> annotationType() {

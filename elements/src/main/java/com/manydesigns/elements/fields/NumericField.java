@@ -31,9 +31,9 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.util.Util;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
@@ -80,6 +80,10 @@ public class NumericField extends AbstractTextField {
             minValue = new BigDecimal(Long.MIN_VALUE);
             maxValue = new BigDecimal(Long.MAX_VALUE);
         }
+        if (type.isPrimitive()) {
+            setRequired(true);
+        }
+
         if (accessor.isAnnotationPresent(PrecisionScale.class)) {
             PrecisionScale annotation =
                     accessor.getAnnotation(PrecisionScale.class);
@@ -148,7 +152,8 @@ public class NumericField extends AbstractTextField {
         BigDecimal tmpValue;
         try {
             //Provo a parserizzare il numero come BigDecimal
-            tmpValue = new BigDecimal(stringValue);
+            tmpValue = (BigDecimal) Util.convertValue(
+                    stringValue, BigDecimal.class);
         } catch (NumberFormatException e) {
             //Se il testo non è un BigDecimal provo a parserizzarlo
             // con il pattern specificato nel format
@@ -156,7 +161,6 @@ public class NumericField extends AbstractTextField {
                 decimalFormatError = true;
                 return;
             } else {
-
                 decimalFormat.setParseBigDecimal(true);
                 ParsePosition parsePos = new ParsePosition(0);
                 tmpValue = (BigDecimal) decimalFormat.parse(stringValue, parsePos);
@@ -198,60 +202,31 @@ public class NumericField extends AbstractTextField {
 
     public void readFromObject(Object obj) {
         super.readFromObject(obj);
-        try {
-            if (obj == null) {
-                decimalValue = null;
-            } else {
-                Object value = accessor.get(obj);
-                Class type = accessor.getType();
-                if (null==value){
-                    decimalValue=null;
-                }else if (type == BigDecimal.class) {
-                    decimalValue = (BigDecimal)value;
-                } else if (type == Byte.class || type == Byte.TYPE) {
-                    decimalValue = new BigDecimal((Byte)value);
-                } else if (type == Short.class || type == Short.TYPE) {
-                    decimalValue = new BigDecimal((Short)value);
-                } else if (type == Integer.class || type == Integer.TYPE) {
-                    decimalValue = new BigDecimal((Integer)value);
-                } else if (type == Long.class || type == Long.TYPE) {
-                    decimalValue = new BigDecimal((Long)value);
-                } else {
-                    throw new Error("Unknown type");
-                }
+
+        if (obj == null) {
+            decimalValue = null;
+        } else {
+            try {
+            Object value = accessor.get(obj);
+            decimalValue =
+                    (BigDecimal) Util.convertValue(value, BigDecimal.class);
+            } catch (Throwable e) {
+                throw new Error(e);
             }
-            if (decimalValue == null) {
-                stringValue = null;
-            } else if (decimalFormat == null) {
-                stringValue = decimalValue.toString();
-            } else {
-                stringValue = decimalFormat.format(decimalValue);
-            }
-        } catch (IllegalAccessException e) {
-            throw new Error(e);
-        } catch (InvocationTargetException e) {
-            throw new Error(e);
+        }
+
+        if (decimalValue == null) {
+            stringValue = null;
+        } else if (decimalFormat == null) {
+            stringValue = Util.convertValueToString(decimalValue);
+        } else {
+            stringValue = decimalFormat.format(decimalValue);
         }
     }
 
     public void writeToObject(Object obj) {
-        Object value;
         Class type = accessor.getType();
-        if (decimalValue == null) {
-            value = null;
-        } else if (type == BigDecimal.class) {
-            value = decimalValue;
-        } else if (type == Byte.class || type == Byte.TYPE) {
-            value = decimalValue.byteValue();
-        } else if (type == Short.class || type == Short.TYPE) {
-            value = decimalValue.shortValue();
-        } else if (type == Integer.class || type == Integer.TYPE) {
-            value = decimalValue.intValue();
-        } else if (type == Long.class || type == Long.TYPE) {
-            value = decimalValue.longValue();
-        } else {
-            throw new Error("Unknown type");
-        }
+        Object value = Util.convertValue(decimalValue, type);
         writeToObject(obj, value);
     }
 

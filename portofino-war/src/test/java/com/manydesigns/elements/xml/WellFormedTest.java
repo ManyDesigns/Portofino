@@ -27,37 +27,57 @@
  *
  */
 
-package com.manydesigns.elements.fields.helpers;
+package com.manydesigns.elements.xml;
 
-import com.manydesigns.elements.annotations.CAP;
-import com.manydesigns.elements.fields.CAPField;
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.search.SearchField;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.AbstractElementsTest;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class CAPFieldHelper implements FieldHelper {
+public class WellFormedTest extends AbstractElementsTest {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Field tryToInstantiateField(ClassAccessor classAccessor,
-                                       PropertyAccessor propertyAccessor,
-                                       String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())
-                && propertyAccessor.isAnnotationPresent(CAP.class)) {
-                return new CAPField(propertyAccessor, prefix);
+    public void testUnderflow() {
+        XmlBuffer xb = new XmlBuffer();
+        try {
+            xb.openElement("bla");
+            xb.closeElement("bla");
+            xb.closeElement("bla");
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("Stack underflow: <bla></bla>", e.getMessage());
         }
-        return null;
     }
 
-    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
-                                                   PropertyAccessor propertyAccessor,
-                                                   String prefix) {
-        return null;
+    public void testNoCheckWellFormed() {
+        XmlBuffer.checkWellFormed = false;
+        XmlBuffer xb = new XmlBuffer();
+        xb.openElement("bla");
+        xb.closeElement("bla");
+        xb.closeElement("bla");
+    }
+    public void testMismatch() {
+        XmlBuffer xb = new XmlBuffer();
+        try {
+            xb.openElement("foo");
+            xb.closeElement("bar");
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("Expected: foo - Actual: bar\n<foo", e.getMessage());
+        }
+    }
+
+    public void testUnclosed() {
+        try {
+            XmlBuffer xb = new XmlBuffer();
+            xb.openElement("foo");
+            xb.toString();
+//            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("Stack not empty: <foo", e.getMessage());
+        }
     }
 }

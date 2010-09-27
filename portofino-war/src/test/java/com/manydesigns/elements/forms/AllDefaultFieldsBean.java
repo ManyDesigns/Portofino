@@ -27,37 +27,76 @@
  *
  */
 
-package com.manydesigns.elements.fields.helpers;
+package com.manydesigns.elements.forms;
 
-import com.manydesigns.elements.annotations.CAP;
-import com.manydesigns.elements.fields.CAPField;
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.search.SearchField;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.annotations.*;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class CAPFieldHelper implements FieldHelper {
+public class AllDefaultFieldsBean {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Field tryToInstantiateField(ClassAccessor classAccessor,
-                                       PropertyAccessor propertyAccessor,
-                                       String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())
-                && propertyAccessor.isAnnotationPresent(CAP.class)) {
-                return new CAPField(propertyAccessor, prefix);
-        }
-        return null;
+    public boolean aBoolean1;
+
+    public Boolean aBoolean2;
+
+    public Date date;
+
+    public BigDecimal decimal;
+
+    public int anInt;
+
+    public Integer anInteger;
+
+    @CAP
+    public String cap;
+
+    @CodiceFiscale
+    public String codiceFiscale;
+
+    @Email
+    public String email;
+
+    @PartitaIva
+    public String partitaIva;
+
+    @Password
+    public String password;
+
+    @Phone
+    public String phone;
+
+    @Radio(labels = {}, values = {})
+    public String radio;
+
+    @Select(labels = {}, values = {})
+    public String select;
+
+    public String text;
+
+    public int getAPrivateInt() {
+        return aPrivateInt;
     }
 
-    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
-                                                   PropertyAccessor propertyAccessor,
-                                                   String prefix) {
-        return null;
+    public void setAPrivateInt(int aPrivateInt) {
+        this.aPrivateInt = aPrivateInt;
     }
+
+    // none of the following fields should be detected due to their modifiers
+
+    static int aStaticInt;
+
+    private int aPrivateInt;
+
+    protected int aProtectedInt;
+
+    int aPackageProtectedInt;
+
 }

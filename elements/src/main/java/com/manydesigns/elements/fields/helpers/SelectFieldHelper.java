@@ -55,7 +55,9 @@ public class SelectFieldHelper implements FieldHelper {
         return null;
     }
 
-    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor, PropertyAccessor propertyAccessor, String prefix) {
+    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
+                                                   PropertyAccessor propertyAccessor,
+                                                   String prefix) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

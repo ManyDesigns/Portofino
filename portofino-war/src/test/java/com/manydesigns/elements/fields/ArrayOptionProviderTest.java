@@ -54,10 +54,11 @@ public class ArrayOptionProviderTest extends TestCase {
             {"qua"}
     };
 
-    ArrayOptionProvider optionProvider;
+    DefaultOptionProvider optionProvider;
 
     public void setUp() {
-        optionProvider = new ArrayOptionProvider(1, valuesArray, labelsArray);
+        optionProvider = DefaultOptionProvider.create(
+                1, valuesArray, labelsArray);
     }
 
     public void testArrayOptionsProvider1() {
@@ -66,9 +67,7 @@ public class ArrayOptionProviderTest extends TestCase {
 
     public void testArrayOptionsProvider2() {
         assertNull(optionProvider.getValue(0));
-        assertTrue(optionProvider.validate());
-        Map<Object, String> options1 = optionProvider.getOptions(0);
-        checkAllPresent(options1);
+        checkAllPresent();
     }
 
 
@@ -78,37 +77,22 @@ public class ArrayOptionProviderTest extends TestCase {
         assertNotNull(value);
         assertEquals(2, value);
 
-        assertTrue(optionProvider.validate());
-
-        String label = optionProvider.getLabel(0);
-        assertNotNull(label);
-        assertEquals("quo", label);
-
-        Map<Object, String> options1 = optionProvider.getOptions(0);
-        assertEquals(1, options1.size());
-        assertTrue(options1.containsKey(2));
-        assertEquals("quo", options1.get(2));
+        checkAllPresent();
     }
 
     public void testArrayOptionsProvider4() {
         optionProvider.setValue(0, 4);
         Object value = optionProvider.getValue(0);
-        assertNotNull(value);
-        assertEquals(4, value);
+        assertNull(value);
 
-        assertFalse(optionProvider.validate());
-
-        Map<Object, String> options1 = optionProvider.getOptions(0);
-        checkAllPresent(options1);
+        checkAllPresent();
     }
 
-    private void checkAllPresent(Map<Object, String> options1) {
-        assertEquals(3, options1.size());
-        assertTrue(options1.containsKey(1));
-        assertTrue(options1.containsKey(2));
-        assertTrue(options1.containsKey(3));
-        assertEquals("qui", options1.get(1));
-        assertEquals("quo", options1.get(2));
-        assertEquals("qua", options1.get(3));
+    private void checkAllPresent() {
+        Map<Object,String> options = optionProvider.getOptions(0);
+        assertEquals(3, options.size());
+        assertEquals("qui", options.get(1));
+        assertEquals("quo", options.get(2));
+        assertEquals("qua", options.get(3));
     }
 }

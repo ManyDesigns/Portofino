@@ -30,11 +30,7 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.AbstractCompositeElement;
-import com.manydesigns.elements.fields.OptionProvider;
 import com.manydesigns.elements.xml.XhtmlBuffer;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,11 +41,7 @@ public class Form extends AbstractCompositeElement<FieldSet> {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    protected final Collection<OptionProvider> optionProviders;
-
-    public Form() {
-        optionProviders = new ArrayList<OptionProvider>();
-    }
+    public Form() {}
 
     public void toXhtml(XhtmlBuffer xb) {
         for (FieldSet current : this) {
@@ -77,17 +69,6 @@ public class Form extends AbstractCompositeElement<FieldSet> {
 
     @Override
     public boolean validate() {
-        boolean result = true;
-        for (OptionProvider current : optionProviders) {
-            result = result && current.validate();
-        }
-
-        result = result && super.validate();
-
-        return result;
-    }
-
-    public Collection<OptionProvider> getOptionProviders() {
-        return optionProviders;
+        return super.validate();
     }
 }

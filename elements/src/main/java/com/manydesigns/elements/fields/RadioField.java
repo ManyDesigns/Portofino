@@ -144,8 +144,8 @@ public class RadioField extends AbstractField {
                 index++;
             }
         }
-        xb.closeElement("div");
         */
+        xb.closeElement("div");
     }
 
     public void valueToXhtmlPreview(XhtmlBuffer xb) {

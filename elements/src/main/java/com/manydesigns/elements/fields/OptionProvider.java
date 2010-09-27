@@ -42,13 +42,8 @@ public interface OptionProvider {
 
     int getFieldCount();
 
-    void resetValues();
-
     void setValue(int index, Object value);
     Object getValue(int index);
 
-    boolean validate();
-
-    String getLabel(int index);
-    Map<Object, String> getOptions(int index);
+    Map<Object,String> getOptions(int index);
 }

@@ -55,6 +55,7 @@ public class JavaFieldAccessor implements PropertyAccessor {
     //**************************************************************************
 
     public JavaFieldAccessor(Field field) {
+        assert field != null;
         this.field = field;
     }
 

@@ -64,7 +64,7 @@ public class UseCaseAction extends PortofinoAction
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // ServletRequestAware implementation
+    // Constants
     //**************************************************************************
 
     public final static String REDIRECT_TO_USE_CASE = "redirectToUseCase";

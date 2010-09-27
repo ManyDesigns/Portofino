@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.fields;
 
+import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -61,6 +62,13 @@ public class SelectField extends AbstractField {
 
     public SelectField(PropertyAccessor accessor, String prefix) {
         super(accessor, prefix);
+
+        Select annotation = accessor.getAnnotation(Select.class);
+        if (annotation != null) {
+            optionProvider = DefaultOptionProvider.create(
+                    1, annotation.values(), annotation.labels());
+        }
+
     }
 
     //**************************************************************************
@@ -132,21 +140,23 @@ public class SelectField extends AbstractField {
         xb.addAttribute("id", id);
         xb.addAttribute("name", inputName);
 
+        Map<Object,String> options =
+                optionProvider.getOptions(optionProviderIndex);
         Object objectValue = optionProvider.getValue(optionProviderIndex);
 
-        boolean checked = (objectValue == null);
+        boolean requiredAndSingleOption = required && (options.size() == 1);
+
+        boolean checked = (objectValue == null) && !requiredAndSingleOption;
         xb.writeOption("", checked, comboLabel);
 
-        if (optionProvider != null) {
-            for (Map.Entry<Object, String> option :
-                    optionProvider.getOptions(optionProviderIndex).entrySet()) {
-                Object optionValue = option.getKey();
-                String optionStringValue =
-                        (String) Util.convertValue(optionValue, String.class);
-                String optionLabel = option.getValue();
-                checked =  optionValue.equals(objectValue);
-                xb.writeOption(optionStringValue, checked, optionLabel);
-            }
+        for (Map.Entry<Object,String> option :
+                options.entrySet()) {
+            Object optionValue = option.getKey();
+            String optionLabel = option.getValue();
+            String optionValueString =
+                    (String) Util.convertValue(optionValue, String.class);
+            checked =  optionValue.equals(objectValue) || requiredAndSingleOption;
+            xb.writeOption(optionValueString, checked, optionLabel);
         }
         xb.closeElement("select");
     }
@@ -157,22 +167,21 @@ public class SelectField extends AbstractField {
     }
 
     private void valueToXhtmlHidden(XhtmlBuffer xb) {
-        Object value = optionProvider.getValue(optionProviderIndex);
-        String stringValue = (String) Util.convertValue(value, String.class);
-        xb.writeInputHidden(inputName, stringValue);
+        Object optionValue = optionProvider.getValue(optionProviderIndex);
+        String optionStringValue =
+                (String) Util.convertValue(optionValue, String.class);
+        xb.writeInputHidden(inputName, optionStringValue);
     }
 
     public void valueToXhtmlView(XhtmlBuffer xb) {
         xb.openElement("div");
         xb.addAttribute("class", "value");
         xb.addAttribute("id", id);
-        String optionLabel = optionProvider.getLabel(optionProviderIndex);
-        String optionUrl = "TODO";
-        if (optionUrl != null) {
-            xb.writeAnchor(optionUrl, optionLabel);
-        } else {
-            xb.write(optionLabel);
-        }
+        Map<Object,String> options =
+                optionProvider.getOptions(optionProviderIndex);
+        Object optionValue = optionProvider.getValue(optionProviderIndex);
+        String optionLabel = options.get(optionValue);
+        xb.write(optionLabel);
         xb.closeElement("div");
     }
 
@@ -204,5 +213,11 @@ public class SelectField extends AbstractField {
         this.comboLabel = comboLabel;
     }
 
-
+    public Object getValue() {
+        return optionProvider.getValue(optionProviderIndex);
+    }
+    
+    public void setValue(Object value) {
+        optionProvider.setValue(optionProviderIndex, value);
+    }
 }

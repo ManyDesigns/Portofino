@@ -27,37 +27,18 @@
  *
  */
 
-package com.manydesigns.elements.fields.helpers;
-
-import com.manydesigns.elements.annotations.CAP;
-import com.manydesigns.elements.fields.CAPField;
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.search.SearchField;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
+package com.manydesigns.elements.forms;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class CAPFieldHelper implements FieldHelper {
+public class ParentBean1 {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Field tryToInstantiateField(ClassAccessor classAccessor,
-                                       PropertyAccessor propertyAccessor,
-                                       String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())
-                && propertyAccessor.isAnnotationPresent(CAP.class)) {
-                return new CAPField(propertyAccessor, prefix);
-        }
-        return null;
-    }
+    public String anotherParentText; // for lexicographic ordering
 
-    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
-                                                   PropertyAccessor propertyAccessor,
-                                                   String prefix) {
-        return null;
-    }
+    public String parentText;
 }

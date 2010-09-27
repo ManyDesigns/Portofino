@@ -47,5 +47,4 @@ public @interface Select {
 
     String[] values();
     String[] labels();
-    String[] urls(); // Optional - the list can be empty
 }

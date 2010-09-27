@@ -27,37 +27,29 @@
  *
  */
 
-package com.manydesigns.elements.fields.helpers;
+package com.manydesigns.elements.forms;
 
-import com.manydesigns.elements.annotations.CAP;
-import com.manydesigns.elements.fields.CAPField;
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.search.SearchField;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.annotations.ColSpan;
+import com.manydesigns.elements.annotations.ForceNewRow;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class CAPFieldHelper implements FieldHelper {
+public class AnnotatedBean2 {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Field tryToInstantiateField(ClassAccessor classAccessor,
-                                       PropertyAccessor propertyAccessor,
-                                       String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())
-                && propertyAccessor.isAnnotationPresent(CAP.class)) {
-                return new CAPField(propertyAccessor, prefix);
-        }
-        return null;
-    }
+    public String s1;
+    public String s2;
+    public String s3;
 
-    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
-                                                   PropertyAccessor propertyAccessor,
-                                                   String prefix) {
-        return null;
-    }
+    @ColSpan(2)
+    public String s4;
+
+    @ForceNewRow
+    public String s5;
+    public String s6;
+    public String s7;
 }
