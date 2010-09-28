@@ -76,8 +76,7 @@ public class PasswordGenerator extends TimerTask {
     }
 
     public void run() {
-        try {
-            
+        try {         
             context.openSession();
             ClassAccessor accessor = context
                     .getTableAccessor("portofino.public.user_");

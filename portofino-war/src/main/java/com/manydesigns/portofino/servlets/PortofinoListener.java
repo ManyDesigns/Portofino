@@ -93,7 +93,7 @@ public class PortofinoListener
 
     public static final Logger logger =
             LogUtil.getLogger(PortofinoListener.class);
-    private static final int PERIOD = 5000;
+    private static final int PERIOD = 10000;
     private static final int DELAY = 5000;
     private static final int DELAY2 = 5300;
 
