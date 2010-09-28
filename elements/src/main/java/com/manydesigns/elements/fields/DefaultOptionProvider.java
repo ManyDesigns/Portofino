@@ -54,6 +54,8 @@ public class DefaultOptionProvider implements OptionProvider {
     // Fields
     //**************************************************************************
 
+    protected final String name;
+    protected final int fieldCount;
     protected final Object[] values;
     protected final Object[][] valuesArray;
     protected final String[][] labelsArray;
@@ -67,7 +69,8 @@ public class DefaultOptionProvider implements OptionProvider {
     // Static builders
     //**************************************************************************
 
-    public static DefaultOptionProvider create(int fieldCount,
+    public static DefaultOptionProvider create(String name,
+                                               int fieldCount,
                                                Object[] values,
                                                String[] labels) {
         Object[][] valuesArray = new Object[values.length][];
@@ -82,23 +85,27 @@ public class DefaultOptionProvider implements OptionProvider {
             labelsArray[i][0] = labels[i];
         }
 
-        return create(fieldCount, valuesArray, labelsArray);
+        return create(name, fieldCount, valuesArray, labelsArray);
     }
 
 
-    public static DefaultOptionProvider create(int fieldCount,
+    public static DefaultOptionProvider create(String name,
+                                               int fieldCount,
                                                Object[][] valuesArray,
                                                String[][] labelsArray) {
-        return new DefaultOptionProvider(fieldCount, valuesArray, labelsArray);
+        return new DefaultOptionProvider(name, fieldCount,
+                valuesArray, labelsArray);
     }
 
-    public static DefaultOptionProvider create(Collection<Object> objects,
+    public static DefaultOptionProvider create(String name,
+                                               Collection<Object> objects,
                                                ClassAccessor classAccessor) {
         PropertyAccessor[] keyProperties = classAccessor.getKeyProperties();
-        return create(objects, keyProperties);
+        return create(name, objects, keyProperties);
     }
 
-    protected static DefaultOptionProvider create(Collection<Object> objects,
+    protected static DefaultOptionProvider create(String name,
+                                                  Collection<Object> objects,
                                                   Class objectClass,
                                                   String... propertyNames) {
         ClassAccessor classAccessor =
@@ -118,10 +125,11 @@ public class DefaultOptionProvider implements OptionProvider {
                 throw new IllegalArgumentException(msg, e);
             }
         }
-        return create(objects, propertyAccessors);
+        return create(name, objects, propertyAccessors);
     }
 
     protected static DefaultOptionProvider create(
+            String name,
             Collection<Object> objects,
             PropertyAccessor[] propertyAccessors
     ) {
@@ -153,16 +161,20 @@ public class DefaultOptionProvider implements OptionProvider {
             labelsArray[i] = labels;
             i++;
         }
-        return new DefaultOptionProvider(fieldsCount, valuesArray, labelsArray);
+        return new DefaultOptionProvider(
+                name, fieldsCount, valuesArray, labelsArray);
     }
 
     //**************************************************************************
     // Constructor
     //**************************************************************************
 
-    protected DefaultOptionProvider(int fieldCount,
-                                 Object[][] valuesArray,
-                                 String[][] labelsArray) {
+    protected DefaultOptionProvider(String name,
+                                    int fieldCount,
+                                    Object[][] valuesArray,
+                                    String[][] labelsArray) {
+        this.name = name;
+        this.fieldCount = fieldCount;
         this.valuesArray = valuesArray;
         this.labelsArray = labelsArray;
         values = new Object[fieldCount];
@@ -179,8 +191,12 @@ public class DefaultOptionProvider implements OptionProvider {
     // OptionProvider implementation
     //**************************************************************************
 
+    public String getName() {
+        return name;
+    }
+
     public int getFieldCount() {
-        return values.length;
+        return fieldCount;
     }
 
     public void setValue(int index, Object value) {
@@ -213,7 +229,7 @@ public class DefaultOptionProvider implements OptionProvider {
 
         // normalize null in values (only null values after first null)
         boolean foundNull = false;
-        for (int j = 0; j < getFieldCount(); j++) {
+        for (int j = 0; j < fieldCount; j++) {
             if (foundNull) {
                 values[j] = null;
             } else if (values[j] == null) {
@@ -226,7 +242,7 @@ public class DefaultOptionProvider implements OptionProvider {
             Object[] currentValueRow = valuesArray[i];
             String[] currentLabelRow = labelsArray[i];
             boolean matching = true;
-            for (int j = 0; j < getFieldCount(); j++) {
+            for (int j = 0; j < fieldCount; j++) {
                 Object cellValue = currentValueRow[j];
                 String cellLabel = currentLabelRow[j];
                 Object value = values[j];
@@ -246,13 +262,13 @@ public class DefaultOptionProvider implements OptionProvider {
             }
         }
 
-        for (int i = maxMatchingIndex + 1; i < getFieldCount(); i++) {
+        for (int i = maxMatchingIndex + 1; i < fieldCount; i++) {
             values[i] = null;
         }
     }
 
     public void resetOptionsArray() {
-        for (int i = 0; i < values.length; i++) {
+        for (int i = 0; i < fieldCount; i++) {
             optionsArray[i].clear();
         }
     }

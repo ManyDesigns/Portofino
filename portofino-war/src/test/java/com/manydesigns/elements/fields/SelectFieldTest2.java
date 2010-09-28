@@ -70,7 +70,7 @@ public class SelectFieldTest2 extends AbstractElementsTest {
         super.setUp();
 
         optionProvider = DefaultOptionProvider.create(
-                2, valuesArray, labelsArray);
+                "optionProvider", 2, valuesArray, labelsArray);
 
         form = new FormBuilder(Bean.class)
                 .configOptionProvider(optionProvider, "p1", "p2")

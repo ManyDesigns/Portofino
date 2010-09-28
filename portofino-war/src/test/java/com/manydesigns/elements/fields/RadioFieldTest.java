@@ -84,14 +84,14 @@ public class RadioFieldTest extends AbstractElementsTest {
         radioField = new RadioField(myPropertyAccessor);
 
         optionProvider = DefaultOptionProvider.create(
-                1, valuesArray, labelsArray);
+                "optionProvider", 1, valuesArray, labelsArray);
         radioField.setOptionProvider(optionProvider);
 
         // impostiamo selectField2
         radioField2 = new RadioField(myPropertyAccessor);
 
         optionProvider2 = DefaultOptionProvider.create(
-                1, valuesArray2, labelsArray2);
+                "optionProvider2", 1, valuesArray2, labelsArray2);
         radioField2.setOptionProvider(optionProvider2);
     }
 

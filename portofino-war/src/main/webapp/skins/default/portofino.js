@@ -12,3 +12,26 @@ YAHOO.example.fixSideBar = function() {
     }
     ;
 };
+
+function updateSelectOptions(relName, optionProviderIndex, optionProviderValues) {
+    var data = {
+        relName : relName,
+        optionProviderIndex : optionProviderIndex
+    };
+    for (var key in optionProviderValues) {
+        data[key] = optionProviderValues[key];
+    }
+    $.ajax({
+        type: 'POST',
+        url: 'TableData!jsonSelectFieldOptions.action',
+        data: data,
+        success: function(data) {
+            var options = jQuery.parseJSON(data);
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+                alert(option['value'] + ' = ' + option['label']);
+            }
+        }
+//                    "  dataType: dataType\n" +
+    });
+}

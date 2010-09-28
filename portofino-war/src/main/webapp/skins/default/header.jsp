@@ -24,6 +24,8 @@
     <script type="text/javascript"
             src="<s:url value="/yui-2.8.1/build/yuiloader-dom-event/yuiloader-dom-event.js"/>"></script>
     <script type="text/javascript"
+            src="<s:url value="/jquery-1.4.2/jquery-1.4.2.min.js"/>"></script>
+    <script type="text/javascript"
             src="<s:url value="/skins/default/portofino.js"/>"></script>
     <title><s:property value="#request.navigation.selectedNavigationNode.description"/></title>
 </head>

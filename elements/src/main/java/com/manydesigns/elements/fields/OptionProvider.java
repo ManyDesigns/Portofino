@@ -40,6 +40,8 @@ public interface OptionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    String getName();
+
     int getFieldCount();
 
     void setValue(int index, Object value);

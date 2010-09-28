@@ -52,7 +52,9 @@ import com.manydesigns.portofino.util.PkHelper;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.io.StringBufferInputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +78,8 @@ public class TableDataAction extends PortofinoAction
 
     public final static String REDIRECT_TO_TABLE = "redirectToTable";
     public final static String NO_TABLES = "noTables";
+    public final static String JSON_SELECT_FIELD_OPTIONS =
+            "jsonSelectFieldOptions";
 
     //**************************************************************************
     // ServletRequestAware implementation
@@ -95,6 +99,8 @@ public class TableDataAction extends PortofinoAction
     public String[] selection;
     public String searchString;
     public String cancelReturnUrl;
+    public String relName;
+    public int optionProviderIndex;
 
     //**************************************************************************
     // Web parameters setters (for struts.xml inspections in IntelliJ)
@@ -126,6 +132,7 @@ public class TableDataAction extends PortofinoAction
     public Form form;
     public SearchForm searchForm;
     public List<RelatedTableForm> relatedTableFormList;
+    public InputStream inputStream;
 
     //**************************************************************************
     // Other objects
@@ -493,6 +500,46 @@ public class TableDataAction extends PortofinoAction
     }
 
     //**************************************************************************
+    // Ajax
+    //**************************************************************************
+
+    public String jsonSelectFieldOptions() {
+        setupTable();
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        Relationship relationship =
+                table.findManyToOneByName(relName);
+
+        String[] fieldNames = createFieldNamesForRelationship(relationship);
+        OptionProvider optionProvider =
+                createOptionProviderForRelationship(relationship);
+
+        Form form = new FormBuilder(tableAccessor)
+                .configFields(fieldNames)
+                .configOptionProvider(optionProvider, fieldNames)
+                .build();
+        form.readFromRequest(req);
+
+        // prepariamo Json
+        StringBuffer sb = new StringBuffer();
+        boolean first = false;
+        // apertura array Json
+        sb.append("[\n");
+
+        sb.append("{\"value\" : \"1\", \"label\" : \"uno\"},\n");
+        sb.append("{\"value\" : \"2\", \"label\" : \"due\"}\n");
+
+        // chiusura array Json
+        if (!first) {
+            sb.append("\n");
+        }
+        sb.append("]");
+
+        inputStream = new StringBufferInputStream(sb.toString());
+
+        return JSON_SELECT_FIELD_OPTIONS;
+    }
+
+    //**************************************************************************
     // Utility methods
     //**************************************************************************
 
@@ -510,26 +557,38 @@ public class TableDataAction extends PortofinoAction
         // setup relationship lookups
         Table table = model.findTableByQualifiedName(qualifiedTableName);
         for (Relationship rel : table.getManyToOneRelationships()) {
-            List<Reference> references = rel.getReferences();
-            String[] fields = new String[references.size()];
-            int i = 0;
-            for (Reference reference : references) {
-                fields[i] = reference.getFromColumn().getPropertyName();
-                i++;
-            }
-
-            // retrieve the related objects
-            Table relatedTable = rel.getToTable();
-            ClassAccessor classAccessor =
-                    context.getTableAccessor(relatedTable.getQualifiedName());
-            List<Object> relatedObjects =
-                    context.getAllObjects(relatedTable.getQualifiedName());
+            String[] fieldNames = createFieldNamesForRelationship(rel);
             OptionProvider optionProvider =
-                    DefaultOptionProvider.create(relatedObjects, classAccessor);
-            formBuilder.configOptionProvider(optionProvider, fields);
+                    createOptionProviderForRelationship(rel);
+
+            formBuilder.configOptionProvider(optionProvider, fieldNames);
         }
 
         form = formBuilder.build();
+    }
+
+    private String[] createFieldNamesForRelationship(Relationship rel) {
+        List<Reference> references = rel.getReferences();
+        String[] fieldNames = new String[references.size()];
+        int i = 0;
+        for (Reference reference : references) {
+            fieldNames[i] = reference.getFromColumn().getPropertyName();
+            i++;
+        }
+        return fieldNames;
+    }
+
+    protected OptionProvider createOptionProviderForRelationship(Relationship rel) {
+        // retrieve the related objects
+        Table relatedTable = rel.getToTable();
+        ClassAccessor classAccessor =
+                context.getTableAccessor(relatedTable.getQualifiedName());
+        List<Object> relatedObjects =
+                context.getAllObjects(relatedTable.getQualifiedName());
+        OptionProvider optionProvider =
+                DefaultOptionProvider.create(rel.getRelationshipName(),
+                        relatedObjects, classAccessor);
+        return optionProvider;
     }
 
 }

@@ -42,23 +42,15 @@ public class ArrayOptionProviderTest extends TestCase {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    Object[][] valuesArray = {
-            {1},
-            {2},
-            {3}
-    };
+    Object[] valuesArray = {1, 2, 3};
 
-    String[][] labelsArray = {
-            {"qui"},
-            {"quo"},
-            {"qua"}
-    };
+    String[] labelsArray = {"qui", "quo", "qua"};
 
     DefaultOptionProvider optionProvider;
 
     public void setUp() {
         optionProvider = DefaultOptionProvider.create(
-                1, valuesArray, labelsArray);
+                "optionProvider", 1, valuesArray, labelsArray);
     }
 
     public void testArrayOptionsProvider1() {

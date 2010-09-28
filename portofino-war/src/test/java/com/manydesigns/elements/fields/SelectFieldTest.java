@@ -84,14 +84,14 @@ public class SelectFieldTest extends AbstractElementsTest {
         selectField = new SelectField(myPropertyAccessor);
 
         optionProvider = DefaultOptionProvider.create(
-                1, valuesArray, labelsArray);
+                "optionProvider", 1, valuesArray, labelsArray);
         selectField.setOptionProvider(optionProvider);
 
         // impostiamo selectField2
         selectField2 = new SelectField(myPropertyAccessor);
 
         optionProvider2 = DefaultOptionProvider.create(
-                1, valuesArray2, labelsArray2);
+                "optionProvider", 1, valuesArray2, labelsArray2);
         selectField2.setOptionProvider(optionProvider2);
     }
 

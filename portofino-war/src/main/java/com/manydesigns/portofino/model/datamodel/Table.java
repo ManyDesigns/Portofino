@@ -160,6 +160,16 @@ public class Table {
         return null;
     }
 
+    public Relationship findManyToOneByName(String relationshipName) {
+        for (Relationship relationship : manyToOneRelationships) {
+            if (relationship.getRelationshipName().equals(relationshipName)) {
+                return relationship;
+            }
+        }
+        LogUtil.fineMF(logger,
+                "Many-to-one relationship not found: {0}", relationshipName);
+        return null;
+    }
 
     //**************************************************************************
     // toString()

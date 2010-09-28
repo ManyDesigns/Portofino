@@ -60,6 +60,8 @@ public class FormBuilder {
     // Fields
     //**************************************************************************
 
+    protected FieldsManager manager;
+
     protected final ClassAccessor classAccessor;
 
     protected List<ArrayList<PropertyAccessor>> groupedPropertyAccessors;
@@ -81,6 +83,7 @@ public class FormBuilder {
     public FormBuilder(ClassAccessor classAccessor) {
         LogUtil.entering(logger, "FormBuilder", classAccessor);
 
+        manager = FieldsManager.getManager();
         this.classAccessor = classAccessor;
         optionProviders = new HashMap<String[], OptionProvider>();
 
@@ -196,56 +199,84 @@ public class FormBuilder {
         LogUtil.entering(logger, "build");
 
         Form form = new Form();
-        FieldsManager manager = FieldsManager.getManager();
 
         if (groupedPropertyAccessors == null) {
             configReflectiveFields();
         }
 
+        // create the form/fieldset/field sructure
+        Map<String,Field> fieldMap = new HashMap<String,Field>();
         for (int i = 0; i < groupedPropertyAccessors.size(); i++) {
-            ArrayList<PropertyAccessor> group = groupedPropertyAccessors.get(i);
-            String fieldSetName;
-            if (fieldSetNames == null) {
-                fieldSetName = null;
-            } else {
-                fieldSetName = fieldSetNames.get(i);
-            }
-            com.manydesigns.elements.forms.FieldSet fieldSet =
-                    new com.manydesigns.elements.forms.FieldSet(
-                            fieldSetName, nColumns);
-            form.add(fieldSet);
-            for (PropertyAccessor propertyAccessor : group) {
-                Field field = null;
-                for (Map.Entry<String[],OptionProvider> current
-                        : optionProviders.entrySet()) {
-                    String[] fieldNames = current.getKey();
-                    int index = ArrayUtils.indexOf(fieldNames,
-                            propertyAccessor.getName());
-                    if (index >= 0) {
-                        SelectField selectField =
-                                new SelectField(propertyAccessor, prefix);
-                        selectField.setOptionProvider(current.getValue());
-                        selectField.setOptionProviderIndex(index);
-                        field = selectField;
-                        break;
-                    }
-                }
-                if (field == null) {
-                    field = manager.tryToInstantiateField(
-                            classAccessor, propertyAccessor, prefix);
-                }
+            buildFieldGroup(form, i, fieldMap);
+        }
 
-                if (field == null) {
-                    LogUtil.warningMF(logger,
-                            "Cannot instanciate field for property {0}",
-                            propertyAccessor);
-                    continue;
-                }
-                fieldSet.add(field);
+        // bind chained select fields
+        for (String[] fieldNames : optionProviders.keySet()) {
+            for (int i = 1; i < fieldNames.length; i++) {
+                SelectField field =
+                        (SelectField) fieldMap.get(fieldNames[i]);
+                SelectField previousField =
+                        (SelectField) fieldMap.get(fieldNames[i-1]);
+                field.setPreviousSelectField(previousField);
+                previousField.setNextSelectField(field);
             }
         }
 
         LogUtil.exiting(logger, "build");
         return form;
+    }
+
+    protected void buildFieldGroup(Form form,
+                                   int i,
+                                   Map<String,Field> fieldMap) {
+        ArrayList<PropertyAccessor> group = groupedPropertyAccessors.get(i);
+        String fieldSetName;
+        if (fieldSetNames == null) {
+            fieldSetName = null;
+        } else {
+            fieldSetName = fieldSetNames.get(i);
+        }
+        com.manydesigns.elements.forms.FieldSet fieldSet =
+                new com.manydesigns.elements.forms.FieldSet(
+                        fieldSetName, nColumns);
+        form.add(fieldSet);
+        for (PropertyAccessor propertyAccessor : group) {
+            buildField(fieldSet, propertyAccessor, fieldMap);
+        }
+    }
+
+    protected void buildField(com.manydesigns.elements.forms.FieldSet fieldSet,
+                              PropertyAccessor propertyAccessor,
+                              Map<String,Field> fieldMap) {
+        Field field = null;
+        String fieldName = propertyAccessor.getName();
+        for (Map.Entry<String[], OptionProvider> current
+                : optionProviders.entrySet()) {
+            String[] fieldNames = current.getKey();
+            OptionProvider optionProvider = current.getValue();
+            int index = ArrayUtils.indexOf(fieldNames, fieldName);
+            if (index >= 0) {
+                SelectField selectField =
+                        new SelectField(propertyAccessor, prefix);
+                selectField.setOptionProvider(optionProvider);
+                selectField.setOptionProviderIndex(index);
+                field = selectField;
+                break;
+            }
+        }
+        if (field == null) {
+            field = manager.tryToInstantiateField(
+                    classAccessor, propertyAccessor, prefix);
+        }
+
+        if (field == null) {
+            LogUtil.warningMF(logger,
+                    "Cannot instanciate field for property {0}",
+                    propertyAccessor);
+            return;
+        }
+
+        fieldSet.add(field);
+        fieldMap.put(fieldName, field);
     }
 }
