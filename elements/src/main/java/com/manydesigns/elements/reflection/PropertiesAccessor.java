@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.reflection;
 
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Properties;
@@ -87,5 +88,22 @@ public class PropertiesAccessor implements ClassAccessor {
 
     public Object newInstance() {
         return null;
+    }
+
+    public boolean isAnnotationPresent(
+            Class<? extends Annotation> annotationClass) {
+        return false;
+    }
+
+    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+        return null;
+    }
+
+    public Annotation[] getAnnotations() {
+        return new Annotation[0];
+    }
+
+    public Annotation[] getDeclaredAnnotations() {
+        return new Annotation[0];
     }
 }

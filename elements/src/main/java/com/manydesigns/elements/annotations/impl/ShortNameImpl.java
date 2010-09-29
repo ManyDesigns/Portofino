@@ -27,39 +27,33 @@
  *
  */
 
-package com.manydesigns.elements.reflection;
+package com.manydesigns.elements.annotations.impl;
+
+import com.manydesigns.elements.annotations.ShortName;
+
+import java.lang.annotation.Annotation;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public final class NullClassAccessor implements ClassAccessor {
+@SuppressWarnings({"ClassExplicitlyAnnotation"})
+public class ShortNameImpl implements ShortName {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public static final NullClassAccessor SINGLETON = new NullClassAccessor();
+    private String value;
 
-    private NullClassAccessor() {}
-
-    public String getName() {
-        return null;
+    public ShortNameImpl(String value) {
+        this.value = value;
     }
 
-    public PropertyAccessor getProperty(String fieldName)
-            throws NoSuchFieldException {
-        throw new NoSuchFieldException(fieldName);
+    public String value() {
+        return value;
     }
 
-    public PropertyAccessor[] getProperties() {
-        return new PropertyAccessor[0];
-    }
-
-    public PropertyAccessor[] getKeyProperties() {
-        return new PropertyAccessor[0];
-    }
-
-    public Object newInstance() {
-        return null;
+    public Class<? extends Annotation> annotationType() {
+        return ShortName.class;
     }
 }

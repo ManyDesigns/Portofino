@@ -29,12 +29,14 @@
 
 package com.manydesigns.elements.reflection;
 
+import java.lang.reflect.AnnotatedElement;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface ClassAccessor {
+public interface ClassAccessor extends AnnotatedElement {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -55,9 +57,11 @@ public interface ClassAccessor {
     public PropertyAccessor[] getProperties();
     public PropertyAccessor[] getKeyProperties();
 
+
     //**************************************************************************
     // Instance management
     //**************************************************************************
 
     public Object newInstance();
+
 }

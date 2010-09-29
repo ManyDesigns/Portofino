@@ -37,6 +37,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -162,9 +163,40 @@ public class JavaClassAccessor implements ClassAccessor {
         return ReflectionUtil.newInstance(javaClass);
     }
 
+
+    //**************************************************************************
+    // AnnotatedElement implementation
+    //**************************************************************************
+
+    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+        return javaClass.isAnnotationPresent(annotationClass);
+    }
+
+    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+        //noinspection unchecked
+        return (T) javaClass.getAnnotation(annotationClass);
+    }
+
+    public Annotation[] getAnnotations() {
+        return javaClass.getAnnotations();
+    }
+
+    public Annotation[] getDeclaredAnnotations() {
+        return javaClass.getDeclaredAnnotations();
+    }
+
+    //**************************************************************************
+    // Getters
+    //**************************************************************************
+
     public Class getJavaClass() {
         return javaClass;
     }
+
+
+    //**************************************************************************
+    // Other methods
+    //**************************************************************************
 
     @Override
     public String toString() {

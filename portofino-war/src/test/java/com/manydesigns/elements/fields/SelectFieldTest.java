@@ -96,7 +96,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testSimple() {
-        assertNull(selectField.getComboLabel());
+        assertNotNull(selectField.getComboLabel());
+        assertEquals("-- Select my text --", selectField.getComboLabel());
         assertEquals(optionProvider, selectField.getOptionProvider());
         assertEquals(optionProvider2, selectField2.getOptionProvider());
         assertNull(selectField.getValue());
@@ -105,7 +106,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertNull(selectField.getHelp());
         assertEquals("myText", selectField.getId());
         assertEquals("myText", selectField.getInputName());
-        assertEquals("My text", selectField.getLabel());
+        assertEquals("my text", selectField.getLabel());
         assertEquals(Mode.EDIT, selectField.getMode());
         assertFalse(selectField.isRequired());
         assertEquals(3, optionProvider.getOptions(0).size());
@@ -120,7 +121,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
-                "<option value=\"\" selected=\"selected\"></option>" +
+                "<option value=\"\" selected=\"selected\">-- Select my text --</option>" +
                 "<option value=\"value1\">label1</option>" +
                 "<option value=\"value2\">label2</option>" +
                 "<option value=\"value3\">label3</option>" +
@@ -133,7 +134,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myText\" class=\"field\">" +
                 "<span class=\"required\">*</span>&nbsp;My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
-                "<option value=\"\" selected=\"selected\"></option>" +
+                "<option value=\"\" selected=\"selected\">-- Select my text --</option>" +
                 "<option value=\"value1\">label1</option>" +
                 "<option value=\"value2\">label2</option>" +
                 "<option value=\"value3\">label3</option>" +
@@ -144,7 +145,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myText\" class=\"field\">" +
                 "<span class=\"required\">*</span>&nbsp;My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
-                "<option value=\"\" selected=\"selected\"></option>" +
+                "<option value=\"\" selected=\"selected\">-- Select my text --</option>" +
                 "<option value=\"value1\">label1</option>" +
                 "<option value=\"value2\">label2</option>" +
                 "<option value=\"value3\">label3</option>" +
@@ -171,7 +172,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
-                "<option value=\"\"></option>" +
+                "<option value=\"\">-- Select my text --</option>" +
                 "<option value=\"value1\" selected=\"selected\">label1</option>" +
                 "<option value=\"value2\">label2</option>" +
                 "<option value=\"value3\">label3</option>" +
@@ -183,7 +184,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
-                "<option value=\"\" selected=\"selected\"></option>" +
+                "<option value=\"\" selected=\"selected\">-- Select my text --</option>" +
                 "<option value=\"value1\">label1</option>" +
                 "<option value=\"value2\">label2</option>" +
                 "<option value=\"value3\">label3</option>" +
@@ -344,8 +345,8 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myText\" class=\"field\">" +
                 "<span class=\"required\">*</span>&nbsp;My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
-                "<option value=\"\"></option>" +
-                "<option value=\"value1\" selected=\"selected\">label1</option>" +
+                "<option value=\"\" selected=\"selected\">-- Select my text --</option>" +
+                "<option value=\"value1\">label1</option>" +
                 "</select></td>", text);
     }
 

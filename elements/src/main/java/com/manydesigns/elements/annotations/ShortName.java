@@ -27,49 +27,23 @@
  *
  */
 
-package com.manydesigns.elements.reflection;
+package com.manydesigns.elements.annotations;
 
-import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DummyPropertyAccessor implements PropertyAccessor {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface ShortName {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final String name;
-
-    public DummyPropertyAccessor(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Class getType() {
-        return null;
-    }
-
-    public int getModifiers() {
-        return 0;
-    }
-
-    public boolean isAnnotationPresent(Class<? extends Annotation> clazz) {
-        return false;
-    }
-
-    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-        return null;
-    }
-
-    public Object get(Object obj) {
-        return null;
-    }
-
-    public void set(Object obj, Object value) {}
-
+    String value();
 }

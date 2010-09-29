@@ -76,6 +76,16 @@ public class PropertiesEntryAccessor implements PropertyAccessor {
         return null;
     }
 
+    public Annotation[] getAnnotations() {
+        Annotation[] result = new Annotation[1];
+        result[0] = labelAnnotation;
+        return result;
+    }
+
+    public Annotation[] getDeclaredAnnotations() {
+        return getAnnotations();
+    }
+
     public String get(Object obj) {
         return ((Properties)obj).getProperty(name);
     }

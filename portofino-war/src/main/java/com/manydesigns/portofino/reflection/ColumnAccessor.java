@@ -52,7 +52,9 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ColumnAccessor extends AbstractAnnotatedPropertyAccessor {
+public class ColumnAccessor
+        extends AbstractAnnotatedAccessor 
+        implements PropertyAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 

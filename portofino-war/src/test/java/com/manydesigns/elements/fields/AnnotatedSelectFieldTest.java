@@ -83,7 +83,7 @@ public class AnnotatedSelectFieldTest extends AbstractElementsTest {
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
-                "<option value=\"\" selected=\"selected\"></option>" +
+                "<option value=\"\" selected=\"selected\">-- Select my text --</option>" +
                 "<option value=\"v1\">l1</option>" +
                 "<option value=\"v2\">l2</option>" +
                 "</select></td>", text);

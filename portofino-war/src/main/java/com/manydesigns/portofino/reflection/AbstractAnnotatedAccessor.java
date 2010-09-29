@@ -31,11 +31,11 @@ package com.manydesigns.portofino.reflection;
 
 import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.HashMap;
@@ -48,8 +48,8 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public abstract class AbstractAnnotatedPropertyAccessor
-        implements PropertyAccessor {
+public abstract class AbstractAnnotatedAccessor
+        implements AnnotatedElement {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -60,14 +60,14 @@ public abstract class AbstractAnnotatedPropertyAccessor
     protected final Map<Class, Annotation> annotations;
 
     public static final Logger logger =
-            LogUtil.getLogger(AbstractAnnotatedPropertyAccessor.class);
+            LogUtil.getLogger(AbstractAnnotatedAccessor.class);
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public AbstractAnnotatedPropertyAccessor(
+    public AbstractAnnotatedAccessor(
             Collection<com.manydesigns.portofino.model.annotations.Annotation>
                     modelAnnotations) {
         annotations = new HashMap<Class, Annotation>();
@@ -147,7 +147,7 @@ public abstract class AbstractAnnotatedPropertyAccessor
     }
 
     //**************************************************************************
-    // PropertyAccessor implementation
+    // AnnotatedElement implementation
     //**************************************************************************
 
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
@@ -157,5 +157,16 @@ public abstract class AbstractAnnotatedPropertyAccessor
     @SuppressWarnings({"unchecked"})
     public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
         return (T) annotations.get(annotationClass);
+    }
+
+    public Annotation[] getAnnotations() {
+        Collection<Annotation> annotationCollection = annotations.values();
+        Annotation[] result = new Annotation[annotationCollection.size()];
+        annotationCollection.toArray(result);
+        return result;
+    }
+
+    public Annotation[] getDeclaredAnnotations() {
+        return getAnnotations();
     }
 }

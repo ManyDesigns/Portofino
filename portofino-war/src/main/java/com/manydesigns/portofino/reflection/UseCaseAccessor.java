@@ -43,7 +43,9 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCaseAccessor implements ClassAccessor {
+public class UseCaseAccessor
+        extends AbstractAnnotatedAccessor
+        implements ClassAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -65,6 +67,7 @@ public class UseCaseAccessor implements ClassAccessor {
     //**************************************************************************
 
     public UseCaseAccessor(UseCase useCase, TableAccessor tableAccessor) {
+        super(useCase.getAnnotations());
         this.useCase = useCase;
         this.tableAccessor = tableAccessor;
         List<UseCaseProperty> properties = useCase.getProperties();

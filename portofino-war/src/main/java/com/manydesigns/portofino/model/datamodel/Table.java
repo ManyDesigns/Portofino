@@ -30,10 +30,12 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -59,6 +61,7 @@ public class Table {
     protected PrimaryKey primaryKey;
     protected boolean m2m;
     protected String className;
+    protected final List<Annotation> annotations;
 
     public static final Logger logger = LogUtil.getLogger(Table.class);
 
@@ -74,6 +77,7 @@ public class Table {
         this.manyToOneRelationships = new ArrayList<Relationship>();
         this.oneToManyRelationships = new ArrayList<Relationship>();
         this.m2m = false;
+        annotations = new ArrayList<Annotation>();
     }
 
     
@@ -144,6 +148,10 @@ public class Table {
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public Collection<Annotation> getAnnotations() {
+        return annotations;
     }
 
     //**************************************************************************

@@ -82,6 +82,20 @@ public class JavaPropertyAccessor implements PropertyAccessor {
         return getter.getModifiers();
     }
 
+    public Object get(Object obj)
+            throws IllegalAccessException, InvocationTargetException {
+        return getter.invoke(obj);
+    }
+
+    public void set(Object obj, Object value)
+            throws IllegalAccessException, InvocationTargetException {
+        setter.invoke(obj, value);
+    }
+
+    //**************************************************************************
+    // AnnotatedElement implementation
+    //**************************************************************************
+
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
         return getter.isAnnotationPresent(annotationClass);
     }
@@ -90,15 +104,14 @@ public class JavaPropertyAccessor implements PropertyAccessor {
         return getter.getAnnotation(annotationClass);
     }
 
-    public Object get(Object obj) throws IllegalAccessException, InvocationTargetException {
-        return getter.invoke(obj);
+    public Annotation[] getAnnotations() {
+        return getter.getAnnotations();
     }
 
-    public void set(Object obj, Object value) throws IllegalAccessException, InvocationTargetException {
-        setter.invoke(obj, value);
+    public Annotation[] getDeclaredAnnotations() {
+        return getter.getDeclaredAnnotations();
     }
 
-    
     //**************************************************************************
     // Overrides
     //**************************************************************************

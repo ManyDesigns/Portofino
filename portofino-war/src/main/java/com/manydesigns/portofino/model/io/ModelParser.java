@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +68,7 @@ public class ModelParser extends XmlParser {
     Table currentTable;
     Column currentColumn;
     UseCase currentUseCase;
-    List<Annotation> currentAnnotations;
+    Collection<Annotation> currentAnnotations;
     Annotation currentAnnotation;
 
     public ModelParser() {}
@@ -168,6 +169,9 @@ public class ModelParser extends XmlParser {
             expectElement(COLUMNS, 1, 1, new ColumnsCallback());
             expectElement(PRIMARY_KEY, 1, 1, new PrimaryKeyCallback());
             expectElement(RELATIONSHIPS, 0, 1, new RelationshipsCallback());
+
+            currentAnnotations = currentTable.getAnnotations();
+            expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
         }
     }
 
@@ -400,6 +404,9 @@ public class ModelParser extends XmlParser {
             currentUseCase.setTable(table);
             model.getUseCases().add(currentUseCase);
             expectElement(PROPERTIES, 0, 1, new PropertiesCallback());
+            
+            currentAnnotations = currentUseCase.getAnnotations();
+            expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
         }
     }
 
@@ -417,6 +424,7 @@ public class ModelParser extends XmlParser {
             String name = attributes.get("name");
             UseCaseProperty useCaseProperty = new UseCaseProperty(name);
             currentUseCase.getProperties().add(useCaseProperty);
+
             currentAnnotations = useCaseProperty.getAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
         }

@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.model.usecases;
 
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.Table;
 
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ public class UseCase {
     protected Table table;
     protected String filter;
     protected final List<UseCaseProperty> properties;
+    protected final List<Annotation> annotations;
 
 
     //**************************************************************************
@@ -66,6 +68,7 @@ public class UseCase {
         this.tableName = tableName;
         this.filter = filter;
         properties = new ArrayList<UseCaseProperty>();
+        annotations = new ArrayList<Annotation>();
     }
 
 
@@ -115,5 +118,9 @@ public class UseCase {
 
     public List<UseCaseProperty> getProperties() {
         return properties;
+    }
+
+    public List<Annotation> getAnnotations() {
+        return annotations;
     }
 }

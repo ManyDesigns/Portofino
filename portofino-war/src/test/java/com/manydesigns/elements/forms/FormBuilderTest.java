@@ -72,77 +72,77 @@ public class FormBuilderTest extends AbstractElementsTest {
         assertEquals(NumericField.class, field.getClass());
 
         field = fieldSet.get(1);
-        assertEquals("A boolean1", field.getLabel());
+        assertEquals("a boolean1", field.getLabel());
         assertTrue(field.isRequired());
         assertEquals(BooleanField.class, field.getClass());
 
         field = fieldSet.get(2);
-        assertEquals("A boolean2", field.getLabel());
+        assertEquals("a boolean2", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(BooleanField.class, field.getClass());
 
         field = fieldSet.get(3);
-        assertEquals("Date", field.getLabel());
+        assertEquals("date", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(DateField.class, field.getClass());
 
         field = fieldSet.get(4);
-        assertEquals("Decimal", field.getLabel());
+        assertEquals("decimal", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(NumericField.class, field.getClass());
 
         field = fieldSet.get(5);
-        assertEquals("An int", field.getLabel());
+        assertEquals("an int", field.getLabel());
         assertTrue(field.isRequired());
         assertEquals(NumericField.class, field.getClass());
 
         field = fieldSet.get(6);
-        assertEquals("An integer", field.getLabel());
+        assertEquals("an integer", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(NumericField.class, field.getClass());
 
         field = fieldSet.get(7);
-        assertEquals("Cap", field.getLabel());
+        assertEquals("cap", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(CAPField.class, field.getClass());
 
         field = fieldSet.get(8);
-        assertEquals("Codice fiscale", field.getLabel());
+        assertEquals("codice fiscale", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(CodiceFiscaleField.class, field.getClass());
 
         field = fieldSet.get(9);
-        assertEquals("Email", field.getLabel());
+        assertEquals("email", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(EmailField.class, field.getClass());
 
         field = fieldSet.get(10);
-        assertEquals("Partita iva", field.getLabel());
+        assertEquals("partita iva", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(PartitaIvaField.class, field.getClass());
 
         field = fieldSet.get(11);
-        assertEquals("Password", field.getLabel());
+        assertEquals("password", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(PasswordField.class, field.getClass());
 
         field = fieldSet.get(12);
-        assertEquals("Phone", field.getLabel());
+        assertEquals("phone", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(PhoneField.class, field.getClass());
 
         field = fieldSet.get(13);
-        assertEquals("Radio", field.getLabel());
+        assertEquals("radio", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(RadioField.class, field.getClass());
 
         field = fieldSet.get(14);
-        assertEquals("Select", field.getLabel());
+        assertEquals("select", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(SelectField.class, field.getClass());
 
         field = fieldSet.get(15);
-        assertEquals("Text", field.getLabel());
+        assertEquals("text", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(TextField.class, field.getClass());
     }
@@ -158,15 +158,15 @@ public class FormBuilderTest extends AbstractElementsTest {
         assertNull(fieldSet.getName());
 
         Field field = fieldSet.get(0);
-        assertEquals("An integer", field.getLabel());
+        assertEquals("an integer", field.getLabel());
         assertEquals(NumericField.class, field.getClass());
 
         field = fieldSet.get(1);
-        assertEquals("Decimal", field.getLabel());
+        assertEquals("decimal", field.getLabel());
         assertEquals(NumericField.class, field.getClass());
 
         field = fieldSet.get(2);
-        assertEquals("Cap", field.getLabel());
+        assertEquals("cap", field.getLabel());
         assertEquals(CAPField.class, field.getClass());
     }
 
@@ -188,15 +188,15 @@ public class FormBuilderTest extends AbstractElementsTest {
         assertEquals(3, fieldSet.size());
 
         Field field = fieldSet.get(0);
-        assertEquals("An integer", field.getLabel());
+        assertEquals("an integer", field.getLabel());
         assertEquals(NumericField.class, field.getClass());
 
         field = fieldSet.get(1);
-        assertEquals("Decimal", field.getLabel());
+        assertEquals("decimal", field.getLabel());
         assertEquals(NumericField.class, field.getClass());
 
         field = fieldSet.get(2);
-        assertEquals("Cap", field.getLabel());
+        assertEquals("cap", field.getLabel());
         assertEquals(CAPField.class, field.getClass());
 
 
@@ -206,7 +206,7 @@ public class FormBuilderTest extends AbstractElementsTest {
         assertEquals(1, fieldSet.size());
 
         field = fieldSet.get(0);
-        assertEquals("Phone", field.getLabel());
+        assertEquals("phone", field.getLabel());
         assertEquals(PhoneField.class, field.getClass());
     }
 
@@ -222,11 +222,11 @@ public class FormBuilderTest extends AbstractElementsTest {
 
         // Field set 0
         Field field = fieldSet.get(0);
-        assertEquals("Boolean1", field.getLabel());
+        assertEquals("boolean1", field.getLabel());
         assertEquals(BooleanField.class, field.getClass());
 
         field = fieldSet.get(1);
-        assertEquals("Boolean2", field.getLabel());
+        assertEquals("boolean2", field.getLabel());
         assertEquals(BooleanField.class, field.getClass());
 
 
@@ -237,15 +237,15 @@ public class FormBuilderTest extends AbstractElementsTest {
         assertEquals(3, fieldSet.size());
 
         field = fieldSet.get(0);
-        assertEquals("Date", field.getLabel());
+        assertEquals("date", field.getLabel());
         assertEquals(DateField.class, field.getClass());
 
         field = fieldSet.get(1);
-        assertEquals("Decimal", field.getLabel());
+        assertEquals("decimal", field.getLabel());
         assertEquals(NumericField.class, field.getClass());
 
         field = fieldSet.get(2);
-        assertEquals("An int", field.getLabel());
+        assertEquals("an int", field.getLabel());
         assertEquals(NumericField.class, field.getClass());
 
 
@@ -256,11 +256,11 @@ public class FormBuilderTest extends AbstractElementsTest {
         assertEquals(2, fieldSet.size());
 
         field = fieldSet.get(0);
-        assertEquals("An integer", field.getLabel());
+        assertEquals("an integer", field.getLabel());
         assertEquals(NumericField.class, field.getClass());
 
         field = fieldSet.get(1);
-        assertEquals("Text", field.getLabel());
+        assertEquals("text", field.getLabel());
         assertEquals(TextField.class, field.getClass());
     }
 
@@ -274,15 +274,15 @@ public class FormBuilderTest extends AbstractElementsTest {
         assertNull(fieldSet.getName());
 
         Field field = fieldSet.get(0);
-        assertEquals("Child text", field.getLabel());
+        assertEquals("child text", field.getLabel());
         assertEquals(TextField.class, field.getClass());
 
         field = fieldSet.get(1);
-        assertEquals("Another parent text", field.getLabel());
+        assertEquals("another parent text", field.getLabel());
         assertEquals(TextField.class, field.getClass());
 
         field = fieldSet.get(2);
-        assertEquals("Parent text", field.getLabel());
+        assertEquals("parent text", field.getLabel());
         assertEquals(TextField.class, field.getClass());
     }
 

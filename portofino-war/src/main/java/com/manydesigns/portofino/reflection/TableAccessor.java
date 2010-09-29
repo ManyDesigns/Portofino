@@ -46,7 +46,9 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableAccessor implements ClassAccessor {
+public class TableAccessor
+        extends AbstractAnnotatedAccessor
+        implements ClassAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -66,6 +68,7 @@ public class TableAccessor implements ClassAccessor {
     //**************************************************************************
 
     public TableAccessor(Table table) {
+        super(table.getAnnotations());
         String className = table.getClassName();
         if (className != null) {
             Class clazz = ReflectionUtil.loadClass(className);

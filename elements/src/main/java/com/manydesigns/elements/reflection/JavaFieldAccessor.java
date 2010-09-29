@@ -76,6 +76,19 @@ public class JavaFieldAccessor implements PropertyAccessor {
         return field.getModifiers();
     }
 
+    public Object get(Object obj) throws IllegalAccessException {
+        return field.get(obj);
+    }
+
+    public void set(Object obj, Object value) throws IllegalAccessException {
+        field.set(obj, value);
+    }
+
+    
+    //**************************************************************************
+    // AnnotatedElement implementation
+    //**************************************************************************
+
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
         return field.isAnnotationPresent(annotationClass);
     }
@@ -84,12 +97,12 @@ public class JavaFieldAccessor implements PropertyAccessor {
         return field.getAnnotation(annotationClass);
     }
 
-    public Object get(Object obj) throws IllegalAccessException {
-        return field.get(obj);
+    public Annotation[] getAnnotations() {
+        return field.getAnnotations();
     }
 
-    public void set(Object obj, Object value) throws IllegalAccessException {
-        field.set(obj, value);
+    public Annotation[] getDeclaredAnnotations() {
+        return field.getDeclaredAnnotations();
     }
 
 

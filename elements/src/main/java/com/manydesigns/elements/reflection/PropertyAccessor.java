@@ -29,7 +29,7 @@
 
 package com.manydesigns.elements.reflection;
 
-import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.InvocationTargetException;
 
 /*
@@ -37,18 +37,22 @@ import java.lang.reflect.InvocationTargetException;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface PropertyAccessor {
+public interface PropertyAccessor extends AnnotatedElement {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+
+    //**************************************************************************
+    // Property description
+    //**************************************************************************
+
     public String getName();
-
     public Class getType();
-
     public int getModifiers();
 
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass);
-    <T extends Annotation> T getAnnotation(Class<T> annotationClass);
+    //**************************************************************************
+    // Accessors
+    //**************************************************************************
 
     public Object get(Object obj)
             throws IllegalAccessException, InvocationTargetException;

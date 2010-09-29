@@ -104,7 +104,7 @@ public class RadioFieldTest extends AbstractElementsTest {
         assertNull(radioField.getHelp());
         assertEquals("myText", radioField.getId());
         assertEquals("myText", radioField.getInputName());
-        assertEquals("My text", radioField.getLabel());
+        assertEquals("my text", radioField.getLabel());
         assertEquals(Mode.EDIT, radioField.getMode());
         assertFalse(radioField.isRequired());
         assertEquals(3, optionProvider.getOptions(0).size());
