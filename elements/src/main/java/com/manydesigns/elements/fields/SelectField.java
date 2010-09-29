@@ -145,13 +145,7 @@ public class SelectField extends AbstractField {
         xb.addAttribute("id", id);
         xb.addAttribute("name", inputName);
         if (nextSelectField != null) {
-            String js = MessageFormat.format("var optionProviderValues = new Object();" +
-                    "optionProviderValues[''regione''] = ''liguria'';" +
-                    "optionProviderValues[''provincia''] = ''savona'';" +
-                    "optionProviderValues[''comune''] = ''savona'';" +
-                    "updateSelectOptions(''{0}'', {1}, optionProviderValues);",
-                    StringEscapeUtils.escapeJavaScript(optionProvider.getName()),
-                    optionProviderIndex + 1);
+            String js = composeJs();
             xb.addAttribute("onChange", js);
         }
 
@@ -174,6 +168,27 @@ public class SelectField extends AbstractField {
             xb.writeOption(optionValueString, checked, optionLabel);
         }
         xb.closeElement("select");
+    }
+
+    protected String composeJs() {
+        SelectField rootField = this;
+        while (rootField.previousSelectField != null) {
+            rootField = rootField.previousSelectField;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(MessageFormat.format(
+                "updateSelectOptions(''{0}'', {1}",
+                StringEscapeUtils.escapeJavaScript(optionProvider.getName()),
+                optionProviderIndex + 1));
+        SelectField currentField = rootField;
+        while (currentField != null) {
+            sb.append(", '");
+            sb.append(StringEscapeUtils.escapeJavaScript(currentField.getId()));
+            sb.append("'");
+            currentField = currentField.nextSelectField;
+        }
+        sb.append(");");
+        return sb.toString();
     }
 
     public void valueToXhtmlPreview(XhtmlBuffer xb) {
