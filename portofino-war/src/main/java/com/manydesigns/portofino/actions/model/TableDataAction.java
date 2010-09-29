@@ -35,7 +35,6 @@ import com.manydesigns.elements.fields.OptionProvider;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
-import com.manydesigns.elements.json.JsonBuffer;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -60,7 +59,6 @@ import java.io.StringBufferInputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -525,40 +523,7 @@ public class TableDataAction extends PortofinoAction
         SelectField targetField =
                 (SelectField) form.get(0).get(optionProviderIndex);
 
-        // prepariamo Json
-        JsonBuffer jb = new JsonBuffer();
-
-        // apertura array Json
-        jb.openArray();
-
-        Map<Object,String> options =
-                optionProvider.getOptions(optionProviderIndex);
-
-        boolean requiredAndOneOption =
-                targetField.isRequired() && options.size() == 1;
-
-        jb.openObject();
-        jb.writeKeyValue("v", ""); // value
-        jb.writeKeyValue("l", ""); // label
-        jb.writeKeyValue("s", !requiredAndOneOption); // selected
-        jb.closeObject();
-        
-        for (Map.Entry<Object,String> current : options.entrySet()) {
-            jb.openObject();
-            Object value = current.getKey();
-            String valueString = Util.convertValueToString(value);
-            String label = current.getValue();
-
-            jb.writeKeyValue("v", valueString);
-            jb.writeKeyValue("l", label);
-            jb.writeKeyValue("s", requiredAndOneOption);
-            jb.closeObject();
-        }
-
-        // chiusura array Json
-        jb.closeArray();
-
-        String text = jb.toString();
+        String text = targetField.jsonSelectFieldOptions();
         LogUtil.infoMF(logger, "jsonSelectFieldOptions: {0}", text);
 
         inputStream = new StringBufferInputStream(text);

@@ -30,6 +30,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.annotations.Select;
+import com.manydesigns.elements.json.JsonBuffer;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -73,6 +74,8 @@ public class SelectField extends AbstractField {
                     accessor.getName(), 1,
                     annotation.values(), annotation.labels());
         }
+
+        comboLabel = MessageFormat.format("-- Select {0} --", label);
     }
 
     //**************************************************************************
@@ -153,10 +156,10 @@ public class SelectField extends AbstractField {
                 optionProvider.getOptions(optionProviderIndex);
         Object objectValue = optionProvider.getValue(optionProviderIndex);
 
-        boolean requiredAndSingleOption = required && (options.size() == 1);
-
-        boolean checked = (objectValue == null) && !requiredAndSingleOption;
-        xb.writeOption("", checked, comboLabel);
+        boolean checked = (objectValue == null);
+        if (!options.isEmpty()) {
+            xb.writeOption("", checked, comboLabel);
+        }
 
         for (Map.Entry<Object,String> option :
                 options.entrySet()) {
@@ -164,7 +167,7 @@ public class SelectField extends AbstractField {
             String optionLabel = option.getValue();
             String optionValueString =
                     (String) Util.convertValue(optionValue, String.class);
-            checked =  optionValue.equals(objectValue) || requiredAndSingleOption;
+            checked =  optionValue.equals(objectValue);
             xb.writeOption(optionValueString, checked, optionLabel);
         }
         xb.closeElement("select");
@@ -213,6 +216,42 @@ public class SelectField extends AbstractField {
         String optionLabel = options.get(optionValue);
         xb.write(optionLabel);
         xb.closeElement("div");
+    }
+
+    public String jsonSelectFieldOptions() {
+        // prepariamo Json
+        JsonBuffer jb = new JsonBuffer();
+
+        // apertura array Json
+        jb.openArray();
+
+        Map<Object,String> options =
+                optionProvider.getOptions(optionProviderIndex);
+
+        if (!options.isEmpty()) {
+            jb.openObject();
+            jb.writeKeyValue("v", ""); // value
+            jb.writeKeyValue("l", comboLabel); // label
+            jb.writeKeyValue("s", true); // selected
+            jb.closeObject();
+        }
+
+        for (Map.Entry<Object,String> current : options.entrySet()) {
+            jb.openObject();
+            Object value = current.getKey();
+            String valueString = Util.convertValueToString(value);
+            String label = current.getValue();
+
+            jb.writeKeyValue("v", valueString);
+            jb.writeKeyValue("l", label);
+            jb.writeKeyValue("s", false);
+            jb.closeObject();
+        }
+
+        // chiusura array Json
+        jb.closeArray();
+
+        return jb.toString();
     }
 
     //**************************************************************************
