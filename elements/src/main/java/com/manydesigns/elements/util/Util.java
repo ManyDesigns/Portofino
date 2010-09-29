@@ -100,7 +100,7 @@ public class Util {
             char c = s.charAt(i);
             if (first) {
                 first = false;
-                sb.append(Character.toUpperCase(c));
+                sb.append(c);
             } else {
                 if (Character.isUpperCase(c)) {
                     sb.append(' ');

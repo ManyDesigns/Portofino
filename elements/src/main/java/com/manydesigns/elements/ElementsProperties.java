@@ -69,6 +69,9 @@ public final class ElementsProperties {
     public static final String ANNOTATIONS_IMPLEMENTATION_LIST_PROPERTY =
             "annotations.implementation.list";
 
+    public static final String FIELDS_LABEL_CAPITALIZE_PROPERTY =
+            "fields.label.capitalize";
+
     //**************************************************************************
     // Static fields, singleton initialization and retrieval
     //**************************************************************************

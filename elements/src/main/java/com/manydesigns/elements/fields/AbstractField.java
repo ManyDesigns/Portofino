@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.fields;
 
+import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.*;
@@ -43,6 +44,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 /*
@@ -55,6 +57,8 @@ public abstract class AbstractField implements Field {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public final static String BULK_SUFFIX = "_bulk";
+
+    protected final Properties elementsProperties;
 
     protected final PropertyAccessor accessor;
 
@@ -89,6 +93,7 @@ public abstract class AbstractField implements Field {
     public AbstractField(PropertyAccessor accessor, String prefix) {
         LogUtil.entering(logger, "AbstractField", accessor, prefix);
 
+        elementsProperties = ElementsProperties.getProperties();
         this.accessor = accessor;
 
         String localId;
@@ -241,7 +246,17 @@ public abstract class AbstractField implements Field {
             xb.closeElement("span");
             xb.writeNbsp();
         }
-        xb.write(StringUtils.capitalize(label + ":"));
+        String actualLabel;
+        boolean capitalize =
+                Boolean.parseBoolean(
+                        elementsProperties.getProperty(
+                                ElementsProperties.FIELDS_LABEL_CAPITALIZE_PROPERTY));
+        if (capitalize) {
+            actualLabel = StringUtils.capitalize(label + ":");
+        } else {
+            actualLabel = label + ":";
+        }
+        xb.write(actualLabel);
         xb.closeElement("label");
     }
 
