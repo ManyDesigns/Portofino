@@ -31,7 +31,6 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.annotations.Annotation;
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -180,15 +179,11 @@ public class Table {
     }
 
     //**************************************************************************
-    // toString()
+    // Overrides
     //**************************************************************************
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this)
-                .append("databaseName", databaseName)
-                .append("schemaName", schemaName)
-                .append("tableName", tableName)
-                .toString();
+        return getQualifiedName();
     }
 }

@@ -246,4 +246,14 @@ public class Column {
         result = 31 * result + (propertyName != null ? propertyName.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return MessageFormat.format("{0} {1}({2},{3}){4}",
+                getQualifiedName(),
+                columnType,
+                Integer.toString(length),
+                Integer.toString(scale),
+                nullable ? "" : " NOT NULL");
+    }
 }

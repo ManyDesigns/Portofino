@@ -28,6 +28,7 @@
  */
 package com.manydesigns.portofino.email;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -76,7 +77,8 @@ public class PasswordGenerator extends TimerTask {
     }
 
     public void run() {
-        try {         
+        try {
+            ElementsThreadLocals.setupDefaultElementsContext();
             context.openSession();
             ClassAccessor accessor = context
                     .getTableAccessor("portofino.public.user_");
@@ -90,6 +92,7 @@ public class PasswordGenerator extends TimerTask {
             LogUtil.warning(logger, "Cannot generate  password", e);
         }finally{
             context.closeSession();
+            ElementsThreadLocals.removeElementsContext();
         }
     }
 

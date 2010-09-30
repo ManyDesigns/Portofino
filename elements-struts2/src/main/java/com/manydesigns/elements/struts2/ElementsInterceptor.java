@@ -29,8 +29,10 @@
 
 package com.manydesigns.elements.struts2;
 
+import com.manydesigns.elements.ElementsContext;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.TextProvider;
+import com.manydesigns.elements.text.BasicTextProvider;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
@@ -40,6 +42,7 @@ import org.apache.struts2.StrutsStatics;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -66,38 +69,28 @@ public class ElementsInterceptor implements Interceptor {
                 (ServletContext)context.get(StrutsStatics.SERVLET_CONTEXT);
         OgnlContext ognlContext = (OgnlContext)context.getContextMap();
 
-        HttpServletRequest oldReq =
-                ElementsThreadLocals.getHttpServletRequest();
-        HttpServletResponse oldRes =
-                ElementsThreadLocals.getHttpServletResponse();
-        ServletContext oldServletContext =
-                ElementsThreadLocals.getServletContext();
-        TextProvider oldTextProvider =
-                ElementsThreadLocals.getTextProvider();
-        OgnlContext oldOgnlContext =
-                ElementsThreadLocals.getOgnlContext();
+        ElementsContext elementsContext =
+                ElementsThreadLocals.getElementsContext();
 
         try {
-            ElementsThreadLocals.setHttpServletRequest(req);
-            ElementsThreadLocals.setHttpServletResponse(res);
-            ElementsThreadLocals.setServletContext(servletContext);
-            ElementsThreadLocals.setOgnlContext(ognlContext);
+            elementsContext.setHttpServletRequest(req);
+            elementsContext.setHttpServletResponse(res);
+            elementsContext.setServletContext(servletContext);
+            elementsContext.setOgnlContext(ognlContext);
 
+            TextProvider textProvider;
             if (action instanceof com.opensymphony.xwork2.TextProvider) {
-                ElementsThreadLocals.setTextProvider(
+                textProvider =
                         new StrutsTextProvider(
-                                (com.opensymphony.xwork2.TextProvider)action));
+                                (com.opensymphony.xwork2.TextProvider)action);
             } else {
-                ElementsThreadLocals.setTextProvider(null);
+                textProvider = new BasicTextProvider(Locale.ENGLISH);
             }
+            elementsContext.setTextProvider(textProvider);
 
             return invocation.invoke();
         } finally {
-            ElementsThreadLocals.setHttpServletRequest(oldReq);
-            ElementsThreadLocals.setHttpServletResponse(oldRes);
-            ElementsThreadLocals.setServletContext(oldServletContext);
-            ElementsThreadLocals.setTextProvider(oldTextProvider);
-            ElementsThreadLocals.setOgnlContext(oldOgnlContext);
+            ElementsThreadLocals.removeElementsContext();
         }
     }
 }

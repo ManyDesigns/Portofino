@@ -24,9 +24,7 @@ function updateSelectOptions(relName, optionProviderIndex) {
     for (var i = 2; i < arguments.length; i++ ) {
         var currentId = arguments[i];
         var current = document.getElementById(currentId);
-        var currentName = current.name;
-        var currentValue = current.value;
-        data[currentName] = currentValue;
+        data[current.name] = current.value;
     }
     jQuery.ajax({
         type: 'POST',

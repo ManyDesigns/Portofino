@@ -1,13 +1,8 @@
 package com.manydesigns.elements;
 
-import com.manydesigns.elements.text.BasicTextProvider;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XmlBuffer;
 import junit.framework.TestCase;
-import ognl.Ognl;
-import ognl.OgnlContext;
-
-import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -29,12 +24,14 @@ public abstract class AbstractElementsTest extends TestCase {
         req = new DummyHttpServletRequest();
         req.setContextPath("");
 
+        ElementsThreadLocals.setupDefaultElementsContext();
         ElementsThreadLocals.setHttpServletRequest(req);
+    }
 
-        ElementsThreadLocals.setTextProvider(
-                new BasicTextProvider(Locale.ENGLISH));
-        ElementsThreadLocals.setOgnlContext(
-                (OgnlContext) Ognl.createDefaultContext(null));
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        ElementsThreadLocals.removeElementsContext();
     }
 
     public String elementToString(Element element) {

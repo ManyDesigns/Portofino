@@ -153,4 +153,13 @@ public class Schema {
         LogUtil.fineMF(logger, "Relationship not found: {0}", relationshipName);
         return null;
     }
+
+    //**************************************************************************
+    // Overrides
+    //**************************************************************************
+
+    @Override
+    public String toString() {
+        return getQualifiedName();
+    }
 }

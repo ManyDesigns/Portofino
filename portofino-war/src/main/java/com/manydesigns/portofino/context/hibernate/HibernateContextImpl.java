@@ -580,7 +580,12 @@ public class HibernateContextImpl implements Context {
         for (HibernateDatabaseSetup current : setups.values()) {
             Session session = current.getThreadSession();
             if (session != null) {
-                session.close();
+                try {
+                    session.close();
+                } catch (Throwable e) {
+                    LogUtil.warning(logger,
+                            "Exception while closing Hibernate session", e);
+                }
             }
             current.setThreadSession(null);
         }

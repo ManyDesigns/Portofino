@@ -33,6 +33,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 
 import java.text.MessageFormat;
@@ -99,14 +100,16 @@ public class DefaultOptionProvider implements OptionProvider {
 
     public static DefaultOptionProvider create(String name,
                                                Collection<Object> objects,
-                                               ClassAccessor classAccessor) {
+                                               ClassAccessor classAccessor,
+                                               TextFormat textFormat) {
         PropertyAccessor[] keyProperties = classAccessor.getKeyProperties();
-        return create(name, objects, keyProperties);
+        return create(name, objects, textFormat, keyProperties);
     }
 
     protected static DefaultOptionProvider create(String name,
                                                   Collection<Object> objects,
                                                   Class objectClass,
+                                                  TextFormat textFormat,
                                                   String... propertyNames) {
         ClassAccessor classAccessor =
                 JavaClassAccessor.getClassAccessor(objectClass);
@@ -125,13 +128,14 @@ public class DefaultOptionProvider implements OptionProvider {
                 throw new IllegalArgumentException(msg, e);
             }
         }
-        return create(name, objects, propertyAccessors);
+        return create(name, objects, textFormat, propertyAccessors);
     }
 
     protected static DefaultOptionProvider create(
             String name,
             Collection<Object> objects,
-            PropertyAccessor[] propertyAccessors
+            TextFormat textFormat,
+            PropertyAccessor... propertyAccessors
     ) {
         int fieldsCount = propertyAccessors.length;
         Object[][] valuesArray = new Object[objects.size()][fieldsCount];
@@ -141,13 +145,21 @@ public class DefaultOptionProvider implements OptionProvider {
             Object[] values = new Object[fieldsCount];
             String[] labels = new String[fieldsCount];
             int j = 0;
+            String shortName = null;
+            if (textFormat != null) {
+                shortName = textFormat.format(current);
+            }
             for (PropertyAccessor property : propertyAccessors) {
                 try {
                     Object value = property.get(current);
-                    String label =
-                            (String) Util.convertValue(value, String.class);
                     values[j] = value;
-                    labels[j] = label;
+                    if (textFormat == null) {
+                        String label =
+                                (String) Util.convertValue(value, String.class);
+                        labels[j] = label;
+                    } else {
+                        labels[j] = shortName;
+                    }
                 } catch (Throwable e) {
                     String msg = MessageFormat.format(
                             "Could not access property: {0}",

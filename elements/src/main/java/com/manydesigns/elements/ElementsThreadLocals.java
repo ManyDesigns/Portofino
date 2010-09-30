@@ -29,11 +29,14 @@
 
 package com.manydesigns.elements;
 
+import com.manydesigns.elements.text.BasicTextProvider;
+import ognl.Ognl;
 import ognl.OgnlContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -117,7 +120,26 @@ public final class ElementsThreadLocals {
         getElementsContext().setOgnlContext(context);
     }
 
+    //**************************************************************************
+    // Utility methods
+    //**************************************************************************
 
+    public static void setupDefaultElementsContext() {
+        OgnlContext ognlContext = (OgnlContext) Ognl.createDefaultContext(null);
+        TextProvider textProvider = new BasicTextProvider(Locale.ENGLISH);
+
+        ElementsContext elementsContext = getElementsContext();
+
+        elementsContext.setOgnlContext(ognlContext);
+        elementsContext.setTextProvider(textProvider);
+        elementsContext.setHttpServletRequest(null);
+        elementsContext.setHttpServletResponse(null);
+        elementsContext.setServletContext(null);
+    }
+
+    public static void removeElementsContext() {
+        threadLocalElementsContext.remove();
+    }
 
     //**************************************************************************
     // i18n

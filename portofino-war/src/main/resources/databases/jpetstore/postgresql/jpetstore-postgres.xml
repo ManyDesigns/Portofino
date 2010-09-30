@@ -311,10 +311,15 @@
                                         searchable="true"
                                         propertyName="bounced"
                                         />
-                                </columns>
-                                <primaryKey name="pk_user">
-                                    <column name="userid"/>
-                                </primaryKey>
+                            </columns>
+                            <primaryKey name="pk_user">
+                                <column name="userid"/>
+                            </primaryKey>
+                            <annotations>
+                                <annotation type="com.manydesigns.elements.annotations.ShortName">
+                                    <value>%{screenName} (%{email})</value>
+                                </annotation>
+                            </annotations>
                         </table>
                         <table name="group_"
                                class="com.manydesigns.portofino.systemModel.users.Group">
@@ -381,10 +386,15 @@
                                         nullable="true"
                                         searchable="true"
                                         propertyName="delDate"/>
-                                </columns>
-                                <primaryKey name="pk_group">
-                                    <column name="groupid"/>
-                                </primaryKey>
+                            </columns>
+                            <primaryKey name="pk_group">
+                                <column name="groupid"/>
+                            </primaryKey>
+                            <annotations>
+                                <annotation type="com.manydesigns.elements.annotations.ShortName">
+                                    <value>%{name} (%{description})</value>
+                                </annotation>
+                            </annotations>
                         </table>
                         <table name="users_groups" manyToMany="true" class="com.manydesigns.portofino.systemModel.users.UsersGroups"
                                >

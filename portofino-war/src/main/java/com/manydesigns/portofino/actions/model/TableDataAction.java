@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.fields.DefaultOptionProvider;
 import com.manydesigns.elements.fields.OptionProvider;
 import com.manydesigns.elements.fields.SelectField;
@@ -40,6 +41,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RelatedTableForm;
@@ -577,9 +579,15 @@ public class TableDataAction extends PortofinoAction
                 context.getTableAccessor(relatedTable.getQualifiedName());
         List<Object> relatedObjects =
                 context.getAllObjects(relatedTable.getQualifiedName());
+        ShortName shortNameAnnotation =
+                classAccessor.getAnnotation(ShortName.class);
+        TextFormat textFormat = null;
+        if (shortNameAnnotation != null) {
+            textFormat = OgnlTextFormat.create(shortNameAnnotation.value());
+        }
         OptionProvider optionProvider =
                 DefaultOptionProvider.create(rel.getRelationshipName(),
-                        relatedObjects, classAccessor);
+                        relatedObjects, classAccessor, textFormat);
         return optionProvider;
     }
 
