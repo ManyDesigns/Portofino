@@ -20,11 +20,15 @@
     <link rel="stylesheet" type="text/css"
           href="<s:url value="/yui-2.8.1/build/base/base-min.css"/>"/>
     <link rel="stylesheet" type="text/css"
+          href="<s:url value="/jquery-ui-1.8.5/css/smoothness/jquery-ui-1.8.5.custom.css"/>"/>
+    <link rel="stylesheet" type="text/css"
           href="<s:url value="/skins/default/portofino.css"/>"/>
     <script type="text/javascript"
             src="<s:url value="/yui-2.8.1/build/yuiloader-dom-event/yuiloader-dom-event.js"/>"></script>
     <script type="text/javascript"
-            src="<s:url value="/jquery-1.4.2/jquery-1.4.2.min.js"/>"></script>
+            src="<s:url value="/jquery-ui-1.8.5/js/jquery-1.4.2.min.js"/>"></script>
+    <script type="text/javascript"
+            src="<s:url value="/jquery-ui-1.8.5/js/jquery-ui-1.8.5.custom.min.js"/>"></script>
     <script type="text/javascript"
             src="<s:url value="/skins/default/portofino.js"/>"></script>
     <title><s:property value="#request.navigation.selectedNavigationNode.description"/></title>

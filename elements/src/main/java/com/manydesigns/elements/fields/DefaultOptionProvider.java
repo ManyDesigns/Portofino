@@ -42,6 +42,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.ArrayUtils;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -58,13 +61,16 @@ public class DefaultOptionProvider implements OptionProvider {
     protected final String name;
     protected final int fieldCount;
     protected final Object[] values;
+    protected final String[] labelSearch;
     protected final Object[][] valuesArray;
     protected final String[][] labelsArray;
     protected final Map<Object, String>[] optionsArray;
     protected boolean needsValidation;
+    protected boolean autoconnect;
 
     public final static Logger logger =
             LogUtil.getLogger(DefaultOptionProvider.class);
+    public static final String NON_WORD_CHARACTERS = " \t\n\f\r\\||!\"£$%&/()='?^[]+*@#<>,;.:-_";
 
     //**************************************************************************
     // Static builders
@@ -190,6 +196,7 @@ public class DefaultOptionProvider implements OptionProvider {
         this.valuesArray = valuesArray;
         this.labelsArray = labelsArray;
         values = new Object[fieldCount];
+        labelSearch = new String[fieldCount];
         //noinspection unchecked
         optionsArray = new Map[fieldCount];
         for (int i = 0; i < fieldCount; i++) {
@@ -221,9 +228,26 @@ public class DefaultOptionProvider implements OptionProvider {
         return values[index];
     }
 
+    public void setLabelSearch(int index, String value) {
+        labelSearch[index] = StringUtils.trimToNull(value);
+        needsValidation = true;
+    }
+
+    public String getLabelSearch(int index) {
+        return labelSearch[index];
+    }
+
     public Map<Object, String> getOptions(int index) {
         validate();
         return optionsArray[index];
+    }
+
+    public boolean isAutoconnect() {
+        return autoconnect;
+    }
+
+    public void setAutoconnect(boolean autoconnect) {
+        this.autoconnect = autoconnect;
     }
 
     //**************************************************************************
@@ -258,13 +282,15 @@ public class DefaultOptionProvider implements OptionProvider {
                 Object cellValue = currentValueRow[j];
                 String cellLabel = currentLabelRow[j];
                 Object value = values[j];
+                String labelSearch2 = labelSearch[j];
 
                 Map<Object, String> options = optionsArray[j];
-                if (matching) {
+                if (matching && matchLabel(cellLabel, labelSearch2)) {
                     options.put(cellValue, cellLabel);
                 }
 
-                if (matching && value != null && value.equals(cellValue)) {
+                if (matching && value != null
+                        && value.equals(cellValue)) {
                     if (j > maxMatchingIndex) {
                         maxMatchingIndex = j;
                     }
@@ -277,6 +303,22 @@ public class DefaultOptionProvider implements OptionProvider {
         for (int i = maxMatchingIndex + 1; i < fieldCount; i++) {
             values[i] = null;
         }
+    }
+
+    private boolean matchLabel(String cellLabel, String labelSearch2) {
+        if (labelSearch2 == null || labelSearch2.length() == 0) {
+            return true;
+        }
+        cellLabel = cellLabel.toLowerCase();
+        labelSearch2 = labelSearch2.toLowerCase();
+        String[] cellLabelArray =
+                StringUtils.split(cellLabel, NON_WORD_CHARACTERS);
+        for (String current : cellLabelArray) {
+            if (current.startsWith(labelSearch2)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void resetOptionsArray() {

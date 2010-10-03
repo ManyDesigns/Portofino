@@ -42,6 +42,7 @@ public class ModelParser extends XmlParser {
     private static final String PRIMARY_KEY = "primaryKey";
     private static final String RELATIONSHIPS = "relationships";
     private static final String RELATIONSHIP = "relationship";
+    private static final String REFERENCES = "references";
     private static final String REFERENCE = "reference";
 
     private static final String SITENODES = "siteNodes";
@@ -60,7 +61,7 @@ public class ModelParser extends XmlParser {
     private static final String ANNOTATION = "annotation";
     private static final String VALUE = "value";
 
-    private List<RelationshipPre> relationships;
+    private List<RelationshipPre> relationshipPres;
 
     Model model;
     Database currentDatabase;
@@ -75,7 +76,7 @@ public class ModelParser extends XmlParser {
 
     public Model parse(String fileName) throws Exception {
         model = new Model();
-        relationships = new ArrayList<RelationshipPre>();
+        relationshipPres = new ArrayList<RelationshipPre>();
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         InputStream input = ReflectionUtil.getResourceAsStream(fileName);
         XMLStreamReader xmlStreamReader = inputFactory.createXMLStreamReader(input);
@@ -276,7 +277,17 @@ public class ModelParser extends XmlParser {
                 onePropertyName = rel.getRelationshipName();
             }
             rel.setOnePropertyName(onePropertyName);
-            relationships.add(rel);
+            relationshipPres.add(rel);
+            expectElement(REFERENCES, 1, 1, new ReferencesCallback());
+
+            currentAnnotations = rel.getAnnotations();
+            expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
+        }
+    }
+
+    private class ReferencesCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
             expectElement(REFERENCE, 1, null, new ReferenceCallback());
         }
     }
@@ -284,7 +295,7 @@ public class ModelParser extends XmlParser {
     private class ReferenceCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            RelationshipPre currRel = relationships.get(relationships.size()-1);
+            RelationshipPre currRel = relationshipPres.get(relationshipPres.size()-1);
             checkRequiredAttributes(attributes,
                                 "fromColumn", "toColumn");
             ReferencePre referencePre = new ReferencePre(
@@ -468,9 +479,10 @@ public class ModelParser extends XmlParser {
     //**************************************************************************
 
     private void createRelationshipsPost() {
-        for (RelationshipPre relPre: relationships) {
+        for (RelationshipPre relPre: relationshipPres) {
             Relationship rel = new Relationship(relPre.getRelationshipName(),
                     relPre.getOnUpdate(), relPre.getOnDelete());
+            rel.getAnnotations().addAll(relPre.getAnnotations());
             final Table fromTable = getTable(relPre.getFromSchema(), relPre.getFromTable());
             final Table toTable = getTable(relPre.getToSchema(), relPre.getToTable());
             rel.setFromTable(fromTable);

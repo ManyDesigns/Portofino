@@ -442,8 +442,15 @@
                                               onDelete="NO ACTION"
                                               manyPropertyName="groups"
                                               onePropertyName="user">
-                                    <reference fromColumn="userid"
-                                               toColumn="userid"/>
+                                    <references>
+                                        <reference fromColumn="userid"
+                                                   toColumn="userid"/>
+                                    </references>
+                                    <annotations>
+                                        <annotation type="com.manydesigns.elements.annotations.Autocomplete">
+                                            <value>true</value>
+                                        </annotation>
+                                    </annotations>
                                 </relationship>
                                 <relationship name="fk_ug_2"
                                               toSchema="public"
@@ -452,8 +459,10 @@
                                               onDelete="NO ACTION"
                                               manyPropertyName="users"
                                               onePropertyName="group">
-                                    <reference fromColumn="groupid"
-                                               toColumn="groupid"/>
+                                    <references>
+                                        <reference fromColumn="groupid"
+                                                   toColumn="groupid"/>
+                                    </references>
                                 </relationship>
                             </relationships>
                         </table>
@@ -578,8 +587,10 @@
                                               toSchema="public"
                                               onDelete="NO ACTION"
                                               onUpdate="NO ACTION">
-                                    <reference fromColumn="state"
-                                               toColumn="id"/>
+                                    <references>
+                                        <reference fromColumn="state"
+                                                   toColumn="id"/>
+                                    </references>
                                 </relationship>
                             </relationships>
                             </table>
@@ -708,8 +719,10 @@
                                               toTable="category"
                                               onUpdate="NO ACTION"
                                               onDelete="NO ACTION">
-                                    <reference fromColumn="category"
-                                               toColumn="catid"/>
+                                    <references>
+                                        <reference fromColumn="category"
+                                                   toColumn="catid"/>
+                                    </references>
                                 </relationship>
                             </relationships>
                         </table>
@@ -850,19 +863,23 @@
                                               onUpdate="NO ACTION"
                                               onDelete="NO ACTION"
                                               >
-                                    <reference fromColumn="t2_id1"
-                                               toColumn="id1"/>
-                                    <reference fromColumn="t2_id2"
-                                               toColumn="id2"/>
+                                    <references>
+                                        <reference fromColumn="t2_id1"
+                                                   toColumn="id1"/>
+                                        <reference fromColumn="t2_id2"
+                                                   toColumn="id2"/>
+                                    </references>
                                 </relationship>
                                 <relationship name="fk_tb_1"
                                               toSchema="public"
                                               toTable="table1"
                                               onUpdate="NO ACTION"
                                               onDelete="NO ACTION"
-                                              >                                    
-                                    <reference fromColumn="tb1_id"
-                                               toColumn="id"/>
+                                              >
+                                    <references>
+                                        <reference fromColumn="tb1_id"
+                                                   toColumn="id"/>
+                                    </references>
                                 </relationship>
                                 <relationship name="fk_tb_4"
                                               toSchema="public"
@@ -870,8 +887,10 @@
                                               onUpdate="NO ACTION"
                                               onDelete="NO ACTION"
                                               >
-                                    <reference fromColumn="tb4_id"
-                                               toColumn="id"/>
+                                    <references>
+                                        <reference fromColumn="tb4_id"
+                                                   toColumn="id"/>
+                                    </references>
                                 </relationship>
                             </relationships>
                         </table>
@@ -968,12 +987,14 @@
                                               toTable="comune"
                                               onDelete="NO ACTION"
                                               onUpdate="NO ACTION">
-                                    <reference fromColumn="regione"
-                                               toColumn="regione"/>
-                                    <reference fromColumn="provincia"
-                                               toColumn="provincia"/>
-                                    <reference fromColumn="comune"
-                                               toColumn="comune"/>
+                                    <references>
+                                        <reference fromColumn="regione"
+                                                   toColumn="regione"/>
+                                        <reference fromColumn="provincia"
+                                                   toColumn="provincia"/>
+                                        <reference fromColumn="comune"
+                                                   toColumn="comune"/>
+                                    </references>
                                 </relationship>
                             </relationships>
                         </table>

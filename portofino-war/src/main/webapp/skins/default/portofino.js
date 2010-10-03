@@ -16,6 +16,7 @@ YAHOO.example.fixSideBar = function() {
 function updateSelectOptions(relName, optionProviderIndex) {
     var selectFieldId = arguments[2 + optionProviderIndex];
     var selectField = document.getElementById(selectFieldId);
+
     var data = {
         relName : relName,
         optionProviderIndex : optionProviderIndex,
@@ -26,12 +27,13 @@ function updateSelectOptions(relName, optionProviderIndex) {
         var current = document.getElementById(currentId);
         data[current.name] = current.value;
     }
+
     jQuery.ajax({
         type: 'POST',
         url: location.href,
         data: data,
-        success: function(data) {
-            var options = jQuery.parseJSON(data);
+        success: function(responseData) {
+            var options = jQuery.parseJSON(responseData);
 
             // empty the select field
             while (selectField.length > 0) {
@@ -53,6 +55,61 @@ function updateSelectOptions(relName, optionProviderIndex) {
             if (selectField.onchange) {
                 selectField.onchange();
             }
+        }
+    });
+}
+
+function setupAutocomplete(autocompleteId, relName, optionProviderIndex) {
+    var setupArguments = arguments;
+    var selectFieldId = setupArguments[3 + optionProviderIndex];
+    var myObj = $("#" + autocompleteId);
+    myObj.autocomplete({
+        source: function( request, response ) {
+            var data = {
+                relName : relName,
+                optionProviderIndex : optionProviderIndex,
+                'method:jsonAutocompleteOptions' : '',
+                labelSearch : request.term
+            };
+            for (var i = 3; i < setupArguments.length; i++ ) {
+                var currentId = setupArguments[i];
+                var current = document.getElementById(currentId);
+                data[current.name] = current.value;
+            }
+
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: location.href,
+                data: data,
+                success: function( responseData ) {
+                    response( $.map( responseData, function( item ) {
+							return {
+								label: item.l,
+								value: item.l,
+								optionValue: item.v
+							}
+						}));
+                },
+                error: function(request, textStatus, errorThrown) {
+                    alert(textStatus);
+                }
+            });
+        },
+        minLength: 1,
+        select: function( event, ui ) {
+            var selectField = document.getElementById(selectFieldId);
+            if (ui.item) {
+                selectField.value = ui.item.optionValue;
+            } else {
+                selectField.value = "";
+            }
+        },
+        open: function() {
+            $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+        },
+        close: function() {
+            $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
         }
     });
 }

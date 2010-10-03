@@ -50,12 +50,16 @@ public class SelectField extends AbstractField {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    public final static String AUTOCOMPLETE_SUFFIX = "_autocomplete";
+
     protected OptionProvider optionProvider;
     protected SelectField previousSelectField;
     protected SelectField nextSelectField;
     protected int optionProviderIndex;
 
     protected String comboLabel;
+    protected String autocompleteId;
+    protected String autocompleteInputName;
 
 
     //**************************************************************************
@@ -76,6 +80,8 @@ public class SelectField extends AbstractField {
         }
 
         comboLabel = MessageFormat.format("-- Select {0} --", label);
+        autocompleteId = id + AUTOCOMPLETE_SUFFIX;
+        autocompleteInputName = inputName + AUTOCOMPLETE_SUFFIX;
     }
 
     //**************************************************************************
@@ -144,11 +150,19 @@ public class SelectField extends AbstractField {
     }
 
     private void valueToXhtmlEdit(XhtmlBuffer xb) {
+        if (optionProvider.isAutoconnect()) {
+            valueToXhtmlEditAutocomplete(xb);
+        } else {
+            valueToXhtmlEditDropDown(xb);
+        }
+    }
+
+    protected void valueToXhtmlEditDropDown(XhtmlBuffer xb) {
         xb.openElement("select");
         xb.addAttribute("id", id);
         xb.addAttribute("name", inputName);
         if (nextSelectField != null) {
-            String js = composeJs();
+            String js = composeDropDownJs();
             xb.addAttribute("onChange", js);
         }
 
@@ -173,16 +187,36 @@ public class SelectField extends AbstractField {
         xb.closeElement("select");
     }
 
-    protected String composeJs() {
-        SelectField rootField = this;
-        while (rootField.previousSelectField != null) {
-            rootField = rootField.previousSelectField;
-        }
+    protected String composeDropDownJs() {
         StringBuilder sb = new StringBuilder();
         sb.append(MessageFormat.format(
                 "updateSelectOptions(''{0}'', {1}",
                 StringEscapeUtils.escapeJavaScript(optionProvider.getName()),
                 optionProviderIndex + 1));
+        appendIds(sb);
+        sb.append(");");
+        return sb.toString();
+    }
+
+    protected String composeAutocompleteJs() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MessageFormat.format(
+                "setupAutocomplete(''{0}'', ''{1}'', {2}",
+                StringEscapeUtils.escapeJavaScript(autocompleteId),
+                StringEscapeUtils.escapeJavaScript(optionProvider.getName()),
+                optionProviderIndex));
+        appendIds(sb);
+        sb.append(");");
+        return sb.toString();
+    }
+
+
+
+    private void appendIds(StringBuilder sb) {
+        SelectField rootField = this;
+        while (rootField.previousSelectField != null) {
+            rootField = rootField.previousSelectField;
+        }
         SelectField currentField = rootField;
         while (currentField != null) {
             sb.append(", '");
@@ -190,8 +224,32 @@ public class SelectField extends AbstractField {
             sb.append("'");
             currentField = currentField.nextSelectField;
         }
-        sb.append(");");
-        return sb.toString();
+    }
+
+    protected void valueToXhtmlEditAutocomplete(XhtmlBuffer xb) {
+        Map<Object,String> options =
+                optionProvider.getOptions(optionProviderIndex);
+        Object optionValue = optionProvider.getValue(optionProviderIndex);
+        String optionStringValue =
+                (String) Util.convertValue(optionValue, String.class);
+        String optionLabel = options.get(optionValue);
+
+        xb.writeInputHidden(id, inputName, optionStringValue);
+
+        xb.openElement("input");
+        xb.addAttribute("id", autocompleteId);
+        xb.addAttribute("type", "text");
+        xb.addAttribute("name", autocompleteInputName);
+        xb.addAttribute("value", optionLabel);
+        xb.addAttribute("class", null);
+        xb.addAttribute("size", null);
+        xb.closeElement("input");
+
+        String autocompleteJs = composeAutocompleteJs();
+
+        xb.openElement("script");
+        xb.write(autocompleteJs);
+        xb.closeElement("script");
     }
 
     public void valueToXhtmlPreview(XhtmlBuffer xb) {
@@ -203,7 +261,7 @@ public class SelectField extends AbstractField {
         Object optionValue = optionProvider.getValue(optionProviderIndex);
         String optionStringValue =
                 (String) Util.convertValue(optionValue, String.class);
-        xb.writeInputHidden(inputName, optionStringValue);
+        xb.writeInputHidden(id, inputName, optionStringValue);
     }
 
     public void valueToXhtmlView(XhtmlBuffer xb) {
@@ -218,7 +276,7 @@ public class SelectField extends AbstractField {
         xb.closeElement("div");
     }
 
-    public String jsonSelectFieldOptions() {
+    public String jsonSelectFieldOptions(boolean includeSelectPrompt) {
         // prepariamo Json
         JsonBuffer jb = new JsonBuffer();
 
@@ -228,7 +286,7 @@ public class SelectField extends AbstractField {
         Map<Object,String> options =
                 optionProvider.getOptions(optionProviderIndex);
 
-        if (!options.isEmpty()) {
+        if (includeSelectPrompt && !options.isEmpty()) {
             jb.openObject();
             jb.writeKeyValue("v", ""); // value
             jb.writeKeyValue("l", comboLabel); // label
@@ -304,5 +362,21 @@ public class SelectField extends AbstractField {
 
     public void setPreviousSelectField(SelectField previousSelectField) {
         this.previousSelectField = previousSelectField;
+    }
+
+    public String getAutocompleteId() {
+        return autocompleteId;
+    }
+
+    public void setAutocompleteId(String autocompleteId) {
+        this.autocompleteId = autocompleteId;
+    }
+
+    public String getAutocompleteInputName() {
+        return autocompleteInputName;
+    }
+
+    public void setAutocompleteInputName(String autocompleteInputName) {
+        this.autocompleteInputName = autocompleteInputName;
     }
 }

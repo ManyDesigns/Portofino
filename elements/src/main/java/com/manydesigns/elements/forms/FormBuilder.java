@@ -60,8 +60,7 @@ public class FormBuilder {
     // Fields
     //**************************************************************************
 
-    protected FieldsManager manager;
-
+    protected final FieldsManager manager;
     protected final ClassAccessor classAccessor;
 
     protected List<ArrayList<PropertyAccessor>> groupedPropertyAccessors;

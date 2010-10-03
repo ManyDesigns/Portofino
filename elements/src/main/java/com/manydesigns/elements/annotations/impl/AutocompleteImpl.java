@@ -27,31 +27,34 @@
  *
  */
 
-package com.manydesigns.elements.fields;
+package com.manydesigns.elements.annotations.impl;
 
-import java.util.Map;
+import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.elements.annotations.Autocomplete;
+
+import java.lang.annotation.Annotation;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface OptionProvider {
+@SuppressWarnings({"ClassExplicitlyAnnotation"})
+public class AutocompleteImpl implements Autocomplete {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    String getName();
+    private boolean value;
 
-    int getFieldCount();
+    public AutocompleteImpl(boolean value) {
+        this.value = value;
+    }
 
-    void setValue(int index, Object value);
-    Object getValue(int index);
+    public boolean value() {
+        return value;
+    }
 
-    void setLabelSearch(int index, String value);
-    String getLabelSearch(int index);
-
-    Map<Object,String> getOptions(int index);
-
-    boolean isAutoconnect();
-    void setAutoconnect(boolean autoconnect);
+    public Class<? extends Annotation> annotationType() {
+        return Autocomplete.class;
+    }
 }

@@ -29,8 +29,11 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
+import com.manydesigns.portofino.model.annotations.Annotation;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collection;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -63,6 +66,7 @@ public class Relationship {
     protected String onePropertyName;
 
     protected final List<Reference>references;
+    protected final List<Annotation> annotations;
 
 
     //**************************************************************************
@@ -74,6 +78,7 @@ public class Relationship {
         this.onUpdate = onUpdate;
         this.onDelete = onDelete;
         references = new ArrayList<Reference>();
+        annotations = new ArrayList<Annotation>();
     }
 
     //**************************************************************************
@@ -139,4 +144,8 @@ public class Relationship {
     public void setOnePropertyName(String onePropertyName) {
         this.onePropertyName = onePropertyName;
     }
+
+    public Collection<Annotation> getAnnotations() {
+        return annotations;
+    }    
 }

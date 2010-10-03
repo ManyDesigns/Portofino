@@ -49,6 +49,7 @@ import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Relationship;
 import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
@@ -104,6 +105,7 @@ public class TableDataAction extends PortofinoAction
     public String cancelReturnUrl;
     public String relName;
     public int optionProviderIndex;
+    public String labelSearch;
 
     //**************************************************************************
     // Web parameters setters (for struts.xml inspections in IntelliJ)
@@ -230,7 +232,7 @@ public class TableDataAction extends PortofinoAction
         hrefFormat.setUrl(true);
 
         TableFormBuilder tableFormBuilder =
-                new TableFormBuilder(tableAccessor)
+                createTableFormBuilderWithOptionProviders()
                         .configNRows(objects.size());
 
         // ogni colonna chiave primaria sarà clickabile
@@ -298,8 +300,7 @@ public class TableDataAction extends PortofinoAction
         objects = context.getObjects(criteria);
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
-        form = formBuilder.build();
+        form = createFormBuilderWithOptionProviders().build();
         form.setMode(Mode.VIEW);
         form.readFromObject(object);
 
@@ -341,7 +342,7 @@ public class TableDataAction extends PortofinoAction
     public String create() {
         setupTable();
 
-        setupFormWithOptionProviders();
+        form = createFormBuilderWithOptionProviders().build();
         form.setMode(Mode.CREATE);
 
         return CREATE;
@@ -350,7 +351,7 @@ public class TableDataAction extends PortofinoAction
     public String save() {
         setupTable();
 
-        setupFormWithOptionProviders();
+        form = createFormBuilderWithOptionProviders().build();
         form.setMode(Mode.CREATE);
 
         form.readFromRequest(req);
@@ -380,7 +381,7 @@ public class TableDataAction extends PortofinoAction
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
 
-        setupFormWithOptionProviders();
+        form = createFormBuilderWithOptionProviders().build();
         form.setMode(Mode.EDIT);
 
         form.readFromObject(object);
@@ -392,7 +393,7 @@ public class TableDataAction extends PortofinoAction
         setupTable();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
-        setupFormWithOptionProviders();
+        form = createFormBuilderWithOptionProviders().build();
         form.setMode(Mode.EDIT);
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
@@ -429,7 +430,7 @@ public class TableDataAction extends PortofinoAction
 
         setupTable();
 
-        setupFormWithOptionProviders();
+        form = createFormBuilderWithOptionProviders().build();
         form.setMode(Mode.BULK_EDIT);
 
         return BULK_EDIT;
@@ -438,7 +439,7 @@ public class TableDataAction extends PortofinoAction
     public String bulkUpdate() {
         setupTable();
 
-        setupFormWithOptionProviders();
+        form = createFormBuilderWithOptionProviders().build();
         form.setMode(Mode.BULK_EDIT);
         form.readFromRequest(req);
         if (form.validate()) {
@@ -507,6 +508,14 @@ public class TableDataAction extends PortofinoAction
     //**************************************************************************
 
     public String jsonSelectFieldOptions() {
+        return jsonOptions(true);
+    }
+
+    public String jsonAutocompleteOptions() {
+        return jsonOptions(false);
+    }
+
+    protected String jsonOptions(boolean includeSelectPrompt) {
         setupTable();
         Table table = model.findTableByQualifiedName(qualifiedTableName);
         Relationship relationship =
@@ -515,6 +524,7 @@ public class TableDataAction extends PortofinoAction
         String[] fieldNames = createFieldNamesForRelationship(relationship);
         OptionProvider optionProvider =
                 createOptionProviderForRelationship(relationship);
+        optionProvider.setLabelSearch(optionProviderIndex, labelSearch);
 
         Form form = new FormBuilder(tableAccessor)
                 .configFields(fieldNames)
@@ -525,7 +535,7 @@ public class TableDataAction extends PortofinoAction
         SelectField targetField =
                 (SelectField) form.get(0).get(optionProviderIndex);
 
-        String text = targetField.jsonSelectFieldOptions();
+        String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
         LogUtil.infoMF(logger, "jsonSelectFieldOptions: {0}", text);
 
         inputStream = new StringBufferInputStream(text);
@@ -545,7 +555,7 @@ public class TableDataAction extends PortofinoAction
         }
     }
 
-    private void setupFormWithOptionProviders() {
+    protected FormBuilder createFormBuilderWithOptionProviders() {
         FormBuilder formBuilder = new FormBuilder(tableAccessor);
 
         // setup relationship lookups
@@ -554,14 +564,45 @@ public class TableDataAction extends PortofinoAction
             String[] fieldNames = createFieldNamesForRelationship(rel);
             OptionProvider optionProvider =
                     createOptionProviderForRelationship(rel);
+            boolean autocomplete = false;
+            for (Annotation current : rel.getAnnotations()) {
+                if ("com.manydesigns.elements.annotations.Autocomplete"
+                        .equals(current.getType())) {
+                    autocomplete = true;
+                }
+            }
+            optionProvider.setAutoconnect(autocomplete);
 
             formBuilder.configOptionProvider(optionProvider, fieldNames);
         }
 
-        form = formBuilder.build();
+        return formBuilder;
     }
 
-    private String[] createFieldNamesForRelationship(Relationship rel) {
+    protected TableFormBuilder createTableFormBuilderWithOptionProviders() {
+        TableFormBuilder tableFormBuilder = new TableFormBuilder(tableAccessor);
+
+        // setup relationship lookups
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        for (Relationship rel : table.getManyToOneRelationships()) {
+            String[] fieldNames = createFieldNamesForRelationship(rel);
+            OptionProvider optionProvider =
+                    createOptionProviderForRelationship(rel);
+            boolean autocomplete = false;
+            for (Annotation current : rel.getAnnotations()) {
+                if ("com.manydesigns.elements.annotations.Autocomplete"
+                        .equals(current.getType())) {
+                    autocomplete = true;
+                }
+            }
+            optionProvider.setAutoconnect(autocomplete);
+
+            tableFormBuilder.configOptionProvider(optionProvider, fieldNames);
+        }
+        return tableFormBuilder;
+    }
+
+    protected String[] createFieldNamesForRelationship(Relationship rel) {
         List<Reference> references = rel.getReferences();
         String[] fieldNames = new String[references.size()];
         int i = 0;

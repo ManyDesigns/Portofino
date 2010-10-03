@@ -28,6 +28,8 @@
  */
 package com.manydesigns.portofino.model.io;
 
+import com.manydesigns.portofino.model.annotations.Annotation;
+
 import java.util.ArrayList;
 import java.util.List;
 /*
@@ -48,6 +50,7 @@ class RelationshipPre {
     public String manyPropertyName;
     public String onePropertyName;
     List<ReferencePre> references = new ArrayList<ReferencePre>();
+    protected final List<Annotation> annotations;
 
     RelationshipPre(String fromDB, String toDB,
                     String fromSchema, String toSchema,
@@ -63,6 +66,7 @@ class RelationshipPre {
         this.relationshipName = relationshipName;
         this.onUpdate = onUpdate;
         this.onDelete = onDelete;
+        annotations = new ArrayList<Annotation>();
     }
 
     public String getFromTable() {
@@ -159,5 +163,9 @@ class RelationshipPre {
 
     public void setOnePropertyName(String onePropertyName) {
         this.onePropertyName = onePropertyName;
+    }
+
+    public List<Annotation> getAnnotations() {
+        return annotations;
     }
 }

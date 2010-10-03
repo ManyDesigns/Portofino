@@ -27,31 +27,23 @@
  *
  */
 
-package com.manydesigns.elements.fields;
+package com.manydesigns.elements.annotations;
 
-import java.util.Map;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.annotation.ElementType;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface OptionProvider {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface Autocomplete {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    String getName();
-
-    int getFieldCount();
-
-    void setValue(int index, Object value);
-    Object getValue(int index);
-
-    void setLabelSearch(int index, String value);
-    String getLabelSearch(int index);
-
-    Map<Object,String> getOptions(int index);
-
-    boolean isAutoconnect();
-    void setAutoconnect(boolean autoconnect);
+    boolean value() default true;
 }

@@ -31,6 +31,8 @@ package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.annotations.InSummary;
 import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.OptionProvider;
+import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -38,6 +40,7 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -58,9 +61,11 @@ public class TableFormBuilder {
     // Fields
     //**************************************************************************
 
+    protected final FieldsManager manager;
     protected final ClassAccessor classAccessor;
     protected final Map<String, TextFormat> hrefGenerators;
     protected final Map<String, TextFormat> altGenerators;
+    protected final Map<String[], OptionProvider> optionProviders;
 
     protected List<PropertyAccessor> propertyAccessors;
     protected String prefix;
@@ -82,6 +87,8 @@ public class TableFormBuilder {
         this.classAccessor = classAccessor;
         hrefGenerators = new HashMap<String, TextFormat>();
         altGenerators = new HashMap<String, TextFormat>();
+        optionProviders = new HashMap<String[], OptionProvider>();
+        manager = FieldsManager.getManager();
     }
 
 
@@ -111,6 +118,12 @@ public class TableFormBuilder {
 
     public TableFormBuilder configNRows(int nRows) {
         this.nRows = nRows;
+        return this;
+    }
+
+    public TableFormBuilder configOptionProvider(OptionProvider optionProvider,
+                                            String... fieldNames) {
+        optionProviders.put(fieldNames, optionProvider);
         return this;
     }
 
@@ -153,7 +166,6 @@ public class TableFormBuilder {
 
     public TableForm build() {
         TableForm tableForm = new TableForm(nRows);
-        FieldsManager manager = FieldsManager.getManager();
 
         if (propertyAccessors == null) {
             configReflectiveFields();
@@ -165,34 +177,65 @@ public class TableFormBuilder {
             rowPrefix[rowIndex] = StringUtils.join(idArgs);
         }
 
+        // create the form/fieldset/field sructure
         for (PropertyAccessor propertyAccessor : propertyAccessors) {
-            TableFormColumn column =
-                    new TableFormColumn(propertyAccessor, nRows);
-
-            final String propertyName = propertyAccessor.getName();
-            column.setHrefGenerator(hrefGenerators.get(propertyName));
-            column.setAltGenerator(altGenerators.get(propertyName));
-
-            boolean columnSuccess = true;
-            for (int i = 0; i < nRows; i++) {
-                Field field = manager.tryToInstantiateField(
-                        classAccessor, propertyAccessor, rowPrefix[i]);
-
-                if (field == null) {
-                    LogUtil.warningMF(logger,
-                            "Cannot instanciate field for property {0}",
-                            propertyAccessor);
-                    columnSuccess = false;
-                    break;
-                }
-                column.getFields()[i] = field;
-            }
-            if (columnSuccess) {
-                tableForm.add(column);
-            }
+            buildColumn(tableForm, propertyAccessor, rowPrefix);
         }
 
         return tableForm;
+    }
+
+    private void buildColumn(TableForm tableForm,
+                             PropertyAccessor propertyAccessor,
+                             String[] rowPrefix) {
+        TableFormColumn column =
+                new TableFormColumn(propertyAccessor, nRows);
+
+        final String propertyName = propertyAccessor.getName();
+        column.setHrefGenerator(hrefGenerators.get(propertyName));
+        column.setAltGenerator(altGenerators.get(propertyName));
+
+        boolean columnSuccess = true;
+        for (int i = 0; i < nRows; i++) {
+            Field field = buildField(propertyAccessor, rowPrefix, i);
+            if (field == null) {
+                LogUtil.warningMF(logger,
+                        "Cannot instanciate field for property {0}",
+                        propertyAccessor);
+                columnSuccess = false;
+                break;
+            }
+            column.getFields()[i] = field;
+        }
+        if (columnSuccess) {
+            tableForm.add(column);
+        }
+    }
+
+    private Field buildField(PropertyAccessor propertyAccessor,
+                             String[] rowPrefix, int i) {
+        Field field = null;
+        String fieldName = propertyAccessor.getName();
+        for (Map.Entry<String[], OptionProvider> current
+                : optionProviders.entrySet()) {
+            String[] fieldNames = current.getKey();
+            OptionProvider optionProvider = current.getValue();
+            int index = ArrayUtils.indexOf(fieldNames, fieldName);
+            if (index >= 0) {
+                SelectField selectField =
+                        new SelectField(propertyAccessor, prefix);
+                selectField.setOptionProvider(optionProvider);
+                selectField.setOptionProviderIndex(index);
+                field = selectField;
+                break;
+            }
+        }
+        if (field == null) {
+            field = manager.tryToInstantiateField(
+                    classAccessor, propertyAccessor, rowPrefix[i]);
+        }
+
+        return field;
     }
 
 }
