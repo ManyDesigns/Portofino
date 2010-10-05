@@ -108,7 +108,7 @@ public class EmailSender implements Runnable{
             email.setTLS(ssl);
             email.send();
             emailBean.setState(EmailHandler.SENT);
-            EmailTask.successQueue.add(this);
+            EmailTask.successQueue.add(this);          
 
         } catch (Throwable e) {
             LogUtil.warningMF(logger, "Cannot send email with id {0}", e,

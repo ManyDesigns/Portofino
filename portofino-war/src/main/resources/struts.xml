@@ -336,9 +336,17 @@
             </result>
             <result name="success" type="redirectAction">
                 <param name="actionName">Login</param>
+                <param name="namespace">/user</param>
+            </result>
+        </action>
+        <action name="LostPasswordChange" class="com.manydesigns.portofino.actions.user.LostPwdChangeAction">
+            <result name="input">/skins/default/user/lostPwdChange.jsp</result>
+            <result name="success" type="redirectAction">
+                <param name="actionName">Homepage</param>
                 <param name="namespace">/</param>
             </result>
         </action>
+        
         <action name="Settings" class="com.manydesigns.portofino.actions.user.SettingsAction">
             <result name="success">/skins/default/user/settings.jsp</result>
         </action>

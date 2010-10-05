@@ -63,9 +63,9 @@ public class EmailHandler {
     }
 
     public static synchronized void addEmail(Context context, String subject, String body,
-    String addressee, String sender) {
-        EmailBean email = new EmailBean(subject, body, addressee,
-                sender);
+    String to, String from) {
+        EmailBean email = new EmailBean(subject, body, to,
+                from);
         context.saveObject(EMAILQUEUE_TABLE, email);
     }
     

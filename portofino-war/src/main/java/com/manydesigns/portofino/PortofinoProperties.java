@@ -92,6 +92,7 @@ public class PortofinoProperties {
     public static final String MAIL_POP3_SSL_ENABLED = "mail.pop3.ssl.enabled";
     public static final String KEEP_SENT = "mail.keep.sent";
 
+    
 
     //**************************************************************************
     // Static fields, singleton initialization and retrieval
@@ -100,6 +101,7 @@ public class PortofinoProperties {
     private static final Properties properties;
     public static final Logger logger =
             LogUtil.getLogger(PortofinoProperties.class);
+
 
 
     static {

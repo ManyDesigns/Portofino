@@ -133,6 +133,8 @@ public interface Context {
 
     public User findUserByEmail(String email);
 
+    public User findUserByToken(String token);
+
     void logout();
 
     User getCurrentUser();

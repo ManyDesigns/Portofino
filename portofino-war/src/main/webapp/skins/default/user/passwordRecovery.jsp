@@ -14,7 +14,8 @@
 
         <form action="./SendPwd.action" method="post">
             email: <input type="text" name="email" size="25"/><br/>
-            <input type="submit" name="invia" value="invia"/>            
+            <input type="submit" name="invia" value="invia"/>
+            <input type="hidden" name="method:send" value="send"/> 
         </form>
         
     </div>

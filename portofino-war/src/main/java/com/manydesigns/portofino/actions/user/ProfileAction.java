@@ -141,7 +141,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
         
         if(!form.validate()){
             form.setMode(Mode.EDIT);
-            state = CHANGE_PWD;
+            state = EDIT;
             return SUCCESS;
         }
 
@@ -227,12 +227,11 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
 
         if(!pwd.getOldPwd().equals(user.getPwd())){
             SessionMessages.addErrorMessage
-                    ("La vecchia password non corrisponde a quella in uso");
+                    ("La password non corrisponde a quella in uso");
             form.setMode(Mode.EDIT);
             state = CHANGE_PWD;
             return SUCCESS;
         }
-
 
         user.setPwd(pwd.getPwd());
         user.setPwdModDate(new Date());
@@ -252,6 +251,4 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
 
         return SUCCESS;
     }
-
-
 }

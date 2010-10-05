@@ -28,13 +28,16 @@
  */
 package com.manydesigns.portofino.systemModel.users;
 
+import com.manydesigns.elements.annotations.Email;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class Password {
-
+    @Email
+    public String email;
     @com.manydesigns.elements.annotations.Password
     public String oldPwd;
     @com.manydesigns.elements.annotations.Password
@@ -54,5 +57,13 @@ public class Password {
 
     public void setPwd(String pwd) {
         this.pwd = pwd;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

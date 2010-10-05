@@ -793,16 +793,31 @@ public class HibernateContextImpl implements Context {
         Session session = getSession(qualifiedTableName);
         org.hibernate.Criteria criteria = session.createCriteria(qualifiedTableName);
         criteria.add(Restrictions.eq("email", email));
-
         startTimer();
-
         @SuppressWarnings({"unchecked"})
         List<Object> result = (List<Object>) criteria.list();
         stopTimer();
 
         if (result.size() == 1) {
             User user = (User) result.get(0);
+            return user;
+        } else {
+            return null;
+        }
+    }
 
+    public User findUserByToken(String token) {
+        String qualifiedTableName = "portofino.public.user_";
+        Session session = getSession(qualifiedTableName);
+        org.hibernate.Criteria criteria = session.createCriteria(qualifiedTableName);
+        criteria.add(Restrictions.eq("token", token));
+        startTimer();
+        @SuppressWarnings({"unchecked"})
+        List<Object> result = (List<Object>) criteria.list();
+        stopTimer();
+
+        if (result.size() == 1) {
+            User user = (User) result.get(0);
             return user;
         } else {
             return null;

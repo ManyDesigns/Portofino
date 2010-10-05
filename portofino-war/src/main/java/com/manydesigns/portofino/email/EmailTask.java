@@ -133,7 +133,7 @@ public class EmailTask extends TimerTask {
                 try{
                     email.setState(EmailHandler.SENDING);
                     context.saveObject("portofino.public.emailqueue", email);
-                    context.commit("portofino.public.emailqueue");
+                    context.commit("portofino");
                 } catch (Throwable e) {
                     LogUtil.warning(logger, "cannot store email state", e);
                 }

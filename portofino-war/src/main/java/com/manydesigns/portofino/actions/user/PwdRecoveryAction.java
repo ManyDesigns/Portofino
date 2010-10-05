@@ -30,10 +30,15 @@ package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.systemModel.users.User;
 import com.manydesigns.portofino.email.EmailHandler;
+import com.manydesigns.portofino.systemModel.users.User;
+import org.apache.struts2.interceptor.ServletRequestAware;
 
+import javax.servlet.http.HttpServletRequest;
+import java.text.MessageFormat;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 /*
@@ -41,7 +46,15 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PwdRecoveryAction extends PortofinoAction implements LoginUnAware{
+public class PwdRecoveryAction extends PortofinoAction
+        implements ServletRequestAware, LoginUnAware{
+
+    HttpServletRequest req;
+        public void setServletRequest(HttpServletRequest req) {
+        this.req=req;
+    }
+
+
     public static final Logger logger =
         LogUtil.getLogger(PwdRecoveryAction.class);
 
@@ -52,14 +65,17 @@ public class PwdRecoveryAction extends PortofinoAction implements LoginUnAware{
     }
 
     public String send(){
+        User user;
         try {
-            String url = "";
-            User user = context.findUserByEmail(email);
+
+            user = context.findUserByEmail(email);
             if (user==null){
                 SessionMessages.addErrorMessage("email non esistente");
                 return INPUT;
             }
             user.tokenGenerator();
+            context.updateObject("portofino.public.user_", user);
+            context.commit("portofino");
         } catch (Exception e) {
             final String errore = "Errore nella verifica della email. " +
                     "L'email non è stata inviata";
@@ -68,8 +84,32 @@ public class PwdRecoveryAction extends PortofinoAction implements LoginUnAware{
             LogUtil.warning(logger, errore, e);
             return INPUT;
         }
-        EmailHandler.addEmail(context,"subject", "body",
-                "giampiero.granatella@manydesigns.com", "giampiero.granatella@manydesigns.com");
+
+        String port = (req.getServerPort()!=0)?":"+req.getServerPort():"";
+
+
+        String url = MessageFormat.format("{0}://{1}{2}{3}?token={4}",
+                    req.getScheme(),
+                    req.getServerName(),
+                    port,
+                    com.manydesigns.elements.util.Util.getAbsoluteLink(req,
+                            "user/LostPasswordChange.action"),
+                    user.getToken());
+        Properties properties = PortofinoProperties
+                .getProperties();
+        String from = properties.getProperty(
+                PortofinoProperties.MAIL_SMTP_SENDER);
+        String subject = "Password recovery";
+        String body = new StringBuilder().append("Someone has requested a reset of your password, ")
+                .append("if it isn't you simply ignore this email.\n")
+                .append("othrewise go to this url ")
+                .append(url)
+                .append(" to insert a new one. \n\n")
+                .append("Thank you.").toString();
+        EmailHandler.addEmail(context, subject, body, email, from);
+        SessionMessages.addInfoMessage("An email was sent to your address. " +
+                "Please check your email.");
+        context.commit();
         return SUCCESS;
     }
 }
