@@ -201,7 +201,7 @@ public class Table {
 
     public ForeignKey findForeignKeyByName(String fkName) {
         for (ForeignKey current : foreignKeys) {
-            if (current.getFkName().equals(fkName)) {
+            if (current.getForeignKeyName().equals(fkName)) {
                 return current;
             }
         }
@@ -212,7 +212,7 @@ public class Table {
 
     public ForeignKey findOneToManyRelationshipByName(String relationshipName) {
         for (ForeignKey current : getOneToManyRelationships()) {
-            if (current.getFkName().equals(relationshipName)) {
+            if (current.getForeignKeyName().equals(relationshipName)) {
                 return current;
             }
         }

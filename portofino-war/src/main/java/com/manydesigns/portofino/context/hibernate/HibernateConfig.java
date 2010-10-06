@@ -34,21 +34,20 @@ import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.Type;
+import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
-import com.manydesigns.portofino.model.datamodel.*;
+import com.manydesigns.portofino.model.datamodel.Reference;
+import com.manydesigns.portofino.model.datamodel.Schema;
 import org.hibernate.FetchMode;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Mappings;
 import org.hibernate.id.PersistentIdentifierGenerator;
 import org.hibernate.mapping.*;
-import org.hibernate.mapping.Column;
-import org.hibernate.mapping.PrimaryKey;
-import org.hibernate.mapping.Table;
 
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Logger;
-import java.text.MessageFormat;
 
 
 /**
@@ -130,7 +129,7 @@ public class HibernateConfig {
                 for (ForeignKey rel : aTable.getForeignKeys()) {
                     if (aTable.isM2m()) {
                         LogUtil.finestMF(logger, MessageFormat.format("Many to one - {0} {1}",
-                                aTable.getQualifiedName(), rel.getFkName()));
+                                aTable.getQualifiedName(), rel.getForeignKeyName()));
                         createM2O(configuration, mappings, rel);
                     }
                 }
@@ -144,7 +143,7 @@ public class HibernateConfig {
                     schema.getTables()) {
                 for (ForeignKey rel : aTable.getOneToManyRelationships()) {
                      LogUtil.finestMF(logger, MessageFormat.format("One to many - {0} {1}",
-                                aTable.getQualifiedName(), rel.getFkName()));
+                                aTable.getQualifiedName(), rel.getForeignKeyName()));
                     createO2M(database, configuration, mappings, rel);
                 }
             }
@@ -184,10 +183,10 @@ public class HibernateConfig {
                 = aTable.getPrimaryKey().getColumns();
 
         if (columnPKList.size() > 1) {
-            createPKComposite(mappings, aTable, aTable.getPrimaryKey().getPkName(),
+            createPKComposite(mappings, aTable, aTable.getPrimaryKey().getPrimaryKeyName(),
                     clazz, tab, columnPKList);
         } else {
-            createPKSingle(mappings, aTable, aTable.getPrimaryKey().getPkName(),
+            createPKSingle(mappings, aTable, aTable.getPrimaryKey().getPrimaryKeyName(),
                     clazz, tab, columnPKList);
         }
 
@@ -223,13 +222,9 @@ public class HibernateConfig {
         tab.addColumn(col);
 
         Property prop = new Property();
-        if (column.getPropertyName() != null) {
-            prop.setName(column.getPropertyName());
-            prop.setNodeName(column.getPropertyName());
-        } else {
-            prop.setName(column.getColumnName());
-            prop.setNodeName(column.getColumnName());
-        }
+        prop.setName(column.getName());
+        prop.setNodeName(column.getName());
+
         SimpleValue value = new SimpleValue();
         value.setTable(tab);
         org.hibernate.type.Type hibernateType =
@@ -289,14 +284,13 @@ public class HibernateConfig {
             tab.getPrimaryKey().addColumn(col);
             tab.addColumn(col);
             Property prop = new Property();
-            prop.setName(column.getColumnName());
+            prop.setName(column.getName());
             prop.setValue(value);
             prop.setCascade("none");
-            prop.setNodeName(column.getColumnName());
+            prop.setNodeName(column.getName());
             prop.setPropertyAccessorName("property");
             component.addProperty(prop);
-            mappings.addColumnBinding(column.getColumnName(),
-                    col, tab);
+            mappings.addColumnBinding(column.getColumnName(), col, tab);
         }
         tab.setIdentifierValue(component);
         clazz.setIdentifier(component);
@@ -339,13 +333,9 @@ public class HibernateConfig {
         id.addColumn(col);
 
         Property prop = new Property();
-        if (column.getPropertyName() != null) {
-            prop.setName(column.getPropertyName());
-            prop.setNodeName(column.getPropertyName());
-        } else {
-            prop.setName(column.getColumnName());
-            prop.setNodeName(column.getColumnName());
-        }
+        prop.setName(column.getName());
+        prop.setNodeName(column.getName());
+
         prop.setValue(id);
         prop.setPropertyAccessorName(mappings.getDefaultAccess());
         PropertyGeneration generation = PropertyGeneration.parse(null);
@@ -407,8 +397,8 @@ public class HibernateConfig {
 
         if (relationship.getManyPropertyName() == null) {
             set.setRole(manyMDQualifiedTableName + "."
-                    + relationship.getFkName());
-            set.setNodeName(relationship.getFkName());
+                    + relationship.getForeignKeyName());
+            set.setNodeName(relationship.getForeignKeyName());
         } else {
             set.setRole(relationship.getManyPropertyName());
             set.setNodeName(relationship.getManyPropertyName());
@@ -441,7 +431,7 @@ public class HibernateConfig {
                     oneColumns, manyColumns, refs);
         }
 
-        tableMany.createForeignKey(relationship.getFkName(),
+        tableMany.createForeignKey(relationship.getForeignKeyName(),
                 manyColumns,
                 oneMDQualifiedTableName,
                 oneColumns);
@@ -451,8 +441,8 @@ public class HibernateConfig {
         Property prop = new Property();
         if (relationship.getManyPropertyName() == null) {
             prop.setName(manyMDQualifiedTableName + "."
-                    + relationship.getFkName());
-            prop.setNodeName(relationship.getFkName());
+                    + relationship.getForeignKeyName());
+            prop.setNodeName(relationship.getForeignKeyName());
         } else {
             prop.setName(relationship.getManyPropertyName());
             prop.setNodeName(relationship.getManyPropertyName());

@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
     <databases>
-        <database name="jpetstore">
+        <database databaseName="jpetstore">
             <schemas>
-                <schema name="public">
+                <schema schemaName="public">
                     <tables>
-                         <table name="lineitem">
+                         <table tableName="lineitem">
                             <columns>
-                                <column name="orderid"
+                                <column columnName="orderid"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="linenum"
+                                <column columnName="linenum"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="itemid"
+                                <column columnName="itemid"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="255"
                                         scale="0"
                                         nullable="false"
                                         searchable="true" />
-                                <column name="quantity"
+                                <column columnName="quantity"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="unitprice"
+                                <column columnName="unitprice"
                                         columnType="numeric"
                                         javaType="java.math.BigDecimal"
                                         length="10"
@@ -43,28 +43,28 @@
                                         nullable="false"
                                         searchable="true"/>
                             </columns>
-                            <primaryKey name="pk_lineitem">
-                                <column name="orderid"/>
-                                <column name="linenum"/>
+                            <primaryKey primaryKeyName="pk_lineitem">
+                                <column columnName="orderid"/>
+                                <column columnName="linenum"/>
                             </primaryKey>
                         </table>
-                        <table name="category">
+                        <table tableName="category">
                             <columns>
-                                <column name="catid"
+                                <column columnName="catid"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="10"
                                         scale = "0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="name"
+                                <column columnName="name"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="80"
                                         scale="0"
                                         nullable="true"
                                         searchable="true"/>
-                                <column name="descn"
+                                <column columnName="descn"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="255"
@@ -72,34 +72,34 @@
                                         nullable="true"
                                         searchable="true"/>
                             </columns>
-                            <primaryKey name="pk_category">
-                                <column name="catid"/>
+                            <primaryKey primaryKeyName="pk_category">
+                                <column columnName="catid"/>
                             </primaryKey>
                         </table>
-                        <table name="product">
+                        <table tableName="product">
                             <columns>
-                                <column name="productid"
+                                <column columnName="productid"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="10"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="category"
+                                <column columnName="category"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="10"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="name"
+                                <column columnName="name"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="80"
                                         scale="0"
                                         nullable="true"
                                         searchable="true"/>
-                                <column name="descn"
+                                <column columnName="descn"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="255"
@@ -113,11 +113,11 @@
                                     </annotations>
                                 </column>
                             </columns>
-                            <primaryKey name="pk_category">
-                                <column name="productid"/>
+                            <primaryKey primaryKeyName="pk_category">
+                                <column columnName="productid"/>
                             </primaryKey>
                             <foreignKeys>
-                                <foreignKey name="fk_product_1"
+                                <foreignKey foreignKeyName="fk_product_1"
                                             toDatabase="jpetstore"
                                             toSchema="public"
                                             toTable="category"

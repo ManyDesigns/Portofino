@@ -318,7 +318,7 @@ public class TableDataAction extends PortofinoAction
     protected void setupRelatedTableForm(ForeignKey relationship) {
         List<Object> relatedObjects =
                 context.getRelatedObjects(qualifiedTableName, object,
-                        relationship.getFkName());
+                        relationship.getForeignKeyName());
 
         String qualifiedFromTableName =
                 relationship.getFromTable().getQualifiedName();
@@ -609,7 +609,7 @@ public class TableDataAction extends PortofinoAction
         int i = 0;
         for (Reference reference : references) {
             Column column = reference.getFromColumn();
-            fieldNames[i] = column.getPropertyName();
+            fieldNames[i] = column.getName();
             i++;
         }
         return fieldNames;
@@ -629,7 +629,7 @@ public class TableDataAction extends PortofinoAction
             textFormat = OgnlTextFormat.create(shortNameAnnotation.value());
         }
         OptionProvider optionProvider =
-                DefaultOptionProvider.create(rel.getFkName(),
+                DefaultOptionProvider.create(rel.getForeignKeyName(),
                         relatedObjects, classAccessor, textFormat);
         return optionProvider;
     }

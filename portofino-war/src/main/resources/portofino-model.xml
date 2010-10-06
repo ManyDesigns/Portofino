@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
     <databases>
-        <database name="portofino">
+        <database databaseName="portofino">
             <schemas>
-                <schema name="public">
+                <schema schemaName="public">
                     <tables>
-                        <table name="user_"
-                               class="com.manydesigns.portofino.systemModel.users.User">
+                        <table tableName="user_"
+                               javaClass="com.manydesigns.portofino.systemModel.users.User">
                             <columns>
-                                <column name="userid"
+                                <column columnName="userid"
                                         autoincrement="true"
                                         columnType="serial"
                                         javaType="java.lang.Integer"
@@ -17,7 +17,7 @@
                                         nullable="false"
                                         propertyName="uuid"
                                         searchable="true"/>
-                                <column name="emailaddress"
+                                <column columnName="emailaddress"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
@@ -29,7 +29,7 @@
                                         <annotation type="com.manydesigns.elements.annotations.Email"/>
                                     </annotations>
                                 </column>
-                                <column name="pwd"
+                                <column columnName="pwd"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
@@ -42,14 +42,14 @@
                                     </annotations>
                                 </column>
 
-                                <column name="state"
+                                <column columnName="state"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="token"
+                                <column columnName="token"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="255"
@@ -57,7 +57,7 @@
                                         nullable="true"
                                         searchable="false"
                                         />
-                                <column name="remquestion"
+                                <column columnName="remquestion"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
@@ -66,7 +66,7 @@
                                         searchable="false"
                                         propertyName="remQuestion"
                                         />
-                                <column name="remans"
+                                <column columnName="remans"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
@@ -75,7 +75,7 @@
                                         searchable="false"
                                         />
 
-                                <column name="screenname"
+                                <column columnName="screenname"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
@@ -84,7 +84,7 @@
                                         searchable="true"
                                         propertyName="screenName"
                                         />
-                                <column name="greeting"
+                                <column columnName="greeting"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
@@ -92,7 +92,7 @@
                                         nullable="true"
                                         searchable="false"
                                         />
-                                <column name="comments"
+                                <column columnName="comments"
                                         columnType="text"
                                         javaType="java.lang.String"
                                         length="2147483647"
@@ -100,7 +100,7 @@
                                         nullable="true"
                                         searchable="false"
                                         />
-                                <column name="firstname"
+                                <column columnName="firstname"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
@@ -109,7 +109,7 @@
                                         searchable="true"
                                         propertyName="firstName"
                                         />
-                                <column name="middlename"
+                                <column columnName="middlename"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
@@ -118,7 +118,7 @@
                                         searchable="true"
                                         propertyName="middleName"
                                         />
-                                <column name="lastname"
+                                <column columnName="lastname"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
@@ -127,7 +127,7 @@
                                         searchable="true"
                                         propertyName="lastName"
                                         />
-                                <column name="jobtitle"
+                                <column columnName="jobtitle"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
@@ -136,7 +136,7 @@
                                         searchable="true"
                                         propertyName="jobTitle"
                                         />
-                                <column name="loginip"
+                                <column columnName="loginip"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
@@ -145,7 +145,7 @@
                                         searchable="false"
                                         propertyName="loginIp"
                                         />
-                                <column name="lastloginip"
+                                <column columnName="lastloginip"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
@@ -154,7 +154,7 @@
                                         searchable="false"
                                         propertyName="lastLoginIp"
                                         />
-                                <column name="defaultuser"
+                                <column columnName="defaultuser"
                                         columnType="bool"
                                         javaType="java.lang.Boolean"
                                         length="1"
@@ -163,7 +163,7 @@
                                         searchable="true"
                                         propertyName="defaultUser"
                                         />
-                                <column name="extauth"
+                                <column columnName="extauth"
                                         columnType="bool"
                                         javaType="java.lang.Boolean"
                                         length="1"
@@ -172,7 +172,7 @@
                                         searchable="true"
                                         propertyName="extAuth"
                                         />
-                                <column name="pwdreset"
+                                <column columnName="pwdreset"
                                         columnType="bool"
                                         javaType="java.lang.Boolean"
                                         length="1"
@@ -181,7 +181,7 @@
                                         searchable="false"
                                         propertyName="pwdReset"
                                         />
-                                <column name="pwdencrypted"
+                                <column columnName="pwdencrypted"
                                         columnType="bool"
                                         javaType="java.lang.Boolean"
                                         length="1"
@@ -190,7 +190,7 @@
                                         searchable="false"
                                         propertyName="pwdEncrypted"
                                         />
-                                <column name="lockout"
+                                <column columnName="lockout"
                                         columnType="bool"
                                         javaType="java.lang.Boolean"
                                         length="1"
@@ -199,7 +199,7 @@
                                         searchable="true"
                                         propertyName="lockout"
                                         />
-                                <column name="agreedtoterms"
+                                <column columnName="agreedtoterms"
                                         columnType="bool"
                                         javaType="java.lang.Boolean"
                                         length="1"
@@ -208,7 +208,7 @@
                                         searchable="true"
                                         propertyName="agreedToTerms"
                                         />
-                                <column name="active"
+                                <column columnName="active"
                                         columnType="bool"
                                         javaType="java.lang.Boolean"
                                         length="1"
@@ -218,7 +218,7 @@
                                         propertyName="active"
                                         />
 
-                                <column name="createdate"
+                                <column columnName="createdate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="15"
@@ -227,7 +227,7 @@
                                         searchable="true"
                                         propertyName="createDate"
                                         />
-                                <column name="deldate"
+                                <column columnName="deldate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="29"
@@ -236,7 +236,7 @@
                                         nullable="true"
                                         propertyName="delDate"
                                         />
-                                <column name="modifieddate"
+                                <column columnName="modifieddate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="29"
@@ -244,7 +244,7 @@
                                         searchable="true"
                                         nullable="true"
                                         propertyName="modifiedDate"/>
-                                <column name="pwdmoddate"
+                                <column columnName="pwdmoddate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="29"
@@ -252,7 +252,7 @@
                                         searchable="true"
                                         nullable="true"
                                         propertyName="pwdModDate"/>
-                                <column name="logindate"
+                                <column columnName="logindate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="29"
@@ -260,7 +260,7 @@
                                         searchable="true"
                                         nullable="true"
                                         propertyName="loginDate"/>
-                                <column name="lastlogindate"
+                                <column columnName="lastlogindate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="29"
@@ -268,7 +268,7 @@
                                         searchable="true"
                                         nullable="true"
                                         propertyName="lastLoginDate"/>
-                                <column name="lastfailedlogindate"
+                                <column columnName="lastfailedlogindate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="29"
@@ -276,7 +276,7 @@
                                         searchable="true"
                                         nullable="true"
                                         propertyName="lastFailedLoginDate"/>
-                                <column name="lockoutdate"
+                                <column columnName="lockoutdate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="29"
@@ -284,7 +284,7 @@
                                         searchable="true"
                                         nullable="true"
                                         propertyName="lockoutDate"/>
-                                <column name="failedloginattempts"
+                                <column columnName="failedloginattempts"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="10"
@@ -293,7 +293,7 @@
                                         searchable="true"
                                         propertyName="failedLoginAttempts"
                                         />
-                                <column name="gracelogincount"
+                                <column columnName="gracelogincount"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="10"
@@ -302,7 +302,7 @@
                                         searchable="true"
                                         propertyName="graceLoginCount"
                                         />
-                                <column name="bounced"
+                                <column columnName="bounced"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="10"
@@ -312,8 +312,8 @@
                                         propertyName="bounced"
                                         />
                             </columns>
-                            <primaryKey name="pk_user">
-                                <column name="userid"/>
+                            <primaryKey primaryKeyName="pk_user">
+                                <column columnName="userid"/>
                             </primaryKey>
                             <annotations>
                                 <annotation type="com.manydesigns.elements.annotations.ShortName">
@@ -321,10 +321,10 @@
                                 </annotation>
                             </annotations>
                         </table>
-                        <table name="group_"
-                               class="com.manydesigns.portofino.systemModel.users.Group">
+                        <table tableName="group_"
+                               javaClass="com.manydesigns.portofino.systemModel.users.Group">
                             <columns>
-                                <column name="groupid"
+                                <column columnName="groupid"
                                         autoincrement="true"
                                         columnType="serial"
                                         javaType="java.lang.Integer"
@@ -333,14 +333,14 @@
                                         nullable="false"
                                         propertyName="groupId"
                                         searchable="true"/>
-                                <column name="name"
+                                <column columnName="name"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="description"
+                                <column columnName="description"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="255"
@@ -355,7 +355,7 @@
                                         </annotation>
                                     </annotations>
                                 </column>
-                                <column name="creatorid"
+                                <column columnName="creatorid"
                                         columnType="int8"
                                         javaType="java.lang.Long"
                                         length="19"
@@ -363,7 +363,7 @@
                                         nullable="true"
                                         searchable="false"
                                         propertyName="creatorId"/>
-                                <column name="parentgroupid"
+                                <column columnName="parentgroupid"
                                         columnType="int8"
                                         javaType="java.lang.Long"
                                         length="19"
@@ -371,14 +371,14 @@
                                         nullable="true"
                                         searchable="false"
                                         propertyName="parentGroupId"/>
-                                <column name="active"
+                                <column columnName="active"
                                         columnType="bool"
                                         javaType="java.lang.Boolean"
                                         length="1"
                                         scale="0"
                                         nullable="true"
                                         searchable="true"/>
-                                <column name="deldate"
+                                <column columnName="deldate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="29"
@@ -387,8 +387,8 @@
                                         searchable="true"
                                         propertyName="delDate"/>
                             </columns>
-                            <primaryKey name="pk_group">
-                                <column name="groupid"/>
+                            <primaryKey primaryKeyName="pk_group">
+                                <column columnName="groupid"/>
                             </primaryKey>
                             <annotations>
                                 <annotation type="com.manydesigns.elements.annotations.ShortName">
@@ -396,24 +396,24 @@
                                 </annotation>
                             </annotations>
                         </table>
-                        <table name="users_groups" manyToMany="true" class="com.manydesigns.portofino.systemModel.users.UsersGroups"
+                        <table tableName="users_groups" manyToMany="true" javaClass="com.manydesigns.portofino.systemModel.users.UsersGroups"
                                >
                             <columns>
-                                <column name="userid"
+                                <column columnName="userid"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="groupid"
+                                <column columnName="groupid"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="deletiondate"
+                                <column columnName="deletiondate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="29"
@@ -421,7 +421,7 @@
                                         nullable="true"
                                         searchable="true"
                                         propertyName="deletionDate"/>
-                                <column name="creationdate"
+                                <column columnName="creationdate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="29"
@@ -430,12 +430,12 @@
                                         searchable="true"
                                         propertyName="creationDate"/>
                                 </columns>
-                                <primaryKey name="pk_group">
-                                    <column name="userid"/>
-                                    <column name="groupid"/>
+                                <primaryKey primaryKeyName="pk_group">
+                                    <column columnName="userid"/>
+                                    <column columnName="groupid"/>
                                 </primaryKey>
                                 <foreignKeys>
-                                <foreignKey name="fk_ug_1"
+                                <foreignKey foreignKeyName="fk_ug_1"
                                               toDatabase="portofino"
                                               toSchema="public"
                                               toTable="user_"
@@ -453,7 +453,7 @@
                                         </annotation>
                                     </annotations>
                                 </foreignKey>
-                                <foreignKey name="fk_ug_2"
+                                <foreignKey foreignKeyName="fk_ug_2"
                                             toDatabase="portofino"
                                             toSchema="public"
                                             toTable="group_"
@@ -469,9 +469,9 @@
                             </foreignKeys>
                         </table>
 
-                        <table name="emailstate">
+                        <table tableName="emailstate">
                             <columns>
-                                <column name="id"
+                                <column columnName="id"
                                         columnType="serial"
                                         javaType="java.lang.Integer"
                                         length="10"
@@ -479,7 +479,7 @@
                                         nullable="false"
                                         searchable="false"
                                         />
-                                <column name="name"
+                                <column columnName="name"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="75"
@@ -487,7 +487,7 @@
                                         nullable="false"
                                         searchable="true"
                                         />
-                                <column name="description"
+                                <column columnName="description"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="255"
@@ -496,34 +496,34 @@
                                         searchable="true"
                                         />
                             </columns>
-                            <primaryKey name="emailstate_pkey">
-                                <column name="id"/>
+                            <primaryKey primaryKeyName="emailstate_pkey">
+                                <column columnName="id"/>
                             </primaryKey>
                         </table>
-                        <table name="emailqueue" class="com.manydesigns.portofino.systemModel.email.EmailBean">
+                        <table tableName="emailqueue" javaClass="com.manydesigns.portofino.systemModel.email.EmailBean">
                             <columns>
-                                <column name="id"
+                                <column columnName="id"
                                         columnType="serial"
                                         javaType="java.lang.Integer"
                                         length="10"
                                         scale="0"
                                         nullable="false"
                                         searchable="false"/>
-                                <column name="subject"
+                                <column columnName="subject"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="100"
                                         scale="0"
                                         nullable="true"
                                         searchable="true"/>
-                                <column name="body"
+                                <column columnName="body"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="4000"
                                         scale="0"
                                         nullable="true"
                                         searchable="true"/>
-                                <column name="to_"
+                                <column columnName="to_"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="100"
@@ -531,7 +531,7 @@
                                         nullable="true"
                                         searchable="true"
                                         propertyName="to"/>
-                                <column name="attachmentpath"
+                                <column columnName="attachmentpath"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="255"
@@ -539,7 +539,7 @@
                                         nullable="true"
                                         searchable="true"
                                         propertyName="attachmentPath"/>
-                                <column name="attachmentdescription"
+                                <column columnName="attachmentdescription"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="255"
@@ -547,7 +547,7 @@
                                         nullable="true"
                                         searchable="true"
                                         propertyName="attachmentDescription"/>
-                                <column name="attachmentname"
+                                <column columnName="attachmentname"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="255"
@@ -555,7 +555,7 @@
                                         nullable="true"
                                         searchable="true"
                                         propertyName="attachmentName"/>
-                                <column name="from_"
+                                <column columnName="from_"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="100"
@@ -563,7 +563,7 @@
                                         nullable="true"
                                         searchable="true"
                                         propertyName="from"/>
-                                <column name="createdate"
+                                <column columnName="createdate"
                                         columnType="date"
                                         javaType="java.util.Date"
                                         length="13"
@@ -572,7 +572,7 @@
                                         searchable="true"
                                         propertyName="createDate"
                                         />
-                                <column name="state"
+                                <column columnName="state"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="10"
@@ -580,11 +580,11 @@
                                         nullable="true"
                                         searchable="true"/>
                             </columns>
-                            <primaryKey name="pk_emailqueue">
-                                    <column name="id"/>
+                            <primaryKey primaryKeyName="pk_emailqueue">
+                                    <column columnName="id"/>
                             </primaryKey>
                             <foreignKeys>
-                                <foreignKey name="fk_emailqueue_1"
+                                <foreignKey foreignKeyName="fk_emailqueue_1"
                                             toDatabase="portofino"
                                             toTable="emailstate"
                                             toSchema="public"
@@ -601,41 +601,41 @@
                 </schema>
             </schemas>
         </database>
-        <database name="jpetstore">
+        <database databaseName="jpetstore">
             <schemas>
-                <schema name="public">
+                <schema schemaName="public">
                     <tables>
-                         <table name="lineitem">
+                         <table tableName="lineitem">
                             <columns>
-                                <column name="orderid"
+                                <column columnName="orderid"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="linenum"
+                                <column columnName="linenum"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="itemid"
+                                <column columnName="itemid"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="255"
                                         scale="0"
                                         nullable="true"
                                         searchable="true" />
-                                <column name="quantity"
+                                <column columnName="quantity"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
                                         nullable="true"
                                         searchable="true"/>
-                                <column name="unitprice"
+                                <column columnName="unitprice"
                                         columnType="numeric"
                                         javaType="java.math.BigDecimal"
                                         length="10"
@@ -643,28 +643,28 @@
                                         nullable="true"
                                         searchable="true"/>
                             </columns>
-                            <primaryKey name="pk_lineitem">
-                                <column name="orderid"/>
-                                <column name="linenum"/>
+                            <primaryKey primaryKeyName="pk_lineitem">
+                                <column columnName="orderid"/>
+                                <column columnName="linenum"/>
                             </primaryKey>
                         </table>
-                        <table name="category">
+                        <table tableName="category">
                             <columns>
-                                <column name="catid"
+                                <column columnName="catid"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="10"
                                         scale = "0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="name"
+                                <column columnName="name"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="80"
                                         scale="0"
                                         nullable="true"
                                         searchable="true"/>
-                                <column name="descn"
+                                <column columnName="descn"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="255"
@@ -672,34 +672,34 @@
                                         nullable="true"
                                         searchable="true"/>
                             </columns>
-                            <primaryKey name="pk_category">
-                                <column name="catid"/>
+                            <primaryKey primaryKeyName="pk_category">
+                                <column columnName="catid"/>
                             </primaryKey>
                         </table>
-                        <table name="product">
+                        <table tableName="product">
                             <columns>
-                                <column name="productid"
+                                <column columnName="productid"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="10"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="category"
+                                <column columnName="category"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="10"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
-                                <column name="name"
+                                <column columnName="name"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="80"
                                         scale="0"
                                         nullable="true"
                                         searchable="true"/>
-                                <column name="descn"
+                                <column columnName="descn"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="255"
@@ -713,11 +713,11 @@
                                     </annotations>
                                 </column>
                             </columns>
-                            <primaryKey name="pk_category">
-                                <column name="productid"/>
+                            <primaryKey primaryKeyName="pk_category">
+                                <column columnName="productid"/>
                             </primaryKey>
                             <foreignKeys>
-                                <foreignKey name="fk_product_1"
+                                <foreignKey foreignKeyName="fk_product_1"
                                             toDatabase="jpetstore"
                                             toSchema="public"
                                             toTable="category"
@@ -734,13 +734,13 @@
                 </schema>
             </schemas>
         </database>
-        <database name="hibernatetest">
+        <database databaseName="hibernatetest">
             <schemas>
-                <schema name="public">
+                <schema schemaName="public">
                     <tables>
-                        <table name="table1">
+                        <table tableName="table1">
                             <columns>
-                                <column name="id"
+                                <column columnName="id"
                                         columnType="serial"
                                         javaType="java.lang.Integer"
                                         length="8"
@@ -748,7 +748,7 @@
                                         nullable="false"
                                         autoincrement="true"
                                         searchable="true"/>
-                                <column name="testo"
+                                <column columnName="testo"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="15"
@@ -756,13 +756,13 @@
                                         nullable="true"
                                         searchable="true"/>
                             </columns>
-                            <primaryKey name="pk_table1">
-                                <column name="id"/>
+                            <primaryKey primaryKeyName="pk_table1">
+                                <column columnName="id"/>
                             </primaryKey>
                         </table>
-                        <table name="table4">
+                        <table tableName="table4">
                             <columns>
-                                <column name="id"
+                                <column columnName="id"
                                         columnType="serial"
                                         javaType="java.lang.Integer"
                                         length="8"
@@ -770,7 +770,7 @@
                                         nullable="false"
                                         autoincrement="true"
                                         searchable="true"/>
-                                <column name="testo"
+                                <column columnName="testo"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="15"
@@ -778,13 +778,13 @@
                                         nullable="true"
                                         searchable="true"/>
                             </columns>
-                            <primaryKey name="pk_table4">
-                                <column name="id"/>
+                            <primaryKey primaryKeyName="pk_table4">
+                                <column columnName="id"/>
                             </primaryKey>
                         </table>
-                        <table name="table2">
+                        <table tableName="table2">
                             <columns>
-                                <column name="id1"
+                                <column columnName="id1"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="3"
@@ -792,7 +792,7 @@
                                         nullable="false"
                                         autoincrement="false"
                                         searchable="true"/>
-                                <column name="id2"
+                                <column columnName="id2"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="3"
@@ -800,7 +800,7 @@
                                         nullable="false"
                                         autoincrement="false"
                                         searchable="true"/>
-                                <column name="testo"
+                                <column columnName="testo"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="15"
@@ -808,14 +808,14 @@
                                         nullable="true"
                                         searchable="true"/>
                             </columns>
-                            <primaryKey name="pk_table2">
-                                <column name="id1"/>
-                                <column name="id2"/>
+                            <primaryKey primaryKeyName="pk_table2">
+                                <column columnName="id1"/>
+                                <column columnName="id2"/>
                             </primaryKey>
                         </table>
-                        <table name="table3" manyToMany="true">
+                        <table tableName="table3" manyToMany="true">
                             <columns>
-                                <column name="id"
+                                <column columnName="id"
                                         columnType="serial"
                                         javaType="java.lang.Integer"
                                         length="8"
@@ -823,7 +823,7 @@
                                         nullable="false"
                                         autoincrement="true"
                                         searchable="true"/>
-                                <column name="t2_id1"
+                                <column columnName="t2_id1"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="3"
@@ -831,7 +831,7 @@
                                         nullable="false"
                                         autoincrement="false"
                                         searchable="true"/>
-                                <column name="t2_id2"
+                                <column columnName="t2_id2"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="3"
@@ -839,7 +839,7 @@
                                         nullable="false"
                                         autoincrement="false"
                                         searchable="true"/>
-                                <column name="tb1_id"
+                                <column columnName="tb1_id"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
@@ -847,7 +847,7 @@
                                         nullable="false"
                                         autoincrement="false"
                                         searchable="true"/>
-                                <column name="tb4_id"
+                                <column columnName="tb4_id"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
@@ -856,11 +856,11 @@
                                         autoincrement="false"
                                         searchable="true"/>
                             </columns>
-                            <primaryKey name="pk_table3">
-                                <column name="id"/>
+                            <primaryKey primaryKeyName="pk_table3">
+                                <column columnName="id"/>
                             </primaryKey>
                             <foreignKeys>
-                                <foreignKey name="fk_tb_2"
+                                <foreignKey foreignKeyName="fk_tb_2"
                                             toDatabase="hibernatetest"
                                             toSchema="public"
                                             toTable="table2"
@@ -873,7 +873,7 @@
                                                    toColumn="id2"/>
                                     </references>
                                 </foreignKey>
-                                <foreignKey name="fk_tb_1"
+                                <foreignKey foreignKeyName="fk_tb_1"
                                             toDatabase="hibernatetest"
                                             toSchema="public"
                                             toTable="table1"
@@ -884,7 +884,7 @@
                                                    toColumn="id"/>
                                     </references>
                                 </foreignKey>
-                                <foreignKey name="fk_tb_4"
+                                <foreignKey foreignKeyName="fk_tb_4"
                                             toDatabase="hibernatetest"
                                             toSchema="public"
                                             toTable="table4"
@@ -897,9 +897,9 @@
                                 </foreignKey>
                             </foreignKeys>
                         </table>
-                        <table name="comune">
+                        <table tableName="comune">
                             <columns>
-                                <column name="regione"
+                                <column columnName="regione"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="30"
@@ -907,7 +907,7 @@
                                         nullable="false"
                                         autoincrement="false"
                                         searchable="true"/>
-                                <column name="provincia"
+                                <column columnName="provincia"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="30"
@@ -915,7 +915,7 @@
                                         nullable="false"
                                         autoincrement="false"
                                         searchable="true"/>
-                                <column name="comune"
+                                <column columnName="comune"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="30"
@@ -924,15 +924,15 @@
                                         autoincrement="false"
                                         searchable="true"/>
                             </columns>
-                            <primaryKey name="comune_pk">
-                                <column name="regione"/>
-                                <column name="provincia"/>
-                                <column name="comune"/>
+                            <primaryKey primaryKeyName="comune_pk">
+                                <column columnName="regione"/>
+                                <column columnName="provincia"/>
+                                <column columnName="comune"/>
                             </primaryKey>
                         </table>
-                        <table name="domanda">
+                        <table tableName="domanda">
                             <columns>
-                                <column name="protocollo"
+                                <column columnName="protocollo"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="20"
@@ -940,7 +940,7 @@
                                         nullable="false"
                                         autoincrement="false"
                                         searchable="true"/>
-                                <column name="richiedente"
+                                <column columnName="richiedente"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="30"
@@ -948,7 +948,7 @@
                                         nullable="false"
                                         autoincrement="false"
                                         searchable="true"/>
-                                <column name="regione"
+                                <column columnName="regione"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="30"
@@ -956,7 +956,7 @@
                                         nullable="false"
                                         autoincrement="false"
                                         searchable="true"/>
-                                <column name="provincia"
+                                <column columnName="provincia"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="30"
@@ -964,7 +964,7 @@
                                         nullable="false"
                                         autoincrement="false"
                                         searchable="true"/>
-                                <column name="comune"
+                                <column columnName="comune"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="30"
@@ -972,7 +972,7 @@
                                         nullable="false"
                                         autoincrement="false"
                                         searchable="true"/>
-                                <column name="data"
+                                <column columnName="data"
                                         columnType="date"
                                         javaType="java.util.Date"
                                         length="29"
@@ -981,11 +981,11 @@
                                         autoincrement="false"
                                         searchable="true"/>
                             </columns>
-                            <primaryKey name="domanda_pkey">
-                                <column name="protocollo"/>
+                            <primaryKey primaryKeyName="domanda_pkey">
+                                <column columnName="protocollo"/>
                             </primaryKey>
                             <foreignKeys>
-                                <foreignKey name="domanda_regione_fkey"
+                                <foreignKey foreignKeyName="domanda_regione_fkey"
                                             toDatabase="hibernatetest"
                                             toSchema="public"
                                             toTable="comune"

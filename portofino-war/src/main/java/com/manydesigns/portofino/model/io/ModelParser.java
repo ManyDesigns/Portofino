@@ -30,13 +30,33 @@ public class ModelParser extends XmlParser {
     private static final String MODEL = "model";
 
     private static final String DATABASES = "databases";
+
     private static final String DATABASE = "database";
+    private static final String DATABASE_DATABASENAME = "databaseName";
+
     private static final String SCHEMAS = "schemas";
+
     private static final String SCHEMA = "schema";
+    private static final String SCHEMA_SCHEMANAME = "schemaName";
+
     private static final String TABLES = "tables";
+
     private static final String TABLE = "table";
+    private static final String TABLE_TABLENAME = "tableName";
+    private static final String TABLE_JAVACLASS = "javaClass";
+    private static final String TABLE_MANYTOMANY = "manyToMany";
+
     private static final String COLUMNS = "columns";
+
     private static final String COLUMN = "column";
+    private static final String COLUMN_COLUMNNAME = "columnName";
+    private static final String COLUMN_COLUMNTYPE = "columnType";
+    private static final String COLUMN_NULLABLE = "nullable";
+    private static final String COLUMN_PROPERTYNAME = "propertyName";
+    private static final String COLUMN_AUTOINCREMENT = "autoincrement";
+    private static final String COLUMN_LENGTH = "length";
+    private static final String COLUMN_SCALE = "scale";
+
     private static final String PRIMARY_KEY = "primaryKey";
     private static final String FOREIGN_KEYS = "foreignKeys";
     private static final String FOREIGN_KEY = "foreignKey";
@@ -114,8 +134,8 @@ public class ModelParser extends XmlParser {
     private class DatabaseCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            checkRequiredAttributes(attributes, "name");
-            currentDatabase = new Database(attributes.get("name"));
+            checkRequiredAttributes(attributes, DATABASE_DATABASENAME);
+            currentDatabase = new Database(attributes.get(DATABASE_DATABASENAME));
             model.getDatabases().add(currentDatabase);
             expectElement(SCHEMAS, 1, 1, new SchemasCallback());
 
@@ -132,9 +152,9 @@ public class ModelParser extends XmlParser {
     private class SchemaCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            checkRequiredAttributes(attributes, "name");
+            checkRequiredAttributes(attributes, SCHEMA_SCHEMANAME);
             currentSchema =
-                    new Schema(currentDatabase, attributes.get("name"));
+                    new Schema(currentDatabase, attributes.get(SCHEMA_SCHEMANAME));
             currentDatabase.getSchemas().add(currentSchema);
             expectElement(TABLES, 0, 1, new TablesCallback());
         }
@@ -150,17 +170,15 @@ public class ModelParser extends XmlParser {
     private class TableCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            checkRequiredAttributes(attributes, "name");
+            checkRequiredAttributes(attributes, TABLE_TABLENAME);
             currentTable =
-                    new Table(currentSchema, attributes.get("name"));
-            String m2m = attributes.get("manyToMany");
+                    new Table(currentSchema, attributes.get(TABLE_TABLENAME));
+            String m2m = attributes.get(TABLE_MANYTOMANY);
             if (m2m!=null) {
                 currentTable.setM2m(Boolean.parseBoolean(m2m));
             }
-            String className = attributes.get("class");
-            if (className!=null){
-                currentTable.setJavaClassName(className);
-            }
+            String javaClassName = attributes.get(TABLE_JAVACLASS);
+            currentTable.setJavaClassName(javaClassName);
             currentSchema.getTables().add(currentTable);
 
             expectElement(COLUMNS, 1, 1, new ColumnsCallback());
@@ -183,23 +201,20 @@ public class ModelParser extends XmlParser {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             checkRequiredAttributes(attributes,
-                    "name", "columnType", "length", "scale",
-                    "nullable", "searchable");
-            String columnName = attributes.get("name");
+                    COLUMN_COLUMNNAME, COLUMN_COLUMNTYPE, COLUMN_LENGTH, COLUMN_SCALE,
+                    COLUMN_NULLABLE, "searchable", COLUMN_AUTOINCREMENT);
+            String columnName = attributes.get(COLUMN_COLUMNNAME);
             currentColumn = new Column(currentTable,
                     columnName,
-                    attributes.get("columnType"),
-                    Boolean.parseBoolean(attributes.get("nullable")),
-                    Boolean.parseBoolean(attributes.get("autoincrement")),
-                    Integer.parseInt(attributes.get("length")),
-                    Integer.parseInt(attributes.get("scale")),
+                    attributes.get(COLUMN_COLUMNTYPE),
+                    Boolean.parseBoolean(attributes.get(COLUMN_NULLABLE)),
+                    Boolean.parseBoolean(attributes.get(COLUMN_AUTOINCREMENT)),
+                    Integer.parseInt(attributes.get(COLUMN_LENGTH)),
+                    Integer.parseInt(attributes.get(COLUMN_SCALE)),
                     Boolean.parseBoolean(attributes.get("searchable"))
                     );
 
-            String propertyName = attributes.get("propertyName");
-            if (propertyName == null) {
-                propertyName = columnName;
-            }
+            String propertyName = attributes.get(COLUMN_PROPERTYNAME);
             currentColumn.setPropertyName(propertyName);
 
             String javaTypeName = attributes.get("javaType");
@@ -259,13 +274,13 @@ public class ModelParser extends XmlParser {
             
             String manyPropertyName = attributes.get("manyPropertyName");
             if (manyPropertyName == null) {
-                manyPropertyName = currentFk.getFkName();
+                manyPropertyName = currentFk.getForeignKeyName();
             }
             currentFk.setManyPropertyName(manyPropertyName);
 
             String onePropertyName = attributes.get("onePropertyName");
             if (onePropertyName == null) {
-                onePropertyName = currentFk.getFkName();
+                onePropertyName = currentFk.getForeignKeyName();
             }
             currentFk.setOnePropertyName(onePropertyName);
             currentTable.getForeignKeys().add(currentFk);

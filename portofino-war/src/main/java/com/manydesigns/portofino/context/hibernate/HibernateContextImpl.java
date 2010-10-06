@@ -204,6 +204,7 @@ public class HibernateContextImpl implements Context {
             Database syncDatabase = current.readModel();
             syncModel.getDatabases().add(syncDatabase);
         }
+        syncModel.init();
         installDataModel(syncModel);
     }
 
@@ -657,9 +658,9 @@ public class HibernateContextImpl implements Context {
                     Column fromColumn = reference.getFromColumn();
                     Column toColumn = reference.getToColumn();
                     PropertyAccessor toPropertyAccessor
-                            = toAccessor.getProperty(toColumn.getPropertyName());
+                            = toAccessor.getProperty(toColumn.getName());
                     Object toValue = toPropertyAccessor.get(obj);
-                    criteria.add(Restrictions.eq(fromColumn.getColumnName(),
+                    criteria.add(Restrictions.eq(fromColumn.getName(),
                             toValue));
                 }
                 startTimer();

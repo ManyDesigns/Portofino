@@ -72,6 +72,7 @@ public class Column {
     // Fields for wire-up
     //**************************************************************************
 
+    protected String name;
     protected Class javaType;
 
     public static final Logger logger = LogUtil.getLogger(Column.class);
@@ -97,7 +98,12 @@ public class Column {
     }
 
     public void init() {
-        // wire up javaType
+        if (propertyName == null) {
+            name = columnName;
+        } else {
+            name = propertyName;
+        }
+
         javaType = ReflectionUtil.loadClass(javaTypeName);
         if (javaType == null) {
             LogUtil.warningMF(logger,
@@ -191,6 +197,10 @@ public class Column {
     public String getQualifiedName() {
         return MessageFormat.format("{0}.{1}",
                 table.getQualifiedName(), columnName);
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getPropertyName() {

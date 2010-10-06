@@ -54,7 +54,7 @@ public class LinkHelper {
                 sb.append(",");
             }
             
-            sb.append(object.get(column.getColumnName()));
+            sb.append(object.get(column.getName()));
         }
         return sb.toString();
     }

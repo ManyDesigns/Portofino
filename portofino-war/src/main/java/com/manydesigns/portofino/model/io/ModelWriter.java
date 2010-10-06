@@ -157,6 +157,9 @@ public class ModelWriter {
         if (column.getJavaType()!=null) {
             w.writeAttribute("javaType", column.getJavaType().getCanonicalName());
         }
+        if (column.getPropertyName()!=null) {
+            w.writeAttribute("propertyName", column.getPropertyName());
+        }
         w.writeAttribute("length", Integer.toString(column.getLength()));
         w.writeAttribute("scale", Integer.toString(column.getScale()));
         w.writeAttribute("nullable", Boolean.toString(column.isNullable()));
@@ -169,7 +172,7 @@ public class ModelWriter {
     private void visit(XMLStreamWriter w, PrimaryKey primaryKey)
             throws XMLStreamException {
         w.writeStartElement( "primarykey");
-        w.writeAttribute("name", primaryKey.getPkName());
+        w.writeAttribute("name", primaryKey.getPrimaryKeyName());
         w.writeCharacters("\n");
 
         for (PrimaryKeyColumn column : primaryKey.getPrimaryKeyColumns()){
@@ -195,7 +198,7 @@ public class ModelWriter {
 
         for(ForeignKey rel : manyToOneRelationships) {
             w.writeStartElement( "relationship");
-            w.writeAttribute("name", rel.getFkName());
+            w.writeAttribute("name", rel.getForeignKeyName());
             w.writeAttribute("toTable", rel.getToTableName());
             w.writeAttribute("toSchema", rel.getToSchemaName());
             w.writeAttribute("onDelete", rel.getOnDelete());

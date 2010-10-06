@@ -92,10 +92,7 @@ public class TableAccessor
             if (javaClassAccessor == null) {
                 nestedPropertyAccessor = null;
             } else {
-                String propertyName = current.getColumnName();
-                if (current.getPropertyName() != null) {
-                    propertyName = current.getPropertyName();
-                }
+                String propertyName = current.getName();
                 try {
                     nestedPropertyAccessor =
                             javaClassAccessor.getProperty(propertyName);

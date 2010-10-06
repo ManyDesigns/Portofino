@@ -309,12 +309,12 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 if (primaryKey == null) {
                     primaryKey = new PrimaryKey(table, pkName);
                     LogUtil.fineMF(logger, "Found primary key: {0}", pkName);
-                } else if (!primaryKey.getPkName().equals(pkName)) {
+                } else if (!primaryKey.getPrimaryKeyName().equals(pkName)) {
                     //sanity check
                     LogUtil.warningMF(logger,
                             "Found new PK name {0} different " +
                             "from previous name {1}",
-                            pkName, primaryKey.getPkName());
+                            pkName, primaryKey.getPrimaryKeyName());
                     return;
                 }
 
@@ -359,13 +359,13 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
             if (primaryKey.getPrimaryKeyColumns().size() == 0) {
                 LogUtil.warningMF(logger,
                         "Primary key {0} is empty. Discarding.",
-                        primaryKey.getPkName());
+                        primaryKey.getPrimaryKeyName());
                 return;
             }
             table.setPrimaryKey(primaryKey);
             LogUtil.fineMF(logger,
                     "Installed PK {0} with number of columns: {1}",
-                    primaryKey.getPkName(),
+                    primaryKey.getPrimaryKeyName(),
                     primaryKey.getPrimaryKeyColumns().size());
         } finally {
             DbUtil.closeResultSetAndStatement(rs);
@@ -430,7 +430,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 }
 
                 if (relationship == null ||
-                        !relationship.getFkName().equals(fkName)) {
+                        !relationship.getForeignKeyName().equals(fkName)) {
                     if (relationship != null) {
                         installRelationship(table, relationship, referenceArray);
                     }
@@ -498,13 +498,13 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
         if (relationship.getReferences().size() == 0) {
             LogUtil.warningMF(logger,
                     "Foreign key {0} is empty. Discarding.",
-                    relationship.getFkName());
+                    relationship.getForeignKeyName());
             return;
         }
         table.getForeignKeys().add(relationship);
         LogUtil.fineMF(logger,
                     "Installed FK {0} with number of columns: {1}",
-                relationship.getFkName(),
+                relationship.getForeignKeyName(),
                 relationship.getReferences().size());
     }
 

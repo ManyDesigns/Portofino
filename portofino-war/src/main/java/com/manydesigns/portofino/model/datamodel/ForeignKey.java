@@ -58,7 +58,7 @@ public class ForeignKey {
     // Fields
     //**************************************************************************
     protected final Table fromTable;
-    protected String fkName;
+    protected String foreignKeyName;
 
     protected Table toTable;
     protected String toDatabaseName;
@@ -80,13 +80,13 @@ public class ForeignKey {
     //**************************************************************************
 
     public ForeignKey(Table fromTable,
-                      String fkName,
+                      String foreignKeyName,
                       String toDatabaseName,
                       String toSchemaName,
                       String toTableName,
                       String onUpdate, String onDelete) {
         this.fromTable = fromTable;
-        this.fkName = fkName;
+        this.foreignKeyName = foreignKeyName;
 
         this.toDatabaseName = toDatabaseName;
         this.toSchemaName = toSchemaName;
@@ -134,12 +134,12 @@ public class ForeignKey {
         return fromTable.getTableName();
     }
 
-    public String getFkName() {
-        return fkName;
+    public String getForeignKeyName() {
+        return foreignKeyName;
     }
 
-    public void setFkName(String fkName) {
-        this.fkName = fkName;
+    public void setForeignKeyName(String foreignKeyName) {
+        this.foreignKeyName = foreignKeyName;
     }
 
     public String getToDatabaseName() {
