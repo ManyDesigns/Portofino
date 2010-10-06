@@ -27,82 +27,67 @@
  *
  */
 
-package com.manydesigns.portofino.model.site;
+package com.manydesigns.portofino.model.datamodel;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.manydesigns.elements.logging.LogUtil;
+
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SiteNode {
+public class PrimaryKeyColumn {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-
 
     //**************************************************************************
     // Fields
     //**************************************************************************
+    protected final PrimaryKey pk;
+    protected String columnName;
+    protected Column column;
 
-    protected String type;
-    protected String url;
-    protected String title;
-    protected String description;
-    protected final ArrayList<SiteNode> childNodes;
+    public static final Logger logger =
+            LogUtil.getLogger(PrimaryKeyColumn.class);
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public SiteNode(String type, String url, String title, String description) {
-        this.type = type;
-        this.url = url;
-        this.title = title;
-        this.description = description;
-        childNodes = new ArrayList<SiteNode>();
+    public PrimaryKeyColumn(PrimaryKey pk, String columnName) {
+        this.pk = pk;
+        this.columnName = columnName;
     }
 
-    public void init() {}
+    public void init() {
+        column = pk.getTable().findColumnByName(columnName);
+        if (column == null) {
+            LogUtil.warningMF(logger,
+                    "Cannor wire primary key column ''{0}'' to primary key ''{1}''",
+                    columnName, pk);
+
+        }
+    }
 
     //**************************************************************************
-    // Getters/Setters
+    // Getters/setter
     //**************************************************************************
 
-    public String getType() {
-        return type;
+    public PrimaryKey getPk() {
+        return pk;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public String getColumnName() {
+        return columnName;
     }
 
-    public String getUrl() {
-        return url;
+    public void setColumnName(String columnName) {
+        this.columnName = columnName;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<SiteNode> getChildNodes() {
-        return childNodes;
+    public Column getColumn() {
+        return column;
     }
 }

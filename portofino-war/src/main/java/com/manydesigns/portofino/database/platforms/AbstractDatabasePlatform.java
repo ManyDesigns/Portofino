@@ -132,7 +132,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
             rs = metadata.getSchemas();
             while(rs.next()) {
                 String schemaName = rs.getString("TABLE_SCHEM");
-                Schema schema = new Schema(database.getDatabaseName(), schemaName);
+                Schema schema = new Schema(database, schemaName);
                 LogUtil.fineMF(logger, "Found schema: {0}",
                         schema.getQualifiedName());
                 database.getSchemas().add(schema);
@@ -180,8 +180,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                     continue;
                 }
 
-                Table table = new Table(expectedDatabaseName,
-                        expectedSchemaName, tableName);
+                Table table = new Table(schema, tableName);
                 LogUtil.fineMF(logger, "Found table: {0}",
                         table.getQualifiedName());
                 schema.getTables().add(table);
@@ -242,15 +241,14 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 }
 
                 Type type = connectionProvider.getTypeByName(columnType);
-                Column column = new Column(expectedDatabaseName,
-                        expectedSchemaName, expectedTableName,
+                Column column = new Column(table,
                         columnName, columnType,
                         nullable, type.isAutoincrement(),
                         length, scale, type.isSearchable());
                 LogUtil.fineMF(logger, "Found column: {0} of type {1}",
                         column.getQualifiedName(),
                         column.getColumnType());
-                column.setJavaType(type.getDefaultJavaType());
+                column.setJavaTypeName(type.getDefaultJavaType().getName());
 
                 table.getColumns().add(column);
             }
@@ -282,7 +280,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
         ResultSet rs = null;
         try {
             PrimaryKey primaryKey = null;
-            Column[] pkColumnArray = new Column[0];
+            PrimaryKeyColumn[] pkColumnArray = new PrimaryKeyColumn[0];
 
             rs = metadata.getPrimaryKeys(null, expectedSchemaName,
                     expectedTableName);
@@ -309,11 +307,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 }
 
                 if (primaryKey == null) {
-                    primaryKey = new PrimaryKey(
-                            expectedDatabaseName,
-                            expectedSchemaName,
-                            expectedTableName,
-                            pkName);
+                    primaryKey = new PrimaryKey(table, pkName);
                     LogUtil.fineMF(logger, "Found primary key: {0}", pkName);
                 } else if (!primaryKey.getPkName().equals(pkName)) {
                     //sanity check
@@ -325,6 +319,8 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 }
 
                 Column column = table.findColumnByName(columnName);
+                PrimaryKeyColumn primaryKeyColumn =
+                        new PrimaryKeyColumn(primaryKey, columnName);
 
                 // sanity check
                 if (column == null) {
@@ -342,7 +338,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
 
                 pkColumnArray =
                         ensureMinimumArrayLength(pkColumnArray, keySeq + 1);
-                pkColumnArray[keySeq] = column;
+                pkColumnArray[keySeq] = primaryKeyColumn;
             }
 
             if (primaryKey == null) {
@@ -353,14 +349,14 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
             }
 
             // copy non-null elements of array
-            for (Column current : pkColumnArray) {
+            for (PrimaryKeyColumn current : pkColumnArray) {
                 if (current == null) {
                     continue;
                 }
-                primaryKey.getColumns().add(current);
+                primaryKey.getPrimaryKeyColumns().add(current);
             }
             // sanity check
-            if (primaryKey.getColumns().size() == 0) {
+            if (primaryKey.getPrimaryKeyColumns().size() == 0) {
                 LogUtil.warningMF(logger,
                         "Primary key {0} is empty. Discarding.",
                         primaryKey.getPkName());
@@ -370,7 +366,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
             LogUtil.fineMF(logger,
                     "Installed PK {0} with number of columns: {1}",
                     primaryKey.getPkName(),
-                    primaryKey.getColumns().size());
+                    primaryKey.getPrimaryKeyColumns().size());
         } finally {
             DbUtil.closeResultSetAndStatement(rs);
         }
@@ -384,19 +380,19 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     protected void readFKs(DatabaseMetaData metadata, Database database)
             throws SQLException {
         for (Table table : database.getAllTables()) {
-            readFKs(metadata, database, table);
+            readFKs(metadata, table);
         }
     }
 
-    protected void readFKs(DatabaseMetaData metadata, Database database,
-                         Table table) throws SQLException {
+    protected void readFKs(DatabaseMetaData metadata,
+                           Table table) throws SQLException {
         String expectedDatabaseName = table.getDatabaseName();
         String expectedSchemaName = table.getSchemaName();
         String expectedTableName = table.getTableName();
         LogUtil.fineMF(logger, "Searching for foreign keys in table {0}",
                 table.getQualifiedName());
         ResultSet rs = null;
-        Relationship relationship = null;
+        ForeignKey relationship = null;
         Reference[] referenceArray = new Reference[0];
         try {
             rs = metadata.getImportedKeys(null, expectedSchemaName,
@@ -406,6 +402,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 String tableName = rs.getString("FKTABLE_NAME");
                 String columnName = rs.getString("FKCOLUMN_NAME");
 
+                String referencedDatabaseName = expectedDatabaseName;
                 String referencedSchemaName = rs.getString("PKTABLE_SCHEM");
                 String referencedTableName = rs.getString("PKTABLE_NAME");
                 String referencedColumnName = rs.getString("PKCOLUMN_NAME");
@@ -421,68 +418,59 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                         !expectedTableName.equals(tableName)) {
                     LogUtil.fineMF(logger,
                             "Skipping column {0}.{1}.{2}.{3} because table " +
-                                    "does not match expected: {0}.{4}.{5}",
-                            expectedDatabaseName,
+                                    "does not match expected: {4}.{5}.{6}",
+                            referencedDatabaseName,
                             schemaName,
                             tableName,
                             columnName,
+                            expectedDatabaseName,
                             expectedSchemaName,
                             expectedTableName);
                     continue;
                 }
 
-                String qualifiedReferencedTableName =
-                        MessageFormat.format("{0}.{1}.{2}",
-                                expectedDatabaseName,
-                                referencedSchemaName,
-                                referencedTableName
-                        );
-                Table referencedTable =
-                        database.findTableByQualifiedName(
-                                qualifiedReferencedTableName);
-
                 if (relationship == null ||
-                        !relationship.getRelationshipName().equals(fkName)) {
+                        !relationship.getFkName().equals(fkName)) {
                     if (relationship != null) {
-                        installRelationship(relationship, referenceArray);
+                        installRelationship(table, relationship, referenceArray);
                     }
 
-                    relationship = new Relationship(
-                            fkName,
+                    relationship = new ForeignKey(
+                            table, fkName,
+                            referencedDatabaseName,
+                            referencedSchemaName,
+                            referencedTableName,
                             decodeUpdateDeleteRule(updateRule),
                             decodeUpdateDeleteRule(deleteRule));
-                    relationship.setFromTable(table);
-                    relationship.setToTable(referencedTable);
 
                     // reset the refernceArray
                     referenceArray = new Reference[0];
                     LogUtil.fineMF(logger, "Found foreign key: {0}", fkName);
                 }
 
-                Column column = findColumn(database, table, columnName);
-                if (column == null) {
-                    LogUtil.warningMF(logger, "Column {0} not found. " +
-                            "Aborting FK search for this table.",
-                            column.getQualifiedName());
-                    return;
-                }
+                Reference reference = new Reference(
+                        relationship,
+                        columnName,
+                        referencedColumnName);
 
-                Column referencedColumn =
-                        findColumn(database,
-                                referencedTable, referencedColumnName);
-                if (referencedColumn == null) {
-                    LogUtil.warningMF(logger, "Column {0} not found. " +
-                            "Aborting FK search for this table.",
-                            column.getQualifiedName());
-                    return;
-                }
+                String qualifiedFromColumnName = MessageFormat.format(
+                        "{0}.{1}.{2}.{3}",
+                        expectedDatabaseName,
+                        expectedSchemaName,
+                        expectedTableName,
+                        columnName);
 
-                Reference reference = new Reference(column, referencedColumn);
+                String qualifiedToColumnName = MessageFormat.format(
+                        "{0}.{1}.{2}.{3}",
+                        referencedDatabaseName,
+                        referencedSchemaName,
+                        referencedTableName,
+                        referencedColumnName);
 
                 LogUtil.fineMF(logger,
                         "Found FK reference {0} -> {1} with key sequence {2}",
-                        column.getQualifiedName(),
-                        referencedColumn.getQualifiedName(),
+                        qualifiedFromColumnName,
+                        qualifiedToColumnName,
                         keySeq);
 
                 referenceArray =
@@ -490,24 +478,14 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 referenceArray[keySeq] = reference;
             }
             if (relationship != null) {
-                installRelationship(relationship, referenceArray);
+                installRelationship(table, relationship, referenceArray);
             }
         } finally {
             DbUtil.closeResultSetAndStatement(rs);
         }
     }
 
-    protected Column findColumn(Database database, Table table, String columnName) {
-        String qualifiedColumnName =
-                MessageFormat.format("{0}.{1}.{2}",
-                        table.getSchemaName(),
-                        table.getQualifiedName(),
-                        columnName);
-        return database.findColumnByQualifiedName(
-                        qualifiedColumnName);
-    }
-
-    protected void installRelationship(Relationship relationship,
+    protected void installRelationship(Table table, ForeignKey relationship,
                                      Reference[] referenceArray) {
         // copy non-null elements of array
         for (Reference current : referenceArray) {
@@ -520,16 +498,13 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
         if (relationship.getReferences().size() == 0) {
             LogUtil.warningMF(logger,
                     "Foreign key {0} is empty. Discarding.",
-                    relationship.getRelationshipName());
+                    relationship.getFkName());
             return;
         }
-        relationship.getFromTable()
-                    .getManyToOneRelationships().add(relationship);
-        relationship.getToTable()
-                    .getOneToManyRelationships().add(relationship);
+        table.getForeignKeys().add(relationship);
         LogUtil.fineMF(logger,
                     "Installed FK {0} with number of columns: {1}",
-                relationship.getRelationshipName(),
+                relationship.getFkName(),
                 relationship.getReferences().size());
     }
 
@@ -537,13 +512,13 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
         switch (rule) {
             case DatabaseMetaData.importedKeyNoAction:
             case DatabaseMetaData.importedKeyRestrict:
-                return Relationship.RULE_NO_ACTION;
+                return ForeignKey.RULE_NO_ACTION;
             case DatabaseMetaData.importedKeyCascade:
-                return Relationship.RULE_CASCADE;
+                return ForeignKey.RULE_CASCADE;
             case DatabaseMetaData.importedKeySetNull:
-                return Relationship.RULE_SET_NULL;
+                return ForeignKey.RULE_SET_NULL;
             case DatabaseMetaData.importedKeySetDefault:
-                return Relationship.RULE_SET_DEFAULT;
+                return ForeignKey.RULE_SET_DEFAULT;
             default:
                 throw new IllegalArgumentException("Rule: " + rule);
         }
@@ -553,11 +528,11 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     // Utility methods
     //**************************************************************************
 
-    protected Column[] ensureMinimumArrayLength(Column[] oldArray, int length) {
+    protected PrimaryKeyColumn[] ensureMinimumArrayLength(PrimaryKeyColumn[] oldArray, int length) {
         if (oldArray.length >= length) {
             return oldArray;
         }
-        Column[] newArray = new Column[length];
+        PrimaryKeyColumn[] newArray = new PrimaryKeyColumn[length];
         System.arraycopy(oldArray, 0, newArray, 0, oldArray.length);
         return newArray;
     }

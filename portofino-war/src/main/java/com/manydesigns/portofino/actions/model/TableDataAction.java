@@ -46,10 +46,11 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RelatedTableForm;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
+import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.datamodel.Column;
+import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.Reference;
-import com.manydesigns.portofino.model.datamodel.Relationship;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
@@ -307,22 +308,22 @@ public class TableDataAction extends PortofinoAction
         relatedTableFormList = new ArrayList<RelatedTableForm>();
 
         Table table = model.findTableByQualifiedName(qualifiedTableName);
-        
-        for (Relationship relationship : table.getOneToManyRelationships()) {
+        for (ForeignKey relationship : table.getOneToManyRelationships()) {
             setupRelatedTableForm(relationship);
         }
 
         return READ;
     }
 
-    protected void setupRelatedTableForm(Relationship relationship) {
+    protected void setupRelatedTableForm(ForeignKey relationship) {
         List<Object> relatedObjects =
                 context.getRelatedObjects(qualifiedTableName, object,
-                        relationship.getRelationshipName());
+                        relationship.getFkName());
 
-        Table relatedTable = relationship.getFromTable();
+        String qualifiedFromTableName =
+                relationship.getFromTable().getQualifiedName();
         TableAccessor relatedTableAccessor =
-                context.getTableAccessor(relatedTable.getQualifiedName());
+                context.getTableAccessor(qualifiedFromTableName);
         TableFormBuilder tableFormBuilder =
                 new TableFormBuilder(relatedTableAccessor);
         tableFormBuilder.configNRows(relatedObjects.size());
@@ -518,8 +519,8 @@ public class TableDataAction extends PortofinoAction
     protected String jsonOptions(boolean includeSelectPrompt) {
         setupTable();
         Table table = model.findTableByQualifiedName(qualifiedTableName);
-        Relationship relationship =
-                table.findManyToOneByName(relName);
+        ForeignKey relationship =
+                table.findForeignKeyByName(relName);
 
         String[] fieldNames = createFieldNamesForRelationship(relationship);
         OptionProvider optionProvider =
@@ -560,12 +561,12 @@ public class TableDataAction extends PortofinoAction
 
         // setup relationship lookups
         Table table = model.findTableByQualifiedName(qualifiedTableName);
-        for (Relationship rel : table.getManyToOneRelationships()) {
+        for (ForeignKey rel : table.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
             OptionProvider optionProvider =
                     createOptionProviderForRelationship(rel);
             boolean autocomplete = false;
-            for (Annotation current : rel.getAnnotations()) {
+            for (ModelAnnotation current : rel.getAnnotations()) {
                 if ("com.manydesigns.elements.annotations.Autocomplete"
                         .equals(current.getType())) {
                     autocomplete = true;
@@ -584,12 +585,12 @@ public class TableDataAction extends PortofinoAction
 
         // setup relationship lookups
         Table table = model.findTableByQualifiedName(qualifiedTableName);
-        for (Relationship rel : table.getManyToOneRelationships()) {
+        for (ForeignKey rel : table.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
             OptionProvider optionProvider =
                     createOptionProviderForRelationship(rel);
             boolean autocomplete = false;
-            for (Annotation current : rel.getAnnotations()) {
+            for (ModelAnnotation current : rel.getAnnotations()) {
                 if ("com.manydesigns.elements.annotations.Autocomplete"
                         .equals(current.getType())) {
                     autocomplete = true;
@@ -602,18 +603,19 @@ public class TableDataAction extends PortofinoAction
         return tableFormBuilder;
     }
 
-    protected String[] createFieldNamesForRelationship(Relationship rel) {
+    protected String[] createFieldNamesForRelationship(ForeignKey rel) {
         List<Reference> references = rel.getReferences();
         String[] fieldNames = new String[references.size()];
         int i = 0;
         for (Reference reference : references) {
-            fieldNames[i] = reference.getFromColumn().getPropertyName();
+            Column column = reference.getFromColumn();
+            fieldNames[i] = column.getPropertyName();
             i++;
         }
         return fieldNames;
     }
 
-    protected OptionProvider createOptionProviderForRelationship(Relationship rel) {
+    protected OptionProvider createOptionProviderForRelationship(ForeignKey rel) {
         // retrieve the related objects
         Table relatedTable = rel.getToTable();
         ClassAccessor classAccessor =
@@ -627,7 +629,7 @@ public class TableDataAction extends PortofinoAction
             textFormat = OgnlTextFormat.create(shortNameAnnotation.value());
         }
         OptionProvider optionProvider =
-                DefaultOptionProvider.create(rel.getRelationshipName(),
+                DefaultOptionProvider.create(rel.getFkName(),
                         relatedObjects, classAccessor, textFormat);
         return optionProvider;
     }

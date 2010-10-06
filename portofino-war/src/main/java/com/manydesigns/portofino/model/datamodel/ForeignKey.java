@@ -29,18 +29,18 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.portofino.model.annotations.Annotation;
+import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Relationship {
+public class ForeignKey {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -57,40 +57,113 @@ public class Relationship {
     //**************************************************************************
     // Fields
     //**************************************************************************
-    protected Table fromTable;
+    protected final Table fromTable;
+    protected String fkName;
+
     protected Table toTable;
-    protected String relationshipName;
+    protected String toDatabaseName;
+    protected String toSchemaName;
+    protected String toTableName;
+
     protected String onUpdate;
     protected String onDelete;
+    
     protected String manyPropertyName;
     protected String onePropertyName;
 
-    protected final List<Reference>references;
-    protected final List<Annotation> annotations;
+    protected final List<Reference> references;
+    protected final List<ModelAnnotation> modelAnnotations;
 
 
     //**************************************************************************
-    // Constructors
+    // Constructors and init
     //**************************************************************************
 
-    public Relationship(String relationshipName, String onUpdate, String onDelete) {
-        this.relationshipName = relationshipName;
+    public ForeignKey(Table fromTable,
+                      String fkName,
+                      String toDatabaseName,
+                      String toSchemaName,
+                      String toTableName,
+                      String onUpdate, String onDelete) {
+        this.fromTable = fromTable;
+        this.fkName = fkName;
+
+        this.toDatabaseName = toDatabaseName;
+        this.toSchemaName = toSchemaName;
+        this.toTableName = toTableName;
+
         this.onUpdate = onUpdate;
         this.onDelete = onDelete;
+
         references = new ArrayList<Reference>();
-        annotations = new ArrayList<Annotation>();
+        modelAnnotations = new ArrayList<ModelAnnotation>();
     }
+
+    public void init() {
+        for (Reference reference : references) {
+            // wire up Referenece.fromColumn
+            reference.fromColumn =
+                    fromTable.findColumnByName(reference.getFromColumnName());
+
+            // wire up Referenece.toColumn
+            if (toTable != null) {
+                reference.toColumn =
+                        toTable.findColumnByName(reference.getToColumnName());
+            }
+        }
+    }
+
 
     //**************************************************************************
     // Getters/setter
     //**************************************************************************
 
-    public String getRelationshipName() {
-        return relationshipName;
+    public Table getFromTable() {
+        return fromTable;
     }
 
-    public void setRelationshipName(String relationshipName) {
-        this.relationshipName = relationshipName;
+    public String getFromDatabaseName() {
+        return fromTable.getDatabaseName();
+    }
+
+    public String getFromSchemaName() {
+        return fromTable.getSchemaName();
+    }
+
+    public String getFromTableName() {
+        return fromTable.getTableName();
+    }
+
+    public String getFkName() {
+        return fkName;
+    }
+
+    public void setFkName(String fkName) {
+        this.fkName = fkName;
+    }
+
+    public String getToDatabaseName() {
+        return toDatabaseName;
+    }
+
+    public void setToDatabaseName(String toDatabaseName) {
+        this.toDatabaseName = toDatabaseName;
+    }
+
+    public String getToSchemaName() {
+        return toSchemaName;
+    }
+
+    public void setToSchemaName(String toSchemaName) {
+        this.toSchemaName = toSchemaName;
+    }
+
+    public String getToTableName() {
+        return toTableName;
+    }
+
+    public void setToTableName(String toTableName) {
+        this.toTableName = toTableName;
     }
 
     public String getOnUpdate() {
@@ -113,22 +186,6 @@ public class Relationship {
         return references;
     }
 
-    public Table getToTable() {
-        return toTable;
-    }
-
-    public void setToTable(Table toTable) {
-        this.toTable = toTable;
-    }
-
-    public Table getFromTable() {
-        return fromTable;
-    }
-
-    public void setFromTable(Table fromTable) {
-        this.fromTable = fromTable;
-    }
-
     public String getManyPropertyName() {
         return manyPropertyName;
     }
@@ -145,7 +202,15 @@ public class Relationship {
         this.onePropertyName = onePropertyName;
     }
 
-    public Collection<Annotation> getAnnotations() {
-        return annotations;
-    }    
+    public Collection<ModelAnnotation> getAnnotations() {
+        return modelAnnotations;
+    }
+
+    public Table getToTable() {
+        return toTable;
+    }
+
+    public void setToTable(Table toTable) {
+        this.toTable = toTable;
+    }
 }

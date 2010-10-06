@@ -42,6 +42,10 @@ public class Reference {
     // Fields
     //**************************************************************************
 
+    protected final ForeignKey foreignKey;
+    protected String fromColumnName;
+    protected String toColumnName;
+
     protected Column fromColumn;
     protected Column toColumn;
 
@@ -50,9 +54,12 @@ public class Reference {
     // Constructors
     //**************************************************************************
 
-    public Reference(Column fromColumn, Column toColumn) {
-        this.fromColumn = fromColumn;
-        this.toColumn = toColumn;
+    public Reference(ForeignKey foreignKey,
+                     String fromColumnName,
+                     String toColumnName) {
+        this.foreignKey = foreignKey;
+        this.fromColumnName = fromColumnName;
+        this.toColumnName = toColumnName;
     }
 
 
@@ -60,19 +67,51 @@ public class Reference {
     // Getters/setter
     //**************************************************************************
 
+    public String getFromDatabaseName() {
+        return foreignKey.getFromDatabaseName();
+    }
+
+    public String getFromSchemaName() {
+        return foreignKey.getFromSchemaName();
+    }
+
+    public String getFromTableName() {
+        return foreignKey.getFromTableName();
+    }
+
+    public String getFromColumnName() {
+        return fromColumnName;
+    }
+
+    public void setFromColumnName(String fromColumnName) {
+        this.fromColumnName = fromColumnName;
+    }
+
+    public String getToDatabaseName() {
+        return foreignKey.getToDatabaseName();
+    }
+
+    public String getToSchemaName() {
+        return foreignKey.getToSchemaName();
+    }
+
+    public String getToTableName() {
+        return foreignKey.getToTableName();
+    }
+
+    public String getToColumnName() {
+        return toColumnName;
+    }
+
+    public void setToColumnName(String toColumnName) {
+        this.toColumnName = toColumnName;
+    }
+
     public Column getFromColumn() {
         return fromColumn;
     }
 
-    public void setFromColumn(Column fromColumn) {
-        this.fromColumn = fromColumn;
-    }
-
     public Column getToColumn() {
         return toColumn;
-    }
-
-    public void setToColumn(Column toColumn) {
-        this.toColumn = toColumn;
     }
 }

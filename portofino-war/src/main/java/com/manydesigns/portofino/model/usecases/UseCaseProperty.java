@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.model.usecases;
 
-import com.manydesigns.portofino.model.annotations.Annotation;
+import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class UseCaseProperty {
     //**************************************************************************
 
     protected String name;
-    protected final List<Annotation> annotations;
+    protected final List<ModelAnnotation> modelAnnotations;
 
 
     //**************************************************************************
@@ -58,7 +58,7 @@ public class UseCaseProperty {
 
     public UseCaseProperty(String name) {
         this.name = name;
-        annotations = new ArrayList<Annotation>();
+        modelAnnotations = new ArrayList<ModelAnnotation>();
     }
 
 
@@ -74,7 +74,7 @@ public class UseCaseProperty {
         this.name = name;
     }
 
-    public List<Annotation> getAnnotations() {
-        return annotations;
+    public List<ModelAnnotation> getAnnotations() {
+        return modelAnnotations;
     }
 }

@@ -29,17 +29,13 @@
 
 package com.manydesigns.portofino.reflection;
 
-import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.elements.util.Util;
+import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -68,82 +64,15 @@ public abstract class AbstractAnnotatedAccessor
     //**************************************************************************
 
     public AbstractAnnotatedAccessor(
-            Collection<com.manydesigns.portofino.model.annotations.Annotation>
+            Collection<ModelAnnotation>
                     modelAnnotations) {
         annotations = new HashMap<Class, Annotation>();
 
-        for (com.manydesigns.portofino.model.annotations.Annotation
-                propertyAnnotation : modelAnnotations) {
-            String type = propertyAnnotation.getType();
-
-            Class annotationClass = ReflectionUtil.loadClass(type);
-            if (annotationClass == null) {
-                LogUtil.warningMF(logger,
-                        "Cannot load annotation class: {0}", type);
-                continue;
-            }
-
-            Annotation annotation = instanciateOneAnnotation(
-                    annotationClass,
-                    propertyAnnotation.getValues());
+        for (ModelAnnotation modelAnnotation : modelAnnotations) {
+            Class annotationClass = modelAnnotation.getJavaAnnotationClass();
+            Annotation annotation = modelAnnotation.getJavaAnnotation();
             annotations.put(annotationClass, annotation);
         }
-    }
-
-    public Annotation instanciateOneAnnotation(Class annotationClass,
-                                               List<String> values) {
-        AnnotationsManager annotationsManager =
-                AnnotationsManager.getManager();
-
-        Class annotationImplClass =
-                annotationsManager.getAnnotationImplementationClass(
-                        annotationClass);
-        if (annotationImplClass == null) {
-            LogUtil.warningMF(logger,
-                    "Cannot find implementation for annotation class: {0}",
-                    annotationClass);
-            return null;
-        }
-
-        Annotation annotation = null;
-        Constructor[] constructors =
-                annotationImplClass.getConstructors();
-        for (Constructor candidateConstructor : constructors) {
-            Class[] parameterTypes =
-                    candidateConstructor.getParameterTypes();
-            if (parameterTypes.length != values.size()) {
-                continue;
-            }
-
-            try {
-                Object castValues[] = new Object[parameterTypes.length];
-                for (int i = 0; i < parameterTypes.length; i++) {
-                    Class parameterType = parameterTypes[i];
-                    String stringValue = values.get(i);
-                    Object value;
-                    if (parameterType.isArray()) {
-                        value = Util.matchStringArray(stringValue);
-                    } else {
-                        value = stringValue;
-                    }
-                    castValues[i] = Util.convertValue(value, parameterType);
-                }
-
-                annotation = (Annotation) ReflectionUtil.newInstance(
-                        candidateConstructor, castValues);
-            } catch (Throwable e) {
-                LogUtil.finerMF(logger, "Failed to use constructor: {0}", e,
-                        candidateConstructor);
-            }
-        }
-
-        if (annotation == null) {
-            LogUtil.warningMF(logger,
-                    "Cannot instanciate annotation: {0}", annotationClass);
-            return null;
-        }
-
-        return annotation;
     }
 
     //**************************************************************************

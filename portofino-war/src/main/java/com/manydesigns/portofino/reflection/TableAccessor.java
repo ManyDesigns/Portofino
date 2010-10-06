@@ -33,7 +33,6 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.Table;
 
@@ -69,12 +68,9 @@ public class TableAccessor
 
     public TableAccessor(Table table) {
         super(table.getAnnotations());
-        String className = table.getClassName();
-        if (className != null) {
-            Class clazz = ReflectionUtil.loadClass(className);
-            if (clazz != null) {
-                javaClassAccessor = JavaClassAccessor.getClassAccessor(clazz);
-            }
+        Class clazz = table.getJavaClass();
+        if (clazz != null) {
+            javaClassAccessor = JavaClassAccessor.getClassAccessor(clazz);
         }
 
         this.table = table;
@@ -87,7 +83,8 @@ public class TableAccessor
         setupKeyColumns(columns, pkColumns);
     }
 
-    private void setupColumns(List<Column> columns, List<Column> pkColumns) {
+    private void setupColumns(List<Column> columns,
+                              List<Column> pkColumns) {
         int i = 0;
         for (Column current : columns) {
             boolean inPk = pkColumns.contains(current);

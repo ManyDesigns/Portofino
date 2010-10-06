@@ -29,8 +29,12 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
+import com.manydesigns.elements.logging.LogUtil;
+
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -44,53 +48,68 @@ public class PrimaryKey {
     //**************************************************************************
     // Fields
     //**************************************************************************
-    protected String databaseName;
-    protected String schemaName;
-    protected String tableName;
+
+    protected final Table table;
     protected String pkName;
     protected String className;
+    protected final List<PrimaryKeyColumn> primaryKeyColumns;
+
+    //**************************************************************************
+    // Fields for wire-up
+    //**************************************************************************
+
     protected final List<Column> columns;
 
+    public static final Logger logger = LogUtil.getLogger(Table.class);
 
     //**************************************************************************
-    // Constructors
+    // Constructors and wire up
     //**************************************************************************
 
-    public PrimaryKey(String databaseName, String schemaName,
-                      String tableName, String pkName) {
-        this.databaseName = databaseName;
-        this.schemaName = schemaName;
-        this.tableName = tableName;
+    public PrimaryKey(Table table, String pkName) {
+        this.table = table;
         this.pkName = pkName;
+        primaryKeyColumns = new ArrayList<PrimaryKeyColumn>();
         columns = new ArrayList<Column>();
+    }
+
+    public void init() {
+        columns.clear();
+
+        for (PrimaryKeyColumn pkc : primaryKeyColumns) {
+            pkc.init();
+            Column column = pkc.getColumn();
+            columns.add(column);
+        }
+
+        if (columns.isEmpty()) {
+            LogUtil.warningMF(logger,
+                    "Primary key ''{0}'' has no columns", this);
+        }
     }
 
     //**************************************************************************
     // Getters/setter
     //**************************************************************************
 
-    public String getDatabaseName() {
-        return databaseName;
+    public Table getTable() {
+        return table;
     }
 
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
+    public List<Column> getColumns() {
+        return columns;
+    }
+
+    public String getDatabaseName() {
+        return table.getTableName();
     }
 
     public String getSchemaName() {
-        return schemaName;
-    }
-
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
+        return table.getSchemaName();
     }
 
     public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
+        return table.getTableName();
     }
 
     public String getPkName() {
@@ -101,8 +120,8 @@ public class PrimaryKey {
         this.pkName = pkName;
     }
 
-    public List<Column> getColumns() {
-        return columns;
+    public List<PrimaryKeyColumn> getPrimaryKeyColumns() {
+        return primaryKeyColumns;
     }
 
     public String getClassName() {
@@ -111,5 +130,10 @@ public class PrimaryKey {
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    @Override
+    public String toString() {
+        return MessageFormat.format("PK {0} for {1}", pkName, table.toString());
     }
 }

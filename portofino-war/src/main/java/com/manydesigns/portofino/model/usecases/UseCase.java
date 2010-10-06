@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.model.usecases;
 
-import com.manydesigns.portofino.model.annotations.Annotation;
+import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.Table;
 
 import java.util.ArrayList;
@@ -52,11 +52,15 @@ public class UseCase {
     protected String name;
     protected String title;
     protected String tableName;
-    protected Table table;
     protected String filter;
     protected final List<UseCaseProperty> properties;
-    protected final List<Annotation> annotations;
+    protected final List<ModelAnnotation> modelAnnotations;
 
+    //**************************************************************************
+    // Fields for wire-up
+    //**************************************************************************
+
+    protected Table table;
 
     //**************************************************************************
     // Constructors
@@ -68,8 +72,11 @@ public class UseCase {
         this.tableName = tableName;
         this.filter = filter;
         properties = new ArrayList<UseCaseProperty>();
-        annotations = new ArrayList<Annotation>();
+        modelAnnotations = new ArrayList<ModelAnnotation>();
     }
+
+
+    public void init() {}
 
 
     //**************************************************************************
@@ -120,7 +127,7 @@ public class UseCase {
         return properties;
     }
 
-    public List<Annotation> getAnnotations() {
-        return annotations;
+    public List<ModelAnnotation> getAnnotations() {
+        return modelAnnotations;
     }
 }

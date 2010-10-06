@@ -29,11 +29,14 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.portofino.model.annotations.Annotation;
+import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,12 +48,10 @@ public class Column {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // Fields: physical (jdbc)
+    // Fields (physical JDBC)
     //**************************************************************************
 
-    protected String databaseName;
-    protected String schemaName;
-    protected String tableName;
+    protected final Table table;
     protected String columnName;
     protected String columnType;
     protected boolean nullable;
@@ -58,29 +59,33 @@ public class Column {
     protected int length;
     protected int scale;
     protected boolean searchable;
+    
+    //**************************************************************************
+    // Fields (logical)
+    //**************************************************************************
+
+    protected String javaTypeName;
+    protected String propertyName;
+    protected final List<ModelAnnotation> modelAnnotations;
 
     //**************************************************************************
-    // Fields: logical (Java)
+    // Fields for wire-up
     //**************************************************************************
 
     protected Class javaType;
-    protected String propertyName;
-    protected final List<Annotation> annotations;
 
+    public static final Logger logger = LogUtil.getLogger(Column.class);
 
     //**************************************************************************
-    // Constructors
+    // Constructors and init
     //**************************************************************************
-    public Column(String databaseName, String schemaName,
-                  String tableName, String columnName,
+    public Column(Table table, String columnName,
                   String columnType,
                   boolean nullable,
                   boolean autoincrement,
                   int length, int scale,
                   boolean searchable) {
-        this.databaseName = databaseName;
-        this.schemaName = schemaName;
-        this.tableName = tableName;
+        this.table = table;
         this.columnName = columnName;
         this.columnType = columnType;
         this.nullable = nullable;
@@ -88,35 +93,39 @@ public class Column {
         this.length = length;
         this.scale = scale;
         this.searchable = searchable;
-        annotations = new ArrayList<Annotation>();
+        modelAnnotations = new ArrayList<ModelAnnotation>();
     }
 
+    public void init() {
+        // wire up javaType
+        javaType = ReflectionUtil.loadClass(javaTypeName);
+        if (javaType == null) {
+            LogUtil.warningMF(logger,
+                    "Cannot load column java type: {0}", javaTypeName);
+        }
+
+        for (ModelAnnotation modelAnnotation : modelAnnotations) {
+            modelAnnotation.init();
+        }
+    }
     //**************************************************************************
     // Getters/setter
     //**************************************************************************
 
-    public String getDatabaseName() {
-        return databaseName;
+    public Table getTable() {
+        return table;
     }
 
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
+    public String getDatabaseName() {
+        return table.getDatabaseName();
     }
 
     public String getSchemaName() {
-        return schemaName;
-    }
-
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
+        return table.getSchemaName();
     }
 
     public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
+        return table.getTableName();
     }
 
     public String getColumnName() {
@@ -163,8 +172,12 @@ public class Column {
         return javaType;
     }
 
-    public void setJavaType(Class javaType) {
-        this.javaType = javaType;
+    public String getJavaTypeName() {
+        return javaTypeName;
+    }
+
+    public void setJavaTypeName(String javaTypeName) {
+        this.javaTypeName = javaTypeName;
     }
 
     public boolean isAutoincrement() {
@@ -176,8 +189,8 @@ public class Column {
     }
 
     public String getQualifiedName() {
-        return MessageFormat.format("{0}.{1}.{2}.{3}",
-                databaseName, schemaName, tableName, columnName);
+        return MessageFormat.format("{0}.{1}",
+                table.getQualifiedName(), columnName);
     }
 
     public String getPropertyName() {
@@ -196,55 +209,8 @@ public class Column {
         this.searchable = searchable;
     }
 
-    public List<Annotation> getAnnotations() {
-        return annotations;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Column column = (Column) o;
-
-        if (autoincrement != column.autoincrement) return false;
-        if (length != column.length) return false;
-        if (nullable != column.nullable) return false;
-        if (scale != column.scale) return false;
-        if (searchable != column.searchable) return false;
-        if (columnName != null ? !columnName.equals(column.columnName) : column.columnName != null)
-            return false;
-        if (columnType != null ? !columnType.equals(column.columnType) : column.columnType != null)
-            return false;
-        if (databaseName != null ? !databaseName.equals(column.databaseName) : column.databaseName != null)
-            return false;
-        if (javaType != null ? !javaType.equals(column.javaType) : column.javaType != null)
-            return false;
-        if (propertyName != null ? !propertyName.equals(column.propertyName) : column.propertyName != null)
-            return false;
-        if (schemaName != null ? !schemaName.equals(column.schemaName) : column.schemaName != null)
-            return false;
-        if (tableName != null ? !tableName.equals(column.tableName) : column.tableName != null)
-            return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = databaseName != null ? databaseName.hashCode() : 0;
-        result = 31 * result + (schemaName != null ? schemaName.hashCode() : 0);
-        result = 31 * result + (tableName != null ? tableName.hashCode() : 0);
-        result = 31 * result + (columnName != null ? columnName.hashCode() : 0);
-        result = 31 * result + (columnType != null ? columnType.hashCode() : 0);
-        result = 31 * result + (nullable ? 1 : 0);
-        result = 31 * result + (autoincrement ? 1 : 0);
-        result = 31 * result + length;
-        result = 31 * result + scale;
-        result = 31 * result + (searchable ? 1 : 0);
-        result = 31 * result + (javaType != null ? javaType.hashCode() : 0);
-        result = 31 * result + (propertyName != null ? propertyName.hashCode() : 0);
-        return result;
+    public List<ModelAnnotation> getAnnotations() {
+        return modelAnnotations;
     }
 
     @Override
@@ -256,4 +222,20 @@ public class Column {
                 Integer.toString(scale),
                 nullable ? "" : " NOT NULL");
     }
+
+    //**************************************************************************
+    // Utility methods
+    //**************************************************************************
+
+    public static String composeQualifiedName(String databaseName,
+                                              String schemaName,
+                                              String tableName,
+                                              String columnName) {
+        return MessageFormat.format("{0}.{1}.{2}.{3}",
+                databaseName,
+                schemaName,
+                tableName,
+                columnName);
+    }
+
 }

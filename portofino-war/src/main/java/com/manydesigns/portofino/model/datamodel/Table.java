@@ -30,7 +30,8 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.portofino.model.annotations.Annotation;
+import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -51,53 +52,76 @@ public class Table {
     // Fields
     //**************************************************************************
 
-    protected String databaseName;
-    protected String schemaName;
+    protected final Schema schema;
     protected String tableName;
-    protected List<Column> columns;
-    protected final List<Relationship> manyToOneRelationships;
-    protected final List<Relationship> oneToManyRelationships;
-    protected PrimaryKey primaryKey;
     protected boolean m2m;
-    protected String className;
-    protected final List<Annotation> annotations;
+    protected String javaClassName;
+    protected List<Column> columns;
+    protected PrimaryKey primaryKey;
+    protected final List<ForeignKey> foreignKeys;
+    protected final List<ModelAnnotation> modelAnnotations;
 
     public static final Logger logger = LogUtil.getLogger(Table.class);
 
+    //**************************************************************************
+    // Fields for wire-up
+    //**************************************************************************
+
+    protected final List<ForeignKey> oneToManyRelationships;
+    protected Class javaClass;
 
     //**************************************************************************
-    // Constructors
+    // Constructors and init
     //**************************************************************************
-    public Table(String databaseName, String schemaName, String tableName) {
-        this.databaseName = databaseName;
-        this.schemaName = schemaName;
+    public Table(Schema schema, String tableName) {
+        this.schema = schema;
         this.tableName = tableName;
-        this.columns = new ArrayList<Column>();
-        this.manyToOneRelationships = new ArrayList<Relationship>();
-        this.oneToManyRelationships = new ArrayList<Relationship>();
         this.m2m = false;
-        annotations = new ArrayList<Annotation>();
+        columns = new ArrayList<Column>();
+        foreignKeys = new ArrayList<ForeignKey>();
+        oneToManyRelationships = new ArrayList<ForeignKey>();
+        modelAnnotations = new ArrayList<ModelAnnotation>();
     }
 
-    
+    public void init() {
+        // wire up javaClass
+        javaClass = ReflectionUtil.loadClass(javaClassName);
+
+        for (Column column : columns) {
+            column.init();
+        }
+
+        if (primaryKey == null) {
+            LogUtil.warningMF(logger,
+                    "Table {0} has no primary key", toString());
+        } else {
+            primaryKey.init();
+        }
+
+        for (ForeignKey foreignKey : foreignKeys) {
+            foreignKey.init();
+        }
+
+
+        for (ModelAnnotation modelAnnotation : modelAnnotations) {
+            modelAnnotation.init();
+        }
+    }
+
     //**************************************************************************
     // Getters/setter
     //**************************************************************************
 
-    public String getDatabaseName() {
-        return databaseName;
+    public Schema getSchema() {
+        return schema;
     }
 
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
+    public String getDatabaseName() {
+        return schema.getDatabaseName();
     }
 
     public String getSchemaName() {
-        return schemaName;
-    }
-
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
+        return schema.getSchemaName();
     }
 
     public String getTableName() {
@@ -108,16 +132,28 @@ public class Table {
         this.tableName = tableName;
     }
 
+    public boolean isM2m() {
+        return m2m;
+    }
+
+    public void setM2m(boolean m2m) {
+        this.m2m = m2m;
+    }
+
+    public String getJavaClassName() {
+        return javaClassName;
+    }
+
+    public void setJavaClassName(String javaClassName) {
+        this.javaClassName = javaClassName;
+    }
+
     public List<Column> getColumns() {
         return columns;
     }
 
-    public List<Relationship> getManyToOneRelationships() {
-        return manyToOneRelationships;
-    }
-
-    public List<Relationship> getOneToManyRelationships() {
-        return oneToManyRelationships;
+    public void setColumns(List<Column> columns) {
+        this.columns = columns;
     }
 
     public PrimaryKey getPrimaryKey() {
@@ -128,29 +164,25 @@ public class Table {
         this.primaryKey = primaryKey;
     }
 
-    public boolean isM2m() {
-        return m2m;
+    public Class getJavaClass() {
+        return javaClass;
     }
 
-    public void setM2m(boolean m2m) {
-        this.m2m = m2m;
+    public Collection<ModelAnnotation> getAnnotations() {
+        return modelAnnotations;
+    }
+
+    public List<ForeignKey> getForeignKeys() {
+        return foreignKeys;
+    }
+
+    public List<ForeignKey> getOneToManyRelationships() {
+        return oneToManyRelationships;
     }
 
     public String getQualifiedName() {
-        return MessageFormat.format("{0}.{1}.{2}",
-                databaseName, schemaName, tableName);
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    public Collection<Annotation> getAnnotations() {
-        return annotations;
+        return MessageFormat.format("{0}.{1}",
+                schema.getQualifiedName(), tableName);
     }
 
     //**************************************************************************
@@ -167,14 +199,25 @@ public class Table {
         return null;
     }
 
-    public Relationship findManyToOneByName(String relationshipName) {
-        for (Relationship relationship : manyToOneRelationships) {
-            if (relationship.getRelationshipName().equals(relationshipName)) {
-                return relationship;
+    public ForeignKey findForeignKeyByName(String fkName) {
+        for (ForeignKey current : foreignKeys) {
+            if (current.getFkName().equals(fkName)) {
+                return current;
             }
         }
         LogUtil.fineMF(logger,
-                "Many-to-one relationship not found: {0}", relationshipName);
+                "Foreign key not found: {0}", fkName);
+        return null;
+    }
+
+    public ForeignKey findOneToManyRelationshipByName(String relationshipName) {
+        for (ForeignKey current : getOneToManyRelationships()) {
+            if (current.getFkName().equals(relationshipName)) {
+                return current;
+            }
+        }
+        LogUtil.fineMF(logger,
+                "One to many relationship not found: {0}", relationshipName);
         return null;
     }
 
@@ -185,5 +228,16 @@ public class Table {
     @Override
     public String toString() {
         return getQualifiedName();
+    }
+
+    //**************************************************************************
+    // Utility methods
+    //**************************************************************************
+
+    public static String composeQualifiedName(String databaseName,
+                                              String schemaName,
+                                              String tableName) {
+        return MessageFormat.format(
+                "{0}.{1}.{2}", databaseName, schemaName, tableName);
     }
 }

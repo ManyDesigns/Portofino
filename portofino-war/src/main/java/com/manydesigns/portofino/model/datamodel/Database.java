@@ -55,11 +55,17 @@ public class Database {
 
 
     //**************************************************************************
-    // Constructors
+    // Constructors and init
     //**************************************************************************
     public Database(String databaseName) {
         this.databaseName = databaseName;
         this.schemas = new ArrayList<Schema>();
+    }
+
+    public void init() {
+        for (Schema schema : schemas) {
+            schema.init();
+        }
     }
 
     //**************************************************************************
@@ -103,6 +109,19 @@ public class Database {
         }
         return result;
     }
+
+    public List<ForeignKey> getAllForeignKeys() {
+        List<ForeignKey> result = new ArrayList<ForeignKey>();
+        for (Schema schema : schemas) {
+            for (Table table : schema.getTables()) {
+                for (ForeignKey foreignKey : table.getForeignKeys()) {
+                    result.add(foreignKey);
+                }
+            }
+        }
+        return result;
+    }
+
 
     //**************************************************************************
     // Search objects of a certain kind
@@ -152,17 +171,4 @@ public class Database {
         return null;
     }
 
-    public Relationship findOneToManyRelationship(String qualifiedTableName,
-                                                  String relationshipName) {
-        Table table = findTableByQualifiedName(qualifiedTableName);
-        if (table != null) {
-            for (Relationship relationship : table.getOneToManyRelationships()) {
-                if (relationship.getRelationshipName().equals(relationshipName)) {
-                    return relationship;
-                }
-            }
-        }
-        LogUtil.fineMF(logger, "Relationship not found: {0}", relationshipName);
-        return null;
-    }
 }

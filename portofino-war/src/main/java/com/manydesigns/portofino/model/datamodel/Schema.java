@@ -49,7 +49,7 @@ public class Schema {
     // Fields
     //**************************************************************************
 
-    protected String databaseName;
+    protected final Database database;
     protected String schemaName;
     protected final List<Table> tables;
 
@@ -57,24 +57,30 @@ public class Schema {
 
 
     //**************************************************************************
-    // Constructors
+    // Constructors and init
     //**************************************************************************
-    public Schema(String databaseName, String schemaName) {
-        this.databaseName = databaseName;
+    public Schema(Database database, String schemaName) {
+        this.database = database;
         this.schemaName = schemaName;
         this.tables = new ArrayList<Table>();
+    }
+
+    public void init() {
+        for (Table table : tables) {
+            table.init();
+        }
     }
 
     //**************************************************************************
     // Getters/setter
     //**************************************************************************
 
-    public String getDatabaseName() {
-        return databaseName;
+    public Database getDatabase() {
+        return database;
     }
 
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
+    public String getDatabaseName() {
+        return database.getDatabaseName();
     }
 
     public String getSchemaName() {
@@ -91,10 +97,10 @@ public class Schema {
 
 
     public String getQualifiedName() {
-        return MessageFormat.format("{0}.{1}", databaseName, schemaName);
+        return MessageFormat.format("{0}.{1}", getDatabaseName(), schemaName);
     }
 
-        //**************************************************************************
+    //**************************************************************************
     // Get all objects of a certain kind
     //**************************************************************************
 
@@ -137,20 +143,6 @@ public class Schema {
             }
         }
         LogUtil.fineMF(logger, "Column not found: {0}", qualifiedColumnName);
-        return null;
-    }
-
-    public Relationship findOneToManyRelationship(String qualifiedTableName,
-                                                  String relationshipName) {
-        Table table = findTableByQualifiedName(qualifiedTableName);
-        if (table != null) {
-            for (Relationship relationship : table.getOneToManyRelationships()) {
-                if (relationship.getRelationshipName().equals(relationshipName)) {
-                    return relationship;
-                }
-            }
-        }
-        LogUtil.fineMF(logger, "Relationship not found: {0}", relationshipName);
         return null;
     }
 

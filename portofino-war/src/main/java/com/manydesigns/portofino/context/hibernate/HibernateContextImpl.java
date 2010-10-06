@@ -245,11 +245,11 @@ public class HibernateContextImpl implements Context {
         org.hibernate.Criteria hibernateCriteria;
         Table table = model.findTableByQualifiedName(qualifiedTableName);
 
-        if (table.getClassName() == null) {
+        if (table.getJavaClassName() == null) {
             hibernateCriteria = session.createCriteria(qualifiedTableName);
         } else {
             hibernateCriteria = session.createCriteria
-                    (ReflectionUtil.loadClass(table.getClassName()));
+                    (ReflectionUtil.loadClass(table.getJavaClassName()));
         }
 
         startTimer();
@@ -639,7 +639,7 @@ public class HibernateContextImpl implements Context {
     public List<Object> getRelatedObjects(String qualifiedTableName,
                                           Object obj,
                                           String oneToManyRelationshipName) {
-        Relationship relationship =
+        ForeignKey relationship =
                 model.findOneToManyRelationship(
                         qualifiedTableName, oneToManyRelationshipName);
         Table toTable = relationship.getToTable();

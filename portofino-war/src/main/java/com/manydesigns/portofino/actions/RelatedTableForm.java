@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.forms.TableForm;
-import com.manydesigns.portofino.model.datamodel.Relationship;
+import com.manydesigns.portofino.model.datamodel.ForeignKey;
 
 import java.util.List;
 
@@ -43,11 +43,11 @@ public class RelatedTableForm {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Relationship relationship;
+    public ForeignKey relationship;
     public TableForm tableForm;
     public List<Object> objects;
 
-    public RelatedTableForm(Relationship relationship,
+    public RelatedTableForm(ForeignKey relationship,
                           TableForm tableForm,
                           List<Object> objects) {
         this.relationship = relationship;

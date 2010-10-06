@@ -259,6 +259,8 @@ public class PortofinoListener
                 "registering on servlet context...");
         // create and register the container first, without exceptions
 
+        ElementsThreadLocals.setupDefaultElementsContext();
+
         String managerClassName =
                 portofinoProperties.getProperty(
                         PortofinoProperties.CONTEXT_CLASS_PROPERTY);
@@ -278,5 +280,6 @@ public class PortofinoListener
                 portofinoProperties.getProperty(
                         PortofinoProperties.MODEL_LOCATION_PROPERTY));
 
+        ElementsThreadLocals.removeElementsContext();
     }
 }

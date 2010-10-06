@@ -59,6 +59,8 @@ public class Portlet {
         this.urlExpression = urlExpression;
     }
 
+    public void init() {}
+
     public String getName() {
         return name;
     }

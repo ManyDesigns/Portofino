@@ -244,7 +244,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\"></div>" +
-                "<input type=\"hidden\" name=\"myText\"></input>" +
+                "<input type=\"hidden\" id=\"myText\" name=\"myText\"></input>" +
                 "</td>", text);
     }
 
@@ -255,7 +255,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\">label1</div>" +
-                "<input type=\"hidden\" name=\"myText\" value=\"value1\"></input>" +
+                "<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value1\"></input>" +
                 "</td>", text);
     }
 
@@ -266,7 +266,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\">label3</div>" +
-                "<input type=\"hidden\" name=\"myText\" value=\"value3\"></input>" +
+                "<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value3\"></input>" +
                 "</td>", text);
     }
 
@@ -277,7 +277,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\"></div>" +
-                "<input type=\"hidden\" name=\"myText\"></input>" +
+                "<input type=\"hidden\" id=\"myText\" name=\"myText\"></input>" +
                 "</td>", text);
     }
 
@@ -289,28 +289,28 @@ public class SelectFieldTest extends AbstractElementsTest {
     public void testHiddenNull() {
         selectField.setMode(Mode.HIDDEN);
         String text = elementToString(selectField);
-        assertEquals("<input type=\"hidden\" name=\"myText\"></input>", text);
+        assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\"></input>", text);
     }
 
     public void testHiddenValidSelection() {
         selectField.setMode(Mode.HIDDEN);
         selectField.setValue("value1");
         String text = elementToString(selectField);
-        assertEquals("<input type=\"hidden\" name=\"myText\" value=\"value1\"></input>", text);
+        assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value1\"></input>", text);
     }
 
     public void testHiddenValidSelectionNoUrl() {
         selectField.setMode(Mode.HIDDEN);
         selectField.setValue("value3");
         String text = elementToString(selectField);
-        assertEquals("<input type=\"hidden\" name=\"myText\" value=\"value3\"></input>", text);
+        assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value3\"></input>", text);
     }
 
     public void testHiddenInvalidSelection() {
         selectField.setMode(Mode.HIDDEN);
         selectField.setValue("value4");
         String text = elementToString(selectField);
-        assertEquals("<input type=\"hidden\" name=\"myText\"></input>", text);
+        assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\"></input>", text);
     }
 
     //--------------------------------------------------------------------------

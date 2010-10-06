@@ -60,7 +60,7 @@ public class Model {
     public static final Logger logger = LogUtil.getLogger(Model.class);
 
     //**************************************************************************
-    // Constructors
+    // Constructors and init
     //**************************************************************************
 
     public Model() {
@@ -68,6 +68,58 @@ public class Model {
         this.siteNodes = new ArrayList<SiteNode>();
         this.portlets = new ArrayList<Portlet>();
         this.useCases = new ArrayList<UseCase>();
+    }
+
+    public void init() {
+        List<Table> allTables = getAllTables();
+        // reset collections
+        for (Table table : allTables) {
+            table.getOneToManyRelationships().clear();
+        }
+        // wire-up relationships and references
+        for (Table table : allTables) {
+            for (ForeignKey foreignKey : table.getForeignKeys()) {
+                // wire up ForeignKey.toTable
+                String qualifiedToTableName =
+                        Table.composeQualifiedName(
+                                foreignKey.getToDatabaseName(),
+                                foreignKey.getToSchemaName(),
+                                foreignKey.getToTableName());
+                Table toTable = findTableByQualifiedName(qualifiedToTableName);
+                foreignKey.setToTable(toTable);
+                if (toTable == null) {
+                    LogUtil.warningMF(logger,
+                            "Cannor wire foreign key ''{0}'' to table ''{1}''",
+                            foreignKey, qualifiedToTableName);
+                } else {
+                    // wire up Table.oneToManyRelationships
+                    toTable.getOneToManyRelationships().add(foreignKey);
+                }
+            }
+        }
+
+        // databases
+        for (Database database : databases) {
+            database.init();
+        }
+
+        // site nodes
+        for (SiteNode siteNode : siteNodes) {
+            siteNode.init();
+        }
+
+        // databases
+        for (Portlet portlet : portlets) {
+            portlet.init();
+        }
+
+        // databases
+        for (UseCase useCase : useCases) {
+            String qualifiedTableName = useCase.getTableName();
+            Table table = findTableByQualifiedName(qualifiedTableName);
+            useCase.setTable(table);
+            useCase.init();
+        }
     }
 
     //**************************************************************************
@@ -103,6 +155,20 @@ public class Model {
                 for (Table table : schema.getTables()) {
                     for (Column column : table.getColumns()) {
                         result.add(column);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<ForeignKey> getAllForeignKeys() {
+        List<ForeignKey> result = new ArrayList<ForeignKey>();
+        for (Database database : getDatabases()) {
+            for (Schema schema : database.getSchemas()) {
+                for (Table table : schema.getTables()) {
+                    for (ForeignKey foreignKey : table.getForeignKeys()) {
+                        result.add(foreignKey);
                     }
                 }
             }
@@ -167,19 +233,12 @@ public class Model {
         return null;
     }
 
-    public Relationship findOneToManyRelationship(String qualifiedTableName,
-                                                  String relationshipName) {
+    public ForeignKey findOneToManyRelationship(String qualifiedTableName,
+                                                String relationshipName) {
         Table table = findTableByQualifiedName(qualifiedTableName);
-        if (table != null) {
-            for (Relationship relationship : table.getOneToManyRelationships()) {
-                if (relationship.getRelationshipName().equals(relationshipName)) {
-                    return relationship;
-                }
-            }
-        }
-        LogUtil.fineMF(logger, "Relationship not found: {0}", relationshipName);
-        return null;
+        return table.findOneToManyRelationshipByName(relationshipName);
     }
+
 
     //**************************************************************************
     // Getters/setter

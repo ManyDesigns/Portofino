@@ -2,7 +2,7 @@ package com.manydesigns.portofino.model.io;
 
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.annotations.Annotation;
+import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.portlets.Portlet;
 import com.manydesigns.portofino.model.site.SiteNode;
@@ -17,8 +17,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.InputStream;
-import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +38,8 @@ public class ModelParser extends XmlParser {
     private static final String COLUMNS = "columns";
     private static final String COLUMN = "column";
     private static final String PRIMARY_KEY = "primaryKey";
-    private static final String RELATIONSHIPS = "relationships";
-    private static final String RELATIONSHIP = "relationship";
+    private static final String FOREIGN_KEYS = "foreignKeys";
+    private static final String FOREIGN_KEY = "foreignKey";
     private static final String REFERENCES = "references";
     private static final String REFERENCE = "reference";
 
@@ -61,28 +59,28 @@ public class ModelParser extends XmlParser {
     private static final String ANNOTATION = "annotation";
     private static final String VALUE = "value";
 
-    private List<RelationshipPre> relationshipPres;
-
     Model model;
     Database currentDatabase;
     Schema currentSchema;
     Table currentTable;
     Column currentColumn;
+    PrimaryKey currentPk;
+    ForeignKey currentFk;
     UseCase currentUseCase;
-    Collection<Annotation> currentAnnotations;
-    Annotation currentAnnotation;
+
+    Collection<ModelAnnotation> currentModelAnnotations;
+    ModelAnnotation currentModelAnnotation;
 
     public ModelParser() {}
 
     public Model parse(String fileName) throws Exception {
         model = new Model();
-        relationshipPres = new ArrayList<RelationshipPre>();
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         InputStream input = ReflectionUtil.getResourceAsStream(fileName);
         XMLStreamReader xmlStreamReader = inputFactory.createXMLStreamReader(input);
         initParser(xmlStreamReader);
         expectDocument(new ModelDocumentCallback());
-        createRelationshipsPost();
+        model.init();
         return model;
     }
 
@@ -136,8 +134,7 @@ public class ModelParser extends XmlParser {
                 throws XMLStreamException {
             checkRequiredAttributes(attributes, "name");
             currentSchema =
-                    new Schema(currentDatabase.getDatabaseName(),
-                            attributes.get("name"));
+                    new Schema(currentDatabase, attributes.get("name"));
             currentDatabase.getSchemas().add(currentSchema);
             expectElement(TABLES, 0, 1, new TablesCallback());
         }
@@ -155,23 +152,22 @@ public class ModelParser extends XmlParser {
                 throws XMLStreamException {
             checkRequiredAttributes(attributes, "name");
             currentTable =
-                    new Table(currentSchema.getDatabaseName(),
-                            currentSchema.getSchemaName(),
-                            attributes.get("name"));
+                    new Table(currentSchema, attributes.get("name"));
             String m2m = attributes.get("manyToMany");
             if (m2m!=null) {
                 currentTable.setM2m(Boolean.parseBoolean(m2m));
             }
             String className = attributes.get("class");
             if (className!=null){
-                currentTable.setClassName(className);
+                currentTable.setJavaClassName(className);
             }
             currentSchema.getTables().add(currentTable);
+
             expectElement(COLUMNS, 1, 1, new ColumnsCallback());
             expectElement(PRIMARY_KEY, 1, 1, new PrimaryKeyCallback());
-            expectElement(RELATIONSHIPS, 0, 1, new RelationshipsCallback());
+            expectElement(FOREIGN_KEYS, 0, 1, new ForeignKeysCallback());
 
-            currentAnnotations = currentTable.getAnnotations();
+            currentModelAnnotations = currentTable.getAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
         }
     }
@@ -190,9 +186,7 @@ public class ModelParser extends XmlParser {
                     "name", "columnType", "length", "scale",
                     "nullable", "searchable");
             String columnName = attributes.get("name");
-            currentColumn = new Column(currentTable.getDatabaseName(),
-                    currentTable.getSchemaName(),
-                    currentTable.getTableName(),
+            currentColumn = new Column(currentTable,
                     columnName,
                     attributes.get("columnType"),
                     Boolean.parseBoolean(attributes.get("nullable")),
@@ -208,12 +202,13 @@ public class ModelParser extends XmlParser {
             }
             currentColumn.setPropertyName(propertyName);
 
-            Class javatype = ReflectionUtil.loadClass(attributes.get("javaType"));
-            currentColumn.setJavaType(javatype);
+            String javaTypeName = attributes.get("javaType");
+            
+            currentColumn.setJavaTypeName(javaTypeName);
 
             currentTable.getColumns().add(currentColumn);
 
-            currentAnnotations = currentColumn.getAnnotations();
+            currentModelAnnotations = currentColumn.getAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
         }
     }
@@ -222,12 +217,10 @@ public class ModelParser extends XmlParser {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             checkRequiredAttributes(attributes, "name");
-            PrimaryKey pk = new PrimaryKey(currentTable.getDatabaseName(),
-                            currentTable.getSchemaName(),
-                            currentTable.getTableName(),
-                            attributes.get("name"));
-            currentTable.setPrimaryKey(pk);
-            pk.setClassName(attributes.get("className"));
+            currentPk = new PrimaryKey(currentTable, attributes.get("name"));
+            currentTable.setPrimaryKey(currentPk);
+            currentPk.setClassName(attributes.get("className"));
+
             expectElement(COLUMN, 1, null, new PrimaryKeyColumnCallback());
         }
     }
@@ -237,50 +230,49 @@ public class ModelParser extends XmlParser {
                 throws XMLStreamException {
             checkRequiredAttributes(attributes, "name");
             String columnName = attributes.get("name");
-            Column column = getColumn(currentTable, columnName);
-            currentTable.getPrimaryKey().getColumns().add(column);
+            PrimaryKeyColumn pkColumn =
+                    new PrimaryKeyColumn(currentPk, columnName);
+            currentPk.getPrimaryKeyColumns().add(pkColumn);
         }
     }
 
-    private class RelationshipsCallback implements ElementCallback {
+    private class ForeignKeysCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(RELATIONSHIP, 1, null, new RelationshipCallback());
+            expectElement(FOREIGN_KEY, 1, null, new ForeignKeyCallback());
         }
     }
 
-    private class RelationshipCallback implements ElementCallback {
+    private class ForeignKeyCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             checkRequiredAttributes(attributes,
-                    "name", "toSchema", "toTable", "onUpdate", "onDelete");
-            RelationshipPre rel =
-                    new RelationshipPre(
-                            currentTable.getDatabaseName(),
-                            currentTable.getDatabaseName(),
-                            currentTable.getSchemaName(),
-                            attributes.get("toSchema"),
-                            currentTable.getTableName(),
-                            attributes.get("toTable"),
-                            attributes.get("name"),
-                            attributes.get("onUpdate"),
-                            attributes.get("onDelete"));
+                    "name", "toDatabase", "toSchema", "toTable", "onUpdate", "onDelete");
+            currentFk = new ForeignKey(
+                    currentTable,
+                    attributes.get("name"),
+                    attributes.get("toDatabase"),
+                    attributes.get("toSchema"),
+                    attributes.get("toTable"),
+                    attributes.get("onUpdate"),
+                    attributes.get("onDelete"));
             
             String manyPropertyName = attributes.get("manyPropertyName");
             if (manyPropertyName == null) {
-                manyPropertyName = rel.getRelationshipName();
+                manyPropertyName = currentFk.getFkName();
             }
-            rel.setManyPropertyName(manyPropertyName);
+            currentFk.setManyPropertyName(manyPropertyName);
 
             String onePropertyName = attributes.get("onePropertyName");
             if (onePropertyName == null) {
-                onePropertyName = rel.getRelationshipName();
+                onePropertyName = currentFk.getFkName();
             }
-            rel.setOnePropertyName(onePropertyName);
-            relationshipPres.add(rel);
+            currentFk.setOnePropertyName(onePropertyName);
+            currentTable.getForeignKeys().add(currentFk);
+
             expectElement(REFERENCES, 1, 1, new ReferencesCallback());
 
-            currentAnnotations = rel.getAnnotations();
+            currentModelAnnotations = currentFk.getAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
         }
     }
@@ -295,13 +287,12 @@ public class ModelParser extends XmlParser {
     private class ReferenceCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            RelationshipPre currRel = relationshipPres.get(relationshipPres.size()-1);
             checkRequiredAttributes(attributes,
                                 "fromColumn", "toColumn");
-            ReferencePre referencePre = new ReferencePre(
-                attributes.get("fromColumn"),
-                attributes.get("toColumn"));
-            currRel.getReferences().add(referencePre);            
+            Reference reference = new Reference(currentFk,
+                    attributes.get("fromColumn"),
+                    attributes.get("toColumn"));
+            currentFk.getReferences().add(reference);
         }
     }
 
@@ -416,7 +407,7 @@ public class ModelParser extends XmlParser {
             model.getUseCases().add(currentUseCase);
             expectElement(PROPERTIES, 0, 1, new PropertiesCallback());
             
-            currentAnnotations = currentUseCase.getAnnotations();
+            currentModelAnnotations = currentUseCase.getAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
         }
     }
@@ -436,7 +427,7 @@ public class ModelParser extends XmlParser {
             UseCaseProperty useCaseProperty = new UseCaseProperty(name);
             currentUseCase.getProperties().add(useCaseProperty);
 
-            currentAnnotations = useCaseProperty.getAnnotations();
+            currentModelAnnotations = useCaseProperty.getAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
         }
     }
@@ -453,8 +444,8 @@ public class ModelParser extends XmlParser {
                 throws XMLStreamException {
             checkRequiredAttributes(attributes, "type");
             String type = attributes.get("type");
-            currentAnnotation = new Annotation(type);
-            currentAnnotations.add(currentAnnotation);
+            currentModelAnnotation = new ModelAnnotation(type);
+            currentModelAnnotations.add(currentModelAnnotation);
             expectElement(VALUE, 0, null, new AnnotationValueCallback());
         }
     }
@@ -469,62 +460,9 @@ public class ModelParser extends XmlParser {
     private class AnnotationValueCharactersCallback
             implements CharactersCallback {
         public void doCharacters(String text) throws XMLStreamException {
-            currentAnnotation.getValues().add(text);
+            currentModelAnnotation.getValues().add(text);
         }
     }
 
-
-    //**************************************************************************
-    // utility methods
-    //**************************************************************************
-
-    private void createRelationshipsPost() {
-        for (RelationshipPre relPre: relationshipPres) {
-            Relationship rel = new Relationship(relPre.getRelationshipName(),
-                    relPre.getOnUpdate(), relPre.getOnDelete());
-            rel.getAnnotations().addAll(relPre.getAnnotations());
-            final Table fromTable = getTable(relPre.getFromSchema(), relPre.getFromTable());
-            final Table toTable = getTable(relPre.getToSchema(), relPre.getToTable());
-            rel.setFromTable(fromTable);
-            rel.setToTable(toTable);
-            rel.setManyPropertyName(relPre.getManyPropertyName());
-            rel.setOnePropertyName(relPre.getOnePropertyName());
-            fromTable.getManyToOneRelationships().add(rel);
-            toTable.getOneToManyRelationships().add(rel);
-
-            for (ReferencePre refPre: relPre.getReferences()) {
-                Reference ref = new Reference(getColumn(fromTable, refPre.getFromColumn()),
-                        getColumn(toTable, refPre.getToColumn()));
-                rel.getReferences().add(ref);
-            }
-        }
-    }
-
-    private Table getTable(String schemaName, String tableName) {
-        for (Database db : model.getDatabases()) {
-            for (Schema schema : db.getSchemas()) {
-                if (schemaName.equals(schema.getSchemaName())){
-                    for (Table tb : schema.getTables()) {
-                        if(tableName.equals(tb.getTableName()))
-                            return tb;
-                    }
-                }
-            }
-
-        }
-        throw new Error(MessageFormat.format("Tabella {0} non presente " +
-                "nello schema {1}", tableName, schemaName));
-
-    }
-
-    private Column getColumn(Table table, String attValue) {
-        for (Column col : table.getColumns()) {
-            if (col.getColumnName().equals(attValue)) {
-                return col;
-            }
-        }
-        throw new Error(MessageFormat.format("Colonna {0} non presente " +
-                "nella tabella {1}", attValue, table.getQualifiedName()));
-    }
 }
 

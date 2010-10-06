@@ -62,7 +62,7 @@ public class JdbcMetadataReaderTest extends TestCase {
                         "jdbc:postgresql://127.0.0.1:5432/jpetstore",
                         "manydesigns",
                         "manydesigns");
-
+        connectionProvider.test();
         database = connectionProvider.readModel();
     }
 
@@ -79,10 +79,9 @@ public class JdbcMetadataReaderTest extends TestCase {
 
 
         Database database2 = new Database("pippo");
-        Schema schema2 = new Schema(database2.getDatabaseName(), "public");
+        Schema schema2 = new Schema(database2, "public");
         database2.getSchemas().add(schema2);
-        Table table2 = new Table(schema2.getDatabaseName(),
-                schema2.getSchemaName(), "product");
+        Table table2 = new Table(schema2, "product");
         schema2.getTables().add(table2);
 
         ModelDiff diff = new ModelDiff();

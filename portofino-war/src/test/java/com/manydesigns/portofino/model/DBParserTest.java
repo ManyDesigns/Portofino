@@ -68,7 +68,7 @@ public class DBParserTest extends TestCase {
         assertNotNull(model);
 
         List<Database> databases = model.getDatabases();
-        assertEquals(2, databases.size());
+        assertEquals(1, databases.size());
 
         Database database = databases.get(0);
         assertEquals("jpetstore", database.getDatabaseName());
@@ -120,12 +120,12 @@ public class DBParserTest extends TestCase {
         checkTable(table1, "jpetstore", "public", "product");
 
         int idxRel = 0;
-        checkRelationships(table1.getManyToOneRelationships()
+        checkRelationships(table1.getForeignKeys()
                 , idxRel, "fk_product_1", "public" ,
                 "category", "NO ACTION", "NO ACTION");
-        assertEquals(1, table1.getManyToOneRelationships().size());
+        assertEquals(1, table1.getForeignKeys().size());
         List<Reference> references2 =
-                table1.getManyToOneRelationships().get(idxRel).getReferences();
+                table1.getForeignKeys().get(idxRel).getReferences();
         checkReference(references2, 0, "category", "catid");
 
         List<Column> columns1 = table1.getColumns();
@@ -178,17 +178,17 @@ public class DBParserTest extends TestCase {
     private void checkReference(List<Reference> references, int idx,
                                 String fromColumn, String toColumn) {
         Reference ref = references.get(idx);
-        assertEquals(fromColumn, ref.getFromColumn().getColumnName());
-        assertEquals(toColumn, ref.getToColumn().getColumnName());
+        assertEquals(fromColumn, ref.getFromColumnName());
+        assertEquals(toColumn, ref.getToColumnName());
     }
 
-    private void checkRelationships(List<Relationship> relationships, int idx, String name,
+    private void checkRelationships(List<ForeignKey> relationships, int idx, String name,
                                     String toSchema, String toTable,
                                     String onUpdate, String onDelete) {
-        Relationship rel = relationships.get(idx);
-        assertEquals(name, rel.getRelationshipName());
-        assertEquals(toSchema, rel.getToTable().getSchemaName());
-        assertEquals(toTable, rel.getToTable().getTableName());
+        ForeignKey rel = relationships.get(idx);
+        assertEquals(name, rel.getFkName());
+        assertEquals(toSchema, rel.getToSchemaName());
+        assertEquals(toTable, rel.getToTableName());
         assertEquals(onUpdate, rel.getOnUpdate());
         assertEquals(onDelete, rel.getOnDelete());
 

@@ -143,7 +143,7 @@ public class ModelWriter {
         visit (w, table.getPrimaryKey());
 
         //Relationships
-        visit (w, table.getManyToOneRelationships());
+        visit (w, table.getForeignKeys());
 
         w.writeCharacters("\n");
         w.writeEndElement();//table
@@ -172,7 +172,7 @@ public class ModelWriter {
         w.writeAttribute("name", primaryKey.getPkName());
         w.writeCharacters("\n");
 
-        for (Column column : primaryKey.getColumns()){
+        for (PrimaryKeyColumn column : primaryKey.getPrimaryKeyColumns()){
             w.writeStartElement( "column");
             w.writeAttribute("name", column.getColumnName());
             w.writeEndElement();
@@ -184,7 +184,7 @@ public class ModelWriter {
     }
 
 
-    private void visit(XMLStreamWriter w, List<Relationship> manyToOneRelationships)
+    private void visit(XMLStreamWriter w, List<ForeignKey> manyToOneRelationships)
             throws XMLStreamException {
         if (manyToOneRelationships.isEmpty())
             return;
@@ -193,18 +193,18 @@ public class ModelWriter {
         w.writeStartElement( "relationships");
         w.writeCharacters("\n");
 
-        for(Relationship rel : manyToOneRelationships) {
+        for(ForeignKey rel : manyToOneRelationships) {
             w.writeStartElement( "relationship");
-            w.writeAttribute("name", rel.getRelationshipName());
-            w.writeAttribute("toTable", rel.getToTable().getTableName());
-            w.writeAttribute("toSchema", rel.getToTable().getSchemaName());
+            w.writeAttribute("name", rel.getFkName());
+            w.writeAttribute("toTable", rel.getToTableName());
+            w.writeAttribute("toSchema", rel.getToSchemaName());
             w.writeAttribute("onDelete", rel.getOnDelete());
             w.writeAttribute("onUpdate", rel.getOnUpdate());
             w.writeCharacters("\n");
             for (Reference ref : rel.getReferences()){
                 w.writeStartElement( "reference");
-                w.writeAttribute("fromColumn", ref.getFromColumn().getColumnName());
-                w.writeAttribute("toColumn", ref.getToColumn().getColumnName());
+                w.writeAttribute("fromColumn", ref.getFromColumnName());
+                w.writeAttribute("toColumn", ref.getToColumnName());
                 w.writeEndElement();//reference
                 w.writeCharacters("\n");
             }
