@@ -31,9 +31,7 @@ package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
-import com.manydesigns.elements.fields.DefaultOptionProvider;
-import com.manydesigns.elements.fields.OptionProvider;
-import com.manydesigns.elements.fields.SelectField;
+import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.logging.LogUtil;
@@ -51,21 +49,31 @@ import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Table;
+
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
+import com.manydesigns.portofino.util.TempFiles;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.io.StringBufferInputStream;
+import java.io.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
+import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import jxl.write.WritableWorkbook;
+import jxl.write.WritableSheet;
+import jxl.write.Label;
+import jxl.write.Number;
+import jxl.write.WriteException;
+import jxl.write.biff.RowsExceededException;
+import jxl.Workbook;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -85,6 +93,7 @@ public class TableDataAction extends PortofinoAction
     public final static String NO_TABLES = "noTables";
     public final static String JSON_SELECT_FIELD_OPTIONS =
             "jsonSelectFieldOptions";
+    public static final String EXPORT_FILENAME_FORMAT = "export-{0}";
 
     //**************************************************************************
     // ServletRequestAware implementation
@@ -139,6 +148,15 @@ public class TableDataAction extends PortofinoAction
     public SearchForm searchForm;
     public List<RelatedTableForm> relatedTableFormList;
     public InputStream inputStream;
+
+    //**************************************************************************
+    // export parameters
+    //***************************************************************************
+
+    public String contentType;
+    public String fileName;
+    public Long contentLength;
+    public String chartId;
 
     //**************************************************************************
     // Other objects
@@ -633,5 +651,113 @@ public class TableDataAction extends PortofinoAction
                         relatedObjects, classAccessor, textFormat);
         return optionProvider;
     }
+
+
+    //**************************************************************************
+    // Export
+    //**************************************************************************
+
+    public String export() {
+        setupTable();
+
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        //Relationship relationship =
+        //        table.findManyToOneByName(relName);
+
+        SearchFormBuilder searchFormBuilder =
+                new SearchFormBuilder(tableAccessor);
+        searchForm = searchFormBuilder.build();
+        searchForm.readFromRequest(req);
+
+        Criteria criteria = new Criteria(tableAccessor);
+        searchForm.configureCriteria(criteria);
+        objects = context.getObjects(criteria);
+
+        String exportId = TempFiles.generateRandomCode();
+        File fileTemp = TempFiles.getTempFile(EXPORT_FILENAME_FORMAT, exportId);
+
+        WritableWorkbook workbook = null;
+        try {
+            workbook = Workbook.createWorkbook(fileTemp);
+            WritableSheet sheet = workbook.createSheet("First Sheet", 0);
+
+            TableFormBuilder tableFormBuilder =
+                    createTableFormBuilderWithOptionProviders()
+                            .configNRows(objects.size());
+
+            tableForm = tableFormBuilder.build();
+            tableForm.setKeyGenerator(pkHelper.createPkGenerator());
+            tableForm.readFromObject(objects);
+
+            int i = 0;
+            for (Object obj : objects) {
+                TableFormColumn col = tableForm.get(i);
+
+                for (Field field : Arrays.asList(col.getFields())) {
+                    if ( field instanceof  NumericField) {
+                       System.out.println("::  " + ((NumericField)field).getStringValue());
+                    } else if ( field instanceof BooleanField ) {
+                       System.out.println("::  " + ((BooleanField)field).getBooleanValue());
+                    } else if ( field instanceof PasswordField ) {
+                        System.out.println("::  " + ((PasswordField)field).getStringValue());
+                    } else if ( field instanceof SelectField ) {
+                        //System.out.println("::  " + ((SelectField)field).get);
+                    } else if ( field instanceof DateField ) {
+                        System.out.println("::  " + ((DateField)field).getStringValue());
+                    } else if ( field instanceof TextField ) {
+                        System.out.println("::  " + ((TextField)field).getStringValue());
+                    } else {
+                        continue;
+                    }
+                }
+                i++;   
+            }
+
+            Label label = new Label(0, 2, "A label record");
+            sheet.addCell(label);
+            Label label2 = new Label(1, 2, "A label record2");
+            sheet.addCell(label2);
+
+            Number number = new Number(3, 4, 3.1459);
+            sheet.addCell(number);
+
+            workbook.write();
+        } catch (IOException e) {
+            LogUtil.warning(logger, "IOException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } catch (RowsExceededException e) {
+            LogUtil.warning(logger, "RowsExceededException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } catch (WriteException e) {
+            LogUtil.warning(logger, "WriteException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } finally {
+            try {
+                if (workbook != null)
+                    workbook.close();
+            }
+            catch (Exception e) {
+                LogUtil.warning(logger, "IOException", e);
+                SessionMessages.addErrorMessage(e.getMessage());
+            }
+        }
+
+        contentLength = fileTemp.length();
+        contentType = "application/ms-excel; charset=UTF-8";
+        fileName = fileTemp.getName() + ".xls";
+
+
+        try {
+            inputStream = new FileInputStream(fileTemp);
+        } catch (IOException e) {
+            LogUtil.warning(logger, "IOException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        }
+
+
+        return EXPORT;
+
+    }
+
 
 }

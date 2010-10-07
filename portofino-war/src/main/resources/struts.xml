@@ -206,9 +206,19 @@
                 <param name="prependServletContext">false</param>
             </result>
 
+            <result name="export" type="stream">
+                <param name="contentType">%{contentType}</param>
+                <param name="contentLength">%{contentLength}</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename="%{fileName}"</param>
+                <param name="bufferSize">1024</param>
+            </result>
+    
+            
             <result name="jsonSelectFieldOptions" type="stream">
                 <param name="contentType">text/plain</param>
                 <param name="inputName">inputStream</param>
+                <param name="bufferSize">1024</param>
             </result>
         </action>
 
