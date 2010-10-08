@@ -30,22 +30,26 @@
 package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.fields.PasswordField;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.systemModel.users.Group;
 import com.manydesigns.portofino.systemModel.users.Password;
 import com.manydesigns.portofino.systemModel.users.User;
+import com.manydesigns.portofino.systemModel.users.UsersGroups;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.logging.Logger;
 import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -61,6 +65,10 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     //**************************************************************************
     public HttpServletRequest req;
 
+    public ProfileAction() {
+        groups = new ArrayList<Group>();
+    }
+
     public void setServletRequest(HttpServletRequest req) {
         this.req = req;
     }
@@ -69,6 +77,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     // User
     //**************************************************************************
     public User user;
+    public List<Group> groups;
     public Form form;
 
     //**************************************************************************
@@ -89,7 +98,11 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
 
     private boolean setUser() {
         user = context.getCurrentUser();
-
+        groups.clear();
+        for (UsersGroups group : user.getGroups())
+        {
+            groups.add(group.getGroup());
+        }
         //se l'utente è null lo mando ad Unauthorized
         if (user==null) {
             return true;

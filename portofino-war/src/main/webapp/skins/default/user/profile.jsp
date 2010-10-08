@@ -11,6 +11,11 @@
         <h1>Profile</h1>
 
         <mdes:write value="form"/>
+        <ul>
+            <s:iterator value="user.groups" var="group">
+                <li><s:property value="group.name"/></li>
+            </s:iterator>
+        </ul>
     </div>
     <s:include value="/skins/default/user/userButtonsBar.jsp"/>
 </s:form>
