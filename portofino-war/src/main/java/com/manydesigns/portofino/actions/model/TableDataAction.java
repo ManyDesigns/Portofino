@@ -59,19 +59,16 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.text.MessageFormat;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Iterator;
 import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jxl.write.WritableWorkbook;
-import jxl.write.WritableSheet;
-import jxl.write.Label;
+import jxl.write.*;
 import jxl.write.Number;
-import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 import jxl.Workbook;
 
@@ -660,7 +657,6 @@ public class TableDataAction extends PortofinoAction
     public String export() {
         setupTable();
 
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
         //Relationship relationship =
         //        table.findManyToOneByName(relName);
 
@@ -676,6 +672,21 @@ public class TableDataAction extends PortofinoAction
         String exportId = TempFiles.generateRandomCode();
         File fileTemp = TempFiles.getTempFile(EXPORT_FILENAME_FORMAT, exportId);
 
+        createExportExcel(fileTemp);
+
+        contentLength = fileTemp.length();
+
+        try {
+            inputStream = new FileInputStream(fileTemp);
+        } catch (IOException e) {
+            LogUtil.warning(logger, "IOException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        }
+        return EXPORT;
+
+    }
+
+    private void createExportExcel(File fileTemp) {
         WritableWorkbook workbook = null;
         try {
             workbook = Workbook.createWorkbook(fileTemp);
@@ -690,36 +701,45 @@ public class TableDataAction extends PortofinoAction
             tableForm.readFromObject(objects);
 
             int i = 0;
-            for (Object obj : objects) {
-                TableFormColumn col = tableForm.get(i);
+            for ( TableFormColumn col : tableForm) {
+                int j = 0;
 
+                sheet.addCell(new Label(i,j, col.getLabel()));
+                j++;
+                
                 for (Field field : Arrays.asList(col.getFields())) {
-                    if ( field instanceof  NumericField) {
-                       System.out.println("::  " + ((NumericField)field).getStringValue());
-                    } else if ( field instanceof BooleanField ) {
-                       System.out.println("::  " + ((BooleanField)field).getBooleanValue());
-                    } else if ( field instanceof PasswordField ) {
-                        System.out.println("::  " + ((PasswordField)field).getStringValue());
-                    } else if ( field instanceof SelectField ) {
-                        //System.out.println("::  " + ((SelectField)field).get);
+                    if ( field instanceof NumericField) {
+                        //NumberFormat numberFormat = new NumberFormat();
+                        NumericField numField = (NumericField)field;
+                        DecimalFormat format = numField.getDecimalFormat();
+                        String val = format.format(numField.getDecimalValue());
+                        Number number = new Number(i, j, numField.getDecimalValue().doubleValue());
+                        sheet.addCell(number);
+                    } else if ( field instanceof BooleanField) {
+                        Label label = new Label(i, j, ((NumericField)field).getStringValue());
+                        sheet.addCell(label);
+                    } else if ( field instanceof PasswordField) {
+                        Label label = new Label(i, j, ((PasswordField)field).getStringValue());
+                        sheet.addCell(label);
+                    } else if ( field instanceof SelectField) {
+                        SelectField selField = (SelectField)field;
+                        Label label = new Label(i, j, selField.getValue().toString());
+                        sheet.addCell(label);
                     } else if ( field instanceof DateField ) {
-                        System.out.println("::  " + ((DateField)field).getStringValue());
-                    } else if ( field instanceof TextField ) {
-                        System.out.println("::  " + ((TextField)field).getStringValue());
+                        Label label = new Label(i, j, ((DateField)field).getStringValue());
+                        sheet.addCell(label);
+                    } else if ( field instanceof TextField
+                        || field instanceof AbstractTextField ) {
+                        Label label = new Label(i, j, ((TextField)field).getStringValue());
+                        sheet.addCell(label);
                     } else {
                         continue;
                     }
+
+                    j++;
                 }
-                i++;   
+                i++;
             }
-
-            Label label = new Label(0, 2, "A label record");
-            sheet.addCell(label);
-            Label label2 = new Label(1, 2, "A label record2");
-            sheet.addCell(label2);
-
-            Number number = new Number(3, 4, 3.1459);
-            sheet.addCell(number);
 
             workbook.write();
         } catch (IOException e) {
@@ -741,22 +761,8 @@ public class TableDataAction extends PortofinoAction
                 SessionMessages.addErrorMessage(e.getMessage());
             }
         }
-
-        contentLength = fileTemp.length();
         contentType = "application/ms-excel; charset=UTF-8";
         fileName = fileTemp.getName() + ".xls";
-
-
-        try {
-            inputStream = new FileInputStream(fileTemp);
-        } catch (IOException e) {
-            LogUtil.warning(logger, "IOException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        }
-
-
-        return EXPORT;
-
     }
 
 
