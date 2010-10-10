@@ -52,5 +52,5 @@
               onclick="return confirm ('Are you sure?');"/>
     <s:submit id="Table_duplicate" method="duplicate" value="Duplicate" disabled="true"/>
     <s:submit id="Table_print" method="print" value="Print" disabled="true"/>
-    <s:submit id="Table_export" method="export" value="Export" disabled="true"/>
+    <s:submit id="Table_export" method="exportRead" value="Export" disabled="false"/>
 </div>

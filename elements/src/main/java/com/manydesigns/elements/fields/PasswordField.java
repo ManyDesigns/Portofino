@@ -45,7 +45,7 @@ public class PasswordField extends TextField {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final static String PASSWORD_PLACEHOLDER = "********";
+    public final static String PASSWORD_PLACEHOLDER = "********";
 
     private String confirmationValue;
     private boolean confirmationRequired = false;
