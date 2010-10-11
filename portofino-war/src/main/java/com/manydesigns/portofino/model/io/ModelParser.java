@@ -202,7 +202,7 @@ public class ModelParser extends XmlParser {
                 throws XMLStreamException {
             checkRequiredAttributes(attributes,
                     COLUMN_COLUMNNAME, COLUMN_COLUMNTYPE, COLUMN_LENGTH, COLUMN_SCALE,
-                    COLUMN_NULLABLE, "searchable", COLUMN_AUTOINCREMENT);
+                    COLUMN_NULLABLE, "searchable");//, COLUMN_AUTOINCREMENT);
             String columnName = attributes.get(COLUMN_COLUMNNAME);
             currentColumn = new Column(currentTable,
                     columnName,
@@ -231,8 +231,8 @@ public class ModelParser extends XmlParser {
     private class PrimaryKeyCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            checkRequiredAttributes(attributes, "name");
-            currentPk = new PrimaryKey(currentTable, attributes.get("name"));
+            checkRequiredAttributes(attributes, "primaryKeyName");
+            currentPk = new PrimaryKey(currentTable, attributes.get("primaryKeyName"));
             currentTable.setPrimaryKey(currentPk);
             currentPk.setClassName(attributes.get("className"));
 
@@ -243,8 +243,8 @@ public class ModelParser extends XmlParser {
     private class PrimaryKeyColumnCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            checkRequiredAttributes(attributes, "name");
-            String columnName = attributes.get("name");
+            checkRequiredAttributes(attributes, "columnName");
+            String columnName = attributes.get("columnName");
             PrimaryKeyColumn pkColumn =
                     new PrimaryKeyColumn(currentPk, columnName);
             currentPk.getPrimaryKeyColumns().add(pkColumn);
@@ -262,10 +262,10 @@ public class ModelParser extends XmlParser {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             checkRequiredAttributes(attributes,
-                    "name", "toDatabase", "toSchema", "toTable", "onUpdate", "onDelete");
+                    "foreignKeyName", "toDatabase", "toSchema", "toTable", "onUpdate", "onDelete");
             currentFk = new ForeignKey(
                     currentTable,
-                    attributes.get("name"),
+                    attributes.get("foreignKeyName"),
                     attributes.get("toDatabase"),
                     attributes.get("toSchema"),
                     attributes.get("toTable"),
