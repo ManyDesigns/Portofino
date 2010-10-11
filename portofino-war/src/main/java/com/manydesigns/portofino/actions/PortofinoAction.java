@@ -72,6 +72,7 @@ public class PortofinoAction extends ActionSupport
     public final static String SUMMARY = "summary";
     public final static String CHART = "chart";
     public final static String CANCEL = "cancel";
+    public final static String EXPORT = "export";
 
 
     //**************************************************************************

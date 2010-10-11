@@ -12,5 +12,5 @@
     <s:submit id="Table_bulkDelete" method="bulkDelete" value="Delete"
               onclick="return confirm ('Are you sure?');"/>
     <s:submit id="Table_print" method="print" value="Print" disabled="true"/>
-    <s:submit id="Table_export" method="export" value="Export" disabled="true"/>
+    <s:submit id="Table_export" method="exportSearch" value="Export" disabled="false"/>
 </div>
