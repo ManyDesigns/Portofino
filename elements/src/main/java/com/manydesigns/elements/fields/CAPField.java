@@ -30,6 +30,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.Mode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -46,12 +47,12 @@ public class CAPField extends RegExpTextField {
     // Constructors
     //**************************************************************************
 
-    public CAPField(PropertyAccessor accessor) {
-        this(accessor, null);
+    public CAPField(PropertyAccessor accessor, Mode mode) {
+        this(accessor, mode, null);
     }
 
-    public CAPField(PropertyAccessor accessor, String prefix) {
-        super(accessor, prefix, regExp);
+    public CAPField(PropertyAccessor accessor, Mode mode, String prefix) {
+        super(accessor, mode, prefix, regExp);
         setErrorString(getText("elements.error.field.cap.format"));
     }
 }

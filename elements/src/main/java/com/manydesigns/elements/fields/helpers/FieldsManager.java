@@ -30,6 +30,7 @@
 package com.manydesigns.elements.fields.helpers;
 
 import com.manydesigns.elements.ElementsProperties;
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.logging.LogUtil;
@@ -131,10 +132,11 @@ public class FieldsManager implements FieldHelper {
 
     public Field tryToInstantiateField(ClassAccessor classAccessor,
                                   PropertyAccessor propertyAccessor,
+                                  Mode mode,
                                   String prefix) {
         for (FieldHelper current : helperList) {
             Field result = current.tryToInstantiateField(classAccessor,
-                    propertyAccessor, prefix);
+                    propertyAccessor, mode, prefix);
             if (result != null) {
                 return result;
             }

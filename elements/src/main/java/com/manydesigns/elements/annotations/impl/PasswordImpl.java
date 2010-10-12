@@ -43,7 +43,15 @@ public class PasswordImpl implements Password {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public PasswordImpl() {}
+    private boolean confirmationRequired;
+
+    public PasswordImpl(boolean confirmationRequired) {
+        this.confirmationRequired = confirmationRequired;
+    }
+
+    public boolean confirmationRequired() {
+        return confirmationRequired;
+    }
 
     public Class<? extends Annotation> annotationType() {
         return Password.class;

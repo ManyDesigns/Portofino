@@ -27,9 +27,7 @@
  *
  */
 
-package com.manydesigns.elements.fields;
-
-import junit.framework.TestCase;
+package com.manydesigns.elements.options;
 
 import java.util.Map;
 
@@ -38,53 +36,16 @@ import java.util.Map;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ArrayOptionProviderTest extends TestCase {
+public interface SelectionModel {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    Object[] valuesArray = {1, 2, 3};
+    String getName();
+    Object getValue(int index);
+    void setValue(int index, Object value);
 
-    String[] labelsArray = {"qui", "quo", "qua"};
+    String getLabelSearch(int index);
+    void setLabelSearch(int index, String labelSearch);
 
-    DefaultOptionProvider optionProvider;
-
-    public void setUp() {
-        optionProvider = DefaultOptionProvider.create(
-                "optionProvider", 1, valuesArray, labelsArray);
-    }
-
-    public void testArrayOptionsProvider1() {
-        assertEquals(1, optionProvider.getFieldCount());
-    }
-
-    public void testArrayOptionsProvider2() {
-        assertNull(optionProvider.getValue(0));
-        checkAllPresent();
-    }
-
-
-    public void testArrayOptionsProvider3() {
-        optionProvider.setValue(0, 2);
-        Object value = optionProvider.getValue(0);
-        assertNotNull(value);
-        assertEquals(2, value);
-
-        checkAllPresent();
-    }
-
-    public void testArrayOptionsProvider4() {
-        optionProvider.setValue(0, 4);
-        Object value = optionProvider.getValue(0);
-        assertNull(value);
-
-        checkAllPresent();
-    }
-
-    private void checkAllPresent() {
-        Map<Object,String> options = optionProvider.getOptions(0);
-        assertEquals(3, options.size());
-        assertEquals("qui", options.get(1));
-        assertEquals("quo", options.get(2));
-        assertEquals("qua", options.get(3));
-    }
+    Map<Object, String> getOptions(int index);
 }

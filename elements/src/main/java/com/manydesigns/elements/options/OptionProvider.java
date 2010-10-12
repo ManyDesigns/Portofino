@@ -27,39 +27,22 @@
  *
  */
 
-package com.manydesigns.elements.fields.helpers;
-
-import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.Radio;
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.SelectField;
-import com.manydesigns.elements.fields.search.SearchField;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
+package com.manydesigns.elements.options;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class RadioFieldHandler implements FieldHelper {
+public interface OptionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Field tryToInstantiateField(ClassAccessor classAccessor,
-                                  PropertyAccessor propertyAccessor,
-                                  Mode mode,
-                                  String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())
-                && propertyAccessor.isAnnotationPresent(Radio.class)) {
-            Radio annotation =
-                    propertyAccessor.getAnnotation(Radio.class);
-            return new SelectField(propertyAccessor, mode, prefix);
-        }
-        return null;
-    }
+    String getName();
+    int getFieldCount();
 
-    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor, PropertyAccessor propertyAccessor, String prefix) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+    boolean isAutocomplete();
+    void setAutocomplete(boolean autocomplete);
+
+    SelectionModel createSelectionModel();
 }

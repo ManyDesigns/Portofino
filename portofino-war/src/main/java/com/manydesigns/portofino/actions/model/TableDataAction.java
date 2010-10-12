@@ -30,6 +30,8 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.options.OptionProvider;
+import com.manydesigns.elements.options.DefaultOptionProvider;
 import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.fields.search.Criteria;
@@ -49,27 +51,25 @@ import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Table;
-
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.TempFiles;
+import jxl.Workbook;
+import jxl.write.*;
+import jxl.write.Number;
+import jxl.write.biff.RowsExceededException;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import jxl.write.*;
-import jxl.write.Number;
-import jxl.write.biff.RowsExceededException;
-import jxl.Workbook;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -248,7 +248,8 @@ public class TableDataAction extends PortofinoAction
 
         TableFormBuilder tableFormBuilder =
                 createTableFormBuilderWithOptionProviders()
-                        .configNRows(objects.size());
+                        .configNRows(objects.size())
+                        .configMode(Mode.VIEW);
 
         // ogni colonna chiave primaria sarà clickabile
         for (PropertyAccessor property : tableAccessor.getKeyProperties()) {
@@ -258,7 +259,6 @@ public class TableDataAction extends PortofinoAction
 
         tableForm = tableFormBuilder.build();
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
-        tableForm.setMode(Mode.VIEW);
         tableForm.setSelectable(true);
         tableForm.readFromObject(objects);
 
@@ -315,8 +315,9 @@ public class TableDataAction extends PortofinoAction
         objects = context.getObjects(criteria);
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
-        form = createFormBuilderWithOptionProviders().build();
-        form.setMode(Mode.VIEW);
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.VIEW)
+                .build();
         form.readFromObject(object);
 
         relatedTableFormList = new ArrayList<RelatedTableForm>();
@@ -341,8 +342,9 @@ public class TableDataAction extends PortofinoAction
         TableFormBuilder tableFormBuilder =
                 new TableFormBuilder(relatedTableAccessor);
         tableFormBuilder.configNRows(relatedObjects.size());
-        TableForm tableForm = tableFormBuilder.build();
-        tableForm.setMode(Mode.VIEW);
+        TableForm tableForm = tableFormBuilder
+                .configMode(Mode.VIEW)
+                .build();
         tableForm.readFromObject(relatedObjects);
 
         RelatedTableForm relatedTableForm =
@@ -357,8 +359,9 @@ public class TableDataAction extends PortofinoAction
     public String create() {
         setupTable();
 
-        form = createFormBuilderWithOptionProviders().build();
-        form.setMode(Mode.CREATE);
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.CREATE)
+                .build();
 
         return CREATE;
     }
@@ -366,8 +369,9 @@ public class TableDataAction extends PortofinoAction
     public String save() {
         setupTable();
 
-        form = createFormBuilderWithOptionProviders().build();
-        form.setMode(Mode.CREATE);
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.CREATE)
+                .build();
 
         form.readFromRequest(req);
         if (form.validate()) {
@@ -396,8 +400,9 @@ public class TableDataAction extends PortofinoAction
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
 
-        form = createFormBuilderWithOptionProviders().build();
-        form.setMode(Mode.EDIT);
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.EDIT)
+                .build();
 
         form.readFromObject(object);
 
@@ -408,8 +413,9 @@ public class TableDataAction extends PortofinoAction
         setupTable();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
-        form = createFormBuilderWithOptionProviders().build();
-        form.setMode(Mode.EDIT);
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.EDIT)
+                .build();
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
         form.readFromObject(object);
@@ -445,8 +451,9 @@ public class TableDataAction extends PortofinoAction
 
         setupTable();
 
-        form = createFormBuilderWithOptionProviders().build();
-        form.setMode(Mode.BULK_EDIT);
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.BULK_EDIT)
+                .build();
 
         return BULK_EDIT;
     }
@@ -454,8 +461,9 @@ public class TableDataAction extends PortofinoAction
     public String bulkUpdate() {
         setupTable();
 
-        form = createFormBuilderWithOptionProviders().build();
-        form.setMode(Mode.BULK_EDIT);
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.BULK_EDIT)
+                .build();
         form.readFromRequest(req);
         if (form.validate()) {
             for (String current : selection) {
@@ -539,16 +547,19 @@ public class TableDataAction extends PortofinoAction
         String[] fieldNames = createFieldNamesForRelationship(relationship);
         OptionProvider optionProvider =
                 createOptionProviderForRelationship(relationship);
-        optionProvider.setLabelSearch(optionProviderIndex, labelSearch);
 
         Form form = new FormBuilder(tableAccessor)
                 .configFields(fieldNames)
                 .configOptionProvider(optionProvider, fieldNames)
+                .configMode(Mode.EDIT)
                 .build();
         form.readFromRequest(req);
 
         SelectField targetField =
                 (SelectField) form.get(0).get(optionProviderIndex);
+        targetField.setLabelSearch(labelSearch);
+
+        form.validate();
 
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
         LogUtil.infoMF(logger, "jsonSelectFieldOptions: {0}", text);
@@ -586,7 +597,7 @@ public class TableDataAction extends PortofinoAction
                     autocomplete = true;
                 }
             }
-            optionProvider.setAutoconnect(autocomplete);
+            optionProvider.setAutocomplete(autocomplete);
 
             formBuilder.configOptionProvider(optionProvider, fieldNames);
         }
@@ -610,7 +621,7 @@ public class TableDataAction extends PortofinoAction
                     autocomplete = true;
                 }
             }
-            optionProvider.setAutoconnect(autocomplete);
+            optionProvider.setAutocomplete(autocomplete);
 
             tableFormBuilder.configOptionProvider(optionProvider, fieldNames);
         }
@@ -671,7 +682,9 @@ public class TableDataAction extends PortofinoAction
         TableFormBuilder tableFormBuilder =
             createTableFormBuilderWithOptionProviders()
                             .configNRows(objects.size());
-        tableForm = tableFormBuilder.build();
+        tableForm = tableFormBuilder
+                .configMode(Mode.VIEW)
+                .build();
         tableForm.readFromObject(objects);
 
         String exportId = TempFiles.generateRandomCode();
@@ -795,6 +808,7 @@ public class TableDataAction extends PortofinoAction
 
         TableFormBuilder tableFormBuilder =
             createTableFormBuilderWithOptionProviders()
+                            .configMode(Mode.VIEW)
                             .configNRows(objects.size());
         tableForm = tableFormBuilder.build();
         tableForm.readFromObject(object);

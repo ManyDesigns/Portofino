@@ -63,8 +63,8 @@ public class ServerInfoAction extends ActionSupport
                         "totalMemory",
                         "maxMemory",
                         "availableProcessors")
+                .configMode(Mode.VIEW)
                 .build();
-        form.setMode(Mode.VIEW);
         form.readFromObject(serverInfo);
         return SUCCESS;
     }

@@ -29,34 +29,23 @@
 
 package com.manydesigns.elements.forms;
 
-import com.manydesigns.elements.Element;
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.List;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableFormColumn implements Element {
+public class TableFormColumn {
     public static final String copyright =
             "Copyright (c) 2005-2009, ManyDesigns srl";
 
-    protected final Field[] fields;
     protected final PropertyAccessor propertyAccessor;
-
-    protected Mode mode = Mode.EDIT;
 
     protected String label;
     protected TextFormat hrefTextFormat;
@@ -66,13 +55,7 @@ public class TableFormColumn implements Element {
     // Costruttori
     //**************************************************************************
 
-    public TableFormColumn(PropertyAccessor propertyAccessor, int nRows) {
-        this(propertyAccessor, nRows, null);
-    }
-
-    public TableFormColumn(PropertyAccessor propertyAccessor,
-                           int nRows, String prefix) {
-        fields = new Field[nRows];
+    public TableFormColumn(PropertyAccessor propertyAccessor) {
         this.propertyAccessor = propertyAccessor;
 
         if (propertyAccessor.isAnnotationPresent(Label.class)) {
@@ -82,99 +65,6 @@ public class TableFormColumn implements Element {
         }
     }
 
-
-    //**************************************************************************
-    // Implementazione di Element
-    //**************************************************************************
-
-    public void readFromRequest(HttpServletRequest req) {
-        for (Field current : fields) {
-            current.readFromRequest(req);
-        }
-    }
-
-
-    public boolean validate() {
-        boolean result = true;
-        for (Field current : fields) {
-            result = current.validate() && result;
-        }
-        return result;
-    }
-
-    public void toXhtml(XhtmlBuffer xhtmlBuffer) {
-
-    }
-
-    public void readFromObject(Object obj) {
-        Class clazz = obj.getClass();
-        if (clazz.isArray()) { // Tratta obj come un array
-            // Scorre tutti gli ellementi dell'array obj,
-            // indipendentemente da quante righe ci sono nell table form.
-            // Eventualmente lancia Eccezione.
-            final int arrayLength = Array.getLength(obj);
-            for (int i = 0; i < arrayLength; i++) {
-                Object currentObj = Array.get(obj, i);
-                readFromObject(i, currentObj);
-            }
-
-            // Scorre le rimanenti righe del table form,
-            // passano null come ottetto di bind.
-            for (int i = arrayLength; i < fields.length; i++) {
-                readFromObject(i, null);
-            }
-        } else if (Collection.class.isAssignableFrom(clazz)) {
-            // Tratta obj come collection
-            Collection collection = (Collection)obj;
-
-            int i = 0;
-            for (Object currentObj : collection) {
-                readFromObject(i, currentObj);
-                i++;
-            }
-
-            for (; i < fields.length; i++) {
-                readFromObject(i, null);
-            }
-        }
-    }
-
-    protected void readFromObject(int rowIndex, Object obj) {
-        Field field = fields[rowIndex];
-        if (hrefTextFormat != null) {
-            field.setHref(hrefTextFormat.format(obj));
-            if (altTextFormat != null) {
-                field.setAlt(altTextFormat.format(obj));
-            }
-        }
-        field.readFromObject(obj);
-    }
-
-
-    public void writeToObject(Object obj) {
-        Class clazz = obj.getClass();
-        if (clazz.isArray()) { // Tratta obj come un array
-            // Scorre tutti gli ellementi dell'array obj,
-            // indipendentemente da quante righe ci sono nell table form.
-            // Eventualmente lancia Eccezione.
-            final int arrayLength = Array.getLength(obj);
-            for (int i = 0; i < arrayLength; i++) {
-                Object currentObj = Array.get(obj, i);
-                fields[i].writeToObject(currentObj);
-            }
-        }
-    }
-
-    public Mode getMode() {
-        return mode;
-    }
-
-    public void setMode(Mode mode) {
-        this.mode = mode;
-        for (Field current : fields) {
-            current.setMode(mode);
-        }
-    }
     //**************************************************************************
     // Getter/setter
     //**************************************************************************
@@ -195,16 +85,6 @@ public class TableFormColumn implements Element {
         xb.write(StringUtils.capitalize(label));
     }
 
-    public void valueToXhtml(XhtmlBuffer xb, int rowIndex) {
-        Field field = fields[rowIndex];
-        field.valueToXhtml(xb);
-    }
-
-    public List<String> getErrors(int rowIndex) {
-        Field field = fields[rowIndex];
-        return field.getErrors();
-    }
-
     public TextFormat getHrefGenerator() {
         return hrefTextFormat;
     }
@@ -219,9 +99,5 @@ public class TableFormColumn implements Element {
 
     public void setAltGenerator(TextFormat altTextFormat) {
         this.altTextFormat = altTextFormat;
-    }
-
-    public Field[] getFields() {
-        return fields;
     }
 }

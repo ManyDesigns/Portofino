@@ -30,6 +30,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.Mode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -46,12 +47,8 @@ public class PartitaIvaField extends RegExpTextField {
     // Constructors
     //**************************************************************************
 
-    public PartitaIvaField(PropertyAccessor accessor) {
-        this(accessor, null);
-    }
-
-    public PartitaIvaField(PropertyAccessor accessor, String prefix) {
-        super(accessor, prefix, partitaIvaRegExp);
+    public PartitaIvaField(PropertyAccessor accessor, Mode mode, String prefix) {
+        super(accessor, mode, prefix, partitaIvaRegExp);
         setErrorString(getText("elements.error.field.partita.iva.format"));
     }
 }

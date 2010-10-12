@@ -30,7 +30,6 @@
 package com.manydesigns.elements.composites;
 
 import com.manydesigns.elements.Element;
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Id;
 import org.apache.commons.lang.StringUtils;
 
@@ -50,7 +49,6 @@ public abstract class AbstractReflectiveCompositeElement implements Element {
             "Copyright (c) 2005-2009, ManyDesigns srl";
 
     protected String _id;
-    protected Mode _mode = Mode.EDIT;
     protected List<Field> _fields;
 
     //**************************************************************************
@@ -114,18 +112,6 @@ public abstract class AbstractReflectiveCompositeElement implements Element {
         }
         return result;
     }
-
-    public Mode getMode() {
-        return _mode;
-    }
-
-    public void setMode(Mode mode) {
-        _mode = mode;
-        for (Element current : elements()) {
-            current.setMode(mode);
-        }
-    }
-
 
     //**************************************************************************
     // Altri metodi

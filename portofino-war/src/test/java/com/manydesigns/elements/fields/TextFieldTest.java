@@ -34,19 +34,28 @@ public class TextFieldTest extends AbstractElementsTest {
 
         myText = null;
         annotatedText = null;
+    }
 
+    private void setupFields(Mode mode) {
         ClassAccessor classAccessor =
                 JavaClassAccessor.getClassAccessor(this.getClass());
-        PropertyAccessor myPropertyAccessor =
-                classAccessor.getProperty("myText");
-        textField = new TextField(myPropertyAccessor);
+        try {
+            PropertyAccessor myPropertyAccessor =
+                    classAccessor.getProperty("myText");
+            textField = new TextField(myPropertyAccessor, mode, null);
 
-        myPropertyAccessor =
-                classAccessor.getProperty("annotatedText");
-        annotatedTextField = new TextField(myPropertyAccessor);
+            myPropertyAccessor =
+                    classAccessor.getProperty("annotatedText");
+            annotatedTextField = new TextField(myPropertyAccessor, mode, null);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+            fail();
+        }
     }
 
     public void testSimple() {
+        setupFields(Mode.EDIT);
+
         String text = elementToString(textField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td><input type=\"text\" class=\"text\" " +
@@ -68,6 +77,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testValue() {
+        setupFields(Mode.EDIT);
+
         textField.setStringValue("myValue");
         String text = elementToString(textField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -77,6 +88,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testRequired() {
+        setupFields(Mode.EDIT);
+
         textField.setRequired(true);
         String text = elementToString(textField);
         assertEquals("<th><label for=\"myText\" class=\"field\">" +
@@ -87,7 +100,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testModeView() {
-        textField.setMode(Mode.VIEW);
+        setupFields(Mode.VIEW);
+
         textField.setStringValue("www.manydesigns.com");
         String text = elementToString(textField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -96,7 +110,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testHighlightLinks() {
-        textField.setMode(Mode.VIEW);
+        setupFields(Mode.VIEW);
+
         textField.setRequired(true);
         textField.setStringValue("www.manydesigns.com - http://www.google.com - info@manydesigns.com");
         textField.setHighlightLinks(true);
@@ -111,6 +126,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testAutoCapitalize() {
+        setupFields(Mode.EDIT);
+
         req.setParameter("myText", "myValue");
         textField.setAutoCapitalize(true);
         textField.readFromRequest(req);
@@ -122,6 +139,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testHelp() {
+        setupFields(Mode.EDIT);
+
         textField.setHelp("myHelp");
         String text = elementToString(textField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -131,6 +150,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testHtmlId() {
+        setupFields(Mode.EDIT);
+
         textField.setId("myId");
         String text = elementToString(textField);
         assertEquals("<th><label for=\"myId\" class=\"field\">My text:" +
@@ -139,6 +160,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testInputName() {
+        setupFields(Mode.EDIT);
+
         textField.setInputName("myInput");
         String text = elementToString(textField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -147,6 +170,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testLabel() {
+        setupFields(Mode.EDIT);
+
         textField.setLabel("myLabel");
         String text = elementToString(textField);
         assertEquals("<th><label for=\"myText\" class=\"field\">MyLabel:" +
@@ -155,6 +180,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testValidateRequired() {
+        setupFields(Mode.EDIT);
+
         textField.setRequired(true);
         textField.readFromRequest(req);
         assertNull(textField.getStringValue());
@@ -170,6 +197,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testMaxLength() {
+        setupFields(Mode.EDIT);
+
         textField.setMaxLength(3);
         req.setParameter("myText", "myValue");
         textField.readFromRequest(req);
@@ -185,6 +214,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testMaxLengthWithTrim() {
+        setupFields(Mode.EDIT);
+
         textField.setMaxLength(3);
         req.setParameter("myText", " 123 ");
         textField.readFromRequest(req);
@@ -198,6 +229,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testMultilineEditDefaults() {
+        setupFields(Mode.EDIT);
+
         textField.setMultiline(true);
         req.setParameter("myText", "myValue");
         textField.readFromRequest(req);
@@ -209,6 +242,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testMultilineEditArea() {
+        setupFields(Mode.EDIT);
+
         textField.setMultiline(true);
         textField.setTextAreaMinRows(5);
         textField.setTextAreaWidth(60);
@@ -222,8 +257,9 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testMultilineView() {
+        setupFields(Mode.VIEW);
+
         textField.setMultiline(true);
-        textField.setMode(Mode.VIEW);
         myText = "\tmy\nValue";
         textField.readFromObject(this);
         String text = elementToString(textField);
@@ -234,7 +270,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testReadFromNullObject() {
-        textField.setMode(Mode.VIEW);
+        setupFields(Mode.VIEW);
+
         textField.readFromObject(null);
         String text = elementToString(textField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -243,6 +280,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testTextInputMaxLength() {
+        setupFields(Mode.EDIT);
+
         textField.setMaxLength(100);
         String text = elementToString(textField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -252,6 +291,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testTextInputMaxLength2() {
+        setupFields(Mode.EDIT);
+
         textField.setMaxLength(100);
         textField.setSize(20);
         String text = elementToString(textField);
@@ -262,6 +303,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testAnnotations() throws NoSuchFieldException {
+        setupFields(Mode.EDIT);
+
         assertTrue(annotatedTextField.isMultiline());
         assertTrue(annotatedTextField.isHighlightLinks());
         assertNotNull(annotatedTextField.getMaxLength());
@@ -277,6 +320,8 @@ public class TextFieldTest extends AbstractElementsTest {
     }
 
     public void testWriteToObject() {
+        setupFields(Mode.EDIT);
+
         assertNull(myText);
         textField.setStringValue("myValue");
         textField.writeToObject(this);

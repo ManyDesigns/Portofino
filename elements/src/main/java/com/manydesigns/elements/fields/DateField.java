@@ -30,6 +30,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -54,12 +55,12 @@ public class DateField extends AbstractTextField {
     protected SimpleDateFormat simpleDateFormat;
     protected boolean dateFormatError;
 
-    public DateField(PropertyAccessor accessor) {
-        this(accessor, null);
+    public DateField(PropertyAccessor accessor, Mode mode) {
+        this(accessor, mode, null);
     }
 
-    public DateField(PropertyAccessor accessor, String prefix) {
-        super(accessor, prefix);
+    public DateField(PropertyAccessor accessor, Mode mode, String prefix) {
+        super(accessor, mode, prefix);
         setMaxLength(10);
     }
 

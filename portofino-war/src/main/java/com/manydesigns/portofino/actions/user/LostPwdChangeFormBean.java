@@ -27,20 +27,25 @@
  *
  */
 
-package com.manydesigns.elements.fields;
+package com.manydesigns.portofino.actions.user;
+
+import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.elements.annotations.Email;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface SelectFieldOption {
+public class LostPwdChangeFormBean {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    Object getValue();
+    @Required
+    @Email
+    public String email;
 
-    String getLabel();
-
-    String getUrl();
+    @Required
+    @com.manydesigns.elements.annotations.Password(confirmationRequired = true)
+    public String pwd;
 }

@@ -31,6 +31,7 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.options.OptionProvider;
 import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
@@ -59,19 +60,20 @@ public class AnnotatedSelectFieldTest extends AbstractElementsTest {
         super.setUp();
 
         myText = null;
+    }
 
+    private void setupField(Mode mode) throws Exception {
         ClassAccessor classAccessor =
                 JavaClassAccessor.getClassAccessor(this.getClass());
         PropertyAccessor myPropertyAccessor =
                 classAccessor.getProperty("myText");
-        selectField = new SelectField(myPropertyAccessor);
-        optionProvider = selectField.getOptionProvider();
-        selectField.setOptionProvider(optionProvider);
+        selectField = new SelectField(myPropertyAccessor, mode, null);
     }
 
-    public void testOptions() {
-        assertEquals(optionProvider, selectField.getOptionProvider());
-        Map<Object,String> options = optionProvider.getOptions(0);
+    public void testOptions() throws Exception {
+        setupField(Mode.EDIT);
+
+        Map<Object,String> options = selectField.getOptions();
         assertNotNull(options);
         assertEquals(2, options.size());
 
@@ -79,7 +81,9 @@ public class AnnotatedSelectFieldTest extends AbstractElementsTest {
         assertEquals("l2", options.get("v2"));
     }
 
-    public void testEditNull() {
+    public void testEditNull() throws Exception {
+        setupField(Mode.EDIT);
+
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
@@ -89,13 +93,13 @@ public class AnnotatedSelectFieldTest extends AbstractElementsTest {
                 "</select></td>", text);
     }
 
-    public void testViewNull() {
+    public void testViewNull() throws Exception {
+        setupField(Mode.VIEW);
+
         selectField.setValue("v2");
-        selectField.setMode(Mode.VIEW);
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\">l2</div></td>", text);
     }
-
 }

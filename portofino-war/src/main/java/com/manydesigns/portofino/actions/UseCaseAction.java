@@ -234,9 +234,8 @@ public class UseCaseAction extends PortofinoAction
                     property.getName(), hrefFormat, null);
         }
 
-        tableForm = tableFormBuilder.build();
+        tableForm = tableFormBuilder.configMode(Mode.VIEW).build();
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
-        tableForm.setMode(Mode.VIEW);
         tableForm.setSelectable(true);
         tableForm.readFromObject(objects);
 
@@ -304,8 +303,7 @@ public class UseCaseAction extends PortofinoAction
             return STATUS_404;
         }
         FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
-        form = formBuilder.build();
-        form.setMode(Mode.VIEW);
+        form = formBuilder.configMode(Mode.VIEW).build();
         form.readFromObject(object);
 
         return READ;
@@ -320,8 +318,9 @@ public class UseCaseAction extends PortofinoAction
         setupUseCase();
 
         FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
-        form = formBuilder.build();
-        form.setMode(Mode.CREATE);
+        form = formBuilder
+                .configMode(Mode.CREATE)
+                .build();
 
         return CREATE;
     }
@@ -330,8 +329,9 @@ public class UseCaseAction extends PortofinoAction
         setupUseCase();
 
         FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
-        form = formBuilder.build();
-        form.setMode(Mode.CREATE);
+        form = formBuilder
+                .configMode(Mode.CREATE)
+                .build();
 
         form.readFromRequest(req);
         if (form.validate()) {
@@ -359,8 +359,9 @@ public class UseCaseAction extends PortofinoAction
         object = context.getObjectByPk(useCase.getTableName(), pkObject);
 
         FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
-        form = formBuilder.build();
-        form.setMode(Mode.EDIT);
+        form = formBuilder
+                .configMode(Mode.EDIT)
+                .build();
 
         form.readFromObject(object);
 
@@ -372,8 +373,9 @@ public class UseCaseAction extends PortofinoAction
         Serializable pkObject = pkHelper.parsePkString(pk);
 
         FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
-        form = formBuilder.build();
-        form.setMode(Mode.EDIT);
+        form = formBuilder
+                .configMode(Mode.EDIT)
+                .build();
 
         object = context.getObjectByPk(useCase.getTableName(), pkObject);
         form.readFromObject(object);
@@ -405,8 +407,9 @@ public class UseCaseAction extends PortofinoAction
         setupUseCase();
 
         FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
-        form = formBuilder.build();
-        form.setMode(Mode.BULK_EDIT);
+        form = formBuilder
+                .configMode(Mode.BULK_EDIT)
+                .build();
 
         return BULK_EDIT;
     }
@@ -415,8 +418,9 @@ public class UseCaseAction extends PortofinoAction
         setupUseCase();
 
         FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
-        form = formBuilder.build();
-        form.setMode(Mode.BULK_EDIT);
+        form = formBuilder
+                .configMode(Mode.VIEW)
+                .build();
         form.readFromRequest(req);
         if (form.validate()) {
             for (String current : selection) {

@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.fields.helpers;
 
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.BooleanField;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.search.SearchField;
@@ -46,11 +47,12 @@ public class BooleanFieldHelper implements FieldHelper {
 
     public Field tryToInstantiateField(ClassAccessor classAccessor,
                                   PropertyAccessor propertyAccessor,
+                                  Mode mode,
                                   String prefix) {
         Field result;
         Class type = propertyAccessor.getType();
         if (type == Boolean.class || type == Boolean.TYPE) {
-            result = new BooleanField(propertyAccessor, prefix);
+            result = new BooleanField(propertyAccessor, mode, prefix);
         } else {
             result = null;
         }

@@ -6,11 +6,11 @@
 <s:form method="post">
     <s:include value="/skins/default/user/profile/readButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1>Cambia password</h1>
+
+
+        <h1>Profile</h1>
+
         <mdes:write value="form"/>
-        <input type="hidden" name="token" value="<s:property value="token"/>"/>
-        <input type="hidden" name="method:updatePwd" value="updatePwd"/>
-        <input type="submit" name="invia" value="invia"/>
     </div>
     <s:include value="/skins/default/user/profile/readButtonsBar.jsp"/>
 </s:form>

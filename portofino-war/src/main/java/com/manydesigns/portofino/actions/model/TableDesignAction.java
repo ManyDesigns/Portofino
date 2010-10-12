@@ -106,17 +106,17 @@ public class TableDesignAction extends PortofinoAction {
 
         form = new FormBuilder(Table.class)
                 .configFields("databaseName", "schemaName", "tableName")
+                .configMode(Mode.VIEW)
                 .build();
-        form.setMode(Mode.VIEW);
         form.readFromObject(table);
 
         columnTableForm = new TableFormBuilder(Column.class)
                 .configFields("columnName", "columnType")
                 .configNRows(table.getColumns().size())
+                .configMode(Mode.VIEW)
                 .build();
         columnTableForm.readFromObject(table.getColumns());
-        columnTableForm.setMode(Mode.VIEW);
-
+        
         return SUMMARY;
     }
 

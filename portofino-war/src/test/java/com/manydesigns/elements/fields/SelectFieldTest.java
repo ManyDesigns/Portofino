@@ -31,6 +31,9 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.options.DefaultOptionProvider;
+import com.manydesigns.elements.options.OptionProvider;
+import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -68,7 +71,10 @@ public class SelectFieldTest extends AbstractElementsTest {
     };
 
     private OptionProvider optionProvider;
+    private SelectionModel selectionModel;
+
     private OptionProvider optionProvider2;
+    private SelectionModel selectionModel2;
 
     @Override
     protected void setUp() throws Exception {
@@ -76,30 +82,40 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         myText = null;
 
-        // impostiamo selectField
-        ClassAccessor classAccessor =
-                JavaClassAccessor.getClassAccessor(this.getClass());
-        PropertyAccessor myPropertyAccessor =
-                classAccessor.getProperty("myText");
-        selectField = new SelectField(myPropertyAccessor);
-
         optionProvider = DefaultOptionProvider.create(
                 "optionProvider", 1, valuesArray, labelsArray);
-        selectField.setOptionProvider(optionProvider);
-
-        // impostiamo selectField2
-        selectField2 = new SelectField(myPropertyAccessor);
+        selectionModel = optionProvider.createSelectionModel();
 
         optionProvider2 = DefaultOptionProvider.create(
                 "optionProvider", 1, valuesArray2, labelsArray2);
-        selectField2.setOptionProvider(optionProvider2);
+        selectionModel2 = optionProvider2.createSelectionModel();
+    }
+
+    private void setupSelectFields(Mode mode) {
+        ClassAccessor classAccessor =
+                JavaClassAccessor.getClassAccessor(this.getClass());
+        PropertyAccessor myPropertyAccessor =
+                null;
+        try {
+            myPropertyAccessor = classAccessor.getProperty("myText");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+            fail();
+        }
+
+        // impostiamo selectField1
+        selectField = new SelectField(myPropertyAccessor, mode, null);
+        selectField.setSelectionModel(selectionModel);
+        // impostiamo selectField2
+        selectField2 = new SelectField(myPropertyAccessor, mode, null);
+        selectField2.setSelectionModel(selectionModel2);
     }
 
     public void testSimple() {
+        setupSelectFields(Mode.EDIT);
+
         assertNotNull(selectField.getComboLabel());
         assertEquals("-- Select my text --", selectField.getComboLabel());
-        assertEquals(optionProvider, selectField.getOptionProvider());
-        assertEquals(optionProvider2, selectField2.getOptionProvider());
         assertNull(selectField.getValue());
         assertNotNull(selectField.getErrors());
         assertEquals(0, selectField.getErrors().size());
@@ -109,8 +125,8 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals("my text", selectField.getLabel());
         assertEquals(Mode.EDIT, selectField.getMode());
         assertFalse(selectField.isRequired());
-        assertEquals(3, optionProvider.getOptions(0).size());
-        assertEquals(1, optionProvider2.getOptions(0).size());
+        assertEquals(3, selectField.getOptions().size());
+        assertEquals(1, selectField2.getOptions().size());
     }
 
     //--------------------------------------------------------------------------
@@ -118,6 +134,7 @@ public class SelectFieldTest extends AbstractElementsTest {
     //--------------------------------------------------------------------------
 
     public void testEditNull() {
+        setupSelectFields(Mode.EDIT);
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
@@ -129,6 +146,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testEditNullRequired() {
+        setupSelectFields(Mode.EDIT);
+
         selectField.setRequired(true);
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">" +
@@ -155,6 +174,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testEditNullWithComboLabel() {
+        setupSelectFields(Mode.EDIT);
+
         selectField.setComboLabel("-- Scegli opzione --");
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -168,6 +189,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testEditValidSelection() {
+        setupSelectFields(Mode.EDIT);
+
         selectField.setValue("value1");
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -180,6 +203,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testEditInvalidSelection() {
+        setupSelectFields(Mode.EDIT);
+
         selectField.setValue("value4");
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -196,7 +221,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     //--------------------------------------------------------------------------
 
     public void testViewNull() {
-        selectField.setMode(Mode.VIEW);
+        setupSelectFields(Mode.VIEW);
+
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td>" +
@@ -205,7 +231,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testViewValidSelection() {
-        selectField.setMode(Mode.VIEW);
+        setupSelectFields(Mode.VIEW);
+
         selectField.setValue("value1");
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -215,7 +242,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testViewValidSelectionNoUrl() {
-        selectField.setMode(Mode.VIEW);
+        setupSelectFields(Mode.VIEW);
+
         selectField.setValue("value3");
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -225,7 +253,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testViewInvalidSelection() {
-        selectField.setMode(Mode.VIEW);
+        setupSelectFields(Mode.VIEW);
+
         selectField.setValue("value4");
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -239,7 +268,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     //--------------------------------------------------------------------------
 
     public void testPreviewNull() {
-        selectField.setMode(Mode.PREVIEW);
+        setupSelectFields(Mode.PREVIEW);
+
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td>" +
@@ -249,7 +279,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testPreviewValidSelection() {
-        selectField.setMode(Mode.PREVIEW);
+        setupSelectFields(Mode.PREVIEW);
+
         selectField.setValue("value1");
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -260,7 +291,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testPreviewValidSelectionNoUrl() {
-        selectField.setMode(Mode.PREVIEW);
+        setupSelectFields(Mode.PREVIEW);
+
         selectField.setValue("value3");
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -271,7 +303,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testPreviewInvalidSelection() {
-        selectField.setMode(Mode.PREVIEW);
+        setupSelectFields(Mode.PREVIEW);
+
         selectField.setValue("value4");
         String text = elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -287,27 +320,31 @@ public class SelectFieldTest extends AbstractElementsTest {
     //--------------------------------------------------------------------------
 
     public void testHiddenNull() {
-        selectField.setMode(Mode.HIDDEN);
+        setupSelectFields(Mode.HIDDEN);
+
         String text = elementToString(selectField);
         assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\"></input>", text);
     }
 
     public void testHiddenValidSelection() {
-        selectField.setMode(Mode.HIDDEN);
+        setupSelectFields(Mode.HIDDEN);
+
         selectField.setValue("value1");
         String text = elementToString(selectField);
         assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value1\"></input>", text);
     }
 
     public void testHiddenValidSelectionNoUrl() {
-        selectField.setMode(Mode.HIDDEN);
+        setupSelectFields(Mode.HIDDEN);
+
         selectField.setValue("value3");
         String text = elementToString(selectField);
         assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value3\"></input>", text);
     }
 
     public void testHiddenInvalidSelection() {
-        selectField.setMode(Mode.HIDDEN);
+        setupSelectFields(Mode.HIDDEN);
+
         selectField.setValue("value4");
         String text = elementToString(selectField);
         assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\"></input>", text);
@@ -318,6 +355,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     //--------------------------------------------------------------------------
 
     public void testReadFromRequestWrongValue() {
+        setupSelectFields(Mode.EDIT);
+
         assertFalse(selectField.isRequired());
 
         req.setParameter("myText", "wrongValue");
@@ -327,6 +366,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testReadFromRequest() {
+        setupSelectFields(Mode.EDIT);
+
         assertFalse(selectField.isRequired());
 
         req.setParameter("myText", "value1");
@@ -336,7 +377,9 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testReadFromRequestRequired() {
-        assertEquals(1, optionProvider2.getOptions(0).size());
+        setupSelectFields(Mode.EDIT);
+
+        assertEquals(1, selectField2.getOptions().size());
         selectField2.setRequired(true);
 
         assertNull(selectField2.getValue());
@@ -351,8 +394,10 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testReadFromRequestNotRequired() {
-        assertFalse(selectField.isRequired());
-        assertEquals(1, optionProvider2.getOptions(0).size());
+        setupSelectFields(Mode.EDIT);
+
+        assertFalse(selectField2.isRequired());
+        assertEquals(1, selectField2.getOptions().size());
 
         assertNull(selectField2.getValue());
         selectField2.readFromRequest(req);
@@ -360,6 +405,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testReadFromObject() {
+        setupSelectFields(Mode.EDIT);
+
         assertNull(selectField.getValue());
         myText = "value2";
         selectField.readFromObject(this);
@@ -367,6 +414,8 @@ public class SelectFieldTest extends AbstractElementsTest {
     }
 
     public void testWriteToObject() {
+        setupSelectFields(Mode.EDIT);
+
         assertNull(myText);
         selectField.setValue("value2");
         selectField.writeToObject(this);

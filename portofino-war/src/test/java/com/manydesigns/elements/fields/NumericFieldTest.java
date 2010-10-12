@@ -32,8 +32,7 @@ public class NumericFieldTest extends AbstractElementsTest {
                 JavaClassAccessor.getClassAccessor(this.getClass());
         PropertyAccessor myPropertyAccessor =
                 classAccessor.getProperty("myDecimal");
-        decimalField = new NumericField(myPropertyAccessor);
-
+        decimalField = new NumericField(myPropertyAccessor, Mode.EDIT, null);
     }
 
     public void testSimple() {

@@ -35,6 +35,7 @@ import com.manydesigns.elements.fields.PhoneField;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.Mode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -47,10 +48,11 @@ public class PhoneFieldHandler implements FieldHelper {
 
     public Field tryToInstantiateField(ClassAccessor classAccessor,
                                   PropertyAccessor propertyAccessor,
+                                  Mode mode,
                                   String prefix) {
         if (String.class.isAssignableFrom(propertyAccessor.getType())
                 && propertyAccessor.isAnnotationPresent(Phone.class)) {
-                return new PhoneField(propertyAccessor, prefix);
+                return new PhoneField(propertyAccessor, mode, prefix);
         }
         return null;
     }

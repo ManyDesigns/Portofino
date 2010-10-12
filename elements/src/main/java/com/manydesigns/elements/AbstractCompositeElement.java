@@ -45,7 +45,6 @@ public abstract class AbstractCompositeElement<T extends Element>
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     protected String id;
-    protected Mode mode = Mode.EDIT;
 
     public AbstractCompositeElement(int initialCapacity) {
         super(initialCapacity);
@@ -91,14 +90,4 @@ public abstract class AbstractCompositeElement<T extends Element>
         this.id = id;
     }
 
-    public Mode getMode() {
-        return mode;
-    }
-
-    public void setMode(Mode mode) {
-        this.mode = mode;
-        for (T current : this) {
-            current.setMode(mode);
-        }
-    }
 }

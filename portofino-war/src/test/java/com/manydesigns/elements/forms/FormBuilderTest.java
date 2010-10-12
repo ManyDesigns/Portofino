@@ -134,7 +134,7 @@ public class FormBuilderTest extends AbstractElementsTest {
         field = fieldSet.get(13);
         assertEquals("radio", field.getLabel());
         assertFalse(field.isRequired());
-        assertEquals(RadioField.class, field.getClass());
+        assertEquals(SelectField.class, field.getClass());
 
         field = fieldSet.get(14);
         assertEquals("select", field.getLabel());

@@ -30,6 +30,7 @@
 package com.manydesigns.elements.composites;
 
 import com.manydesigns.elements.Element;
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -51,22 +52,22 @@ public class Selection extends AbstractReflectiveCompositeElement {
     //**************************************************************************
     // Costruttori
     //**************************************************************************
-    public Selection(PropertyAccessor accessor) {
-        this(accessor, null);
+    public Selection(PropertyAccessor accessor, Mode mode) {
+        this(accessor, mode, null);
     }
 
-    public Selection(PropertyAccessor accessor, String prefix) {
+    public Selection(PropertyAccessor accessor, Mode mode, String prefix) {
         super(prefix);
-        _selectField = new SelectField(accessor, prefix);
+        _selectField = new SelectField(accessor, mode, prefix);
     }
 
-    public Selection(ClassAccessor classAccessor,
+    public Selection(ClassAccessor classAccessor, Mode mode,
                      String propertyName, String prefix) {
         super(prefix);
         try {
             PropertyAccessor accessor =
                     classAccessor.getProperty(propertyName);
-            _selectField = new SelectField(accessor, prefix);
+            _selectField = new SelectField(accessor, mode, prefix);
         } catch (NoSuchFieldException e) {
             throw new Error(e);
         }

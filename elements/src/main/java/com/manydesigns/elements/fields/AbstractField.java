@@ -61,6 +61,7 @@ public abstract class AbstractField implements Field {
     protected final Properties elementsProperties;
 
     protected final PropertyAccessor accessor;
+    protected final Mode mode;
 
     protected String id;
     protected String bulkCheckboxName;
@@ -77,7 +78,6 @@ public abstract class AbstractField implements Field {
     protected int colSpan = 1;
     protected String help;
 
-    protected Mode mode = Mode.EDIT;
 
     protected List<String> errors = new ArrayList<String>();
 
@@ -86,15 +86,16 @@ public abstract class AbstractField implements Field {
     //**************************************************************************
     // Costruttori
     //**************************************************************************
-    public AbstractField(PropertyAccessor accessor) {
-        this(accessor, null);
+    public AbstractField(PropertyAccessor accessor, Mode mode) {
+        this(accessor, mode, null);
     }
 
-    public AbstractField(PropertyAccessor accessor, String prefix) {
+    public AbstractField(PropertyAccessor accessor, Mode mode, String prefix) {
         LogUtil.entering(logger, "AbstractField", accessor, prefix);
 
         elementsProperties = ElementsProperties.getProperties();
         this.accessor = accessor;
+        this.mode = mode;
 
         String localId;
         if (accessor.isAnnotationPresent(Id.class)) {
@@ -297,7 +298,7 @@ public abstract class AbstractField implements Field {
     // Getters/setters
     //**************************************************************************
 
-    public PropertyAccessor getAccessor() {
+    public PropertyAccessor getPropertyAccessor() {
         return accessor;
     }
 
@@ -351,10 +352,6 @@ public abstract class AbstractField implements Field {
 
     public Mode getMode() {
         return mode;
-    }
-
-    public void setMode(Mode mode) {
-        this.mode = mode;
     }
 
     public List<String> getErrors() {

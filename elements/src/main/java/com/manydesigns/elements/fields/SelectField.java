@@ -29,8 +29,12 @@
 
 package com.manydesigns.elements.fields;
 
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.json.JsonBuffer;
+import com.manydesigns.elements.options.DefaultOptionProvider;
+import com.manydesigns.elements.options.OptionProvider;
+import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -52,31 +56,33 @@ public class SelectField extends AbstractField {
 
     public final static String AUTOCOMPLETE_SUFFIX = "_autocomplete";
 
-    protected OptionProvider optionProvider;
+    protected SelectionModel selectionModel;
+    protected int selectionModelIndex;
     protected SelectField previousSelectField;
     protected SelectField nextSelectField;
-    protected int optionProviderIndex;
 
     protected String comboLabel;
+
+    protected boolean autocomplete;
     protected String autocompleteId;
     protected String autocompleteInputName;
-
 
     //**************************************************************************
     // Costruttori
     //**************************************************************************
-    public SelectField(PropertyAccessor accessor) {
-        this(accessor, null);
-    }
-
-    public SelectField(PropertyAccessor accessor, String prefix) {
-        super(accessor, prefix);
+    public SelectField(PropertyAccessor accessor, Mode mode, String prefix) {
+        super(accessor, mode, prefix);
 
         Select annotation = accessor.getAnnotation(Select.class);
         if (annotation != null) {
-            optionProvider = DefaultOptionProvider.create(
-                    accessor.getName(), 1,
-                    annotation.values(), annotation.labels());
+            Object[] values = annotation.values();
+            String[] labels = annotation.labels();
+            assert(values.length == labels.length);
+            OptionProvider optionProvider =
+                    DefaultOptionProvider.create(
+                            accessor.getName(), 1, values, labels);
+            selectionModel = optionProvider.createSelectionModel();
+            selectionModelIndex = 0;
         }
 
         comboLabel = MessageFormat.format("-- Select {0} --", label);
@@ -85,8 +91,9 @@ public class SelectField extends AbstractField {
     }
 
     //**************************************************************************
-    // Implementazione di Component
+    // Element implementation
     //**************************************************************************
+
     public void readFromRequest(HttpServletRequest req) {
         super.readFromRequest(req);
 
@@ -96,7 +103,7 @@ public class SelectField extends AbstractField {
 
         String stringValue = req.getParameter(inputName);
         Object value = Util.convertValue(stringValue, accessor.getType());
-        optionProvider.setValue(optionProviderIndex, value);
+        selectionModel.setValue(selectionModelIndex, value);
     }
 
     public boolean validate() {
@@ -105,7 +112,7 @@ public class SelectField extends AbstractField {
             return true;
         }
 
-        Object value = optionProvider.getValue(optionProviderIndex);
+        Object value = selectionModel.getValue(selectionModelIndex);
         if (required && value == null) {
             errors.add(getText("elements.error.field.required"));
             return false;
@@ -116,13 +123,11 @@ public class SelectField extends AbstractField {
     public void readFromObject(Object obj) {
         super.readFromObject(obj);
         try {
-            Object value;
             if (obj == null) {
-                value = null;
+                setValue(null);
             } else {
-                value = accessor.get(obj);
+                setValue(accessor.get(obj));
             }
-            optionProvider.setValue(optionProviderIndex, value);
         } catch (IllegalAccessException e) {
             throw new Error(e);
         } catch (InvocationTargetException e) {
@@ -131,7 +136,7 @@ public class SelectField extends AbstractField {
     }
 
     public void writeToObject(Object obj) {
-        Object value = optionProvider.getValue(optionProviderIndex);
+        Object value = selectionModel.getValue(selectionModelIndex);
         writeToObject(obj, value);
     }
 
@@ -150,7 +155,7 @@ public class SelectField extends AbstractField {
     }
 
     private void valueToXhtmlEdit(XhtmlBuffer xb) {
-        if (optionProvider.isAutoconnect()) {
+        if (autocomplete) {
             valueToXhtmlEditAutocomplete(xb);
         } else {
             valueToXhtmlEditDropDown(xb);
@@ -158,19 +163,15 @@ public class SelectField extends AbstractField {
     }
 
     protected void valueToXhtmlEditDropDown(XhtmlBuffer xb) {
+        Object value = selectionModel.getValue(selectionModelIndex);
+        Map<Object, String> options =
+                selectionModel.getOptions(selectionModelIndex);
+
         xb.openElement("select");
         xb.addAttribute("id", id);
         xb.addAttribute("name", inputName);
-        if (nextSelectField != null) {
-            String js = composeDropDownJs();
-            xb.addAttribute("onChange", js);
-        }
 
-        Map<Object,String> options =
-                optionProvider.getOptions(optionProviderIndex);
-        Object objectValue = optionProvider.getValue(optionProviderIndex);
-
-        boolean checked = (objectValue == null);
+        boolean checked = (value == null);
         if (!options.isEmpty()) {
             xb.writeOption("", checked, comboLabel);
         }
@@ -178,23 +179,33 @@ public class SelectField extends AbstractField {
         for (Map.Entry<Object,String> option :
                 options.entrySet()) {
             Object optionValue = option.getKey();
-            String optionLabel = option.getValue();
-            String optionValueString =
+            String optionStringValue =
                     (String) Util.convertValue(optionValue, String.class);
-            checked =  optionValue.equals(objectValue);
-            xb.writeOption(optionValueString, checked, optionLabel);
+            String optionLabel = option.getValue();
+            checked =  optionValue.equals(value);
+            xb.writeOption(optionStringValue, checked, optionLabel);
         }
         xb.closeElement("select");
+
+        String autocompleteJs = composeAutocompleteJs();
+
+        xb.openElement("script");
+        xb.write(autocompleteJs);
+        xb.closeElement("script");
+
     }
 
     protected String composeDropDownJs() {
         StringBuilder sb = new StringBuilder();
         sb.append(MessageFormat.format(
-                "updateSelectOptions(''{0}'', {1}",
-                StringEscapeUtils.escapeJavaScript(optionProvider.getName()),
-                optionProviderIndex + 1));
+                "$(''#{0}'').change(" +
+                        "function() '{'" +
+                        "updateSelectOptions(''{1}'', {2}",
+                StringEscapeUtils.escapeJavaScript(id),
+                StringEscapeUtils.escapeJavaScript(selectionModel.getName()),
+                selectionModelIndex + 1));
         appendIds(sb);
-        sb.append(");");
+        sb.append(");});");
         return sb.toString();
     }
 
@@ -203,8 +214,8 @@ public class SelectField extends AbstractField {
         sb.append(MessageFormat.format(
                 "setupAutocomplete(''{0}'', ''{1}'', {2}",
                 StringEscapeUtils.escapeJavaScript(autocompleteId),
-                StringEscapeUtils.escapeJavaScript(optionProvider.getName()),
-                optionProviderIndex));
+                StringEscapeUtils.escapeJavaScript(selectionModel.getName()),
+                selectionModelIndex));
         appendIds(sb);
         sb.append(");");
         return sb.toString();
@@ -219,28 +230,24 @@ public class SelectField extends AbstractField {
         }
         SelectField currentField = rootField;
         while (currentField != null) {
-            sb.append(", '");
-            sb.append(StringEscapeUtils.escapeJavaScript(currentField.getId()));
-            sb.append("'");
+            sb.append(MessageFormat.format(", ''#{0}''",
+                    StringEscapeUtils.escapeJavaScript(currentField.getId())));
             currentField = currentField.nextSelectField;
         }
     }
 
     protected void valueToXhtmlEditAutocomplete(XhtmlBuffer xb) {
-        Map<Object,String> options =
-                optionProvider.getOptions(optionProviderIndex);
-        Object optionValue = optionProvider.getValue(optionProviderIndex);
-        String optionStringValue =
-                (String) Util.convertValue(optionValue, String.class);
-        String optionLabel = options.get(optionValue);
-
-        xb.writeInputHidden(id, inputName, optionStringValue);
+        Object value = selectionModel.getValue(selectionModelIndex);
+        Map<Object, String> options =
+                selectionModel.getOptions(selectionModelIndex);
+        String stringValue = Util.convertValueToString(value);
+        xb.writeInputHidden(id, inputName, stringValue);
 
         xb.openElement("input");
         xb.addAttribute("id", autocompleteId);
         xb.addAttribute("type", "text");
         xb.addAttribute("name", autocompleteInputName);
-        xb.addAttribute("value", optionLabel);
+        xb.addAttribute("value", options.get(value));
         xb.addAttribute("class", null);
         xb.addAttribute("size", null);
         xb.closeElement("input");
@@ -258,33 +265,30 @@ public class SelectField extends AbstractField {
     }
 
     private void valueToXhtmlHidden(XhtmlBuffer xb) {
-        Object optionValue = optionProvider.getValue(optionProviderIndex);
-        String optionStringValue =
-                (String) Util.convertValue(optionValue, String.class);
-        xb.writeInputHidden(id, inputName, optionStringValue);
+        Object value = selectionModel.getValue(selectionModelIndex);
+        String stringValue = Util.convertValueToString(value);
+        xb.writeInputHidden(id, inputName, stringValue);
     }
 
     public void valueToXhtmlView(XhtmlBuffer xb) {
+        Object value = selectionModel.getValue(selectionModelIndex);
+        Map<Object, String> options =
+                selectionModel.getOptions(selectionModelIndex);
         xb.openElement("div");
         xb.addAttribute("class", "value");
         xb.addAttribute("id", id);
-        Map<Object,String> options =
-                optionProvider.getOptions(optionProviderIndex);
-        Object optionValue = optionProvider.getValue(optionProviderIndex);
-        String optionLabel = options.get(optionValue);
-        xb.write(optionLabel);
+        xb.write(options.get(value));
         xb.closeElement("div");
     }
 
     public String jsonSelectFieldOptions(boolean includeSelectPrompt) {
+        Map<Object, String> options =
+                selectionModel.getOptions(selectionModelIndex);
         // prepariamo Json
         JsonBuffer jb = new JsonBuffer();
 
         // apertura array Json
         jb.openArray();
-
-        Map<Object,String> options =
-                optionProvider.getOptions(optionProviderIndex);
 
         if (includeSelectPrompt && !options.isEmpty()) {
             jb.openObject();
@@ -294,14 +298,14 @@ public class SelectField extends AbstractField {
             jb.closeObject();
         }
 
-        for (Map.Entry<Object,String> current : options.entrySet()) {
+        for (Map.Entry<Object,String> option : options.entrySet()) {
             jb.openObject();
-            Object value = current.getKey();
-            String valueString = Util.convertValueToString(value);
-            String label = current.getValue();
+            Object optionValue = option.getKey();
+            String optionStringValue = Util.convertValueToString(optionValue);
+            String optionLabel = option.getValue();
 
-            jb.writeKeyValue("v", valueString);
-            jb.writeKeyValue("l", label);
+            jb.writeKeyValue("v", optionStringValue);
+            jb.writeKeyValue("l", optionLabel);
             jb.writeKeyValue("s", false);
             jb.closeObject();
         }
@@ -316,20 +320,20 @@ public class SelectField extends AbstractField {
     // Getters/setters
     //**************************************************************************
 
-    public OptionProvider getOptionProvider() {
-        return optionProvider;
+    public Object getValue() {
+        return selectionModel.getValue(selectionModelIndex);
     }
 
-    public void setOptionProvider(OptionProvider optionProvider) {
-        this.optionProvider = optionProvider;
+    public void setValue(Object value) {
+        selectionModel.setValue(selectionModelIndex, value);
     }
 
-    public int getOptionProviderIndex() {
-        return optionProviderIndex;
+    public Map<Object, String> getOptions() {
+        return selectionModel.getOptions(selectionModelIndex);
     }
 
-    public void setOptionProviderIndex(int optionProviderIndex) {
-        this.optionProviderIndex = optionProviderIndex;
+    public String getLabelSearch() {
+        return selectionModel.getLabelSearch(selectionModelIndex);
     }
 
     public String getComboLabel() {
@@ -340,12 +344,16 @@ public class SelectField extends AbstractField {
         this.comboLabel = comboLabel;
     }
 
-    public Object getValue() {
-        return optionProvider.getValue(optionProviderIndex);
+    public boolean isAutocomplete() {
+        return autocomplete;
     }
-    
-    public void setValue(Object value) {
-        optionProvider.setValue(optionProviderIndex, value);
+
+    public void setAutocomplete(boolean autocomplete) {
+        this.autocomplete = autocomplete;
+    }
+
+    public String getAutocompleteId() {
+        return autocompleteId;
     }
 
     public SelectField getNextSelectField() {
@@ -364,10 +372,6 @@ public class SelectField extends AbstractField {
         this.previousSelectField = previousSelectField;
     }
 
-    public String getAutocompleteId() {
-        return autocompleteId;
-    }
-
     public void setAutocompleteId(String autocompleteId) {
         this.autocompleteId = autocompleteId;
     }
@@ -378,5 +382,25 @@ public class SelectField extends AbstractField {
 
     public void setAutocompleteInputName(String autocompleteInputName) {
         this.autocompleteInputName = autocompleteInputName;
+    }
+
+    public void setLabelSearch(String labelSearch) {
+        selectionModel.setLabelSearch(selectionModelIndex, labelSearch);
+    }
+
+    public SelectionModel getSelectionModel() {
+        return selectionModel;
+    }
+
+    public void setSelectionModel(SelectionModel selectionModel) {
+        this.selectionModel = selectionModel;
+    }
+
+    public int getSelectionModelIndex() {
+        return selectionModelIndex;
+    }
+
+    public void setSelectionModelIndex(int selectionModelIndex) {
+        this.selectionModelIndex = selectionModelIndex;
     }
 }

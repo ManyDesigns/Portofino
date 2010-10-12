@@ -30,6 +30,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.Mode;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,16 +44,16 @@ public class RegExpTextField extends TextField {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    protected Pattern pattern;
+    protected final Pattern pattern;
     protected String errorString;
 
-    public RegExpTextField(PropertyAccessor accessor, String regExp) {
-        this(accessor, null, regExp);
+    public RegExpTextField(PropertyAccessor accessor, Mode mode, String regExp) {
+        this(accessor, mode, null, regExp);
     }
 
-    public RegExpTextField(PropertyAccessor accessor,
+    public RegExpTextField(PropertyAccessor accessor, Mode mode,
                            String prefix, String regExp) {
-        super(accessor, prefix);
+        super(accessor, mode, prefix);
         pattern = Pattern.compile(regExp);
     }
 

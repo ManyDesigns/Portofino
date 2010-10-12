@@ -31,7 +31,7 @@ package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.annotations.InSummary;
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.OptionProvider;
+import com.manydesigns.elements.options.OptionProvider;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.logging.LogUtil;
@@ -39,6 +39,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
+import com.manydesigns.elements.Mode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -70,6 +71,7 @@ public class TableFormBuilder {
     protected List<PropertyAccessor> propertyAccessors;
     protected String prefix;
     protected int nRows = DEFAULT_N_ROWS;
+    protected Mode mode = Mode.EDIT;
 
     public static final Logger logger =
             LogUtil.getLogger(TableFormBuilder.class);
@@ -118,6 +120,11 @@ public class TableFormBuilder {
 
     public TableFormBuilder configNRows(int nRows) {
         this.nRows = nRows;
+        return this;
+    }
+
+    public TableFormBuilder configMode(Mode mode) {
+        this.mode = mode;
         return this;
     }
 
@@ -189,7 +196,7 @@ public class TableFormBuilder {
                              PropertyAccessor propertyAccessor,
                              String[] rowPrefix) {
         TableFormColumn column =
-                new TableFormColumn(propertyAccessor, nRows);
+                new TableFormColumn(propertyAccessor, mode);
 
         final String propertyName = propertyAccessor.getName();
         column.setHrefGenerator(hrefGenerators.get(propertyName));
@@ -219,20 +226,15 @@ public class TableFormBuilder {
         for (Map.Entry<String[], OptionProvider> current
                 : optionProviders.entrySet()) {
             String[] fieldNames = current.getKey();
-            OptionProvider optionProvider = current.getValue();
             int index = ArrayUtils.indexOf(fieldNames, fieldName);
             if (index >= 0) {
-                SelectField selectField =
-                        new SelectField(propertyAccessor, prefix);
-                selectField.setOptionProvider(optionProvider);
-                selectField.setOptionProviderIndex(index);
-                field = selectField;
+                field = new SelectField(propertyAccessor, mode, prefix);
                 break;
             }
         }
         if (field == null) {
             field = manager.tryToInstantiateField(
-                    classAccessor, propertyAccessor, rowPrefix[i]);
+                    classAccessor, propertyAccessor, mode, rowPrefix[i]);
         }
 
         return field;
