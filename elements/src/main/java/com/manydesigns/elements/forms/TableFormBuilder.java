@@ -172,69 +172,66 @@ public class TableFormBuilder {
     //**************************************************************************
 
     public TableForm build() {
-        TableForm tableForm = new TableForm(nRows);
-
         if (propertyAccessors == null) {
             configReflectiveFields();
         }
 
-        String[] rowPrefix = new String[nRows];
-        for (int rowIndex = 0; rowIndex < nRows; rowIndex++) {
-            Object[] idArgs = {prefix, "row", rowIndex, "."};
-            rowPrefix[rowIndex] = StringUtils.join(idArgs);
+        PropertyAccessor[] propertyAccessorsArray =
+                new PropertyAccessor[propertyAccessors.size()];
+        propertyAccessors.toArray(propertyAccessorsArray);
+
+        TableForm tableForm = new TableForm(nRows, propertyAccessorsArray);
+
+        // set up the columns
+        for (TableForm.Column column : tableForm.getColumns()) {
+            String propertyName = column.getPropertyAccessor().getName();
+            column.setHrefGenerator(hrefGenerators.get(propertyName));
+            column.setAltGenerator(altGenerators.get(propertyName));
         }
 
-        // create the form/fieldset/field sructure
-        for (PropertyAccessor propertyAccessor : propertyAccessors) {
-            buildColumn(tableForm, propertyAccessor, rowPrefix);
+        // set up the rows
+        int index = 0;
+        for (TableForm.Row row : tableForm.getRows()) {
+            String rowPrefix = 
+                    StringUtils.join(new Object[] {prefix, "row", index, "_"});
+
+            for (int j = 0; j < propertyAccessors.size(); j++) {
+                PropertyAccessor propertyAccessor =
+                        propertyAccessorsArray[j];
+                Field field = buildField(propertyAccessor, rowPrefix);
+                if (field == null) {
+                    LogUtil.warningMF(logger,
+                            "Cannot instanciate field for property {0}",
+                            propertyAccessor);
+                    break;
+                }
+                row.fields[j] = field;
+            }
+
+            index++;
         }
 
         return tableForm;
     }
 
-    private void buildColumn(TableForm tableForm,
-                             PropertyAccessor propertyAccessor,
-                             String[] rowPrefix) {
-        TableFormColumn column =
-                new TableFormColumn(propertyAccessor, mode);
-
-        final String propertyName = propertyAccessor.getName();
-        column.setHrefGenerator(hrefGenerators.get(propertyName));
-        column.setAltGenerator(altGenerators.get(propertyName));
-
-        boolean columnSuccess = true;
-        for (int i = 0; i < nRows; i++) {
-            Field field = buildField(propertyAccessor, rowPrefix, i);
-            if (field == null) {
-                LogUtil.warningMF(logger,
-                        "Cannot instanciate field for property {0}",
-                        propertyAccessor);
-                columnSuccess = false;
-                break;
-            }
-            column.getFields()[i] = field;
-        }
-        if (columnSuccess) {
-            tableForm.add(column);
-        }
-    }
-
     private Field buildField(PropertyAccessor propertyAccessor,
-                             String[] rowPrefix, int i) {
+                             String rowPrefix) {
         Field field = null;
         String fieldName = propertyAccessor.getName();
+        /*
         for (Map.Entry<String[], OptionProvider> current
                 : optionProviders.entrySet()) {
             String[] fieldNames = current.getKey();
             int index = ArrayUtils.indexOf(fieldNames, fieldName);
             if (index >= 0) {
-                field = new SelectField(propertyAccessor, mode, prefix);
+                field = new SelectField(propertyAccessor, mode, rowPrefix);
                 break;
             }
         }
+        */
         if (field == null) {
             field = manager.tryToInstantiateField(
-                    classAccessor, propertyAccessor, mode, rowPrefix[i]);
+                    classAccessor, propertyAccessor, mode, rowPrefix);
         }
 
         return field;

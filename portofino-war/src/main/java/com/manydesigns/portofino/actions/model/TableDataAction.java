@@ -710,12 +710,15 @@ public class TableDataAction extends PortofinoAction
             workbook = Workbook.createWorkbook(fileTemp);
             WritableSheet sheet = workbook.createSheet("First Sheet", 0);
 
-            int i = 0;
-            for ( TableFormColumn col : tableForm) {
-                int j = 0;
+            int l = 0;
+            for (TableForm.Column col : tableForm.getColumns()) {
+                sheet.addCell(new Label(0, l, col.getLabel()));
+                l++;
+            }
 
-                sheet.addCell(new Label(i,j, col.getLabel()));
-                j++;
+            int i = 0;
+            for ( TableForm.Row col : tableForm.getRows()) {
+                int j = 1;
 
                 for (Field field : Arrays.asList(col.getFields())) {
                     if ( field instanceof NumericField) {
@@ -842,13 +845,15 @@ public class TableDataAction extends PortofinoAction
             workbook = Workbook.createWorkbook(fileTemp);
             WritableSheet sheet = workbook.createSheet("First Sheet", 0);
 
+            int l = 0;
+            for (TableForm.Column col : tableForm.getColumns()) {
+                sheet.addCell(new Label(0, l, col.getLabel()));
+                l++;
+            }
+
             int i = 0;
-            for ( TableFormColumn col : tableForm) {
-                int j = 0;
-
-                sheet.addCell(new Label(i,j, col.getLabel()));
-                j++;
-
+            for (TableForm.Row col : tableForm.getRows()) {
+                int j = 1;
 
                 for (Field field : Arrays.asList(col.getFields())) {
                     if ( field instanceof NumericField) {

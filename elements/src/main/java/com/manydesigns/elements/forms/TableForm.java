@@ -53,8 +53,8 @@ public class TableForm implements Element {
 
     protected String selectInputName = "select";
 
-    protected Column[] columns;
-    protected Row[] rows;
+    protected final Column[] columns;
+    protected final Row[] rows;
 
     protected String caption;
     protected boolean selectable = false;
@@ -64,9 +64,17 @@ public class TableForm implements Element {
     // Costruttori
     //**************************************************************************
 
-    public TableForm(int nCols, int nRows) {
-        columns = new Column[nCols];
+    public TableForm(int nRows, PropertyAccessor... propertyAccessors) {
         rows = new Row[nRows];
+        columns = new Column[propertyAccessors.length];
+
+        for (int i = 0; i < nRows; i++) {
+            rows[i] = new Row(i);
+        }
+
+        for (int i = 0; i < columns.length; i++) {
+            columns[i] = new Column(propertyAccessors[i]);
+        }
     }
 
     //**************************************************************************
@@ -202,6 +210,13 @@ public class TableForm implements Element {
         this.selectable = selectable;
     }
 
+    public Column[] getColumns() {
+        return columns;
+    }
+
+    public Row[] getRows() {
+        return rows;
+    }
 
     //**************************************************************************
     // Inner class: Row
@@ -213,9 +228,11 @@ public class TableForm implements Element {
 
         protected String key;
         protected final Field[] fields;
+        protected final int index;
 
-        public Row() {
+        public Row(int index) {
             fields = new Field[columns.length];
+            this.index = index;
         }
 
         public void toXhtml(XhtmlBuffer xb) {
@@ -253,7 +270,11 @@ public class TableForm implements Element {
         }
 
         public void readFromObject(Object obj) {
-            key = keyTextFormat.format(obj);
+            if (keyTextFormat == null) {
+                key = Integer.toString(index);
+            } else {
+                key = keyTextFormat.format(obj);
+            }
             int index = 0;
             for (Field field : fields) {
                 Column column = columns[index];
@@ -274,6 +295,18 @@ public class TableForm implements Element {
             for (Field current : fields) {
                 current.writeToObject(obj);
             }
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public Field[] getFields() {
+            return fields;
+        }
+
+        public int getIndex() {
+            return index;
         }
     }
 
