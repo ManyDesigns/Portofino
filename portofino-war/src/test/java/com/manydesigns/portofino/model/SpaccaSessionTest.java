@@ -30,7 +30,7 @@ package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
-import com.manydesigns.portofino.systemModel.users.User;
+import com.manydesigns.portofino.system.model.users.User;
 import junit.framework.TestCase;
 
 import java.util.List;

@@ -36,11 +36,15 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.systemModel.users.User;
+import com.manydesigns.portofino.system.model.users.Group;
+import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.system.model.users.UsersGroups;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /*
@@ -59,6 +63,12 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     // ServletRequestAware implementation
     //**************************************************************************
     public HttpServletRequest req;
+    public List<Group> groups;
+
+    public ProfileAction() {
+        groups = new ArrayList<Group>();
+    }
+
 
     public void setServletRequest(HttpServletRequest req) {
         this.req = req;
@@ -79,11 +89,15 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
 
     private String read() {
         user = context.getCurrentUser();
-
         ClassAccessor accessor = context.getTableAccessor("portofino.public.user_");
         FormBuilder formBuilder = new FormBuilder(accessor);
         formBuilder.configFields("email", "screenName", "firstName",
                 "middleName", "lastName", "createDate");
+        User thisUser = (User) context.getObjectByPk("portofino.public.user_", user);
+        for (UsersGroups ug : thisUser.getGroups()){
+            Group grp = ug.getGroup();
+            groups.add(grp);
+        }
         form = formBuilder
                 .configMode(Mode.VIEW)
                 .build();

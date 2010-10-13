@@ -26,7 +26,7 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.systemModel.users;
+package com.manydesigns.portofino.system.model.users;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -111,6 +111,23 @@ public class Group implements Serializable{
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Group group = (Group) o;
+
+        if (!groupId.equals(group.groupId)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return groupId.hashCode();
     }
 }
 

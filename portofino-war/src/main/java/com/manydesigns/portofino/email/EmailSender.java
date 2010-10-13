@@ -30,7 +30,7 @@ package com.manydesigns.portofino.email;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.systemModel.email.EmailBean;
+import com.manydesigns.portofino.system.model.email.EmailBean;
 import org.apache.commons.mail.*;
 
 import java.util.logging.Logger;

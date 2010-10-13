@@ -3,7 +3,7 @@
 %><%@ taglib prefix="s" uri="/struts-tags"
 %><%@ taglib prefix="mdes" uri="/manydesigns-elements-struts2"
 %><s:include value="/skins/default/header.jsp"/>
-<s:form method="post" action="Login.action">
+<s:form method="post" namespace="/user" action="Login.action">
 
     <div id="inner-content">
 
@@ -14,8 +14,10 @@
 
             <s:submit id="loginButton" method="login" value="Login" />
             <p>
+            <s:if test="recoverPwd">
             Hai dimenticato la password? <a href="PwdRecovery.action">recupera password</a>
             </p>
+            </s:if>
         </div>
         <s:hidden name="successReturnUrl" value="%{successReturnUrl}"/>
     </div>

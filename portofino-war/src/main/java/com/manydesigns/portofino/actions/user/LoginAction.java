@@ -33,7 +33,8 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.systemModel.users.User;
+import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.PortofinoProperties;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
@@ -65,6 +66,7 @@ public class LoginAction extends PortofinoAction
     // Presentation elements
     //**************************************************************************
     public Form form;
+    public boolean recoverPwd;
 
     public static final Logger logger =
             LogUtil.getLogger(LoginAction.class);
@@ -75,14 +77,25 @@ public class LoginAction extends PortofinoAction
         builder.configFields("email", "pwd");
 
         form = builder.build();
-        
+        recoverPwd = false;
     }
 
     public String execute () {
+        recoverPwd();
+
         return INPUT;
     }
 
+    private void recoverPwd() {
+        String smtp = PortofinoProperties.getProperties().
+                getProperty(PortofinoProperties.MAIL_SMTP_HOST);
+        if (null!=smtp) {
+            recoverPwd=true;
+        }
+    }
+
     public String login (){
+        recoverPwd();
         form.readFromRequest(req);
         User user = new User();
         form.writeToObject(user);
@@ -125,6 +138,7 @@ public class LoginAction extends PortofinoAction
     }
 
     public String logout(){
+        recoverPwd();
         context.logout();
         return INPUT;
     }

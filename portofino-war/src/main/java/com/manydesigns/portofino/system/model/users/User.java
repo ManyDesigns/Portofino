@@ -26,7 +26,7 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.systemModel.users;
+package com.manydesigns.portofino.system.model.users;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Password;
@@ -214,14 +214,6 @@ public class User implements Serializable{
     public void setRemans(String remans) {
         this.remans = remans;
     }
-
-    /*public Integer getGraceLoginCount() {
-        return graceLoginCount;
-    }
-
-    public void setGraceLoginCount(Integer graceLoginCount) {
-        this.graceLoginCount = graceLoginCount;
-    }*/
 
     public String getScreenName() {
         return screenName;
@@ -411,5 +403,24 @@ public class User implements Serializable{
 
     public synchronized void passwordGenerator(int len) {
         setPwd(RandomStringUtils.random(len, true, true));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        if (uuid != null ? !uuid.equals(user.uuid) : user.uuid != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = uuid.hashCode();
+        return result;
     }
 }

@@ -34,7 +34,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.systemModel.users.User;
+import com.manydesigns.portofino.system.model.users.User;
 
 import java.util.List;
 import java.util.Properties;

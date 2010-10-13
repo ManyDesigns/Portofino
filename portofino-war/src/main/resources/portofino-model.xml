@@ -6,7 +6,7 @@
                 <schema schemaName="public">
                     <tables>
                         <table tableName="user_"
-                               javaClass="com.manydesigns.portofino.systemModel.users.User">
+                               javaClass="com.manydesigns.portofino.system.model.users.User">
                             <columns>
                                 <column columnName="userid"
                                         autoincrement="true"
@@ -322,7 +322,7 @@
                             </annotations>
                         </table>
                         <table tableName="group_"
-                               javaClass="com.manydesigns.portofino.systemModel.users.Group">
+                               javaClass="com.manydesigns.portofino.system.model.users.Group">
                             <columns>
                                 <column columnName="groupid"
                                         autoincrement="true"
@@ -396,7 +396,7 @@
                                 </annotation>
                             </annotations>
                         </table>
-                        <table tableName="users_groups" manyToMany="true" javaClass="com.manydesigns.portofino.systemModel.users.UsersGroups"
+                        <table tableName="users_groups" manyToMany="true" javaClass="com.manydesigns.portofino.system.model.users.UsersGroups"
                                >
                             <columns>
                                 <column columnName="userid"
@@ -500,7 +500,7 @@
                                 <column columnName="id"/>
                             </primaryKey>
                         </table>
-                        <table tableName="emailqueue" javaClass="com.manydesigns.portofino.systemModel.email.EmailBean">
+                        <table tableName="emailqueue" javaClass="com.manydesigns.portofino.system.model.email.EmailBean">
                             <columns>
                                 <column columnName="id"
                                         columnType="serial"
