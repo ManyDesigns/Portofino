@@ -30,6 +30,7 @@
 package com.manydesigns.elements;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import com.manydesigns.elements.composites.AbstractCompositeElement;
 import junit.framework.TestCase;
 
 import javax.servlet.http.HttpServletRequest;

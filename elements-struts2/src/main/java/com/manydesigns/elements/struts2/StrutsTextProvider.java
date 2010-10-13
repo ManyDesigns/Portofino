@@ -29,7 +29,7 @@
 
 package com.manydesigns.elements.struts2;
 
-import com.manydesigns.elements.TextProvider;
+import com.manydesigns.elements.i18n.TextProvider;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
