@@ -87,4 +87,6 @@ public interface Field extends Element {
     void setAlt(String alt);
 
     boolean isRequiredField();
+
+    String getStringValue();
 }

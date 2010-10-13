@@ -186,12 +186,12 @@ public class SelectField extends AbstractField {
         }
         xb.closeElement("select");
 
-        String js = composeDropDownJs();
-
-        xb.openElement("script");
-        xb.write(js);
-        xb.closeElement("script");
-
+        if (nextSelectField != null) {
+            String js = composeDropDownJs();
+            xb.openElement("script");
+            xb.write(js);
+            xb.closeElement("script");
+        }
     }
 
     protected String composeDropDownJs() {
@@ -237,8 +237,6 @@ public class SelectField extends AbstractField {
 
     protected void valueToXhtmlEditAutocomplete(XhtmlBuffer xb) {
         Object value = selectionModel.getValue(selectionModelIndex);
-        Map<Object, String> options =
-                selectionModel.getOptions(selectionModelIndex);
         String stringValue = Util.convertValueToString(value);
         xb.writeInputHidden(id, inputName, stringValue);
 
@@ -246,7 +244,7 @@ public class SelectField extends AbstractField {
         xb.addAttribute("id", autocompleteId);
         xb.addAttribute("type", "text");
         xb.addAttribute("name", autocompleteInputName);
-        xb.addAttribute("value", options.get(value));
+        xb.addAttribute("value", getStringValue());
         xb.addAttribute("class", null);
         xb.addAttribute("size", null);
         xb.closeElement("input");
@@ -270,9 +268,6 @@ public class SelectField extends AbstractField {
     }
 
     public void valueToXhtmlView(XhtmlBuffer xb) {
-        Object value = selectionModel.getValue(selectionModelIndex);
-        Map<Object, String> options =
-                selectionModel.getOptions(selectionModelIndex);
         xb.openElement("div");
         xb.addAttribute("class", "value");
         xb.addAttribute("id", id);
@@ -280,11 +275,18 @@ public class SelectField extends AbstractField {
             xb.openElement("a");
             xb.addAttribute("href", href);
         }
-        xb.write(options.get(value));
+        xb.write(getStringValue());
         if (href != null) {
             xb.closeElement("a");
         }
         xb.closeElement("div");
+    }
+
+    public String getStringValue() {
+        Object value = selectionModel.getValue(selectionModelIndex);
+        Map<Object, String> options =
+                selectionModel.getOptions(selectionModelIndex);
+        return options.get(value);
     }
 
     public String jsonSelectFieldOptions(boolean includeSelectPrompt) {

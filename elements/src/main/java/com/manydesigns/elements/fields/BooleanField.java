@@ -147,13 +147,15 @@ public class BooleanField extends AbstractField {
             xb.openElement("a");
             xb.addAttribute("href", href);
         }
-        xb.write(booleanValue
-                ? getText("elements.Yes")
-                : getText("elements.No"));
+        xb.write(getStringValue());
         if (href != null) {
             xb.closeElement("a");
         }
         xb.closeElement("div");
+    }
+
+    public String getStringValue() {
+        return booleanValue ? getText("elements.Yes") : getText("elements.No");
     }
 
     //**************************************************************************
