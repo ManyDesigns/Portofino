@@ -29,7 +29,7 @@
 package com.manydesigns.portofino.email;
 
 import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.systemModel.email.EmailBean;
+import com.manydesigns.portofino.system.model.email.EmailBean;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

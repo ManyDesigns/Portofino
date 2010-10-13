@@ -59,6 +59,7 @@ public class HibernateConfig {
 
     protected final ConnectionProvider connectionProvider;
     private static final String SHOW_SQL = "true";
+    private static final boolean LAZY = true;
     public static final Logger logger =
             LogUtil.getLogger(HibernateConfig.class);
 
@@ -169,7 +170,7 @@ public class HibernateConfig {
             clazz.setClassName(aTable.getJavaClassName());
             clazz.setProxyInterfaceName(aTable.getJavaClassName());
         }
-        clazz.setLazy(true);
+        clazz.setLazy(LAZY);
         clazz.setTable(tab);
         clazz.setNodeName(aTable.getTableName());
 
@@ -393,7 +394,7 @@ public class HibernateConfig {
         Bag set = new Bag(clazzOne);
         // Mettere Lazy in debug a false per ottenere subito eventuali errori
         // nelle relazioni
-        set.setLazy(true);
+        set.setLazy(LAZY);
 
         if (relationship.getManyPropertyName() == null) {
             set.setRole(manyMDQualifiedTableName + "."
@@ -552,7 +553,7 @@ public class HibernateConfig {
         }
 
         ManyToOne m2o = new ManyToOne(tab);
-        m2o.setLazy(true);
+        m2o.setLazy(LAZY);
         final HashMap<String, PersistentClass> persistentClasses =
                 new HashMap<String, PersistentClass>();
         persistentClasses.put(oneMDQualifiedTableName,

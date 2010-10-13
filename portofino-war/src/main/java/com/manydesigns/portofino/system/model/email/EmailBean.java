@@ -26,7 +26,7 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.systemModel.email;
+package com.manydesigns.portofino.system.model.email;
 
 import java.util.Date;
 import java.io.Serializable;
@@ -144,5 +144,22 @@ public class EmailBean implements Serializable{
 
     public void setAttachmentName(String attachmentName) {
         this.attachmentName = attachmentName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EmailBean emailBean = (EmailBean) o;
+
+        if (!id.equals(emailBean.id)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

@@ -26,7 +26,7 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.systemModel.users;
+package com.manydesigns.portofino.system.model.users;
 
 import java.util.Date;
 import java.io.Serializable;
@@ -93,7 +93,25 @@ public class UsersGroups implements Serializable {
         this.deletionDate = deletionDate;
     }
 
-    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UsersGroups that = (UsersGroups) o;
+
+        if (!groupid.equals(that.groupid)) return false;
+        if (!userid.equals(that.userid)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = userid.hashCode();
+        result = 31 * result + groupid.hashCode();
+        return result;
+    }
 }
 
 

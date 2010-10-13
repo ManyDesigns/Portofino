@@ -33,7 +33,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.systemModel.users.User;
+import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.PortofinoProperties;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
