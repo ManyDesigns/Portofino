@@ -1,0 +1,197 @@
+ManyDesigns Portofino includes other software as detailed below.
+
+This product includes software developed by the Apache Software 
+Foundation (http://www.apache.org/).
+
+This product includes software developed by the
+OpenSymphony Group (http://www.opensymphony.com/).
+
+This product includes software developed by the
+Visigoth Software Society (http://www.visigoths.org/).
+
+
+All trademarks belong to their respective owners.
+
+
+JavaBeans Activation Framework 1.1.1
+Site: http://java.sun.com/javase/technologies/desktop/javabeans/jaf/
+File: activation-1.1.jar
+License: Sun Microsystems JavaBeans Activation Framework 1.1.1 license
+
+Apache Struts 2.1.6
+Site: http://struts.apache.org/
+File: struts2-core-2.1.6.jar
+License: Apache License v2
+
+OpenSymphony ognl
+Site: http://www.opensymphony.com/ognl
+File: ognl-2.6.11.jar
+License: http://www.opensymphony.com/ognl/license.action
+
+OpenSymphony xwork
+Site: http://www.opensymphony.com/xwork
+File: xwork-2.1.2.jar
+License: http://www.opensymphony.com/xwork/license.action
+
+spring-test
+Site: http://www.springframework.org
+File: spring-test-2.5.6.jar
+License: Apache License v2
+
+JUnit
+Site: http://junit.sourceforge.net
+File: junit-3.8.1.jar
+License: Common Public License - v 1.0
+
+FreeMarker
+Site: http://freemarker.org/
+File: freemarker-2.3.13.jar
+License: http://freemarker.org/docs/app_license.html
+
+
+bcmail-jdk14-136
+Site: http://www.bouncycastle.org
+File: bcmail-jdk14-136.jar
+License: http://www.bouncycastle.org/licence.html
+
+bcprov-jdk14-136
+Site: http://www.bouncycastle.org
+File: bcprov-jdk14-136.jar
+License: http://www.bouncycastle.org/licence.html
+
+BeanShell
+Site: http://www.beanshell.org/
+File: bsh-2.0b4.jar
+License: Dual license: Sun Public License / LGPL
+
+Commons BeanUtils
+Site: http://commons.apache.org/beanutils/
+File: commons-beanutils1-1.7.0.jar
+License: Apache License v2
+
+Commons BeanUtils Core
+Site: http://commons.apache.org/beanutils/
+File: commons-beanutils-core-1.7.0.jar
+License: Apache License v2
+
+Commons Collections
+Site: http://commons.apache.org/collections/
+File: commons-collections-3.2.1.jar
+License: Apache License v2
+
+Commons Configuration
+Site: http://commons.apache.org/configuration/
+File: commons-configuration-1.5.jar
+License: Apache License v2
+
+Commons Digester
+Site: http://commons.apache.org/digester/
+File: commons-digester-1.8.jar
+License: Apache License v2
+
+Commons FileUpload
+Site: http://commons.apache.org/fileupload/
+File: commons-fileupload-1.2.jar
+License: Apache License v2
+
+Commons IO
+Site: http://commons.apache.org/io/
+File: commons-io-1.4.1.jar
+License: Apache License v2
+
+Commons Lang
+Site: http://commons.apache.org/lang/
+File: commons-lang-2.4.jar
+License: Apache License v2
+
+Commons Logging
+Site: http://commons.apache.org/logging/
+File: commons-logging-1.1.jar
+License: Apache License v2
+
+Commons Logging
+Site: http://commons.apache.org/logging/
+File: commons-logging-api-1.1.jar
+License: Apache License v2
+
+LALR Parser Generator in Java
+Site: http://www2.cs.tum.edu/projects/cup/
+File: cup.jar
+License: Standard ML of New Jersey
+
+Netbeans CVS Client Library
+Site: http://javacvs.netbeans.org/library/
+File: org-netbeans-lib-cvsclient.jar
+License: Dual license: CDDL/GPL w/classpath exception
+
+FontBox
+Site: http://sourceforge.net/projects/fontbox/
+File: FontBox-0.1.0.jar
+License: BSD (new)
+
+iText
+Site: http://www.lowagie.com/iText/
+File: itext-2.1.0.jar
+License: Dual: Mozilla Public License 1.1 / LGPL
+
+JasperReports
+Site: http://www.jasperforge.org/jaspersoft/opensource/business_intelligence/jasperreports/
+File: jasperreports-3.5.0.jar
+License: LGPL
+
+Jcommon
+Site: http://www.jfree.org/jcommon/index.php
+File: jcommon-1.0.15.jar
+License: LGPL
+
+Eclipse JDT Core
+Site: http://www.eclipse.org/jdt/core/
+File: jdtcore-3.1.0.jar
+License: Eclipse Public License v1
+
+JempBox
+Site: http://jempbox.org/
+File: jempbox-0.2.0.jar
+License: BSD (new)
+
+JFreeChart
+Site: http://www.jfree.org/jfreechart/
+File: jfreechart-1.0.12.jar
+License: LGPL
+
+JavaMail API 1.4.1
+http://java.sun.com/products/javamail/
+File: mail-1.4.jar
+File: mailapi-1.3.jar
+File: smtp.jar
+License: Sun Microsystems JavaBeans Activation Framework 1.1.1 license
+
+Mime Type Detection Utility 1.0
+http://sourceforge.net/projects/mime-util/
+File: mime-util-1.0.jar
+License: Apache License V2.0
+
+Jakarta ORO
+Site: http://jakarta.apache.org/oro/
+File: oro-2.0.8.jar
+License: Apache License v2
+
+Apache PDFBox
+Site: http://www.pdfbox.org/
+File: pdfbox-0.7.3.jar
+License: BSD (new)
+
+Apache POI
+Site: http://poi.apache.org/
+File: poi-3.2-FINAL.jar
+License: Apache License v2
+
+Apache XML-commons
+Site: http://xml.apache.org/commons/
+File: xml-apis-1.3.02.jar
+License: Apache License v2 and W3C License on applicable parts
+
+Popup Calendar
+Site: http://www.mojavelinux.com/projects/popupcalendar/
+Files: "calendar" directory
+License: LGPL
