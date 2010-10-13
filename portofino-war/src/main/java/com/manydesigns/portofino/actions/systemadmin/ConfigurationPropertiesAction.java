@@ -80,8 +80,7 @@ public class ConfigurationPropertiesAction extends PortofinoAction {
 
     private Form configureForm(Properties properties) {
         ClassAccessor accessor = new PropertiesAccessor(properties);
-        Form form = new FormBuilder(accessor).build();
-        form.setMode(Mode.VIEW);
+        Form form = new FormBuilder(accessor).configMode(Mode.VIEW).build();
         form.readFromObject(properties);
         return form;
     }

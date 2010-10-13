@@ -30,6 +30,7 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.AbstractCompositeElement;
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.MultipartFormDataField;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -43,15 +44,18 @@ public class FieldSet extends AbstractCompositeElement<Field> {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    protected String name;
     protected final int nColumns;
+    protected final Mode mode;
+
+    protected String name;
 
     protected int currentColumn;
     protected boolean trOpened;
 
-    public FieldSet(String name, int nColumns) {
+    public FieldSet(String name, int nColumns, Mode mode) {
         this.name = name;
         this.nColumns = nColumns;
+        this.mode = mode;
     }
 
     public void toXhtml(XhtmlBuffer xb) {
@@ -119,6 +123,10 @@ public class FieldSet extends AbstractCompositeElement<Field> {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Mode getMode() {
+        return mode;
     }
 
     public boolean isRequiredFieldsPresent() {

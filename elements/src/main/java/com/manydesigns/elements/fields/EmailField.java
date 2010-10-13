@@ -30,6 +30,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.Mode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -47,12 +48,12 @@ public class EmailField extends RegExpTextField {
     // Constructors
     //**************************************************************************
 
-    public EmailField(PropertyAccessor accessor) {
-        this(accessor, null);
+    public EmailField(PropertyAccessor accessor, Mode mode) {
+        this(accessor, mode, null);
     }
 
-    public EmailField(PropertyAccessor accessor, String prefix) {
-        super(accessor, prefix, emailRegExp);
+    public EmailField(PropertyAccessor accessor, Mode mode, String prefix) {
+        super(accessor, mode, prefix, emailRegExp);
         setErrorString(getText("elements.error.field.email.format"));
     }
 }

@@ -36,6 +36,7 @@ import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
+import com.manydesigns.elements.Mode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -48,10 +49,11 @@ public class NumericFieldHelper implements FieldHelper {
 
     public Field tryToInstantiateField(ClassAccessor classAccessor,
                                        PropertyAccessor propertyAccessor,
+                                       Mode mode,
                                        String prefix) {
         Class type = propertyAccessor.getType();
         if (Util.isNumericType(type)) {
-            return new NumericField(propertyAccessor, prefix);
+            return new NumericField(propertyAccessor, mode, prefix);
         }
 
         return null;

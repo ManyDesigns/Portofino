@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.elements.fields;
+package com.manydesigns.elements.options;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -35,6 +35,7 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
+import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -42,15 +43,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.ArrayUtils;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DefaultOptionProvider implements OptionProvider {
+public class DefaultSelectionProvider implements SelectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -60,23 +58,21 @@ public class DefaultOptionProvider implements OptionProvider {
 
     protected final String name;
     protected final int fieldCount;
-    protected final Object[] values;
-    protected final String[] labelSearch;
     protected final Object[][] valuesArray;
     protected final String[][] labelsArray;
-    protected final Map<Object, String>[] optionsArray;
-    protected boolean needsValidation;
-    protected boolean autoconnect;
+
+    protected boolean autocomplete;
 
     public final static Logger logger =
-            LogUtil.getLogger(DefaultOptionProvider.class);
-    public static final String NON_WORD_CHARACTERS = " \t\n\f\r\\||!\"£$%&/()='?^[]+*@#<>,;.:-_";
+            LogUtil.getLogger(DefaultSelectionProvider.class);
+    public static final String NON_WORD_CHARACTERS =
+            " \t\n\f\r\\||!\"£$%&/()='?^[]+*@#<>,;.:-_";
 
     //**************************************************************************
     // Static builders
     //**************************************************************************
 
-    public static DefaultOptionProvider create(String name,
+    public static DefaultSelectionProvider create(String name,
                                                int fieldCount,
                                                Object[] values,
                                                String[] labels) {
@@ -96,15 +92,15 @@ public class DefaultOptionProvider implements OptionProvider {
     }
 
 
-    public static DefaultOptionProvider create(String name,
+    public static DefaultSelectionProvider create(String name,
                                                int fieldCount,
                                                Object[][] valuesArray,
                                                String[][] labelsArray) {
-        return new DefaultOptionProvider(name, fieldCount,
+        return new DefaultSelectionProvider(name, fieldCount,
                 valuesArray, labelsArray);
     }
 
-    public static DefaultOptionProvider create(String name,
+    public static DefaultSelectionProvider create(String name,
                                                Collection<Object> objects,
                                                ClassAccessor classAccessor,
                                                TextFormat textFormat) {
@@ -112,7 +108,7 @@ public class DefaultOptionProvider implements OptionProvider {
         return create(name, objects, textFormat, keyProperties);
     }
 
-    protected static DefaultOptionProvider create(String name,
+    protected static DefaultSelectionProvider create(String name,
                                                   Collection<Object> objects,
                                                   Class objectClass,
                                                   TextFormat textFormat,
@@ -137,7 +133,7 @@ public class DefaultOptionProvider implements OptionProvider {
         return create(name, objects, textFormat, propertyAccessors);
     }
 
-    protected static DefaultOptionProvider create(
+    protected static DefaultSelectionProvider create(
             String name,
             Collection<Object> objects,
             TextFormat textFormat,
@@ -179,7 +175,7 @@ public class DefaultOptionProvider implements OptionProvider {
             labelsArray[i] = labels;
             i++;
         }
-        return new DefaultOptionProvider(
+        return new DefaultSelectionProvider(
                 name, fieldsCount, valuesArray, labelsArray);
     }
 
@@ -187,7 +183,7 @@ public class DefaultOptionProvider implements OptionProvider {
     // Constructor
     //**************************************************************************
 
-    protected DefaultOptionProvider(String name,
+    protected DefaultSelectionProvider(String name,
                                     int fieldCount,
                                     Object[][] valuesArray,
                                     String[][] labelsArray) {
@@ -195,16 +191,7 @@ public class DefaultOptionProvider implements OptionProvider {
         this.fieldCount = fieldCount;
         this.valuesArray = valuesArray;
         this.labelsArray = labelsArray;
-        values = new Object[fieldCount];
-        labelSearch = new String[fieldCount];
-        //noinspection unchecked
-        optionsArray = new Map[fieldCount];
-        for (int i = 0; i < fieldCount; i++) {
-            optionsArray[i] = new LinkedHashMap<Object, String>();
-        }
-        needsValidation = true;
     }
-
 
     //**************************************************************************
     // OptionProvider implementation
@@ -218,90 +205,122 @@ public class DefaultOptionProvider implements OptionProvider {
         return fieldCount;
     }
 
-    public void setValue(int index, Object value) {
-        values[index] = value;
-        needsValidation = true;
+    public boolean isAutocomplete() {
+        return autocomplete;
     }
 
-    public Object getValue(int index) {
-        validate();
-        return values[index];
+    public void setAutocomplete(boolean autocomplete) {
+        this.autocomplete = autocomplete;
     }
 
-    public void setLabelSearch(int index, String value) {
-        labelSearch[index] = StringUtils.trimToNull(value);
-        needsValidation = true;
-    }
-
-    public String getLabelSearch(int index) {
-        return labelSearch[index];
-    }
-
-    public Map<Object, String> getOptions(int index) {
-        validate();
-        return optionsArray[index];
-    }
-
-    public boolean isAutoconnect() {
-        return autoconnect;
-    }
-
-    public void setAutoconnect(boolean autoconnect) {
-        this.autoconnect = autoconnect;
+    public SelectionModel createSelectionModel() {
+        return new DefaultSelectionModel();
     }
 
     //**************************************************************************
-    // inetrnal-use methods
+    // inner class
     //**************************************************************************
 
+    class DefaultSelectionModel implements SelectionModel {
+        public static final String copyright =
+                "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    protected void validate() {
-        if (!needsValidation) {
-            return;
-        }
+        private final Object[] values;
+        private final String[] labelSearches;
+        private final Map<Object,String>[] optionsArray;
 
-        needsValidation = false;
-        resetOptionsArray();
+        private boolean needsValidation;
 
-        // normalize null in values (only null values after first null)
-        boolean foundNull = false;
-        for (int j = 0; j < fieldCount; j++) {
-            if (foundNull) {
-                values[j] = null;
-            } else if (values[j] == null) {
-                foundNull = true;
+        public DefaultSelectionModel() {
+            values = new Object[fieldCount];
+            labelSearches = new String[fieldCount];
+            //noinspection unchecked
+            optionsArray = new Map[fieldCount];
+            for (int i = 0; i < fieldCount; i++) {
+                optionsArray[i] = new LinkedHashMap<Object, String>();
             }
+            needsValidation = true;
         }
 
-        int maxMatchingIndex = -1;
-        for (int i = 0; i < valuesArray.length; i++) {
-            Object[] currentValueRow = valuesArray[i];
-            String[] currentLabelRow = labelsArray[i];
-            boolean matching = true;
+        public SelectionProvider getSelectionProvider() {
+            return DefaultSelectionProvider.this;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Object getValue(int index) {
+            validate();
+            return values[index];
+        }
+
+        public void setValue(int index, Object value) {
+            this.values[index] = value;
+            needsValidation = true;
+        }
+
+        public void setLabelSearch(int index, String labelSearch) {
+            this.labelSearches[index] = labelSearch;
+            needsValidation = true;
+        }
+
+        public String getLabelSearch(int index) {
+            return labelSearches[index];
+        }
+
+        public Map<Object, String> getOptions(int index) {
+            validate();
+            return optionsArray[index];
+        }
+
+        private void validate() {
+            if (!needsValidation) {
+                return;
+            }
+            needsValidation = false;
+
+            // normalize null in values (only null values after first null)
+            boolean foundNull = false;
             for (int j = 0; j < fieldCount; j++) {
-                Object cellValue = currentValueRow[j];
-                String cellLabel = currentLabelRow[j];
-                Object value = values[j];
-                String labelSearch2 = labelSearch[j];
-
-                Map<Object, String> options = optionsArray[j];
-                if (matching && matchLabel(cellLabel, labelSearch2)) {
-                    options.put(cellValue, cellLabel);
+                if (foundNull) {
+                    values[j] = null;
+                } else if (values[j] == null) {
+                    foundNull = true;
                 }
+                // clean options
+                optionsArray[j].clear();
+            }
 
-                if (matching && value != null
-                        && value.equals(cellValue)) {
-                    if (j > maxMatchingIndex) {
-                        maxMatchingIndex = j;
+            int maxMatchingIndex = -1;
+            for (int i = 0; i < valuesArray.length; i++) {
+                Object[] currentValueRow = valuesArray[i];
+                String[] currentLabelRow = labelsArray[i];
+                boolean matching = true;
+                for (int j = 0; j < fieldCount; j++) {
+                    Object cellValue = currentValueRow[j];
+                    String cellLabel = currentLabelRow[j];
+                    Object value = values[j];
+                    String labelSearch = labelSearches[j];
+
+                    if (matching && matchLabel(cellLabel, labelSearch)) {
+                        optionsArray[j].put(cellValue, cellLabel);
                     }
-                } else {
-                    matching = false;
+
+                    if (matching && value != null
+                            && value.equals(cellValue)) {
+                        if (j > maxMatchingIndex) {
+                            maxMatchingIndex = j;
+                        }
+                    } else {
+                        matching = false;
+                    }
                 }
             }
-        }
 
-        for (int i = maxMatchingIndex + 1; i < fieldCount; i++) {
-            values[i] = null;
+            for (int i = maxMatchingIndex + 1; i < fieldCount; i++) {
+                values[i] = null;
+            }
         }
     }
 
@@ -321,9 +340,4 @@ public class DefaultOptionProvider implements OptionProvider {
         return false;
     }
 
-    public void resetOptionsArray() {
-        for (int i = 0; i < fieldCount; i++) {
-            optionsArray[i].clear();
-        }
-    }
 }

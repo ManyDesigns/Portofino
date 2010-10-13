@@ -46,7 +46,4 @@ public interface Element extends XhtmlFragment {
     public boolean validate();
     public void    readFromObject(Object obj);
     public void    writeToObject(Object obj);
-
-    public Mode getMode();
-    public void setMode(Mode mode);
 }

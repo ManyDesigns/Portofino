@@ -35,6 +35,7 @@ import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import com.manydesigns.elements.Mode;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -69,12 +70,12 @@ public class TextField extends AbstractTextField {
     //**************************************************************************
     // Costruttori
     //**************************************************************************
-    public TextField(PropertyAccessor accessor) {
-        this(accessor, null);
+    public TextField(PropertyAccessor accessor, Mode mode) {
+        this(accessor, mode, null);
     }
 
-    public TextField(PropertyAccessor accessor, String prefix) {
-        super(accessor, prefix);
+    public TextField(PropertyAccessor accessor, Mode mode, String prefix) {
+        super(accessor, mode, prefix);
 
         HighlightLinks highlightLinksAnnotation =
                 accessor.getAnnotation(HighlightLinks.class);

@@ -34,6 +34,8 @@ import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionModel;
 
 import java.util.Map;
 
@@ -60,16 +62,17 @@ public class SelectFieldTest2 extends AbstractElementsTest {
             {"cip", "ciop"}
     };
 
-    DefaultOptionProvider optionProvider;
+    DefaultSelectionProvider optionProvider;
 
     Form form;
     SelectField selectField1;
     SelectField selectField2;
+    SelectionModel selectionModel;
 
     public void setUp() throws Exception {
         super.setUp();
 
-        optionProvider = DefaultOptionProvider.create(
+        optionProvider = DefaultSelectionProvider.create(
                 "optionProvider", 2, valuesArray, labelsArray);
 
         form = new FormBuilder(Bean.class)
@@ -78,14 +81,16 @@ public class SelectFieldTest2 extends AbstractElementsTest {
         FieldSet fieldSet = form.get(0);
         selectField1 = (SelectField) fieldSet.get(0);
         selectField2 = (SelectField) fieldSet.get(1);
+
+        selectionModel = selectField1.getSelectionModel();
     }
 
     public void testSelectField1() {
-        assertEquals(optionProvider, selectField1.getOptionProvider());
-        assertEquals(0, selectField1.getOptionProviderIndex());
-
-        assertEquals(optionProvider, selectField2.getOptionProvider());
-        assertEquals(1, selectField2.getOptionProviderIndex());
+        assertEquals(selectionModel, selectField1.getSelectionModel());
+        assertEquals(0, selectField1.getSelectionModelIndex());
+        
+        assertEquals(selectionModel, selectField2.getSelectionModel());
+        assertEquals(1, selectField2.getSelectionModelIndex());
     }
 
     public void testSelectField2() {
@@ -93,8 +98,8 @@ public class SelectFieldTest2 extends AbstractElementsTest {
         form.readFromObject(bean);
         assertFalse(form.validate());
 
-        assertNull(optionProvider.getValue(0));
-        assertNull(optionProvider.getValue(1));
+        assertNull(selectField1.getValue());
+        assertNull(selectField2.getValue());
     }
 
     public void testSelectField3() {
@@ -102,9 +107,9 @@ public class SelectFieldTest2 extends AbstractElementsTest {
         form.readFromObject(bean);
         assertFalse(form.validate());
 
-        assertNotNull(optionProvider.getValue(0));
-        assertEquals(2, optionProvider.getValue(0));
-        assertNull(optionProvider.getValue(1));
+        assertNotNull(selectField1.getValue());
+        assertEquals(2, selectField1.getValue());
+        assertNull(selectField2.getValue());
     }
 
 
@@ -113,20 +118,20 @@ public class SelectFieldTest2 extends AbstractElementsTest {
         form.readFromObject(bean);
         assertFalse(form.validate());
 
-        assertNull(optionProvider.getValue(0));
-        assertNull(optionProvider.getValue(1));
+        assertNull(selectField1.getValue());
+        assertNull(selectField2.getValue());
 
         checkOptions1();
     }
 
     private void checkOptions1() {
-        Map<Object,String> options0 = optionProvider.getOptions(0);
+        Map<Object,String> options0 = selectField1.getOptions();
         assertNotNull(options0);
         assertEquals(2, options0.size());
         assertEquals("paperino", options0.get(1));
         assertEquals("cip", options0.get(2));
 
-        Map<Object,String> options1 = optionProvider.getOptions(1);
+        Map<Object,String> options1 = selectField2.getOptions();
         assertNotNull(options1);
         assertEquals(0, options1.size());
     }
@@ -136,8 +141,8 @@ public class SelectFieldTest2 extends AbstractElementsTest {
         form.readFromObject(bean);
         assertFalse(form.validate());
 
-        assertNull(optionProvider.getValue(0));
-        assertNull(optionProvider.getValue(1));
+        assertNull(selectField1.getValue());
+        assertNull(selectField2.getValue());
 
         checkOptions1();
     }
@@ -147,20 +152,21 @@ public class SelectFieldTest2 extends AbstractElementsTest {
         form.readFromObject(bean);
         assertFalse(form.validate());
 
-        assertEquals(1, optionProvider.getValue(0));
-        assertEquals(null, optionProvider.getValue(1));
+        assertNotNull(selectField1.getValue());
+        assertEquals(1, selectField1.getValue());
+        assertNull(selectField2.getValue());
 
         checkOptions2();
     }
 
     private void checkOptions2() {
-        Map<Object,String> options0 = optionProvider.getOptions(0);
+        Map<Object,String> options0 = selectField1.getOptions();
         assertNotNull(options0);
         assertEquals(2, options0.size());
         assertEquals("paperino", options0.get(1));
         assertEquals("cip", options0.get(2));
 
-        Map<Object,String> options1 = optionProvider.getOptions(1);
+        Map<Object,String> options1 = selectField2.getOptions();
         assertNotNull(options1);
         assertEquals(3, options1.size());
         assertEquals("qui", options1.get(1));
@@ -173,8 +179,8 @@ public class SelectFieldTest2 extends AbstractElementsTest {
         form.readFromObject(bean);
         assertTrue(form.validate());
 
-        assertEquals(1, optionProvider.getValue(0));
-        assertEquals(3, optionProvider.getValue(1));
+        assertEquals(1, selectField1.getValue());
+        assertEquals(3, selectField2.getValue());
 
         checkOptions2();
     }

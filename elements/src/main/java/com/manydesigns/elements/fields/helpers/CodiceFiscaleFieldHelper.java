@@ -35,6 +35,7 @@ import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.Mode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -47,10 +48,11 @@ public class CodiceFiscaleFieldHelper implements FieldHelper {
 
     public Field tryToInstantiateField(ClassAccessor classAccessor,
                                        PropertyAccessor propertyAccessor,
+                                       Mode mode,
                                        String prefix) {
         if (String.class.isAssignableFrom(propertyAccessor.getType())
                 && propertyAccessor.isAnnotationPresent(CodiceFiscale.class)) {
-                return new CodiceFiscaleField(propertyAccessor, prefix);
+                return new CodiceFiscaleField(propertyAccessor, mode, prefix);
         }
         return null;
     }

@@ -94,6 +94,9 @@ public class Util {
     }
 
     public static String camelCaseToWords(String s) {
+        if (s == null) {
+            return null;
+        }
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (int i = 0; i < s.length(); i++) {

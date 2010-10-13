@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.fields.helpers;
 
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.CAP;
 import com.manydesigns.elements.fields.CAPField;
 import com.manydesigns.elements.fields.Field;
@@ -47,10 +48,11 @@ public class CAPFieldHelper implements FieldHelper {
 
     public Field tryToInstantiateField(ClassAccessor classAccessor,
                                        PropertyAccessor propertyAccessor,
+                                       Mode mode,
                                        String prefix) {
         if (String.class.isAssignableFrom(propertyAccessor.getType())
                 && propertyAccessor.isAnnotationPresent(CAP.class)) {
-                return new CAPField(propertyAccessor, prefix);
+                return new CAPField(propertyAccessor, mode, prefix);
         }
         return null;
     }

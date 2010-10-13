@@ -29,12 +29,14 @@
 
 package com.manydesigns.elements.forms;
 
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.FieldSet;
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.OptionProvider;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.options.SelectionModel;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -62,12 +64,13 @@ public class FormBuilder {
 
     protected final FieldsManager manager;
     protected final ClassAccessor classAccessor;
+    protected final Map<String[], SelectionProvider> optionProviders;
 
     protected List<ArrayList<PropertyAccessor>> groupedPropertyAccessors;
     protected List<String> fieldSetNames;
-    protected final Map<String[], OptionProvider> optionProviders;
     protected String prefix;
     protected int nColumns = DEFAULT_N_COLUMNS;
+    protected Mode mode = Mode.EDIT;
 
     public static final Logger logger = LogUtil.getLogger(FormBuilder.class);
 
@@ -84,7 +87,7 @@ public class FormBuilder {
 
         manager = FieldsManager.getManager();
         this.classAccessor = classAccessor;
-        optionProviders = new HashMap<String[], OptionProvider>();
+        optionProviders = new HashMap<String[], SelectionProvider>();
 
         LogUtil.exiting(logger, "FormBuilder");
     }
@@ -147,9 +150,14 @@ public class FormBuilder {
         return this;
     }
 
-    public FormBuilder configOptionProvider(OptionProvider optionProvider,
+    public FormBuilder configOptionProvider(SelectionProvider selectionProvider,
                                             String... fieldNames) {
-        optionProviders.put(fieldNames, optionProvider);
+        optionProviders.put(fieldNames, selectionProvider);
+        return this;
+    }
+
+    public FormBuilder configMode(Mode mode) {
+        this.mode = mode;
         return this;
     }
 
@@ -197,7 +205,7 @@ public class FormBuilder {
     public Form build() {
         LogUtil.entering(logger, "build");
 
-        Form form = new Form();
+        Form form = new Form(mode);
 
         if (groupedPropertyAccessors == null) {
             configReflectiveFields();
@@ -209,15 +217,25 @@ public class FormBuilder {
             buildFieldGroup(form, i, fieldMap);
         }
 
-        // bind chained select fields
-        for (String[] fieldNames : optionProviders.keySet()) {
-            for (int i = 1; i < fieldNames.length; i++) {
-                SelectField field =
-                        (SelectField) fieldMap.get(fieldNames[i]);
-                SelectField previousField =
-                        (SelectField) fieldMap.get(fieldNames[i-1]);
-                field.setPreviousSelectField(previousField);
-                previousField.setNextSelectField(field);
+        // handle cascaded select fields
+        for (Map.Entry<String[], SelectionProvider> current :
+                optionProviders.entrySet()) {
+            String[] fieldNames = current.getKey();
+            SelectionProvider selectionProvider = current.getValue();
+            SelectionModel selectionModel =
+                    selectionProvider.createSelectionModel();
+
+            SelectField previousField = null;
+            for (int i = 0; i < fieldNames.length; i++) {
+                SelectField selectField =
+                        (SelectField)fieldMap.get(fieldNames[i]);
+                selectField.setSelectionModel(selectionModel);
+                selectField.setSelectionModelIndex(i);
+                if (previousField != null) {
+                    selectField.setPreviousSelectField(previousField);
+                    previousField.setNextSelectField(selectField);
+                }
+                previousField = selectField;
             }
         }
 
@@ -237,7 +255,7 @@ public class FormBuilder {
         }
         com.manydesigns.elements.forms.FieldSet fieldSet =
                 new com.manydesigns.elements.forms.FieldSet(
-                        fieldSetName, nColumns);
+                        fieldSetName, nColumns, mode);
         form.add(fieldSet);
         for (PropertyAccessor propertyAccessor : group) {
             buildField(fieldSet, propertyAccessor, fieldMap);
@@ -249,23 +267,18 @@ public class FormBuilder {
                               Map<String,Field> fieldMap) {
         Field field = null;
         String fieldName = propertyAccessor.getName();
-        for (Map.Entry<String[], OptionProvider> current
+        for (Map.Entry<String[], SelectionProvider> current
                 : optionProviders.entrySet()) {
             String[] fieldNames = current.getKey();
-            OptionProvider optionProvider = current.getValue();
             int index = ArrayUtils.indexOf(fieldNames, fieldName);
             if (index >= 0) {
-                SelectField selectField =
-                        new SelectField(propertyAccessor, prefix);
-                selectField.setOptionProvider(optionProvider);
-                selectField.setOptionProviderIndex(index);
-                field = selectField;
+                field = new SelectField(propertyAccessor, mode, prefix);
                 break;
             }
         }
         if (field == null) {
             field = manager.tryToInstantiateField(
-                    classAccessor, propertyAccessor, prefix);
+                    classAccessor, propertyAccessor, mode, prefix);
         }
 
         if (field == null) {

@@ -32,6 +32,7 @@ package com.manydesigns.elements.fields;
 import com.manydesigns.elements.annotations.MaxLength;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import com.manydesigns.elements.Mode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -51,12 +52,12 @@ public abstract class AbstractTextField extends AbstractField {
     //**************************************************************************
     // Costruttori
     //**************************************************************************
-    public AbstractTextField(PropertyAccessor accessor) {
-        this(accessor, null);
+    public AbstractTextField(PropertyAccessor accessor, Mode mode) {
+        this(accessor, mode, null);
     }
 
-    public AbstractTextField(PropertyAccessor accessor, String prefix) {
-        super(accessor, prefix);
+    public AbstractTextField(PropertyAccessor accessor, Mode mode, String prefix) {
+        super(accessor, mode, prefix);
         if (accessor.isAnnotationPresent(MaxLength.class)) {
             maxLength = accessor.getAnnotation(MaxLength.class).value();
         }

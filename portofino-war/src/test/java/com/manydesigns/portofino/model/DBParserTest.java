@@ -92,17 +92,17 @@ public class DBParserTest extends TestCase {
         assertEquals(3, columns0.size());
 
         checkColumn(columns0.get(0),
-                "jpetstore", "public", "category", "catid",
-                "varchar", false, 10, 0);
+                "jpetstore", "public", "category", "catid", null,
+                "catid", "varchar", false, 10, 0);
         checkColumn(columns0.get(1),
-                "jpetstore", "public", "category", "name",
-                "varchar", true, 80, 0);
+                "jpetstore", "public", "category", "name", null,
+                "name", "varchar", true, 80, 0);
         checkColumn(columns0.get(2),
-                "jpetstore", "public", "category", "descn",
-                "varchar", true, 255, 0);
+                "jpetstore", "public", "category", "descn", null,
+                "descn", "varchar", true, 255, 0);
 
         PrimaryKey primaryKey0 = table0.getPrimaryKey();
-        assertEquals("pk_category", primaryKey0.getPkName());
+        assertEquals("pk_category", primaryKey0.getPrimaryKeyName());
         List<Column> pkColumns0 = primaryKey0.getColumns();
         assertEquals(1, pkColumns0.size());
         assertEquals(columns0.get(0), pkColumns0.get(0));
@@ -132,17 +132,17 @@ public class DBParserTest extends TestCase {
         assertEquals(4, columns1.size());
 
         checkColumn(columns1.get(0),
-                "jpetstore", "public", "product", "productid",
-                "varchar", false, 10, 0);
+                "jpetstore", "public", "product", "productid", null,
+                "productid", "varchar", false, 10, 0);
         checkColumn(columns1.get(1),
-                "jpetstore", "public", "product", "category",
-                "varchar", false, 10, 0);
+                "jpetstore", "public", "product", "category", null,
+                "category", "varchar", false, 10, 0);
         checkColumn(columns1.get(2),
-                "jpetstore", "public", "product", "name",
-                "varchar", true, 80, 0);
+                "jpetstore", "public", "product", "name", null,
+                "name", "varchar", true, 80, 0);
         checkColumn(columns1.get(3),
-                "jpetstore", "public", "product", "descn",
-                "varchar", true, 255, 0);
+                "jpetstore", "public", "product", "descn", null,
+                "descn", "varchar", true, 255, 0);
 
         // tabella 2
         Table table2 = tables.get(0);
@@ -152,23 +152,23 @@ public class DBParserTest extends TestCase {
         assertEquals(3, columns0.size());
 
         checkColumn(columns2.get(0),
-                "jpetstore", "public", "lineitem", "orderid",
-                "int4", false, 8, 0);
+                "jpetstore", "public", "lineitem", "orderid", null,
+                "orderid", "int4", false, 8, 0);
         checkColumn(columns2.get(1),
-                "jpetstore", "public", "lineitem", "linenum",
-                "int4", false, 8, 0);
+                "jpetstore", "public", "lineitem", "linenum", null,
+                "linenum", "int4", false, 8, 0);
         checkColumn(columns2.get(2),
-                "jpetstore", "public", "lineitem", "itemid",
-                "varchar", false, 255, 0);
+                "jpetstore", "public", "lineitem", "itemid", null,
+                "itemid", "varchar", false, 255, 0);
         checkColumn(columns2.get(3),
-                "jpetstore", "public", "lineitem", "quantity",
-                "int4", false, 8, 0);
+                "jpetstore", "public", "lineitem", "quantity", null,
+                "quantity", "int4", false, 8, 0);
         checkColumn(columns2.get(4),
-                "jpetstore", "public", "lineitem", "unitprice",
-                "numeric", false, 10, 2);
+                "jpetstore", "public", "lineitem", "unitprice", null,
+                "unitprice", "numeric", false, 10, 2);
 
         PrimaryKey primaryKey2 = table2.getPrimaryKey();
-        assertEquals("pk_lineitem", primaryKey2.getPkName());
+        assertEquals("pk_lineitem", primaryKey2.getPrimaryKeyName());
         List<Column> pkColumns2 = primaryKey2.getColumns();
         assertEquals(2, pkColumns2.size());
         assertEquals(columns2.get(0), pkColumns2.get(0));
@@ -186,7 +186,7 @@ public class DBParserTest extends TestCase {
                                     String toSchema, String toTable,
                                     String onUpdate, String onDelete) {
         ForeignKey rel = relationships.get(idx);
-        assertEquals(name, rel.getFkName());
+        assertEquals(name, rel.getForeignKeyName());
         assertEquals(toSchema, rel.getToSchemaName());
         assertEquals(toTable, rel.getToTableName());
         assertEquals(onUpdate, rel.getOnUpdate());
@@ -206,12 +206,15 @@ public class DBParserTest extends TestCase {
 
     private void checkColumn(Column column, String databaseName,
                              String schemaName, String tableName,
-                             String columnName, String columnType,
+                             String columnName, String propertyName,
+                             String name, String columnType, 
                              boolean nullable, int length, int scale) {
         assertEquals(databaseName, column.getDatabaseName());
         assertEquals(schemaName, column.getSchemaName());
         assertEquals(tableName, column.getTableName());
         assertEquals(columnName, column.getColumnName());
+        assertEquals(propertyName, column.getPropertyName());
+        assertEquals(name, column.getName());
         assertEquals(columnType.toUpperCase(), column.getColumnType().toUpperCase());
         assertEquals(nullable, column.isNullable());
         assertEquals(length, column.getLength());

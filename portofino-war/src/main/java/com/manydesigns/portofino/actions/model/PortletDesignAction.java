@@ -142,14 +142,14 @@ public class PortletDesignAction extends PortofinoAction {
         form = new FormBuilder(Portlet.class)
                 .configFields("name", "title", "legend", "database",
                         "sql", "urlExpression")
+                .configMode(Mode.VIEW)
                 .build();
-        form.setMode(Mode.VIEW);
         form.readFromObject(portlet);
 
         displayForm = new FormBuilder(PortletDesignAction.class)
                 .configFields("width", "height", "antiAlias", "borderVisible")
+                .configMode(Mode.EDIT)
                 .build();
-        displayForm.setMode(Mode.EDIT);
         displayForm.readFromObject(this);
 
         // Run/generate the chart

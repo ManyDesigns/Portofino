@@ -89,8 +89,8 @@ public class ConnectionProvidersAction extends PortofinoAction {
                 .configFields("databaseName", "description", "status")
                 .configNRows(connectionProviders.size())
                 .configHyperlinkGenerators("databaseName", hrefFormat, null)
+                .configMode(Mode.VIEW)
                 .build();
-        tableForm.setMode(Mode.VIEW);
         tableForm.readFromObject(connectionProviders);
 
         // database platforms
@@ -102,8 +102,8 @@ public class ConnectionProvidersAction extends PortofinoAction {
                                 "standardDriverClassName",
                                 "status")
                         .configNRows(databasePlatforms.length)
+                        .configMode(Mode.VIEW)
                         .build();
-        databasePlatformsTableForm.setMode(Mode.VIEW);
         databasePlatformsTableForm.readFromObject(databasePlatforms);
 
         return LIST;
@@ -122,9 +122,9 @@ public class ConnectionProvidersAction extends PortofinoAction {
                     .build();
         } else {
             form = new FormBuilder(connectionProvider.getClass())
+                    .configMode(Mode.VIEW)
                     .build();
         }
-        form.setMode(Mode.VIEW);
         form.readFromObject(connectionProvider);
 
         if (ConnectionProvider.STATUS_CONNECTED
@@ -146,8 +146,8 @@ public class ConnectionProvidersAction extends PortofinoAction {
                         "driverMajorMinorVersion",
                         "JDBCMajorMinorVersion"
                         )
+                .configMode(Mode.VIEW)
                 .build();
-        detectedValuesForm.setMode(Mode.VIEW);
         detectedValuesForm.readFromObject(connectionProvider);
 
         typesTableForm = new TableFormBuilder(Type.class)
@@ -165,8 +165,8 @@ public class ConnectionProvidersAction extends PortofinoAction {
 //                        "maximumScale"
                 )
                 .configNRows(types.length)
+                .configMode(Mode.VIEW)
                 .build();
-        typesTableForm.setMode(Mode.VIEW);
         typesTableForm.readFromObject(types);
     }
 

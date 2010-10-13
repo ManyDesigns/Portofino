@@ -30,6 +30,7 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.AbstractCompositeElement;
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 /*
@@ -41,7 +42,11 @@ public class Form extends AbstractCompositeElement<FieldSet> {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Form() {}
+    protected final Mode mode;
+
+    public Form(Mode mode) {
+        this.mode = mode;
+    }
 
     public void toXhtml(XhtmlBuffer xb) {
         for (FieldSet current : this) {
@@ -67,8 +72,7 @@ public class Form extends AbstractCompositeElement<FieldSet> {
         return false;
     }
 
-    @Override
-    public boolean validate() {
-        return super.validate();
+    public Mode getMode() {
+        return mode;
     }
 }

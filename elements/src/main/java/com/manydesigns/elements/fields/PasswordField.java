@@ -30,6 +30,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
@@ -45,7 +46,7 @@ public class PasswordField extends TextField {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final static String PASSWORD_PLACEHOLDER = "********";
+    public final static String PASSWORD_PLACEHOLDER = "********";
 
     private String confirmationValue;
     private boolean confirmationRequired = false;
@@ -53,12 +54,12 @@ public class PasswordField extends TextField {
     //**************************************************************************
     // Constructors
     //**************************************************************************
-    public PasswordField(PropertyAccessor accessor) {
-        this(accessor, null);
+    public PasswordField(PropertyAccessor accessor, Mode mode) {
+        this(accessor, mode, null);
     }
 
-    public PasswordField(PropertyAccessor accessor, String prefix) {
-        super(accessor, prefix);
+    public PasswordField(PropertyAccessor accessor, Mode mode, String prefix) {
+        super(accessor, mode, prefix);
     }
 
     //**************************************************************************

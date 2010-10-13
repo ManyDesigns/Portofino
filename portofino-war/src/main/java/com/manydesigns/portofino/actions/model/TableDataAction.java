@@ -31,13 +31,13 @@ package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
-import com.manydesigns.elements.fields.DefaultOptionProvider;
-import com.manydesigns.elements.fields.OptionProvider;
-import com.manydesigns.elements.fields.SelectField;
+import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
@@ -54,14 +54,18 @@ import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
+import com.manydesigns.portofino.util.TempFiles;
+import jxl.Workbook;
+import jxl.write.*;
+import jxl.write.Number;
+import jxl.write.biff.RowsExceededException;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.io.StringBufferInputStream;
+import java.io.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -85,6 +89,7 @@ public class TableDataAction extends PortofinoAction
     public final static String NO_TABLES = "noTables";
     public final static String JSON_SELECT_FIELD_OPTIONS =
             "jsonSelectFieldOptions";
+    public static final String EXPORT_FILENAME_FORMAT = "export-{0}";
 
     //**************************************************************************
     // ServletRequestAware implementation
@@ -139,6 +144,15 @@ public class TableDataAction extends PortofinoAction
     public SearchForm searchForm;
     public List<RelatedTableForm> relatedTableFormList;
     public InputStream inputStream;
+
+    //**************************************************************************
+    // export parameters
+    //***************************************************************************
+
+    public String contentType;
+    public String fileName;
+    public Long contentLength;
+    public String chartId;
 
     //**************************************************************************
     // Other objects
@@ -234,7 +248,8 @@ public class TableDataAction extends PortofinoAction
 
         TableFormBuilder tableFormBuilder =
                 createTableFormBuilderWithOptionProviders()
-                        .configNRows(objects.size());
+                        .configNRows(objects.size())
+                        .configMode(Mode.VIEW);
 
         // ogni colonna chiave primaria sarà clickabile
         for (PropertyAccessor property : tableAccessor.getKeyProperties()) {
@@ -244,7 +259,6 @@ public class TableDataAction extends PortofinoAction
 
         tableForm = tableFormBuilder.build();
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
-        tableForm.setMode(Mode.VIEW);
         tableForm.setSelectable(true);
         tableForm.readFromObject(objects);
 
@@ -301,8 +315,9 @@ public class TableDataAction extends PortofinoAction
         objects = context.getObjects(criteria);
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
-        form = createFormBuilderWithOptionProviders().build();
-        form.setMode(Mode.VIEW);
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.VIEW)
+                .build();
         form.readFromObject(object);
 
         relatedTableFormList = new ArrayList<RelatedTableForm>();
@@ -318,7 +333,7 @@ public class TableDataAction extends PortofinoAction
     protected void setupRelatedTableForm(ForeignKey relationship) {
         List<Object> relatedObjects =
                 context.getRelatedObjects(qualifiedTableName, object,
-                        relationship.getFkName());
+                        relationship.getForeignKeyName());
 
         String qualifiedFromTableName =
                 relationship.getFromTable().getQualifiedName();
@@ -327,8 +342,9 @@ public class TableDataAction extends PortofinoAction
         TableFormBuilder tableFormBuilder =
                 new TableFormBuilder(relatedTableAccessor);
         tableFormBuilder.configNRows(relatedObjects.size());
-        TableForm tableForm = tableFormBuilder.build();
-        tableForm.setMode(Mode.VIEW);
+        TableForm tableForm = tableFormBuilder
+                .configMode(Mode.VIEW)
+                .build();
         tableForm.readFromObject(relatedObjects);
 
         RelatedTableForm relatedTableForm =
@@ -343,8 +359,9 @@ public class TableDataAction extends PortofinoAction
     public String create() {
         setupTable();
 
-        form = createFormBuilderWithOptionProviders().build();
-        form.setMode(Mode.CREATE);
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.CREATE)
+                .build();
 
         return CREATE;
     }
@@ -352,8 +369,9 @@ public class TableDataAction extends PortofinoAction
     public String save() {
         setupTable();
 
-        form = createFormBuilderWithOptionProviders().build();
-        form.setMode(Mode.CREATE);
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.CREATE)
+                .build();
 
         form.readFromRequest(req);
         if (form.validate()) {
@@ -382,8 +400,9 @@ public class TableDataAction extends PortofinoAction
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
 
-        form = createFormBuilderWithOptionProviders().build();
-        form.setMode(Mode.EDIT);
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.EDIT)
+                .build();
 
         form.readFromObject(object);
 
@@ -394,8 +413,9 @@ public class TableDataAction extends PortofinoAction
         setupTable();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
-        form = createFormBuilderWithOptionProviders().build();
-        form.setMode(Mode.EDIT);
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.EDIT)
+                .build();
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
         form.readFromObject(object);
@@ -431,8 +451,9 @@ public class TableDataAction extends PortofinoAction
 
         setupTable();
 
-        form = createFormBuilderWithOptionProviders().build();
-        form.setMode(Mode.BULK_EDIT);
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.BULK_EDIT)
+                .build();
 
         return BULK_EDIT;
     }
@@ -440,8 +461,9 @@ public class TableDataAction extends PortofinoAction
     public String bulkUpdate() {
         setupTable();
 
-        form = createFormBuilderWithOptionProviders().build();
-        form.setMode(Mode.BULK_EDIT);
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.BULK_EDIT)
+                .build();
         form.readFromRequest(req);
         if (form.validate()) {
             for (String current : selection) {
@@ -523,18 +545,21 @@ public class TableDataAction extends PortofinoAction
                 table.findForeignKeyByName(relName);
 
         String[] fieldNames = createFieldNamesForRelationship(relationship);
-        OptionProvider optionProvider =
+        SelectionProvider selectionProvider =
                 createOptionProviderForRelationship(relationship);
-        optionProvider.setLabelSearch(optionProviderIndex, labelSearch);
 
         Form form = new FormBuilder(tableAccessor)
                 .configFields(fieldNames)
-                .configOptionProvider(optionProvider, fieldNames)
+                .configOptionProvider(selectionProvider, fieldNames)
+                .configMode(Mode.EDIT)
                 .build();
         form.readFromRequest(req);
 
         SelectField targetField =
                 (SelectField) form.get(0).get(optionProviderIndex);
+        targetField.setLabelSearch(labelSearch);
+
+        form.validate();
 
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
         LogUtil.infoMF(logger, "jsonSelectFieldOptions: {0}", text);
@@ -563,7 +588,7 @@ public class TableDataAction extends PortofinoAction
         Table table = model.findTableByQualifiedName(qualifiedTableName);
         for (ForeignKey rel : table.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
-            OptionProvider optionProvider =
+            SelectionProvider selectionProvider =
                     createOptionProviderForRelationship(rel);
             boolean autocomplete = false;
             for (ModelAnnotation current : rel.getAnnotations()) {
@@ -572,9 +597,9 @@ public class TableDataAction extends PortofinoAction
                     autocomplete = true;
                 }
             }
-            optionProvider.setAutoconnect(autocomplete);
+            selectionProvider.setAutocomplete(autocomplete);
 
-            formBuilder.configOptionProvider(optionProvider, fieldNames);
+            formBuilder.configOptionProvider(selectionProvider, fieldNames);
         }
 
         return formBuilder;
@@ -587,7 +612,7 @@ public class TableDataAction extends PortofinoAction
         Table table = model.findTableByQualifiedName(qualifiedTableName);
         for (ForeignKey rel : table.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
-            OptionProvider optionProvider =
+            SelectionProvider selectionProvider =
                     createOptionProviderForRelationship(rel);
             boolean autocomplete = false;
             for (ModelAnnotation current : rel.getAnnotations()) {
@@ -596,9 +621,9 @@ public class TableDataAction extends PortofinoAction
                     autocomplete = true;
                 }
             }
-            optionProvider.setAutoconnect(autocomplete);
+            selectionProvider.setAutocomplete(autocomplete);
 
-            tableFormBuilder.configOptionProvider(optionProvider, fieldNames);
+            tableFormBuilder.configOptionProvider(selectionProvider, fieldNames);
         }
         return tableFormBuilder;
     }
@@ -609,13 +634,13 @@ public class TableDataAction extends PortofinoAction
         int i = 0;
         for (Reference reference : references) {
             Column column = reference.getFromColumn();
-            fieldNames[i] = column.getPropertyName();
+            fieldNames[i] = column.getName();
             i++;
         }
         return fieldNames;
     }
 
-    protected OptionProvider createOptionProviderForRelationship(ForeignKey rel) {
+    protected SelectionProvider createOptionProviderForRelationship(ForeignKey rel) {
         // retrieve the related objects
         Table relatedTable = rel.getToTable();
         ClassAccessor classAccessor =
@@ -628,10 +653,339 @@ public class TableDataAction extends PortofinoAction
         if (shortNameAnnotation != null) {
             textFormat = OgnlTextFormat.create(shortNameAnnotation.value());
         }
-        OptionProvider optionProvider =
-                DefaultOptionProvider.create(rel.getFkName(),
+        SelectionProvider selectionProvider =
+                DefaultSelectionProvider.create(rel.getForeignKeyName(),
                         relatedObjects, classAccessor, textFormat);
-        return optionProvider;
+        return selectionProvider;
     }
+
+
+    //**************************************************************************
+    // ExportSearch
+    //**************************************************************************
+
+    public String exportSearch() {
+        setupTable();
+
+        //Relationship relationship =
+        //        table.findManyToOneByName(relName);
+
+        SearchFormBuilder searchFormBuilder =
+                new SearchFormBuilder(tableAccessor);
+        searchForm = searchFormBuilder.build();
+        searchForm.readFromRequest(req);
+
+        Criteria criteria = new Criteria(tableAccessor);
+        searchForm.configureCriteria(criteria);
+        objects = context.getObjects(criteria);
+
+        TableFormBuilder tableFormBuilder =
+            createTableFormBuilderWithOptionProviders()
+                            .configNRows(objects.size());
+        tableForm = tableFormBuilder
+                .configMode(Mode.VIEW)
+                .build();
+        tableForm.readFromObject(objects);
+
+        String exportId = TempFiles.generateRandomCode();
+        File fileTemp = TempFiles.getTempFile(EXPORT_FILENAME_FORMAT, exportId);
+
+        createExportExcel(fileTemp);
+
+        contentLength = fileTemp.length();
+
+        try {
+            inputStream = new FileInputStream(fileTemp);
+        } catch (IOException e) {
+            LogUtil.warning(logger, "IOException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        }
+        return EXPORT;
+
+    }
+
+    private void createExportExcel(File fileTemp) {
+        WritableWorkbook workbook = null;
+        try {
+            workbook = Workbook.createWorkbook(fileTemp);
+            WritableSheet sheet = workbook.createSheet("First Sheet", 0);
+
+            int l = 0;
+            for (TableForm.Column col : tableForm.getColumns()) {
+                sheet.addCell(new Label(l, 0, col.getLabel()));
+                l++;
+            }
+
+            int i = 1;
+            for ( TableForm.Row col : tableForm.getRows()) {
+                int j = 0;
+
+                for (Field field : Arrays.asList(col.getFields())) {
+                    if ( field instanceof NumericField) {
+                        //NumberFormat numberFormat = new NumberFormat();
+                        NumericField numField = (NumericField)field;
+                        //DecimalFormat format = numField.getDecimalFormat();
+                        //String val = format.format(numField.getDecimalValue());
+                        if ( numField.getDecimalValue() != null ) {
+                            Number number = new Number(j, i,
+                                    numField.getDecimalValue().doubleValue());
+                            sheet.addCell(number);
+                        }
+                    } else if ( field instanceof BooleanField) {
+                        BooleanField bool = (BooleanField)field;
+                        String value = bool.getBooleanValue()?
+                                getText("elements.Yes"):getText("elements.No");
+                        Label label = new Label(j, i, value);
+                        sheet.addCell(label);
+                    } else if ( field instanceof PasswordField) {
+                        Label label = new Label(j, i,
+                                PasswordField.PASSWORD_PLACEHOLDER);
+                        sheet.addCell(label);
+                    } else if ( field instanceof SelectField) {
+                        SelectField selField = (SelectField)field;
+                        Label label = new Label(j, i,
+                                selField.getValue().toString());
+                        sheet.addCell(label);
+                    } else if ( field instanceof DateField ) {
+                        Label label = new Label(j, i,
+                                ((DateField)field).getStringValue());
+                        sheet.addCell(label);
+                    } else if ( field instanceof AbstractTextField) {
+                        Label label = new Label(j, i,
+                                ((TextField)field).getStringValue());
+                        sheet.addCell(label);
+                    } else {
+                        continue;
+                    }
+
+                    j++;
+                }
+                i++;
+            }
+
+            workbook.write();
+        } catch (IOException e) {
+            LogUtil.warning(logger, "IOException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } catch (RowsExceededException e) {
+            LogUtil.warning(logger, "RowsExceededException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } catch (WriteException e) {
+            LogUtil.warning(logger, "WriteException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } finally {
+            try {
+                if (workbook != null)
+                    workbook.close();
+            }
+            catch (Exception e) {
+                LogUtil.warning(logger, "IOException", e);
+                SessionMessages.addErrorMessage(e.getMessage());
+            }
+        }
+        contentType = "application/ms-excel; charset=UTF-8";
+        fileName = fileTemp.getName() + ".xls";
+    }
+
+      //**************************************************************************
+    // ExportRead
+    //**************************************************************************
+
+    public String exportRead() {
+        setupTable();
+
+        //Relationship relationship =
+        //        table.findManyToOneByName(relName);
+        Serializable pkObject = pkHelper.parsePkString(pk);
+
+        SearchFormBuilder searchFormBuilder =
+                new SearchFormBuilder(tableAccessor);
+        searchForm = searchFormBuilder.build();
+        configureSearchFormFromString();
+
+        Criteria criteria = new Criteria(tableAccessor);
+        searchForm.configureCriteria(criteria);
+        objects = context.getObjects(criteria);
+
+        object = context.getObjectByPk(qualifiedTableName, pkObject);
+
+        TableFormBuilder tableFormBuilder =
+            createTableFormBuilderWithOptionProviders()
+                            .configMode(Mode.VIEW)
+                            .configNRows(objects.size());
+        tableForm = tableFormBuilder.build();
+        tableForm.readFromObject(object);
+
+        relatedTableFormList = new ArrayList<RelatedTableForm>();
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        for (ForeignKey relationship : table.getOneToManyRelationships()) {
+            setupRelatedTableForm(relationship);
+        }
+
+        String exportId = TempFiles.generateRandomCode();
+        File fileTemp = TempFiles.getTempFile(EXPORT_FILENAME_FORMAT, exportId);
+
+        createExportExcelRel(fileTemp);
+
+        contentLength = fileTemp.length();
+
+        try {
+            inputStream = new FileInputStream(fileTemp);
+        } catch (IOException e) {
+            LogUtil.warning(logger, "IOException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        }
+        return EXPORT;
+
+    }
+
+    private void createExportExcelRel(File fileTemp) {
+        WritableWorkbook workbook = null;
+        try {
+            workbook = Workbook.createWorkbook(fileTemp);
+            WritableSheet sheet = workbook.createSheet("First Sheet", 0);
+
+            int l = 0;
+            for (TableForm.Column col : tableForm.getColumns()) {
+                sheet.addCell(new Label(l, 0, col.getLabel()));
+                l++;
+            }
+
+            int i = 1;
+            for (TableForm.Row col : tableForm.getRows()) {
+                int j = 0;
+
+                for (Field field : Arrays.asList(col.getFields())) {
+                    if ( field instanceof NumericField) {
+                        //NumberFormat numberFormat = new NumberFormat();
+                        NumericField numField = (NumericField)field;
+                        //DecimalFormat format = numField.getDecimalFormat();
+                        //String val = format.format(numField.getDecimalValue());
+                        if ( numField.getDecimalValue() != null ) {
+                            Number number = new Number(j, i,
+                                    numField.getDecimalValue().doubleValue());
+                            sheet.addCell(number);
+                        }
+                    } else if ( field instanceof BooleanField) {
+                        BooleanField bool = (BooleanField)field;
+                        String value = bool.getBooleanValue()?
+                                getText("elements.Yes"):getText("elements.No");
+                        Label label = new Label(j, i, value);
+                        sheet.addCell(label);
+                    } else if ( field instanceof PasswordField) {
+                        Label label = new Label(j, i,
+                                PasswordField.PASSWORD_PLACEHOLDER);
+                        sheet.addCell(label);
+                    } else if ( field instanceof SelectField) {
+                        SelectField selField = (SelectField)field;
+                        Label label = new Label(j, i,
+                                selField.getValue().toString());
+                        sheet.addCell(label);
+                    } else if ( field instanceof DateField ) {
+                        Label label = new Label(j, i,
+                                ((DateField)field).getStringValue());
+                        sheet.addCell(label);
+                    } else if ( field instanceof AbstractTextField) {
+                        Label label = new Label(j, i,
+                                ((TextField)field).getStringValue());
+                        sheet.addCell(label);
+
+                    } else {
+                        continue;
+                    }
+
+                    j++;
+                }
+                i++;
+            }
+            //Aggiungo le relazioni/sheet
+            //Iterator<RelatedTableForm> relTabForm = relatedTableFormList.iterator();
+            int k = 1;
+          /*  for (RelatedTableForm relTabForm : relatedTableFormList) {
+                TableFormBuilder tableFormBuilder =
+                        createTableFormBuilderWithOptionProviders()
+                                .configNRows(relTabForm.objects.size());
+                TableForm tableForm = tableFormBuilder.build();
+                tableForm.readFromObject(relTabForm.objects);
+                sheet = workbook.createSheet("sheet " + k, k);
+                k++;
+
+                i = 0;
+                for (TableFormColumn col : tableForm) {
+                    int j = 0;
+
+                    sheet.addCell(new Label(i, j, col.getLabel()));
+                    j++;
+
+
+                    for (Field field : Arrays.asList(col.getFields())) {
+                        if (field instanceof NumericField) {
+                            //NumberFormat numberFormat = new NumberFormat();
+                            NumericField numField = (NumericField) field;
+                            //DecimalFormat format = numField.getDecimalFormat();
+                            //String val = format.format(numField.getDecimalValue());
+                            if (numField.getDecimalValue() != null) {
+                                Number number = new Number(i, j,
+                                        numField.getDecimalValue().doubleValue());
+                                sheet.addCell(number);
+                            }
+                        } else if (field instanceof BooleanField) {
+                            BooleanField bool = (BooleanField) field;
+                            String value = bool.getBooleanValue() ?
+                                    getText("elements.Yes") : getText("elements.No");
+                            Label label = new Label(i, j, value);
+                            sheet.addCell(label);
+                        } else if (field instanceof PasswordField) {
+                            Label label = new Label(i, j,
+                                    PasswordField.PASSWORD_PLACEHOLDER);
+                            sheet.addCell(label);
+                        } else if (field instanceof SelectField) {
+                            SelectField selField = (SelectField) field;
+                            Label label = new Label(i, j,
+                                    selField.getValue().toString());
+                            sheet.addCell(label);
+                        } else if (field instanceof DateField) {
+                            Label label = new Label(i, j,
+                                    ((DateField) field).getStringValue());
+                            sheet.addCell(label);
+                        } else if ( field instanceof AbstractTextField) {
+                            Label label = new Label(i, j,
+                                ((TextField)field).getStringValue());
+                            sheet.addCell(label);
+                        } else {
+                            continue;
+                        }
+
+                        j++;
+                    }
+                    i++;
+                }
+
+            }      */
+
+            workbook.write();
+        } catch (IOException e) {
+            LogUtil.warning(logger, "IOException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } catch (RowsExceededException e) {
+            LogUtil.warning(logger, "RowsExceededException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } catch (WriteException e) {
+            LogUtil.warning(logger, "WriteException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } finally {
+            try {
+                if (workbook != null)
+                    workbook.close();
+            }
+            catch (Exception e) {
+                LogUtil.warning(logger, "IOException", e);
+                SessionMessages.addErrorMessage(e.getMessage());
+            }
+        }
+        contentType = "application/ms-excel; charset=UTF-8";
+        fileName = fileTemp.getName() + ".xls";
+    }
+
 
 }

@@ -35,6 +35,7 @@ import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.fields.search.TextSearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.Mode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -47,9 +48,10 @@ public class TextFieldHelper implements FieldHelper {
 
     public Field tryToInstantiateField(ClassAccessor classAccessor,
                                        PropertyAccessor propertyAccessor,
+                                       Mode mode,
                                        String prefix) {
         if (String.class.isAssignableFrom(propertyAccessor.getType())) {
-            return new TextField(propertyAccessor, prefix);
+            return new TextField(propertyAccessor, mode, prefix);
         }
         return null;
     }

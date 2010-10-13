@@ -63,6 +63,14 @@ public class ModelDiff extends ArrayList<String> {
     }
 
     public void diff(Database database1, Database database2) {
+        if (database1 == null) {
+            addDifference("Database 1 is null");
+            return;
+        } else if (database2 == null) {
+            addDifference("Database 2 is null");
+            return;
+        }
+
         String databaseName1 = database1.getDatabaseName();
         String databaseName2 = database2.getDatabaseName();
         if (!databaseName1.equals(databaseName2)) {

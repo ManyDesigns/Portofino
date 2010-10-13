@@ -30,7 +30,6 @@
 package com.manydesigns.elements.composites;
 
 import com.manydesigns.elements.Element;
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -84,10 +83,8 @@ public class Wizard extends AbstractReflectiveCompositeElement {
         int index = 0;
         for (Element component : elements()) {
             if (index == _step) {
-                component.setMode(_mode);
                 component.toXhtml(xb);
             } else {
-                component.setMode(Mode.HIDDEN);
                 component.toXhtml(xb);
             }
             index++;

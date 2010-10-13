@@ -29,10 +29,16 @@
 
 package com.manydesigns.elements.forms;
 
-import com.manydesigns.elements.AbstractCompositeElement;
+import com.manydesigns.elements.Element;
+import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.apache.commons.lang.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Array;
 import java.util.Collection;
 
@@ -41,27 +47,34 @@ import java.util.Collection;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableForm extends AbstractCompositeElement<TableFormColumn> {
+public class TableForm implements Element {
     public static final String copyright =
             "Copyright (c) 2005-2009, ManyDesigns srl";
 
     protected String selectInputName = "select";
 
-    protected final int nRows;
+    protected final Column[] columns;
+    protected final Row[] rows;
+
     protected String caption;
     protected boolean selectable = false;
-    protected final String[] rowKeys;
-    protected final boolean[] selected;
     protected TextFormat keyTextFormat;
 
     //**************************************************************************
     // Costruttori
     //**************************************************************************
 
-    public TableForm(int nRows) {
-        this.nRows = nRows;
-        rowKeys = new String[nRows];
-        selected = new boolean[nRows];
+    public TableForm(int nRows, PropertyAccessor... propertyAccessors) {
+        rows = new Row[nRows];
+        columns = new Column[propertyAccessors.length];
+
+        for (int i = 0; i < nRows; i++) {
+            rows[i] = new Row(i);
+        }
+
+        for (int i = 0; i < columns.length; i++) {
+            columns[i] = new Column(propertyAccessors[i]);
+        }
     }
 
     //**************************************************************************
@@ -82,43 +95,38 @@ public class TableForm extends AbstractCompositeElement<TableFormColumn> {
             xb.closeElement("th");
         }
 
-        for (TableFormColumn current : this) {
+        for (Column column : columns) {
             xb.openElement("th");
-            current.labelToXhtml(xb);
+            column.labelToXhtml(xb);
             xb.closeElement("th");
         }
         xb.closeElement("tr");
         xb.closeElement("thead");
 
         xb.openElement("tbody");
-        for (int rowIndex = 0; rowIndex < nRows; rowIndex++) {
-            xb.openElement("tr");
-            if (selectable) {
-                xb.openElement("td");
-                xb.writeInputCheckbox(null, "selection",
-                        rowKeys[rowIndex], false);
-                xb.closeElement("td");
-            }
-
-            for (TableFormColumn currentColumn : this) {
-                xb.openElement("td");
-                if (!currentColumn.getErrors(rowIndex).isEmpty()) {
-                    xb.addAttribute("class", "tableform-error");
-                }
-                currentColumn.valueToXhtml(xb, rowIndex);
-                xb.closeElement("td");
-            }
-            xb.closeElement("tr");
+        for (Row row : rows) {
+            row.toXhtml(xb);
         }
         xb.closeElement("tbody");
 
         xb.closeElement("table");
     }
 
-    @Override
-    public void readFromObject(Object obj) {
-        super.readFromObject(obj);
+    public void readFromRequest(HttpServletRequest req) {
+        for (Row row : rows) {
+            row.readFromRequest(req);
+        }
+    }
 
+    public boolean validate() {
+        boolean result = true;
+        for (Row row : rows) {
+            result = row.validate() && result;
+        }
+        return result;
+    }
+
+    public void readFromObject(Object obj) {
         Class clazz = obj.getClass();
         if (clazz.isArray()) { // Tratta obj come un array
             // Scorre tutti gli ellementi dell'array obj,
@@ -127,13 +135,13 @@ public class TableForm extends AbstractCompositeElement<TableFormColumn> {
             final int arrayLength = Array.getLength(obj);
             for (int i = 0; i < arrayLength; i++) {
                 Object currentObj = Array.get(obj, i);
-                readFromObject(i, currentObj);
+                rows[i].readFromObject(currentObj);
             }
 
             // Scorre le rimanenti righe del table form,
             // passano null come ottetto di bind.
-            for (int i = arrayLength; i < nRows; i++) {
-                readFromObject(i, null);
+            for (int i = arrayLength; i < rows.length; i++) {
+                rows[i].readFromObject(null);
             }
         } else if (Collection.class.isAssignableFrom(clazz)) {
             // Tratta obj come collection
@@ -141,23 +149,37 @@ public class TableForm extends AbstractCompositeElement<TableFormColumn> {
 
             int i = 0;
             for (Object currentObj : collection) {
-                readFromObject(i, currentObj);
+                rows[i].readFromObject(currentObj);
                 i++;
             }
 
-            for (; i < nRows; i++) {
-                readFromObject(i, null);
+            for (; i < rows.length; i++) {
+                rows[i].readFromObject(null);
             }
         }
-
     }
 
-    protected void readFromObject(int index, Object obj) {
-        String key = Integer.toString(index);
-        if (keyTextFormat != null) {
-            key = keyTextFormat.format(obj);
+    public void writeToObject(Object obj) {
+        Class clazz = obj.getClass();
+        if (clazz.isArray()) { // Tratta obj come un array
+            // Scorre tutti gli ellementi dell'array obj,
+            // indipendentemente da quante righe ci sono nell table form.
+            // Eventualmente lancia Eccezione.
+            final int arrayLength = Array.getLength(obj);
+            for (int i = 0; i < arrayLength; i++) {
+                Object currentObj = Array.get(obj, i);
+                rows[i].writeToObject(currentObj);
+            }
+        } else if (Collection.class.isAssignableFrom(clazz)) {
+            // Tratta obj come collection
+            Collection collection = (Collection)obj;
+
+            int i = 0;
+            for (Object currentObj : collection) {
+                rows[i].writeToObject(currentObj);
+                i++;
+            }
         }
-        rowKeys[index] = key;
     }
 
     //**************************************************************************
@@ -170,10 +192,6 @@ public class TableForm extends AbstractCompositeElement<TableFormColumn> {
 
     public void setCaption(String caption) {
         this.caption = caption;
-    }
-
-    public int getNRows() {
-        return nRows;
     }
 
     public TextFormat getKeyGenerator() {
@@ -190,5 +208,170 @@ public class TableForm extends AbstractCompositeElement<TableFormColumn> {
 
     public void setSelectable(boolean selectable) {
         this.selectable = selectable;
+    }
+
+    public Column[] getColumns() {
+        return columns;
+    }
+
+    public Row[] getRows() {
+        return rows;
+    }
+
+    //**************************************************************************
+    // Inner class: Row
+    //**************************************************************************
+
+    public class Row implements Element {
+        public static final String copyright =
+                "Copyright (c) 2005-2010, ManyDesigns srl";
+
+        protected String key;
+        protected final Field[] fields;
+        protected final int index;
+
+        public Row(int index) {
+            fields = new Field[columns.length];
+            this.index = index;
+        }
+
+        public void toXhtml(XhtmlBuffer xb) {
+            xb.openElement("tr");
+            if (selectable) {
+                xb.openElement("td");
+                xb.writeInputCheckbox(null, "selection", key, false);
+                xb.closeElement("td");
+            }
+
+            for (Field current : fields) {
+                xb.openElement("td");
+                if (!current.getErrors().isEmpty()) {
+                    xb.addAttribute("class", "tableform-error");
+                }
+                current.valueToXhtml(xb);
+                xb.closeElement("td");
+            }
+
+            xb.closeElement("tr");
+        }
+
+        public void readFromRequest(HttpServletRequest req) {
+            for (Field current : fields) {
+                current.readFromRequest(req);
+            }
+        }
+
+        public boolean validate() {
+            boolean result = true;
+            for (Field current : fields) {
+                result = current.validate() && result;
+            }
+            return result;
+        }
+
+        public void readFromObject(Object obj) {
+            if (keyTextFormat == null) {
+                key = Integer.toString(index);
+            } else {
+                key = keyTextFormat.format(obj);
+            }
+            int index = 0;
+            for (Field field : fields) {
+                Column column = columns[index];
+                TextFormat hrefTextFormat = column.getHrefGenerator();
+                TextFormat altTextFormat = column.getAltGenerator();
+                if (hrefTextFormat != null) {
+                    field.setHref(hrefTextFormat.format(obj));
+                    if (altTextFormat != null) {
+                        field.setAlt(altTextFormat.format(obj));
+                    }
+                }
+                field.readFromObject(obj);
+                index++;
+            }
+        }
+
+        public void writeToObject(Object obj) {
+            for (Field current : fields) {
+                current.writeToObject(obj);
+            }
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public Field[] getFields() {
+            return fields;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+    }
+
+    //**************************************************************************
+    // Inner class: Column
+    //**************************************************************************
+
+    public class Column {
+        public static final String copyright =
+                "Copyright (c) 2005-2009, ManyDesigns srl";
+
+        protected final PropertyAccessor propertyAccessor;
+
+        protected String label;
+        protected TextFormat hrefTextFormat;
+        protected TextFormat altTextFormat;
+
+        //**************************************************************************
+        // Costruttori
+        //**************************************************************************
+
+        public Column(PropertyAccessor propertyAccessor) {
+            this.propertyAccessor = propertyAccessor;
+
+            if (propertyAccessor.isAnnotationPresent(Label.class)) {
+                label = propertyAccessor.getAnnotation(Label.class).value();
+            } else {
+                label = Util.camelCaseToWords(propertyAccessor.getName());
+            }
+        }
+
+        //**************************************************************************
+        // Getter/setter
+        //**************************************************************************
+
+        public PropertyAccessor getPropertyAccessor() {
+            return propertyAccessor;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public void setLabel(String label) {
+            this.label = label;
+        }
+
+        public void labelToXhtml(XhtmlBuffer xb) {
+            xb.write(StringUtils.capitalize(label));
+        }
+
+        public TextFormat getHrefGenerator() {
+            return hrefTextFormat;
+        }
+
+        public void setHrefGenerator(TextFormat hrefTextFormat) {
+            this.hrefTextFormat = hrefTextFormat;
+        }
+
+        public TextFormat getAltGenerator() {
+            return altTextFormat;
+        }
+
+        public void setAltGenerator(TextFormat altTextFormat) {
+            this.altTextFormat = altTextFormat;
+        }
     }
 }

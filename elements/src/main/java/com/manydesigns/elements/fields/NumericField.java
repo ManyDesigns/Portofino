@@ -32,6 +32,7 @@ package com.manydesigns.elements.fields;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
+import com.manydesigns.elements.Mode;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -60,12 +61,8 @@ public class NumericField extends AbstractTextField {
     //**************************************************************************
     // Costruttori
     //**************************************************************************
-    public NumericField(PropertyAccessor accessor) {
-        this(accessor, null);
-    }
-
-    public NumericField(PropertyAccessor accessor, String prefix) {
-        super(accessor, prefix);
+    public NumericField(PropertyAccessor accessor, Mode mode, String prefix) {
+        super(accessor, mode, prefix);
         Class type = accessor.getType();
         if (type == Byte.class || type == Byte.TYPE) {
             minValue = new BigDecimal(Byte.MIN_VALUE);

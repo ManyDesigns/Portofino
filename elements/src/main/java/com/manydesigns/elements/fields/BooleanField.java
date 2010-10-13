@@ -31,6 +31,7 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import com.manydesigns.elements.Mode;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,12 +55,12 @@ public class BooleanField extends AbstractField {
     //**************************************************************************
     // Costruttori
     //**************************************************************************
-    public BooleanField(PropertyAccessor accessor) {
-        this(accessor, null);
+    public BooleanField(PropertyAccessor accessor, Mode mode) {
+        this(accessor, mode, null);
     }
 
-    public BooleanField(PropertyAccessor accessor, String prefix) {
-        super(accessor, prefix);
+    public BooleanField(PropertyAccessor accessor, Mode mode, String prefix) {
+        super(accessor, mode, prefix);
         Class type = accessor.getType();
         if (type.isPrimitive()) {
             setRequired(true);

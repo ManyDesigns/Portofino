@@ -29,8 +29,10 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.Element;
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.xml.XhtmlBuffer;
 
 import java.util.List;
 
@@ -42,6 +44,9 @@ import java.util.List;
 public interface Field extends Element {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    PropertyAccessor getPropertyAccessor();
+    Mode getMode();
 
     void valueToXhtml(XhtmlBuffer xb);
     void labelToXhtml(XhtmlBuffer xb);
@@ -75,11 +80,11 @@ public interface Field extends Element {
     List<String> getErrors();
 
 
-    public String getHref();
-    public void setHref(String href);
+    String getHref();
+    void setHref(String href);
 
-    public String getAlt();
-    public void setAlt(String alt);
+    String getAlt();
+    void setAlt(String alt);
 
     boolean isRequiredField();
 }

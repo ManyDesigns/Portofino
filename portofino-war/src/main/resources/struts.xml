@@ -206,9 +206,19 @@
                 <param name="prependServletContext">false</param>
             </result>
 
+            <result name="export" type="stream">
+                <param name="contentType">%{contentType}</param>
+                <param name="contentLength">%{contentLength}</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename="%{fileName}"</param>
+                <param name="bufferSize">1024</param>
+            </result>
+    
+            
             <result name="jsonSelectFieldOptions" type="stream">
                 <param name="contentType">text/plain</param>
                 <param name="inputName">inputStream</param>
+                <param name="bufferSize">1024</param>
             </result>
         </action>
 
@@ -326,8 +336,20 @@
             </result>
         </action>
         <action name="Profile" class="com.manydesigns.portofino.actions.user.ProfileAction">
-            <result name="success">
-                /skins/default/user/profile.jsp
+            <result name="read">
+                /skins/default/user/profile/read.jsp
+            </result>
+            <result name="edit">
+                /skins/default/user/profile/edit.jsp
+            </result>
+            <result name="update" type="redirectAction">
+                <param name="actionName">Profile</param>
+            </result>
+            <result name="changePwd">
+                /skins/default/user/profile/changePwd.jsp
+            </result>
+            <result name="updatePwd" type="redirectAction">
+                <param name="actionName">Profile</param>
             </result>
         </action>
         <action name="PwdRecovery" class="com.manydesigns.portofino.actions.user.PwdRecoveryAction">

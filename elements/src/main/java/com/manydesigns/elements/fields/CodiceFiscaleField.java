@@ -30,6 +30,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.Mode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -46,12 +47,8 @@ public class CodiceFiscaleField extends RegExpTextField {
     //**************************************************************************
     // Constructors
     //**************************************************************************
-    public CodiceFiscaleField(PropertyAccessor accessor) {
-        this(accessor, null);
-    }
-
-    public CodiceFiscaleField(PropertyAccessor accessor, String prefix) {
-        super(accessor, prefix, codiceFiscaleRegExp);
+    public CodiceFiscaleField(PropertyAccessor accessor, Mode mode, String prefix) {
+        super(accessor, mode, prefix, codiceFiscaleRegExp);
         setErrorString(getText("elements.error.field.codice.fiscale.format"));
         setAutoCapitalize(true);
     }

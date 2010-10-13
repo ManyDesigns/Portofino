@@ -29,7 +29,6 @@
 
 package com.manydesigns.elements.fields.search;
 
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
@@ -104,13 +103,6 @@ public class TextSearchField extends AbstractSearchField {
     public boolean validate() {
         return true;
     }
-
-    public Mode getMode() {
-        return Mode.VIEW;
-    }
-
-    public void setMode(Mode mode) {}
-
 
     public void toSearchString(StringBuilder sb) {
         if (value != null) {

@@ -50,7 +50,7 @@ public class PrimaryKey {
     //**************************************************************************
 
     protected final Table table;
-    protected String pkName;
+    protected String primaryKeyName;
     protected String className;
     protected final List<PrimaryKeyColumn> primaryKeyColumns;
 
@@ -66,9 +66,9 @@ public class PrimaryKey {
     // Constructors and wire up
     //**************************************************************************
 
-    public PrimaryKey(Table table, String pkName) {
+    public PrimaryKey(Table table, String primaryKeyName) {
         this.table = table;
-        this.pkName = pkName;
+        this.primaryKeyName = primaryKeyName;
         primaryKeyColumns = new ArrayList<PrimaryKeyColumn>();
         columns = new ArrayList<Column>();
     }
@@ -112,12 +112,12 @@ public class PrimaryKey {
         return table.getTableName();
     }
 
-    public String getPkName() {
-        return pkName;
+    public String getPrimaryKeyName() {
+        return primaryKeyName;
     }
 
-    public void setPkName(String pkName) {
-        this.pkName = pkName;
+    public void setPrimaryKeyName(String primaryKeyName) {
+        this.primaryKeyName = primaryKeyName;
     }
 
     public List<PrimaryKeyColumn> getPrimaryKeyColumns() {
@@ -134,6 +134,6 @@ public class PrimaryKey {
 
     @Override
     public String toString() {
-        return MessageFormat.format("PK {0} for {1}", pkName, table.toString());
+        return MessageFormat.format("PK {0} for {1}", primaryKeyName, table.toString());
     }
 }

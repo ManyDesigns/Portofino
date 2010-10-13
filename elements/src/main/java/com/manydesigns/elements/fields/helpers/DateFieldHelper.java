@@ -34,6 +34,7 @@ import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.Mode;
 
 import java.util.Date;
 
@@ -48,9 +49,10 @@ public class DateFieldHelper implements FieldHelper {
 
     public Field tryToInstantiateField(ClassAccessor classAccessor,
                                   PropertyAccessor propertyAccessor,
+                                  Mode mode,
                                   String prefix) {
         if (Date.class.isAssignableFrom(propertyAccessor.getType())) {
-            return new DateField(propertyAccessor, prefix);
+            return new DateField(propertyAccessor, mode, prefix);
         }
         return null;
     }
