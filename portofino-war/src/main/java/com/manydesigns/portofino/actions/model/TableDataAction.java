@@ -58,18 +58,22 @@ import com.manydesigns.portofino.util.TempFiles;
 import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
+import jxl.write.NumberFormat;
+import jxl.write.DateFormat;
 import jxl.write.biff.RowsExceededException;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.text.MessageFormat;
+import java.text.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Date;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.math.BigDecimal;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -688,7 +692,8 @@ public class TableDataAction extends PortofinoAction
         tableForm.readFromObject(objects);
 
         String exportId = TempFiles.generateRandomCode();
-        File fileTemp = TempFiles.getTempFile(EXPORT_FILENAME_FORMAT, exportId);
+        File fileTemp = TempFiles.getTempFile(EXPORT_FILENAME_FORMAT,
+                exportId);
 
         createExportExcel(fileTemp);
 
@@ -708,7 +713,7 @@ public class TableDataAction extends PortofinoAction
         WritableWorkbook workbook = null;
         try {
             workbook = Workbook.createWorkbook(fileTemp);
-            WritableSheet sheet = workbook.createSheet("First Sheet", 0);
+            WritableSheet sheet = workbook.createSheet(qualifiedTableName, 0);
 
             int l = 0;
             for (TableForm.Column col : tableForm.getColumns()) {
@@ -717,31 +722,8 @@ public class TableDataAction extends PortofinoAction
             }
 
             int i = 1;
-            for ( TableForm.Row col : tableForm.getRows()) {
-                int j = 0;
-
-                for (Field field : col.getFields()) {
-                    if ( field instanceof NumericField) {
-                        //NumberFormat numberFormat = new NumberFormat();
-                        NumericField numField = (NumericField)field;
-                        //DecimalFormat format = numField.getDecimalFormat();
-                        //String val = format.format(numField.getDecimalValue());
-                        if ( numField.getDecimalValue() != null ) {
-                            Number number = new Number(j, i,
-                                    numField.getDecimalValue().doubleValue());
-                            sheet.addCell(number);
-                        }
-                    } else if ( field instanceof PasswordField) {
-                        Label label = new Label(j, i,
-                                PasswordField.PASSWORD_PLACEHOLDER);
-                        sheet.addCell(label);
-                    } else {
-                        Label label = new Label(j, i, field.getStringValue());
-                        sheet.addCell(label);
-                    }
-
-                    j++;
-                }
+            for ( TableForm.Row row : tableForm.getRows()) {
+                exportRows(sheet, i, row);
                 i++;
             }
 
@@ -769,7 +751,63 @@ public class TableDataAction extends PortofinoAction
         fileName = fileTemp.getName() + ".xls";
     }
 
-      //**************************************************************************
+    
+    private void exportRows(WritableSheet sheet, int i,
+                            TableForm.Row row) throws WriteException {
+        int j = 0;
+        for (Field field : row.getFields()) {
+            if ( field instanceof NumericField) {
+                NumericField numField = (NumericField)field;
+                if (numField.getDecimalValue() != null) {
+                    Number number;
+                    BigDecimal decimalValue = numField.getDecimalValue();
+                    if (numField.getDecimalFormat() == null) {
+                        number = new Number(j, i,
+                                decimalValue==null
+                                        ?null:decimalValue.doubleValue());
+                    } else {
+                        NumberFormat numberFormat = new NumberFormat(
+                                numField.getDecimalFormat().toPattern());
+                        WritableCellFormat writeCellNumberFormat =
+                                new WritableCellFormat(numberFormat);
+                        number = new Number(j, i,
+                                decimalValue==null
+                                        ?null:decimalValue.doubleValue(),
+                                writeCellNumberFormat);
+                    }
+                    sheet.addCell(number);
+                }
+            } else if (field instanceof PasswordField) {
+                Label label = new Label(j, i,
+                        PasswordField.PASSWORD_PLACEHOLDER);
+                sheet.addCell(label);
+            } else if ( field instanceof DateField) {
+                DateField dateField = (DateField)field;
+                DateTime dateCell = null;
+                Date date = dateField.getDateValue();
+                if (date != null) {
+                    if (dateField.getSimpleDateFormat() == null) {
+                        dateCell = new DateTime(j, i, dateField.getDateValue() == null ? null : dateField.getDateValue());
+                    } else {
+                        DateFormat dateFormat = new DateFormat(
+                                dateField.getSimpleDateFormat().toPattern());
+                        WritableCellFormat wDateFormat =
+                                new WritableCellFormat(dateFormat);
+                        dateCell = new DateTime(j, i,
+                                dateField.getDateValue() == null ? null : dateField.getDateValue(), wDateFormat);
+                    }
+                    sheet.addCell(dateCell);
+                }
+            } else {
+                Label label = new Label(j, i, field.getStringValue());
+                sheet.addCell(label);
+            }
+
+            j++;
+        }
+    }
+
+    //**************************************************************************
     // ExportRead
     //**************************************************************************
 
