@@ -720,7 +720,7 @@ public class TableDataAction extends PortofinoAction
             for ( TableForm.Row col : tableForm.getRows()) {
                 int j = 0;
 
-                for (Field field : Arrays.asList(col.getFields())) {
+                for (Field field : col.getFields()) {
                     if ( field instanceof NumericField) {
                         //NumberFormat numberFormat = new NumberFormat();
                         NumericField numField = (NumericField)field;
@@ -731,31 +731,13 @@ public class TableDataAction extends PortofinoAction
                                     numField.getDecimalValue().doubleValue());
                             sheet.addCell(number);
                         }
-                    } else if ( field instanceof BooleanField) {
-                        BooleanField bool = (BooleanField)field;
-                        String value = bool.getBooleanValue()?
-                                getText("elements.Yes"):getText("elements.No");
-                        Label label = new Label(j, i, value);
-                        sheet.addCell(label);
                     } else if ( field instanceof PasswordField) {
                         Label label = new Label(j, i,
                                 PasswordField.PASSWORD_PLACEHOLDER);
                         sheet.addCell(label);
-                    } else if ( field instanceof SelectField) {
-                        SelectField selField = (SelectField)field;
-                        Label label = new Label(j, i,
-                                selField.getValue().toString());
-                        sheet.addCell(label);
-                    } else if ( field instanceof DateField ) {
-                        Label label = new Label(j, i,
-                                ((DateField)field).getStringValue());
-                        sheet.addCell(label);
-                    } else if ( field instanceof AbstractTextField) {
-                        Label label = new Label(j, i,
-                                ((TextField)field).getStringValue());
-                        sheet.addCell(label);
                     } else {
-                        continue;
+                        Label label = new Label(j, i, field.getStringValue());
+                        sheet.addCell(label);
                     }
 
                     j++;
@@ -866,32 +848,13 @@ public class TableDataAction extends PortofinoAction
                                     numField.getDecimalValue().doubleValue());
                             sheet.addCell(number);
                         }
-                    } else if ( field instanceof BooleanField) {
-                        BooleanField bool = (BooleanField)field;
-                        String value = bool.getBooleanValue()?
-                                getText("elements.Yes"):getText("elements.No");
-                        Label label = new Label(j, i, value);
-                        sheet.addCell(label);
                     } else if ( field instanceof PasswordField) {
                         Label label = new Label(j, i,
                                 PasswordField.PASSWORD_PLACEHOLDER);
                         sheet.addCell(label);
-                    } else if ( field instanceof SelectField) {
-                        SelectField selField = (SelectField)field;
-                        Label label = new Label(j, i,
-                                selField.getValue().toString());
-                        sheet.addCell(label);
-                    } else if ( field instanceof DateField ) {
-                        Label label = new Label(j, i,
-                                ((DateField)field).getStringValue());
-                        sheet.addCell(label);
-                    } else if ( field instanceof AbstractTextField) {
-                        Label label = new Label(j, i,
-                                ((TextField)field).getStringValue());
-                        sheet.addCell(label);
-
                     } else {
-                        continue;
+                        Label label = new Label(j, i, field.getStringValue());
+                        sheet.addCell(label);
                     }
 
                     j++;

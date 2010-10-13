@@ -29,7 +29,7 @@
 
 package com.manydesigns.elements.portal;
 
-import com.manydesigns.elements.AbstractCompositeElement;
+import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.Element;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;

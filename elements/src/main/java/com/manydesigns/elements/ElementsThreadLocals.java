@@ -30,6 +30,7 @@
 package com.manydesigns.elements;
 
 import com.manydesigns.elements.text.BasicTextProvider;
+import com.manydesigns.elements.i18n.TextProvider;
 import ognl.Ognl;
 import ognl.OgnlContext;
 

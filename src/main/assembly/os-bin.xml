@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+  <id>os-bin</id>
+  <formats>
+    <format>tar.gz</format>
+    <format>zip</format>
+  </formats>
+  <files>
+    <file>
+      <source>OPEN-SOURCE-LICENSE.txt</source>
+      <outputDirectory></outputDirectory>
+      <destName>OPEN-SOURCE-LICENSE.txt</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>THIRDPARTIES.txt</source>
+      <outputDirectory></outputDirectory>
+      <destName>THIRDPARTIES.txt</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-war/target/portofino-war-${project.version}.war</source>
+      <outputDirectory></outputDirectory>
+      <destName>portofino-war-${project.version}.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+  </files>
+</assembly>
+

@@ -30,7 +30,7 @@
 package com.manydesigns.elements.servlet;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.TextProvider;
+import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.elements.i18n.SimpleTextProvider;
 
 import javax.servlet.*;

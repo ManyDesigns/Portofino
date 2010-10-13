@@ -85,6 +85,10 @@ public class UploadField extends AbstractField
         }
     }
 
+    public String getStringValue() {
+        return null;
+    }
+
     private void valueToXhtmlView(XhtmlBuffer xb) {
         xb.openElement("div");
         xb.addAttribute("id", id);

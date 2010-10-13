@@ -31,7 +31,7 @@ package com.manydesigns.elements.struts2;
 
 import com.manydesigns.elements.ElementsContext;
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.TextProvider;
+import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.elements.text.BasicTextProvider;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;

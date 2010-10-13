@@ -29,7 +29,7 @@
 
 package com.manydesigns.elements.forms;
 
-import com.manydesigns.elements.AbstractCompositeElement;
+import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 

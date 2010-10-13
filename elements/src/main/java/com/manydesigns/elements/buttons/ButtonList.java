@@ -28,8 +28,7 @@
  */
 package com.manydesigns.elements.buttons;
 
-import com.manydesigns.elements.AbstractCompositeElement;
-import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 /*

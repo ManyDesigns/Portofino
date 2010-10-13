@@ -29,7 +29,7 @@
 
 package com.manydesigns.elements.text;
 
-import com.manydesigns.elements.TextProvider;
+import com.manydesigns.elements.i18n.TextProvider;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
