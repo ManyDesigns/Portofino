@@ -34,7 +34,7 @@ package com.manydesigns.elements.options;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface OptionProvider {
+public interface SelectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 

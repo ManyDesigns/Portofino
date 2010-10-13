@@ -40,6 +40,7 @@ public interface SelectionModel {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    SelectionProvider getSelectionProvider();
     String getName();
     Object getValue(int index);
     void setValue(int index, Object value);

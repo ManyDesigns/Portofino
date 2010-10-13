@@ -31,9 +31,9 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.options.DefaultOptionProvider;
-import com.manydesigns.elements.options.OptionProvider;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionModel;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -70,10 +70,10 @@ public class SelectFieldTest extends AbstractElementsTest {
             {"label1"}
     };
 
-    private OptionProvider optionProvider;
+    private SelectionProvider selectionProvider;
     private SelectionModel selectionModel;
 
-    private OptionProvider optionProvider2;
+    private SelectionProvider selectionProvider2;
     private SelectionModel selectionModel2;
 
     @Override
@@ -82,13 +82,13 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         myText = null;
 
-        optionProvider = DefaultOptionProvider.create(
+        selectionProvider = DefaultSelectionProvider.create(
                 "optionProvider", 1, valuesArray, labelsArray);
-        selectionModel = optionProvider.createSelectionModel();
+        selectionModel = selectionProvider.createSelectionModel();
 
-        optionProvider2 = DefaultOptionProvider.create(
+        selectionProvider2 = DefaultSelectionProvider.create(
                 "optionProvider", 1, valuesArray2, labelsArray2);
-        selectionModel2 = optionProvider2.createSelectionModel();
+        selectionModel2 = selectionProvider2.createSelectionModel();
     }
 
     private void setupSelectFields(Mode mode) {

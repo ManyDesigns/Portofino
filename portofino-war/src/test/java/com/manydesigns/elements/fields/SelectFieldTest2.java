@@ -34,7 +34,7 @@ import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.options.DefaultOptionProvider;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionModel;
 
 import java.util.Map;
@@ -62,7 +62,7 @@ public class SelectFieldTest2 extends AbstractElementsTest {
             {"cip", "ciop"}
     };
 
-    DefaultOptionProvider optionProvider;
+    DefaultSelectionProvider optionProvider;
 
     Form form;
     SelectField selectField1;
@@ -72,7 +72,7 @@ public class SelectFieldTest2 extends AbstractElementsTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        optionProvider = DefaultOptionProvider.create(
+        optionProvider = DefaultSelectionProvider.create(
                 "optionProvider", 2, valuesArray, labelsArray);
 
         form = new FormBuilder(Bean.class)

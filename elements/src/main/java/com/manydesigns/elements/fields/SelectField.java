@@ -32,9 +32,9 @@ package com.manydesigns.elements.fields;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.json.JsonBuffer;
-import com.manydesigns.elements.options.DefaultOptionProvider;
-import com.manydesigns.elements.options.OptionProvider;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionModel;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -63,7 +63,6 @@ public class SelectField extends AbstractField {
 
     protected String comboLabel;
 
-    protected boolean autocomplete;
     protected String autocompleteId;
     protected String autocompleteInputName;
 
@@ -78,10 +77,10 @@ public class SelectField extends AbstractField {
             Object[] values = annotation.values();
             String[] labels = annotation.labels();
             assert(values.length == labels.length);
-            OptionProvider optionProvider =
-                    DefaultOptionProvider.create(
+            SelectionProvider selectionProvider =
+                    DefaultSelectionProvider.create(
                             accessor.getName(), 1, values, labels);
-            selectionModel = optionProvider.createSelectionModel();
+            selectionModel = selectionProvider.createSelectionModel();
             selectionModelIndex = 0;
         }
 
@@ -155,7 +154,7 @@ public class SelectField extends AbstractField {
     }
 
     private void valueToXhtmlEdit(XhtmlBuffer xb) {
-        if (autocomplete) {
+        if (selectionModel.getSelectionProvider().isAutocomplete()) {
             valueToXhtmlEditAutocomplete(xb);
         } else {
             valueToXhtmlEditDropDown(xb);
@@ -187,10 +186,10 @@ public class SelectField extends AbstractField {
         }
         xb.closeElement("select");
 
-        String autocompleteJs = composeAutocompleteJs();
+        String js = composeDropDownJs();
 
         xb.openElement("script");
-        xb.write(autocompleteJs);
+        xb.write(js);
         xb.closeElement("script");
 
     }
@@ -212,7 +211,7 @@ public class SelectField extends AbstractField {
     protected String composeAutocompleteJs() {
         StringBuilder sb = new StringBuilder();
         sb.append(MessageFormat.format(
-                "setupAutocomplete(''{0}'', ''{1}'', {2}",
+                "setupAutocomplete(''#{0}'', ''{1}'', {2}",
                 StringEscapeUtils.escapeJavaScript(autocompleteId),
                 StringEscapeUtils.escapeJavaScript(selectionModel.getName()),
                 selectionModelIndex));
@@ -252,10 +251,10 @@ public class SelectField extends AbstractField {
         xb.addAttribute("size", null);
         xb.closeElement("input");
 
-        String autocompleteJs = composeAutocompleteJs();
+        String js = composeAutocompleteJs();
 
         xb.openElement("script");
-        xb.write(autocompleteJs);
+        xb.write(js);
         xb.closeElement("script");
     }
 
@@ -277,7 +276,14 @@ public class SelectField extends AbstractField {
         xb.openElement("div");
         xb.addAttribute("class", "value");
         xb.addAttribute("id", id);
+        if (href != null) {
+            xb.openElement("a");
+            xb.addAttribute("href", href);
+        }
         xb.write(options.get(value));
+        if (href != null) {
+            xb.closeElement("a");
+        }
         xb.closeElement("div");
     }
 
@@ -342,14 +348,6 @@ public class SelectField extends AbstractField {
 
     public void setComboLabel(String comboLabel) {
         this.comboLabel = comboLabel;
-    }
-
-    public boolean isAutocomplete() {
-        return autocomplete;
-    }
-
-    public void setAutocomplete(boolean autocomplete) {
-        this.autocomplete = autocomplete;
     }
 
     public String getAutocompleteId() {

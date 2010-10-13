@@ -30,14 +30,14 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.options.OptionProvider;
-import com.manydesigns.elements.options.DefaultOptionProvider;
 import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
@@ -545,12 +545,12 @@ public class TableDataAction extends PortofinoAction
                 table.findForeignKeyByName(relName);
 
         String[] fieldNames = createFieldNamesForRelationship(relationship);
-        OptionProvider optionProvider =
+        SelectionProvider selectionProvider =
                 createOptionProviderForRelationship(relationship);
 
         Form form = new FormBuilder(tableAccessor)
                 .configFields(fieldNames)
-                .configOptionProvider(optionProvider, fieldNames)
+                .configOptionProvider(selectionProvider, fieldNames)
                 .configMode(Mode.EDIT)
                 .build();
         form.readFromRequest(req);
@@ -588,7 +588,7 @@ public class TableDataAction extends PortofinoAction
         Table table = model.findTableByQualifiedName(qualifiedTableName);
         for (ForeignKey rel : table.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
-            OptionProvider optionProvider =
+            SelectionProvider selectionProvider =
                     createOptionProviderForRelationship(rel);
             boolean autocomplete = false;
             for (ModelAnnotation current : rel.getAnnotations()) {
@@ -597,9 +597,9 @@ public class TableDataAction extends PortofinoAction
                     autocomplete = true;
                 }
             }
-            optionProvider.setAutocomplete(autocomplete);
+            selectionProvider.setAutocomplete(autocomplete);
 
-            formBuilder.configOptionProvider(optionProvider, fieldNames);
+            formBuilder.configOptionProvider(selectionProvider, fieldNames);
         }
 
         return formBuilder;
@@ -612,7 +612,7 @@ public class TableDataAction extends PortofinoAction
         Table table = model.findTableByQualifiedName(qualifiedTableName);
         for (ForeignKey rel : table.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
-            OptionProvider optionProvider =
+            SelectionProvider selectionProvider =
                     createOptionProviderForRelationship(rel);
             boolean autocomplete = false;
             for (ModelAnnotation current : rel.getAnnotations()) {
@@ -621,9 +621,9 @@ public class TableDataAction extends PortofinoAction
                     autocomplete = true;
                 }
             }
-            optionProvider.setAutocomplete(autocomplete);
+            selectionProvider.setAutocomplete(autocomplete);
 
-            tableFormBuilder.configOptionProvider(optionProvider, fieldNames);
+            tableFormBuilder.configOptionProvider(selectionProvider, fieldNames);
         }
         return tableFormBuilder;
     }
@@ -640,7 +640,7 @@ public class TableDataAction extends PortofinoAction
         return fieldNames;
     }
 
-    protected OptionProvider createOptionProviderForRelationship(ForeignKey rel) {
+    protected SelectionProvider createOptionProviderForRelationship(ForeignKey rel) {
         // retrieve the related objects
         Table relatedTable = rel.getToTable();
         ClassAccessor classAccessor =
@@ -653,10 +653,10 @@ public class TableDataAction extends PortofinoAction
         if (shortNameAnnotation != null) {
             textFormat = OgnlTextFormat.create(shortNameAnnotation.value());
         }
-        OptionProvider optionProvider =
-                DefaultOptionProvider.create(rel.getForeignKeyName(),
+        SelectionProvider selectionProvider =
+                DefaultSelectionProvider.create(rel.getForeignKeyName(),
                         relatedObjects, classAccessor, textFormat);
-        return optionProvider;
+        return selectionProvider;
     }
 
 
@@ -712,13 +712,13 @@ public class TableDataAction extends PortofinoAction
 
             int l = 0;
             for (TableForm.Column col : tableForm.getColumns()) {
-                sheet.addCell(new Label(0, l, col.getLabel()));
+                sheet.addCell(new Label(l, 0, col.getLabel()));
                 l++;
             }
 
-            int i = 0;
+            int i = 1;
             for ( TableForm.Row col : tableForm.getRows()) {
-                int j = 1;
+                int j = 0;
 
                 for (Field field : Arrays.asList(col.getFields())) {
                     if ( field instanceof NumericField) {
@@ -727,7 +727,7 @@ public class TableDataAction extends PortofinoAction
                         //DecimalFormat format = numField.getDecimalFormat();
                         //String val = format.format(numField.getDecimalValue());
                         if ( numField.getDecimalValue() != null ) {
-                            Number number = new Number(i, j,
+                            Number number = new Number(j, i,
                                     numField.getDecimalValue().doubleValue());
                             sheet.addCell(number);
                         }
@@ -735,23 +735,23 @@ public class TableDataAction extends PortofinoAction
                         BooleanField bool = (BooleanField)field;
                         String value = bool.getBooleanValue()?
                                 getText("elements.Yes"):getText("elements.No");
-                        Label label = new Label(i, j, value);
+                        Label label = new Label(j, i, value);
                         sheet.addCell(label);
                     } else if ( field instanceof PasswordField) {
-                        Label label = new Label(i, j,
+                        Label label = new Label(j, i,
                                 PasswordField.PASSWORD_PLACEHOLDER);
                         sheet.addCell(label);
                     } else if ( field instanceof SelectField) {
                         SelectField selField = (SelectField)field;
-                        Label label = new Label(i, j,
+                        Label label = new Label(j, i,
                                 selField.getValue().toString());
                         sheet.addCell(label);
                     } else if ( field instanceof DateField ) {
-                        Label label = new Label(i, j,
+                        Label label = new Label(j, i,
                                 ((DateField)field).getStringValue());
                         sheet.addCell(label);
                     } else if ( field instanceof AbstractTextField) {
-                        Label label = new Label(i, j,
+                        Label label = new Label(j, i,
                                 ((TextField)field).getStringValue());
                         sheet.addCell(label);
                     } else {
@@ -847,13 +847,13 @@ public class TableDataAction extends PortofinoAction
 
             int l = 0;
             for (TableForm.Column col : tableForm.getColumns()) {
-                sheet.addCell(new Label(0, l, col.getLabel()));
+                sheet.addCell(new Label(l, 0, col.getLabel()));
                 l++;
             }
 
-            int i = 0;
+            int i = 1;
             for (TableForm.Row col : tableForm.getRows()) {
-                int j = 1;
+                int j = 0;
 
                 for (Field field : Arrays.asList(col.getFields())) {
                     if ( field instanceof NumericField) {
@@ -862,7 +862,7 @@ public class TableDataAction extends PortofinoAction
                         //DecimalFormat format = numField.getDecimalFormat();
                         //String val = format.format(numField.getDecimalValue());
                         if ( numField.getDecimalValue() != null ) {
-                            Number number = new Number(i, j,
+                            Number number = new Number(j, i,
                                     numField.getDecimalValue().doubleValue());
                             sheet.addCell(number);
                         }
@@ -870,23 +870,23 @@ public class TableDataAction extends PortofinoAction
                         BooleanField bool = (BooleanField)field;
                         String value = bool.getBooleanValue()?
                                 getText("elements.Yes"):getText("elements.No");
-                        Label label = new Label(i, j, value);
+                        Label label = new Label(j, i, value);
                         sheet.addCell(label);
                     } else if ( field instanceof PasswordField) {
-                        Label label = new Label(i, j,
+                        Label label = new Label(j, i,
                                 PasswordField.PASSWORD_PLACEHOLDER);
                         sheet.addCell(label);
                     } else if ( field instanceof SelectField) {
                         SelectField selField = (SelectField)field;
-                        Label label = new Label(i, j,
+                        Label label = new Label(j, i,
                                 selField.getValue().toString());
                         sheet.addCell(label);
                     } else if ( field instanceof DateField ) {
-                        Label label = new Label(i, j,
+                        Label label = new Label(j, i,
                                 ((DateField)field).getStringValue());
                         sheet.addCell(label);
                     } else if ( field instanceof AbstractTextField) {
-                        Label label = new Label(i, j,
+                        Label label = new Label(j, i,
                                 ((TextField)field).getStringValue());
                         sheet.addCell(label);
 

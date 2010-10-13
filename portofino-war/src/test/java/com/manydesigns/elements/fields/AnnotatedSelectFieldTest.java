@@ -31,8 +31,8 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.options.OptionProvider;
 import com.manydesigns.elements.annotations.Select;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -53,7 +53,7 @@ public class AnnotatedSelectFieldTest extends AbstractElementsTest {
 
     private SelectField selectField;
 
-    OptionProvider optionProvider;
+    SelectionProvider selectionProvider;
 
     @Override
     protected void setUp() throws Exception {

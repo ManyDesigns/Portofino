@@ -29,8 +29,8 @@
 
 package com.manydesigns.elements;
 
-import com.manydesigns.elements.options.OptionProvider;
 import com.manydesigns.elements.fields.SelectField;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -46,12 +46,12 @@ public class OptionProviderRunner implements Element {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    protected final OptionProvider optionProvider;
+    protected final SelectionProvider selectionProvider;
     protected final SelectField selectFields[];
 
-    public OptionProviderRunner(OptionProvider optionProvider,
+    public OptionProviderRunner(SelectionProvider selectionProvider,
                                 SelectField[] selectFields) {
-        this.optionProvider = optionProvider;
+        this.selectionProvider = selectionProvider;
         this.selectFields = selectFields;
     }
 
@@ -69,7 +69,7 @@ public class OptionProviderRunner implements Element {
 
     public void toXhtml(XhtmlBuffer xb) {
         xb.openElement("script");
-        if (optionProvider.isAutocomplete()) {
+        if (selectionProvider.isAutocomplete()) {
             int index = 0;
             for (SelectField current : selectFields) {
                 String js = composeAutocompleteJs(current, index);
@@ -95,7 +95,7 @@ public class OptionProviderRunner implements Element {
                         "function() '{'" +
                         "updateSelectOptions(''{1}'', {2}",
                 StringEscapeUtils.escapeJavaScript(field.getId()),
-                StringEscapeUtils.escapeJavaScript(optionProvider.getName()),
+                StringEscapeUtils.escapeJavaScript(selectionProvider.getName()),
                 index + 1));
         appendIds(sb);
         sb.append(");});");
@@ -107,7 +107,7 @@ public class OptionProviderRunner implements Element {
         sb.append(MessageFormat.format(
                 "setupAutocomplete(''{0}'', ''{1}'', {2}",
                 StringEscapeUtils.escapeJavaScript(field.getAutocompleteId()),
-                StringEscapeUtils.escapeJavaScript(optionProvider.getName()),
+                StringEscapeUtils.escapeJavaScript(selectionProvider.getName()),
                 index));
         appendIds(sb);
         sb.append(");");
@@ -126,8 +126,8 @@ public class OptionProviderRunner implements Element {
     //**************************************************************************
 
 
-    public OptionProvider getOptionProvider() {
-        return optionProvider;
+    public SelectionProvider getOptionProvider() {
+        return selectionProvider;
     }
 
     public SelectField[] getSelectFields() {

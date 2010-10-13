@@ -53,8 +53,8 @@ function updateSelectOptions(relName, optionProviderIndex) {
 function setupAutocomplete(autocompleteId, relName, optionProviderIndex) {
     var setupArguments = arguments;
     var selectFieldId = setupArguments[3 + optionProviderIndex];
-    var myObj = $("#" + autocompleteId);
-    myObj.autocomplete({
+    var autocompleteObj = $(autocompleteId);
+    autocompleteObj.autocomplete({
         source: function( request, response ) {
             var data = {
                 relName : relName,
@@ -63,9 +63,9 @@ function setupAutocomplete(autocompleteId, relName, optionProviderIndex) {
                 labelSearch : request.term
             };
             for (var i = 3; i < setupArguments.length; i++ ) {
-                var currentId = setupArguments[i];
-                var current = document.getElementById(currentId);
-                data[current.name] = current.value;
+                var currentId = arguments[i];
+                var current = $(currentId);
+                data[current.attr('name')] = current.attr('value');
             }
 
             $.ajax({
@@ -76,24 +76,24 @@ function setupAutocomplete(autocompleteId, relName, optionProviderIndex) {
                 success: function( responseData ) {
                     response( $.map( responseData, function( item ) {
 							return {
-								label: item.l,
-								value: item.l,
-								optionValue: item.v
-							}
+                                label: item.l,
+                                value: item.l,
+                                optionValue: item.v
+                            };
 						}));
                 },
-                error: function(request, textStatus, errorThrown) {
+                error: function(request, textStatus) {
                     alert(textStatus);
                 }
             });
         },
         minLength: 1,
         select: function( event, ui ) {
-            var selectField = document.getElementById(selectFieldId);
+            var selectField = $(selectFieldId);
             if (ui.item) {
-                selectField.value = ui.item.optionValue;
+                selectField.val(ui.item.optionValue);
             } else {
-                selectField.value = "";
+                selectField.val("");
             }
         },
         open: function() {

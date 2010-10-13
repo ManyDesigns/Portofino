@@ -35,8 +35,8 @@ import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.elements.options.OptionProvider;
 import com.manydesigns.elements.options.SelectionModel;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -64,7 +64,7 @@ public class FormBuilder {
 
     protected final FieldsManager manager;
     protected final ClassAccessor classAccessor;
-    protected final Map<String[], OptionProvider> optionProviders;
+    protected final Map<String[], SelectionProvider> optionProviders;
 
     protected List<ArrayList<PropertyAccessor>> groupedPropertyAccessors;
     protected List<String> fieldSetNames;
@@ -87,7 +87,7 @@ public class FormBuilder {
 
         manager = FieldsManager.getManager();
         this.classAccessor = classAccessor;
-        optionProviders = new HashMap<String[], OptionProvider>();
+        optionProviders = new HashMap<String[], SelectionProvider>();
 
         LogUtil.exiting(logger, "FormBuilder");
     }
@@ -150,9 +150,9 @@ public class FormBuilder {
         return this;
     }
 
-    public FormBuilder configOptionProvider(OptionProvider optionProvider,
+    public FormBuilder configOptionProvider(SelectionProvider selectionProvider,
                                             String... fieldNames) {
-        optionProviders.put(fieldNames, optionProvider);
+        optionProviders.put(fieldNames, selectionProvider);
         return this;
     }
 
@@ -218,12 +218,12 @@ public class FormBuilder {
         }
 
         // handle cascaded select fields
-        for (Map.Entry<String[], OptionProvider> current :
+        for (Map.Entry<String[], SelectionProvider> current :
                 optionProviders.entrySet()) {
             String[] fieldNames = current.getKey();
-            OptionProvider optionProvider = current.getValue();
+            SelectionProvider selectionProvider = current.getValue();
             SelectionModel selectionModel =
-                    optionProvider.createSelectionModel();
+                    selectionProvider.createSelectionModel();
 
             SelectField previousField = null;
             for (int i = 0; i < fieldNames.length; i++) {
@@ -267,7 +267,7 @@ public class FormBuilder {
                               Map<String,Field> fieldMap) {
         Field field = null;
         String fieldName = propertyAccessor.getName();
-        for (Map.Entry<String[], OptionProvider> current
+        for (Map.Entry<String[], SelectionProvider> current
                 : optionProviders.entrySet()) {
             String[] fieldNames = current.getKey();
             int index = ArrayUtils.indexOf(fieldNames, fieldName);

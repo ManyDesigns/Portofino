@@ -48,7 +48,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DefaultOptionProvider implements OptionProvider {
+public class DefaultSelectionProvider implements SelectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -64,7 +64,7 @@ public class DefaultOptionProvider implements OptionProvider {
     protected boolean autocomplete;
 
     public final static Logger logger =
-            LogUtil.getLogger(DefaultOptionProvider.class);
+            LogUtil.getLogger(DefaultSelectionProvider.class);
     public static final String NON_WORD_CHARACTERS =
             " \t\n\f\r\\||!\"£$%&/()='?^[]+*@#<>,;.:-_";
 
@@ -72,7 +72,7 @@ public class DefaultOptionProvider implements OptionProvider {
     // Static builders
     //**************************************************************************
 
-    public static DefaultOptionProvider create(String name,
+    public static DefaultSelectionProvider create(String name,
                                                int fieldCount,
                                                Object[] values,
                                                String[] labels) {
@@ -92,15 +92,15 @@ public class DefaultOptionProvider implements OptionProvider {
     }
 
 
-    public static DefaultOptionProvider create(String name,
+    public static DefaultSelectionProvider create(String name,
                                                int fieldCount,
                                                Object[][] valuesArray,
                                                String[][] labelsArray) {
-        return new DefaultOptionProvider(name, fieldCount,
+        return new DefaultSelectionProvider(name, fieldCount,
                 valuesArray, labelsArray);
     }
 
-    public static DefaultOptionProvider create(String name,
+    public static DefaultSelectionProvider create(String name,
                                                Collection<Object> objects,
                                                ClassAccessor classAccessor,
                                                TextFormat textFormat) {
@@ -108,7 +108,7 @@ public class DefaultOptionProvider implements OptionProvider {
         return create(name, objects, textFormat, keyProperties);
     }
 
-    protected static DefaultOptionProvider create(String name,
+    protected static DefaultSelectionProvider create(String name,
                                                   Collection<Object> objects,
                                                   Class objectClass,
                                                   TextFormat textFormat,
@@ -133,7 +133,7 @@ public class DefaultOptionProvider implements OptionProvider {
         return create(name, objects, textFormat, propertyAccessors);
     }
 
-    protected static DefaultOptionProvider create(
+    protected static DefaultSelectionProvider create(
             String name,
             Collection<Object> objects,
             TextFormat textFormat,
@@ -175,7 +175,7 @@ public class DefaultOptionProvider implements OptionProvider {
             labelsArray[i] = labels;
             i++;
         }
-        return new DefaultOptionProvider(
+        return new DefaultSelectionProvider(
                 name, fieldsCount, valuesArray, labelsArray);
     }
 
@@ -183,7 +183,7 @@ public class DefaultOptionProvider implements OptionProvider {
     // Constructor
     //**************************************************************************
 
-    protected DefaultOptionProvider(String name,
+    protected DefaultSelectionProvider(String name,
                                     int fieldCount,
                                     Object[][] valuesArray,
                                     String[][] labelsArray) {
@@ -240,6 +240,10 @@ public class DefaultOptionProvider implements OptionProvider {
                 optionsArray[i] = new LinkedHashMap<Object, String>();
             }
             needsValidation = true;
+        }
+
+        public SelectionProvider getSelectionProvider() {
+            return DefaultSelectionProvider.this;
         }
 
         public String getName() {
