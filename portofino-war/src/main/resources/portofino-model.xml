@@ -16,7 +16,8 @@
                                         scale="0"
                                         nullable="false"
                                         propertyName="uuid"
-                                        searchable="true"/>
+                                        searchable="true">
+                                </column>
                                 <column columnName="emailaddress"
                                         columnType="varchar"
                                         javaType="java.lang.String"
@@ -1034,8 +1035,11 @@
         <siteNode url="/user/Index.action" title="Personal area" description="Personal area">
             <childNodes>
                 <siteNode url="/user/Profile.action" title="Profile" description="Profile"/>
-                <siteNode url="/user/Settings.action" title="Settings" description="Settings"/>
-                <siteNode url="/user/Help.action" title="Help" description="Help"/>
+            </childNodes>
+        </siteNode>
+        <siteNode url="/user-admin/Index.action" title="User admin" description="User administration">
+            <childNodes>
+                <siteNode url="/user-admin/users.action" title="Users" description="users"/>
             </childNodes>
         </siteNode>
     </siteNodes>
