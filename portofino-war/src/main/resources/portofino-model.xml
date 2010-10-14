@@ -1028,8 +1028,6 @@
                 <siteNode url="/system-admin/ServerInfo.action" title="Server info" description="Server info"/>
                 <siteNode url="/system-admin/ConfigurationProperties.action" title="Configuration properties" description="Configuration properties"/>
                 <siteNode url="/system-admin/Logs.action" title="Logs" description="Logs"/>
-                <siteNode url="/system-admin/Logs.action" title="Users" description="Users">
-                </siteNode>
             </childNodes>
         </siteNode>
         <siteNode url="/user/Index.action" title="Personal area" description="Personal area">

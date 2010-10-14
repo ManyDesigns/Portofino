@@ -72,8 +72,8 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>portofino-war/src/main/webapp</directory>
-      <outputDirectory>portofino-war/src/main/webapp</outputDirectory>
+      <directory>portofino-war/src/main</directory>
+      <outputDirectory>portofino-war/src/main</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
