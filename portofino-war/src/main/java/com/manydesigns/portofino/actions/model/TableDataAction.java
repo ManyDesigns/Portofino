@@ -66,10 +66,7 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.text.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Date;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -787,14 +784,18 @@ public class TableDataAction extends PortofinoAction
                 Date date = dateField.getDateValue();
                 if (date != null) {
                     if (dateField.getSimpleDateFormat() == null) {
-                        dateCell = new DateTime(j, i, dateField.getDateValue() == null ? null : dateField.getDateValue());
+                        dateCell = new DateTime(j, i,
+                                dateField.getDateValue() == null
+                                        ? null : dateField.getDateValue());
                     } else {
                         DateFormat dateFormat = new DateFormat(
                                 dateField.getSimpleDateFormat().toPattern());
                         WritableCellFormat wDateFormat =
                                 new WritableCellFormat(dateFormat);
                         dateCell = new DateTime(j, i,
-                                dateField.getDateValue() == null ? null : dateField.getDateValue(), wDateFormat);
+                                dateField.getDateValue() == null
+                                        ? null : dateField.getDateValue(),
+                                wDateFormat);
                     }
                     sheet.addCell(dateCell);
                 }
@@ -813,9 +814,6 @@ public class TableDataAction extends PortofinoAction
 
     public String exportRead() {
         setupTable();
-
-        //Relationship relationship =
-        //        table.findManyToOneByName(relName);
         Serializable pkObject = pkHelper.parsePkString(pk);
 
         SearchFormBuilder searchFormBuilder =
@@ -829,12 +827,17 @@ public class TableDataAction extends PortofinoAction
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
 
-        TableFormBuilder tableFormBuilder =
+       TableFormBuilder tableFormBuilder =
             createTableFormBuilderWithOptionProviders()
                             .configMode(Mode.VIEW)
                             .configNRows(objects.size());
         tableForm = tableFormBuilder.build();
         tableForm.readFromObject(object);
+
+        form = createFormBuilderWithOptionProviders()
+                .configMode(Mode.VIEW)
+                .build();
+        form.readFromObject(object);
 
         relatedTableFormList = new ArrayList<RelatedTableForm>();
         Table table = model.findTableByQualifiedName(qualifiedTableName);
@@ -863,7 +866,7 @@ public class TableDataAction extends PortofinoAction
         WritableWorkbook workbook = null;
         try {
             workbook = Workbook.createWorkbook(fileTemp);
-            WritableSheet sheet = workbook.createSheet("First Sheet", 0);
+            WritableSheet sheet = workbook.createSheet(qualifiedTableName, 0);
 
             int l = 0;
             for (TableForm.Column col : tableForm.getColumns()) {
@@ -872,24 +875,56 @@ public class TableDataAction extends PortofinoAction
             }
 
             int i = 1;
-            for (TableForm.Row col : tableForm.getRows()) {
+            for (FieldSet fieldset : form) {
                 int j = 0;
 
-                for (Field field : Arrays.asList(col.getFields())) {
-                    if ( field instanceof NumericField) {
-                        //NumberFormat numberFormat = new NumberFormat();
-                        NumericField numField = (NumericField)field;
-                        //DecimalFormat format = numField.getDecimalFormat();
-                        //String val = format.format(numField.getDecimalValue());
-                        if ( numField.getDecimalValue() != null ) {
-                            Number number = new Number(j, i,
-                                    numField.getDecimalValue().doubleValue());
+                for (Field field : fieldset) {
+                    if (field instanceof NumericField) {
+                        NumericField numField = (NumericField) field;
+                        if (numField.getDecimalValue() != null) {
+                            Number number;
+                            BigDecimal decimalValue = numField.getDecimalValue();
+                            if (numField.getDecimalFormat() == null) {
+                                number = new Number(j, i,
+                                        decimalValue == null
+                                                ? null : decimalValue.doubleValue());
+                            } else {
+                                NumberFormat numberFormat = new NumberFormat(
+                                        numField.getDecimalFormat().toPattern());
+                                WritableCellFormat writeCellNumberFormat =
+                                        new WritableCellFormat(numberFormat);
+                                number = new Number(j, i,
+                                        decimalValue == null
+                                                ? null : decimalValue.doubleValue(),
+                                        writeCellNumberFormat);
+                            }
                             sheet.addCell(number);
                         }
-                    } else if ( field instanceof PasswordField) {
+                    } else if (field instanceof PasswordField) {
                         Label label = new Label(j, i,
                                 PasswordField.PASSWORD_PLACEHOLDER);
                         sheet.addCell(label);
+                    } else if (field instanceof DateField) {
+                        DateField dateField = (DateField) field;
+                        DateTime dateCell = null;
+                        Date date = dateField.getDateValue();
+                        if (date != null) {
+                            if (dateField.getSimpleDateFormat() == null) {
+                                dateCell = new DateTime(j, i,
+                                        dateField.getDateValue() == null
+                                                ? null : dateField.getDateValue());
+                            } else {
+                                DateFormat dateFormat = new DateFormat(
+                                        dateField.getSimpleDateFormat().toPattern());
+                                WritableCellFormat wDateFormat =
+                                        new WritableCellFormat(dateFormat);
+                                dateCell = new DateTime(j, i,
+                                        dateField.getDateValue() == null
+                                                ? null : dateField.getDateValue(),
+                                        wDateFormat);
+                            }
+                            sheet.addCell(dateCell);
+                        }
                     } else {
                         Label label = new Label(j, i, field.getStringValue());
                         sheet.addCell(label);
@@ -899,70 +934,81 @@ public class TableDataAction extends PortofinoAction
                 }
                 i++;
             }
+
+
             //Aggiungo le relazioni/sheet
-            //Iterator<RelatedTableForm> relTabForm = relatedTableFormList.iterator();
             int k = 1;
-          /*  for (RelatedTableForm relTabForm : relatedTableFormList) {
-                TableFormBuilder tableFormBuilder =
-                        createTableFormBuilderWithOptionProviders()
-                                .configNRows(relTabForm.objects.size());
-                TableForm tableForm = tableFormBuilder.build();
-                tableForm.readFromObject(relTabForm.objects);
-                sheet = workbook.createSheet("sheet " + k, k);
+           for (RelatedTableForm relTabForm : relatedTableFormList) {
+                sheet = workbook.createSheet("sheet " + k , k);
                 k++;
 
-                i = 0;
-                for (TableFormColumn col : tableForm) {
+                int m = 0;
+                for (TableForm.Column col : relTabForm.tableForm.getColumns()) {
+                    sheet.addCell(new Label(m, 0, col.getLabel()));
+                    m++;
+                }
+
+                i = 1;
+                for (TableForm.Row row : relTabForm.tableForm.getRows()) {
                     int j = 0;
 
-                    sheet.addCell(new Label(i, j, col.getLabel()));
-                    j++;
-
-
-                    for (Field field : Arrays.asList(col.getFields())) {
+                    for (Field field : Arrays.asList(row.getFields())) {
                         if (field instanceof NumericField) {
-                            //NumberFormat numberFormat = new NumberFormat();
                             NumericField numField = (NumericField) field;
-                            //DecimalFormat format = numField.getDecimalFormat();
-                            //String val = format.format(numField.getDecimalValue());
                             if (numField.getDecimalValue() != null) {
-                                Number number = new Number(i, j,
-                                        numField.getDecimalValue().doubleValue());
+                                Number number;
+                                BigDecimal decimalValue = numField.getDecimalValue();
+                                if (numField.getDecimalFormat() == null) {
+                                    number = new Number(j, i,
+                                            decimalValue == null
+                                                    ? null : decimalValue.doubleValue());
+                                } else {
+                                    NumberFormat numberFormat = new NumberFormat(
+                                            numField.getDecimalFormat().toPattern());
+                                    WritableCellFormat writeCellNumberFormat =
+                                            new WritableCellFormat(numberFormat);
+                                    number = new Number(j, i,
+                                            decimalValue == null
+                                                    ? null : decimalValue.doubleValue(),
+                                            writeCellNumberFormat);
+                                }
                                 sheet.addCell(number);
                             }
-                        } else if (field instanceof BooleanField) {
-                            BooleanField bool = (BooleanField) field;
-                            String value = bool.getBooleanValue() ?
-                                    getText("elements.Yes") : getText("elements.No");
-                            Label label = new Label(i, j, value);
-                            sheet.addCell(label);
                         } else if (field instanceof PasswordField) {
-                            Label label = new Label(i, j,
+                            Label label = new Label(j, i,
                                     PasswordField.PASSWORD_PLACEHOLDER);
                             sheet.addCell(label);
-                        } else if (field instanceof SelectField) {
-                            SelectField selField = (SelectField) field;
-                            Label label = new Label(i, j,
-                                    selField.getValue().toString());
-                            sheet.addCell(label);
                         } else if (field instanceof DateField) {
-                            Label label = new Label(i, j,
-                                    ((DateField) field).getStringValue());
-                            sheet.addCell(label);
-                        } else if ( field instanceof AbstractTextField) {
-                            Label label = new Label(i, j,
-                                ((TextField)field).getStringValue());
-                            sheet.addCell(label);
+                            DateField dateField = (DateField) field;
+                            DateTime dateCell = null;
+                            Date date = dateField.getDateValue();
+                            if (date != null) {
+                                if (dateField.getSimpleDateFormat() == null) {
+                                    dateCell = new DateTime(j, i,
+                                            dateField.getDateValue() == null
+                                                    ? null : dateField.getDateValue());
+                                } else {
+                                    DateFormat dateFormat = new DateFormat(
+                                            dateField.getSimpleDateFormat().toPattern());
+                                    WritableCellFormat wDateFormat =
+                                            new WritableCellFormat(dateFormat);
+                                    dateCell = new DateTime(j, i,
+                                            dateField.getDateValue() == null
+                                                    ? null : dateField.getDateValue(),
+                                            wDateFormat);
+                                }
+                                sheet.addCell(dateCell);
+                            }
                         } else {
-                            continue;
+                            Label label = new Label(j, i, field.getStringValue());
+                            sheet.addCell(label);
                         }
-
                         j++;
                     }
                     i++;
                 }
 
-            }      */
+            }
 
             workbook.write();
         } catch (IOException e) {
