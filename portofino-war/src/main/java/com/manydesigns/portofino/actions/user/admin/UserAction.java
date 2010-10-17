@@ -642,7 +642,7 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
 
         tableForm.readFromObject(objects);
 
-        String exportId = TempFiles.generateRandomCode();
+        String exportId = TempFiles.createExportFileTemp();
         File fileTemp = TempFiles.getTempFile(EXPORT_FILENAME_FORMAT, exportId);
 
         createExportExcel(fileTemp);
@@ -763,7 +763,7 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
             setupRelatedTableForm(relationship);
         }
 
-        String exportId = TempFiles.generateRandomCode();
+        String exportId = TempFiles.createExportFileTemp();
         File fileTemp = TempFiles.getTempFile(EXPORT_FILENAME_FORMAT, exportId);
 
         createExportExcelRel(fileTemp);
