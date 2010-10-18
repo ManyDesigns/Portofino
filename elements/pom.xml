@@ -37,5 +37,11 @@
             <version>${ognl.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda-time.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>

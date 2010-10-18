@@ -29,10 +29,10 @@
 
 package com.manydesigns.elements.fields;
 
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.elements.Mode;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -152,7 +152,7 @@ public class NumericField extends AbstractTextField {
             //Provo a parserizzare il numero come BigDecimal
             tmpValue = (BigDecimal) Util.convertValue(
                     stringValue, BigDecimal.class);
-        } catch (NumberFormatException e) {
+        } catch (Throwable e) {
             //Se il testo non è un BigDecimal provo a parserizzarlo
             // con il pattern specificato nel format
             if (decimalFormat == null) {

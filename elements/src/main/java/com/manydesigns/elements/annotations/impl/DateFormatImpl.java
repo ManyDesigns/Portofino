@@ -39,7 +39,7 @@ import java.lang.annotation.Annotation;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 @SuppressWarnings({"ClassExplicitlyAnnotation"})
-public class DateFormatImpl {
+public class DateFormatImpl implements DateFormat {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 

@@ -89,3 +89,8 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex) {
         }
     });
 }
+
+function setupDatePicker(dateFieldId, dateFormat) {
+    var dateField = $(dateFieldId);
+    dateField.datepicker({ dateFormat: dateFormat });
+}

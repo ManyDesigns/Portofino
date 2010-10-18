@@ -71,6 +71,8 @@ public final class ElementsProperties {
 
     public static final String FIELDS_LABEL_CAPITALIZE_PROPERTY =
             "fields.label.capitalize";
+    public static final String FIELDS_DATE_DEFAULT_FORMAT_PROPERTY =
+            "fields.date.default.format";
 
     //**************************************************************************
     // Static fields, singleton initialization and retrieval

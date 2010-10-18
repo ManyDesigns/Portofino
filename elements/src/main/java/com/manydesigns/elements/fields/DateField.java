@@ -29,19 +29,22 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.DateFormat;
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
+import java.text.MessageFormat;
 import java.util.Date;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,9 +55,15 @@ public class DateField extends AbstractTextField {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    protected final String datePattern;
+    protected final DateTimeFormatter dateTimeFormatter;
+    protected final boolean containsTime;
+    protected final String jsDatePattern;
+
     protected Date dateValue;
-    protected SimpleDateFormat simpleDateFormat;
     protected boolean dateFormatError;
+
+    public static final Logger logger = LogUtil.getLogger(DateField.class);
 
     public DateField(PropertyAccessor accessor, Mode mode) {
         this(accessor, mode, null);
@@ -62,14 +71,35 @@ public class DateField extends AbstractTextField {
 
     public DateField(PropertyAccessor accessor, Mode mode, String prefix) {
         super(accessor, mode, prefix);
-        setMaxLength(10);
 
         DateFormat dateFormatAnnotation =
                 accessor.getAnnotation(DateFormat.class);
         if (dateFormatAnnotation != null) {
-            simpleDateFormat = new SimpleDateFormat(dateFormatAnnotation.value());
+            datePattern = dateFormatAnnotation.value();
+        } else {
+            Properties elementsProperties =
+                    ElementsProperties.getProperties();
+            datePattern = elementsProperties.getProperty(
+                    ElementsProperties.FIELDS_DATE_DEFAULT_FORMAT_PROPERTY);
         }
+        dateTimeFormatter = DateTimeFormat.forPattern(datePattern);
+        setMaxLength(dateTimeFormatter.getParser().estimateParsedLength());
 
+        containsTime = datePattern.contains("HH")
+                || datePattern.contains("mm")
+                || datePattern.contains("ss");
+
+        String tmpPattern = datePattern;
+        if (tmpPattern.contains("yyyy")) {
+            tmpPattern = tmpPattern.replaceAll("yyyy", "yy");
+        }
+        if (tmpPattern.contains("MM")) {
+            tmpPattern = tmpPattern.replaceAll("MM", "mm");
+        }
+        if (tmpPattern.contains("dd")) {
+            tmpPattern = tmpPattern.replaceAll("dd", "dd");
+        }
+        jsDatePattern = tmpPattern;
     }
 
     public void readFromRequest(HttpServletRequest req) {
@@ -92,22 +122,12 @@ public class DateField extends AbstractTextField {
             return;
         }
 
-        ParsePosition parsePos = new ParsePosition(0);
-        ensureDateFormatPresent();
-        java.util.Date parsedDate =
-                simpleDateFormat.parse(stringValue, parsePos);
-
-        if (stringValue.length() != parsePos.getIndex()) {
+        try {
+            DateTime dateTime = dateTimeFormatter.parseDateTime(stringValue);
+            dateValue = new Date(dateTime.getMillis());
+        } catch (Throwable e) {
             dateFormatError = true;
-            return;
-        }
-        dateValue = new Date(parsedDate.getTime());
-    }
-
-    public void ensureDateFormatPresent() {
-        if (simpleDateFormat == null) {
-            // install ISO date formatter
-            simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            LogUtil.fineMF(logger, "Cannot parse date: {0}", stringValue);
         }
     }
 
@@ -145,13 +165,11 @@ public class DateField extends AbstractTextField {
             if (dateValue == null) {
                 stringValue = null;
             } else {
-                ensureDateFormatPresent();
-                stringValue = simpleDateFormat.format(dateValue);
+                DateTime dateTime = new DateTime(dateValue);
+                stringValue = dateTimeFormatter.print(dateTime);
             }
-        } catch (IllegalAccessException e) {
-            throw new Error(e);
-        } catch (InvocationTargetException e) {
-            throw new Error(e);
+        } catch (Throwable e) {
+            LogUtil.severe(logger, "Exception caught", e);
         }
     }
 
@@ -176,43 +194,22 @@ public class DateField extends AbstractTextField {
                 xb.addAttribute("maxlength", Integer.toString(maxLength));
                 xb.addAttribute("size", Integer.toString(maxLength));
             }
-            String errorMsg =
-                    getText("elements.error.field.date.format");
 
-            ensureDateFormatPresent();
-            String localizedPattern = simpleDateFormat.toLocalizedPattern();
-
-            String onBlurScript = "ctrTypeDate(this, '" +
-                    localizedPattern +
-                    "','" + StringEscapeUtils.escapeJavaScript(errorMsg) + "');";
-            xb.addAttribute("onblur", onBlurScript);
-            xb.addAttribute("onfocus", "backgroundDelete(this);");
             xb.closeElement("input");
-
             xb.write(" (");
-            xb.write(localizedPattern);
+            xb.write(datePattern);
             xb.write(") ");
 
-            HttpServletRequest req =
-                    ElementsThreadLocals.getHttpServletRequest();
-            String calImgLink =
-                    Util.getAbsoluteLink(req, "/jscalendar/img.gif");
-            xb.writeImage(calImgLink, "calendar", "calendar",
-                    "cal" + id, "calendar");
-
-            String dateFormat = localizedPattern.toUpperCase();
-            dateFormat = dateFormat.replaceAll("DD", "%d");
-            dateFormat = dateFormat.replaceAll("YYYY", "%Y");
-            dateFormat = dateFormat.replaceAll("MM", "%m");
-
-            xb.openElement("script");
-            xb.addAttribute("type", "text/javascript");
-            xb.writeNoHtmlEscape("Calendar.setup({ "
-                    + "inputField     :    \"" + id + "\","
-                    + "ifFormat       :    \"" + dateFormat + "\","
-                    + "button         :    \"cal" + id + "\""
-                    + "});");
-            xb.closeElement("script");
+            if (!containsTime) {
+                String js = MessageFormat.format(
+                        "setupDatePicker(''#{0}'', ''{1}'');",
+                        StringEscapeUtils.escapeJavaScript(id),
+                        StringEscapeUtils.escapeJavaScript(jsDatePattern));
+                xb.openElement("script");
+                xb.addAttribute("type", "text/javascript");
+                xb.writeNoHtmlEscape(js);
+                xb.closeElement("script");
+            }
         } else {
             super.valueToXhtml(xb);
         }
@@ -230,11 +227,8 @@ public class DateField extends AbstractTextField {
         this.dateValue = dateValue;
     }
 
-    public SimpleDateFormat getSimpleDateFormat() {
-        return simpleDateFormat;
+    public String getDatePattern() {
+        return datePattern;
     }
 
-    public void setSimpleDateFormat(SimpleDateFormat simpleDateFormat) {
-        this.simpleDateFormat = simpleDateFormat;
-    }
 }

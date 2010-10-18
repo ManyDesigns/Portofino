@@ -92,7 +92,7 @@ public class PwdRecoveryAction extends PortofinoAction
                     req.getScheme(),
                     req.getServerName(),
                     port,
-                    com.manydesigns.elements.util.Util.getAbsoluteLink(req,
+                    com.manydesigns.elements.util.Util.getAbsoluteUrl(req,
                             "user/LostPasswordChange.action"),
                     user.getToken());
         Properties properties = PortofinoProperties

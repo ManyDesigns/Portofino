@@ -58,19 +58,20 @@ import com.manydesigns.portofino.util.TempFiles;
 import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
-import jxl.write.NumberFormat;
-import jxl.write.DateFormat;
 import jxl.write.biff.RowsExceededException;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.text.*;
-import java.util.*;
+import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.math.BigDecimal;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -914,20 +915,14 @@ public class TableDataAction extends PortofinoAction
             DateTime dateCell = null;
             Date date = dateField.getDateValue();
             if (date != null) {
-                if (dateField.getSimpleDateFormat() == null) {
-                    dateCell = new DateTime(j, i,
-                            dateField.getDateValue() == null
-                                    ? null : dateField.getDateValue());
-                } else {
-                    DateFormat dateFormat = new DateFormat(
-                            dateField.getSimpleDateFormat().toPattern());
-                    WritableCellFormat wDateFormat =
-                            new WritableCellFormat(dateFormat);
-                    dateCell = new DateTime(j, i,
-                            dateField.getDateValue() == null
-                                    ? null : dateField.getDateValue(),
-                            wDateFormat);
-                }
+                DateFormat dateFormat = new DateFormat(
+                        dateField.getDatePattern());
+                WritableCellFormat wDateFormat =
+                        new WritableCellFormat(dateFormat);
+                dateCell = new DateTime(j, i,
+                        dateField.getDateValue() == null
+                                ? null : dateField.getDateValue(),
+                        wDateFormat);
                 sheet.addCell(dateCell);
             }
         } else {

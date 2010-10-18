@@ -64,7 +64,7 @@ public class Util {
 
     public static final Logger logger = LogUtil.getLogger(Util.class);
 
-    public static String getAbsoluteLink(HttpServletRequest req,
+    public static String getAbsoluteUrl(HttpServletRequest req,
                                          String url) {
         StringBuilder sb = new StringBuilder();
 
@@ -90,7 +90,7 @@ public class Util {
         HttpServletRequest req =
                 ElementsThreadLocals.getHttpServletRequest();
 
-        return getAbsoluteLink(req, link);
+        return getAbsoluteUrl(req, link);
     }
 
     public static String camelCaseToWords(String s) {
