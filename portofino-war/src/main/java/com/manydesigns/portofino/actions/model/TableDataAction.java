@@ -554,7 +554,7 @@ public class TableDataAction extends PortofinoAction
 
         Form form = new FormBuilder(tableAccessor)
                 .configFields(fieldNames)
-                .configOptionProvider(selectionProvider, fieldNames)
+                .configSelectionProvider(selectionProvider, fieldNames)
                 .configMode(Mode.EDIT)
                 .build();
         form.readFromRequest(req);
@@ -562,8 +562,6 @@ public class TableDataAction extends PortofinoAction
         SelectField targetField =
                 (SelectField) form.get(0).get(optionProviderIndex);
         targetField.setLabelSearch(labelSearch);
-
-        form.validate();
 
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
         LogUtil.infoMF(logger, "jsonSelectFieldOptions: {0}", text);
@@ -603,7 +601,7 @@ public class TableDataAction extends PortofinoAction
             }
             selectionProvider.setAutocomplete(autocomplete);
 
-            formBuilder.configOptionProvider(selectionProvider, fieldNames);
+            formBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
 
         return formBuilder;
@@ -653,13 +651,15 @@ public class TableDataAction extends PortofinoAction
                 context.getAllObjects(relatedTable.getQualifiedName());
         ShortName shortNameAnnotation =
                 classAccessor.getAnnotation(ShortName.class);
-        TextFormat textFormat = null;
+        TextFormat[] textFormats = null;
         if (shortNameAnnotation != null) {
-            textFormat = OgnlTextFormat.create(shortNameAnnotation.value());
+            textFormats = new TextFormat[] {
+                OgnlTextFormat.create(shortNameAnnotation.value())
+            };
         }
         SelectionProvider selectionProvider =
                 DefaultSelectionProvider.create(rel.getForeignKeyName(),
-                        relatedObjects, classAccessor, textFormat);
+                        relatedObjects, classAccessor, textFormats);
         return selectionProvider;
     }
 

@@ -101,18 +101,36 @@ public class DefaultSelectionProvider implements SelectionProvider {
     }
 
     public static DefaultSelectionProvider create(String name,
-                                               Collection<Object> objects,
+                                               Collection objects,
                                                ClassAccessor classAccessor,
                                                TextFormat textFormat) {
-        PropertyAccessor[] keyProperties = classAccessor.getKeyProperties();
-        return create(name, objects, textFormat, keyProperties);
+        return create(name, objects, classAccessor,
+                new TextFormat[] {textFormat});
     }
 
-    protected static DefaultSelectionProvider create(String name,
-                                                  Collection<Object> objects,
+    public static DefaultSelectionProvider create(String name,
+                                               Collection objects,
+                                               ClassAccessor classAccessor,
+                                               TextFormat[] textFormats) {
+        PropertyAccessor[] keyProperties = classAccessor.getKeyProperties();
+        return create(name, objects, textFormats, keyProperties);
+    }
+
+    public static DefaultSelectionProvider create(String name,
+                                                  Collection objects,
                                                   Class objectClass,
                                                   TextFormat textFormat,
-                                                  String... propertyNames) {
+                                                  String propertyName) {
+        return create(name, objects, objectClass,
+                new TextFormat[] {textFormat},
+                new String[] {propertyName});
+    }
+
+    public static DefaultSelectionProvider create(String name,
+                                                  Collection objects,
+                                                  Class objectClass,
+                                                  TextFormat[] textFormats,
+                                                  String[] propertyNames) {
         ClassAccessor classAccessor =
                 JavaClassAccessor.getClassAccessor(objectClass);
         PropertyAccessor[] propertyAccessors =
@@ -130,14 +148,25 @@ public class DefaultSelectionProvider implements SelectionProvider {
                 throw new IllegalArgumentException(msg, e);
             }
         }
-        return create(name, objects, textFormat, propertyAccessors);
+        return create(name, objects, textFormats, propertyAccessors);
     }
 
-    protected static DefaultSelectionProvider create(
+    public static DefaultSelectionProvider create(
             String name,
-            Collection<Object> objects,
+            Collection objects,
             TextFormat textFormat,
-            PropertyAccessor... propertyAccessors
+            PropertyAccessor propertyAccessor
+    ) {
+        return create(name, objects,
+                new TextFormat[] {textFormat},
+                new PropertyAccessor[] {propertyAccessor});
+    }
+
+    public static DefaultSelectionProvider create(
+            String name,
+            Collection objects,
+            TextFormat[] textFormats,
+            PropertyAccessor[] propertyAccessors
     ) {
         int fieldsCount = propertyAccessors.length;
         Object[][] valuesArray = new Object[objects.size()][fieldsCount];
@@ -147,20 +176,16 @@ public class DefaultSelectionProvider implements SelectionProvider {
             Object[] values = new Object[fieldsCount];
             String[] labels = new String[fieldsCount];
             int j = 0;
-            String shortName = null;
-            if (textFormat != null) {
-                shortName = textFormat.format(current);
-            }
             for (PropertyAccessor property : propertyAccessors) {
                 try {
                     Object value = property.get(current);
                     values[j] = value;
-                    if (textFormat == null) {
-                        String label =
-                                (String) Util.convertValue(value, String.class);
+                    if (textFormats == null || textFormats[j] == null) {
+                        String label = Util.convertValueToString(value);
                         labels[j] = label;
                     } else {
-                        labels[j] = shortName;
+                        TextFormat textFormat = textFormats[j];
+                        labels[j] = textFormat.format(current);
                     }
                 } catch (Throwable e) {
                     String msg = MessageFormat.format(

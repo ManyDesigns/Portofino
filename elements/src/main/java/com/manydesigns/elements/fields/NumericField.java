@@ -117,9 +117,10 @@ public class NumericField extends AbstractTextField {
             decimalFormat = new DecimalFormat("#,##0");
         }
 
-        if (accessor.isAnnotationPresent(com.manydesigns.elements.annotations.DecimalFormat.class)) {
-            decimalFormat = new DecimalFormat(accessor.getAnnotation(
-                            com.manydesigns.elements.annotations.DecimalFormat.class).value());
+        com.manydesigns.elements.annotations.DecimalFormat decimalFormatAnnotation =
+                accessor.getAnnotation(com.manydesigns.elements.annotations.DecimalFormat.class);
+        if (decimalFormatAnnotation != null) {
+            decimalFormat = new DecimalFormat(decimalFormatAnnotation.value());
         }
     }
 

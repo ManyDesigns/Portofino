@@ -76,7 +76,7 @@ public class SelectFieldTest2 extends AbstractElementsTest {
                 "optionProvider", 2, valuesArray, labelsArray);
 
         form = new FormBuilder(Bean.class)
-                .configOptionProvider(optionProvider, "p1", "p2")
+                .configSelectionProvider(optionProvider, "p1", "p2")
                 .build();
         FieldSet fieldSet = form.get(0);
         selectField1 = (SelectField) fieldSet.get(0);

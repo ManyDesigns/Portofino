@@ -31,6 +31,7 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.DateFormat;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -62,6 +63,13 @@ public class DateField extends AbstractTextField {
     public DateField(PropertyAccessor accessor, Mode mode, String prefix) {
         super(accessor, mode, prefix);
         setMaxLength(10);
+
+        DateFormat dateFormatAnnotation =
+                accessor.getAnnotation(DateFormat.class);
+        if (dateFormatAnnotation != null) {
+            simpleDateFormat = new SimpleDateFormat(dateFormatAnnotation.value());
+        }
+
     }
 
     public void readFromRequest(HttpServletRequest req) {

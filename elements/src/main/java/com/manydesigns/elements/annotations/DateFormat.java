@@ -27,45 +27,23 @@
  *
  */
 
-package com.manydesigns.elements.servlet;
+package com.manydesigns.elements.annotations;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.i18n.TextProvider;
-import com.manydesigns.elements.i18n.SimpleTextProvider;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.annotation.ElementType;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ElementsFilter implements Filter {
-    FilterConfig config;
-    public void init(FilterConfig filterConfig) throws ServletException {
-        this.config=filterConfig;
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface DateFormat {
+    public static final String copyright =
+            "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public void doFilter(ServletRequest req,
-                         ServletResponse res, FilterChain filterChain)
-            throws IOException, ServletException {
-        ServletContext context = config.getServletContext();
-
-        try {
-            ElementsThreadLocals.setupDefaultElementsContext();
-            
-            ElementsThreadLocals.setHttpServletRequest((HttpServletRequest) req);
-            ElementsThreadLocals.setHttpServletResponse((HttpServletResponse) res);
-            ElementsThreadLocals.setServletContext(context);
-
-            filterChain.doFilter(req, res);
-        } finally {
-            ElementsThreadLocals.removeElementsContext();
-        }
-    }
-
-    public void destroy() {}
+    String value();
 }

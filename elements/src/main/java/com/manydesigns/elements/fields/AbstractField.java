@@ -47,6 +47,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import ognl.TypeConverter;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -416,7 +418,9 @@ public abstract class AbstractField implements Field {
         }
 
         try {
-            accessor.set(obj, value);
+            Object convertedValue =
+                    Util.convertValue(value, accessor.getType());
+            accessor.set(obj, convertedValue);
         } catch (IllegalAccessException e) {
             throw new Error(e);
         } catch (InvocationTargetException e) {

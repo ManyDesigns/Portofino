@@ -27,45 +27,33 @@
  *
  */
 
-package com.manydesigns.elements.servlet;
+package com.manydesigns.elements.annotations.impl;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.i18n.TextProvider;
-import com.manydesigns.elements.i18n.SimpleTextProvider;
+import com.manydesigns.elements.annotations.DateFormat;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.lang.annotation.Annotation;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ElementsFilter implements Filter {
-    FilterConfig config;
-    public void init(FilterConfig filterConfig) throws ServletException {
-        this.config=filterConfig;
+@SuppressWarnings({"ClassExplicitlyAnnotation"})
+public class DateFormatImpl {
+    public static final String copyright =
+            "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    private final String value;
+
+    public DateFormatImpl(String value) {
+        this.value = value;
     }
 
-    public void doFilter(ServletRequest req,
-                         ServletResponse res, FilterChain filterChain)
-            throws IOException, ServletException {
-        ServletContext context = config.getServletContext();
-
-        try {
-            ElementsThreadLocals.setupDefaultElementsContext();
-            
-            ElementsThreadLocals.setHttpServletRequest((HttpServletRequest) req);
-            ElementsThreadLocals.setHttpServletResponse((HttpServletResponse) res);
-            ElementsThreadLocals.setServletContext(context);
-
-            filterChain.doFilter(req, res);
-        } finally {
-            ElementsThreadLocals.removeElementsContext();
-        }
+    public String value() {
+        return value;
     }
 
-    public void destroy() {}
+    public Class<? extends Annotation> annotationType() {
+        return DateFormat.class;
+    }
 }

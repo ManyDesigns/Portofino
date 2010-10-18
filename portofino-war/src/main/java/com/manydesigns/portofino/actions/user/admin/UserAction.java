@@ -499,7 +499,7 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
 
         Form form = new FormBuilder(tableAccessor)
                 .configFields(fieldNames)
-                .configOptionProvider(selectionProvider, fieldNames)
+                .configSelectionProvider(selectionProvider, fieldNames)
                 .configMode(Mode.EDIT)
                 .build();
         form.readFromRequest(req);
@@ -548,7 +548,7 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
             }
             selectionProvider.setAutocomplete(autocomplete);
 
-            formBuilder.configOptionProvider(selectionProvider, fieldNames);
+            formBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
 
         return formBuilder;
@@ -598,9 +598,11 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
                 context.getAllObjects(relatedTable.getQualifiedName());
         ShortName shortNameAnnotation =
                 classAccessor.getAnnotation(ShortName.class);
-        TextFormat textFormat = null;
+        TextFormat[] textFormat = null;
         if (shortNameAnnotation != null) {
-            textFormat = OgnlTextFormat.create(shortNameAnnotation.value());
+            textFormat = new TextFormat[] {
+                OgnlTextFormat.create(shortNameAnnotation.value())
+            };
         }
         SelectionProvider selectionProvider =
                 DefaultSelectionProvider.create(rel.getForeignKeyName(),

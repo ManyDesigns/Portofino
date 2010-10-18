@@ -64,7 +64,7 @@ public class FormBuilder {
 
     protected final FieldsManager manager;
     protected final ClassAccessor classAccessor;
-    protected final Map<String[], SelectionProvider> optionProviders;
+    protected final Map<String[], SelectionProvider> selectionProviders;
 
     protected List<ArrayList<PropertyAccessor>> groupedPropertyAccessors;
     protected List<String> fieldSetNames;
@@ -87,7 +87,7 @@ public class FormBuilder {
 
         manager = FieldsManager.getManager();
         this.classAccessor = classAccessor;
-        optionProviders = new HashMap<String[], SelectionProvider>();
+        selectionProviders = new HashMap<String[], SelectionProvider>();
 
         LogUtil.exiting(logger, "FormBuilder");
     }
@@ -150,9 +150,9 @@ public class FormBuilder {
         return this;
     }
 
-    public FormBuilder configOptionProvider(SelectionProvider selectionProvider,
+    public FormBuilder configSelectionProvider(SelectionProvider selectionProvider,
                                             String... fieldNames) {
-        optionProviders.put(fieldNames, selectionProvider);
+        selectionProviders.put(fieldNames, selectionProvider);
         return this;
     }
 
@@ -219,7 +219,7 @@ public class FormBuilder {
 
         // handle cascaded select fields
         for (Map.Entry<String[], SelectionProvider> current :
-                optionProviders.entrySet()) {
+                selectionProviders.entrySet()) {
             String[] fieldNames = current.getKey();
             SelectionProvider selectionProvider = current.getValue();
             SelectionModel selectionModel =
@@ -268,7 +268,7 @@ public class FormBuilder {
         Field field = null;
         String fieldName = propertyAccessor.getName();
         for (Map.Entry<String[], SelectionProvider> current
-                : optionProviders.entrySet()) {
+                : selectionProviders.entrySet()) {
             String[] fieldNames = current.getKey();
             int index = ArrayUtils.indexOf(fieldNames, fieldName);
             if (index >= 0) {

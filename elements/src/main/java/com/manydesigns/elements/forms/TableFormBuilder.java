@@ -67,7 +67,7 @@ public class TableFormBuilder {
     protected final ClassAccessor classAccessor;
     protected final Map<String, TextFormat> hrefGenerators;
     protected final Map<String, TextFormat> altGenerators;
-    protected final Map<String[], SelectionProvider> optionProviders;
+    protected final Map<String[], SelectionProvider> selectionProviders;
 
     protected List<PropertyAccessor> propertyAccessors;
     protected String prefix;
@@ -90,7 +90,7 @@ public class TableFormBuilder {
         this.classAccessor = classAccessor;
         hrefGenerators = new HashMap<String, TextFormat>();
         altGenerators = new HashMap<String, TextFormat>();
-        optionProviders = new HashMap<String[], SelectionProvider>();
+        selectionProviders = new HashMap<String[], SelectionProvider>();
         manager = FieldsManager.getManager();
     }
 
@@ -131,7 +131,7 @@ public class TableFormBuilder {
 
     public TableFormBuilder configOptionProvider(SelectionProvider selectionProvider,
                                             String... fieldNames) {
-        optionProviders.put(fieldNames, selectionProvider);
+        selectionProviders.put(fieldNames, selectionProvider);
         return this;
     }
 
@@ -220,7 +220,7 @@ public class TableFormBuilder {
 
             // handle cascaded select fields
             for (Map.Entry<String[], SelectionProvider> current :
-                    optionProviders.entrySet()) {
+                    selectionProviders.entrySet()) {
                 String[] fieldNames = current.getKey();
                 SelectionProvider selectionProvider = current.getValue();
                 SelectionModel selectionModel =
@@ -262,7 +262,7 @@ public class TableFormBuilder {
         Field field = null;
         String fieldName = propertyAccessor.getName();
         for (Map.Entry<String[], SelectionProvider> current
-                : optionProviders.entrySet()) {
+                : selectionProviders.entrySet()) {
             String[] fieldNames = current.getKey();
             int index = ArrayUtils.indexOf(fieldNames, fieldName);
             if (index >= 0) {

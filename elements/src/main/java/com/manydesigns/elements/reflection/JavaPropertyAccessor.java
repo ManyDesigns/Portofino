@@ -35,6 +35,9 @@ import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.logging.Logger;
+
+import com.manydesigns.elements.logging.LogUtil;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -54,6 +57,8 @@ public class JavaPropertyAccessor implements PropertyAccessor {
     private final Method getter;
     private final Method setter;
 
+    public final static Logger logger =
+            LogUtil.getLogger(JavaPropertyAccessor.class);
 
     //**************************************************************************
     // Constructors
@@ -63,6 +68,11 @@ public class JavaPropertyAccessor implements PropertyAccessor {
         this.propertyDescriptor = propertyDescriptor;
         getter = propertyDescriptor.getReadMethod();
         setter = propertyDescriptor.getWriteMethod();
+        if (setter == null) {
+            LogUtil.fineMF(logger,
+                    "Setter not available for: {0}",
+                    propertyDescriptor.getName());
+        }
     }
 
 
@@ -89,7 +99,13 @@ public class JavaPropertyAccessor implements PropertyAccessor {
 
     public void set(Object obj, Object value)
             throws IllegalAccessException, InvocationTargetException {
-        setter.invoke(obj, value);
+        if (setter == null) {
+            LogUtil.warningMF(logger,
+                    "Setter not available for: {0}",
+                    propertyDescriptor.getName());
+        } else {
+            setter.invoke(obj, value);
+        }
     }
 
     //**************************************************************************
