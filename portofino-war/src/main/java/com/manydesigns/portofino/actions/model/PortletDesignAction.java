@@ -155,7 +155,7 @@ public class PortletDesignAction extends PortofinoAction {
         // Run/generate the chart
         generateChart();
 
-        chartId = TempFiles.generateRandomCode();
+        chartId = TempFiles.createExportFileTemp();
 
         String portletUrl = Util.getAbsoluteUrl(
                 MessageFormat.format(

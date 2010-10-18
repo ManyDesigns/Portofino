@@ -73,7 +73,7 @@ public class TempFiles {
         tmpDir = new File(System.getProperty("java.io.tmpdir"));
     }
 
-    public static String generateRandomCode() {
+    public static String createExportFileTemp() {
         return RandomStringUtils.randomAlphanumeric(codeLength);
     }
 
