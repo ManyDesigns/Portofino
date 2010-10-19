@@ -27,10 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.util;
+package com.manydesigns.elements.util;
 
+import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.portofino.PortofinoProperties;
 import org.apache.commons.lang.RandomStringUtils;
 
 import java.io.File;
@@ -43,22 +43,22 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TempFiles {
+public class RandomUtil {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public final static int DEFAULT_RANDOM_CODE_LENGTH = 20;
 
-    public final static Logger logger = LogUtil.getLogger(TempFiles.class);
+    public final static Logger logger = LogUtil.getLogger(RandomUtil.class);
 
     protected static final int codeLength;
-    protected static final File tmpDir;
+    protected static final File tempDir;
 
     static {
-        Properties properties = PortofinoProperties.getProperties();
+        Properties properties = ElementsProperties.getProperties();
         String stringValue =
                 properties.getProperty(
-                        PortofinoProperties.RANDOM_CODE_LENGTH_PROPERTY);
+                        ElementsProperties.RANDOM_CODE_LENGTH_PROPERTY);
         int tmp;
         try {
             tmp = Integer.parseInt(stringValue);
@@ -70,16 +70,27 @@ public class TempFiles {
         }
         codeLength = tmp;
 
-        tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        tempDir = new File(System.getProperty("java.io.tmpdir"));
     }
 
-    public static String createExportFileTemp() {
+    public static String createRandomCode() {
         return RandomStringUtils.randomAlphanumeric(codeLength);
     }
 
-    public static File getTempFile(String fileNameFormat, String randomCode) {
-        String fileName = MessageFormat.format(fileNameFormat, randomCode);
-        return new File(tmpDir, fileName);
+    public static File getTempCodeFile(String fileNameFormat,
+                                       String randomCode) {
+        return getCodeFile(tempDir, fileNameFormat, randomCode);
+    }
+
+    public static File getCodeFile(File dir,
+                                   String fileNameFormat,
+                                   String code) {
+        return new File(dir, getCodeFileName(fileNameFormat, code));
+    }
+
+    public static String getCodeFileName(String fileNameFormat,
+                                         String randomCode) {
+        return MessageFormat.format(fileNameFormat, randomCode);
     }
 
 }

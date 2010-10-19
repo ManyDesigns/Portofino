@@ -306,14 +306,9 @@ public class FormBuilderTest extends AbstractElementsTest {
                 "<table class=\"details\"><tr><th>" +
                 "<label for=\"date\" class=\"field\">Date:</label></th>" +
                 "<td><input type=\"text\" class=\"text\" id=\"date\" " +
-                "name=\"date\" maxlength=\"10\" size=\"10\" " +
-                "onblur=\"ctrTypeDate(this, 'yyyy-MM-dd','Invalid date');\" " +
-                "onfocus=\"backgroundDelete(this);\"></input> (yyyy-MM-dd) " +
-                "<img src=\"/jscalendar/img.gif\" " +
-                "alt=\"calendar\" class=\"calendar\" id=\"caldate\" " +
-                "title=\"calendar\"></img><script type=\"text/javascript\">" +
-                "Calendar.setup({ inputField     :    \"date\",ifFormat       :    \"%Y-%m-%d\",button         :    \"caldate\"});" +
-                "</script></td></tr><tr><th>" +
+                "name=\"date\" maxlength=\"15\" size=\"15\"></input> (yyyy-MM-dd) " +
+                "<script type=\"text/javascript\">setupDatePicker('#date', 'yy-mm-dd');</script>" +
+                "</td></tr><tr><th>" +
                 "<label for=\"decimal\" class=\"field\">Decimal:</label></th>" +
                 "<td><input type=\"text\" class=\"text\" id=\"decimal\" " +
                 "name=\"decimal\"></input></td></tr>" +

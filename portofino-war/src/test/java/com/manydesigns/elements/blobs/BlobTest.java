@@ -27,7 +27,9 @@
  *
  */
 
-package com.manydesigns.elements.fields;
+package com.manydesigns.elements.blobs;
+
+import com.manydesigns.elements.AbstractElementsTest;
 
 import java.io.File;
 
@@ -36,42 +38,25 @@ import java.io.File;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class FileUpload {
+public class BlobTest extends AbstractElementsTest {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final File file;
-    private final String fileName;
-    private final String fileSystemName;
-    private final String previewUrl;
-    private final String downloadUrl;
+    BlobsManager blobsManager;
 
-    public FileUpload(File file, String fileName, String fileSystemName,
-                      String previewUrl, String downloadUrl) {
-        this.file = file;
-        this.fileName = fileName;
-        this.fileSystemName = fileSystemName;
-        this.previewUrl = previewUrl;
-        this.downloadUrl = downloadUrl;
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        blobsManager = BlobsManager.getManager();
     }
 
-    public File getFile() {
-        return file;
-    }
+    public void testManager1() {
+        assertNotNull(blobsManager);
 
-    public String getFileName() {
-        return fileName;
-    }
-
-    public String getFileSystemName() {
-        return fileSystemName;
-    }
-
-    public String getPreviewUrl() {
-        return previewUrl;
-    }
-
-    public String getDownloadUrl() {
-        return downloadUrl;
+        assertEquals(System.getProperty("java.io.tmpdir"),
+                blobsManager.getBlobsDir().getAbsolutePath() + File.separator);
+        assertEquals("{0}.properties", blobsManager.getMetaFileNamePattern());
+        assertEquals("{0}.data", blobsManager.getDataFileNamePattern());
     }
 }

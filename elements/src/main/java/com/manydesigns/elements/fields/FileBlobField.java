@@ -29,14 +29,16 @@
 
 package com.manydesigns.elements.fields;
 
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.FileBlob;
+import com.manydesigns.elements.blobs.Blob;
+import com.manydesigns.elements.blobs.BlobsManager;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import com.manydesigns.elements.Mode;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /*
@@ -44,7 +46,7 @@ import java.lang.reflect.Method;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UploadField extends AbstractField
+public class FileBlobField extends AbstractField
         implements MultipartFormDataField {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -55,17 +57,28 @@ public class UploadField extends AbstractField
 
     public static final String OPERATION_SUFFIX = "_operation";
 
-    protected FileUpload fileUpload;
+    protected final BlobsManager blobsManager;
+    protected Blob blob;
+
+    protected final File blobDir;
+    protected final String metaFileNamePattern;
+    protected final String dataFileNamePattern;
 
     //**************************************************************************
     // Costruttori
     //**************************************************************************
-    public UploadField(PropertyAccessor accessor, Mode mode) {
+    public FileBlobField(PropertyAccessor accessor, Mode mode) {
         this(accessor, mode, null);
     }
 
-    public UploadField(PropertyAccessor accessor, Mode mode, String prefix) {
+    public FileBlobField(PropertyAccessor accessor, Mode mode, String prefix) {
         super(accessor, mode, prefix);
+        blobsManager = BlobsManager.getManager();
+
+        FileBlob fileBlobAnnotation = accessor.getAnnotation(FileBlob.class);
+        blobDir = new File(fileBlobAnnotation.blobDir());
+        metaFileNamePattern = fileBlobAnnotation.metaFileNamePattern();
+        dataFileNamePattern = fileBlobAnnotation.dataFileNamePattern();
     }
 
     //**************************************************************************
@@ -93,34 +106,26 @@ public class UploadField extends AbstractField
         xb.openElement("div");
         xb.addAttribute("id", id);
         xb.addAttribute("class", "value");
-        if (fileUpload != null
-                && fileUpload.getFileName() != null
-                && !"".equals(fileUpload.getFileName())) {
-            xb.openElement("a");
-            xb.addAttribute("href", fileUpload.getDownloadUrl());
-            valueToTextOrPreview(xb);
-            xb.closeElement("a");
+        if (blob != null) {
+            if (href != null) {
+                xb.openElement("a");
+                xb.addAttribute("href", href);
+            }
+            xb.write(blob.getFilename());
+            if (href != null) {
+                xb.closeElement("a");
+            }
         }
         xb.closeElement("div");
-    }
-
-    private void valueToTextOrPreview(XhtmlBuffer xb) {
-        if (fileUpload.getPreviewUrl() == null) {
-            xb.write(fileUpload.getFileName());
-        } else {
-            xb.writeImage(fileUpload.getPreviewUrl(),
-                    fileUpload.getFileName(),
-                    fileUpload.getFileName(), null, null);
-        }
     }
 
     private void valueToXhtmlEdit(XhtmlBuffer xb) {
         String operationInputName = inputName + OPERATION_SUFFIX;
 
-        if (fileUpload != null
-                && fileUpload.getFileName() != null
-                && !"".equals(fileUpload.getFileName())) {
-
+        if (blob == null) {
+            xb.writeInputHidden(operationInputName, UPLOAD_MODIFY);
+            xb.writeInputFile(id, inputName, false);
+        } else {
             String innerId = id + "_inner";
 
             xb.openElement("div");
@@ -128,7 +133,7 @@ public class UploadField extends AbstractField
             xb.addAttribute("id", id);
 
             xb.openElement("div");
-            valueToTextOrPreview(xb);
+            xb.write(blob.getFilename());
             xb.closeElement("div");
 
             xb.openElement("div");
@@ -164,10 +169,6 @@ public class UploadField extends AbstractField
             xb.writeInputFile(innerId, inputName, true);
 
             xb.closeElement("div");
-        } else {
-            xb.writeInputHidden(operationInputName, UPLOAD_MODIFY);
-            // TODO: verificare se primo parametro è inputName o id
-            xb.writeInputFile(inputName, inputName, false);
         }
     }
 
@@ -212,20 +213,13 @@ public class UploadField extends AbstractField
                         getFileSystemNamesMethod.invoke(req, inputName);
 
                 if (files != null && files.length > 0) {
-                    // create a FileUpload from the attachment
-                    fileUpload = new FileUpload(
-                            files[0],
-                            fileNames[0],
-                            fileSystemNames[0],
-                            null,
-                            null
-                    );
+                    blob = blobsManager.saveBlob(files[0], fileNames[0]);
                 }
             } catch (Exception e) {
                 throw new Error(e);
             }
         } else if (updateTypeStr.equals(UPLOAD_DELETE)) {
-            fileUpload = null;
+            blob = null;
         }
     }
 
@@ -235,7 +229,7 @@ public class UploadField extends AbstractField
         }
 
         boolean result = true;
-        if (required && (fileUpload == null)) {
+        if (required && (blob == null)) {
             errors.add(getText("elements.error.field.required"));
             result = false;
         }
@@ -246,18 +240,21 @@ public class UploadField extends AbstractField
         super.readFromObject(obj);
         try {
             if (obj == null) {
-                fileUpload = null;
+                blob = null;
             } else {
-                fileUpload = (FileUpload) accessor.get(obj);
+                String code = (String) accessor.get(obj);
+                blob = blobsManager.loadBlob(code);
             }
-        } catch (IllegalAccessException e) {
-            throw new Error(e);
-        } catch (InvocationTargetException e) {
+        } catch (Throwable e) {
             throw new Error(e);
         }
     }
 
     public void writeToObject(Object obj) {
-        writeToObject(obj, fileUpload);
+        if (blob == null) {
+            writeToObject(obj, null);
+        } else {
+            writeToObject(obj, blob.getCode());
+        }
     }
 }

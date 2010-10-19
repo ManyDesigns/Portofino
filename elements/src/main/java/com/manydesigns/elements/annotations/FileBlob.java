@@ -27,37 +27,18 @@
  *
  */
 
-package com.manydesigns.elements.annotations.impl;
-
-import com.manydesigns.elements.annotations.Password;
-
-import java.lang.annotation.Annotation;
+package com.manydesigns.elements.annotations;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-@SuppressWarnings({"ClassExplicitlyAnnotation"})
-public class PasswordImpl implements Password {
+public @interface FileBlob {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private boolean confirmationRequired;
-
-    public PasswordImpl() {
-        this(false);
-    }
-
-    public PasswordImpl(boolean confirmationRequired) {
-        this.confirmationRequired = confirmationRequired;
-    }
-
-    public boolean confirmationRequired() {
-        return confirmationRequired;
-    }
-
-    public Class<? extends Annotation> annotationType() {
-        return Password.class;
-    }
+    String blobDir();
+    String metaFileNamePattern();
+    String dataFileNamePattern();
 }

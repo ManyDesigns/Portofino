@@ -80,7 +80,7 @@ public class DateField extends AbstractTextField {
             Properties elementsProperties =
                     ElementsProperties.getProperties();
             datePattern = elementsProperties.getProperty(
-                    ElementsProperties.FIELDS_DATE_DEFAULT_FORMAT_PROPERTY);
+                    ElementsProperties.FIELDS_DATE_FORMAT_PROPERTY);
         }
         dateTimeFormatter = DateTimeFormat.forPattern(datePattern);
         setMaxLength(dateTimeFormatter.getParser().estimateParsedLength());

@@ -73,8 +73,6 @@ public class PortofinoProperties {
             "database.platforms.manager";
     public static final String DATABASE_PLATFORMS_LIST_PROPERTY =
             "database.platforms.list";
-    public static final String RANDOM_CODE_LENGTH_PROPERTY =
-            "random.code.length";
 
     //Email properties
     public static final String MAIL_SMTP_SENDER = "mail.smtp.sender";

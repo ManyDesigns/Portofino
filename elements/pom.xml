@@ -32,6 +32,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>ognl</groupId>
             <artifactId>ognl</artifactId>
             <version>${ognl.version}</version>

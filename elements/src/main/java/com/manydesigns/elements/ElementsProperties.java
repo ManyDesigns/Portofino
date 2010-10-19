@@ -71,8 +71,20 @@ public final class ElementsProperties {
 
     public static final String FIELDS_LABEL_CAPITALIZE_PROPERTY =
             "fields.label.capitalize";
-    public static final String FIELDS_DATE_DEFAULT_FORMAT_PROPERTY =
+    public static final String FIELDS_DATE_FORMAT_PROPERTY =
             "fields.date.default.format";
+    public static final String RANDOM_CODE_LENGTH_PROPERTY =
+            "random.code.length";
+
+    public static final String BLOBS_MANAGER_PROPERTY =
+            "blobs.manager";
+    public static final String BLOBS_DIR_PROPERTY =
+            "blobs.dir";
+    public static final String BLOBS_META_FILENAME_PATTERN_PROPERTY =
+            "blobs.meta.filename.pattern";
+    public static final String BLOBS_DATA_FILENAME_PATTERN_PROPERTY =
+            "blobs.data.filename.pattern";
+
 
     //**************************************************************************
     // Static fields, singleton initialization and retrieval

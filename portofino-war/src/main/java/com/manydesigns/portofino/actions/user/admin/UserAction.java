@@ -44,6 +44,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
+import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RelatedTableForm;
@@ -56,7 +57,6 @@ import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
-import com.manydesigns.portofino.util.TempFiles;
 import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
@@ -644,8 +644,8 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
 
         tableForm.readFromObject(objects);
 
-        String exportId = TempFiles.createExportFileTemp();
-        File fileTemp = TempFiles.getTempFile(EXPORT_FILENAME_FORMAT, exportId);
+        String exportId = RandomUtil.createRandomCode();
+        File fileTemp = RandomUtil.getTempCodeFile(EXPORT_FILENAME_FORMAT, exportId);
 
         createExportExcel(fileTemp);
 
@@ -765,8 +765,8 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
             setupRelatedTableForm(relationship);
         }
 
-        String exportId = TempFiles.createExportFileTemp();
-        File fileTemp = TempFiles.getTempFile(EXPORT_FILENAME_FORMAT, exportId);
+        String exportId = RandomUtil.createRandomCode();
+        File fileTemp = RandomUtil.getTempCodeFile(EXPORT_FILENAME_FORMAT, exportId);
 
         createExportExcelRel(fileTemp);
 

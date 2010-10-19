@@ -35,12 +35,12 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.jfreechart.JBla;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.portlets.Portlet;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
-import com.manydesigns.portofino.util.TempFiles;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.DrawingSupplier;
@@ -155,7 +155,7 @@ public class PortletDesignAction extends PortofinoAction {
         // Run/generate the chart
         generateChart();
 
-        chartId = TempFiles.createExportFileTemp();
+        chartId = RandomUtil.createRandomCode();
 
         String portletUrl = Util.getAbsoluteUrl(
                 MessageFormat.format(
@@ -163,7 +163,7 @@ public class PortletDesignAction extends PortofinoAction {
                         portletName, chartId));
 
         try {
-            File file = TempFiles.getTempFile(CHART_FILENAME_FORMAT, chartId);
+            File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
             fileName = file.getName();
 
             bla = new JBla(chart, file, width, height, portletUrl);
@@ -259,7 +259,7 @@ public class PortletDesignAction extends PortofinoAction {
     }
 
     public String chart() {
-        File file = TempFiles.getTempFile(CHART_FILENAME_FORMAT, chartId);
+        File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
 
         try {
             inputStream = new FileInputStream(file);
