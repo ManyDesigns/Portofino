@@ -840,8 +840,7 @@ public class TableDataAction extends PortofinoAction
     private WritableCellFormat headerExcel() {
         WritableFont fontCell = new WritableFont(WritableFont.ARIAL, 12,
              WritableFont.BOLD, true);
-        WritableCellFormat formatCell = new WritableCellFormat (fontCell);
-        return formatCell;
+        return new WritableCellFormat (fontCell);
     }
 
     private void exportRows(WritableSheet sheet, int i,
