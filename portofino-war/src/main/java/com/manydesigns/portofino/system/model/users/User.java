@@ -46,7 +46,7 @@ import java.util.List;
 */
 public class User implements Serializable{
     //Dati user_
-    Integer uuid;
+    Long uuid;
     String email;
     String pwd;
     Integer state;
@@ -91,11 +91,11 @@ public class User implements Serializable{
     //gruppi di appartenenza
     List<UsersGroups> groups = new ArrayList<UsersGroups>();
 
-    public Integer getUuid() {
+    public Long getUuid() {
         return uuid;
     }
 
-    public void setUuid(Integer uuid) {
+    public void setUuid(Long uuid) {
         this.uuid = uuid;
     }
 

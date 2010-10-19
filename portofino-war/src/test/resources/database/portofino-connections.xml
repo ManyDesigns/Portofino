@@ -1,0 +1,32 @@
+<connections>
+    <connection
+            databaseName="jpetstore"
+            type="jdbc"
+            driver="org.h2.Driver"
+            url="jdbc:h2:mem:jpetstore"
+            username="manydesigns"
+            password="manydesigns"
+            includeSchemas=".*"
+            excludeSchemas=""
+            />
+    <connection
+            databaseName="hibernatetest"
+            type="jdbc"
+            driver="org.h2.Driver"
+            url="jdbc:h2:mem:hibernatetest"
+            username="manydesigns"
+            password="manydesigns"
+            includeSchemas=".*"
+            excludeSchemas=""
+            />
+    <connection
+            databaseName="portofino"
+            type="jdbc"
+            driver="org.h2.Driver"
+            url="jdbc:h2:mem:portofino4"
+            username="manydesigns"
+            password="manydesigns"
+            includeSchemas=".*"
+            excludeSchemas=""
+            />
+</connections>

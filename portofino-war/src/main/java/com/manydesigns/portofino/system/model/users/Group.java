@@ -39,7 +39,7 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class Group implements Serializable{
-    Integer groupId;
+    Long groupId;
     String name;
     String description;
     Long creatorId;
@@ -49,11 +49,11 @@ public class Group implements Serializable{
     
     List<User> users = new ArrayList<User>();
 
-    public Integer getGroupId() {
+    public Long getGroupId() {
         return groupId;
     }
 
-    public void setGroupId(Integer groupId) {
+    public void setGroupId(Long groupId) {
         this.groupId = groupId;
     }
 

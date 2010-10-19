@@ -275,6 +275,9 @@ public class HibernateConfig {
             String columnType = column.getColumnType();
 
             Type type = connectionProvider.getTypeByName(columnType);
+            if (type == null) {
+                System.out.println ("Cannot find type for "+columnType+ " col:"+col.getName());
+            }
             col.setSqlTypeCode(type.getJdbcType());
             primaryKey.addColumn(col);
             SimpleValue value = new SimpleValue();

@@ -41,8 +41,8 @@ public class UsersGroups implements Serializable {
     User user;
     Date creationDate;
     Date deletionDate;
-    Integer userid;
-    Integer groupid;
+    Long userid;
+    Long groupid;
 
 
     public Group getGroup() {
@@ -69,19 +69,19 @@ public class UsersGroups implements Serializable {
         this.user = user;
     }
 
-    public Integer getUserid() {
+    public Long getUserid() {
         return userid;
     }
 
-    public void setUserid(Integer userid) {
+    public void setUserid(Long userid) {
         this.userid = userid;
     }
 
-    public Integer getGroupid() {
+    public Long getGroupid() {
         return groupid;
     }
 
-    public void setGroupid(Integer groupid) {
+    public void setGroupid(Long groupid) {
         this.groupid = groupid;
     }
 
