@@ -98,7 +98,7 @@ public class ModelWriter {
     }
 
     private void visit(XMLStreamWriter w, Database database) throws XMLStreamException {
-        w.writeStartElement( "database");
+        w.writeStartElement("database");
         w.writeAttribute("name", database.getDatabaseName());
         w.writeCharacters("\n");
         w.writeStartElement( "schemas");

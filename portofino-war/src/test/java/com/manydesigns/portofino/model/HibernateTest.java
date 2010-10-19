@@ -29,14 +29,12 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.elements.fields.search.Criteria;
-import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
-import junit.framework.TestCase;
+import com.manydesigns.portofino.util.CommonTestUtil;
 import org.hibernate.proxy.map.MapProxy;
 
 import java.math.BigDecimal;
@@ -49,27 +47,25 @@ import java.util.Map;
  * @author Angelo    Lupo       - angelo.lupo@manydesigns.com
  * @author Paolo     Predonzani - paolo.predonzani@manydesigns.com
  */
-public class HibernateTest extends TestCase {
-    Context context;
+public class HibernateTest extends CommonTestUtil {
 
-    public void setUp() {
-        context = new HibernateContextImpl();
-        context.loadConnectionsAsResource("portofino-connections.xml");
-        context.loadXmlModelAsResource(
-                "databases/jpetstore/postgresql/jpetstore-postgres.xml");
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
         context.openSession();
     }
-
 
     public void tearDown() {
         context.closeSession();
     }
 
     public void testReadProdotti() {
+
         List<Object> resultProd =
                 context.getAllObjects("jpetstore.public.product");
         int sizePrd = resultProd.size();
-        assertTrue("prodotti", sizePrd>=16);
+        assertEquals("prodotti", 16, sizePrd);
+
 
     }
 
@@ -98,7 +94,7 @@ public class HibernateTest extends TestCase {
                 context.getAllObjects("jpetstore.public.category");
 
         int sizeCat = resultCat.size();
-        assertTrue("categorie", sizeCat>0);
+        assertEquals("categorie", 5, sizeCat);
 
 
         Map categoria0 = (Map<String, Object>) resultCat.get(0);
@@ -123,7 +119,7 @@ public class HibernateTest extends TestCase {
         HashMap<String, String> category= findCategory(tableAccessor, criteria);
 
         int sizePrd = resultProd.size();
-        assertTrue("prodotti", sizePrd >= 16);
+        assertEquals("prodotti", 16, sizePrd);
         Map prd0 = (Map<String, Object>)resultProd.get(0);
         assertEquals("FI-SW-01", prd0.get("productid") );
         assertEquals("Angelfish", prd0.get("name"));
@@ -155,7 +151,7 @@ public class HibernateTest extends TestCase {
         List<Object> resultCat =
                 context.getAllObjects("jpetstore.public.category");
         int sizeCat = resultCat.size();
-        assertTrue("categorie", sizeCat>0);
+        assertEquals("categorie", 5, sizeCat);
         Map<String, String> categoria0 =  findCategory(tableAccessor, criteria);
         assertEquals("jpetstore.public.category", categoria0.get("$type$"));
         assertEquals("Fish", categoria0.get("name"));
@@ -319,7 +315,7 @@ public class HibernateTest extends TestCase {
         pk.put("linenum", 1);
         Map lineItem = (Map) context.getObjectByPk
                 ("jpetstore.public.lineitem", pk);
-        assertEquals("test2", lineItem.get("itemid"));
+        assertEquals("EST-1", lineItem.get("itemid"));
     }
 
     public void testGetRelatedObjects(){

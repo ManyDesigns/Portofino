@@ -133,6 +133,7 @@ public class DbUtil {
             case Types.BINARY:
             case Types.BLOB:
             case Types.CLOB:
+                return Hibernate.CLOB;
             case Types.DATALINK:
             case Types.DISTINCT:
             case Types.JAVA_OBJECT:

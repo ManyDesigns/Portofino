@@ -32,7 +32,7 @@ package com.manydesigns.portofino.model;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.io.ModelParser;
-import junit.framework.TestCase;
+import com.manydesigns.portofino.util.CommonTestUtil;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -42,24 +42,29 @@ import java.util.logging.Level;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DBParserTest extends TestCase {
+public class DBParserTest extends CommonTestUtil{
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     ModelParser parser;
     Model model;
 
-    public void setUp() {
+
+    public void setUp() throws Exception {
         LogUtil.initializeLoggingSystem();
         ModelParser.logger.setLevel(Level.ALL);
-
         parser = new ModelParser();
+        super.setUp();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
     }
 
     public void testParseJpetStorePostgresql() {
         try {
-            model = parser.parse(
-                    "databases/jpetstore/postgresql/jpetstore-postgres.xml");
+            model = parser.parse("database/portofino-model.xml");
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -68,9 +73,9 @@ public class DBParserTest extends TestCase {
         assertNotNull(model);
 
         List<Database> databases = model.getDatabases();
-        assertEquals(1, databases.size());
+         assertEquals(3, databases.size());
 
-        Database database = databases.get(0);
+        Database database = databases.get(1);
         assertEquals("jpetstore", database.getDatabaseName());
 
         List<Schema> schemas = database.getSchemas();
@@ -153,16 +158,16 @@ public class DBParserTest extends TestCase {
 
         checkColumn(columns2.get(0),
                 "jpetstore", "public", "lineitem", "orderid", null,
-                "orderid", "int4", false, 8, 0);
+                "orderid", "INTEGER", false, 8, 0);
         checkColumn(columns2.get(1),
                 "jpetstore", "public", "lineitem", "linenum", null,
-                "linenum", "int4", false, 8, 0);
+                "linenum", "INTEGER", false, 8, 0);
         checkColumn(columns2.get(2),
                 "jpetstore", "public", "lineitem", "itemid", null,
                 "itemid", "varchar", false, 255, 0);
         checkColumn(columns2.get(3),
                 "jpetstore", "public", "lineitem", "quantity", null,
-                "quantity", "int4", false, 8, 0);
+                "quantity", "INTEGER", false, 8, 0);
         checkColumn(columns2.get(4),
                 "jpetstore", "public", "lineitem", "unitprice", null,
                 "unitprice", "numeric", false, 10, 2);
@@ -192,16 +197,6 @@ public class DBParserTest extends TestCase {
         assertEquals(onUpdate, rel.getOnUpdate());
         assertEquals(onDelete, rel.getOnDelete());
 
-    }
-
-    public void testFindTableByQualifiedName() {
-        try {
-            model = parser.parse(
-                    "databases/jpetstore/postgresql/jpetstore-postgres.xml");
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
     }
 
     private void checkColumn(Column column, String databaseName,

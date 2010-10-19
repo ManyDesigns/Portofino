@@ -8,14 +8,14 @@
                          <table tableName="lineitem">
                             <columns>
                                 <column columnName="orderid"
-                                        columnType="int4"
+                                        columnType="INTEGER"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
                                 <column columnName="linenum"
-                                        columnType="int4"
+                                        columnType="INTEGER"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
@@ -29,7 +29,7 @@
                                         nullable="false"
                                         searchable="true" />
                                 <column columnName="quantity"
-                                        columnType="int4"
+                                        columnType="INTEGER"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
