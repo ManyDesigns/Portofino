@@ -6,7 +6,7 @@
 <s:form method="post">
     <s:include value="/skins/default/user/admin/createButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1>Create: <s:property value="qualifiedTableName"/></h1>
+        <h1>Create user</h1>
         <s:if test="form.requiredFieldsPresent">
             Fields marked with a "*" are required.
         </s:if>

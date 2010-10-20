@@ -1,28 +1,23 @@
 package com.manydesigns.portofino.context;
 
-import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.Schema;
 import com.manydesigns.portofino.model.datamodel.Table;
-import junit.framework.TestCase;
+import com.manydesigns.portofino.util.CommonTestUtil;
 
 /**
  * File created on Jul 4, 2010 at 8:45:44 PM
  * Copyright Paolo Predonzani (paolo.predonzani@gmail.com)
  * All rights reserved
  */
-public class ContextTest extends TestCase {
+public class ContextTest extends CommonTestUtil {
 
-    Context context;
+
     Model model;
 
     public void setUp() {
-        context = new HibernateContextImpl();
-        context.loadConnectionsAsResource("portofino-connections.xml");
-        context.loadXmlModelAsResource(
-                "databases/jpetstore/postgresql/jpetstore-postgres.xml");
         model = context.getModel();
     }
 

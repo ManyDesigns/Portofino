@@ -6,7 +6,7 @@
 <s:form method="post">
     <s:include value="/skins/default/user/admin/searchButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1>Search: <s:property value="qualifiedTableName"/></h1>
+        <h1>Users: <s:property value="qualifiedTableName"/></h1>
         <s:if test="!searchForm.isEmpty()">
             <div class="search_form">
                 <mdes:write value="searchForm"/>

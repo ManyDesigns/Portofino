@@ -35,7 +35,7 @@ import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.Schema;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.diff.ModelDiff;
-import junit.framework.TestCase;
+import com.manydesigns.portofino.util.CommonTestUtil;
 
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -45,7 +45,7 @@ import java.util.logging.Level;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class JdbcMetadataReaderTest extends TestCase {
+public class JdbcMetadataReaderTest extends CommonTestUtil {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -55,13 +55,7 @@ public class JdbcMetadataReaderTest extends TestCase {
     public void setUp() throws ClassNotFoundException, SQLException {
         LogUtil.initializeLoggingSystem();
 
-        connectionProvider =
-                new JdbcConnectionProvider(
-                        "dbprova",
-                        "org.postgresql.Driver",
-                        "jdbc:postgresql://127.0.0.1:5432/jpetstore",
-                        "manydesigns",
-                        "manydesigns");
+        connectionProvider=context.getConnectionProvider("jpetstore");
         connectionProvider.test();
         database = connectionProvider.readModel();
     }
@@ -70,43 +64,37 @@ public class JdbcMetadataReaderTest extends TestCase {
         AbstractDatabasePlatform.logger.setLevel(Level.FINE);
 
         assertEquals(4, database.getSchemas().size());
-        assertEquals(13, database.getAllTables().size());
-        assertEquals(86, database.getAllColumns().size());
+        assertEquals(14, database.getAllTables().size());
+        assertEquals(88, database.getAllColumns().size());
     }
 
     public void testDiff() {
         ModelDiff.logger.setLevel(Level.FINE);
-
-
         Database database2 = new Database("pippo");
-        Schema schema2 = new Schema(database2, "public");
+        Schema schema2 = new Schema(database2, "PUBLIC");
         database2.getSchemas().add(schema2);
-        Table table2 = new Table(schema2, "product");
+        Table table2 = new Table(schema2, "PRODUCT");
         schema2.getTables().add(table2);
-
         ModelDiff diff = new ModelDiff();
         diff.diff(database, database2);
-
-        assertEquals(20, diff.size());
-        assertEquals("Database names dbprova / pippo are different", diff.get(0));
-        assertEquals("Model 2 does not contain schema: pippo.information_schema", diff.get(1));
-        assertEquals("Model 2 does not contain schema: pippo.pg_catalog", diff.get(2));
-        assertEquals("Model 2 does not contain schema: pippo.pg_toast_temp_1", diff.get(3));
-        assertEquals("Model 2 does not contain table: pippo.public.account", diff.get(4));
-        assertEquals("Model 2 does not contain table: pippo.public.bannerdata", diff.get(5));
-        assertEquals("Model 2 does not contain table: pippo.public.category", diff.get(6));
-        assertEquals("Model 2 does not contain table: pippo.public.inventory", diff.get(7));
-        assertEquals("Model 2 does not contain table: pippo.public.item", diff.get(8));
-        assertEquals("Model 2 does not contain table: pippo.public.lineitem", diff.get(9));
-        assertEquals("Model 2 does not contain table: pippo.public.orders", diff.get(10));
-        assertEquals("Model 2 does not contain table: pippo.public.orderstatus", diff.get(11));
-        assertEquals("Model 2 does not contain table: pippo.public.profile", diff.get(12));
-        assertEquals("Model 2 does not contain table: pippo.public.sequence", diff.get(13));
-        assertEquals("Model 2 does not contain table: pippo.public.signon", diff.get(14));
-        assertEquals("Model 2 does not contain table: pippo.public.supplier", diff.get(15));
-        assertEquals("Model 2 does not contain column: pippo.public.product.category", diff.get(16));
-        assertEquals("Model 2 does not contain column: pippo.public.product.descn", diff.get(17));
-        assertEquals("Model 2 does not contain column: pippo.public.product.name", diff.get(18));
-        assertEquals("Model 2 does not contain column: pippo.public.product.productid", diff.get(19));
+        assertEquals(18, diff.size());
+        assertEquals("Database names jpetstore / pippo are different", diff.get(0));
+        assertEquals("Model 2 does not contain schema: pippo.INFORMATION_SCHEMA", diff.get(1));
+        assertEquals("Model 2 does not contain table: pippo.PUBLIC.ACCOUNT", diff.get(2));
+        assertEquals("Model 2 does not contain table: pippo.PUBLIC.BANNERDATA", diff.get(3));
+        assertEquals("Model 2 does not contain table: pippo.PUBLIC.CATEGORY", diff.get(4));
+        assertEquals("Model 2 does not contain table: pippo.PUBLIC.INVENTORY", diff.get(5));
+        assertEquals("Model 2 does not contain table: pippo.PUBLIC.ITEM", diff.get(6));
+        assertEquals("Model 2 does not contain table: pippo.PUBLIC.LINEITEM", diff.get(7));
+        assertEquals("Model 2 does not contain table: pippo.PUBLIC.ORDERS", diff.get(8));
+        assertEquals("Model 2 does not contain table: pippo.PUBLIC.ORDERSTATUS", diff.get(9));
+        assertEquals("Model 2 does not contain table: pippo.PUBLIC.PROFILE", diff.get(10));
+        assertEquals("Model 2 does not contain table: pippo.PUBLIC.SEQUENCE", diff.get(11));
+        assertEquals("Model 2 does not contain table: pippo.PUBLIC.SIGNON", diff.get(12));
+        assertEquals("Model 2 does not contain table: pippo.PUBLIC.SUPPLIER", diff.get(13));
+        assertEquals("Model 2 does not contain column: pippo.PUBLIC.PRODUCT.CATEGORY", diff.get(14));
+        assertEquals("Model 2 does not contain column: pippo.PUBLIC.PRODUCT.DESCN", diff.get(15));
+        assertEquals("Model 2 does not contain column: pippo.PUBLIC.PRODUCT.NAME", diff.get(16));
+        assertEquals("Model 2 does not contain column: pippo.PUBLIC.PRODUCT.PRODUCTID", diff.get(17));
     }
 }

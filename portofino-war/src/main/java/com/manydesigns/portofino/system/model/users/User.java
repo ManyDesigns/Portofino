@@ -58,16 +58,12 @@ public class User implements Serializable{
     Date loginDate;
     Date lastLoginDate;
     Date lastFailedLoginDate;
-    Date lockoutDate;
     Date createDate;
 
     Boolean defaultUser;
-    Boolean extAuth;
-    Boolean pwdEncrypted;
-    Boolean pwdReset;
-    Boolean lockout;
     Boolean agreedToTerms;
-    Boolean active;
+    Boolean extAuth;
+
 
     String token;
     String remQuestion;
@@ -167,23 +163,7 @@ public class User implements Serializable{
         this.extAuth = extAuth;
     }
 
-    public Boolean getPwdEncrypted() {
-        return pwdEncrypted;
-    }
-
-    public void setPwdEncrypted(Boolean pwdEncrypted) {
-        this.pwdEncrypted = pwdEncrypted;
-    }
-
-    public Boolean getPwdReset() {
-        return pwdReset;
-    }
-
-    public void setPwdReset(Boolean pwdReset) {
-        this.pwdReset = pwdReset;
-    }
-
-    public Date getPwdModDate() {
+        public Date getPwdModDate() {
         return pwdModDate;
     }
 
@@ -319,36 +299,12 @@ public class User implements Serializable{
         this.failedLoginAttempts = failedLoginAttempts;
     }
 
-    public Boolean getLockout() {
-        return lockout;
-    }
-
-    public void setLockout(Boolean lockout) {
-        this.lockout = lockout;
-    }
-
-    public Date getLockoutDate() {
-        return lockoutDate;
-    }
-
-    public void setLockoutDate(Date lockoutDate) {
-        this.lockoutDate = lockoutDate;
-    }
-
     public Boolean getAgreedToTerms() {
         return agreedToTerms;
     }
 
     public void setAgreedToTerms(Boolean agreedToTerms) {
         this.agreedToTerms = agreedToTerms;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
     }
 
     public Date getCreateDate() {

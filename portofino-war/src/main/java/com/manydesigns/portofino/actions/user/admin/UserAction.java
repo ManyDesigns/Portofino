@@ -30,9 +30,6 @@ package com.manydesigns.portofino.actions.user.admin;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.NumericField;
-import com.manydesigns.elements.fields.PasswordField;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
@@ -44,10 +41,9 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
-import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RelatedTableForm;
+import com.manydesigns.portofino.actions.model.TableDataAction;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.Column;
@@ -55,19 +51,19 @@ import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.system.model.users.UsersGroups;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
-import jxl.Workbook;
-import jxl.write.*;
-import jxl.write.Number;
-import jxl.write.biff.RowsExceededException;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.io.StringBufferInputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -78,7 +74,7 @@ import java.util.regex.Pattern;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UserAction extends PortofinoAction implements ServletRequestAware {
+public class UserAction extends TableDataAction implements ServletRequestAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -91,11 +87,15 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
     public final static String JSON_SELECT_FIELD_OPTIONS =
             "jsonSelectFieldOptions";
     public static final String EXPORT_FILENAME_FORMAT = "export-{0}";
+    private static final String userTable = "portofino.public.user_";
+    private static final String groupTable = "portofino.public.group_";
+    private static final String usersGroupsTable = "portofino.public.users_groups";
 
     //**************************************************************************
     // ServletRequestAware implementation
     //**************************************************************************
     public HttpServletRequest req;
+
 
     public void setServletRequest(HttpServletRequest req) {
         this.req = req;
@@ -105,7 +105,6 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
     // Web parameters
     //**************************************************************************
 
-    public static final String qualifiedTableName = "portofino.public.user_";
     public String pk;
     public String[] selection;
     public String searchString;
@@ -126,8 +125,9 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
     // Model objects
     //**************************************************************************
 
-    public Object object;
-    public List<Object> objects;
+    public User user;
+    public List<Object> users;
+
 
 
     //**************************************************************************
@@ -137,6 +137,9 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
     public TableForm tableForm;
     public Form form;
     public SearchForm searchForm;
+    public TableForm activeGroupsForm;
+    public TableForm deletedGroupsForm;
+    public TableForm newGroupsForm;
     public List<RelatedTableForm> relatedTableFormList;
     public InputStream inputStream;
 
@@ -149,7 +152,6 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
     public Long contentLength;
     public String chartId;
 
-    //**************************************************************************
     // Other objects
     //**************************************************************************
 
@@ -228,7 +230,7 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
 
         Criteria criteria = new Criteria(tableAccessor);
         searchForm.configureCriteria(criteria);
-        objects = context.getObjects(criteria);
+        users = context.getObjects(criteria);
 
         String readLinkExpression = getReadLinkExpression();
         OgnlTextFormat hrefFormat =
@@ -237,7 +239,7 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
 
         TableFormBuilder tableFormBuilder =
                 createTableFormBuilderWithOptionProviders()
-                        .configNRows(objects.size())
+                        .configNRows(users.size())
                         .configMode(Mode.VIEW);
         tableFormBuilder.configFields("uuid","email","state",
                 "lastName", "firstName");
@@ -251,7 +253,7 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
         tableForm = tableFormBuilder.build();
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
         tableForm.setSelectable(true);
-        tableForm.readFromObject(objects);
+        tableForm.readFromObject(users);
 
         return SEARCH;
     }
@@ -301,47 +303,144 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
 
         Criteria criteria = new Criteria(tableAccessor);
         searchForm.configureCriteria(criteria);
-        objects = context.getObjects(criteria);
+        users = context.getObjects(criteria);
 
-        object = context.getObjectByPk(qualifiedTableName, pkObject);
+        user = (User) context.getObjectByPk(userTable, pkObject);
         FormBuilder builder = createFormBuilderWithOptionProviders()
                 .configMode(Mode.VIEW);
         builder.configFields("uuid","email","state",
                 "lastName", "firstName");
         form = builder.build();
-        form.readFromObject(object);
-
+        form.readFromObject(user);
         relatedTableFormList = new ArrayList<RelatedTableForm>();
 
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
-        for (ForeignKey relationship : table.getOneToManyRelationships()) {
-            setupRelatedTableForm(relationship);
-        }
-
+        setupActiveGroups();
+        setupDeletedGroups();
         return READ;
     }
 
-    protected void setupRelatedTableForm(ForeignKey relationship) {
-        List<Object> relatedObjects =
-                context.getRelatedObjects(qualifiedTableName, object,
-                        relationship.getForeignKeyName());
+    protected void setupActiveGroups(){
+        try {
+            TableAccessor ugAccessor = context.getTableAccessor(usersGroupsTable);
 
-        String qualifiedFromTableName =
-                relationship.getFromTable().getQualifiedName();
-        TableAccessor relatedTableAccessor =
-                context.getTableAccessor(qualifiedFromTableName);
-        TableFormBuilder tableFormBuilder =
-                new TableFormBuilder(relatedTableAccessor);
-        tableFormBuilder.configNRows(relatedObjects.size());
-        TableForm tableForm = tableFormBuilder
-                .configMode(Mode.VIEW)
-                .build();
-        tableForm.readFromObject(relatedObjects);
+            Criteria criteria = new Criteria(ugAccessor);
+            criteria.eq(ugAccessor.getProperty("userid"), user.getUuid());
+            criteria.isNull(ugAccessor.getProperty("deletionDate"));
+            users = context.getObjects(criteria);
 
-        RelatedTableForm relatedTableForm =
-                new RelatedTableForm(relationship, tableForm, relatedObjects);
-        relatedTableFormList.add(relatedTableForm);
+            TableFormBuilder tableFormBuilder
+                    = new TableFormBuilder(ugAccessor).configMode(Mode.VIEW)
+                    .configFields("userid", "groupid", "creationDate");
+
+            // setup relationship lookups
+            Table table = model.findTableByQualifiedName(usersGroupsTable);
+            if(users.size()>0) {
+                for (ForeignKey rel : table.getForeignKeys()) {
+                    String[] fieldNames = createFieldNamesForRelationship(rel);
+                    SelectionProvider selectionProvider =
+                            createOptionProviderForRelationship(rel);
+                    boolean autocomplete = false;
+                    for (ModelAnnotation current : rel.getAnnotations()) {
+                        if ("com.manydesigns.elements.annotations.Autocomplete"
+                                .equals(current.getType())) {
+                            autocomplete = true;
+                        }
+                    }
+                    selectionProvider.setAutocomplete(autocomplete);
+                    tableFormBuilder.configOptionProvider
+                            (selectionProvider, fieldNames);
+                }
+            }
+            activeGroupsForm = tableFormBuilder.build();
+            if (users.size()>0){
+                PkHelper agPk = new PkHelper(ugAccessor);
+                activeGroupsForm.setKeyGenerator(agPk.createPkGenerator());
+                activeGroupsForm.setSelectable(true);
+                activeGroupsForm.readFromObject(users);
+            }
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+            LogUtil.warning(logger, "cannot find property userid", e);
+        }
     }
+
+    protected void setupDeletedGroups(){
+        try {
+            TableAccessor ugAccessor = context.getTableAccessor(usersGroupsTable);
+
+            Criteria criteria = new Criteria(ugAccessor);
+            criteria.eq(ugAccessor.getProperty("userid"), user.getUuid());
+            criteria.isNotNull(ugAccessor.getProperty("deletionDate"));
+            List<Object> objects = context.getObjects(criteria);
+
+            TableFormBuilder tableFormBuilder
+                    = new TableFormBuilder(ugAccessor).configMode(Mode.VIEW);
+
+
+            // setup relationship lookups
+            Table table = model.findTableByQualifiedName(usersGroupsTable);
+            for (ForeignKey rel : table.getForeignKeys()) {
+                String[] fieldNames = createFieldNamesForRelationship(rel);
+                SelectionProvider selectionProvider =
+                        createOptionProviderForRelationship(rel);
+                boolean autocomplete = false;
+                for (ModelAnnotation current : rel.getAnnotations()) {
+                    if ("com.manydesigns.elements.annotations.Autocomplete"
+                            .equals(current.getType())) {
+                        autocomplete = true;
+                    }
+                }
+                selectionProvider.setAutocomplete(autocomplete);
+
+                tableFormBuilder.configOptionProvider
+                        (selectionProvider, fieldNames);
+            }
+
+
+            deletedGroupsForm = tableFormBuilder.build();
+            deletedGroupsForm.readFromObject(objects);
+        } catch (NoSuchFieldException e) {
+            LogUtil.warning(logger, "cannot find property userid", e);
+        }
+    }
+
+    protected void setupNewGroups(){
+        try {
+            TableAccessor groupAccessor = context.getTableAccessor(groupTable);
+            TableAccessor ugAccessor = context.getTableAccessor(usersGroupsTable);
+
+            Criteria criteria = new Criteria(groupAccessor);
+            criteria.eq(groupAccessor.getProperty("active"), true);
+            List<Object> objects = context.getObjects(criteria);
+
+            TableFormBuilder tableFormBuilder
+                    = new TableFormBuilder(ugAccessor).configMode(Mode.VIEW);
+
+            // setup relationship lookups
+            Table table = model.findTableByQualifiedName(usersGroupsTable);
+            for (ForeignKey rel : table.getForeignKeys()) {
+                String[] fieldNames = createFieldNamesForRelationship(rel);
+                SelectionProvider selectionProvider =
+                        createOptionProviderForRelationship(rel);
+                boolean autocomplete = false;
+                for (ModelAnnotation current : rel.getAnnotations()) {
+                    if ("com.manydesigns.elements.annotations.Autocomplete"
+                            .equals(current.getType())) {
+                        autocomplete = true;
+                    }
+                }
+                selectionProvider.setAutocomplete(autocomplete);
+
+                tableFormBuilder.configOptionProvider
+                        (selectionProvider, fieldNames);
+            }
+            newGroupsForm = tableFormBuilder.build();
+            newGroupsForm.readFromObject(users);
+        } catch (NoSuchFieldException e) {
+            LogUtil.warning(logger, "cannot find property active", e);
+        }
+    }
+
 
     //**************************************************************************
     // Create/Save
@@ -370,14 +469,14 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
 
         form.readFromRequest(req);
         if (form.validate()) {
-            object = tableAccessor.newInstance();
-            form.writeToObject(object);
-            context.saveObject(qualifiedTableName, object);
+            user = (User) tableAccessor.newInstance();
+            form.writeToObject(user);
+            context.saveObject(userTable, user);
             String databaseName = model
-                    .findTableByQualifiedName(qualifiedTableName)
+                    .findTableByQualifiedName(userTable)
                     .getDatabaseName();
             context.commit(databaseName);
-            pk = pkHelper.generatePkString(object);
+            pk = pkHelper.generatePkString(user);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
             return SAVE;
         } else {
@@ -393,7 +492,7 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
         setupTable();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
-        object = context.getObjectByPk(qualifiedTableName, pkObject);
+        user = (User) context.getObjectByPk(userTable, pkObject);
 
         FormBuilder builder = createFormBuilderWithOptionProviders()
                 .configMode(Mode.EDIT);
@@ -401,8 +500,7 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
                 "lastName", "firstName");
         form = builder.build();
 
-        form.readFromObject(object);
-
+        form.readFromObject(user);
         return EDIT;
     }
 
@@ -410,20 +508,20 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
         setupTable();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
-        final FormBuilder builder = createFormBuilderWithOptionProviders()
+        FormBuilder builder = createFormBuilderWithOptionProviders()
                 .configMode(Mode.EDIT);
         builder.configFields("uuid","email","state",
                 "lastName", "firstName");
         form = builder.build();
 
-        object = context.getObjectByPk(qualifiedTableName, pkObject);
-        form.readFromObject(object);
+        user =  (User)context.getObjectByPk(userTable, pkObject);
+        form.readFromObject(user);
         form.readFromRequest(req);
         if (form.validate()) {
-            form.writeToObject(object);
-            context.updateObject(qualifiedTableName, object);
+            form.writeToObject(user);
+            context.updateObject(userTable, user);
             String databaseName = model
-                    .findTableByQualifiedName(qualifiedTableName).getDatabaseName();
+                    .findTableByQualifiedName(userTable).getDatabaseName();
             context.commit(databaseName);
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
             return UPDATE;
@@ -440,8 +538,8 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
     public String delete() {
         setupTable();
         Object pkObject = pkHelper.parsePkString(pk);
-        context.deleteObject(qualifiedTableName, pkObject);
-        String databaseName = model.findTableByQualifiedName(qualifiedTableName)
+        context.deleteObject(userTable, pkObject);
+        String databaseName = model.findTableByQualifiedName(userTable)
                 .getDatabaseName();
         context.commit(databaseName);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
@@ -457,9 +555,9 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
         }
         for (String current : selection) {
             Object pkObject = pkHelper.parsePkString(current);
-            context.deleteObject(qualifiedTableName, pkObject);
+            context.deleteObject(userTable, pkObject);
         }
-        String databaseName = model.findTableByQualifiedName(qualifiedTableName)
+        String databaseName = model.findTableByQualifiedName(userTable)
                 .getDatabaseName();
         context.commit(databaseName);
         SessionMessages.addInfoMessage(MessageFormat.format(
@@ -476,6 +574,28 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
     }
 
     //**************************************************************************
+    // Remove user from Group
+    //**************************************************************************
+    
+    public String removeGroups(){
+
+        if (null==selection) {
+            SessionMessages.addInfoMessage("No group selected");
+            return read();
+        }
+        for (String current : selection) {
+            TableAccessor ugAccessor = context.getTableAccessor(usersGroupsTable);
+            PkHelper agPkHelper = new PkHelper(ugAccessor);
+            UsersGroups ug = (UsersGroups) agPkHelper.parsePkString(current);
+            ug = (UsersGroups) context.getObjectByPk(usersGroupsTable,ug);
+            ug.setDeletionDate(new Date());
+            context.saveObject(usersGroupsTable, ug);
+        }
+        context.commit("portofino");
+        SessionMessages.addInfoMessage("Group(s) removed");
+        return read();
+    }
+    //**************************************************************************
     // Ajax
     //**************************************************************************
 
@@ -489,7 +609,7 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
 
     protected String jsonOptions(boolean includeSelectPrompt) {
         setupTable();
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        Table table = model.findTableByQualifiedName(userTable);
         ForeignKey relationship =
                 table.findForeignKeyByName(relName);
 
@@ -523,10 +643,10 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
     //**************************************************************************
 
     public void setupTable() {
-        tableAccessor = context.getTableAccessor(qualifiedTableName);
+        tableAccessor = context.getTableAccessor(userTable);
         pkHelper = new PkHelper(tableAccessor);
         if (tableAccessor == null) {
-            throw new ModelObjectNotFoundError(qualifiedTableName);
+            throw new ModelObjectNotFoundError(userTable);
         }
     }
 
@@ -534,7 +654,7 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
         FormBuilder formBuilder = new FormBuilder(tableAccessor);
 
         // setup relationship lookups
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        Table table = model.findTableByQualifiedName(userTable);
         for (ForeignKey rel : table.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
             SelectionProvider selectionProvider =
@@ -558,7 +678,7 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
         TableFormBuilder tableFormBuilder = new TableFormBuilder(tableAccessor);
 
         // setup relationship lookups
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        Table table = model.findTableByQualifiedName(userTable);
         for (ForeignKey rel : table.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
             SelectionProvider selectionProvider =
@@ -604,247 +724,12 @@ public class UserAction extends PortofinoAction implements ServletRequestAware {
                 OgnlTextFormat.create(shortNameAnnotation.value())
             };
         }
-        SelectionProvider selectionProvider =
+        return
                 DefaultSelectionProvider.create(rel.getForeignKeyName(),
                         relatedObjects, classAccessor, textFormat);
-        return selectionProvider;
-    }
-
-
-    //**************************************************************************
-    // ExportSearch
-    //**************************************************************************
-
-    public String exportSearch() {
-        setupTable();
-
-        //Relationship relationship =
-        //        table.findManyToOneByName(relName);
-
-        SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
-        searchFormBuilder.configFields("uuid","email","state",
-                "lastName", "firstName");
-        searchForm = searchFormBuilder.build();
-        searchForm.readFromRequest(req);
-
-        Criteria criteria = new Criteria(tableAccessor);
-        searchForm.configureCriteria(criteria);
-        objects = context.getObjects(criteria);
-
-        TableFormBuilder tableFormBuilder =
-            createTableFormBuilderWithOptionProviders()
-                            .configNRows(objects.size());
-
-        TableFormBuilder builder = tableFormBuilder
-                .configMode(Mode.VIEW);
-        builder.configFields("uuid","email","state",
-                "lastName", "firstName");
-        tableForm = builder.build();
-
-        tableForm.readFromObject(objects);
-
-        String exportId = RandomUtil.createRandomCode();
-        File fileTemp = RandomUtil.getTempCodeFile(EXPORT_FILENAME_FORMAT, exportId);
-
-        createExportExcel(fileTemp);
-
-        contentLength = fileTemp.length();
-
-        try {
-            inputStream = new FileInputStream(fileTemp);
-        } catch (IOException e) {
-            LogUtil.warning(logger, "IOException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        }
-        return EXPORT;
 
     }
 
-    private void createExportExcel(File fileTemp) {
-        WritableWorkbook workbook = null;
-        try {
-            workbook = Workbook.createWorkbook(fileTemp);
-            WritableSheet sheet = workbook.createSheet("First Sheet", 0);
-
-            int l = 0;
-            for (TableForm.Column col : tableForm.getColumns()) {
-                sheet.addCell(new Label(l, 0, col.getLabel()));
-                l++;
-            }
-
-            int i = 1;
-            for ( TableForm.Row col : tableForm.getRows()) {
-                int j = 0;
-
-                for (Field field : col.getFields()) {
-                    if ( field instanceof NumericField) {
-                        //NumberFormat numberFormat = new NumberFormat();
-                        NumericField numField = (NumericField)field;
-                        //DecimalFormat format = numField.getDecimalFormat();
-                        //String val = format.format(numField.getDecimalValue());
-                        if ( numField.getDecimalValue() != null ) {
-                            jxl.write.Number number = new Number(j, i,
-                                    numField.getDecimalValue().doubleValue());
-                            sheet.addCell(number);
-                        }
-                    } else if ( field instanceof PasswordField) {
-                        Label label = new Label(j, i,
-                                PasswordField.PASSWORD_PLACEHOLDER);
-                        sheet.addCell(label);
-                    } else {
-                        Label label = new Label(j, i, field.getStringValue());
-                        sheet.addCell(label);
-                    }
-
-                    j++;
-                }
-                i++;
-            }
-
-            workbook.write();
-        } catch (IOException e) {
-            LogUtil.warning(logger, "IOException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        } catch (RowsExceededException e) {
-            LogUtil.warning(logger, "RowsExceededException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        } catch (WriteException e) {
-            LogUtil.warning(logger, "WriteException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        } finally {
-            try {
-                if (workbook != null)
-                    workbook.close();
-            }
-            catch (Exception e) {
-                LogUtil.warning(logger, "IOException", e);
-                SessionMessages.addErrorMessage(e.getMessage());
-            }
-        }
-        contentType = "application/ms-excel; charset=UTF-8";
-        fileName = fileTemp.getName() + ".xls";
-    }
-
-      //**************************************************************************
-    // ExportRead
-    //**************************************************************************
-
-    public String exportRead() {
-        setupTable();
-
-        //Relationship relationship =
-        //        table.findManyToOneByName(relName);
-        Serializable pkObject = pkHelper.parsePkString(pk);
-
-        SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
-        searchFormBuilder.configFields("uuid","email","state",
-                "lastName", "firstName");
-        searchForm = searchFormBuilder.build();
-        configureSearchFormFromString();
-
-        Criteria criteria = new Criteria(tableAccessor);
-        searchForm.configureCriteria(criteria);
-        objects = context.getObjects(criteria);
-
-        object = context.getObjectByPk(qualifiedTableName, pkObject);
-
-        TableFormBuilder tableFormBuilder =
-            createTableFormBuilderWithOptionProviders()
-                            .configMode(Mode.VIEW)
-                            .configNRows(objects.size());
-        tableFormBuilder.configFields("uuid","email","state",
-                "lastName", "firstName");
-        tableForm = tableFormBuilder.build();
-        tableForm.readFromObject(object);
-
-        relatedTableFormList = new ArrayList<RelatedTableForm>();
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
-        for (ForeignKey relationship : table.getOneToManyRelationships()) {
-            setupRelatedTableForm(relationship);
-        }
-
-        String exportId = RandomUtil.createRandomCode();
-        File fileTemp = RandomUtil.getTempCodeFile(EXPORT_FILENAME_FORMAT, exportId);
-
-        createExportExcelRel(fileTemp);
-
-        contentLength = fileTemp.length();
-
-        try {
-            inputStream = new FileInputStream(fileTemp);
-        } catch (IOException e) {
-            LogUtil.warning(logger, "IOException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        }
-        return EXPORT;
-
-    }
-
-    private void createExportExcelRel(File fileTemp) {
-        WritableWorkbook workbook = null;
-        try {
-            workbook = Workbook.createWorkbook(fileTemp);
-            WritableSheet sheet = workbook.createSheet("First Sheet", 0);
-
-            int l = 0;
-            for (TableForm.Column col : tableForm.getColumns()) {
-                sheet.addCell(new Label(l, 0, col.getLabel()));
-                l++;
-            }
-
-            int i = 1;
-            for (TableForm.Row col : tableForm.getRows()) {
-                int j = 0;
-
-                for (Field field : Arrays.asList(col.getFields())) {
-                    if ( field instanceof NumericField) {
-                        //NumberFormat numberFormat = new NumberFormat();
-                        NumericField numField = (NumericField)field;
-                        //DecimalFormat format = numField.getDecimalFormat();
-                        //String val = format.format(numField.getDecimalValue());
-                        if ( numField.getDecimalValue() != null ) {
-                            Number number = new Number(j, i,
-                                    numField.getDecimalValue().doubleValue());
-                            sheet.addCell(number);
-                        }
-                    } else if ( field instanceof PasswordField) {
-                        Label label = new Label(j, i,
-                                PasswordField.PASSWORD_PLACEHOLDER);
-                        sheet.addCell(label);
-                    } else {
-                        Label label = new Label(j, i, field.getStringValue());
-                        sheet.addCell(label);
-                    }
-
-                    j++;
-                }
-                i++;
-            }
 
 
-            workbook.write();
-        } catch (IOException e) {
-            LogUtil.warning(logger, "IOException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        } catch (RowsExceededException e) {
-            LogUtil.warning(logger, "RowsExceededException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        } catch (WriteException e) {
-            LogUtil.warning(logger, "WriteException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        } finally {
-            try {
-                if (workbook != null)
-                    workbook.close();
-            }
-            catch (Exception e) {
-                LogUtil.warning(logger, "IOException", e);
-                SessionMessages.addErrorMessage(e.getMessage());
-            }
-        }
-        contentType = "application/ms-excel; charset=UTF-8";
-        fileName = fileTemp.getName() + ".xls";
-    }
 }

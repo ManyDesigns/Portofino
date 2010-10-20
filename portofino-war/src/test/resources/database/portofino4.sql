@@ -110,8 +110,6 @@ CREATE TABLE public.user_ (
     defaultuser boolean,
     extauth boolean,
     pwd character varying(75),
-    pwdencrypted boolean,
-    pwdreset boolean,
     pwdmoddate timestamp ,
     token character varying(255),
     remquestion character varying(75),
@@ -131,10 +129,7 @@ CREATE TABLE public.user_ (
     lastloginip character varying(75),
     lastfailedlogindate timestamp ,
     failedloginattempts integer,
-    lockout boolean,
-    lockoutdate timestamp ,
     agreedtoterms boolean,
-    active boolean,
     state integer NOT NULL,
     createdate timestamp ,
     bounced integer
@@ -174,8 +169,8 @@ CREATE TABLE public.userstate (
 INSERT INTO public.group_ (groupid, creatorid, parentgroupid, name, description, active, deldate) VALUES (2, 1, NULL, 'users', 'user', true, NULL);
 INSERT INTO public.group_ (groupid, creatorid, parentgroupid, name, description, active, deldate) VALUES (1, 1, NULL, 'admin', 'admin', true, NULL);
 
-INSERT INTO public.user_ (userid, deldate, modifieddate, defaultuser, extauth, pwd, pwdencrypted, pwdreset, pwdmoddate, token, remquestion, remans, gracelogincount, screenname, emailaddress, greeting, comments, firstname, middlename, lastname, jobtitle, logindate, loginip, lastlogindate, lastloginip, lastfailedlogindate, failedloginattempts, lockout, lockoutdate, agreedtoterms, active, state, createdate, bounced) VALUES (11, NULL, NULL, NULL, NULL, 'piero74', NULL, NULL, NULL, '', '', '', NULL, 'giampi', 'granatella@gmail.com', '', '-', '', '', '', '', NULL, '', NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL);
-INSERT INTO public.user_ (userid, deldate, modifieddate, defaultuser, extauth, pwd, pwdencrypted, pwdreset, pwdmoddate, token, remquestion, remans, gracelogincount, screenname, emailaddress, greeting, comments, firstname, middlename, lastname, jobtitle, logindate, loginip, lastlogindate, lastloginip, lastfailedlogindate, failedloginattempts, lockout, lockoutdate, agreedtoterms, active, state, createdate, bounced) VALUES (1, NULL, '2010-08-12 00:00:00', false, false, 'admin', false, false, '2010-09-24 15:48:09.458', NULL, '', NULL, 3, 'admin', 'admin@manydesigns.com', '', '', 'Giampiero', 'GG', 'Granatella', 'Ing.', NULL, '0:0:0:0:0:0:0:1%0', '2010-09-24 15:47:42.121', '', '2010-09-24 15:47:38.475', 0, false, NULL, false, true, 1, '2009-09-29 00:00:00', NULL);
+INSERT INTO public.user_ (userid, deldate, modifieddate, defaultuser, extauth, pwd, pwdmoddate, token, remquestion, remans, gracelogincount, screenname, emailaddress, greeting, comments, firstname, middlename, lastname, jobtitle, logindate, loginip, lastlogindate, lastloginip, lastfailedlogindate, failedloginattempts,  agreedtoterms,  state, createdate, bounced) VALUES (11, NULL, NULL, NULL, NULL, 'piero74',  NULL, '', '', '', NULL, 'giampi', 'granatella@gmail.com', '', '-', '', '', '', '', NULL, '', NULL, '', NULL, NULL, true, 1, NULL, NULL);
+INSERT INTO public.user_ (userid, deldate, modifieddate, defaultuser, extauth, pwd, pwdmoddate, token, remquestion, remans, gracelogincount, screenname, emailaddress, greeting, comments, firstname, middlename, lastname, jobtitle, logindate, loginip, lastlogindate, lastloginip, lastfailedlogindate, failedloginattempts,  agreedtoterms,  state, createdate, bounced) VALUES (1, NULL, '2010-08-12 00:00:00', false, false, 'admin', '2010-09-24 15:48:09.458', NULL, '', NULL, 3, 'admin', 'admin@manydesigns.com', '', '', 'Giampiero', 'GG', 'Granatella', 'Ing.', NULL, '0:0:0:0:0:0:0:1%0', '2010-09-24 15:47:42.121', '', '2010-09-24 15:47:38.475', 0,  true, 1, '2009-09-29 00:00:00', NULL);
 
 
 
