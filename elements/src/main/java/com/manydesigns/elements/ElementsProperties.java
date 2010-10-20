@@ -72,7 +72,7 @@ public final class ElementsProperties {
     public static final String FIELDS_LABEL_CAPITALIZE_PROPERTY =
             "fields.label.capitalize";
     public static final String FIELDS_DATE_FORMAT_PROPERTY =
-            "fields.date.default.format";
+            "fields.date.format";
     public static final String RANDOM_CODE_LENGTH_PROPERTY =
             "random.code.length";
 

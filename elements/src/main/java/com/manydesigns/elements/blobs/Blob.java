@@ -62,8 +62,8 @@ public class Blob {
     // Fields
     //**************************************************************************
 
-    protected final DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
-
+    protected final static DateTimeFormatter formatter =
+            ISODateTimeFormat.dateTime();
 
     protected final File metaFile;
     protected final File dataFile;
