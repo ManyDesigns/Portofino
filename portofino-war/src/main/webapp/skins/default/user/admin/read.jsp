@@ -6,13 +6,13 @@
 <s:form method="post">
     <s:include value="/skins/default/user/admin/readButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1>Read: <s:property value="qualifiedTableName"/></h1>
+        <h1>User detail</h1>
         <mdes:write value="form"/>
-        <s:iterator var="current" value="relatedTableFormList">
-            <s:set name="rel" value="#current.relationship"/>
-            <h2><s:property value="#rel.relationshipName"/></h2>
-            <mdes:write value="#current.tableForm"/>
-        </s:iterator>
+        <h2>Active groups</h2>
+        <mdes:write value="activeGroupsForm"/>
+
+        <h2>Inactive groups</h2>
+        <mdes:write value="deletedGroupsForm"/>
         <s:hidden name="pk" value="%{pk}"/>
         <s:if test="searchString != null">
             <s:hidden name="searchString" value="%{searchString}"/>

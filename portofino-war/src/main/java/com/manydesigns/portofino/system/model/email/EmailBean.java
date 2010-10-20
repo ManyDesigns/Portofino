@@ -38,7 +38,7 @@ import java.io.Serializable;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class EmailBean implements Serializable{
-    Integer id;
+    Long id;
     String subject;
     String body;
     String to;
@@ -66,11 +66,11 @@ public class EmailBean implements Serializable{
         this.setState(TOBESENT);
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

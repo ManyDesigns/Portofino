@@ -10,8 +10,8 @@
                             <columns>
                                 <column columnName="userid"
                                         autoincrement="true"
-                                        columnType="serial"
-                                        javaType="java.lang.Integer"
+                                        columnType="bigserial"
+                                        javaType="java.lang.Long"
                                         length="8"
                                         scale="0"
                                         nullable="false"
@@ -94,9 +94,9 @@
                                         searchable="false"
                                         />
                                 <column columnName="comments"
-                                        columnType="text"
+                                        columnType="varchar"
                                         javaType="java.lang.String"
-                                        length="2147483647"
+                                        length="255"
                                         scale="0"
                                         nullable="true"
                                         searchable="false"
@@ -173,33 +173,7 @@
                                         searchable="true"
                                         propertyName="extAuth"
                                         />
-                                <column columnName="pwdreset"
-                                        columnType="bool"
-                                        javaType="java.lang.Boolean"
-                                        length="1"
-                                        scale="0"
-                                        nullable="true"
-                                        searchable="false"
-                                        propertyName="pwdReset"
-                                        />
-                                <column columnName="pwdencrypted"
-                                        columnType="bool"
-                                        javaType="java.lang.Boolean"
-                                        length="1"
-                                        scale="0"
-                                        nullable="true"
-                                        searchable="false"
-                                        propertyName="pwdEncrypted"
-                                        />
-                                <column columnName="lockout"
-                                        columnType="bool"
-                                        javaType="java.lang.Boolean"
-                                        length="1"
-                                        scale="0"
-                                        nullable="true"
-                                        searchable="true"
-                                        propertyName="lockout"
-                                        />
+
                                 <column columnName="agreedtoterms"
                                         columnType="bool"
                                         javaType="java.lang.Boolean"
@@ -209,15 +183,7 @@
                                         searchable="true"
                                         propertyName="agreedToTerms"
                                         />
-                                <column columnName="active"
-                                        columnType="bool"
-                                        javaType="java.lang.Boolean"
-                                        length="1"
-                                        scale="0"
-                                        nullable="true"
-                                        searchable="true"
-                                        propertyName="active"
-                                        />
+
 
                                 <column columnName="createdate"
                                         columnType="timestamp"
@@ -277,14 +243,6 @@
                                         searchable="true"
                                         nullable="true"
                                         propertyName="lastFailedLoginDate"/>
-                                <column columnName="lockoutdate"
-                                        columnType="timestamp"
-                                        javaType="java.util.Date"
-                                        length="29"
-                                        scale="6"
-                                        searchable="true"
-                                        nullable="true"
-                                        propertyName="lockoutDate"/>
                                 <column columnName="failedloginattempts"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
@@ -327,8 +285,8 @@
                             <columns>
                                 <column columnName="groupid"
                                         autoincrement="true"
-                                        columnType="serial"
-                                        javaType="java.lang.Integer"
+                                        columnType="bigserial"
+                                        javaType="java.lang.Long"
                                         length="8"
                                         scale="0"
                                         nullable="false"
@@ -401,15 +359,15 @@
                                >
                             <columns>
                                 <column columnName="userid"
-                                        columnType="int4"
-                                        javaType="java.lang.Integer"
+                                        columnType="int8"
+                                        javaType="java.lang.Long"
                                         length="8"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
                                 <column columnName="groupid"
-                                        columnType="int4"
-                                        javaType="java.lang.Integer"
+                                        columnType="int8"
+                                        javaType="java.lang.Long"
                                         length="8"
                                         scale="0"
                                         nullable="false"
@@ -473,8 +431,8 @@
                         <table tableName="emailstate">
                             <columns>
                                 <column columnName="id"
-                                        columnType="serial"
-                                        javaType="java.lang.Integer"
+                                        columnType="bigserial"
+                                        javaType="java.lang.Long"
                                         length="10"
                                         scale="0"
                                         nullable="false"
@@ -504,8 +462,8 @@
                         <table tableName="emailqueue" javaClass="com.manydesigns.portofino.system.model.email.EmailBean">
                             <columns>
                                 <column columnName="id"
-                                        columnType="serial"
-                                        javaType="java.lang.Integer"
+                                        columnType="bigserial"
+                                        javaType="java.lang.Long"
                                         length="10"
                                         scale="0"
                                         nullable="false"
@@ -742,8 +700,8 @@
                         <table tableName="table1">
                             <columns>
                                 <column columnName="id"
-                                        columnType="serial"
-                                        javaType="java.lang.Integer"
+                                        columnType="bigserial"
+                                        javaType="java.lang.Long"
                                         length="8"
                                         scale="0"
                                         nullable="false"
@@ -764,8 +722,8 @@
                         <table tableName="table4">
                             <columns>
                                 <column columnName="id"
-                                        columnType="serial"
-                                        javaType="java.lang.Integer"
+                                        columnType="bigserial"
+                                        javaType="java.lang.Long"
                                         length="8"
                                         scale="0"
                                         nullable="false"
@@ -817,8 +775,8 @@
                         <table tableName="table3" manyToMany="true">
                             <columns>
                                 <column columnName="id"
-                                        columnType="serial"
-                                        javaType="java.lang.Integer"
+                                        columnType="bigserial"
+                                        javaType="java.lang.Long"
                                         length="8"
                                         scale="0"
                                         nullable="false"

@@ -35,8 +35,6 @@ import org.h2.tools.RunScript;
 
 import java.io.FileReader;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -77,9 +75,6 @@ public class CommonTestUtil extends TestCase{
             RunScript.execute(connPetStore, new FileReader(PETSTORE_DB_SCHEMA));
             RunScript.execute(connPetStore, new FileReader(PETSTORE_DB_DATA));
             RunScript.execute(connDBTest, new FileReader(TEST_DB));
-
-
-
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -90,30 +85,5 @@ public class CommonTestUtil extends TestCase{
 
 
     }
-
-    public static void closePreparedStatement(PreparedStatement ps) {
-        try {
-            if (ps!=null)
-                ps.close();
-        } catch (Exception e ){
-            e.printStackTrace();
-        }
-    }
-
-    public static void closePreparedStatement(ResultSet rs, PreparedStatement ps) {
-        try {
-            if (rs!=null)
-                rs.close();
-        } catch (Exception e ){
-            e.printStackTrace();
-        }
-        try {
-            if (ps != null)
-                ps.close();
-        } catch (Exception e ){
-            e.printStackTrace();
-        }
-    }
-
 
 }

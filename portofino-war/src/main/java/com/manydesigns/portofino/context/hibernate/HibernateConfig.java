@@ -220,6 +220,7 @@ public class HibernateConfig {
         }
 
         col.setSqlTypeCode(type.getJdbcType());
+        col.setSqlType(columnType);
         tab.addColumn(col);
 
         Property prop = new Property();
@@ -275,10 +276,12 @@ public class HibernateConfig {
             String columnType = column.getColumnType();
 
             Type type = connectionProvider.getTypeByName(columnType);
-            if (type == null) {
-                System.out.println ("Cannot find type for "+columnType+ " col:"+col.getName());
+            if (type==null) {
+            LogUtil.severeMF(logger, "Cannot find JDBC type for table {0}," +
+                    " column {1}, type {2}", tab.getName(), column.getColumnName(), columnType);
             }
             col.setSqlTypeCode(type.getJdbcType());
+            col.setSqlType(columnType);
             primaryKey.addColumn(col);
             SimpleValue value = new SimpleValue();
             value.setTable(tab);
@@ -325,7 +328,12 @@ public class HibernateConfig {
         col.setScale(column.getScale());
         col.setNullable(column.isNullable());
         Type type = connectionProvider.getTypeByName(columnType);
+        if (type==null) {
+            LogUtil.severeMF(logger, "Cannot find JDBC type for table {0}," +
+                    " column {1}, type {2}", tab.getName(), column.getColumnName(), columnType);
+        }
         col.setSqlTypeCode(type.getJdbcType());
+        col.setSqlType(columnType);
         org.hibernate.type.Type hibernateType =
                 DbUtil.getHibernateType(type.getJdbcType());
         id.setTypeName(hibernateType.getName());
