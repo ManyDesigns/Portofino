@@ -188,9 +188,7 @@ public class SelectField extends AbstractField {
 
         if (nextSelectField != null) {
             String js = composeDropDownJs();
-            xb.openElement("script");
-            xb.write(js);
-            xb.closeElement("script");
+            xb.writeJavaScript(js);
         }
     }
 
@@ -251,9 +249,7 @@ public class SelectField extends AbstractField {
 
         String js = composeAutocompleteJs();
 
-        xb.openElement("script");
-        xb.write(js);
-        xb.closeElement("script");
+        xb.writeJavaScript(js);
     }
 
     public void valueToXhtmlPreview(XhtmlBuffer xb) {

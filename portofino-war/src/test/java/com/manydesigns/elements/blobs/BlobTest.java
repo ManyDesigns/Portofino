@@ -30,8 +30,14 @@
 package com.manydesigns.elements.blobs;
 
 import com.manydesigns.elements.AbstractElementsTest;
+import com.manydesigns.elements.util.RandomUtil;
+import org.apache.commons.io.IOUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,21 +48,78 @@ public class BlobTest extends AbstractElementsTest {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    BlobsManager blobsManager;
+    BlobsManager manager;
+    File blobsDir;
+
+    String sampleContent = "This is some content";
+    String sampleFilename = "sample.txt";
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
 
-        blobsManager = BlobsManager.getManager();
+        manager = BlobsManager.getManager();
+        blobsDir = manager.getBlobsDir();
     }
 
     public void testManager1() {
-        assertNotNull(blobsManager);
+        assertNotNull(manager);
 
+        assertNotNull(blobsDir);
         assertEquals(System.getProperty("java.io.tmpdir"),
-                blobsManager.getBlobsDir().getAbsolutePath() + File.separator);
-        assertEquals("{0}.properties", blobsManager.getMetaFileNamePattern());
-        assertEquals("{0}.data", blobsManager.getDataFileNamePattern());
+                blobsDir.getAbsolutePath() + File.separator);
+        assertEquals("{0}.properties", manager.getMetaFileNamePattern());
+        assertEquals("{0}.data", manager.getDataFileNamePattern());
+    }
+
+    public void testBlob1() throws IOException {
+        byte[] contentBytes = sampleContent.getBytes();
+        Blob blob = manager.saveBlob(contentBytes, sampleFilename);
+        assertNotNull(blob);
+
+        String code = blob.getCode();
+        assertNotNull(code);
+        assertEquals(RandomUtil.DEFAULT_RANDOM_CODE_LENGTH, code.length());
+        assertEquals(sampleFilename, blob.getFilename());
+        assertEquals(contentBytes.length, blob.getSize());
+
+        File dataFile = blob.getDataFile();
+        File metaFile = blob.getMetaFile();
+
+        String expectedMetaFilename =
+                RandomUtil.getCodeFileName(
+                        manager.getMetaFileNamePattern(), code);
+        assertEquals(expectedMetaFilename, metaFile.getName());
+
+        String expectedDataFilename =
+                RandomUtil.getCodeFileName(
+                        manager.getDataFileNamePattern(), code);
+        assertEquals(expectedDataFilename, dataFile.getName());
+
+        // verifica esistenza e corrispondenza contenuto
+        assertTrue(dataFile.exists());
+        assertEquals(contentBytes.length, dataFile.length());
+        assertTrue(IOUtils.contentEquals(
+                new ByteArrayInputStream(contentBytes),
+                new FileInputStream(dataFile)));
+
+        // verifica esistenza e corrispondenza metadati
+        assertTrue(metaFile.exists());
+        // verifica proprietà
+        Properties properties = new Properties();
+        properties.load(new FileInputStream(metaFile));
+        assertEquals(code,
+                properties.getProperty(Blob.CODE_PROPERTY));
+        assertEquals(blob.getFilename(),
+                properties.getProperty(Blob.FILENAME_PROPERTY));
+        assertEquals(Long.toString(blob.getSize()),
+                properties.getProperty(Blob.SIZE_PROPERTY));
+        assertNotNull(properties.getProperty(Blob.CREATE_TIMESTAMP_PROPERTY));
+
+        // ricarica il blob
+        Blob blob2 = manager.loadBlob(code);
+        assertNotNull(blob2);
+        assertNotSame(blob, blob2);
+        assertEquals(blob, blob2);
     }
 }

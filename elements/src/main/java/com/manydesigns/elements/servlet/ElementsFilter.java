@@ -30,8 +30,7 @@
 package com.manydesigns.elements.servlet;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.i18n.TextProvider;
-import com.manydesigns.elements.i18n.SimpleTextProvider;
+import org.apache.commons.fileupload.FileUploadException;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -53,11 +52,19 @@ public class ElementsFilter implements Filter {
                          ServletResponse res, FilterChain filterChain)
             throws IOException, ServletException {
         ServletContext context = config.getServletContext();
-
+        CommonsUploadRequest commonsUploadRequest;
+        try {
+            commonsUploadRequest =
+                    new CommonsUploadRequest(
+                            (HttpServletRequest) req);
+        } catch (FileUploadException e) {
+            throw new ServletException(
+                    "Cannot instanciate CommonsUploadRequest", e);
+        }
         try {
             ElementsThreadLocals.setupDefaultElementsContext();
             
-            ElementsThreadLocals.setHttpServletRequest((HttpServletRequest) req);
+            ElementsThreadLocals.setHttpServletRequest(commonsUploadRequest);
             ElementsThreadLocals.setHttpServletResponse((HttpServletResponse) res);
             ElementsThreadLocals.setServletContext(context);
 

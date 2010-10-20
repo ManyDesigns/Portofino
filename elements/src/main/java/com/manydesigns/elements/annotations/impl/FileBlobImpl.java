@@ -27,33 +27,25 @@
  *
  */
 
-package com.manydesigns.elements.fields;
+package com.manydesigns.elements.annotations.impl;
 
-import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.annotations.FileBlob;
+
+import java.lang.annotation.Annotation;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class CodiceFiscaleField extends RegExpTextField {
+@SuppressWarnings({"ClassExplicitlyAnnotation"})
+public class FileBlobImpl implements FileBlob {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    // regex per codice fiscale con gestione omocodie.
-    public final static String codiceFiscaleRegExp =
-            "[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]";
+    public FileBlobImpl() {}
 
-    /* Regex più semplice che non gestisce le omocodie è:
-     * [A-Z]{6}[\\d]{2}[A-Z][\\d]{2}[A-Z][\\d]{3}[A-Z]
-     */
-    //**************************************************************************
-    // Constructors
-    //**************************************************************************
-    public CodiceFiscaleField(PropertyAccessor accessor, Mode mode, String prefix) {
-        super(accessor, mode, prefix, codiceFiscaleRegExp);
-        setErrorString(getText("elements.error.field.codice.fiscale.format"));
-        setAutoCapitalize(true);
+    public Class<? extends Annotation> annotationType() {
+        return FileBlob.class;
     }
 }

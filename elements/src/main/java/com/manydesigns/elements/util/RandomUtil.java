@@ -73,6 +73,10 @@ public class RandomUtil {
         tempDir = new File(System.getProperty("java.io.tmpdir"));
     }
 
+    public static File getTempDir() {
+        return tempDir;
+    }
+
     public static String createRandomCode() {
         return RandomStringUtils.randomAlphanumeric(codeLength);
     }

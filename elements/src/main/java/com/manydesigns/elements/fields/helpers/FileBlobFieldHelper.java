@@ -27,9 +27,14 @@
  *
  */
 
-package com.manydesigns.elements.fields;
+package com.manydesigns.elements.fields.helpers;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.FileBlob;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.FileBlobField;
+import com.manydesigns.elements.fields.search.SearchField;
+import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
 /*
@@ -37,23 +42,25 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class CodiceFiscaleField extends RegExpTextField {
+public class FileBlobFieldHelper implements FieldHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    // regex per codice fiscale con gestione omocodie.
-    public final static String codiceFiscaleRegExp =
-            "[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]";
-
-    /* Regex più semplice che non gestisce le omocodie è:
-     * [A-Z]{6}[\\d]{2}[A-Z][\\d]{2}[A-Z][\\d]{3}[A-Z]
-     */
-    //**************************************************************************
-    // Constructors
-    //**************************************************************************
-    public CodiceFiscaleField(PropertyAccessor accessor, Mode mode, String prefix) {
-        super(accessor, mode, prefix, codiceFiscaleRegExp);
-        setErrorString(getText("elements.error.field.codice.fiscale.format"));
-        setAutoCapitalize(true);
+    public Field tryToInstantiateField(ClassAccessor classAccessor,
+                                       PropertyAccessor propertyAccessor,
+                                       Mode mode,
+                                       String prefix) {
+        if (String.class.isAssignableFrom(propertyAccessor.getType())
+                && propertyAccessor.isAnnotationPresent(FileBlob.class)) {
+                return new FileBlobField(propertyAccessor, mode, prefix);
+        }
+        return null;
     }
+
+    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
+                                                   PropertyAccessor propertyAccessor,
+                                                   String prefix) {
+        return null;
+    }
+
 }

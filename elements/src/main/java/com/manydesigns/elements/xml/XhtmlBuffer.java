@@ -239,6 +239,13 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
         closeElement("p");
     }
 
+    public void writeJavaScript(String script) {
+        openElement("script");
+        addAttribute("type", "text/javascript");
+        write(script);
+        closeElement("script");
+    }
+
     public void writeInputFile(String id, String name, String value,
                                boolean disabled) {
         openElement("input");
