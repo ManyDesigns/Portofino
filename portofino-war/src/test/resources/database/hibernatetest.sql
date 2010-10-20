@@ -1,5 +1,5 @@
 
-
+DROP TABLE IF EXISTS comune;
 CREATE TABLE comune (
     regione character varying(30) NOT NULL,
     provincia character varying(30) NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE comune (
 --
 -- Name: domanda; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-
+DROP TABLE IF EXISTS domanda;
 CREATE TABLE domanda (
     protocollo character varying(20) NOT NULL,
     richiedente character varying(50) NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE domanda (
 --
 -- Name: table1; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-
+DROP TABLE IF EXISTS table1;
 CREATE TABLE table1 (
     id IDENTITY NOT NULL,
     testo character varying(15) NOT NULL
@@ -34,7 +34,7 @@ CREATE TABLE table1 (
 --
 -- Name: table2; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-
+DROP TABLE IF EXISTS table2;
 CREATE TABLE table2 (
     id1 character varying(3) NOT NULL,
     id2 character varying(3) NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE table2 (
 --
 -- Name: table3; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-
+DROP TABLE IF EXISTS table3;
 CREATE TABLE table3 (
     id IDENTITY NOT NULL,
     t2_id1 character varying(3) NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE table3 (
 --
 -- Name: table4; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-
+DROP TABLE IF EXISTS table4;
 CREATE TABLE table4 (
     id IDENTITY NOT NULL,
     testo character varying(15) NOT NULL

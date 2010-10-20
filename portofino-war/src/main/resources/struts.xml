@@ -394,10 +394,10 @@
     <package name="portofino-useradmin" extends="portofino-default" namespace="/user-admin">
         <action name="Index">
             <result name="success" type="redirectAction">
-                <param name="actionName">UsersAction</param>
+                <param name="actionName">Users</param>
             </result>
         </action>
-        <action name="UsersAction" class="com.manydesigns.portofino.actions.user.admin.UserAction">
+        <action name="Users" class="com.manydesigns.portofino.actions.user.admin.UserAction">
             <result name="search">/skins/default/user/admin/search.jsp</result>
 
             <result name="read">/skins/default/user/admin/read.jsp</result>
@@ -405,7 +405,7 @@
             <result name="create">/skins/default/user/admin/create.jsp</result>
 
             <result name="save" type="redirectAction">
-                <param name="actionName">UsersAction</param>
+                <param name="actionName">Users</param>
                 <param name="namespace">/user-admin</param>
                 <param name="pk">%{pk}</param>
             </result>
@@ -413,7 +413,7 @@
             <result name="edit">/skins/default/user/admin/edit.jsp</result>
 
             <result name="update" type="redirectAction">
-                <param name="actionName">UsersAction</param>
+                <param name="actionName">Users</param>
                 <param name="namespace">/user-admin</param>
                 <param name="pk">%{pk}</param>
                 <param name="searchString">%{searchString}</param>
@@ -421,13 +421,13 @@
 
 
             <result name="returnToSearch" type="redirectAction">
-                <param name="actionName">UsersAction</param>
+                <param name="actionName">Users</param>
                 <param name="namespace">/user-admin</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="delete" type="redirectAction">
-                <param name="actionName">UsersAction</param>
+                <param name="actionName">Users</param>
                 <param name="namespace">/user-admin</param>
                 <param name="searchString">%{searchString}</param>
             </result>
@@ -452,6 +452,64 @@
                 <param name="bufferSize">1024</param>
             </result>
 
+        </action>
+
+        <action name="Groups" class="com.manydesigns.portofino.actions.user.admin.GroupAction">
+            <param name="skin">default</param>
+            <param name="qualifiedTableName">portofino.public.group_</param>
+            <result name="search">/skins/default/group/admin/search.jsp</result>
+
+            <result name="read">/skins/default/group/admin/read.jsp</result>
+
+            <result name="create">/skins/default/group/admin/create.jsp</result>
+
+        <result name="save" type="redirectAction">
+                <param name="actionName">Groups</param>
+                <param name="namespace">/user-admin</param>
+                <param name="pk">%{pk}</param>
+            </result>
+
+            <result name="edit">/skins/default/user/admin/edit.jsp</result>
+
+            <result name="update" type="redirectAction">
+                <param name="actionName">Groups</param>
+                <param name="namespace">/user-admin</param>
+                <param name="pk">%{pk}</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+
+            <result name="returnToSearch" type="redirectAction">
+                <param name="actionName">Groups</param>
+                <param name="namespace">/user-admin</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="delete" type="redirectAction">
+                <param name="actionName">Groups</param>
+                <param name="namespace">/user-admin</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="cancel" type="redirect">
+                <param name="location">${cancelReturnUrl}</param>
+                <param name="prependServletContext">false</param>
+            </result>
+
+            <result name="export" type="stream">
+                <param name="contentType">%{contentType}</param>
+                <param name="contentLength">%{contentLength}</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename="%{fileName}"</param>
+                <param name="bufferSize">1024</param>
+            </result>
+
+
+            <result name="jsonSelectFieldOptions" type="stream">
+                <param name="contentType">text/plain</param>
+                <param name="inputName">inputStream</param>
+                <param name="bufferSize">1024</param>
+            </result>
         </action>
     </package>
 

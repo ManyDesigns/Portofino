@@ -85,8 +85,6 @@ public interface Context {
 
     List<Object> getObjects(String queryString, Criteria criteria);
 
-    void saveOrUpdateObject(String qualifiedTableName, Object obj);
-
     void saveObject(String qualifiedTableName, Object obj);
 
     void updateObject(String qualifiedTableName, Object obj);

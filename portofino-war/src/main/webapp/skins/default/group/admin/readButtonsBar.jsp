@@ -12,13 +12,13 @@
     <s:if test="#position >= 0">
         <div style="float: right;">
             <s:if test="#position > 0">
-                <s:url var="firstUrl" namespace="/user-admin" action="UsersAction">
+                <s:url var="firstUrl" namespace="/model" action="%{qualifiedTableName}/TableData">
                     <s:param name="pk"
                              value="%{pkHelper.generatePkString(objects.get(0))}" />
                     <s:param name="searchString" value="%{searchString}" />
                 </s:url>
                 <s:a id="first" href="%{#firstUrl}">first</s:a>
-                <s:url var="previousUrl" namespace="/user-admin" action="UsersAction">
+                <s:url var="previousUrl" namespace="/model" action="%{qualifiedTableName}/TableData">
                     <s:param name="pk"
                              value="%{pkHelper.generatePkString(objects.get(#position-1))}" />
                     <s:param name="searchString" value="%{searchString}" />
@@ -29,13 +29,13 @@
             </s:else>
             <s:property value="#position+1"/> of <s:property value="objects.size()"/>
             <s:if test="#position < #size-1">
-                <s:url var="nextUrl" namespace="/user-admin" action="UsersAction">
+                <s:url var="nextUrl" namespace="/model" action="%{qualifiedTableName}/TableData">
                     <s:param name="pk"
                              value="%{pkHelper.generatePkString(objects.get(#position+1))}" />
                     <s:param name="searchString" value="%{searchString}" />
                 </s:url>
                 <s:a id="next" href="%{#nextUrl}">next</s:a>
-                <s:url var="lastUrl" namespace="/user-admin" action="UsersAction">
+                <s:url var="lastUrl" namespace="/model" action="%{qualifiedTableName}/TableData">
                     <s:param name="pk"
                              value="%{pkHelper.generatePkString(objects.get(#size - 1))}" />
                     <s:param name="searchString" value="%{searchString}" />
@@ -50,8 +50,7 @@
     <s:submit id="Table_edit" method="edit" value="Edit"/>
     <s:submit id="Table_delete" method="delete" value="Delete"
               onclick="return confirm ('Are you sure?');"/>
-    <s:submit id="Table_groups" method="removeGroups" value="Remove selected groups" onclick="return confirm ('Are you sure?');"/>
-    <s:submit id="Table_add_groups" method="addGroups" value="Add selected groups" onclick="return confirm ('Are you sure?');"/>
+    <s:submit id="Table_duplicate" method="duplicate" value="Duplicate" disabled="true"/>
     <s:submit id="Table_print" method="print" value="Print" disabled="true"/>
     <s:submit id="Table_export" method="exportRead" value="Export" disabled="false"/>
 </div>

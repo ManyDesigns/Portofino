@@ -51,6 +51,7 @@ import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
@@ -68,6 +69,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.sql.Timestamp;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -107,6 +109,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
 
     public String pk;
     public String[] selection;
+    public String[] ng_selection;
     public String searchString;
     public String cancelReturnUrl;
     public String relName;
@@ -127,6 +130,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
 
     public User user;
     public List<Object> users;
+    public List<Group> activeGroups;
 
 
 
@@ -260,7 +264,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
 
 
     public String getReadLinkExpression() {
-        StringBuilder sb = new StringBuilder("/user-admin/UsersAction.action?pk=");
+        StringBuilder sb = new StringBuilder("/user-admin/Users.action?pk=");
         boolean first = true;
         for (PropertyAccessor property : tableAccessor.getKeyProperties()) {
             if (first) {
@@ -316,13 +320,13 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
 
         setupActiveGroups();
         setupDeletedGroups();
+        setupNewGroups();
         return READ;
     }
 
     protected void setupActiveGroups(){
         try {
             TableAccessor ugAccessor = context.getTableAccessor(usersGroupsTable);
-
             Criteria criteria = new Criteria(ugAccessor);
             criteria.eq(ugAccessor.getProperty("userid"), user.getUuid());
             criteria.isNull(ugAccessor.getProperty("deletionDate"));
@@ -330,6 +334,8 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
 
             TableFormBuilder tableFormBuilder
                     = new TableFormBuilder(ugAccessor).configMode(Mode.VIEW)
+
+                    .configNRows(users.size())
                     .configFields("userid", "groupid", "creationDate");
 
             // setup relationship lookups
@@ -359,7 +365,6 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
                 activeGroupsForm.readFromObject(users);
             }
         } catch (NoSuchFieldException e) {
-            e.printStackTrace();
             LogUtil.warning(logger, "cannot find property userid", e);
         }
     }
@@ -374,7 +379,8 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
             List<Object> objects = context.getObjects(criteria);
 
             TableFormBuilder tableFormBuilder
-                    = new TableFormBuilder(ugAccessor).configMode(Mode.VIEW);
+                    = new TableFormBuilder(ugAccessor).configNRows(objects.size())
+                    .configMode(Mode.VIEW);
 
 
             // setup relationship lookups
@@ -407,35 +413,28 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     protected void setupNewGroups(){
         try {
             TableAccessor groupAccessor = context.getTableAccessor(groupTable);
-            TableAccessor ugAccessor = context.getTableAccessor(usersGroupsTable);
-
             Criteria criteria = new Criteria(groupAccessor);
             criteria.eq(groupAccessor.getProperty("active"), true);
+
             List<Object> objects = context.getObjects(criteria);
 
             TableFormBuilder tableFormBuilder
-                    = new TableFormBuilder(ugAccessor).configMode(Mode.VIEW);
+                    = new TableFormBuilder(groupAccessor)
+                    .configPrefix("ng_")
+                    .configFields("name", "description")
+                    .configNRows(objects.size())
+                    .configMode(Mode.VIEW);
 
-            // setup relationship lookups
-            Table table = model.findTableByQualifiedName(usersGroupsTable);
-            for (ForeignKey rel : table.getForeignKeys()) {
-                String[] fieldNames = createFieldNamesForRelationship(rel);
-                SelectionProvider selectionProvider =
-                        createOptionProviderForRelationship(rel);
-                boolean autocomplete = false;
-                for (ModelAnnotation current : rel.getAnnotations()) {
-                    if ("com.manydesigns.elements.annotations.Autocomplete"
-                            .equals(current.getType())) {
-                        autocomplete = true;
-                    }
-                }
-                selectionProvider.setAutocomplete(autocomplete);
-
-                tableFormBuilder.configOptionProvider
-                        (selectionProvider, fieldNames);
-            }
+            
             newGroupsForm = tableFormBuilder.build();
-            newGroupsForm.readFromObject(users);
+            if (objects.size()>0){
+                PkHelper agPk = new PkHelper(groupAccessor);
+                newGroupsForm.setKeyGenerator(agPk.createPkGenerator());
+                newGroupsForm.setSelectable(true);
+                newGroupsForm.readFromObject(objects);
+            }
+
+
         } catch (NoSuchFieldException e) {
             LogUtil.warning(logger, "cannot find property active", e);
         }
@@ -588,11 +587,38 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
             PkHelper agPkHelper = new PkHelper(ugAccessor);
             UsersGroups ug = (UsersGroups) agPkHelper.parsePkString(current);
             ug = (UsersGroups) context.getObjectByPk(usersGroupsTable,ug);
-            ug.setDeletionDate(new Date());
-            context.saveObject(usersGroupsTable, ug);
+            ug.setDeletionDate(new Timestamp(new Date().getTime()));
+            context.updateObject(usersGroupsTable, ug);
         }
         context.commit("portofino");
         SessionMessages.addInfoMessage("Group(s) removed");
+        return read();
+    }
+
+    //**************************************************************************
+    // Add user from Group
+    //**************************************************************************
+
+    public String addGroups(){
+
+        if (null==ng_selection) {
+            SessionMessages.addInfoMessage("No group selected");
+            return read();
+        }
+        for (String current : ng_selection) {
+            UsersGroups newUg = new UsersGroups();
+            newUg.setCreationDate(new Timestamp(new Date().getTime()));
+            newUg.setGroupid(Long.valueOf(current));
+            Group pkGrp = new Group(Long.valueOf(current));
+            newUg.setGroup((Group) context.getObjectByPk(groupTable, pkGrp));
+            newUg.setUserid(Long.valueOf(pk));
+            User pkUsr = new User(Long.valueOf(pk));
+            newUg.setUser((User) context.getObjectByPk(userTable, pkUsr));
+
+            context.saveObject(usersGroupsTable, newUg);
+        }
+        context.commit("portofino");
+        SessionMessages.addInfoMessage("Group added");
         return read();
     }
     //**************************************************************************

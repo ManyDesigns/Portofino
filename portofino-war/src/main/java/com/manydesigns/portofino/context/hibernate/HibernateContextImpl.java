@@ -485,21 +485,6 @@ public class HibernateContextImpl implements Context {
         return result;
     }
 
-    public void saveOrUpdateObject(String qualifiedTableName, Object obj) {
-        Session session = getSession(qualifiedTableName);
-
-        try {
-            startTimer();
-            session.beginTransaction();
-            session.saveOrUpdate(qualifiedTableName, obj);
-            //session.getTransaction().commit();
-        } catch (HibernateException e) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            stopTimer();
-        }
-    }
 
     public void saveObject(String qualifiedTableName, Object obj) {
         Session session = getSession(qualifiedTableName);

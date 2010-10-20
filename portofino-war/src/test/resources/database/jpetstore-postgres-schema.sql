@@ -1,4 +1,4 @@
-
+DROP TABLE IF EXISTS supplier;
 create table supplier (
     suppid int not null,
     name varchar(80) null,
@@ -12,12 +12,14 @@ create table supplier (
     constraint pk_supplier primary key (suppid)
 );
 
+DROP TABLE IF EXISTS signon;
 create table signon (
     username varchar(25) not null,
     password varchar(25)  not null,
     constraint pk_signon primary key (username)
 );
 
+DROP TABLE IF EXISTS account;
 create table account (
     userid varchar(80) not null,
     email varchar(80) not null,
@@ -34,6 +36,7 @@ create table account (
     constraint pk_account primary key (userid)
 );
 
+DROP TABLE IF EXISTS profile;
 create table profile (
     userid varchar(80) not null,
     langpref varchar(80) not null,
@@ -43,12 +46,14 @@ create table profile (
     constraint pk_profile primary key (userid)
 );
 
+DROP TABLE IF EXISTS bannerdata;
 create table bannerdata (
     favcategory varchar(80) not null,
     bannername varchar(255)  null,
     constraint pk_bannerdata primary key (favcategory)
 );
 
+DROP TABLE IF EXISTS orders;
 create table orders (
       orderid int not null,
       userid varchar(80) not null,
@@ -78,6 +83,7 @@ create table orders (
       constraint pk_orders primary key (orderid)
 );
 
+DROP TABLE IF EXISTS orderstatus;
 create table orderstatus (
       orderid int not null,
       linenum int not null,
@@ -86,6 +92,7 @@ create table orderstatus (
       constraint pk_orderstatus primary key (orderid, linenum)
 );
 
+DROP TABLE IF EXISTS lineitem;
 create table lineitem (
       orderid int not null,
       linenum int not null,
@@ -95,6 +102,7 @@ create table lineitem (
       constraint pk_lineitem primary key (orderid, linenum)
 );
 
+DROP TABLE IF EXISTS category;
 create table category (
 	catid varchar(10) not null,
 	name varchar(80) null,
@@ -102,6 +110,7 @@ create table category (
 	constraint pk_category primary key (catid)
 );
 
+DROP TABLE IF EXISTS product;
 create table product (
     productid varchar(10) not null,
     category varchar(10) not null,
@@ -115,6 +124,7 @@ create table product (
 create index productCat on product (category);
 create index productName on product (name);
 
+DROP TABLE IF EXISTS item;
 create table item (
     itemid varchar(10) not null,
     productid varchar(10) not null,
@@ -136,12 +146,14 @@ create table item (
 
 create index itemProd on item (productid);
 
+DROP TABLE IF EXISTS inventory;
 create table inventory (
     itemid varchar(10) not null,
     qty int not null,
     constraint pk_inventory primary key (itemid)
 );
 
+DROP TABLE IF EXISTS sequence;
 CREATE TABLE sequence
 (
     name               varchar(30)  not null,

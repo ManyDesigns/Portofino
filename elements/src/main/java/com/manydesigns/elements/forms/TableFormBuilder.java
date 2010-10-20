@@ -183,6 +183,10 @@ public class TableFormBuilder {
 
         TableForm tableForm = new TableForm(nRows, propertyAccessorsArray);
 
+        if (null!=prefix && prefix.length()>0) {
+            tableForm.setPrefix(prefix);
+        }
+
         // set up the columns
         setupColumns(tableForm);
 

@@ -38,6 +38,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.sql.Timestamp;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,13 +53,13 @@ public class User implements Serializable{
     Integer state;
 
 
-    Date delDate;
-    Date modifiedDate;
-    Date pwdModDate;
-    Date loginDate;
-    Date lastLoginDate;
-    Date lastFailedLoginDate;
-    Date createDate;
+    Timestamp delDate;
+    Timestamp modifiedDate;
+    Timestamp pwdModDate;
+    Timestamp loginDate;
+    Timestamp lastLoginDate;
+    Timestamp lastFailedLoginDate;
+    Timestamp createDate;
 
     Boolean defaultUser;
     Boolean agreedToTerms;
@@ -82,10 +83,19 @@ public class User implements Serializable{
     Integer bounced;
     Integer graceLoginCount;
 
+    List<Group> groupsCreated;
 
 
     //gruppi di appartenenza
     List<UsersGroups> groups = new ArrayList<UsersGroups>();
+
+    public User(){
+
+    }
+    
+    public User(Long uuid){
+        this.uuid=uuid;
+    }
 
     public Long getUuid() {
         return uuid;
@@ -135,7 +145,7 @@ public class User implements Serializable{
         return delDate;
     }
 
-    public void setDelDate(Date delDate) {
+    public void setDelDate(Timestamp delDate) {
         this.delDate = delDate;
     }
 
@@ -143,7 +153,7 @@ public class User implements Serializable{
         return modifiedDate;
     }
 
-    public void setModifiedDate(Date modifiedDate) {
+    public void setModifiedDate(Timestamp modifiedDate) {
         this.modifiedDate = modifiedDate;
     }
 
@@ -167,7 +177,7 @@ public class User implements Serializable{
         return pwdModDate;
     }
 
-    public void setPwdModDate(Date pwdModDate) {
+    public void setPwdModDate(Timestamp pwdModDate) {
         this.pwdModDate = pwdModDate;
     }
 
@@ -255,7 +265,7 @@ public class User implements Serializable{
         return loginDate;
     }
 
-    public void setLoginDate(Date loginDate) {
+    public void setLoginDate(Timestamp loginDate) {
         this.loginDate = loginDate;
     }
 
@@ -271,7 +281,7 @@ public class User implements Serializable{
         return lastLoginDate;
     }
 
-    public void setLastLoginDate(Date lastLoginDate) {
+    public void setLastLoginDate(Timestamp lastLoginDate) {
         this.lastLoginDate = lastLoginDate;
     }
 
@@ -287,7 +297,7 @@ public class User implements Serializable{
         return lastFailedLoginDate;
     }
 
-    public void setLastFailedLoginDate(Date lastFailedLoginDate) {
+    public void setLastFailedLoginDate(Timestamp lastFailedLoginDate) {
         this.lastFailedLoginDate = lastFailedLoginDate;
     }
 
@@ -311,7 +321,7 @@ public class User implements Serializable{
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(Timestamp createDate) {
         this.createDate = createDate;
     }
 
@@ -329,6 +339,14 @@ public class User implements Serializable{
 
     public void setBounced(Integer bounced) {
         this.bounced = bounced;
+    }
+
+    public List<Group> getGroupsCreated() {
+        return groupsCreated;
+    }
+
+    public void setGroupsCreated(List<Group> groupsCreated) {
+        this.groupsCreated = groupsCreated;
     }
 
     public void setPwdEncrypted(String pwd) {

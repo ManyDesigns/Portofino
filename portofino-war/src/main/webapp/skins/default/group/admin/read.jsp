@@ -4,32 +4,28 @@
 %><%@ taglib prefix="mdes" uri="/manydesigns-elements-struts2"
 %><s:include value="/skins/default/header.jsp"/>
 <s:form method="post">
-    <s:include value="/skins/default/user/admin/readButtonsBar.jsp"/>
+    <s:include value="/skins/default/model/tableData/readButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1>User detail</h1>
+        <h1>Read: <s:property value="qualifiedTableName"/></h1>
         <mdes:write value="form"/>
-        <h2>Current groups</h2>
-        <mdes:write value="activeGroupsForm"/>
-
-        <h2>Expired groups</h2>
-        <mdes:write value="deletedGroupsForm"/>
-
-        <h2>Add groups</h2>
-        <mdes:write value="newGroupsForm"/>
-
+        <s:iterator var="current" value="relatedTableFormList">
+            <s:set name="rel" value="#current.relationship"/>
+            <h2><s:property value="#rel.relationshipName"/></h2>
+            <mdes:write value="#current.tableForm"/>
+        </s:iterator>
         <s:hidden name="pk" value="%{pk}"/>
         <s:if test="searchString != null">
             <s:hidden name="searchString" value="%{searchString}"/>
         </s:if>
         <s:url var="cancelReturnUrl"
-               namespace="/user-admin"
-               action="UsersAction"
+               namespace="/model"
+               action="%{qualifiedTableName}/TableData"
                escapeAmp="false">
             <s:param name="pk" value="%{pk}"/>
             <s:param name="searchString" value="%{searchString}"/>
         </s:url>
         <s:hidden name="cancelReturnUrl" value="%{#cancelReturnUrl}"/>
     </div>
-    <s:include value="/skins/default/user/admin/readButtonsBar.jsp"/>
+    <s:include value="/skins/default/model/tableData/readButtonsBar.jsp"/>
 </s:form>
 <s:include value="/skins/default/footer.jsp"/>

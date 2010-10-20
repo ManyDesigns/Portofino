@@ -26,8 +26,7 @@
  * Boston, MA  02111-1307  USA
  *
  */
-
-package com.manydesigns.portofino.actions.model;
+package com.manydesigns.portofino.actions.user.admin;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
@@ -44,8 +43,8 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RelatedTableForm;
+import com.manydesigns.portofino.actions.model.TableDataAction;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.Column;
@@ -59,7 +58,6 @@ import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
-import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -78,8 +76,9 @@ import java.util.regex.Pattern;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableDataAction extends PortofinoAction
-        implements ServletRequestAware {
+public class GroupAction extends TableDataAction{
+
+
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -92,7 +91,7 @@ public class TableDataAction extends PortofinoAction
     public final static String JSON_SELECT_FIELD_OPTIONS =
             "jsonSelectFieldOptions";
     public static final String EXPORT_FILENAME_FORMAT = "export-{0}";
-    public final String ACTIONURL = "/TableData.action";
+    public static final String ACTIONURL = "Groups.action";
     //**************************************************************************
     // ServletRequestAware implementation
     //**************************************************************************
@@ -929,6 +928,4 @@ public class TableDataAction extends PortofinoAction
             sheet.addCell(label);
         }
     }
-
-
 }

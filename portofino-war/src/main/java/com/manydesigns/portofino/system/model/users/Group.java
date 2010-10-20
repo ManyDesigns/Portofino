@@ -32,6 +32,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.sql.Timestamp;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,11 +44,19 @@ public class Group implements Serializable{
     String name;
     String description;
     Long creatorId;
-    Long parentGroupId;
-    Date delDate;
+    Timestamp delDate;
     Boolean active;
+
     
     List<User> users = new ArrayList<User>();
+
+    public Group() {
+
+    }
+    
+    public Group(Long groupId){
+        this.groupId=groupId;
+    }
 
     public Long getGroupId() {
         return groupId;
@@ -89,19 +98,11 @@ public class Group implements Serializable{
         this.creatorId = creatorId;
     }
 
-    public Long getParentGroupId() {
-        return parentGroupId;
-    }
-
-    public void setParentGroupId(Long parentGroupId) {
-        this.parentGroupId = parentGroupId;
-    }
-
     public Date getDelDate() {
         return delDate;
     }
 
-    public void setDelDate(Date delDate) {
+    public void setDelDate(Timestamp delDate) {
         this.delDate = delDate;
     }
 
@@ -120,9 +121,8 @@ public class Group implements Serializable{
 
         Group group = (Group) o;
 
-        if (!groupId.equals(group.groupId)) return false;
+        return groupId.equals(group.groupId);
 
-        return true;
     }
 
     @Override
