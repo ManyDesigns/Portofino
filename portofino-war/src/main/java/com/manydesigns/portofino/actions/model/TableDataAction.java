@@ -60,8 +60,13 @@ import jxl.write.*;
 import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.apache.fop.apps.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.transform.*;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
@@ -666,7 +671,7 @@ public class TableDataAction extends PortofinoAction
     // ExportSearch
     //**************************************************************************
 
-    public String exportSearch() {
+    public String exportSearchExcel() {
         setupTable();
 
         SearchFormBuilder searchFormBuilder =
@@ -685,12 +690,12 @@ public class TableDataAction extends PortofinoAction
                 .build();
         tableForm.readFromObject(objects);
 
-        exportSearchExcel();
+        writeFileSearchExcel();
 
         return EXPORT;
     }
 
-    private void exportSearchExcel() {
+    private void writeFileSearchExcel() {
         File fileTemp = createExportTempFile();
         WritableWorkbook workbook = null;
         try {
@@ -732,7 +737,7 @@ public class TableDataAction extends PortofinoAction
     // ExportRead
     //**************************************************************************
 
-    public String exportRead() {
+    public String exportReadExcel() {
         setupTable();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
@@ -765,13 +770,13 @@ public class TableDataAction extends PortofinoAction
             setupRelatedTableForm(relationship);
         }
 
-        exportReadExcel();
+        writeFileReadExcel();
 
         return EXPORT;
     }
 
 
-    private void exportReadExcel() {
+    private void writeFileReadExcel() {
         File fileTemp = createExportTempFile();
         WritableWorkbook workbook = null;
         try {
@@ -794,7 +799,8 @@ public class TableDataAction extends PortofinoAction
            int k = 1;
            WritableCellFormat formatCell = headerExcel();
            for (RelatedTableForm relTabForm : relatedTableFormList) {
-                sheet = workbook.createSheet("sheet " + k , k);
+                sheet = workbook.createSheet(relTabForm.relationship.
+                        getFromTable().getQualifiedName() , k);
                 k++;
                 int m = 0;
                 for (TableForm.Column col : relTabForm.tableForm.getColumns()) {
@@ -911,7 +917,7 @@ public class TableDataAction extends PortofinoAction
             sheet.addCell(label);
         } else if (field instanceof DateField) {
             DateField dateField = (DateField) field;
-            DateTime dateCell = null;
+            DateTime dateCell;
             Date date = dateField.getDateValue();
             if (date != null) {
                 DateFormat dateFormat = new DateFormat(
@@ -930,5 +936,141 @@ public class TableDataAction extends PortofinoAction
         }
     }
 
+
+
+    //**************************************************************************
+    // ExportReadPdf
+    //**************************************************************************
+
+    public String exportSearchPdf() throws FOPException,
+            IOException, TransformerException {
+        FopFactory fopFactory = FopFactory.newInstance();
+
+
+        FileOutputStream out = null;
+        File tempPdfFile = createExportTempFile();
+        try {
+                               
+            File fo = new File("/Users/proprietario/FOP/example.xml");
+            File xsl = new File("/Users/proprietario/FOP/example.xsl");
+            out = new FileOutputStream(tempPdfFile);
+
+            Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
+
+            ClassLoader cl = getClass().getClassLoader();
+            //InputStream xsltStream = cl.getResourceAsStream(
+            //        "templateFOP.xsl");
+
+            // Setup XSLT
+            TransformerFactory tFactory = TransformerFactory.newInstance();
+            //Transformer transformer = tFactory.newTransformer(new StreamSource(
+            //        xsltStream));
+            Transformer transformer = tFactory.newTransformer(new StreamSource(xsl));
+
+            // Set the value of a <param> in the stylesheet
+            transformer.setParameter("versionParam", "2.0");
+
+
+            // Setup input for XSLT transformation
+            //String xml = composeXml();
+            //Source src = new StreamSource(xml);
+            Source src = new StreamSource(fo);
+
+            // Resulting SAX events (the generated FO) must be piped through to
+            // FOP
+            Result res = new SAXResult(fop.getDefaultHandler());
+
+
+            // Start XSLT transformation and FOP processing
+            transformer.transform(src, res);
+
+
+            out.flush();
+
+
+        } catch (Exception e) {
+            LogUtil.warning(logger, "IOException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } finally {
+            try {
+                if (out != null)
+                    out.close();
+            }
+            catch (Exception e) {
+                LogUtil.warning(logger, "IOException", e);
+                SessionMessages.addErrorMessage(e.getMessage());
+            }
+        }
+
+
+        inputStream = new FileInputStream(tempPdfFile);
+
+        contentType = "application/pdf";
+
+        fileName = tempPdfFile.getName() + ".pdf";
+
+        contentLength = tempPdfFile.length();
+
+        return EXPORT;
+    }
+
+    public String composeXml() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+sb.append("<projectteam>");
+sb.append("<projectname>The Killer Application</projectname>");
+sb.append("<member>");
+sb.append("<name>John Doe</name>");
+sb.append("<function>lead</function>");
+sb.append("<email>jon.doe@killerapp.fun</email>");
+sb.append("</member>");
+sb.append("<member>");
+sb.append("<name>Paul Coder</name>");
+sb.append("<function>dev</function>");
+sb.append("<email>paul.coder@killerapp.fun</email>");
+sb.append("</member>");
+sb.append("<member>");
+sb.append("<name>Max Hacker</name>");
+sb.append("<function>dev</function>");
+sb.append("<email>max.hacker@killerapp.fun</email>");
+sb.append("</member>");
+sb.append("<member>");
+sb.append("<name>Donna Book</name>");
+sb.append("<function>doc</function>");
+sb.append("<email>donna.book@killerapp.fun</email>");
+sb.append("</member>");
+sb.append("<member>");
+sb.append("<name>Henry Tester</name>");
+sb.append("<function>qa</function>");
+sb.append("<email>henry.tester@killerapp.fun</email>");
+sb.append("</member>");
+sb.append("</projectteam>");
+      /*  sb.append("<fax>");
+
+        sb.append("<mittente>");
+        sb.append("prova");
+        sb.append("</mittente>");
+
+        sb.append("<oggetto>");
+        sb.append("prova");
+        sb.append("</oggetto>");
+
+
+        sb.append("<destinatario>");
+        
+        sb.append("prova");
+        sb.append("</destinatario>");
+
+
+        sb.append("<field name=\"");
+        sb.append("prova");
+        sb.append("\" value=\"");
+        sb.append("prova");
+        sb.append("\" />");
+
+        sb.append("</fax>");
+                              */
+        return sb.toString();
+    }
 
 }

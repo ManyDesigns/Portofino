@@ -13,4 +13,5 @@
               onclick="return confirm ('Are you sure?');"/>
     <s:submit id="Table_print" method="print" value="Print" disabled="true"/>
     <s:submit id="Table_export" method="exportSearch" value="Export" disabled="false"/>
+    <s:submit id="Table_exportPdf" method="exportSearchPdf" value="ExportPdf" disabled="false"/>
 </div>
