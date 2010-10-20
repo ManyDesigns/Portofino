@@ -30,15 +30,17 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.FileBlob;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobsManager;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.servlet.MultipartRequest;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 
 /*
@@ -57,12 +59,10 @@ public class FileBlobField extends AbstractField
 
     public static final String OPERATION_SUFFIX = "_operation";
 
+    protected String operationInputName;
+
     protected final BlobsManager blobsManager;
     protected Blob blob;
-
-    protected final File blobDir;
-    protected final String metaFileNamePattern;
-    protected final String dataFileNamePattern;
 
     //**************************************************************************
     // Costruttori
@@ -74,11 +74,7 @@ public class FileBlobField extends AbstractField
     public FileBlobField(PropertyAccessor accessor, Mode mode, String prefix) {
         super(accessor, mode, prefix);
         blobsManager = BlobsManager.getManager();
-
-        FileBlob fileBlobAnnotation = accessor.getAnnotation(FileBlob.class);
-        blobDir = new File(fileBlobAnnotation.blobDir());
-        metaFileNamePattern = fileBlobAnnotation.metaFileNamePattern();
-        dataFileNamePattern = fileBlobAnnotation.dataFileNamePattern();
+        operationInputName = inputName + OPERATION_SUFFIX;
     }
 
     //**************************************************************************
@@ -120,8 +116,6 @@ public class FileBlobField extends AbstractField
     }
 
     private void valueToXhtmlEdit(XhtmlBuffer xb) {
-        String operationInputName = inputName + OPERATION_SUFFIX;
-
         if (blob == null) {
             xb.writeInputHidden(operationInputName, UPLOAD_MODIFY);
             xb.writeInputFile(id, inputName, false);
@@ -182,44 +176,51 @@ public class FileBlobField extends AbstractField
             return;
         }
 
-        Class reqClass = req.getClass();
-        if (!(reqClass.getName().equals(
-                "org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper"))) {
-            return;
-        }
-
-        String operationInputName = inputName + OPERATION_SUFFIX;
-
         String updateTypeStr = req.getParameter(operationInputName);
         if (updateTypeStr == null) {
             // do nothing
         } else if (updateTypeStr.equals(UPLOAD_KEEP)) {
             // do nothing
         } else if (updateTypeStr.equals(UPLOAD_MODIFY)) {
-            // check that a file is actually attached
-            try {
+            saveUpload(req);
+        } else if (updateTypeStr.equals(UPLOAD_DELETE)) {
+            blob = null;
+        }
+    }
+
+    private void saveUpload(HttpServletRequest req) {
+        Class reqClass = req.getClass();
+        try {
+            if ((reqClass.getName().equals(
+                    "org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper"))) {
                 Method getFilesMethod =
                         reqClass.getMethod("getFiles", String.class);
                 Method getFileNamesMethod =
                         reqClass.getMethod("getFileNames", String.class);
-                Method getFileSystemNamesMethod =
-                        reqClass.getMethod("getFileSystemNames", String.class);
 
                 File[] files = (File[])
                         getFilesMethod.invoke(req, inputName);
                 String[] fileNames = (String[])
                         getFileNamesMethod.invoke(req, inputName);
-                String[] fileSystemNames = (String[])
-                        getFileSystemNamesMethod.invoke(req, inputName);
-
                 if (files != null && files.length > 0) {
                     blob = blobsManager.saveBlob(files[0], fileNames[0]);
                 }
-            } catch (Exception e) {
-                throw new Error(e);
+            } else if (req instanceof MultipartRequest) {
+                MultipartRequest request =
+                        (MultipartRequest)req;
+
+                FileItem fileItem = request.getFileItem(inputName);
+                if (fileItem != null) {
+                    InputStream fis = fileItem.getInputStream();
+                    String fileName = fileItem.getName();
+                    blob = blobsManager.saveBlob(fis, fileName);
+                }
+            } else {
+                logger.warning("Cannot read multipart request");
             }
-        } else if (updateTypeStr.equals(UPLOAD_DELETE)) {
-            blob = null;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new Error(e);
         }
     }
 
@@ -256,5 +257,21 @@ public class FileBlobField extends AbstractField
         } else {
             writeToObject(obj, blob.getCode());
         }
+    }
+
+    public Blob getBlob() {
+        return blob;
+    }
+
+    public void setBlob(Blob blob) {
+        this.blob = blob;
+    }
+
+    public String getOperationInputName() {
+        return operationInputName;
+    }
+
+    public void setOperationInputName(String operationInputName) {
+        this.operationInputName = operationInputName;
     }
 }

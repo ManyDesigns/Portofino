@@ -31,6 +31,7 @@ package com.manydesigns.elements.blobs;
 
 import com.manydesigns.elements.logging.LogUtil;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -56,6 +57,8 @@ public class Blob {
     public final static String FILENAME_PROPERTY = "filename";
     public final static String SIZE_PROPERTY = "size";
     public final static String CREATE_TIMESTAMP_PROPERTY = "create.timestamp";
+    
+    public final static String COMMENT  = "Blob metadata";
 
     
     //**************************************************************************
@@ -83,7 +86,7 @@ public class Blob {
     // Constructor
     //**************************************************************************
 
-    public Blob(File metaFile, File dataFile) {
+    public Blob(@NotNull File metaFile, @NotNull File dataFile) {
         this.metaFile = metaFile;
         this.dataFile = dataFile;
     }
@@ -119,7 +122,7 @@ public class Blob {
         OutputStream metaStream = null;
         try {
             metaStream = new FileOutputStream(metaFile);
-            metaProperties.store(metaStream, "comments");
+            metaProperties.store(metaStream, COMMENT);
         } finally {
             IOUtils.closeQuietly(metaStream);
         }
@@ -182,5 +185,40 @@ public class Blob {
 
     public DateTime getCreateTimestamp() {
         return createTimestamp;
+    }
+
+    //**************************************************************************
+    // Overrides
+    //**************************************************************************
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Blob blob = (Blob) o;
+
+        if (size != blob.size) return false;
+        if (code != null ? !code.equals(blob.code) : blob.code != null)
+            return false;
+        if (createTimestamp != null ? !createTimestamp.equals(blob.createTimestamp) : blob.createTimestamp != null)
+            return false;
+        if (!dataFile.equals(blob.dataFile)) return false;
+        if (filename != null ? !filename.equals(blob.filename) : blob.filename != null)
+            return false;
+        if (!metaFile.equals(blob.metaFile)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = metaFile.hashCode();
+        result = 31 * result + dataFile.hashCode();
+        result = 31 * result + (code != null ? code.hashCode() : 0);
+        result = 31 * result + (filename != null ? filename.hashCode() : 0);
+        result = 31 * result + (int) (size ^ (size >>> 32));
+        result = 31 * result + (createTimestamp != null ? createTimestamp.hashCode() : 0);
+        return result;
     }
 }

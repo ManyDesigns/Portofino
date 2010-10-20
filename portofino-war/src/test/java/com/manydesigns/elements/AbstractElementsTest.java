@@ -1,5 +1,6 @@
 package com.manydesigns.elements;
 
+import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XmlBuffer;
 import junit.framework.TestCase;
@@ -13,7 +14,7 @@ public abstract class AbstractElementsTest extends TestCase {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public DummyHttpServletRequest req;
+    public MutableHttpServletRequest req;
 
     @Override
     protected void setUp() throws Exception {
@@ -21,7 +22,7 @@ public abstract class AbstractElementsTest extends TestCase {
 
         XmlBuffer.checkWellFormed = true;
 
-        req = new DummyHttpServletRequest();
+        req = new MutableHttpServletRequest();
         req.setContextPath("");
 
         ElementsThreadLocals.setupDefaultElementsContext();
