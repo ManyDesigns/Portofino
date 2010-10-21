@@ -57,14 +57,14 @@ public class FormBuilderTest extends AbstractElementsTest {
 
     public void testRegistry() {
         FieldsManager fieldsManager = FieldsManager.getManager();
-        assertEquals(12, fieldsManager.getHelperList().size());
+        assertEquals(13, fieldsManager.getHelperList().size());
 
         Form form = formBuilder1.build();
 
         assertEquals(1, form.size());
 
         FieldSet fieldSet = form.get(0);
-        assertEquals(16, fieldSet.size());
+        assertEquals(17, fieldSet.size());
 
         Field field = fieldSet.get(0);
         assertEquals("A private int", field.getLabel());

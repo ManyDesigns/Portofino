@@ -31,6 +31,8 @@ package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
+import com.manydesigns.elements.blobs.Blob;
+import com.manydesigns.elements.blobs.BlobsManager;
 import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
@@ -93,6 +95,7 @@ public class TableDataAction extends PortofinoAction
             "jsonSelectFieldOptions";
     public static final String EXPORT_FILENAME_FORMAT = "export-{0}";
     public final String ACTIONURL = "/TableData.action";
+    public final String BLOBACTIONURL = "/TableData!downloadBlob.action";
     //**************************************************************************
     // ServletRequestAware implementation
     //**************************************************************************
@@ -114,6 +117,7 @@ public class TableDataAction extends PortofinoAction
     public String relName;
     public int optionProviderIndex;
     public String labelSearch;
+    public String code;
 
     //**************************************************************************
     // Web parameters setters (for struts.xml inspections in IntelliJ)
@@ -321,6 +325,7 @@ public class TableDataAction extends PortofinoAction
                 .configMode(Mode.VIEW)
                 .build();
         form.readFromObject(object);
+        refreshBlobDownloadHref();
 
         relatedTableFormList = new ArrayList<RelatedTableForm>();
 
@@ -331,6 +336,41 @@ public class TableDataAction extends PortofinoAction
 
         return READ;
     }
+
+    private void refreshBlobDownloadHref() {
+
+        for (FieldSet fieldSet : form) {
+            for (Field field : fieldSet) {
+                if (field instanceof FileBlobField) {
+                    FileBlobField fileBlobField = (FileBlobField) field;
+                    Blob blob = fileBlobField.getBlob();
+                    if (blob != null) {
+                        String url = getBlobDownloadUrl(blob.getCode());
+                        field.setHref(url);
+                    }
+                }
+            }
+        }
+    }
+
+    public String getBlobDownloadUrl(String code) {
+        StringBuilder sb = new StringBuilder("/model/");
+        sb.append(tableAccessor.getName());
+        sb.append(BLOBACTIONURL);
+        sb.append("?code=");
+        sb.append(Util.urlencode(code));
+        return Util.getAbsoluteUrl(sb.toString());
+    }
+
+    public String downloadBlob() throws IOException {
+        Blob blob = BlobsManager.getManager().loadBlob(code);
+        contentLength = blob.getSize();
+        contentType = blob.getContentType();
+        inputStream = new FileInputStream(blob.getDataFile());
+        fileName = blob.getFilename();
+        return EXPORT;
+    }
+
 
     protected void setupRelatedTableForm(ForeignKey relationship) {
         List<Object> relatedObjects =

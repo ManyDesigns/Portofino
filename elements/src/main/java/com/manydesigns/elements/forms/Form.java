@@ -29,8 +29,8 @@
 
 package com.manydesigns.elements.forms;
 
-import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 /*
@@ -63,9 +63,9 @@ public class Form extends AbstractCompositeElement<FieldSet> {
         return false;
     }
 
-    public boolean isMultipartFormDataFieldsPresent() {
+    public boolean isMultipartRequest() {
         for (FieldSet current : this) {
-            if (current.isMultipartFormDataFieldsPresent()) {
+            if (current.isMultipartRequest()) {
                 return true;
             }
         }

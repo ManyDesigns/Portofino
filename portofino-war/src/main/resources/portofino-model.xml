@@ -637,7 +637,11 @@
                                         length="255"
                                         scale="0"
                                         nullable="true"
-                                        searchable="true"/>
+                                        searchable="true">
+                                    <annotations>
+                                        <annotation type="com.manydesigns.elements.annotations.FileBlob"/>
+                                    </annotations>
+                                        </column>
                             </columns>
                             <primaryKey primaryKeyName="pk_category">
                                 <column columnName="catid"/>
@@ -664,7 +668,7 @@
                                         javaType="java.lang.String"
                                         length="80"
                                         scale="0"
-                                        nullable="true"
+                                        nullable="false"
                                         searchable="true"/>
                                 <column columnName="descn"
                                         columnType="varchar"

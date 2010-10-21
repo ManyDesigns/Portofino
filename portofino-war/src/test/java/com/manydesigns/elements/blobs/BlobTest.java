@@ -53,6 +53,7 @@ public class BlobTest extends AbstractElementsTest {
 
     String sampleContent = "This is some content";
     String sampleFilename = "sample.txt";
+    String sampleContentType = "text/plain";
 
     @Override
     protected void setUp() throws Exception {
@@ -74,7 +75,8 @@ public class BlobTest extends AbstractElementsTest {
 
     public void testBlob1() throws IOException {
         byte[] contentBytes = sampleContent.getBytes();
-        Blob blob = manager.saveBlob(contentBytes, sampleFilename);
+        Blob blob = manager.saveBlob(
+                contentBytes, sampleFilename, sampleContentType);
         assertNotNull(blob);
 
         String code = blob.getCode();

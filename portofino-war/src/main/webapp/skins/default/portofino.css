@@ -267,6 +267,10 @@ General
     font-weight: bold;
 }
 
+.error {
+    color: gray;
+    font-weight: bold;
+}
 
 /*******************************************************************************
 Login

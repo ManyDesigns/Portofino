@@ -55,6 +55,7 @@ public class Blob {
 
     public final static String CODE_PROPERTY = "code";
     public final static String FILENAME_PROPERTY = "filename";
+    public final static String CONTENT_TYPE_PROPERTY = "content.type";
     public final static String SIZE_PROPERTY = "size";
     public final static String CREATE_TIMESTAMP_PROPERTY = "create.timestamp";
     
@@ -72,6 +73,7 @@ public class Blob {
     protected final File dataFile;
 
     protected String code;
+    protected String contentType;
     protected String filename;
     protected long size;
     protected DateTime createTimestamp;
@@ -115,6 +117,7 @@ public class Blob {
 
         metaProperties.setProperty(CODE_PROPERTY, code);
         metaProperties.setProperty(FILENAME_PROPERTY, filename);
+        metaProperties.setProperty(CONTENT_TYPE_PROPERTY, contentType);
         metaProperties.setProperty(SIZE_PROPERTY, Long.toString(size));
         metaProperties.setProperty(CREATE_TIMESTAMP_PROPERTY,
                 formatter.print(createTimestamp));
@@ -139,6 +142,7 @@ public class Blob {
 
             code = metaProperties.getProperty(CODE_PROPERTY);
             filename = metaProperties.getProperty(FILENAME_PROPERTY);
+            contentType = metaProperties.getProperty(CONTENT_TYPE_PROPERTY);
             size = Long.parseLong(metaProperties.getProperty(SIZE_PROPERTY));
             createTimestamp = formatter.parseDateTime(
                     metaProperties.getProperty(CREATE_TIMESTAMP_PROPERTY));
@@ -185,6 +189,14 @@ public class Blob {
 
     public DateTime getCreateTimestamp() {
         return createTimestamp;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
     //**************************************************************************

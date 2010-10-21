@@ -89,6 +89,9 @@ public class AllDefaultFieldsBean {
         this.aPrivateInt = aPrivateInt;
     }
 
+    @FileBlob
+    public String aBlob;
+
     // none of the following fields should be detected due to their modifiers
 
     static int aStaticInt;

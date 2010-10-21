@@ -120,17 +120,26 @@ public class BlobsManager {
     // Methods
     //**************************************************************************
 
-    public Blob saveBlob(File sourceFile, String fileName) throws IOException {
+    public Blob saveBlob(File sourceFile,
+                         String fileName,
+                         String contentType
+    ) throws IOException {
         InputStream sourceStream = new FileInputStream(sourceFile);
-        return saveBlob(sourceStream, fileName);
+        return saveBlob(sourceStream, fileName, contentType);
     }
 
-    public Blob saveBlob(byte[] sourceBytes, String fileName) throws IOException {
+    public Blob saveBlob(byte[] sourceBytes,
+                         String fileName,
+                         String contentType
+    ) throws IOException {
         InputStream sourceStream = new ByteArrayInputStream(sourceBytes);
-        return saveBlob(sourceStream, fileName);
+        return saveBlob(sourceStream, fileName, contentType);
     }
 
-    public Blob saveBlob(InputStream sourceStream, String fileName) throws IOException {
+    public Blob saveBlob(InputStream sourceStream,
+                         String fileName,
+                         String contentType
+    ) throws IOException {
         String code = RandomUtil.createRandomCode();
 
         File metaFile =
@@ -146,6 +155,7 @@ public class BlobsManager {
         // set and save the metadata
         blob.setCode(code);
         blob.setFilename(fileName);
+        blob.setContentType(contentType);
         blob.setSize(size);
         blob.saveMetaProperties();
 

@@ -29,10 +29,10 @@
 
 package com.manydesigns.elements.forms;
 
-import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.MultipartFormDataField;
+import com.manydesigns.elements.fields.MultipartRequestField;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 /*
@@ -138,9 +138,9 @@ public class FieldSet extends AbstractCompositeElement<Field> {
         return false;
     }
 
-    public boolean isMultipartFormDataFieldsPresent() {
+    public boolean isMultipartRequest() {
         for (Field current : this) {
-            if (current instanceof MultipartFormDataField) {
+            if (current instanceof MultipartRequestField) {
                 return true;
             }
         }
