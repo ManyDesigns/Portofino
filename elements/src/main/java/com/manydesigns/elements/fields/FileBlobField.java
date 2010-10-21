@@ -38,6 +38,7 @@ import com.manydesigns.elements.servlet.MultipartRequest;
 import com.manydesigns.elements.util.MemoryUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -232,8 +233,9 @@ public class FileBlobField extends AbstractField
                 String[] contentTypes = (String[])
                         getContentTypesMethod.invoke(req, inputName);
                 if (files != null && files.length > 0) {
+                    String filename = FilenameUtils.getName(fileNames[0]);
                     blob = blobsManager.saveBlob(
-                            files[0], fileNames[0], contentTypes[0]);
+                            files[0], filename, contentTypes[0]);
                 }
             } else if (req instanceof MultipartRequest) {
                 MultipartRequest request =
@@ -242,7 +244,7 @@ public class FileBlobField extends AbstractField
                 FileItem fileItem = request.getFileItem(inputName);
                 if (fileItem != null) {
                     InputStream fis = fileItem.getInputStream();
-                    String fileName = fileItem.getName();
+                    String fileName = FilenameUtils.getName(fileItem.getName());
                     String contentType = fileItem.getContentType();
                     blob = blobsManager.saveBlob(fis, fileName, contentType);
                 }

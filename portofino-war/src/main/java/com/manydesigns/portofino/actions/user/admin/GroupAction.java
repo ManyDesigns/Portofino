@@ -248,7 +248,7 @@ public class GroupAction extends TableDataAction{
         hrefFormat.setUrl(true);
 
         TableFormBuilder tableFormBuilder =
-                createTableFormBuilderWithOptionProviders()
+                createTableFormBuilderWithSelectionProviders()
                         .configNRows(objects.size())
                         .configMode(Mode.VIEW);
 
@@ -316,7 +316,7 @@ public class GroupAction extends TableDataAction{
         objects = context.getObjects(criteria);
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.VIEW)
                 .build();
         form.readFromObject(object);
@@ -360,7 +360,7 @@ public class GroupAction extends TableDataAction{
     public String create() {
         setupTable();
 
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.CREATE)
                 .build();
 
@@ -370,7 +370,7 @@ public class GroupAction extends TableDataAction{
     public String save() {
         setupTable();
 
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.CREATE)
                 .build();
 
@@ -401,7 +401,7 @@ public class GroupAction extends TableDataAction{
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
 
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.EDIT)
                 .build();
 
@@ -414,7 +414,7 @@ public class GroupAction extends TableDataAction{
         setupTable();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.EDIT)
                 .build();
 
@@ -452,7 +452,7 @@ public class GroupAction extends TableDataAction{
 
         setupTable();
 
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.BULK_EDIT)
                 .build();
 
@@ -462,7 +462,7 @@ public class GroupAction extends TableDataAction{
     public String bulkUpdate() {
         setupTable();
 
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.BULK_EDIT)
                 .build();
         form.readFromRequest(req);
@@ -547,7 +547,7 @@ public class GroupAction extends TableDataAction{
 
         String[] fieldNames = createFieldNamesForRelationship(relationship);
         SelectionProvider selectionProvider =
-                createOptionProviderForRelationship(relationship);
+                createSelectionProviderForRelationship(relationship);
 
         Form form = new FormBuilder(tableAccessor)
                 .configFields(fieldNames)
@@ -580,7 +580,7 @@ public class GroupAction extends TableDataAction{
         }
     }
 
-    protected FormBuilder createFormBuilderWithOptionProviders() {
+    protected FormBuilder createFormBuilderWithSelectionProviders() {
         FormBuilder formBuilder = new FormBuilder(tableAccessor);
 
         // setup relationship lookups
@@ -588,7 +588,7 @@ public class GroupAction extends TableDataAction{
         for (ForeignKey rel : table.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
             SelectionProvider selectionProvider =
-                    createOptionProviderForRelationship(rel);
+                    createSelectionProviderForRelationship(rel);
             boolean autocomplete = false;
             for (ModelAnnotation current : rel.getAnnotations()) {
                 if ("com.manydesigns.elements.annotations.Autocomplete"
@@ -604,7 +604,7 @@ public class GroupAction extends TableDataAction{
         return formBuilder;
     }
 
-    protected TableFormBuilder createTableFormBuilderWithOptionProviders() {
+    protected TableFormBuilder createTableFormBuilderWithSelectionProviders() {
         TableFormBuilder tableFormBuilder = new TableFormBuilder(tableAccessor);
 
         // setup relationship lookups
@@ -612,7 +612,7 @@ public class GroupAction extends TableDataAction{
         for (ForeignKey rel : table.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
             SelectionProvider selectionProvider =
-                    createOptionProviderForRelationship(rel);
+                    createSelectionProviderForRelationship(rel);
             boolean autocomplete = false;
             for (ModelAnnotation current : rel.getAnnotations()) {
                 if ("com.manydesigns.elements.annotations.Autocomplete"
@@ -622,7 +622,7 @@ public class GroupAction extends TableDataAction{
             }
             selectionProvider.setAutocomplete(autocomplete);
 
-            tableFormBuilder.configOptionProvider(selectionProvider, fieldNames);
+            tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
         return tableFormBuilder;
     }
@@ -639,7 +639,7 @@ public class GroupAction extends TableDataAction{
         return fieldNames;
     }
 
-    protected SelectionProvider createOptionProviderForRelationship(ForeignKey rel) {
+    protected SelectionProvider createSelectionProviderForRelationship(ForeignKey rel) {
         // retrieve the related objects
         Table relatedTable = rel.getToTable();
         ClassAccessor classAccessor =
@@ -678,7 +678,7 @@ public class GroupAction extends TableDataAction{
         objects = context.getObjects(criteria);
 
         TableFormBuilder tableFormBuilder =
-            createTableFormBuilderWithOptionProviders()
+            createTableFormBuilderWithSelectionProviders()
                             .configNRows(objects.size());
         tableForm = tableFormBuilder.configMode(Mode.VIEW)
                 .build();
@@ -747,13 +747,13 @@ public class GroupAction extends TableDataAction{
         object = context.getObjectByPk(qualifiedTableName, pkObject);
 
         TableFormBuilder tableFormBuilder =
-            createTableFormBuilderWithOptionProviders()
+            createTableFormBuilderWithSelectionProviders()
                             .configMode(Mode.VIEW)
                             .configNRows(objects.size());
         tableForm = tableFormBuilder.build();
         tableForm.readFromObject(object);
 
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.VIEW)
                 .build();
         form.readFromObject(object);

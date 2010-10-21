@@ -213,6 +213,8 @@ public class Blob {
         if (size != blob.size) return false;
         if (code != null ? !code.equals(blob.code) : blob.code != null)
             return false;
+        if (contentType != null ? !contentType.equals(blob.contentType) : blob.contentType != null)
+            return false;
         if (createTimestamp != null ? !createTimestamp.equals(blob.createTimestamp) : blob.createTimestamp != null)
             return false;
         if (!dataFile.equals(blob.dataFile)) return false;
@@ -228,6 +230,7 @@ public class Blob {
         int result = metaFile.hashCode();
         result = 31 * result + dataFile.hashCode();
         result = 31 * result + (code != null ? code.hashCode() : 0);
+        result = 31 * result + (contentType != null ? contentType.hashCode() : 0);
         result = 31 * result + (filename != null ? filename.hashCode() : 0);
         result = 31 * result + (int) (size ^ (size >>> 32));
         result = 31 * result + (createTimestamp != null ? createTimestamp.hashCode() : 0);

@@ -62,6 +62,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.StringBufferInputStream;
+import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,7 +70,6 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.sql.Timestamp;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -242,7 +242,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
         hrefFormat.setUrl(true);
 
         TableFormBuilder tableFormBuilder =
-                createTableFormBuilderWithOptionProviders()
+                createTableFormBuilderWithSelectionProviders()
                         .configNRows(users.size())
                         .configMode(Mode.VIEW);
         tableFormBuilder.configFields("uuid","email","state",
@@ -310,7 +310,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
         users = context.getObjects(criteria);
 
         user = (User) context.getObjectByPk(userTable, pkObject);
-        FormBuilder builder = createFormBuilderWithOptionProviders()
+        FormBuilder builder = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.VIEW);
         builder.configFields("uuid","email","state",
                 "lastName", "firstName");
@@ -344,7 +344,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
                 for (ForeignKey rel : table.getForeignKeys()) {
                     String[] fieldNames = createFieldNamesForRelationship(rel);
                     SelectionProvider selectionProvider =
-                            createOptionProviderForRelationship(rel);
+                            createSelectionProviderForRelationship(rel);
                     boolean autocomplete = false;
                     for (ModelAnnotation current : rel.getAnnotations()) {
                         if ("com.manydesigns.elements.annotations.Autocomplete"
@@ -353,7 +353,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
                         }
                     }
                     selectionProvider.setAutocomplete(autocomplete);
-                    tableFormBuilder.configOptionProvider
+                    tableFormBuilder.configSelectionProvider
                             (selectionProvider, fieldNames);
                 }
             }
@@ -388,7 +388,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
             for (ForeignKey rel : table.getForeignKeys()) {
                 String[] fieldNames = createFieldNamesForRelationship(rel);
                 SelectionProvider selectionProvider =
-                        createOptionProviderForRelationship(rel);
+                        createSelectionProviderForRelationship(rel);
                 boolean autocomplete = false;
                 for (ModelAnnotation current : rel.getAnnotations()) {
                     if ("com.manydesigns.elements.annotations.Autocomplete"
@@ -398,7 +398,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
                 }
                 selectionProvider.setAutocomplete(autocomplete);
 
-                tableFormBuilder.configOptionProvider
+                tableFormBuilder.configSelectionProvider
                         (selectionProvider, fieldNames);
             }
 
@@ -448,7 +448,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     public String create() {
         setupTable();
 
-        final FormBuilder builder = createFormBuilderWithOptionProviders()
+        final FormBuilder builder = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.CREATE);
         builder.configFields("uuid","email","state",
                 "lastName", "firstName");
@@ -460,7 +460,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     public String save() {
         setupTable();
 
-        final FormBuilder builder = createFormBuilderWithOptionProviders()
+        final FormBuilder builder = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.CREATE);
         builder.configFields("uuid","email","state",
                 "lastName", "firstName");
@@ -493,7 +493,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
 
         user = (User) context.getObjectByPk(userTable, pkObject);
 
-        FormBuilder builder = createFormBuilderWithOptionProviders()
+        FormBuilder builder = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.EDIT);
         builder.configFields("uuid","email","state",
                 "lastName", "firstName");
@@ -507,7 +507,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
         setupTable();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
-        FormBuilder builder = createFormBuilderWithOptionProviders()
+        FormBuilder builder = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.EDIT);
         builder.configFields("uuid","email","state",
                 "lastName", "firstName");
@@ -641,7 +641,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
 
         String[] fieldNames = createFieldNamesForRelationship(relationship);
         SelectionProvider selectionProvider =
-                createOptionProviderForRelationship(relationship);
+                createSelectionProviderForRelationship(relationship);
 
         Form form = new FormBuilder(tableAccessor)
                 .configFields(fieldNames)
@@ -676,7 +676,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
         }
     }
 
-    protected FormBuilder createFormBuilderWithOptionProviders() {
+    protected FormBuilder createFormBuilderWithSelectionProviders() {
         FormBuilder formBuilder = new FormBuilder(tableAccessor);
 
         // setup relationship lookups
@@ -684,7 +684,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
         for (ForeignKey rel : table.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
             SelectionProvider selectionProvider =
-                    createOptionProviderForRelationship(rel);
+                    createSelectionProviderForRelationship(rel);
             boolean autocomplete = false;
             for (ModelAnnotation current : rel.getAnnotations()) {
                 if ("com.manydesigns.elements.annotations.Autocomplete"
@@ -700,7 +700,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
         return formBuilder;
     }
 
-    protected TableFormBuilder createTableFormBuilderWithOptionProviders() {
+    protected TableFormBuilder createTableFormBuilderWithSelectionProviders() {
         TableFormBuilder tableFormBuilder = new TableFormBuilder(tableAccessor);
 
         // setup relationship lookups
@@ -708,7 +708,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
         for (ForeignKey rel : table.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
             SelectionProvider selectionProvider =
-                    createOptionProviderForRelationship(rel);
+                    createSelectionProviderForRelationship(rel);
             boolean autocomplete = false;
             for (ModelAnnotation current : rel.getAnnotations()) {
                 if ("com.manydesigns.elements.annotations.Autocomplete"
@@ -718,7 +718,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
             }
             selectionProvider.setAutocomplete(autocomplete);
 
-            tableFormBuilder.configOptionProvider(selectionProvider, fieldNames);
+            tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
         return tableFormBuilder;
     }
@@ -735,7 +735,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
         return fieldNames;
     }
 
-    protected SelectionProvider createOptionProviderForRelationship(ForeignKey rel) {
+    protected SelectionProvider createSelectionProviderForRelationship(ForeignKey rel) {
         // retrieve the related objects
         Table relatedTable = rel.getToTable();
         ClassAccessor classAccessor =
@@ -755,7 +755,6 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
                         relatedObjects, classAccessor, textFormat);
 
     }
-
 
 
 }

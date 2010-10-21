@@ -20,7 +20,9 @@ function updateSelectOptions(relName, selectionProviderIndex) {
             var options = jQuery.parseJSON(responseData);
 
             var selectField = $(selectFieldId);
-            selectField.empty();
+            var selOptions = selectField.attr('options');
+            selOptions.length = 0;
+//            selectField.empty();
 
             for (var i = 0; i < options.length; i++) {
                 var option = options[i];
@@ -28,7 +30,8 @@ function updateSelectOptions(relName, selectionProviderIndex) {
                 y.value = option['v'];
                 y.text = option['l'];
                 y.selected = option['s'];
-                selectField.append(y);
+
+                selOptions[selOptions.length] = y;
             }
             selectField.change();
         }

@@ -129,7 +129,7 @@ public class TableFormBuilder {
         return this;
     }
 
-    public TableFormBuilder configOptionProvider(SelectionProvider selectionProvider,
+    public TableFormBuilder configSelectionProvider(SelectionProvider selectionProvider,
                                             String... fieldNames) {
         selectionProviders.put(fieldNames, selectionProvider);
         return this;

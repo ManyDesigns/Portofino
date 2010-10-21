@@ -69,8 +69,8 @@ public class BlobTest extends AbstractElementsTest {
         assertNotNull(blobsDir);
         assertEquals(System.getProperty("java.io.tmpdir"),
                 blobsDir.getAbsolutePath() + File.separator);
-        assertEquals("{0}.properties", manager.getMetaFileNamePattern());
-        assertEquals("{0}.data", manager.getDataFileNamePattern());
+        assertEquals("blob-{0}.properties", manager.getMetaFileNamePattern());
+        assertEquals("blob-{0}.data", manager.getDataFileNamePattern());
     }
 
     public void testBlob1() throws IOException {
@@ -83,6 +83,7 @@ public class BlobTest extends AbstractElementsTest {
         assertNotNull(code);
         assertEquals(RandomUtil.DEFAULT_RANDOM_CODE_LENGTH, code.length());
         assertEquals(sampleFilename, blob.getFilename());
+        assertEquals(sampleContentType, blob.getContentType());
         assertEquals(contentBytes.length, blob.getSize());
 
         File dataFile = blob.getDataFile();
@@ -114,6 +115,8 @@ public class BlobTest extends AbstractElementsTest {
                 properties.getProperty(Blob.CODE_PROPERTY));
         assertEquals(blob.getFilename(),
                 properties.getProperty(Blob.FILENAME_PROPERTY));
+        assertEquals(blob.getContentType(),
+                properties.getProperty(Blob.CONTENT_TYPE_PROPERTY));
         assertEquals(Long.toString(blob.getSize()),
                 properties.getProperty(Blob.SIZE_PROPERTY));
         assertNotNull(properties.getProperty(Blob.CREATE_TIMESTAMP_PROPERTY));
