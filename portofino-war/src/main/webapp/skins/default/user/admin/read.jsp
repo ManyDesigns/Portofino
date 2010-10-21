@@ -8,11 +8,15 @@
     <div id="inner-content">
         <h1>User detail</h1>
         <mdes:write value="form"/>
-        <h2>Active groups</h2>
+        <h2>Current groups</h2>
         <mdes:write value="activeGroupsForm"/>
 
-        <h2>Inactive groups</h2>
+        <h2>Expired groups</h2>
         <mdes:write value="deletedGroupsForm"/>
+
+        <h2>Add groups</h2>
+        <mdes:write value="newGroupsForm"/>
+
         <s:hidden name="pk" value="%{pk}"/>
         <s:if test="searchString != null">
             <s:hidden name="searchString" value="%{searchString}"/>

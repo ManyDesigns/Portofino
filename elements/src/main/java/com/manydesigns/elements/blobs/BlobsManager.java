@@ -35,10 +35,7 @@ import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.RandomUtil;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -123,7 +120,26 @@ public class BlobsManager {
     // Methods
     //**************************************************************************
 
-    public Blob saveBlob(File sourceFile, String fileName) throws IOException {
+    public Blob saveBlob(File sourceFile,
+                         String fileName,
+                         String contentType
+    ) throws IOException {
+        InputStream sourceStream = new FileInputStream(sourceFile);
+        return saveBlob(sourceStream, fileName, contentType);
+    }
+
+    public Blob saveBlob(byte[] sourceBytes,
+                         String fileName,
+                         String contentType
+    ) throws IOException {
+        InputStream sourceStream = new ByteArrayInputStream(sourceBytes);
+        return saveBlob(sourceStream, fileName, contentType);
+    }
+
+    public Blob saveBlob(InputStream sourceStream,
+                         String fileName,
+                         String contentType
+    ) throws IOException {
         String code = RandomUtil.createRandomCode();
 
         File metaFile =
@@ -134,12 +150,12 @@ public class BlobsManager {
 
         // copy the data
         long size = IOUtils.copyLarge(
-                new FileReader(sourceFile),
-                new FileWriter(dataFile));
+                sourceStream, new FileOutputStream(dataFile));
 
         // set and save the metadata
         blob.setCode(code);
         blob.setFilename(fileName);
+        blob.setContentType(contentType);
         blob.setSize(size);
         blob.saveMetaProperties();
 

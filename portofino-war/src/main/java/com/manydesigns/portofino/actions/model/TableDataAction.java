@@ -31,6 +31,8 @@ package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
+import com.manydesigns.elements.blobs.Blob;
+import com.manydesigns.elements.blobs.BlobsManager;
 import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
@@ -97,7 +99,8 @@ public class TableDataAction extends PortofinoAction
     public final static String JSON_SELECT_FIELD_OPTIONS =
             "jsonSelectFieldOptions";
     public static final String EXPORT_FILENAME_FORMAT = "export-{0}";
-
+    public final String ACTIONURL = "/TableData.action";
+    public final String BLOBACTIONURL = "/TableData!downloadBlob.action";
     //**************************************************************************
     // ServletRequestAware implementation
     //**************************************************************************
@@ -117,8 +120,9 @@ public class TableDataAction extends PortofinoAction
     public String searchString;
     public String cancelReturnUrl;
     public String relName;
-    public int optionProviderIndex;
+    public int selectionProviderIndex;
     public String labelSearch;
+    public String code;
 
     //**************************************************************************
     // Web parameters setters (for struts.xml inspections in IntelliJ)
@@ -254,7 +258,7 @@ public class TableDataAction extends PortofinoAction
         hrefFormat.setUrl(true);
 
         TableFormBuilder tableFormBuilder =
-                createTableFormBuilderWithOptionProviders()
+                createTableFormBuilderWithSelectionProviders()
                         .configNRows(objects.size())
                         .configMode(Mode.VIEW);
 
@@ -276,7 +280,7 @@ public class TableDataAction extends PortofinoAction
     public String getReadLinkExpression() {
         StringBuilder sb = new StringBuilder("/model/");
         sb.append(tableAccessor.getName());
-        sb.append("/TableData.action?pk=");
+        sb.append(ACTIONURL + "?pk=");
         boolean first = true;
         for (PropertyAccessor property : tableAccessor.getKeyProperties()) {
             if (first) {
@@ -322,10 +326,11 @@ public class TableDataAction extends PortofinoAction
         objects = context.getObjects(criteria);
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.VIEW)
                 .build();
         form.readFromObject(object);
+        refreshBlobDownloadHref();
 
         relatedTableFormList = new ArrayList<RelatedTableForm>();
 
@@ -359,6 +364,46 @@ public class TableDataAction extends PortofinoAction
         relatedTableFormList.add(relatedTableForm);
     }
 
+
+    //**************************************************************************
+    // Blobs
+    //**************************************************************************
+
+    public String downloadBlob() throws IOException {
+        Blob blob = BlobsManager.getManager().loadBlob(code);
+        contentLength = blob.getSize();
+        contentType = blob.getContentType();
+        inputStream = new FileInputStream(blob.getDataFile());
+        fileName = blob.getFilename();
+        return EXPORT;
+    }
+
+    protected void refreshBlobDownloadHref() {
+
+        for (FieldSet fieldSet : form) {
+            for (Field field : fieldSet) {
+                if (field instanceof FileBlobField) {
+                    FileBlobField fileBlobField = (FileBlobField) field;
+                    Blob blob = fileBlobField.getBlob();
+                    if (blob != null) {
+                        String url = getBlobDownloadUrl(blob.getCode());
+                        field.setHref(url);
+                    }
+                }
+            }
+        }
+    }
+
+    public String getBlobDownloadUrl(String code) {
+        StringBuilder sb = new StringBuilder("/model/");
+        sb.append(tableAccessor.getName());
+        sb.append(BLOBACTIONURL);
+        sb.append("?code=");
+        sb.append(Util.urlencode(code));
+        return Util.getAbsoluteUrl(sb.toString());
+    }
+
+
     //**************************************************************************
     // Create/Save
     //**************************************************************************
@@ -366,7 +411,7 @@ public class TableDataAction extends PortofinoAction
     public String create() {
         setupTable();
 
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.CREATE)
                 .build();
 
@@ -376,7 +421,7 @@ public class TableDataAction extends PortofinoAction
     public String save() {
         setupTable();
 
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.CREATE)
                 .build();
 
@@ -407,7 +452,7 @@ public class TableDataAction extends PortofinoAction
 
         object = context.getObjectByPk(qualifiedTableName, pkObject);
 
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.EDIT)
                 .build();
 
@@ -420,7 +465,7 @@ public class TableDataAction extends PortofinoAction
         setupTable();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.EDIT)
                 .build();
 
@@ -458,7 +503,7 @@ public class TableDataAction extends PortofinoAction
 
         setupTable();
 
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.BULK_EDIT)
                 .build();
 
@@ -468,7 +513,7 @@ public class TableDataAction extends PortofinoAction
     public String bulkUpdate() {
         setupTable();
 
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.BULK_EDIT)
                 .build();
         form.readFromRequest(req);
@@ -553,7 +598,7 @@ public class TableDataAction extends PortofinoAction
 
         String[] fieldNames = createFieldNamesForRelationship(relationship);
         SelectionProvider selectionProvider =
-                createOptionProviderForRelationship(relationship);
+                createSelectionProviderForRelationship(relationship);
 
         Form form = new FormBuilder(tableAccessor)
                 .configFields(fieldNames)
@@ -563,7 +608,7 @@ public class TableDataAction extends PortofinoAction
         form.readFromRequest(req);
 
         SelectField targetField =
-                (SelectField) form.get(0).get(optionProviderIndex);
+                (SelectField) form.get(0).get(selectionProviderIndex);
         targetField.setLabelSearch(labelSearch);
 
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
@@ -586,7 +631,7 @@ public class TableDataAction extends PortofinoAction
         }
     }
 
-    protected FormBuilder createFormBuilderWithOptionProviders() {
+    protected FormBuilder createFormBuilderWithSelectionProviders() {
         FormBuilder formBuilder = new FormBuilder(tableAccessor);
 
         // setup relationship lookups
@@ -594,7 +639,7 @@ public class TableDataAction extends PortofinoAction
         for (ForeignKey rel : table.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
             SelectionProvider selectionProvider =
-                    createOptionProviderForRelationship(rel);
+                    createSelectionProviderForRelationship(rel);
             boolean autocomplete = false;
             for (ModelAnnotation current : rel.getAnnotations()) {
                 if ("com.manydesigns.elements.annotations.Autocomplete"
@@ -610,7 +655,7 @@ public class TableDataAction extends PortofinoAction
         return formBuilder;
     }
 
-    protected TableFormBuilder createTableFormBuilderWithOptionProviders() {
+    protected TableFormBuilder createTableFormBuilderWithSelectionProviders() {
         TableFormBuilder tableFormBuilder = new TableFormBuilder(tableAccessor);
 
         // setup relationship lookups
@@ -618,7 +663,7 @@ public class TableDataAction extends PortofinoAction
         for (ForeignKey rel : table.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
             SelectionProvider selectionProvider =
-                    createOptionProviderForRelationship(rel);
+                    createSelectionProviderForRelationship(rel);
             boolean autocomplete = false;
             for (ModelAnnotation current : rel.getAnnotations()) {
                 if ("com.manydesigns.elements.annotations.Autocomplete"
@@ -628,7 +673,7 @@ public class TableDataAction extends PortofinoAction
             }
             selectionProvider.setAutocomplete(autocomplete);
 
-            tableFormBuilder.configOptionProvider(selectionProvider, fieldNames);
+            tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
         return tableFormBuilder;
     }
@@ -645,7 +690,7 @@ public class TableDataAction extends PortofinoAction
         return fieldNames;
     }
 
-    protected SelectionProvider createOptionProviderForRelationship(ForeignKey rel) {
+    protected SelectionProvider createSelectionProviderForRelationship(ForeignKey rel) {
         // retrieve the related objects
         Table relatedTable = rel.getToTable();
         ClassAccessor classAccessor =
@@ -684,7 +729,7 @@ public class TableDataAction extends PortofinoAction
         objects = context.getObjects(criteria);
 
         TableFormBuilder tableFormBuilder =
-            createTableFormBuilderWithOptionProviders()
+            createTableFormBuilderWithSelectionProviders()
                             .configNRows(objects.size());
         tableForm = tableFormBuilder.configMode(Mode.VIEW)
                 .build();
@@ -753,13 +798,13 @@ public class TableDataAction extends PortofinoAction
         object = context.getObjectByPk(qualifiedTableName, pkObject);
 
         TableFormBuilder tableFormBuilder =
-            createTableFormBuilderWithOptionProviders()
+            createTableFormBuilderWithSelectionProviders()
                             .configMode(Mode.VIEW)
                             .configNRows(objects.size());
         tableForm = tableFormBuilder.build();
         tableForm.readFromObject(object);
 
-        form = createFormBuilderWithOptionProviders()
+        form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.VIEW)
                 .build();
         form.readFromObject(object);
@@ -950,31 +995,28 @@ public class TableDataAction extends PortofinoAction
         FileOutputStream out = null;
         File tempPdfFile = createExportTempFile();
         try {
-                               
-            File fo = new File("/Users/proprietario/FOP/example.xml");
-            File xsl = new File("/Users/proprietario/FOP/example.xsl");
+
             out = new FileOutputStream(tempPdfFile);
 
             Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
 
             ClassLoader cl = getClass().getClassLoader();
-            //InputStream xsltStream = cl.getResourceAsStream(
-            //        "templateFOP.xsl");
+            InputStream xsltStream = cl.getResourceAsStream(
+                    "templateFOP.xsl");
 
             // Setup XSLT
             TransformerFactory tFactory = TransformerFactory.newInstance();
-            //Transformer transformer = tFactory.newTransformer(new StreamSource(
-            //        xsltStream));
-            Transformer transformer = tFactory.newTransformer(new StreamSource(xsl));
+            Transformer transformer = tFactory.newTransformer(new StreamSource(
+                    xsltStream));
 
             // Set the value of a <param> in the stylesheet
             transformer.setParameter("versionParam", "2.0");
 
 
             // Setup input for XSLT transformation
-            //String xml = composeXml();
-            //Source src = new StreamSource(xml);
-            Source src = new StreamSource(fo);
+            String xml = composeXml();
+            Source src = new StreamSource(xml);
+
 
             // Resulting SAX events (the generated FO) must be piped through to
             // FOP
@@ -1016,60 +1058,7 @@ public class TableDataAction extends PortofinoAction
 
     public String composeXml() {
         StringBuffer sb = new StringBuffer();
-        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-sb.append("<projectteam>");
-sb.append("<projectname>The Killer Application</projectname>");
-sb.append("<member>");
-sb.append("<name>John Doe</name>");
-sb.append("<function>lead</function>");
-sb.append("<email>jon.doe@killerapp.fun</email>");
-sb.append("</member>");
-sb.append("<member>");
-sb.append("<name>Paul Coder</name>");
-sb.append("<function>dev</function>");
-sb.append("<email>paul.coder@killerapp.fun</email>");
-sb.append("</member>");
-sb.append("<member>");
-sb.append("<name>Max Hacker</name>");
-sb.append("<function>dev</function>");
-sb.append("<email>max.hacker@killerapp.fun</email>");
-sb.append("</member>");
-sb.append("<member>");
-sb.append("<name>Donna Book</name>");
-sb.append("<function>doc</function>");
-sb.append("<email>donna.book@killerapp.fun</email>");
-sb.append("</member>");
-sb.append("<member>");
-sb.append("<name>Henry Tester</name>");
-sb.append("<function>qa</function>");
-sb.append("<email>henry.tester@killerapp.fun</email>");
-sb.append("</member>");
-sb.append("</projectteam>");
-      /*  sb.append("<fax>");
 
-        sb.append("<mittente>");
-        sb.append("prova");
-        sb.append("</mittente>");
-
-        sb.append("<oggetto>");
-        sb.append("prova");
-        sb.append("</oggetto>");
-
-
-        sb.append("<destinatario>");
-        
-        sb.append("prova");
-        sb.append("</destinatario>");
-
-
-        sb.append("<field name=\"");
-        sb.append("prova");
-        sb.append("\" value=\"");
-        sb.append("prova");
-        sb.append("\" />");
-
-        sb.append("</fax>");
-                              */
         return sb.toString();
     }
 

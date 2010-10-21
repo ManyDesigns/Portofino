@@ -3,7 +3,8 @@
 %><%@ taglib prefix="s" uri="/struts-tags"
 %><%@ taglib prefix="mdes" uri="/manydesigns-elements-struts2"
 %><s:include value="/skins/default/header.jsp"/>
-<s:form method="post">
+<s:form method="post"
+        enctype="%{form.multipartRequest ? 'multipart/form-data' : 'application/x-www-form-urlencoded'}">
     <s:include value="/skins/default/model/tableData/createButtonsBar.jsp"/>
     <div id="inner-content">
         <h1>Create: <s:property value="qualifiedTableName"/></h1>

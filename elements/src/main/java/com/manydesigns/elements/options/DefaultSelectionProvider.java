@@ -219,7 +219,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
     }
 
     //**************************************************************************
-    // OptionProvider implementation
+    // SelectionProvider implementation
     //**************************************************************************
 
     public String getName() {

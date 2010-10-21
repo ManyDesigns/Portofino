@@ -50,7 +50,8 @@
     <s:submit id="Table_edit" method="edit" value="Edit"/>
     <s:submit id="Table_delete" method="delete" value="Delete"
               onclick="return confirm ('Are you sure?');"/>
-    <s:submit id="Table_groups" method="removeGroups" value="Remove selected groups"/>
+    <s:submit id="Table_groups" method="removeGroups" value="Remove selected groups" onclick="return confirm ('Are you sure?');"/>
+    <s:submit id="Table_add_groups" method="addGroups" value="Add selected groups" onclick="return confirm ('Are you sure?');"/>
     <s:submit id="Table_print" method="print" value="Print" disabled="true"/>
     <s:submit id="Table_export" method="exportRead" value="Export" disabled="false"/>
 </div>

@@ -63,6 +63,15 @@ public class CommonTestUtil extends TestCase{
 
 
     public CommonTestUtil() {
+
+    }
+
+    public void testOk (){
+
+    }
+
+    @Override
+    protected void setUp() {
         try {
             context = new HibernateContextImpl();
             context.loadConnectionsAsResource("database/portofino-connections.xml");
@@ -78,11 +87,6 @@ public class CommonTestUtil extends TestCase{
         } catch (Throwable e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-
 
     }
 

@@ -1,4 +1,4 @@
-
+DROP TABLE IF EXISTS emailqueue;
 CREATE TABLE public.emailqueue (
     id identity NOT NULL,
     subject character varying(100),
@@ -20,7 +20,7 @@ CREATE TABLE public.emailqueue (
 -- Dependencies: 5
 -- Name: emailstate; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-
+DROP TABLE IF EXISTS emailstate;
 CREATE TABLE public.emailstate (
     id identity NOT NULL,
     name character varying(75) NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE public.emailstate (
 -- Dependencies: 5
 -- Name: group_; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-
+DROP TABLE IF EXISTS group_;
 CREATE TABLE public.group_ (
     groupid identity NOT NULL,
     creatorid bigint,
@@ -52,7 +52,7 @@ CREATE TABLE public.group_ (
 -- Dependencies: 5
 -- Name: msg; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-
+DROP TABLE IF EXISTS msg;
 CREATE TABLE public.msg (
     id identity NOT NULL,
     subject character varying(100),
@@ -71,7 +71,7 @@ CREATE TABLE public.msg (
 -- Dependencies: 5
 -- Name: msgstate; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-
+DROP TABLE IF EXISTS msgstate;
 CREATE TABLE public.msgstate (
     id identity NOT NULL,
     name character varying(75) NOT NULL,
@@ -86,7 +86,7 @@ CREATE TABLE public.msgstate (
 -- Dependencies: 5
 -- Name: oldpwd; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-
+DROP TABLE IF EXISTS oldpwd;
 CREATE TABLE public.oldpwd (
     id identity NOT NULL,
     createdate numeric(31,0),
@@ -102,7 +102,7 @@ CREATE TABLE public.oldpwd (
 -- Dependencies: 5
 -- Name: user_; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-
+DROP TABLE IF EXISTS user_;
 CREATE TABLE public.user_ (
     userid identity NOT NULL,
     deldate timestamp ,
@@ -142,12 +142,12 @@ CREATE TABLE public.user_ (
 -- Dependencies: 5
 -- Name: users_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-
+DROP TABLE IF EXISTS users_groups;
 CREATE TABLE public.users_groups (
     groupid integer NOT NULL,
     userid integer NOT NULL,
     deletiondate timestamp ,
-    creationdate timestamp 
+    creationdate timestamp NOT NULL
 );
 
 
@@ -156,7 +156,7 @@ CREATE TABLE public.users_groups (
 -- Dependencies: 5
 -- Name: userstate; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-
+DROP TABLE IF EXISTS userstate;
 CREATE TABLE public.userstate (
     id identity NOT NULL,
     name character varying(75) NOT NULL,
@@ -174,8 +174,6 @@ INSERT INTO public.user_ (userid, deldate, modifieddate, defaultuser, extauth, p
 
 
 
-INSERT INTO public.users_groups (groupid, userid, deletiondate, creationdate) VALUES (2, 1, NULL, NULL);
-INSERT INTO public.users_groups (groupid, userid, deletiondate, creationdate) VALUES (1, 11, NULL, NULL);
 INSERT INTO public.users_groups (groupid, userid, deletiondate, creationdate) VALUES (1, 1, NULL, '2010-09-14 00:00:00');
 
 
@@ -196,7 +194,7 @@ INSERT INTO public.userstate (id, name, description) VALUES (1, 'active', NULL);
 --
 
 ALTER TABLE  public.users_groups
-    ADD CONSTRAINT users_groups_pkey PRIMARY KEY (groupid, userid);
+    ADD CONSTRAINT users_groups_pkey PRIMARY KEY (groupid, userid, creationdate);
 
 
 --

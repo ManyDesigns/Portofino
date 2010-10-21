@@ -56,6 +56,8 @@ public class TableForm implements Element {
     protected final Column[] columns;
     protected final Row[] rows;
 
+    protected String prefix;
+
     protected String caption;
     protected boolean selectable = false;
     protected TextFormat keyTextFormat;
@@ -218,6 +220,14 @@ public class TableForm implements Element {
         return rows;
     }
 
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
     //**************************************************************************
     // Inner class: Row
     //**************************************************************************
@@ -237,9 +247,12 @@ public class TableForm implements Element {
 
         public void toXhtml(XhtmlBuffer xb) {
             xb.openElement("tr");
+            String[] inputNameArgs = {prefix, "selection"};
+            String selection = StringUtils.join(inputNameArgs);
+
             if (selectable) {
                 xb.openElement("td");
-                xb.writeInputCheckbox(null, "selection", key, false);
+                xb.writeInputCheckbox(null, selection, key, false);
                 xb.closeElement("td");
             }
 

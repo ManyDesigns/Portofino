@@ -30,15 +30,21 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.FileBlob;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobsManager;
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.servlet.MultipartRequest;
+import com.manydesigns.elements.util.MemoryUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 
 /*
@@ -47,7 +53,7 @@ import java.lang.reflect.Method;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class FileBlobField extends AbstractField
-        implements MultipartFormDataField {
+        implements MultipartRequestField {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -56,13 +62,16 @@ public class FileBlobField extends AbstractField
     public static final String UPLOAD_DELETE = "_delete";
 
     public static final String OPERATION_SUFFIX = "_operation";
+    public static final String CODE_SUFFIX = "_code";
+    public static final String INNER_SUFFIX = "_inner";
+
+    protected String innerId;
+    protected String operationInputName;
+    protected String codeInputName;
 
     protected final BlobsManager blobsManager;
     protected Blob blob;
-
-    protected final File blobDir;
-    protected final String metaFileNamePattern;
-    protected final String dataFileNamePattern;
+    protected String blobError;
 
     //**************************************************************************
     // Costruttori
@@ -75,10 +84,9 @@ public class FileBlobField extends AbstractField
         super(accessor, mode, prefix);
         blobsManager = BlobsManager.getManager();
 
-        FileBlob fileBlobAnnotation = accessor.getAnnotation(FileBlob.class);
-        blobDir = new File(fileBlobAnnotation.blobDir());
-        metaFileNamePattern = fileBlobAnnotation.metaFileNamePattern();
-        dataFileNamePattern = fileBlobAnnotation.dataFileNamePattern();
+        innerId = id + INNER_SUFFIX;
+        operationInputName = inputName + OPERATION_SUFFIX;
+        codeInputName = inputName + CODE_SUFFIX;
     }
 
     //**************************************************************************
@@ -106,12 +114,17 @@ public class FileBlobField extends AbstractField
         xb.openElement("div");
         xb.addAttribute("id", id);
         xb.addAttribute("class", "value");
-        if (blob != null) {
+        if (blobError != null) {
+            xb.openElement("div");
+            xb.addAttribute("class", "error");
+            xb.write(blobError);
+            xb.closeElement("div");
+        } else if (blob != null) {
             if (href != null) {
                 xb.openElement("a");
                 xb.addAttribute("href", href);
             }
-            xb.write(blob.getFilename());
+            writeBlobShortName(xb);
             if (href != null) {
                 xb.closeElement("a");
             }
@@ -119,21 +132,24 @@ public class FileBlobField extends AbstractField
         xb.closeElement("div");
     }
 
-    private void valueToXhtmlEdit(XhtmlBuffer xb) {
-        String operationInputName = inputName + OPERATION_SUFFIX;
+    private void writeBlobShortName(XhtmlBuffer xb) {
+        xb.write(blob.getFilename());
+        xb.write(" (");
+        xb.write(MemoryUtil.bytesToHumanString(blob.getSize()));
+        xb.write(")");
+    }
 
+    private void valueToXhtmlEdit(XhtmlBuffer xb) {
         if (blob == null) {
             xb.writeInputHidden(operationInputName, UPLOAD_MODIFY);
             xb.writeInputFile(id, inputName, false);
         } else {
-            String innerId = id + "_inner";
-
             xb.openElement("div");
             xb.addAttribute("class", "value");
             xb.addAttribute("id", id);
 
             xb.openElement("div");
-            xb.write(blob.getFilename());
+            writeBlobShortName(xb);
             xb.closeElement("div");
 
             xb.openElement("div");
@@ -167,6 +183,7 @@ public class FileBlobField extends AbstractField
             xb.closeElement("div");
 
             xb.writeInputFile(innerId, inputName, true);
+            xb.writeInputHidden(codeInputName, blob.getCode());
 
             xb.closeElement("div");
         }
@@ -182,44 +199,61 @@ public class FileBlobField extends AbstractField
             return;
         }
 
-        Class reqClass = req.getClass();
-        if (!(reqClass.getName().equals(
-                "org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper"))) {
-            return;
-        }
-
-        String operationInputName = inputName + OPERATION_SUFFIX;
-
         String updateTypeStr = req.getParameter(operationInputName);
         if (updateTypeStr == null) {
             // do nothing
         } else if (updateTypeStr.equals(UPLOAD_KEEP)) {
-            // do nothing
+            if (mode.isCreate()) {
+                String code = req.getParameter(codeInputName);
+                safeLoadBlob(code);
+            }
         } else if (updateTypeStr.equals(UPLOAD_MODIFY)) {
-            // check that a file is actually attached
-            try {
+            saveUpload(req);
+        } else if (updateTypeStr.equals(UPLOAD_DELETE)) {
+            blob = null;
+        }
+    }
+
+    private void saveUpload(HttpServletRequest req) {
+        Class reqClass = req.getClass();
+        try {
+            if ((reqClass.getName().equals(
+                    "org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper"))) {
                 Method getFilesMethod =
                         reqClass.getMethod("getFiles", String.class);
                 Method getFileNamesMethod =
                         reqClass.getMethod("getFileNames", String.class);
-                Method getFileSystemNamesMethod =
-                        reqClass.getMethod("getFileSystemNames", String.class);
+                Method getContentTypesMethod =
+                        reqClass.getMethod("getContentTypes", String.class);
 
                 File[] files = (File[])
                         getFilesMethod.invoke(req, inputName);
                 String[] fileNames = (String[])
                         getFileNamesMethod.invoke(req, inputName);
-                String[] fileSystemNames = (String[])
-                        getFileSystemNamesMethod.invoke(req, inputName);
-
+                String[] contentTypes = (String[])
+                        getContentTypesMethod.invoke(req, inputName);
                 if (files != null && files.length > 0) {
-                    blob = blobsManager.saveBlob(files[0], fileNames[0]);
+                    String filename = FilenameUtils.getName(fileNames[0]);
+                    blob = blobsManager.saveBlob(
+                            files[0], filename, contentTypes[0]);
                 }
-            } catch (Exception e) {
-                throw new Error(e);
+            } else if (req instanceof MultipartRequest) {
+                MultipartRequest request =
+                        (MultipartRequest)req;
+
+                FileItem fileItem = request.getFileItem(inputName);
+                if (fileItem != null) {
+                    InputStream fis = fileItem.getInputStream();
+                    String fileName = FilenameUtils.getName(fileItem.getName());
+                    String contentType = fileItem.getContentType();
+                    blob = blobsManager.saveBlob(fis, fileName, contentType);
+                }
+            } else {
+                logger.warning("Cannot read multipart request");
             }
-        } else if (updateTypeStr.equals(UPLOAD_DELETE)) {
-            blob = null;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new Error(e);
         }
     }
 
@@ -238,15 +272,33 @@ public class FileBlobField extends AbstractField
 
     public void readFromObject(Object obj) {
         super.readFromObject(obj);
-        try {
-            if (obj == null) {
-                blob = null;
-            } else {
+        if (obj == null) {
+            blob = null;
+        } else {
+            try {
                 String code = (String) accessor.get(obj);
-                blob = blobsManager.loadBlob(code);
+                safeLoadBlob(code);
+            } catch (Throwable e) {
+                blob = null;
+                LogUtil.severe(logger, "Cannot access blob", e);
+                throw new Error(e);
             }
-        } catch (Throwable e) {
-            throw new Error(e);
+        }
+    }
+
+    protected void safeLoadBlob(String code) {
+        if (code == null) {
+            blob = null;
+        } else {
+            try {
+                blob = blobsManager.loadBlob(code);
+            } catch (IOException e) {
+                blob = null;
+                blobError = "Cannot load blob";
+                LogUtil.warningMF(logger,
+                        "Cannot load blob with code {0}. Cause: {1}",
+                        code, e.getMessage());
+            }
         }
     }
 
@@ -256,5 +308,29 @@ public class FileBlobField extends AbstractField
         } else {
             writeToObject(obj, blob.getCode());
         }
+    }
+
+    public Blob getBlob() {
+        return blob;
+    }
+
+    public void setBlob(Blob blob) {
+        this.blob = blob;
+    }
+
+    public String getOperationInputName() {
+        return operationInputName;
+    }
+
+    public void setOperationInputName(String operationInputName) {
+        this.operationInputName = operationInputName;
+    }
+
+    public String getBlobError() {
+        return blobError;
+    }
+
+    public void setBlobError(String blobError) {
+        this.blobError = blobError;
     }
 }

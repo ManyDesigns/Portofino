@@ -50,7 +50,7 @@ public class DBParserTest extends CommonTestUtil{
     Model model;
 
 
-    public void setUp() throws Exception {
+    public void setUp() {
         LogUtil.initializeLoggingSystem();
         ModelParser.logger.setLevel(Level.ALL);
         parser = new ModelParser();

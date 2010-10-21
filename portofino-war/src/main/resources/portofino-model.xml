@@ -322,14 +322,6 @@
                                         nullable="true"
                                         searchable="false"
                                         propertyName="creatorId"/>
-                                <column columnName="parentgroupid"
-                                        columnType="int8"
-                                        javaType="java.lang.Long"
-                                        length="19"
-                                        scale="0"
-                                        nullable="true"
-                                        searchable="false"
-                                        propertyName="parentGroupId"/>
                                 <column columnName="active"
                                         columnType="bool"
                                         javaType="java.lang.Boolean"
@@ -349,6 +341,21 @@
                             <primaryKey primaryKeyName="pk_group">
                                 <column columnName="groupid"/>
                             </primaryKey>
+                            <foreignKeys>
+                                <foreignKey foreignKeyName="fk_grp_1"
+                                              toDatabase="portofino"
+                                              toSchema="public"
+                                              toTable="user_"
+                                              onUpdate="NO ACTION"
+                                              onDelete="NO ACTION"
+                                              manyPropertyName="groupsCreated"
+                                              onePropertyName="creatorId">
+                                    <references>
+                                        <reference fromColumn="creatorid"
+                                                   toColumn="uuid"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
                             <annotations>
                                 <annotation type="com.manydesigns.elements.annotations.ShortName">
                                     <value>%{name} (%{description})</value>
@@ -382,7 +389,7 @@
                                         propertyName="deletionDate"/>
                                 <column columnName="creationdate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         nullable="true"
@@ -392,6 +399,7 @@
                                 <primaryKey primaryKeyName="pk_group">
                                     <column columnName="userid"/>
                                     <column columnName="groupid"/>
+                                    <column columnName="creationdate"/>
                                 </primaryKey>
                                 <foreignKeys>
                                 <foreignKey foreignKeyName="fk_ug_1"
@@ -629,7 +637,11 @@
                                         length="255"
                                         scale="0"
                                         nullable="true"
-                                        searchable="true"/>
+                                        searchable="true">
+                                    <annotations>
+                                        <annotation type="com.manydesigns.elements.annotations.FileBlob"/>
+                                    </annotations>
+                                        </column>
                             </columns>
                             <primaryKey primaryKeyName="pk_category">
                                 <column columnName="catid"/>
@@ -656,7 +668,7 @@
                                         javaType="java.lang.String"
                                         length="80"
                                         scale="0"
-                                        nullable="true"
+                                        nullable="false"
                                         searchable="true"/>
                                 <column columnName="descn"
                                         columnType="varchar"
@@ -995,7 +1007,8 @@
         </siteNode>
         <siteNode url="/user-admin/Index.action" title="User admin" description="User administration">
             <childNodes>
-                <siteNode url="/user-admin/users.action" title="Users" description="users"/>
+                <siteNode url="/user-admin/Users.action" title="Users" description="users"/>
+                <siteNode url="/user-admin/Groups.action" title="Groups" description="groups"/>
             </childNodes>
         </siteNode>
     </siteNodes>

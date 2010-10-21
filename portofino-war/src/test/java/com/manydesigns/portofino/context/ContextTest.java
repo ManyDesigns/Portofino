@@ -18,6 +18,7 @@ public class ContextTest extends CommonTestUtil {
     Model model;
 
     public void setUp() {
+        super.setUp();
         model = context.getModel();
     }
 

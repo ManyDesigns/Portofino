@@ -29,8 +29,8 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,9 +41,13 @@ public class CodiceFiscaleField extends RegExpTextField {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    // regex per codice fiscale con gestione omocodie.
     public final static String codiceFiscaleRegExp =
-            "[A-Z]{6}[\\d]{2}[A-Z][\\d]{2}[A-Z][\\d]{3}[A-Z]";
+            "[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]";
 
+    /* Regex più semplice che non gestisce le omocodie è:
+     * [A-Z]{6}[\\d]{2}[A-Z][\\d]{2}[A-Z][\\d]{3}[A-Z]
+     */
     //**************************************************************************
     // Constructors
     //**************************************************************************

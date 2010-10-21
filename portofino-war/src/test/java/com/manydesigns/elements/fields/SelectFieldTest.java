@@ -83,11 +83,11 @@ public class SelectFieldTest extends AbstractElementsTest {
         myText = null;
 
         selectionProvider = DefaultSelectionProvider.create(
-                "optionProvider", 1, valuesArray, labelsArray);
+                "selectionProvider", 1, valuesArray, labelsArray);
         selectionModel = selectionProvider.createSelectionModel();
 
         selectionProvider2 = DefaultSelectionProvider.create(
-                "optionProvider", 1, valuesArray2, labelsArray2);
+                "selectionProvider", 1, valuesArray2, labelsArray2);
         selectionModel2 = selectionProvider2.createSelectionModel();
     }
 

@@ -24,7 +24,6 @@ CREATE TABLE emailstate (
 CREATE TABLE group_ (
     groupid bigserial NOT NULL,
     creatorid bigint,
-    parentgroupid bigint,
     name character varying(75),
     description character varying(255),
     active boolean,
@@ -109,8 +108,8 @@ INSERT INTO emailstate (id, name, description) VALUES (2, 'sent', NULL);
 INSERT INTO emailstate (id, name, description) VALUES (3, 'rejected', NULL);
 INSERT INTO emailstate (id, name, description) VALUES (4, 'bounced', NULL);
 INSERT INTO emailstate (id, name, description) VALUES (0, 'sending', NULL);
-INSERT INTO group_ (groupid, creatorid, parentgroupid, name, description, active, deldate) VALUES (2, 1, NULL, 'users', 'user', true, NULL);
-INSERT INTO group_ (groupid, creatorid, parentgroupid, name, description, active, deldate) VALUES (1, 1, NULL, 'admin', 'admin', true, NULL);
+INSERT INTO group_ (groupid, creatorid,  name, description, active, deldate) VALUES (2, 1, 'users', 'user', true, NULL);
+INSERT INTO group_ (groupid, creatorid,  name, description, active, deldate) VALUES (1, 1, 'admin', 'admin', true, NULL);
 
 INSERT INTO user_ ( deldate, modifieddate, defaultuser, extauth, pwd, pwdmoddate, token, remquestion, remans, gracelogincount, screenname, emailaddress, greeting, comments, firstname, middlename, lastname, jobtitle, logindate, loginip, lastlogindate, lastloginip, lastfailedlogindate, failedloginattempts, agreedtoterms,  state, createdate, bounced) VALUES ( NULL, '2010-08-12 00:00:00', false, false, 'admin', '2010-10-04 17:29:29.045', NULL, '', NULL, 3, 'admin', 'giampiero.granatella@manydesigns.com', '', '', 'Giampiero', 'GG', 'Granatella', 'Ing.', NULL, '0:0:0:0:0:0:0:1%0', '2010-10-18 15:56:13.836', '', '2010-10-13 16:41:28.07', 0, false, 1, '2009-09-29 00:00:00', NULL);
 
@@ -140,8 +139,8 @@ ALTER TABLE ONLY msgstate
 ALTER TABLE ONLY user_
     ADD CONSTRAINT user_pkey PRIMARY KEY (userid);
 
-ALTER TABLE ONLY users_groups
-    ADD CONSTRAINT users_groups_pkey PRIMARY KEY (groupid, userid);
+ALTER TABLE  public.users_groups
+    ADD CONSTRAINT users_groups_pkey PRIMARY KEY (groupid, userid, creationdate);
 
 ALTER TABLE ONLY userstate
     ADD CONSTRAINT userstate_pkey PRIMARY KEY (id);

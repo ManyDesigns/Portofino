@@ -37,7 +37,6 @@ import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.diff.ModelDiff;
 import com.manydesigns.portofino.util.CommonTestUtil;
 
-import java.sql.SQLException;
 import java.util.logging.Level;
 
 /*
@@ -52,20 +51,22 @@ public class JdbcMetadataReaderTest extends CommonTestUtil {
     ConnectionProvider connectionProvider;
     Database database;
 
-    public void setUp() throws ClassNotFoundException, SQLException {
+    public void setUp()  {
         LogUtil.initializeLoggingSystem();
+        super.setUp();
 
         connectionProvider=context.getConnectionProvider("jpetstore");
         connectionProvider.test();
         database = connectionProvider.readModel();
+
     }
 
     public void testReadModelFromConnection() {
         AbstractDatabasePlatform.logger.setLevel(Level.FINE);
 
-        assertEquals(4, database.getSchemas().size());
-        assertEquals(14, database.getAllTables().size());
-        assertEquals(88, database.getAllColumns().size());
+        assertEquals(2, database.getSchemas().size());
+        assertEquals(13, database.getAllTables().size());
+        assertEquals(86, database.getAllColumns().size());
     }
 
     public void testDiff() {

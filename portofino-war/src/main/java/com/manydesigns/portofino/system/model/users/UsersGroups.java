@@ -30,6 +30,7 @@ package com.manydesigns.portofino.system.model.users;
 
 import java.util.Date;
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -39,8 +40,8 @@ import java.io.Serializable;
 public class UsersGroups implements Serializable {
     Group group;
     User user;
-    Date creationDate;
-    Date deletionDate;
+    Timestamp creationDate;
+    Timestamp deletionDate;
     Long userid;
     Long groupid;
 
@@ -53,11 +54,11 @@ public class UsersGroups implements Serializable {
         this.group = group;
     }
 
-    public Date getCreationDate() {
+    public Timestamp getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(Timestamp creationDate) {
         this.creationDate = creationDate;
     }
 
@@ -89,7 +90,7 @@ public class UsersGroups implements Serializable {
         return deletionDate;
     }
 
-    public void setDeletionDate(Date deletionDate) {
+    public void setDeletionDate(Timestamp deletionDate) {
         this.deletionDate = deletionDate;
     }
 

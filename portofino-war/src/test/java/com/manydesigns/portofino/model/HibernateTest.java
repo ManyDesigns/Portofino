@@ -31,7 +31,6 @@ package com.manydesigns.portofino.model;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
 import com.manydesigns.portofino.util.CommonTestUtil;
@@ -50,7 +49,7 @@ import java.util.Map;
 public class HibernateTest extends CommonTestUtil {
 
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp()  {
         super.setUp();
         context.openSession();
     }
@@ -60,13 +59,10 @@ public class HibernateTest extends CommonTestUtil {
     }
 
     public void testReadProdotti() {
-
         List<Object> resultProd =
                 context.getAllObjects("jpetstore.public.product");
         int sizePrd = resultProd.size();
         assertEquals("prodotti", 16, sizePrd);
-
-
     }
 
     public void testUsers() {
@@ -76,17 +72,15 @@ public class HibernateTest extends CommonTestUtil {
 
         List<Object> usergroups =
                 context.getAllObjects("portofino.public.users_groups");
-        assertEquals( 3, usergroups.size());
+        assertEquals( 1, usergroups.size());
 
         List<Object> users =
                 context.getAllObjects("portofino.public.user_");
         assertEquals("numero utenti", 2, users.size());
         User admin = (User) users.get(0);
         List<UsersGroups> groups = admin.getGroups();
-        assertEquals("numero gruppi per admin", 1, groups.size());
-        UsersGroups ug1 = groups.get(0);
-        Group g1 = ug1.getGroup();
-        assertNotNull(g1);
+        assertEquals("numero gruppi per admin", 0, groups.size());
+        
 
     }
     public void testSearchAndReadCategorieProdotti() {
@@ -167,7 +161,7 @@ public class HibernateTest extends CommonTestUtil {
         assertEquals("jpetstore.public.category", categoria0.get("$type$"));
         assertEquals("Pesciu", categoria0.get("name"));
         categoria0.put("name", "Fish");
-        context.saveOrUpdateObject("jpetstore.public.category", categoria0);
+        context.updateObject("jpetstore.public.category", categoria0);
         context.commit("jpetstore");
         context.closeSession();
     }
@@ -239,7 +233,7 @@ public class HibernateTest extends CommonTestUtil {
             worms.put("descn",
           "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
                       "Worms</font>");
-            context.saveOrUpdateObject("jpetstore.public.category", worms);
+            context.saveObject("jpetstore.public.category", worms);
             context.commit("jpetstore");
             context.deleteObject("jpetstore.public.category", worms);
             //test commit globale

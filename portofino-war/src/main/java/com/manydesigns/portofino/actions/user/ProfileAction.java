@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.logging.Logger;
+import java.sql.Timestamp;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -165,7 +166,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
 
             if(bean.oldPwd.equals(user.getPwd())) {
                 user.setPwd(bean.pwd);
-                user.setPwdModDate(new Date());
+                user.setPwdModDate(new Timestamp(new Date().getTime()));
                 context.updateObject("portofino.public.user_", user);
                 context.commit("portofino");
 

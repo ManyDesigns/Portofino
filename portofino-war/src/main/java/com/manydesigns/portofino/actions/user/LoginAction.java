@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.logging.Logger;
+import java.sql.Timestamp;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -121,7 +122,7 @@ public class LoginAction extends PortofinoAction
         if (user == null) {
             return;
         }
-        user.setLastFailedLoginDate(new Date());
+        user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
         int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
         user.setFailedLoginAttempts(failedAttempts+1);
         context.updateObject("portofino.public.user_", user);
@@ -130,7 +131,7 @@ public class LoginAction extends PortofinoAction
 
     private void updateUser(User user) {
         user.setFailedLoginAttempts(0);
-        user.setLastLoginDate(new Date());
+        user.setLastLoginDate(new Timestamp(new Date().getTime()));
         user.setLoginIp(req.getRemoteHost());
         user.setToken(null);
         context.updateObject("portofino.public.user_", user);

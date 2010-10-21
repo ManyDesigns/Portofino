@@ -27,38 +27,129 @@
  *
  */
 
-package com.manydesigns.elements;
+package com.manydesigns.elements.servlet;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.ArrayUtils;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DummyHttpServletRequest implements HttpServletRequest {
+public class MutableHttpServletRequest implements MultipartRequest {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
+    protected final Map<String, String[]> parameterMap;
+    protected final Map<String, FileItem[]> fileItemMap;
+
     private String method;
-    private final Map<String, String[]> parameterMap;
     private String contextPath;
 
-    public DummyHttpServletRequest() {
+    //**************************************************************************
+    // Constructor
+    //**************************************************************************
+
+    public MutableHttpServletRequest() {
         parameterMap = new HashMap<String, String[]>();
+        fileItemMap = new HashMap<String, FileItem[]>();
     }
+
+    //**************************************************************************
+    // Methods
+    //**************************************************************************
+
+    public void addParameter(String name, String value) {
+        String[] oldValues = parameterMap.get(name);
+        String[] newValues = (String[]) ArrayUtils.add(oldValues, value);
+        parameterMap.put(name, newValues);
+    }
+
+    public void setParameter(String key, String value) {
+        String[] values = {value};
+        parameterMap.put(key, values);
+    }
+
+    public void addFileItem(String name, FileItem item) {
+        FileItem[] oldValues = fileItemMap.get(name);
+        FileItem[] newValues = (FileItem[]) ArrayUtils.add(oldValues, item);
+        fileItemMap.put(name, newValues);
+    }
+
+    public FileItem getFileItem(String name) {
+        FileItem[] values = fileItemMap.get(name);
+        if (values == null) {
+            return null;
+        } else {
+            return values[0];
+        }
+    }
+
+    public void setFileItem(String key, FileItem value) {
+        FileItem[] values = {value};
+        fileItemMap.put(key, values);
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public void setContextPath(String context) {
+        this.contextPath=context;
+    }
+
+
+    //**************************************************************************
+    // HttpServletRequest implementation
+    //**************************************************************************
+
+    public String getParameter(String name) {
+        String[] values = parameterMap.get(name);
+        if (values == null || values.length == 0) {
+            return null;
+        } else {
+            return values[0];
+        }
+    }
+
+    public Enumeration getParameterNames() {
+        return Collections.enumeration(parameterMap.keySet());
+    }
+
+    public String[] getParameterValues(String name) {
+        return parameterMap.get(name);
+    }
+
+    public Map getParameterMap() {
+        return parameterMap;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public String getContextPath() {
+        return contextPath;
+    }
+
+    //**************************************************************************
+    // Unimplemented HttpServletRequest methods
+    //**************************************************************************
 
     public String getAuthType() {
         throw new UnsupportedOperationException();
@@ -88,24 +179,12 @@ public class DummyHttpServletRequest implements HttpServletRequest {
         throw new UnsupportedOperationException();
     }
 
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
-    public String getMethod() {
-        return method;
-    }
-
     public String getPathInfo() {
         throw new UnsupportedOperationException();
     }
 
     public String getPathTranslated() {
         throw new UnsupportedOperationException();
-    }
-
-    public String getContextPath() {
-        return contextPath;
     }
 
     public String getQueryString() {
@@ -192,26 +271,6 @@ public class DummyHttpServletRequest implements HttpServletRequest {
         throw new UnsupportedOperationException();
     }
 
-    public String getParameter(String key) {
-        String[] values = getParameterValues(key);
-        if (values == null || values.length < 1) {
-            return null;
-        }
-        return values[0];
-    }
-
-    public Enumeration getParameterNames() {
-        throw new UnsupportedOperationException();
-    }
-
-    public String[] getParameterValues(String key) {
-        return parameterMap.get(key);
-    }
-
-    public Map getParameterMap() {
-        return parameterMap;
-    }
-
     public String getProtocol() {
         throw new UnsupportedOperationException();
     }
@@ -283,16 +342,5 @@ public class DummyHttpServletRequest implements HttpServletRequest {
     public int getLocalPort() {
         throw new UnsupportedOperationException();
     }
-
-    public void setParameter(String key, String value) {
-        String[] values = {value};
-        parameterMap.put(key, values);
-    }
-
-    public void setContextPath(String context)
-    {
-        this.contextPath=context;
-    }
-
 
 }

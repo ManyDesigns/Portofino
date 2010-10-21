@@ -205,10 +205,7 @@ public class DateField extends AbstractTextField {
                         "setupDatePicker(''#{0}'', ''{1}'');",
                         StringEscapeUtils.escapeJavaScript(id),
                         StringEscapeUtils.escapeJavaScript(jsDatePattern));
-                xb.openElement("script");
-                xb.addAttribute("type", "text/javascript");
-                xb.writeNoHtmlEscape(js);
-                xb.closeElement("script");
+                xb.writeJavaScript(js);
             }
         } else {
             super.valueToXhtml(xb);

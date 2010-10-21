@@ -40,6 +40,7 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.logging.Logger;
+import java.sql.Timestamp;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -85,7 +86,7 @@ public class LostPwdChangeAction extends PortofinoAction
             if(form.validate()){
                 User user = context.findUserByToken(token);
                 user.setPwd(pwd.pwd);
-                user.setPwdModDate(new Date());
+                user.setPwdModDate(new Timestamp(new Date().getTime()));
                 context.updateObject("portofino.public.user_", user);
                 context.commit("portofino");
                 LogUtil.finestMF(logger, "User {0} updated", user.getEmail());

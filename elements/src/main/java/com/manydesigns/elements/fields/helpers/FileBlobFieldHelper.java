@@ -27,15 +27,40 @@
  *
  */
 
-package com.manydesigns.elements.fields;
+package com.manydesigns.elements.fields.helpers;
+
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.FileBlob;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.FileBlobField;
+import com.manydesigns.elements.fields.search.SearchField;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface MultipartFormDataField {
+public class FileBlobFieldHelper implements FieldHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    public Field tryToInstantiateField(ClassAccessor classAccessor,
+                                       PropertyAccessor propertyAccessor,
+                                       Mode mode,
+                                       String prefix) {
+        if (String.class.isAssignableFrom(propertyAccessor.getType())
+                && propertyAccessor.isAnnotationPresent(FileBlob.class)) {
+                return new FileBlobField(propertyAccessor, mode, prefix);
+        }
+        return null;
+    }
+
+    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
+                                                   PropertyAccessor propertyAccessor,
+                                                   String prefix) {
+        return null;
+    }
 
 }

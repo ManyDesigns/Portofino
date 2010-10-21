@@ -366,7 +366,7 @@
                                         searchable="true"/>
                                 <column columnName="deletiondate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         nullable="true"
@@ -374,7 +374,7 @@
                                         propertyName="deletionDate"/>
                                 <column columnName="creationdate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         nullable="true"
@@ -384,6 +384,7 @@
                                 <primaryKey primaryKeyName="pk_group">
                                     <column columnName="userid"/>
                                     <column columnName="groupid"/>
+                                    <column columnName="creationdate"/>
                                 </primaryKey>
                                 <foreignKeys>
                                 <foreignKey foreignKeyName="fk_ug_1"
@@ -516,7 +517,7 @@
                                         propertyName="from"/>
                                 <column columnName="createdate"
                                         columnType="date"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="13"
                                         scale="0"
                                         nullable="true"
@@ -925,7 +926,7 @@
                                         searchable="true"/>
                                 <column columnName="data"
                                         columnType="date"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         nullable="false"

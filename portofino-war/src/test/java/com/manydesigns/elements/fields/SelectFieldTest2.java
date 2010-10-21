@@ -62,7 +62,7 @@ public class SelectFieldTest2 extends AbstractElementsTest {
             {"cip", "ciop"}
     };
 
-    DefaultSelectionProvider optionProvider;
+    DefaultSelectionProvider selectionProvider;
 
     Form form;
     SelectField selectField1;
@@ -72,11 +72,11 @@ public class SelectFieldTest2 extends AbstractElementsTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        optionProvider = DefaultSelectionProvider.create(
-                "optionProvider", 2, valuesArray, labelsArray);
+        selectionProvider = DefaultSelectionProvider.create(
+                "selectionProvider", 2, valuesArray, labelsArray);
 
         form = new FormBuilder(Bean.class)
-                .configSelectionProvider(optionProvider, "p1", "p2")
+                .configSelectionProvider(selectionProvider, "p1", "p2")
                 .build();
         FieldSet fieldSet = form.get(0);
         selectField1 = (SelectField) fieldSet.get(0);

@@ -129,7 +129,7 @@ public class TableFormBuilder {
         return this;
     }
 
-    public TableFormBuilder configOptionProvider(SelectionProvider selectionProvider,
+    public TableFormBuilder configSelectionProvider(SelectionProvider selectionProvider,
                                             String... fieldNames) {
         selectionProviders.put(fieldNames, selectionProvider);
         return this;
@@ -182,6 +182,10 @@ public class TableFormBuilder {
         propertyAccessors.toArray(propertyAccessorsArray);
 
         TableForm tableForm = new TableForm(nRows, propertyAccessorsArray);
+
+        if (null!=prefix && prefix.length()>0) {
+            tableForm.setPrefix(prefix);
+        }
 
         // set up the columns
         setupColumns(tableForm);
