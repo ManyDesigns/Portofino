@@ -77,7 +77,7 @@ public class WebFramework {
         elementsProperties = ElementsProperties.getProperties();
         String managerClassName =
                 elementsProperties.getProperty(
-                        ElementsProperties.FIELDS_MANAGER_PROPERTY);
+                        ElementsProperties.WEB_FRAMEWORK_PROPERTY);
         InstanceBuilder<WebFramework> builder =
                 new InstanceBuilder<WebFramework>(
                         WebFramework.class,
