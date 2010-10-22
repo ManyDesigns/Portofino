@@ -29,40 +29,52 @@
 
 package com.manydesigns.elements.servlet;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.InputStream;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ElementsFilter implements Filter {
-    FilterConfig config;
-    public void init(FilterConfig filterConfig) throws ServletException {
-        this.config=filterConfig;
+public class Upload {
+    public static final String copyright =
+            "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    protected InputStream inputStream;
+    protected String filename;
+    protected String contentType;
+
+    public Upload() {}
+
+    public Upload(InputStream inputStream,
+                  String filename,
+                  String contentType) {
+        this.filename = filename;
+        this.contentType = contentType;
+        this.inputStream = inputStream;
     }
 
-    public void doFilter(ServletRequest req,
-                         ServletResponse res, FilterChain filterChain)
-            throws IOException, ServletException {
-        ServletContext context = config.getServletContext();
-        try {
-            ElementsThreadLocals.setupDefaultElementsContext();
-            
-            ElementsThreadLocals.setHttpServletRequest((HttpServletRequest) req);
-            ElementsThreadLocals.setHttpServletResponse((HttpServletResponse) res);
-            ElementsThreadLocals.setServletContext(context);
-
-            filterChain.doFilter(req, res);
-        } finally {
-            ElementsThreadLocals.removeElementsContext();
-        }
+    public InputStream getInputStream() {
+        return inputStream;
     }
 
-    public void destroy() {}
+    public void setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
 }

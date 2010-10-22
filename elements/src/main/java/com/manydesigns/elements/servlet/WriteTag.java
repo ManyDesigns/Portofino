@@ -29,11 +29,18 @@
 
 package com.manydesigns.elements.servlet;
 
-import com.manydesigns.elements.Element;
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import com.manydesigns.elements.xml.XhtmlFragment;
+import ognl.Ognl;
+import ognl.OgnlContext;
+import ognl.OgnlException;
 
-import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
+import javax.servlet.jsp.tagext.TagSupport;
+import java.util.logging.Logger;
 
 
 /*
@@ -44,40 +51,123 @@ import javax.servlet.jsp.JspWriter;
 public class WriteTag extends TagSupport {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-    protected String value;
+
+    //--------------------------------------------------------------------------
+    // Constants
+    //--------------------------------------------------------------------------
+
+    public static final String APPLICATION_SCOPE = "APPLICATION";
+    public static final String SESSION_SCOPE = "SESSION";
+    public static final String REQUEST_SCOPE = "REQUEST";
+    public static final String PAGE_SCOPE = "PAGE";
+
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
+
+    protected String name;
+    protected String property;
     protected String scope;
 
-    public void setValue(String value) {
-        this.value = value;
-    }
+    //--------------------------------------------------------------------------
+    // Logging
+    //--------------------------------------------------------------------------
 
-    public void setScope(String scope) {
-        this.scope = scope.toUpperCase();
-    }
+    public final static Logger logger = LogUtil.getLogger(WriteTag.class);
 
+    //--------------------------------------------------------------------------
+    // TabSupport override
+    //--------------------------------------------------------------------------
+
+    @Override
     public int doStartTag() {
         JspWriter out = pageContext.getOut();
-        Element element;
         try {
-            if(("APPLICATION").equals(scope)){
-                element= (Element)
-                        pageContext.getServletContext().getAttribute(value);
-            } else if(("SESSION").equals(scope)){
-                element= (Element)
-                        pageContext.getSession().getAttribute(value);
-            }else if(("PAGE").equals(scope)){
-                element= (Element)
-                        pageContext.getAttribute(value);
-            } else {
-                //Request
-                element= (Element)
-                        pageContext.getRequest().getAttribute(value);
-            }
-            XhtmlBuffer xb = new XhtmlBuffer(out);
-            element.toXhtml(xb);
-        } catch (Exception e) {
+            doTag(out);
+        } catch (Throwable e) {
             throw new Error(e);
         }
         return SKIP_BODY;
     }
+
+    private void doTag(JspWriter out) throws OgnlException {
+        Integer scopeCode;
+        if (scope == null) {
+            scopeCode = null;
+        } else if (APPLICATION_SCOPE.equals(scope)){
+                scopeCode = PageContext.APPLICATION_SCOPE;
+        } else if (SESSION_SCOPE.equals(scope)){
+            scopeCode = PageContext.SESSION_SCOPE;
+        } else if (REQUEST_SCOPE.equals(scope)){
+            scopeCode = PageContext.REQUEST_SCOPE;
+        } else if (PAGE_SCOPE.equals(scope)){
+            scopeCode = PageContext.PAGE_SCOPE;
+        } else {
+            LogUtil.warningMF(logger, "Unknown scope: {0}", scope);
+            return;
+        }
+
+        Object bean;
+        if (scopeCode != null) {
+            bean = pageContext.getAttribute(name, scopeCode);
+        } else {
+            bean = pageContext.findAttribute(name);
+        }
+
+        if (bean == null) {
+            LogUtil.warningMF(logger,
+                    "Bean {0} not found in scope {1}",
+                    name, scope);
+            return;
+        }
+
+        if (property != null) {
+            // use property as Ognl expression
+            OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+            if (ognlContext == null) {
+                bean = Ognl.getValue(property, ognlContext, bean);
+            } else {
+                bean = Ognl.getValue(property, bean);
+            }
+        }
+
+        if (bean instanceof XhtmlFragment) {
+            XhtmlFragment xhtmlFragment = (XhtmlFragment) bean;
+            XhtmlBuffer xb = new XhtmlBuffer(out);
+            xhtmlFragment.toXhtml(xb);
+        } else {
+            LogUtil.warningMF(logger,
+                    "Bean {0} scope {1} property {2} not of type XhtmlFragment",
+                    name, scope, property);
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    // Getters/setters
+    //--------------------------------------------------------------------------
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getProperty() {
+        return property;
+    }
+
+    public void setProperty(String property) {
+        this.property = property;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+    
 }

@@ -14,13 +14,19 @@
         <tag-class>com.manydesigns.elements.servlet.WriteTag</tag-class>
         <body-content>JSP</body-content>
         <attribute>
-            <description>XhtmlFragment</description>
-            <name>value</name>
+            <description>Bean name</description>
+            <name>name</name>
             <required>true</required>
-            <rtexprvalue>true</rtexprvalue>
+            <rtexprvalue>false</rtexprvalue>
         </attribute>
         <attribute>
-            <description>XhtmlFragment</description>
+            <description>Bean property</description>
+            <name>property</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>Scope</description>
             <name>scope</name>
             <required>false</required>
             <rtexprvalue>false</rtexprvalue>

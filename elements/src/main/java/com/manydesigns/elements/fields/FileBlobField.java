@@ -34,18 +34,14 @@ import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobsManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.servlet.MultipartRequest;
+import com.manydesigns.elements.servlet.Upload;
+import com.manydesigns.elements.servlet.WebFramework;
 import com.manydesigns.elements.util.MemoryUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -215,44 +211,19 @@ public class FileBlobField extends AbstractField
     }
 
     private void saveUpload(HttpServletRequest req) {
-        Class reqClass = req.getClass();
+        WebFramework webFramework = WebFramework.getWebFramework();
         try {
-            if ((reqClass.getName().equals(
-                    "org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper"))) {
-                Method getFilesMethod =
-                        reqClass.getMethod("getFiles", String.class);
-                Method getFileNamesMethod =
-                        reqClass.getMethod("getFileNames", String.class);
-                Method getContentTypesMethod =
-                        reqClass.getMethod("getContentTypes", String.class);
-
-                File[] files = (File[])
-                        getFilesMethod.invoke(req, inputName);
-                String[] fileNames = (String[])
-                        getFileNamesMethod.invoke(req, inputName);
-                String[] contentTypes = (String[])
-                        getContentTypesMethod.invoke(req, inputName);
-                if (files != null && files.length > 0) {
-                    String filename = FilenameUtils.getName(fileNames[0]);
-                    blob = blobsManager.saveBlob(
-                            files[0], filename, contentTypes[0]);
-                }
-            } else if (req instanceof MultipartRequest) {
-                MultipartRequest request =
-                        (MultipartRequest)req;
-
-                FileItem fileItem = request.getFileItem(inputName);
-                if (fileItem != null) {
-                    InputStream fis = fileItem.getInputStream();
-                    String fileName = FilenameUtils.getName(fileItem.getName());
-                    String contentType = fileItem.getContentType();
-                    blob = blobsManager.saveBlob(fis, fileName, contentType);
-                }
+            Upload upload = webFramework.getUpload(req, inputName);
+            if (upload == null) {
+                blob = null;
             } else {
-                logger.warning("Cannot read multipart request");
+                blob = blobsManager.saveBlob(
+                        upload.getInputStream(), 
+                        upload.getFilename(),
+                        upload.getContentType());
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            LogUtil.warning(logger, "Cannot save upload", e);
             throw new Error(e);
         }
     }

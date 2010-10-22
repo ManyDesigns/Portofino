@@ -85,6 +85,9 @@ public final class ElementsProperties {
     public static final String BLOBS_DATA_FILENAME_PATTERN_PROPERTY =
             "blobs.data.filename.pattern";
 
+    public static final String WEB_FRAMEWORK_PROPERTY =
+            "web.framework";
+
 
     //**************************************************************************
     // Static fields, singleton initialization and retrieval

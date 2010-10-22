@@ -8,9 +8,9 @@
         <artifactId>portofino</artifactId>
         <version>4.0.beta2</version>
     </parent>
-    <artifactId>elements-struts2</artifactId>
+    <artifactId>elements-struts1</artifactId>
     <packaging>jar</packaging>
-    <name>manydesigns-elements-struts2</name>
+    <name>manydesigns-elements-struts1</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>
@@ -33,8 +33,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.struts</groupId>
-            <artifactId>struts2-core</artifactId>
-            <version>${struts2.version}</version>
+            <artifactId>struts-core</artifactId>
+            <version>${struts1.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
