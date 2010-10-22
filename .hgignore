@@ -2,6 +2,7 @@
 ^target
 ^portofino-war/target
 ^elements/target
+^elements-struts1/target
 ^elements-struts2/target
 ^elements-extras/target
 ^out/
