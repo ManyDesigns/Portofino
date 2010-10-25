@@ -29,11 +29,11 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.elements.fields.search.Criteria;
+import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
-import com.manydesigns.portofino.util.CommonTestUtil;
 import org.hibernate.proxy.map.MapProxy;
 
 import java.math.BigDecimal;
@@ -46,10 +46,10 @@ import java.util.Map;
  * @author Angelo    Lupo       - angelo.lupo@manydesigns.com
  * @author Paolo     Predonzani - paolo.predonzani@manydesigns.com
  */
-public class HibernateTest extends CommonTestUtil {
+public class HibernateTest extends AbstractPortofinoTest {
 
     @Override
-    protected void setUp()  {
+    public void setUp() throws Exception {
         super.setUp();
         context.openSession();
     }

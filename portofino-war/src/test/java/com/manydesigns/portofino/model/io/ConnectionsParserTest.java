@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.model.io;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.Model;
 import junit.framework.TestCase;
 
@@ -46,8 +45,8 @@ public class ConnectionsParserTest extends TestCase {
     ConnectionsParser parser;
     Model model;
 
-    public void setUp() {
-        LogUtil.initializeLoggingSystem();
+    public void setUp() throws Exception {
+        super.setUp();
         ConnectionsParser.logger.setLevel(Level.ALL);
 
         parser = new ConnectionsParser();

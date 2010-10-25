@@ -29,13 +29,12 @@
 
 package com.manydesigns.portofino.database;
 
-import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.database.platforms.AbstractDatabasePlatform;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.Schema;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.diff.ModelDiff;
-import com.manydesigns.portofino.util.CommonTestUtil;
 
 import java.util.logging.Level;
 
@@ -44,15 +43,14 @@ import java.util.logging.Level;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class JdbcMetadataReaderTest extends CommonTestUtil {
+public class JdbcMetadataReaderTest extends AbstractPortofinoTest {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     ConnectionProvider connectionProvider;
     Database database;
 
-    public void setUp()  {
-        LogUtil.initializeLoggingSystem();
+    public void setUp() throws Exception {
         super.setUp();
 
         connectionProvider=context.getConnectionProvider("jpetstore");

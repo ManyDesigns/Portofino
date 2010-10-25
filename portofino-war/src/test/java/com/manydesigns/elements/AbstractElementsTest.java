@@ -1,5 +1,6 @@
 package com.manydesigns.elements;
 
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.elements.servlet.WebFramework;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -28,6 +29,7 @@ public abstract class AbstractElementsTest extends TestCase {
         super.setUp();
 
         XmlBuffer.checkWellFormed = true;
+        LogUtil.initializeLoggingSystem();
 
         setUpProperties();
         setUpSingletons();

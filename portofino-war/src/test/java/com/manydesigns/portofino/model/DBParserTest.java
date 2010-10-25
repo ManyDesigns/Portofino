@@ -29,10 +29,9 @@
 
 package com.manydesigns.portofino.model;
 
-import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.io.ModelParser;
-import com.manydesigns.portofino.util.CommonTestUtil;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -42,7 +41,7 @@ import java.util.logging.Level;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DBParserTest extends CommonTestUtil{
+public class DBParserTest extends AbstractPortofinoTest {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -50,16 +49,10 @@ public class DBParserTest extends CommonTestUtil{
     Model model;
 
 
-    public void setUp() {
-        LogUtil.initializeLoggingSystem();
+    public void setUp() throws Exception {
+        super.setUp();
         ModelParser.logger.setLevel(Level.ALL);
         parser = new ModelParser();
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
     }
 
     public void testParseJpetStorePostgresql() {

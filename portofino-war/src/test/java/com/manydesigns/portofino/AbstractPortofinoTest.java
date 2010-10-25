@@ -26,11 +26,11 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.util;
+package com.manydesigns.portofino;
 
+import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
-import junit.framework.TestCase;
 import org.h2.tools.RunScript;
 
 import java.io.InputStreamReader;
@@ -41,14 +41,13 @@ import java.sql.Connection;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class CommonTestUtil extends TestCase{
+public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
     //Connessioni e context
     public Connection connPetStore;
     public Connection connPortofino;
     public Connection connDBTest;
     public Context context = null;
-
 
     //Script per h2 3 file di configurazione
     public static final String PETSTORE_DB_SCHEMA =
@@ -61,43 +60,32 @@ public class CommonTestUtil extends TestCase{
             "database/hibernatetest.sql";
 
 
-    public CommonTestUtil() {
-
-    }
-
-    public void testOk (){
-
-    }
-
     @Override
-    protected void setUp() {
-        try {
-            context = new HibernateContextImpl();
-            context.loadConnectionsAsResource("database/portofino-connections.xml");
-            context.loadXmlModelAsResource(
-                    "database/portofino-model.xml");
-            connPortofino = context.getConnectionProvider("portofino").acquireConnection();
-            connPetStore = context.getConnectionProvider("jpetstore").acquireConnection();
-            connDBTest = context.getConnectionProvider("hibernatetest").acquireConnection();
+    public void setUp() throws Exception {
+        super.setUp();
 
-            ClassLoader cl = CommonTestUtil.class.getClassLoader();
+        context = new HibernateContextImpl();
+        context.loadConnectionsAsResource("database/portofino-connections.xml");
+        context.loadXmlModelAsResource(
+                "database/portofino-model.xml");
+        connPortofino = context.getConnectionProvider("portofino").acquireConnection();
+        connPetStore = context.getConnectionProvider("jpetstore").acquireConnection();
+        connDBTest = context.getConnectionProvider("hibernatetest").acquireConnection();
 
-            RunScript.execute(connPortofino,
-                    new InputStreamReader(
-                            cl.getResourceAsStream(PORTOFINO4_DB)));
-            RunScript.execute(connPetStore,
-                    new InputStreamReader(
-                            cl.getResourceAsStream(PETSTORE_DB_SCHEMA)));
-            RunScript.execute(connPetStore,
-                    new InputStreamReader(
-                            cl.getResourceAsStream(PETSTORE_DB_DATA)));
-            RunScript.execute(connDBTest,
-                    new InputStreamReader(
-                            cl.getResourceAsStream(TEST_DB)));
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
+        ClassLoader cl = AbstractPortofinoTest.class.getClassLoader();
 
+        RunScript.execute(connPortofino,
+                new InputStreamReader(
+                        cl.getResourceAsStream(PORTOFINO4_DB)));
+        RunScript.execute(connPetStore,
+                new InputStreamReader(
+                        cl.getResourceAsStream(PETSTORE_DB_SCHEMA)));
+        RunScript.execute(connPetStore,
+                new InputStreamReader(
+                        cl.getResourceAsStream(PETSTORE_DB_DATA)));
+        RunScript.execute(connDBTest,
+                new InputStreamReader(
+                        cl.getResourceAsStream(TEST_DB)));
     }
 
 }
