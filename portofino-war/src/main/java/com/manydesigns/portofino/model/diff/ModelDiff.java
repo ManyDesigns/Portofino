@@ -30,10 +30,13 @@
 package com.manydesigns.portofino.model.diff;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.Schema;
 import com.manydesigns.portofino.model.datamodel.Table;
+import org.apache.commons.lang.ObjectUtils;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -153,7 +156,7 @@ public class ModelDiff extends ArrayList<String> {
         String schemaName2 = table2.getSchemaName();
         String tableName1 = table1.getTableName();
         String tableName2 = table2.getTableName();
-        if (!schemaName1.equals(schemaName2)) {
+        if (!tableName1.equals(tableName2)) {
             addDifference("Table names {0}.{1}.{3} / {4}.{5}.{6} are different",
                     databaseName1, schemaName1, tableName1,
                     databaseName2, schemaName2, tableName2);
@@ -185,8 +188,25 @@ public class ModelDiff extends ArrayList<String> {
         for (String columnName : commonColumnNames) {
             Column column1 = table1.findColumnByName(columnName);
             Column column2 = table2.findColumnByName(columnName);
-//            diff(column1, column2);
+            diff(column1, column2);
         }
+    }
+
+    private void diff(Column column1, Column column2) {
+        String databaseName1 = column1.getDatabaseName();
+        String databaseName2 = column2.getDatabaseName();
+        String schemaName1 = column1.getSchemaName();
+        String schemaName2 = column2.getSchemaName();
+        String tableName1 = column1.getTableName();
+        String tableName2 = column2.getTableName();
+        String columnName1 = column1.getColumnName();
+        String columnName2 = column2.getTableName();
+        if (!columnName1.equals(columnName2)) {
+            addDifference("Column names {0}.{1}.{3}.{4} / {5}.{6}.{7}.{8} are different",
+                    databaseName1, schemaName1, tableName1, columnName1,
+                    databaseName2, schemaName2, tableName2, columnName2);
+        }
+
     }
 
     private void addDifference(String format, Object... args) {
@@ -220,5 +240,35 @@ public class ModelDiff extends ArrayList<String> {
 
     public String getModelName2() {
         return modelName2;
+    }
+
+
+    public void compareBeanProperties(ClassAccessor classAccessor,
+                                      Object bean1,
+                                      Object bean2,
+                                      String[] propertyNames) {
+        try {
+            for (String propertyName : propertyNames) {
+                PropertyAccessor propertyAccessor =
+                        classAccessor.getProperty(propertyName);
+                compareBeanProperty(bean1, bean2, propertyAccessor);
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void compareBeanProperty(Object bean1,
+                                    Object bean2,
+                                    PropertyAccessor propertyAccessor) {
+        try {
+            Object value1 = propertyAccessor.get(bean1);
+            Object value2 = propertyAccessor.get(bean2);
+            if (!ObjectUtils.equals(value1, value2)) {
+// TODO:                addDifference();
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 }
