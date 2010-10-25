@@ -321,14 +321,7 @@
                                         nullable="true"
                                         searchable="false"
                                         propertyName="creatorId"/>
-                                <column columnName="parentgroupid"
-                                        columnType="INTEGER"
-                                        javaType="java.lang.Integer"
-                                        length="19"
-                                        scale="0"
-                                        nullable="true"
-                                        searchable="false"
-                                        propertyName="parentGroupId"/>
+                                
                                 <column columnName="deldate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
