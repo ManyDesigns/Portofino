@@ -33,7 +33,7 @@ import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
 import junit.framework.TestCase;
 import org.h2.tools.RunScript;
 
-import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 
 /*
@@ -51,15 +51,14 @@ public class CommonTestUtil extends TestCase{
 
 
     //Script per h2 3 file di configurazione
-    public  static final String DIR_TEST_DB = "portofino-war/src/test/resources/database/";
-    public  static final String PETSTORE_DB_SCHEMA
-            = DIR_TEST_DB +
-            "jpetstore-postgres-schema.sql";
-    public  static final String PETSTORE_DB_DATA
-            = DIR_TEST_DB +
-            "jpetstore-postgres-dataload.sql";
-    public  static final String PORTODINO4_DB = DIR_TEST_DB + "portofino4.sql";
-    public  static final String TEST_DB = DIR_TEST_DB + "hibernatetest.sql";
+    public static final String PETSTORE_DB_SCHEMA =
+        "database/jpetstore-postgres-schema.sql";
+    public static final String PETSTORE_DB_DATA =
+            "database/jpetstore-postgres-dataload.sql";
+    public static final String PORTOFINO4_DB =
+            "database/portofino4.sql";
+    public static final String TEST_DB =
+            "database/hibernatetest.sql";
 
 
     public CommonTestUtil() {
@@ -80,10 +79,21 @@ public class CommonTestUtil extends TestCase{
             connPortofino = context.getConnectionProvider("portofino").acquireConnection();
             connPetStore = context.getConnectionProvider("jpetstore").acquireConnection();
             connDBTest = context.getConnectionProvider("hibernatetest").acquireConnection();
-            RunScript.execute(connPortofino, new FileReader(PORTODINO4_DB));
-            RunScript.execute(connPetStore, new FileReader(PETSTORE_DB_SCHEMA));
-            RunScript.execute(connPetStore, new FileReader(PETSTORE_DB_DATA));
-            RunScript.execute(connDBTest, new FileReader(TEST_DB));
+
+            ClassLoader cl = CommonTestUtil.class.getClassLoader();
+
+            RunScript.execute(connPortofino,
+                    new InputStreamReader(
+                            cl.getResourceAsStream(PORTOFINO4_DB)));
+            RunScript.execute(connPetStore,
+                    new InputStreamReader(
+                            cl.getResourceAsStream(PETSTORE_DB_SCHEMA)));
+            RunScript.execute(connPetStore,
+                    new InputStreamReader(
+                            cl.getResourceAsStream(PETSTORE_DB_DATA)));
+            RunScript.execute(connDBTest,
+                    new InputStreamReader(
+                            cl.getResourceAsStream(TEST_DB)));
         } catch (Throwable e) {
             e.printStackTrace();
         }

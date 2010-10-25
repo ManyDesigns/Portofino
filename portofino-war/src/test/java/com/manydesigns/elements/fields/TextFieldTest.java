@@ -29,7 +29,7 @@ public class TextFieldTest extends AbstractElementsTest {
     private TextField annotatedTextField;
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
 
         myText = null;

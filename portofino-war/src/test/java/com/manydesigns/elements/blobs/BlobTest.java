@@ -56,7 +56,7 @@ public class BlobTest extends AbstractElementsTest {
     String sampleContentType = "text/plain";
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
 
         manager = BlobsManager.getManager();

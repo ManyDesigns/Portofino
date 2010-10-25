@@ -30,6 +30,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.AbstractElementsTest;
+import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.annotations.FileBlob;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobsManager;
@@ -63,8 +64,14 @@ public class FileBlobFieldTest extends AbstractElementsTest {
     FileBlobField field;
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
+
+        // use plain servlet api
+        elementsProperties.setProperty(
+                ElementsProperties.WEB_FRAMEWORK_PROPERTY,
+                com.manydesigns.elements.servlet.WebFramework.class.getName());
+        setUpSingletons();
 
         manager = BlobsManager.getManager();
 

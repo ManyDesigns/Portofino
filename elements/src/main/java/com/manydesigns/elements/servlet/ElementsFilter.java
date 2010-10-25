@@ -30,11 +30,14 @@
 package com.manydesigns.elements.servlet;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.logging.LogUtil;
+import org.apache.commons.fileupload.FileUploadException;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,27 +45,64 @@ import java.io.IOException;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class ElementsFilter implements Filter {
-    FilterConfig config;
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
+
+    protected FilterConfig config;
+
+
+    //--------------------------------------------------------------------------
+    // Logging
+    //--------------------------------------------------------------------------
+
+    public final static Logger logger = LogUtil.getLogger(ElementsFilter.class);
+
     public void init(FilterConfig filterConfig) throws ServletException {
-        this.config=filterConfig;
+        this.config = filterConfig;
+        logger.info("ElementsFilter initialized");
     }
 
     public void doFilter(ServletRequest req,
                          ServletResponse res, FilterChain filterChain)
             throws IOException, ServletException {
+
+        if (req instanceof HttpServletRequest
+                && res instanceof HttpServletResponse) {
+            doHttpFilter((HttpServletRequest) req,
+                    (HttpServletResponse)res,
+                    filterChain);
+        } else {
+            filterChain.doFilter(req, res);
+        }
+    }
+
+    protected void doHttpFilter(HttpServletRequest req,
+                                HttpServletResponse res,
+                                FilterChain filterChain)
+            throws IOException, ServletException {
         ServletContext context = config.getServletContext();
+
         try {
+            MultipartRequestWrapper wrappedRequest =
+                    new MultipartRequestWrapper(req);
+
             ElementsThreadLocals.setupDefaultElementsContext();
-            
-            ElementsThreadLocals.setHttpServletRequest((HttpServletRequest) req);
-            ElementsThreadLocals.setHttpServletResponse((HttpServletResponse) res);
+
+            ElementsThreadLocals.setHttpServletRequest(wrappedRequest);
+            ElementsThreadLocals.setHttpServletResponse(res);
             ElementsThreadLocals.setServletContext(context);
 
             filterChain.doFilter(req, res);
+        } catch (FileUploadException e) {
+            LogUtil.severe(logger, "FileUploadException caught", e);
+            throw new ServletException(e);
         } finally {
             ElementsThreadLocals.removeElementsContext();
         }
     }
 
-    public void destroy() {}
+    public void destroy() {
+        logger.info("ElementsFilter destroyed");
+    }
 }

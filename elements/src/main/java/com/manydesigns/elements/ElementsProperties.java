@@ -51,7 +51,7 @@ public final class ElementsProperties {
 
     public final static String PROPERIES_RESOURCE =
             "elements.properties";
-    public final static String CUSTOM_PROPERIES_RESOURCE =
+    public final static String CUSTOM_PROPERTIES_RESOURCE =
             "elements-custom.properties";
 
 
@@ -100,12 +100,16 @@ public final class ElementsProperties {
 
     static {
         properties = new Properties();
-
-        loadProperties(PROPERIES_RESOURCE);
-        loadProperties(CUSTOM_PROPERIES_RESOURCE);
+        reloadProperties();
     }
 
-    private static void loadProperties(String resource) {
+    public static void reloadProperties() {
+        properties.clear();
+        loadProperties(PROPERIES_RESOURCE);
+        loadProperties(CUSTOM_PROPERTIES_RESOURCE);
+    }
+
+    public static void loadProperties(String resource) {
         InputStream stream = ReflectionUtil.getResourceAsStream(resource);
         if (stream == null) {
             LogUtil.infoMF(logger, "Properties resource not found: {0}",

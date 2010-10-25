@@ -47,7 +47,7 @@ public class FormBuilderTest extends AbstractElementsTest {
     public FormBuilder formBuilder3;
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
 
         formBuilder1 = new FormBuilder(AllDefaultFieldsBean.class);

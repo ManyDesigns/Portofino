@@ -17,7 +17,7 @@ public class FormTest extends AbstractElementsTest {
     private Form formWithFieldNames;
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
 
         FormBuilder builder =

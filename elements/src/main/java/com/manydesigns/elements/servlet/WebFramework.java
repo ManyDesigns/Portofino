@@ -61,7 +61,7 @@ public class WebFramework {
     //**************************************************************************
 
     protected static final Properties elementsProperties;
-    protected static final WebFramework webFramework;
+    protected static WebFramework webFramework;
 
     //**************************************************************************
     // Logging
@@ -75,6 +75,10 @@ public class WebFramework {
 
     static {
         elementsProperties = ElementsProperties.getProperties();
+        resetSingleton();
+    }
+
+    public static void resetSingleton() {
         String managerClassName =
                 elementsProperties.getProperty(
                         ElementsProperties.WEB_FRAMEWORK_PROPERTY);

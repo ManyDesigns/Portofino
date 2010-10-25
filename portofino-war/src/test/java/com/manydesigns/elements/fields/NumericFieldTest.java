@@ -23,7 +23,7 @@ public class NumericFieldTest extends AbstractElementsTest {
 
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
 
         myDecimal = null;

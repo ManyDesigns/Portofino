@@ -77,7 +77,7 @@ public class SelectFieldTest extends AbstractElementsTest {
     private SelectionModel selectionModel2;
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
 
         myText = null;

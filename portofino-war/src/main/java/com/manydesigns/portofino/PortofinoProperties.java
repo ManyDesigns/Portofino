@@ -104,12 +104,17 @@ public class PortofinoProperties {
 
     static {
         properties = new Properties();
+        reloadProperties();
+    }
+
+    public static void reloadProperties() {
+        properties.clear();
 
         loadProperties(PROPERIES_RESOURCE);
         loadProperties(CUSTOM_PROPERIES_RESOURCE);
     }
 
-    private static void loadProperties(String resource) {
+    public static void loadProperties(String resource) {
         InputStream stream = ReflectionUtil.getResourceAsStream(resource);
         if (stream == null) {
             LogUtil.infoMF(logger, "Properties resource not found: {0}",
