@@ -114,6 +114,7 @@ public class Column {
             modelAnnotation.init();
         }
     }
+
     //**************************************************************************
     // Getters/setter
     //**************************************************************************
@@ -194,11 +195,6 @@ public class Column {
         this.autoincrement = autoincrement;
     }
 
-    public String getQualifiedName() {
-        return MessageFormat.format("{0}.{1}",
-                table.getQualifiedName(), columnName);
-    }
-
     public String getName() {
         return name;
     }
@@ -219,10 +215,10 @@ public class Column {
         this.searchable = searchable;
     }
 
-    public List<ModelAnnotation> getAnnotations() {
+    public List<ModelAnnotation> getModelAnnotations() {
         return modelAnnotations;
     }
-
+    
     @Override
     public String toString() {
         return MessageFormat.format("{0} {1}({2},{3}){4}",
@@ -247,5 +243,21 @@ public class Column {
                 tableName,
                 columnName);
     }
+
+    public String getQualifiedName() {
+        return MessageFormat.format("{0}.{1}",
+                table.getQualifiedName(), columnName);
+    }
+
+    public ModelAnnotation findModelAnnotationByType(String annotationType) {
+        for (ModelAnnotation modelAnnotation : modelAnnotations) {
+            if (modelAnnotation.getType().equals(annotationType)) {
+                return modelAnnotation;
+            }
+        }
+        return null;
+    }
+
+
 
 }

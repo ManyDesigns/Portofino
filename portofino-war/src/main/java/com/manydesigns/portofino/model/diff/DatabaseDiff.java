@@ -27,44 +27,41 @@
  *
  */
 
-package com.manydesigns.portofino.actions.model;
+package com.manydesigns.portofino.model.diff;
 
-import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.diff.DiffUtil;
-import com.manydesigns.portofino.model.diff.DatabaseDiff;
 
-import java.sql.SQLException;
+import java.util.List;
+import java.util.ArrayList;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SelfTestAction extends PortofinoAction {
+public class DatabaseDiff {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public DiffUtil diff;
+    private final Database sourceDatabase;
+    private final Database targetDatabase;
+    private final List<SchemaDiff> schemaDiffs;
 
-    public String execute() throws SQLException {
-        model = context.getModel();
-        for (ConnectionProvider current : context.getConnectionProviders()) {
-            Database database =
-                    model.findDatabaseByName(current.getDatabaseName());
-            Database targetDatabase = current.readModel();
-
-            DatabaseDiff databaseComparison =
-                    DiffUtil.diff(database, targetDatabase);
-        }
-        return SUCCESS;
+    public DatabaseDiff(Database sourceDatabase, Database targetDatabase) {
+        this.sourceDatabase = sourceDatabase;
+        this.targetDatabase = targetDatabase;
+        schemaDiffs = new ArrayList<SchemaDiff>();
     }
 
-    public String sync() throws SQLException {
-        context.syncDataModel();
-        SessionMessages.addInfoMessage("In-memory model synchronized to database model");
-        return execute();
+    public Database getSourceDatabase() {
+        return sourceDatabase;
+    }
+
+    public Database getTargetDatabase() {
+        return targetDatabase;
+    }
+
+    public List<SchemaDiff> getSchemaDiffs() {
+        return schemaDiffs;
     }
 }

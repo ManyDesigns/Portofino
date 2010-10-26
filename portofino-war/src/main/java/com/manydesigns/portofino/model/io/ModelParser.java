@@ -185,7 +185,7 @@ public class ModelParser extends XmlParser {
             expectElement(PRIMARY_KEY, 1, 1, new PrimaryKeyCallback());
             expectElement(FOREIGN_KEYS, 0, 1, new ForeignKeysCallback());
 
-            currentModelAnnotations = currentTable.getAnnotations();
+            currentModelAnnotations = currentTable.getModelAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
         }
     }
@@ -223,7 +223,7 @@ public class ModelParser extends XmlParser {
 
             currentTable.getColumns().add(currentColumn);
 
-            currentModelAnnotations = currentColumn.getAnnotations();
+            currentModelAnnotations = currentColumn.getModelAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
         }
     }

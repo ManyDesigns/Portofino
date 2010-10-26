@@ -31,11 +31,13 @@ package com.manydesigns.portofino.database;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.database.platforms.AbstractDatabasePlatform;
-import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.datamodel.Schema;
-import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.model.diff.ModelDiff;
+import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.datamodel.*;
+import com.manydesigns.portofino.model.diff.DatabaseDiff;
+import com.manydesigns.portofino.model.diff.DiffUtil;
+import com.manydesigns.portofino.model.diff.MessageDiffVisitor;
 
+import java.util.List;
 import java.util.logging.Level;
 
 /*
@@ -68,32 +70,65 @@ public class JdbcMetadataReaderTest extends AbstractPortofinoTest {
     }
 
     public void testDiff() {
-        ModelDiff.logger.setLevel(Level.FINE);
-        Database database2 = new Database("pippo");
-        Schema schema2 = new Schema(database2, "PUBLIC");
-        database2.getSchemas().add(schema2);
-        Table table2 = new Table(schema2, "PRODUCT");
-        schema2.getTables().add(table2);
-        ModelDiff diff = new ModelDiff();
-        diff.diff(database, database2);
-        assertEquals(18, diff.size());
+        DiffUtil.logger.setLevel(Level.FINE);
+        Database pippoDatabase = new Database("pippo");
+        Schema publicSchema = new Schema(pippoDatabase, "PUBLIC");
+        pippoDatabase.getSchemas().add(publicSchema);
+
+        Table productTable = new Table(publicSchema, "PRODUCT");
+        publicSchema.getTables().add(productTable);
+        Column descnColumn = new Column(productTable, "DESCN", "varchar", true, false, 255, 0, true);
+        productTable.getColumns().add(descnColumn);
+        ModelAnnotation modelAnnotation1 = new ModelAnnotation(
+                com.manydesigns.elements.annotations.Label.class.getName());
+        descnColumn.getModelAnnotations().add(modelAnnotation1);
+
+        Table supplierTable = new Table(publicSchema, "SUPPLIER");
+        publicSchema.getTables().add(supplierTable);
+        PrimaryKey supplierPrimaryKey = new PrimaryKey(supplierTable, "some_pk");
+        supplierTable.setPrimaryKey(supplierPrimaryKey);
+//        Column descnColumn = new Column(productTable, "DESCN", "varchar", true, false, 255, 0, true);
+//        supplierTable.getColumns().add(descnColumn);
+
+        DatabaseDiff databaseComparison =
+                DiffUtil.diff(database, pippoDatabase);
+        assertNotNull(databaseComparison);
+
+        MessageDiffVisitor diffs = new MessageDiffVisitor();
+        diffs.visitDatabase(databaseComparison);
+        List<String> diff = diffs.getMessages();
+
+        assertEquals(28, diff.size());
         assertEquals("Database names jpetstore / pippo are different", diff.get(0));
-        assertEquals("Model 2 does not contain schema: pippo.INFORMATION_SCHEMA", diff.get(1));
-        assertEquals("Model 2 does not contain table: pippo.PUBLIC.ACCOUNT", diff.get(2));
-        assertEquals("Model 2 does not contain table: pippo.PUBLIC.BANNERDATA", diff.get(3));
-        assertEquals("Model 2 does not contain table: pippo.PUBLIC.CATEGORY", diff.get(4));
-        assertEquals("Model 2 does not contain table: pippo.PUBLIC.INVENTORY", diff.get(5));
-        assertEquals("Model 2 does not contain table: pippo.PUBLIC.ITEM", diff.get(6));
-        assertEquals("Model 2 does not contain table: pippo.PUBLIC.LINEITEM", diff.get(7));
-        assertEquals("Model 2 does not contain table: pippo.PUBLIC.ORDERS", diff.get(8));
-        assertEquals("Model 2 does not contain table: pippo.PUBLIC.ORDERSTATUS", diff.get(9));
-        assertEquals("Model 2 does not contain table: pippo.PUBLIC.PROFILE", diff.get(10));
-        assertEquals("Model 2 does not contain table: pippo.PUBLIC.SEQUENCE", diff.get(11));
-        assertEquals("Model 2 does not contain table: pippo.PUBLIC.SIGNON", diff.get(12));
-        assertEquals("Model 2 does not contain table: pippo.PUBLIC.SUPPLIER", diff.get(13));
-        assertEquals("Model 2 does not contain column: pippo.PUBLIC.PRODUCT.CATEGORY", diff.get(14));
-        assertEquals("Model 2 does not contain column: pippo.PUBLIC.PRODUCT.DESCN", diff.get(15));
-        assertEquals("Model 2 does not contain column: pippo.PUBLIC.PRODUCT.NAME", diff.get(16));
-        assertEquals("Model 2 does not contain column: pippo.PUBLIC.PRODUCT.PRODUCTID", diff.get(17));
+        assertEquals("Target does not contain schema: pippo.INFORMATION_SCHEMA", diff.get(1));
+        assertEquals("Target does not contain table: pippo.PUBLIC.ACCOUNT", diff.get(2));
+        assertEquals("Target does not contain table: pippo.PUBLIC.BANNERDATA", diff.get(3));
+        assertEquals("Target does not contain table: pippo.PUBLIC.CATEGORY", diff.get(4));
+        assertEquals("Target does not contain table: pippo.PUBLIC.INVENTORY", diff.get(5));
+        assertEquals("Target does not contain table: pippo.PUBLIC.ITEM", diff.get(6));
+        assertEquals("Target does not contain table: pippo.PUBLIC.LINEITEM", diff.get(7));
+        assertEquals("Target does not contain table: pippo.PUBLIC.ORDERS", diff.get(8));
+        assertEquals("Target does not contain table: pippo.PUBLIC.ORDERSTATUS", diff.get(9));
+
+        assertEquals("Target does not contain column: pippo.PUBLIC.PRODUCT.CATEGORY", diff.get(10));
+        assertEquals("Source column jpetstore.PUBLIC.PRODUCT.DESCN does not contain annotation of type: com.manydesigns.elements.annotations.Label", diff.get(11));
+        assertEquals("Target does not contain column: pippo.PUBLIC.PRODUCT.NAME", diff.get(12));
+        assertEquals("Target does not contain column: pippo.PUBLIC.PRODUCT.PRODUCTID", diff.get(13));
+        assertEquals("Target table pippo.PUBLIC.PRODUCT does not contain primary key: PK_PRODUCT", diff.get(14));
+
+        assertEquals("Target does not contain table: pippo.PUBLIC.PROFILE", diff.get(15));
+        assertEquals("Target does not contain table: pippo.PUBLIC.SEQUENCE", diff.get(16));
+        assertEquals("Target does not contain table: pippo.PUBLIC.SIGNON", diff.get(17));
+
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.ADDR1", diff.get(18));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.ADDR2", diff.get(19));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.CITY", diff.get(20));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.NAME", diff.get(21));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.PHONE", diff.get(22));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.STATE", diff.get(23));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.STATUS", diff.get(24));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.SUPPID", diff.get(25));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.ZIP", diff.get(26));
+        assertEquals("Primary key names PK_SUPPLIER / some_pk are different", diff.get(27));
     }
 }

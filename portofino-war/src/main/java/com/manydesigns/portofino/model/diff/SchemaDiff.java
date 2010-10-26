@@ -27,44 +27,41 @@
  *
  */
 
-package com.manydesigns.portofino.actions.model;
+package com.manydesigns.portofino.model.diff;
 
-import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.diff.DiffUtil;
-import com.manydesigns.portofino.model.diff.DatabaseDiff;
+import com.manydesigns.portofino.model.datamodel.Schema;
 
-import java.sql.SQLException;
+import java.util.List;
+import java.util.ArrayList;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SelfTestAction extends PortofinoAction {
+public class SchemaDiff {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public DiffUtil diff;
+    private final Schema sourceSchema;
+    private final Schema targetSchema;
+    private final List<TableDiff> tableDiffs;
 
-    public String execute() throws SQLException {
-        model = context.getModel();
-        for (ConnectionProvider current : context.getConnectionProviders()) {
-            Database database =
-                    model.findDatabaseByName(current.getDatabaseName());
-            Database targetDatabase = current.readModel();
-
-            DatabaseDiff databaseComparison =
-                    DiffUtil.diff(database, targetDatabase);
-        }
-        return SUCCESS;
+    public SchemaDiff(Schema sourceSchema, Schema targetSchema) {
+        this.sourceSchema = sourceSchema;
+        this.targetSchema = targetSchema;
+        tableDiffs = new ArrayList<TableDiff>();
     }
 
-    public String sync() throws SQLException {
-        context.syncDataModel();
-        SessionMessages.addInfoMessage("In-memory model synchronized to database model");
-        return execute();
+    public Schema getSourceSchema() {
+        return sourceSchema;
+    }
+
+    public Schema getTargetSchema() {
+        return targetSchema;
+    }
+
+    public List<TableDiff> getTableDiffs() {
+        return tableDiffs;
     }
 }

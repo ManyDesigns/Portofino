@@ -168,10 +168,6 @@ public class Table {
         return javaClass;
     }
 
-    public Collection<ModelAnnotation> getAnnotations() {
-        return modelAnnotations;
-    }
-
     public List<ForeignKey> getForeignKeys() {
         return foreignKeys;
     }
@@ -180,9 +176,8 @@ public class Table {
         return oneToManyRelationships;
     }
 
-    public String getQualifiedName() {
-        return MessageFormat.format("{0}.{1}",
-                schema.getQualifiedName(), tableName);
+    public Collection<ModelAnnotation> getModelAnnotations() {
+        return modelAnnotations;
     }
 
     //**************************************************************************
@@ -221,6 +216,16 @@ public class Table {
         return null;
     }
 
+    public ModelAnnotation findModelAnnotationByType(String annotationType) {
+        for (ModelAnnotation modelAnnotation : modelAnnotations) {
+            if (modelAnnotation.getType().equals(annotationType)) {
+                return modelAnnotation;
+            }
+        }
+        return null;
+    }
+
+
     //**************************************************************************
     // Overrides
     //**************************************************************************
@@ -240,4 +245,11 @@ public class Table {
         return MessageFormat.format(
                 "{0}.{1}.{2}", databaseName, schemaName, tableName);
     }
+
+    public String getQualifiedName() {
+        return MessageFormat.format("{0}.{1}",
+                schema.getQualifiedName(), tableName);
+    }
+
+    
 }
