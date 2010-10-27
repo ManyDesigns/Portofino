@@ -989,47 +989,57 @@ public class TableDataAction extends PortofinoAction
 
     public String exportSearchPdf() throws FOPException,
             IOException, TransformerException {
-        FopFactory fopFactory = FopFactory.newInstance();
+        setupTable();
 
+        SearchFormBuilder searchFormBuilder =
+                new SearchFormBuilder(tableAccessor);
+        searchForm = searchFormBuilder.build();
+        searchForm.readFromRequest(req);
+
+        Criteria criteria = new Criteria(tableAccessor);
+        searchForm.configureCriteria(criteria);
+        objects = context.getObjects(criteria);
+
+        TableFormBuilder tableFormBuilder =
+            createTableFormBuilderWithSelectionProviders()
+                            .configNRows(objects.size());
+        tableForm = tableFormBuilder.configMode(Mode.VIEW)
+                .build();
+        tableForm.readFromObject(objects);
+
+        FopFactory fopFactory = FopFactory.newInstance();
 
         FileOutputStream out = null;
         File tempPdfFile = createExportTempFile();
         try {
-
             out = new FileOutputStream(tempPdfFile);
 
             Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
 
             ClassLoader cl = getClass().getClassLoader();
             InputStream xsltStream = cl.getResourceAsStream(
-                    "templateFOP.xsl");
+                   "templateFOP.xsl");
 
             // Setup XSLT
-            TransformerFactory tFactory = TransformerFactory.newInstance();
-            Transformer transformer = tFactory.newTransformer(new StreamSource(
+            TransformerFactory Factory = TransformerFactory.newInstance();
+            Transformer transformer = Factory.newTransformer(new StreamSource(
                     xsltStream));
 
             // Set the value of a <param> in the stylesheet
             transformer.setParameter("versionParam", "2.0");
 
-
             // Setup input for XSLT transformation
             String xml = composeXml();
-            Source src = new StreamSource(xml);
-
+            Source src = new StreamSource(new StringReader(xml));
 
             // Resulting SAX events (the generated FO) must be piped through to
             // FOP
             Result res = new SAXResult(fop.getDefaultHandler());
 
-
             // Start XSLT transformation and FOP processing
             transformer.transform(src, res);
 
-
             out.flush();
-
-
         } catch (Exception e) {
             LogUtil.warning(logger, "IOException", e);
             SessionMessages.addErrorMessage(e.getMessage());
@@ -1044,7 +1054,6 @@ public class TableDataAction extends PortofinoAction
             }
         }
 
-
         inputStream = new FileInputStream(tempPdfFile);
 
         contentType = "application/pdf";
@@ -1058,7 +1067,25 @@ public class TableDataAction extends PortofinoAction
 
     public String composeXml() {
         StringBuffer sb = new StringBuffer();
+        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        sb.append("<class>");
+        sb.append("<table>" + qualifiedTableName + "</table>");
+        for (TableForm.Row row : tableForm.getRows()) {
+            for (Field field : row.getFields()) {
+                sb.append("<header>");
+                sb.append("<nameColumn>"+ field.getLabel()+"</nameColumn>");
+                sb.append("</header>");
+            }
+        }
 
+        for (TableForm.Row row : tableForm.getRows()) {
+            for (Field field : row.getFields()) {
+                sb.append("<row>");
+                sb.append("<value>"+ field.getStringValue() +"</value>");
+                sb.append("</row>");
+            }
+        }
+        sb.append("</class>");
         return sb.toString();
     }
 
