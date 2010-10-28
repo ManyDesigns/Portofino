@@ -27,41 +27,46 @@
  *
  */
 
-package com.manydesigns.portofino.model.diff;
-
-import com.manydesigns.portofino.model.datamodel.PrimaryKey;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.manydesigns.portofino.util;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PrimaryKeyDiff {
+public class Pair<T> {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final PrimaryKey sourcePrimaryKey;
-    private final PrimaryKey targetPrimaryKey;
-    private final List<PrimaryKeyColumnDiff> primaryKeyColumnDiffs;
+    public T left;
+    public T right;
 
-    public PrimaryKeyDiff(PrimaryKey sourcePrimaryKey, PrimaryKey targetPrimaryKey) {
-        this.sourcePrimaryKey = sourcePrimaryKey;
-        this.targetPrimaryKey = targetPrimaryKey;
-        primaryKeyColumnDiffs = new ArrayList<PrimaryKeyColumnDiff>();
+    public Pair(T left, T right) {
+        this.left = left;
+        this.right = right;
     }
 
-    public PrimaryKey getSourcePrimaryKey() {
-        return sourcePrimaryKey;
+    public Pair() {}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Pair that = (Pair) o;
+
+        if (left != null ? !left.equals(that.left) : that.left != null)
+            return false;
+        if (right != null ? !right.equals(that.right) : that.right != null)
+            return false;
+
+        return true;
     }
 
-    public PrimaryKey getTargetPrimaryKey() {
-        return targetPrimaryKey;
-    }
-
-    public List<PrimaryKeyColumnDiff> getPrimaryKeyColumnDiffs() {
-        return primaryKeyColumnDiffs;
+    @Override
+    public int hashCode() {
+        int result = left != null ? left.hashCode() : 0;
+        result = 31 * result + (right != null ? right.hashCode() : 0);
+        return result;
     }
 }

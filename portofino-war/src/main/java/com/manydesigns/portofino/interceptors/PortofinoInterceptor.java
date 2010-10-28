@@ -75,6 +75,10 @@ public class PortofinoInterceptor implements Interceptor {
                 (Context)servletContext.getAttribute(
                         PortofinoListener.CONTEXT_ATTRIBUTE);
 
+        if (context == null || context.getModel() == null) {
+            return "modelNotFound";
+        }
+
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
 
         String requestUrl = Util.getAbsoluteUrl(req.getServletPath());

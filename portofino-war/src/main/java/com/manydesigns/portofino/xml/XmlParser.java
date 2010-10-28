@@ -31,9 +31,8 @@ package com.manydesigns.portofino.xml;
 
 import com.manydesigns.elements.logging.LogUtil;
 
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.*;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,18 +49,18 @@ public class XmlParser {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     protected XMLStreamReader xmlStreamReader;
-    protected int _event;
-    protected String _localName;
-    protected String _text;
-    protected Map<String, String> _attributes;
-    protected Stack<String> _elementStack = new Stack<String>();
+    protected int event;
+    protected String localName;
+    protected String text;
+    protected Map<String, String> attributes;
+    protected Stack<String> elementStack = new Stack<String>();
 
     public static final Logger logger =
             LogUtil.getLogger(XmlParser.class);
 
-    public void initParser(XMLStreamReader xmlStreamReader)
-            throws XMLStreamException {
-        this.xmlStreamReader = xmlStreamReader;
+    public void initParser(InputStream inputStream) throws XMLStreamException {
+        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        xmlStreamReader = inputFactory.createXMLStreamReader(inputStream);
         next();
     }
 
@@ -69,27 +68,48 @@ public class XmlParser {
                                          String... attrNames) {
         for (String current : attrNames) {
             if (attributes.get(current) == null) {
-                throw new Error("Attribute " + current + " required");
+                throw new Error(MessageFormat.format(
+                        "Attribute ''{0}'' required. {1}",
+                        current,
+                        getLocationString()));
             }
         }
     }
 
+    public String getLocationString() {
+        StringBuilder sb = new StringBuilder();
+        Location location = xmlStreamReader.getLocation();
+        sb.append("Line ");
+        sb.append(location.getLineNumber() - 1);
+        sb.append(". Column ");
+        sb.append(location.getColumnNumber());
+        sb.append(". Element stack: ");
+        for (String current : elementStack) {
+            sb.append("/");
+            sb.append(current);
+        }
+        return sb.toString();
+    }
+
     public void next() throws XMLStreamException {
-        _event = xmlStreamReader.next();
-        switch (_event) {
+        event = xmlStreamReader.next();
+        switch (event) {
             case XMLStreamConstants.START_ELEMENT:
                 loadLocalName();
-                LogUtil.fineMF(logger, "START_ELEMENT: {0}", _localName);
+                LogUtil.fineMF(logger, "START_ELEMENT: {0}", localName);
                 loadAttributes();
-                _elementStack.push(_localName);
+                elementStack.push(localName);
                 break;
             case XMLStreamConstants.END_ELEMENT:
                 loadLocalName();
-                LogUtil.fineMF(logger, "END_ELEMENT: {0}", _localName);
-                String matchingElementName = _elementStack.pop();
-                if (!matchingElementName.equals(_localName)) {
-                    throw new Error("Open/close tags don't match: " +
-                            matchingElementName + "/" + _localName);
+                LogUtil.fineMF(logger, "END_ELEMENT: {0}", localName);
+                String matchingElementName = elementStack.pop();
+                if (!matchingElementName.equals(localName)) {
+                    throw new Error(MessageFormat.format(
+                            "Open/close tags don''t match: {0}/{1}. {1}",
+                            matchingElementName,
+                            localName,
+                            getLocationString()));
                 }
                 break;
             case XMLStreamConstants.PROCESSING_INSTRUCTION:
@@ -97,7 +117,7 @@ public class XmlParser {
                 break;
             case XMLStreamConstants.CHARACTERS:
                 loadText();
-                LogUtil.fineMF(logger, "CHARACTERS: {0}", _text);
+                LogUtil.fineMF(logger, "CHARACTERS: {0}", text);
                 break;
             case XMLStreamConstants.COMMENT:
                 LogUtil.fineMF(logger, "COMMENT");
@@ -122,7 +142,7 @@ public class XmlParser {
                 break;
             case XMLStreamConstants.CDATA:
                 loadText();
-                LogUtil.fineMF(logger, "CDATA: {0}", _text);
+                LogUtil.fineMF(logger, "CDATA: {0}", text);
                 break;
             case XMLStreamConstants.NAMESPACE:
                 LogUtil.fineMF(logger, "NAMESPACE");
@@ -138,8 +158,10 @@ public class XmlParser {
 
     public void expectDocument(DocumentCallback callback) throws XMLStreamException {
         callback.doDocument();
-        if (_event != XMLStreamConstants.END_DOCUMENT) {
-            throw new Error("Document end expected but not found");
+        if (event != XMLStreamConstants.END_DOCUMENT) {
+            throw new Error(MessageFormat.format(
+                    "Document end expected but not found. {0}",
+                    getLocationString()));
         }
     }
 
@@ -148,17 +170,19 @@ public class XmlParser {
         int counter = 0;
         while (true) {
             skipSpacesAndComments();
-            if (_event == XMLStreamConstants.START_ELEMENT
-                    && _localName.equals(elementName)) {
-                Map<String, String> callbackAttributes = _attributes;
+            if (event == XMLStreamConstants.START_ELEMENT
+                    && localName.equals(elementName)) {
+                Map<String, String> callbackAttributes = attributes;
                 next();
                 callback.doElement(callbackAttributes);
                 skipSpacesAndComments();
-                if (_event == XMLStreamConstants.END_ELEMENT
-                        && _localName.equals(elementName)) {
+                if (event == XMLStreamConstants.END_ELEMENT
+                        && localName.equals(elementName)) {
                     next();
                 } else {
-                    throw new Error("Closing tag not found for: " + elementName);
+                    throw new Error(MessageFormat.format(
+                            "Closing tag ''{0}'' not found. Found ''{1}'' instead. {2}",
+                            elementName, localName, getLocationString()));
                 }
             } else {
                 break;
@@ -167,28 +191,28 @@ public class XmlParser {
         }
         if (counter < min) {
             throw new Error(MessageFormat.format(
-                    "Element {0} expected min: {1}  actual: {2}",
-                    elementName, min, counter));
+                    "Element ''{0}'' expected min: {1}  actual: {2}. {3}",
+                    elementName, min, counter, getLocationString()));
         }
         if (max != null && counter > max) {
             throw new Error(MessageFormat.format(
-                    "Element {0} expected max: {1}  actual: {2}",
-                    elementName, max, counter));
+                    "Element ''{0}'' expected max: {1}  actual: {2}. {3}",
+                    elementName, max, counter, getLocationString()));
         }
     }
 
     protected void skipSpacesAndComments() throws XMLStreamException {
         while (true) {
-            if (_event == XMLStreamConstants.CHARACTERS
-                    && _text.trim().length() == 0) {
+            if (event == XMLStreamConstants.CHARACTERS
+                    && text.trim().length() == 0) {
                 next();
                 continue;
             }
-            if (_event == XMLStreamConstants.SPACE) {
+            if (event == XMLStreamConstants.SPACE) {
                 next();
                 continue;
             }
-            if (_event == XMLStreamConstants.COMMENT) {
+            if (event == XMLStreamConstants.COMMENT) {
                 next();
                 continue;
             }
@@ -198,8 +222,8 @@ public class XmlParser {
 
     public void expectCharacters(CharactersCallback callback)
             throws XMLStreamException {
-        if (_event == XMLStreamConstants.CHARACTERS) {
-            String callbackText = _text;
+        if (event == XMLStreamConstants.CHARACTERS) {
+            String callbackText = text;
             next();
             callback.doCharacters(callbackText);
         } else {
@@ -208,19 +232,19 @@ public class XmlParser {
     }
 
     public void loadText() {
-        _text = xmlStreamReader.getText();
+        text = xmlStreamReader.getText();
     }
 
     public void loadLocalName() {
-        _localName = xmlStreamReader.getLocalName();
+        localName = xmlStreamReader.getLocalName();
     }
 
     public void loadAttributes() {
-        _attributes = new HashMap<String, String>();
+        attributes = new HashMap<String, String>();
         for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
             String attrName = xmlStreamReader.getAttributeLocalName(i);
             String attrvalue = xmlStreamReader.getAttributeValue(i);
-            _attributes.put(attrName, attrvalue);
+            attributes.put(attrName, attrvalue);
             LogUtil.fineMF(logger, "Attribute {0} = {1}", attrName, attrvalue);
         }
     }

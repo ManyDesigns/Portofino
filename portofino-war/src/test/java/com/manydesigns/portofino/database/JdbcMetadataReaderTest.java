@@ -87,18 +87,16 @@ public class JdbcMetadataReaderTest extends AbstractPortofinoTest {
         publicSchema.getTables().add(supplierTable);
         PrimaryKey supplierPrimaryKey = new PrimaryKey(supplierTable, "some_pk");
         supplierTable.setPrimaryKey(supplierPrimaryKey);
-//        Column descnColumn = new Column(productTable, "DESCN", "varchar", true, false, 255, 0, true);
-//        supplierTable.getColumns().add(descnColumn);
 
         DatabaseDiff databaseComparison =
                 DiffUtil.diff(database, pippoDatabase);
         assertNotNull(databaseComparison);
 
         MessageDiffVisitor diffs = new MessageDiffVisitor();
-        diffs.visitDatabase(databaseComparison);
+        diffs.visitDatabaseDiff(databaseComparison);
         List<String> diff = diffs.getMessages();
 
-        assertEquals(28, diff.size());
+        assertEquals(30, diff.size());
         assertEquals("Database names jpetstore / pippo are different", diff.get(0));
         assertEquals("Target does not contain schema: pippo.INFORMATION_SCHEMA", diff.get(1));
         assertEquals("Target does not contain table: pippo.PUBLIC.ACCOUNT", diff.get(2));
@@ -115,20 +113,22 @@ public class JdbcMetadataReaderTest extends AbstractPortofinoTest {
         assertEquals("Target does not contain column: pippo.PUBLIC.PRODUCT.NAME", diff.get(12));
         assertEquals("Target does not contain column: pippo.PUBLIC.PRODUCT.PRODUCTID", diff.get(13));
         assertEquals("Target table pippo.PUBLIC.PRODUCT does not contain primary key: PK_PRODUCT", diff.get(14));
+        assertEquals("Target table pippo.PUBLIC.PRODUCT does not contain foreign key: FK_PRODUCT_1", diff.get(15));
 
-        assertEquals("Target does not contain table: pippo.PUBLIC.PROFILE", diff.get(15));
-        assertEquals("Target does not contain table: pippo.PUBLIC.SEQUENCE", diff.get(16));
-        assertEquals("Target does not contain table: pippo.PUBLIC.SIGNON", diff.get(17));
+        assertEquals("Target does not contain table: pippo.PUBLIC.PROFILE", diff.get(16));
+        assertEquals("Target does not contain table: pippo.PUBLIC.SEQUENCE", diff.get(17));
+        assertEquals("Target does not contain table: pippo.PUBLIC.SIGNON", diff.get(18));
 
-        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.ADDR1", diff.get(18));
-        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.ADDR2", diff.get(19));
-        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.CITY", diff.get(20));
-        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.NAME", diff.get(21));
-        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.PHONE", diff.get(22));
-        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.STATE", diff.get(23));
-        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.STATUS", diff.get(24));
-        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.SUPPID", diff.get(25));
-        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.ZIP", diff.get(26));
-        assertEquals("Primary key names PK_SUPPLIER / some_pk are different", diff.get(27));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.ADDR1", diff.get(19));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.ADDR2", diff.get(20));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.CITY", diff.get(21));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.NAME", diff.get(22));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.PHONE", diff.get(23));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.STATE", diff.get(24));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.STATUS", diff.get(25));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.SUPPID", diff.get(26));
+        assertEquals("Target does not contain column: pippo.PUBLIC.SUPPLIER.ZIP", diff.get(27));
+        assertEquals("Primary key names PK_SUPPLIER / some_pk are different", diff.get(28));
+        assertEquals("Target table pippo.PUBLIC.SUPPLIER primary key some_pk does not contain column: SUPPID", diff.get(29));
     }
 }

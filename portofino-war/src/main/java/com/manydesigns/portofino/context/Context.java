@@ -36,6 +36,7 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.UseCaseAccessor;
 import com.manydesigns.portofino.system.model.users.User;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.List;
 
@@ -54,7 +55,9 @@ public interface Context {
     //**************************************************************************
 
     void loadConnectionsAsResource(String resource);
-    void loadXmlModelAsResource(String resource);
+
+    void loadXmlModel(File file);
+    void saveXmlModel();
 
 
     //**************************************************************************

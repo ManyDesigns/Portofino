@@ -68,7 +68,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
@@ -641,7 +640,7 @@ public class TableDataAction extends PortofinoAction
             SelectionProvider selectionProvider =
                     createSelectionProviderForRelationship(rel);
             boolean autocomplete = false;
-            for (ModelAnnotation current : rel.getAnnotations()) {
+            for (ModelAnnotation current : rel.getModelAnnotations()) {
                 if ("com.manydesigns.elements.annotations.Autocomplete"
                         .equals(current.getType())) {
                     autocomplete = true;
@@ -665,7 +664,7 @@ public class TableDataAction extends PortofinoAction
             SelectionProvider selectionProvider =
                     createSelectionProviderForRelationship(rel);
             boolean autocomplete = false;
-            for (ModelAnnotation current : rel.getAnnotations()) {
+            for (ModelAnnotation current : rel.getModelAnnotations()) {
                 if ("com.manydesigns.elements.annotations.Autocomplete"
                         .equals(current.getType())) {
                     autocomplete = true;

@@ -30,10 +30,14 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.util.Pair;
+import com.manydesigns.elements.logging.LogUtil;
+import org.apache.commons.lang.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -57,6 +61,7 @@ public class ForeignKey {
     //**************************************************************************
     // Fields
     //**************************************************************************
+
     protected final Table fromTable;
     protected String foreignKeyName;
 
@@ -74,6 +79,11 @@ public class ForeignKey {
     protected final List<Reference> references;
     protected final List<ModelAnnotation> modelAnnotations;
 
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
+
+    public static final Logger logger = LogUtil.getLogger(ForeignKey.class);
 
     //**************************************************************************
     // Constructors and init
@@ -113,6 +123,31 @@ public class ForeignKey {
         }
     }
 
+
+    //**************************************************************************
+    // Find methods
+    //**************************************************************************
+
+    public Reference findReferenceByColumnNamePair(Pair<String> columnNamePair) {
+        for (Reference reference : references) {
+            if (ObjectUtils.equals(reference.getFromColumnName(), columnNamePair.left)
+                    && ObjectUtils.equals(reference.getToColumnName(), columnNamePair.right)) {
+                return reference;
+            }
+        }
+        return null;
+    }
+
+    public ModelAnnotation findModelAnnotationByType(String annotationType) {
+        for (ModelAnnotation modelAnnotation : modelAnnotations) {
+            if (modelAnnotation.getType().equals(annotationType)) {
+                return modelAnnotation;
+            }
+        }
+        LogUtil.fineMF(logger,
+                "Model annotation not found: {0}", annotationType);
+        return null;
+    }
 
     //**************************************************************************
     // Getters/setter
@@ -202,7 +237,7 @@ public class ForeignKey {
         this.onePropertyName = onePropertyName;
     }
 
-    public Collection<ModelAnnotation> getAnnotations() {
+    public Collection<ModelAnnotation> getModelAnnotations() {
         return modelAnnotations;
     }
 

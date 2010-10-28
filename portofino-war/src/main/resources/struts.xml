@@ -47,6 +47,7 @@
                 <param name="actionName">Login</param>
                 <param name="namespace">/user</param>  
             </result>
+            <result name="modelNotFound">/errors/model-not-found.jsp</result>
         </global-results>
     </package>
 

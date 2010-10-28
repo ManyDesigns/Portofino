@@ -5,12 +5,11 @@
 %><s:include value="/skins/default/header.jsp"/>
 <div id="inner-content">
     <h1>Self test</h1>
-    Differences between "<s:property value="diff.modelName1"/>"
-    and "<s:property value="diff.modelName2"/>":
-    <s:if test="diff.size() > 0">
+    Differences between "A" and "B":
+    <s:if test="messages.size() > 0">
         <s:form method="post">
             <table>
-                <s:iterator var="message" value="diff">
+                <s:iterator var="message" value="messages">
                     <tr><td><s:property value="#message"/></td></tr>
                 </s:iterator>
             </table>

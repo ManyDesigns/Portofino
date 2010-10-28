@@ -29,39 +29,31 @@
 
 package com.manydesigns.portofino.model.diff;
 
-import com.manydesigns.portofino.model.datamodel.PrimaryKey;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.manydesigns.portofino.model.datamodel.PrimaryKeyColumn;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PrimaryKeyDiff {
+public class PrimaryKeyColumnDiff {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final PrimaryKey sourcePrimaryKey;
-    private final PrimaryKey targetPrimaryKey;
-    private final List<PrimaryKeyColumnDiff> primaryKeyColumnDiffs;
+    private final PrimaryKeyColumn sourcePrimaryKeyColumn;
+    private final PrimaryKeyColumn targetPrimaryKeyColumn;
 
-    public PrimaryKeyDiff(PrimaryKey sourcePrimaryKey, PrimaryKey targetPrimaryKey) {
-        this.sourcePrimaryKey = sourcePrimaryKey;
-        this.targetPrimaryKey = targetPrimaryKey;
-        primaryKeyColumnDiffs = new ArrayList<PrimaryKeyColumnDiff>();
+    public PrimaryKeyColumnDiff(PrimaryKeyColumn sourcePrimaryKeyColumn,
+                                PrimaryKeyColumn targetPrimaryKeyColumn) {
+        this.sourcePrimaryKeyColumn = sourcePrimaryKeyColumn;
+        this.targetPrimaryKeyColumn = targetPrimaryKeyColumn;
     }
 
-    public PrimaryKey getSourcePrimaryKey() {
-        return sourcePrimaryKey;
+    public PrimaryKeyColumn getSourcePrimaryKeyColumn() {
+        return sourcePrimaryKeyColumn;
     }
 
-    public PrimaryKey getTargetPrimaryKey() {
-        return targetPrimaryKey;
-    }
-
-    public List<PrimaryKeyColumnDiff> getPrimaryKeyColumnDiffs() {
-        return primaryKeyColumnDiffs;
+    public PrimaryKeyColumn getTargetPrimaryKeyColumn() {
+        return targetPrimaryKeyColumn;
     }
 }

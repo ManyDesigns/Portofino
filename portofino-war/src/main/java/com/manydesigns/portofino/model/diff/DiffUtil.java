@@ -31,10 +31,8 @@ package com.manydesigns.portofino.model.diff;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
-import com.manydesigns.portofino.model.datamodel.Column;
-import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.datamodel.Schema;
-import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.datamodel.*;
+import com.manydesigns.portofino.util.Pair;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -68,9 +66,9 @@ public class DiffUtil {
         for (String schemaName : sortedSchemaNames) {
             Schema sourceSchema = findSchema(sourceDatabase, schemaName);
             Schema targetSchema = findSchema(targetDatabase, schemaName);
-            SchemaDiff schemaComparison =
+            SchemaDiff schemaDiff =
                     diff(sourceSchema, targetSchema);
-            result.getSchemaDiffs().add(schemaComparison);
+            result.getSchemaDiffs().add(schemaDiff);
         }
 
         return result;
@@ -90,9 +88,9 @@ public class DiffUtil {
         for (String tableName : sortedTableNames) {
             Table sourceTable = findTable(sourceSchema, tableName);
             Table targetTable = findTable(targetSchema, tableName);
-            TableDiff tableComparison =
+            TableDiff tableDiff =
                     diff(sourceTable, targetTable);
-            result.getTableDiffs().add(tableComparison);
+            result.getTableDiffs().add(tableDiff);
         }
 
         return result;
@@ -103,6 +101,7 @@ public class DiffUtil {
         TableDiff result =
                 new TableDiff(sourceTable, targetTable);
 
+        // diff columns
         Set<String> columnNames = new HashSet<String>();
         extractColumnNames(sourceTable, columnNames);
         extractColumnNames(targetTable, columnNames);
@@ -112,11 +111,35 @@ public class DiffUtil {
         for (String columnName : sortedColumnNames) {
             Column sourceColumn = findColumn(sourceTable, columnName);
             Column targetColumn = findColumn(targetTable, columnName);
-            ColumnDiff columnComparison =
-                    diff(sourceColumn, targetColumn);
-            result.getColumnDiffs().add(columnComparison);
+            ColumnDiff columnDiff = diff(sourceColumn, targetColumn);
+            result.getColumnDiffs().add(columnDiff);
         }
 
+        // diff primary key
+        PrimaryKeyDiff primaryKeyDiff = result.getPrimaryKeyDiff();
+        if (primaryKeyDiff != null) {
+            diff(primaryKeyDiff);
+        }
+
+        // diff foreign keys
+        Set<String> foreignKeyNames = new HashSet<String>();
+        extractForeignKeyNames(sourceTable, foreignKeyNames);
+        extractForeignKeyNames(targetTable, foreignKeyNames);
+        List<String> sortedForeignKeyNames =
+                new ArrayList<String>(foreignKeyNames);
+        Collections.sort(sortedForeignKeyNames);
+
+        for (String foreignKeyName : sortedForeignKeyNames) {
+            ForeignKey sourceForeignKey =
+                    findForeignKey(sourceTable, foreignKeyName);
+            ForeignKey targetForeignKey =
+                    findForeignKey(targetTable, foreignKeyName);
+            ForeignKeyDiff foreignKeyDiff =
+                    diff(sourceForeignKey, targetForeignKey);
+            result.getForeignKeyDiffs().add(foreignKeyDiff);
+        }
+
+        // diff table annotations
         Set<String> annotationTypes = new HashSet<String>();
         extractAnnotationTypes(sourceTable, annotationTypes);
         extractAnnotationTypes(targetTable, annotationTypes);
@@ -130,19 +153,92 @@ public class DiffUtil {
             ModelAnnotation targetModelAnnotation =
                     findModelAnnotation(sourceTable, annotationType);
 
-            ModelAnnotationDiff modelAnnotationComparison =
+            ModelAnnotationDiff modelAnnotationDiff =
                     diff(sourceModelAnnotation, targetModelAnnotation);
-            result.getModelAnnotationDiffs().add(modelAnnotationComparison);
+            result.getModelAnnotationDiffs().add(modelAnnotationDiff);
         }
 
         return result;
+    }
+
+    private static void diff(PrimaryKeyDiff primaryKeyDiff) {
+        PrimaryKey sourcePrimaryKey = primaryKeyDiff.getSourcePrimaryKey();
+        PrimaryKey targetPrimaryKey = primaryKeyDiff.getTargetPrimaryKey();
+
+        Set<String> pkColumnNames = new HashSet<String>();
+        extractPrimaryKeyColumnNames(sourcePrimaryKey, pkColumnNames);
+        extractPrimaryKeyColumnNames(targetPrimaryKey, pkColumnNames);
+        List<String> sortedPkColumnNames = new ArrayList<String>(pkColumnNames);
+        Collections.sort(sortedPkColumnNames);
+
+        for (String pkColumnName : sortedPkColumnNames) {
+            PrimaryKeyColumn sourcePkColumn =
+                    findPrimaryKeyColumn(sourcePrimaryKey, pkColumnName);
+            PrimaryKeyColumn targetPkColumn =
+                    findPrimaryKeyColumn(targetPrimaryKey, pkColumnName);
+            PrimaryKeyColumnDiff primaryKeyColumnDiff =
+                    diff(sourcePkColumn, targetPkColumn);
+            primaryKeyDiff.getPrimaryKeyColumnDiffs().add(primaryKeyColumnDiff);
+        }
+    }
+
+    public static ForeignKeyDiff diff(ForeignKey sourceForeignKey,
+                                      ForeignKey targetForeignKey) {
+        ForeignKeyDiff result =
+                new ForeignKeyDiff(sourceForeignKey, targetForeignKey);
+
+        // diff references
+        Set<Pair<String>> columnNamePairs = new HashSet<Pair<String>>();
+        extractReferencePairs(sourceForeignKey, columnNamePairs);
+        extractReferencePairs(targetForeignKey, columnNamePairs);
+
+        for (Pair<String> columnNamePair : columnNamePairs) {
+            Reference sourceReference =
+                    findReference(sourceForeignKey, columnNamePair);
+            Reference targetReference =
+                    findReference(targetForeignKey, columnNamePair);
+            ReferenceDiff referenceDiff =
+                    diff(sourceReference, targetReference);
+            result.getReferenceDiffs().add(referenceDiff);
+        }
+
+        // diff table annotations
+        Set<String> annotationTypes = new HashSet<String>();
+        extractAnnotationTypes(sourceForeignKey, annotationTypes);
+        extractAnnotationTypes(sourceForeignKey, annotationTypes);
+        List<String> sortedAnnotationTypes =
+                new ArrayList<String>(annotationTypes);
+        Collections.sort(sortedAnnotationTypes);
+
+        for (String annotationType : sortedAnnotationTypes) {
+            ModelAnnotation sourceModelAnnotation =
+                    findModelAnnotation(sourceForeignKey, annotationType);
+            ModelAnnotation targetModelAnnotation =
+                    findModelAnnotation(sourceForeignKey, annotationType);
+
+            ModelAnnotationDiff modelAnnotationDiff =
+                    diff(sourceModelAnnotation, targetModelAnnotation);
+            result.getModelAnnotationDiffs().add(modelAnnotationDiff);
+        }
+
+        return result;
+    }
+
+    private static ReferenceDiff diff(Reference sourceReference, Reference targetReference) {
+        return new ReferenceDiff(sourceReference, targetReference);
+    }
+
+    public static PrimaryKeyColumnDiff diff(PrimaryKeyColumn sourcePkColumn,
+                                             PrimaryKeyColumn targetPkColumn) {
+        return new PrimaryKeyColumnDiff(sourcePkColumn, targetPkColumn);
     }
 
     public static ColumnDiff diff(Column sourceColumn,
                                   Column targetColumn) {
         ColumnDiff result =
                 new ColumnDiff(sourceColumn, targetColumn);
-        
+
+        // diff column annotations
         Set<String> annotationTypes = new HashSet<String>();
         extractAnnotationTypes(sourceColumn, annotationTypes);
         extractAnnotationTypes(targetColumn, annotationTypes);
@@ -156,9 +252,9 @@ public class DiffUtil {
             ModelAnnotation targetModelAnnotation =
                     findModelAnnotation(targetColumn, annotationType);
 
-            ModelAnnotationDiff modelAnnotationComparison =
+            ModelAnnotationDiff modelAnnotationDiff =
                     diff(sourceModelAnnotation, targetModelAnnotation);
-            result.getModelAnnotationDiffs().add(modelAnnotationComparison);
+            result.getModelAnnotationDiffs().add(modelAnnotationDiff);
         }
 
         return result;
@@ -195,6 +291,29 @@ public class DiffUtil {
         return table.findColumnByName(columnName);
     }
 
+    public static PrimaryKeyColumn findPrimaryKeyColumn(PrimaryKey primaryKey,
+                                                        String columnName) {
+        if (primaryKey == null) {
+            return null;
+        }
+        return primaryKey.findPrimaryKeyColumnByName(columnName);
+    }
+
+    public static ForeignKey findForeignKey(Table table, String foreignKeyName) {
+        if (table == null) {
+            return null;
+        }
+        return table.findForeignKeyByName(foreignKeyName);
+    }
+
+    public static Reference findReference(ForeignKey foreignKey,
+                                          Pair<String> columnNamePair) {
+        if (foreignKey == null) {
+            return null;
+        }
+        return foreignKey.findReferenceByColumnNamePair(columnNamePair);
+    }
+
     public static ModelAnnotation findModelAnnotation(Table table,
                                                       String annotationType) {
         if (table == null) {
@@ -209,6 +328,14 @@ public class DiffUtil {
             return null;
         }
         return column.findModelAnnotationByType(annotationType);
+    }
+
+    public static ModelAnnotation findModelAnnotation(ForeignKey foreignKey,
+                                                      String annotationType) {
+        if (foreignKey == null) {
+            return null;
+        }
+        return foreignKey.findModelAnnotationByType(annotationType);
     }
 
     //--------------------------------------------------------------------------
@@ -245,6 +372,40 @@ public class DiffUtil {
         }
     }
 
+    public static void extractPrimaryKeyColumnNames(PrimaryKey primaryKey,
+                                                    Set<String> columnNames) {
+        if (primaryKey == null) {
+            return;
+        }
+        for (PrimaryKeyColumn primaryKeyColumn :
+                primaryKey.getPrimaryKeyColumns()) {
+            columnNames.add(primaryKeyColumn.getColumnName());
+        }
+    }
+
+    public static void extractForeignKeyNames(Table table,
+                                              Set<String> foreignKeyNames) {
+        if (table == null) {
+            return;
+        }
+        for (ForeignKey foreignKey : table.getForeignKeys()) {
+            foreignKeyNames.add(foreignKey.getForeignKeyName());
+        }
+    }
+
+    public static void extractReferencePairs(ForeignKey foreignKey,
+                                             Set<Pair<String>> columnNamePairs) {
+        if (foreignKey == null) {
+            return;
+        }
+        for (Reference reference : foreignKey.getReferences()) {
+            Pair<String> columnNamePair =
+                    new Pair<String>(reference.getFromColumnName(),
+                            reference.getToColumnName());
+            columnNamePairs.add(columnNamePair);
+        }
+    }
+
 
     public static void extractAnnotationTypes(Table table,
                                               Set<String> annotationTypes) {
@@ -265,4 +426,15 @@ public class DiffUtil {
             annotationTypes.add(modelAnnotation.getType());
         }
     }
+
+    public static void extractAnnotationTypes(ForeignKey foreignKey,
+                                              Set<String> annotationTypes) {
+        if (foreignKey == null) {
+            return;
+        }
+        for (ModelAnnotation modelAnnotation : foreignKey.getModelAnnotations()) {
+            annotationTypes.add(modelAnnotation.getType());
+        }
+    }
+
 }

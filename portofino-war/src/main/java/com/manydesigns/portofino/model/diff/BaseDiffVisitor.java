@@ -42,63 +42,109 @@ public class BaseDiffVisitor {
 
     public BaseDiffVisitor() {}
 
-    public void visitDatabase(DatabaseDiff databaseDiff) {
-        visitSchemas(databaseDiff.getSchemaDiffs());
+    public void visitDatabaseDiff(DatabaseDiff databaseDiff) {
+        visitSchemaDiffs(databaseDiff.getSchemaDiffs());
     }
 
-    public void visitSchemas(List<SchemaDiff> schemaDiffs) {
+    public void visitSchemaDiffs(List<SchemaDiff> schemaDiffs) {
         for (SchemaDiff schemaComparison : schemaDiffs) {
-            visitSchema(schemaComparison);
+            visitSchemaDiff(schemaComparison);
         }
     }
 
-    public void visitSchema(SchemaDiff schemaDiff) {
-        visitTables(schemaDiff.getTableDiffs());
+    public void visitSchemaDiff(SchemaDiff schemaDiff) {
+        visitTableDiffs(schemaDiff.getTableDiffs());
     }
 
-    public void visitTables(List<TableDiff> tableDiffs) {
+    public void visitTableDiffs(List<TableDiff> tableDiffs) {
         for (TableDiff tableComparison : tableDiffs) {
-            visitTable(tableComparison);
+            visitTableDiff(tableComparison);
         }
     }
 
-    public void visitTable(TableDiff tableDiff) {
-        visitTableAnnotations(tableDiff.getModelAnnotationDiffs());
-        visitColumns(tableDiff.getColumnDiffs());
-        visitPrimaryKey(tableDiff.getPrimaryKeyDiff());
+    public void visitTableDiff(TableDiff tableDiff) {
+        visitTableAnnotationDiffs(tableDiff.getModelAnnotationDiffs());
+        visitColumnDiffs(tableDiff.getColumnDiffs());
+        PrimaryKeyDiff primaryKeyDiff = tableDiff.getPrimaryKeyDiff();
+        if (primaryKeyDiff != null) {
+            visitPrimaryKeyDiff(primaryKeyDiff);
+        }
+        visitForeignKeyDiffs(tableDiff.getForeignKeyDiffs());
     }
 
-    public void visitTableAnnotations(List<ModelAnnotationDiff> modelAnnotationDiffs) {
+    public void visitTableAnnotationDiffs(List<ModelAnnotationDiff> modelAnnotationDiffs) {
         for (ModelAnnotationDiff modelAnnotationComparison :
                 modelAnnotationDiffs) {
-            visitTableAnnotations(modelAnnotationComparison);
+            visitTableAnnotationDiff(modelAnnotationComparison);
         }
     }
 
-    public void visitTableAnnotations(ModelAnnotationDiff modelAnnotationDiff) {
+    public void visitTableAnnotationDiff(ModelAnnotationDiff modelAnnotationDiff) {
     }
 
-    public void visitColumns(List<ColumnDiff> columnDiffs) {
+    public void visitColumnDiffs(List<ColumnDiff> columnDiffs) {
         for (ColumnDiff columnComparison : columnDiffs) {
-            visitColumn(columnComparison);
+            visitColumnDiff(columnComparison);
         }
     }
 
-    public void visitColumn(ColumnDiff columnDiff) {
-        visitColumnAnnotations(columnDiff.getModelAnnotationDiffs());
+    public void visitColumnDiff(ColumnDiff columnDiff) {
+        visitColumnAnnotationDiffs(columnDiff.getModelAnnotationDiffs());
     }
 
-    public void visitColumnAnnotations(List<ModelAnnotationDiff> modelAnnotationDiffs) {
+    public void visitColumnAnnotationDiffs(List<ModelAnnotationDiff> modelAnnotationDiffs) {
         for (ModelAnnotationDiff modelAnnotationComparison :
                 modelAnnotationDiffs) {
-            visitColumnAnnotations(modelAnnotationComparison);
+            visitColumnAnnotationDiff(modelAnnotationComparison);
         }
     }
 
-    public void visitColumnAnnotations(ModelAnnotationDiff modelAnnotationDiff) {
+    public void visitColumnAnnotationDiff(ModelAnnotationDiff modelAnnotationDiff) {
     }
 
-    public void visitPrimaryKey(PrimaryKeyDiff primaryKeyDiff) {
+    public void visitPrimaryKeyDiff(PrimaryKeyDiff primaryKeyDiff) {
+        visitPrimaryKeyColumnDiffs(primaryKeyDiff.getPrimaryKeyColumnDiffs());
     }
+
+    public void visitPrimaryKeyColumnDiffs(List<PrimaryKeyColumnDiff> primaryKeyColumnDiffs) {
+        for (PrimaryKeyColumnDiff primaryKeyColumnDiff :
+                primaryKeyColumnDiffs) {
+            visitPrimaryKeyColumnDiff(primaryKeyColumnDiff);
+        }
+    }
+
+    public void visitPrimaryKeyColumnDiff(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
+    }
+
+    public void visitForeignKeyDiffs(List<ForeignKeyDiff> foreignKeyDiffs) {
+        for (ForeignKeyDiff foreignKeyDiff : foreignKeyDiffs) {
+            visitForeignKeyDiff(foreignKeyDiff);
+        }
+    }
+
+    public void visitForeignKeyDiff(ForeignKeyDiff foreignKeyDiff) {
+        visitReferenceDiffs(foreignKeyDiff.getReferenceDiffs());
+        visitForeignKeyAnnotationDiffs(foreignKeyDiff.getModelAnnotationDiffs());
+    }
+
+    public void visitReferenceDiffs(List<ReferenceDiff> referenceDiffs) {
+        for (ReferenceDiff referenceDiff : referenceDiffs) {
+            visitReferenceDiff(referenceDiff);
+        }
+    }
+
+    public void visitReferenceDiff(ReferenceDiff referenceDiff) {
+    }
+
+    public void visitForeignKeyAnnotationDiffs(List<ModelAnnotationDiff> modelAnnotationDiffs) {
+        for (ModelAnnotationDiff modelAnnotationComparison :
+                modelAnnotationDiffs) {
+            visitForeignKeyAnnotationDiff(modelAnnotationComparison);
+        }
+    }
+
+    public void visitForeignKeyAnnotationDiff(ModelAnnotationDiff modelAnnotationDiff) {
+    }
+
 
 }

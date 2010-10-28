@@ -590,7 +590,7 @@ public class GroupAction extends TableDataAction{
             SelectionProvider selectionProvider =
                     createSelectionProviderForRelationship(rel);
             boolean autocomplete = false;
-            for (ModelAnnotation current : rel.getAnnotations()) {
+            for (ModelAnnotation current : rel.getModelAnnotations()) {
                 if ("com.manydesigns.elements.annotations.Autocomplete"
                         .equals(current.getType())) {
                     autocomplete = true;
@@ -614,7 +614,7 @@ public class GroupAction extends TableDataAction{
             SelectionProvider selectionProvider =
                     createSelectionProviderForRelationship(rel);
             boolean autocomplete = false;
-            for (ModelAnnotation current : rel.getAnnotations()) {
+            for (ModelAnnotation current : rel.getModelAnnotations()) {
                 if ("com.manydesigns.elements.annotations.Autocomplete"
                         .equals(current.getType())) {
                     autocomplete = true;

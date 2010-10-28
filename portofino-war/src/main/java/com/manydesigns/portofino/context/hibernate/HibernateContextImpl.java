@@ -46,6 +46,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.io.ConnectionsParser;
 import com.manydesigns.portofino.model.io.ModelParser;
+import com.manydesigns.portofino.model.io.ModelWriter;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -59,6 +60,7 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 
+import java.io.File;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.text.MessageFormat;
@@ -91,6 +93,7 @@ public class HibernateContextImpl implements Context {
     protected final ThreadLocal<StopWatch> stopWatches;
     protected final ThreadLocal<User> threadUsers;
     protected final List<SiteNode> siteNodes;
+    protected File xmlModelFile;
 
     public static final Logger logger =
             LogUtil.getLogger(HibernateContextImpl.class);
@@ -127,19 +130,30 @@ public class HibernateContextImpl implements Context {
         LogUtil.exiting(logger, "loadConnectionsAsResource");
     }
 
-    public void loadXmlModelAsResource(String resource) {
-        LogUtil.entering(logger, "loadXmlModelAsResource", resource);
+    public void loadXmlModel(File file) {
+        LogUtil.infoMF(logger, "Loading xml model from file: {0}",
+                file.getAbsolutePath());
 
         ModelParser parser = new ModelParser();
         try {
-            Model loadedModel = parser.parse(resource);
+            Model loadedModel = parser.parse(file);
             installDataModel(loadedModel);
+            xmlModelFile = file;
         } catch (Exception e) {
-            LogUtil.severeMF(logger, "Cannot load/parse model: {0}", e,
-                    resource);
+            LogUtil.severeMF(logger, "Cannot load/parse model: {0}", e, file);
         }
+    }
 
-        LogUtil.exiting(logger, "loadXmlModelAsResource");
+    public void saveXmlModel() {
+        ModelWriter modelWriter = new ModelWriter(model);
+        try {
+            modelWriter.write(xmlModelFile);
+            LogUtil.infoMF(logger,
+                    "Saved xml model to file: {0}", xmlModelFile);
+        } catch (Throwable e) {
+            LogUtil.severeMF(logger,
+                    "Cannot save xml model to file: {0}", e, xmlModelFile);
+        }
     }
 
     private synchronized void installDataModel(Model newModel) {
@@ -207,6 +221,7 @@ public class HibernateContextImpl implements Context {
         }
         syncModel.init();
         installDataModel(syncModel);
+        saveXmlModel();
     }
 
     //**************************************************************************

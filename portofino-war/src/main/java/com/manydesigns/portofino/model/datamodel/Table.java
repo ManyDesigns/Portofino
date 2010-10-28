@@ -61,14 +61,18 @@ public class Table {
     protected final List<ForeignKey> foreignKeys;
     protected final List<ModelAnnotation> modelAnnotations;
 
-    public static final Logger logger = LogUtil.getLogger(Table.class);
-
     //**************************************************************************
     // Fields for wire-up
     //**************************************************************************
 
     protected final List<ForeignKey> oneToManyRelationships;
     protected Class javaClass;
+
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
+
+    public static final Logger logger = LogUtil.getLogger(Table.class);
 
     //**************************************************************************
     // Constructors and init
@@ -222,6 +226,8 @@ public class Table {
                 return modelAnnotation;
             }
         }
+        LogUtil.fineMF(logger,
+                "Model annotation not found: {0}", annotationType);
         return null;
     }
 

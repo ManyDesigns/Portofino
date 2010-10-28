@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.model.diff;
 
-import com.manydesigns.portofino.model.datamodel.PrimaryKey;
+import com.manydesigns.portofino.model.datamodel.ForeignKey;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,29 +39,36 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PrimaryKeyDiff {
+public class ForeignKeyDiff {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final PrimaryKey sourcePrimaryKey;
-    private final PrimaryKey targetPrimaryKey;
-    private final List<PrimaryKeyColumnDiff> primaryKeyColumnDiffs;
+    private final ForeignKey sourceForeignKey;
+    private final ForeignKey targetForeignKey;
+    private final List<ReferenceDiff> referenceDiffs;
+    private final List<ModelAnnotationDiff> modelAnnotationDiffs;
 
-    public PrimaryKeyDiff(PrimaryKey sourcePrimaryKey, PrimaryKey targetPrimaryKey) {
-        this.sourcePrimaryKey = sourcePrimaryKey;
-        this.targetPrimaryKey = targetPrimaryKey;
-        primaryKeyColumnDiffs = new ArrayList<PrimaryKeyColumnDiff>();
+    public ForeignKeyDiff(ForeignKey sourceForeignKey,
+                          ForeignKey targetForeignKey) {
+        this.sourceForeignKey = sourceForeignKey;
+        this.targetForeignKey = targetForeignKey;
+        referenceDiffs = new ArrayList<ReferenceDiff>();
+        modelAnnotationDiffs = new ArrayList<ModelAnnotationDiff>();
     }
 
-    public PrimaryKey getSourcePrimaryKey() {
-        return sourcePrimaryKey;
+    public ForeignKey getSourceForeignKey() {
+        return sourceForeignKey;
     }
 
-    public PrimaryKey getTargetPrimaryKey() {
-        return targetPrimaryKey;
+    public ForeignKey getTargetForeignKey() {
+        return targetForeignKey;
     }
 
-    public List<PrimaryKeyColumnDiff> getPrimaryKeyColumnDiffs() {
-        return primaryKeyColumnDiffs;
+    public List<ReferenceDiff> getReferenceDiffs() {
+        return referenceDiffs;
+    }
+
+    public List<ModelAnnotationDiff> getModelAnnotationDiffs() {
+        return modelAnnotationDiffs;
     }
 }

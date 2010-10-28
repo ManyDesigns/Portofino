@@ -35,8 +35,10 @@ import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.diff.DiffUtil;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
+import com.manydesigns.portofino.model.diff.MessageDiffVisitor;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -47,18 +49,23 @@ public class SelfTestAction extends PortofinoAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public DiffUtil diff;
+    public List<String> messages;
 
     public String execute() throws SQLException {
+        MessageDiffVisitor visitor = new MessageDiffVisitor();
         model = context.getModel();
         for (ConnectionProvider current : context.getConnectionProviders()) {
             Database database =
                     model.findDatabaseByName(current.getDatabaseName());
             Database targetDatabase = current.readModel();
 
-            DatabaseDiff databaseComparison =
+            DatabaseDiff diff =
                     DiffUtil.diff(database, targetDatabase);
+
+            visitor.visitDatabaseDiff(diff);
+
         }
+        messages = visitor.getMessages();
         return SUCCESS;
     }
 

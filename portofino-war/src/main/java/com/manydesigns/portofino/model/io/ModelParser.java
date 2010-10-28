@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.model.io;
 
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
@@ -13,13 +14,14 @@ import com.manydesigns.portofino.xml.DocumentCallback;
 import com.manydesigns.portofino.xml.ElementCallback;
 import com.manydesigns.portofino.xml.XmlParser;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -27,57 +29,114 @@ import java.util.Map;
  * @author Paolo     Predonzani - paolo.predonzani@manydesigns.com
  */
 public class ModelParser extends XmlParser {
-    private static final String MODEL = "model";
+    public static final String copyright =
+            "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private static final String DATABASES = "databases";
+    //--------------------------------------------------------------------------
+    // Constants
+    //--------------------------------------------------------------------------
 
-    private static final String DATABASE = "database";
-    private static final String DATABASE_DATABASENAME = "databaseName";
+    public static final String MODEL = "model";
 
-    private static final String SCHEMAS = "schemas";
+    public static final String DATABASES = "databases";
 
-    private static final String SCHEMA = "schema";
-    private static final String SCHEMA_SCHEMANAME = "schemaName";
+    public static final String DATABASE = "database";
+    public static final String DATABASE_DATABASENAME = "databaseName"; // required
 
-    private static final String TABLES = "tables";
+    public static final String SCHEMAS = "schemas";
 
-    private static final String TABLE = "table";
-    private static final String TABLE_TABLENAME = "tableName";
-    private static final String TABLE_JAVACLASS = "javaClass";
-    private static final String TABLE_MANYTOMANY = "manyToMany";
+    public static final String SCHEMA = "schema";
+    public static final String SCHEMA_SCHEMANAME = "schemaName"; // required
 
-    private static final String COLUMNS = "columns";
+    public static final String TABLES = "tables";
 
-    private static final String COLUMN = "column";
-    private static final String COLUMN_COLUMNNAME = "columnName";
-    private static final String COLUMN_COLUMNTYPE = "columnType";
-    private static final String COLUMN_NULLABLE = "nullable";
-    private static final String COLUMN_PROPERTYNAME = "propertyName";
-    private static final String COLUMN_AUTOINCREMENT = "autoincrement";
-    private static final String COLUMN_LENGTH = "length";
-    private static final String COLUMN_SCALE = "scale";
+    public static final String TABLE = "table";
+    public static final String TABLE_TABLENAME = "tableName"; // required
+    public static final String TABLE_JAVACLASS = "javaClass";
+    public static final String TABLE_MANYTOMANY = "manyToMany";
 
-    private static final String PRIMARY_KEY = "primaryKey";
-    private static final String FOREIGN_KEYS = "foreignKeys";
-    private static final String FOREIGN_KEY = "foreignKey";
-    private static final String REFERENCES = "references";
-    private static final String REFERENCE = "reference";
+    public static final String COLUMNS = "columns";
 
-    private static final String SITENODES = "siteNodes";
-    private static final String SITENODE = "siteNode";
-    private static final String CHILDNODES = "childNodes";
+    public static final String COLUMN = "column";
+    public static final String COLUMN_COLUMNNAME = "columnName"; // required
+    public static final String COLUMN_COLUMNTYPE = "columnType"; // required
+    public static final String COLUMN_LENGTH = "length"; // required
+    public static final String COLUMN_SCALE = "scale"; // required
+    public static final String COLUMN_NULLABLE = "nullable"; // required
+    public static final String COLUMN_SEARCHABLE = "searchable"; // required
+    public static final String COLUMN_AUTOINCREMENT = "autoincrement"; // required
+    public static final String COLUMN_PROPERTYNAME = "propertyName";
+    public static final String COLUMN_JAVATYPE = "javaType";
 
-    private static final String PORTLETS = "portlets";
-    private static final String PORTLET = "portlet";
+    public static final String PRIMARYKEY = "primaryKey";
+    public static final String PRIMARYKEY_PRIMARYKEYNAME = "primaryKeyName"; // required
+    public static final String PRIMARYKEY_CLASSNAME = "className";
 
-    private static final String USECASES = "useCases";
-    private static final String USECASE = "useCase";
-    private static final String PROPERTIES = "properties";
-    private static final String PROPERTY = "property";
+    public static final String PRIMARYKEYCOLUMN = COLUMN;
+    public static final String PRIMARYKEYCOLUMN_COLUMNNAME = COLUMN_COLUMNNAME; // required
 
-    private static final String ANNOTATIONS = "annotations";
-    private static final String ANNOTATION = "annotation";
-    private static final String VALUE = "value";
+    public static final String FOREIGNKEYS = "foreignKeys";
+
+    public static final String FOREIGNKEY = "foreignKey";
+    public static final String FOREIGNKEY_FOREIGNKEYNAME = "foreignKeyName"; // required
+    public static final String FOREIGNKEY_TODATABASE = "toDatabase"; // required
+    public static final String FOREIGNKEY_TOSCHEMA = "toSchema"; // required
+    public static final String FOREIGNKEY_TOTABLE = "toTable"; // required
+    public static final String FOREIGNKEY_ONUPDATE = "onUpdate"; // required
+    public static final String FOREIGNKEY_ONDELETE = "onDelete"; // required
+    public static final String FOREIGNKEY_MANYPROPERTYNAME = "manyPropertyName";
+    public static final String FOREIGNKEY_ONEPROPERTYNAME = "onePropertyName";
+
+    public static final String REFERENCES = "references";
+
+    public static final String REFERENCE = "reference";
+    public static final String REFERENCE_FROMCOLUMN = "fromColumn"; // required
+    public static final String REFERENCE_TOCOLUMN = "toColumn"; // required
+
+    public static final String SITENODES = "siteNodes";
+
+    public static final String SITENODE = "siteNode";
+    public static final String SITENODE_TYPE = "type"; // required
+    public static final String SITENODE_URL = "url"; // required
+    public static final String SITENODE_TITLE = "title"; // required
+    public static final String SITENODE_DESCRIPTION = "description"; // required
+
+    public static final String CHILDNODES = "childNodes";
+
+    public static final String PORTLETS = "portlets";
+
+    public static final String PORTLET = "portlet";
+    public static final String PORTLET_NAME = "name"; // required
+    public static final String PORTLET_TYPE = "type"; // required
+    public static final String PORTLET_TITLE = "title"; // required
+    public static final String PORTLET_LEGEND = "legend"; // required
+    public static final String PORTLET_DATABASE = "database"; // required
+    public static final String PORTLET_SQL = "sql"; // required
+    public static final String PORTLET_URLEXPRESSION = "urlExpression"; // required
+
+    public static final String USECASES = "useCases";
+
+    public static final String USECASE = "useCase";
+    public static final String USECASE_NAME = "name"; // required
+    public static final String USECASE_TITLE = "title"; // required
+    public static final String USECASE_TABLE = "table"; // required
+    public static final String USECASE_FILTER = "filter"; // required
+
+    public static final String PROPERTIES = "properties";
+
+    public static final String PROPERTY = "property";
+    public static final String PROPERTY_NAME = "name"; // required
+
+    public static final String ANNOTATIONS = "annotations";
+
+    public static final String ANNOTATION = "annotation";
+    public static final String ANNOTATION_TYPE = "type"; // required
+
+    public static final String VALUE = "value";
+
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
 
     Model model;
     Database currentDatabase;
@@ -91,14 +150,37 @@ public class ModelParser extends XmlParser {
     Collection<ModelAnnotation> currentModelAnnotations;
     ModelAnnotation currentModelAnnotation;
 
+
+    //--------------------------------------------------------------------------
+    // Logging
+    //--------------------------------------------------------------------------
+
+    public final static Logger logger = LogUtil.getLogger(ModelParser.class);
+
+    //--------------------------------------------------------------------------
+    // Constructor
+    //--------------------------------------------------------------------------
+
     public ModelParser() {}
 
-    public Model parse(String fileName) throws Exception {
+    //--------------------------------------------------------------------------
+    // Parsing
+    //--------------------------------------------------------------------------
+
+    public Model parse(String resourceName) throws Exception {
+        InputStream inputStream = ReflectionUtil.getResourceAsStream(resourceName);
+        return parse(inputStream);
+    }
+
+    public Model parse(File file) throws Exception {
+        LogUtil.infoMF(logger, "Parsing file: {0}", file.getAbsolutePath());
+        InputStream input = new FileInputStream(file);
+        return parse(input);
+    }
+
+    private Model parse(InputStream inputStream) throws XMLStreamException {
         model = new Model();
-        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-        InputStream input = ReflectionUtil.getResourceAsStream(fileName);
-        XMLStreamReader xmlStreamReader = inputFactory.createXMLStreamReader(input);
-        initParser(xmlStreamReader);
+        initParser(inputStream);
         expectDocument(new ModelDocumentCallback());
         model.init();
         return model;
@@ -113,8 +195,8 @@ public class ModelParser extends XmlParser {
     private class ModelCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(DATABASES, 1, 1, new DatabasesCallback());
-            expectElement(SITENODES, 1, 1, new SiteNodesCallback());
+            expectElement(DATABASES, 0, 1, new DatabasesCallback());
+            expectElement(SITENODES, 0, 1, new SiteNodesCallback());
             expectElement(PORTLETS, 0, 1, new PortletsCallback());
             expectElement(USECASES, 0, 1, new UseCasesCallback());
         }
@@ -182,8 +264,8 @@ public class ModelParser extends XmlParser {
             currentSchema.getTables().add(currentTable);
 
             expectElement(COLUMNS, 1, 1, new ColumnsCallback());
-            expectElement(PRIMARY_KEY, 1, 1, new PrimaryKeyCallback());
-            expectElement(FOREIGN_KEYS, 0, 1, new ForeignKeysCallback());
+            expectElement(PRIMARYKEY, 0, 1, new PrimaryKeyCallback());
+            expectElement(FOREIGNKEYS, 0, 1, new ForeignKeysCallback());
 
             currentModelAnnotations = currentTable.getModelAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
@@ -202,7 +284,7 @@ public class ModelParser extends XmlParser {
                 throws XMLStreamException {
             checkRequiredAttributes(attributes,
                     COLUMN_COLUMNNAME, COLUMN_COLUMNTYPE, COLUMN_LENGTH, COLUMN_SCALE,
-                    COLUMN_NULLABLE, "searchable");//, COLUMN_AUTOINCREMENT);
+                    COLUMN_NULLABLE, COLUMN_SEARCHABLE, COLUMN_AUTOINCREMENT);
             String columnName = attributes.get(COLUMN_COLUMNNAME);
             currentColumn = new Column(currentTable,
                     columnName,
@@ -211,14 +293,13 @@ public class ModelParser extends XmlParser {
                     Boolean.parseBoolean(attributes.get(COLUMN_AUTOINCREMENT)),
                     Integer.parseInt(attributes.get(COLUMN_LENGTH)),
                     Integer.parseInt(attributes.get(COLUMN_SCALE)),
-                    Boolean.parseBoolean(attributes.get("searchable"))
+                    Boolean.parseBoolean(attributes.get(COLUMN_SEARCHABLE))
                     );
 
             String propertyName = attributes.get(COLUMN_PROPERTYNAME);
             currentColumn.setPropertyName(propertyName);
 
-            String javaTypeName = attributes.get("javaType");
-            
+            String javaTypeName = attributes.get(COLUMN_JAVATYPE);
             currentColumn.setJavaTypeName(javaTypeName);
 
             currentTable.getColumns().add(currentColumn);
@@ -231,20 +312,20 @@ public class ModelParser extends XmlParser {
     private class PrimaryKeyCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            checkRequiredAttributes(attributes, "primaryKeyName");
-            currentPk = new PrimaryKey(currentTable, attributes.get("primaryKeyName"));
+            checkRequiredAttributes(attributes, PRIMARYKEY_PRIMARYKEYNAME);
+            currentPk = new PrimaryKey(currentTable, attributes.get(PRIMARYKEY_PRIMARYKEYNAME));
             currentTable.setPrimaryKey(currentPk);
-            currentPk.setClassName(attributes.get("className"));
+            currentPk.setClassName(attributes.get(PRIMARYKEY_CLASSNAME));
 
-            expectElement(COLUMN, 1, null, new PrimaryKeyColumnCallback());
+            expectElement(PRIMARYKEYCOLUMN, 1, null, new PrimaryKeyColumnCallback());
         }
     }
 
     private class PrimaryKeyColumnCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            checkRequiredAttributes(attributes, "columnName");
-            String columnName = attributes.get("columnName");
+            checkRequiredAttributes(attributes, PRIMARYKEYCOLUMN_COLUMNNAME);
+            String columnName = attributes.get(PRIMARYKEYCOLUMN_COLUMNNAME);
             PrimaryKeyColumn pkColumn =
                     new PrimaryKeyColumn(currentPk, columnName);
             currentPk.getPrimaryKeyColumns().add(pkColumn);
@@ -254,7 +335,7 @@ public class ModelParser extends XmlParser {
     private class ForeignKeysCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(FOREIGN_KEY, 1, null, new ForeignKeyCallback());
+            expectElement(FOREIGNKEY, 1, null, new ForeignKeyCallback());
         }
     }
 
@@ -262,23 +343,25 @@ public class ModelParser extends XmlParser {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             checkRequiredAttributes(attributes,
-                    "foreignKeyName", "toDatabase", "toSchema", "toTable", "onUpdate", "onDelete");
+                    FOREIGNKEY_FOREIGNKEYNAME, FOREIGNKEY_TODATABASE,
+                    FOREIGNKEY_TOSCHEMA, FOREIGNKEY_TOTABLE,
+                    FOREIGNKEY_ONUPDATE, FOREIGNKEY_ONDELETE);
             currentFk = new ForeignKey(
                     currentTable,
-                    attributes.get("foreignKeyName"),
-                    attributes.get("toDatabase"),
-                    attributes.get("toSchema"),
-                    attributes.get("toTable"),
-                    attributes.get("onUpdate"),
-                    attributes.get("onDelete"));
+                    attributes.get(FOREIGNKEY_FOREIGNKEYNAME),
+                    attributes.get(FOREIGNKEY_TODATABASE),
+                    attributes.get(FOREIGNKEY_TOSCHEMA),
+                    attributes.get(FOREIGNKEY_TOTABLE),
+                    attributes.get(FOREIGNKEY_ONUPDATE),
+                    attributes.get(FOREIGNKEY_ONDELETE));
             
-            String manyPropertyName = attributes.get("manyPropertyName");
+            String manyPropertyName = attributes.get(FOREIGNKEY_MANYPROPERTYNAME);
             if (manyPropertyName == null) {
                 manyPropertyName = currentFk.getForeignKeyName();
             }
             currentFk.setManyPropertyName(manyPropertyName);
 
-            String onePropertyName = attributes.get("onePropertyName");
+            String onePropertyName = attributes.get(FOREIGNKEY_ONEPROPERTYNAME);
             if (onePropertyName == null) {
                 onePropertyName = currentFk.getForeignKeyName();
             }
@@ -287,7 +370,7 @@ public class ModelParser extends XmlParser {
 
             expectElement(REFERENCES, 1, 1, new ReferencesCallback());
 
-            currentModelAnnotations = currentFk.getAnnotations();
+            currentModelAnnotations = currentFk.getModelAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
         }
     }
@@ -303,10 +386,10 @@ public class ModelParser extends XmlParser {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             checkRequiredAttributes(attributes,
-                                "fromColumn", "toColumn");
+                    REFERENCE_FROMCOLUMN, REFERENCE_TOCOLUMN);
             Reference reference = new Reference(currentFk,
-                    attributes.get("fromColumn"),
-                    attributes.get("toColumn"));
+                    attributes.get(REFERENCE_FROMCOLUMN),
+                    attributes.get(REFERENCE_TOCOLUMN));
             currentFk.getReferences().add(reference);
         }
     }
@@ -333,14 +416,12 @@ public class ModelParser extends XmlParser {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             checkRequiredAttributes(attributes,
-                    "url", "title", "description");
-            String type = attributes.get("type");
-            if (type == null) {
-                type = "simple";
-            }
-            String url = attributes.get("url");
-            String title = attributes.get("title");
-            String description = attributes.get("description");
+                    SITENODE_TYPE, SITENODE_URL,
+                    SITENODE_TITLE, SITENODE_DESCRIPTION);
+            String type = attributes.get(SITENODE_TYPE);
+            String url = attributes.get(SITENODE_URL);
+            String title = attributes.get(SITENODE_TITLE);
+            String description = attributes.get(SITENODE_DESCRIPTION);
             SiteNode currentSiteNode =
                     new SiteNode(type, url, title, description);
             parentNodes.add(currentSiteNode);
@@ -378,15 +459,16 @@ public class ModelParser extends XmlParser {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             checkRequiredAttributes(attributes,
-                    "name", "type", "title", "legend", "database",
-                    "sql", "urlExpression");
-            String name = attributes.get("name");
-            String type = attributes.get("type");
-            String title = attributes.get("title");
-            String legend = attributes.get("legend");
-            String database = attributes.get("database");
-            String sql = attributes.get("sql");
-            String urlExpression = attributes.get("urlExpression");
+                    PORTLET_NAME, PORTLET_TYPE,
+                    PORTLET_TITLE, PORTLET_LEGEND, PORTLET_DATABASE,
+                    PORTLET_SQL, PORTLET_URLEXPRESSION);
+            String name = attributes.get(PORTLET_NAME);
+            String type = attributes.get(PORTLET_TYPE);
+            String title = attributes.get(PORTLET_TITLE);
+            String legend = attributes.get(PORTLET_LEGEND);
+            String database = attributes.get(PORTLET_DATABASE);
+            String sql = attributes.get(PORTLET_SQL);
+            String urlExpression = attributes.get(PORTLET_URLEXPRESSION);
             Portlet portlet =
                     new Portlet(name, type, title, legend, database,
                             sql, urlExpression);
@@ -411,11 +493,11 @@ public class ModelParser extends XmlParser {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             checkRequiredAttributes(attributes,
-                    "name", "title", "table", "filter");
-            String name = attributes.get("name");
-            String title = attributes.get("title");
-            String tableName = attributes.get("table");
-            String filter = attributes.get("filter");
+                    USECASE_NAME, USECASE_TITLE, USECASE_TABLE, USECASE_FILTER);
+            String name = attributes.get(USECASE_NAME);
+            String title = attributes.get(USECASE_TITLE);
+            String tableName = attributes.get(USECASE_TABLE);
+            String filter = attributes.get(USECASE_FILTER);
             currentUseCase = new UseCase(name, title, tableName, filter);
             Table table = model.findTableByQualifiedName(tableName);
             currentUseCase.setTable(table);
@@ -437,8 +519,8 @@ public class ModelParser extends XmlParser {
     private class PropertyCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            checkRequiredAttributes(attributes, "name");
-            String name = attributes.get("name");
+            checkRequiredAttributes(attributes, PROPERTY_NAME);
+            String name = attributes.get(PROPERTY_NAME);
             UseCaseProperty useCaseProperty = new UseCaseProperty(name);
             currentUseCase.getProperties().add(useCaseProperty);
 
@@ -457,8 +539,8 @@ public class ModelParser extends XmlParser {
     private class AnnotationCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            checkRequiredAttributes(attributes, "type");
-            String type = attributes.get("type");
+            checkRequiredAttributes(attributes, ANNOTATION_TYPE);
+            String type = attributes.get(ANNOTATION_TYPE);
             currentModelAnnotation = new ModelAnnotation(type);
             currentModelAnnotations.add(currentModelAnnotation);
             expectElement(VALUE, 0, null, new AnnotationValueCallback());

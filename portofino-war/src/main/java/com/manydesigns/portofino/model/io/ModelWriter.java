@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model.io;
 
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.*;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -38,6 +39,7 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 /*
@@ -48,188 +50,209 @@ import java.util.List;
 
 public class ModelWriter {
     public final Model model;
+    protected XMLStreamWriter w = null;
 
     public ModelWriter(Model model) {
         this.model = model;
     }
 
     public String write(File file) throws IOException {
-        if(file==null) {
-            file = File.createTempFile("portofino-model", ".xml");
-        }
         XMLOutputFactory f = XMLOutputFactory.newInstance();
-        XMLStreamWriter w = null;
 
         try {
-
             //Istanzio il Writer a partire da un FileWiter
-            w = f.createXMLStreamWriter(new FileWriter(file));
+            w = new IndentingXMLStreamWriter(f.createXMLStreamWriter(new FileWriter(file)));
             //Inizio il documento XML
             w.writeStartDocument();
     
-            //Ritorni a capo nel documento finale
-            w.writeCharacters("\n");
-           
-            w.writeStartElement( "model");
-            w.writeCharacters("\n");
-            w.writeStartElement( "databases");
+            w.writeStartElement(ModelParser.MODEL);
+            w.writeStartElement(ModelParser.DATABASES);
             for (Database database :model.getDatabases()){
-                visit (w, database);
+                visit (database);
             }
             w.writeEndElement(); // databases
             w.writeEndElement(); // model
     
             // Chiudo il documento
             w.writeEndDocument();
+            w.flush();
         }catch (Exception e) {
             
             e.printStackTrace();
         } finally {
-    
-            //Concludo la scrittura
-            try {
-                w.close();
-            } catch (XMLStreamException e) {
-                //do nothing
+
+            if (w != null) {
+                //Concludo la scrittura
+                try {
+                    w.close();
+                } catch (XMLStreamException e) {
+                    //do nothing
+                }
             }
         }
 
         return file.getAbsolutePath();
     }
 
-    private void visit(XMLStreamWriter w, Database database) throws XMLStreamException {
-        w.writeStartElement("database");
-        w.writeAttribute("name", database.getDatabaseName());
-        w.writeCharacters("\n");
-        w.writeStartElement( "schemas");
-        w.writeCharacters("\n");
+    private void visit(Database database) throws XMLStreamException {
+        w.writeStartElement(ModelParser.DATABASE);
+        w.writeAttribute(ModelParser.DATABASE_DATABASENAME, database.getDatabaseName());
+        w.writeStartElement(ModelParser.SCHEMAS);
         for (Schema schema : database.getSchemas()){
-            visit (w, schema);
+            visit (schema);
         }
-        w.writeCharacters("\n");
         w.writeEndElement();//schemas
-        w.writeCharacters("\n");
         w.writeEndElement();//database
     }
 
-    private void visit(XMLStreamWriter w, Schema schema) throws XMLStreamException {
-        w.writeStartElement( "schema");
-        w.writeAttribute("name", schema.getSchemaName());
-        w.writeCharacters("\n");
-        w.writeStartElement( "tables");
-        w.writeCharacters("\n");
+    private void visit(Schema schema) throws XMLStreamException {
+        w.writeStartElement(ModelParser.SCHEMA);
+        w.writeAttribute(ModelParser.SCHEMA_SCHEMANAME, schema.getSchemaName());
+        w.writeStartElement(ModelParser.TABLES);
         for (Table table : schema.getTables()){
-            visit (w, table);
+            visit (table);
         }
-        w.writeCharacters("\n");//tables
         w.writeEndElement();
-        w.writeCharacters("\n");
         w.writeEndElement();//schema
     }
 
-    private void visit(XMLStreamWriter w, Table table) throws XMLStreamException {
-        w.writeStartElement( "table");
-        w.writeAttribute("name", table.getTableName());
-        w.writeCharacters("\n");
-        w.writeStartElement( "columns");
-        w.writeCharacters("\n");
+    private void visit(Table table) throws XMLStreamException {
+        w.writeStartElement(ModelParser.TABLE);
+        w.writeAttribute(ModelParser.TABLE_TABLENAME, table.getTableName());
+        writeOptionalAttribute(ModelParser.TABLE_JAVACLASS, table.getJavaClassName());
+        w.writeAttribute(ModelParser.TABLE_MANYTOMANY, Boolean.toString(table.isM2m()));
+        w.writeStartElement(ModelParser.COLUMNS);
         for (Column column : table.getColumns()){
-            visit (w, column);
+            visit (column);
         }
-        w.writeCharacters("\n");//columns
         w.writeEndElement();
 
         //PrimaryKey
-        visit (w, table.getPrimaryKey());
+        visit (table.getPrimaryKey());
 
         //Relationships
-        visit (w, table.getForeignKeys());
+        visit (table.getForeignKeys());
 
-        w.writeCharacters("\n");
-        w.writeEndElement();//table
+        // Annotations
+        visitAnnotations(table.getModelAnnotations());
+
+        w.writeEndElement(); //table
     }
 
-    private void visit(XMLStreamWriter w, Column column) throws XMLStreamException {
-        w.writeStartElement( "column");
-        w.writeAttribute("name", column.getColumnName());
-        w.writeAttribute("columnType", column.getColumnType());
-
-        if (column.getJavaType()!=null) {
-            w.writeAttribute("javaType", column.getJavaType().getCanonicalName());
-        }
-        if (column.getPropertyName()!=null) {
-            w.writeAttribute("propertyName", column.getPropertyName());
-        }
-        w.writeAttribute("length", Integer.toString(column.getLength()));
-        w.writeAttribute("scale", Integer.toString(column.getScale()));
-        w.writeAttribute("nullable", Boolean.toString(column.isNullable()));
-        w.writeEndElement();//column
-        w.writeCharacters("\n");
-    }
-
-
-
-    private void visit(XMLStreamWriter w, PrimaryKey primaryKey)
+    private void writeOptionalAttribute(String localName, String optionalValue)
             throws XMLStreamException {
-        w.writeStartElement( "primarykey");
-        w.writeAttribute("name", primaryKey.getPrimaryKeyName());
-        w.writeCharacters("\n");
+        if (optionalValue != null) {
+            w.writeAttribute(localName, optionalValue);
+        }
+    }
+
+    private void visit(Column column) throws XMLStreamException {
+        Collection<ModelAnnotation> modelAnnotations = column.getModelAnnotations();
+        if (modelAnnotations.isEmpty()) {
+            w.writeEmptyElement(ModelParser.COLUMN);
+            writeColumnAttributes(column);
+        } else {
+            w.writeStartElement(ModelParser.COLUMN);
+            writeColumnAttributes(column);
+            visitAnnotations(modelAnnotations);
+            w.writeEndElement(); //column
+        }
+    }
+
+    private void writeColumnAttributes(Column column) throws XMLStreamException {
+        w.writeAttribute(ModelParser.COLUMN_COLUMNNAME, column.getColumnName());
+        w.writeAttribute(ModelParser.COLUMN_COLUMNTYPE, column.getColumnType());
+        w.writeAttribute(ModelParser.COLUMN_LENGTH, Integer.toString(column.getLength()));
+        w.writeAttribute(ModelParser.COLUMN_SCALE, Integer.toString(column.getScale()));
+        w.writeAttribute(ModelParser.COLUMN_NULLABLE, Boolean.toString(column.isNullable()));
+        w.writeAttribute(ModelParser.COLUMN_SEARCHABLE, Boolean.toString(column.isSearchable()));
+        w.writeAttribute(ModelParser.COLUMN_AUTOINCREMENT, Boolean.toString(column.isAutoincrement()));
+        writeOptionalAttribute(ModelParser.COLUMN_PROPERTYNAME, column.getPropertyName());
+        writeOptionalAttribute(ModelParser.COLUMN_JAVATYPE, column.getJavaTypeName());
+    }
+
+    private void visitAnnotations(Collection<ModelAnnotation> modelAnnotations)
+            throws XMLStreamException {
+        if (!modelAnnotations.isEmpty()) {
+            w.writeStartElement(ModelParser.ANNOTATIONS);
+            for (ModelAnnotation modelAnnotation : modelAnnotations){
+                visit (modelAnnotation);
+            }
+            w.writeEndElement(); // annotations
+        }
+    }
+
+    private void visit(ModelAnnotation modelAnnotation) throws XMLStreamException {
+        List<String> values= modelAnnotation.getValues();
+        if (values.isEmpty()) {
+            w.writeEmptyElement(ModelParser.ANNOTATION);
+            w.writeAttribute(ModelParser.ANNOTATION_TYPE, modelAnnotation.getType());
+        } else {
+            w.writeStartElement(ModelParser.ANNOTATION);
+            w.writeAttribute(ModelParser.ANNOTATION_TYPE, modelAnnotation.getType());
+            for (String value : values) {
+                if (value == null) {
+                    w.writeEmptyElement(ModelParser.VALUE);                    
+                } else {
+                    w.writeStartElement(ModelParser.VALUE);
+                    w.writeCharacters(value);
+                    w.writeEndElement(); // value
+                }
+            }
+            w.writeEndElement(); // annotation
+        }
+    }
+
+
+    private void visit(PrimaryKey primaryKey)
+            throws XMLStreamException {
+        if (primaryKey == null) {
+            return;
+        }
+        w.writeStartElement(ModelParser.PRIMARYKEY);
+        w.writeAttribute(ModelParser.PRIMARYKEY_PRIMARYKEYNAME,
+                primaryKey.getPrimaryKeyName());
 
         for (PrimaryKeyColumn column : primaryKey.getPrimaryKeyColumns()){
-            w.writeStartElement( "column");
-            w.writeAttribute("name", column.getColumnName());
-            w.writeEndElement();
-            w.writeCharacters("\n");
-
+            w.writeEmptyElement(ModelParser.COLUMN);
+            w.writeAttribute(ModelParser.COLUMN_COLUMNNAME, column.getColumnName());
         }
         w.writeEndElement();//primaryKey
-        w.writeCharacters("\n");
     }
 
 
-    private void visit(XMLStreamWriter w, List<ForeignKey> manyToOneRelationships)
+    private void visit(List<ForeignKey> foreignKeys)
             throws XMLStreamException {
-        if (manyToOneRelationships.isEmpty())
+        if (foreignKeys.isEmpty())
             return;
 
+        w.writeStartElement(ModelParser.FOREIGNKEYS);
 
-        w.writeStartElement( "relationships");
-        w.writeCharacters("\n");
-
-        for(ForeignKey rel : manyToOneRelationships) {
-            w.writeStartElement( "relationship");
-            w.writeAttribute("name", rel.getForeignKeyName());
-            w.writeAttribute("toTable", rel.getToTableName());
-            w.writeAttribute("toSchema", rel.getToSchemaName());
-            w.writeAttribute("onDelete", rel.getOnDelete());
-            w.writeAttribute("onUpdate", rel.getOnUpdate());
-            w.writeCharacters("\n");
-            for (Reference ref : rel.getReferences()){
-                w.writeStartElement( "reference");
-                w.writeAttribute("fromColumn", ref.getFromColumnName());
-                w.writeAttribute("toColumn", ref.getToColumnName());
-                w.writeEndElement();//reference
-                w.writeCharacters("\n");
-            }
-            w.writeEndElement();//relationship
-
+        for(ForeignKey rel : foreignKeys) {
+            visit(rel);
         }
 
 
-        w.writeEndElement();//relationships
-        w.writeCharacters("\n");
+        w.writeEndElement(); // foreign keys
     }
 
-
-    public static void main(String[] args){
-        try {
-            ModelParser parser = new ModelParser();
-             Model model = parser.parse(
-                    "databases/jpetstore/postgresql/jpetstore-postgres.xml");
-            ModelWriter writer = new ModelWriter(model);
-            System.out.println(writer.write(null));
-        } catch (Throwable e) {
-
+    private void visit(ForeignKey rel) throws XMLStreamException {
+        w.writeStartElement(ModelParser.FOREIGNKEY);
+        w.writeAttribute(ModelParser.FOREIGNKEY_FOREIGNKEYNAME, rel.getForeignKeyName());
+        w.writeAttribute(ModelParser.FOREIGNKEY_TODATABASE, rel.getToDatabaseName());
+        w.writeAttribute(ModelParser.FOREIGNKEY_TOSCHEMA, rel.getToSchemaName());
+        w.writeAttribute(ModelParser.FOREIGNKEY_TOTABLE, rel.getToTableName());
+        w.writeAttribute(ModelParser.FOREIGNKEY_ONDELETE, rel.getOnDelete());
+        w.writeAttribute(ModelParser.FOREIGNKEY_ONUPDATE, rel.getOnUpdate());
+        w.writeStartElement(ModelParser.REFERENCES);
+        for (Reference ref : rel.getReferences()){
+            w.writeEmptyElement(ModelParser.REFERENCE);
+            w.writeAttribute(ModelParser.REFERENCE_FROMCOLUMN, ref.getFromColumnName());
+            w.writeAttribute(ModelParser.REFERENCE_TOCOLUMN, ref.getToColumnName());
         }
+        w.writeEndElement(); // references
+        // Annotations
+        visitAnnotations(rel.getModelAnnotations());
+        w.writeEndElement(); // foreign key
     }
 }

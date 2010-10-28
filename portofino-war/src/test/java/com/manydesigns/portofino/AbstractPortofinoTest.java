@@ -29,11 +29,13 @@
 package com.manydesigns.portofino;
 
 import com.manydesigns.elements.AbstractElementsTest;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
+import org.apache.commons.io.IOUtils;
 import org.h2.tools.RunScript;
 
-import java.io.InputStreamReader;
+import java.io.*;
 import java.sql.Connection;
 
 /*
@@ -48,6 +50,10 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     public Connection connPortofino;
     public Connection connDBTest;
     public Context context = null;
+    public File xmlModelFile;
+
+    public static final String PORTOFINO_MODEL_RESOURCE =
+            "database/portofino-model.xml";
 
     //Script per h2 3 file di configurazione
     public static final String PETSTORE_DB_SCHEMA =
@@ -66,8 +72,16 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
         context = new HibernateContextImpl();
         context.loadConnectionsAsResource("database/portofino-connections.xml");
-        context.loadXmlModelAsResource(
-                "database/portofino-model.xml");
+
+        // copy portofino-model from classpath resource to temp file
+        InputStream is =
+                ReflectionUtil.getResourceAsStream(PORTOFINO_MODEL_RESOURCE);
+        xmlModelFile = File.createTempFile("portofino-model-", ".xml");
+        Writer writer = new FileWriter(xmlModelFile);
+        IOUtils.copy(is, writer);
+        IOUtils.closeQuietly(writer);
+        context.loadXmlModel(xmlModelFile);
+
         connPortofino = context.getConnectionProvider("portofino").acquireConnection();
         connPetStore = context.getConnectionProvider("jpetstore").acquireConnection();
         connDBTest = context.getConnectionProvider("hibernatetest").acquireConnection();

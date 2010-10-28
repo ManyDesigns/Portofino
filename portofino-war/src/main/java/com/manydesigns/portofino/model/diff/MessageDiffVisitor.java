@@ -63,6 +63,15 @@ public class MessageDiffVisitor extends BaseDiffVisitor {
     protected PrimaryKey sourcePrimaryKey;
     protected PrimaryKey targetPrimaryKey;
 
+    protected PrimaryKeyColumn sourcePrimaryKeyColumn;
+    protected PrimaryKeyColumn targetPrimaryKeyColumn;
+
+    protected ForeignKey sourceForeignKey;
+    protected ForeignKey targetForeignKey;
+
+    protected Reference sourceReference;
+    protected Reference targetReference;
+
     protected ModelAnnotation sourceModelAnnotation;
     protected ModelAnnotation targetModelAnnotation;
 
@@ -72,7 +81,7 @@ public class MessageDiffVisitor extends BaseDiffVisitor {
     }
 
     @Override
-    public void visitDatabase(DatabaseDiff databaseDiff) {
+    public void visitDatabaseDiff(DatabaseDiff databaseDiff) {
         sourceDatabase = databaseDiff.getSourceDatabase();
         targetDatabase = databaseDiff.getTargetDatabase();
 
@@ -96,12 +105,12 @@ public class MessageDiffVisitor extends BaseDiffVisitor {
                 messages.add(difference);
             }
 
-            super.visitDatabase(databaseDiff);
+            super.visitDatabaseDiff(databaseDiff);
         }
     }
 
     @Override
-    public void visitSchema(SchemaDiff schemaDiff) {
+    public void visitSchemaDiff(SchemaDiff schemaDiff) {
         sourceSchema = schemaDiff.getSourceSchema();
         targetSchema = schemaDiff.getTargetSchema();
 
@@ -127,12 +136,12 @@ public class MessageDiffVisitor extends BaseDiffVisitor {
                 messages.add(difference);
             }
 
-            super.visitSchema(schemaDiff);
+            super.visitSchemaDiff(schemaDiff);
         }
     }
 
     @Override
-    public void visitTable(TableDiff tableDiff) {
+    public void visitTableDiff(TableDiff tableDiff) {
         sourceTable = tableDiff.getSourceTable();
         targetTable = tableDiff.getTargetTable();
 
@@ -158,12 +167,12 @@ public class MessageDiffVisitor extends BaseDiffVisitor {
                 messages.add(difference);
             }
 
-            super.visitTable(tableDiff);
+            super.visitTableDiff(tableDiff);
         }
     }
 
     @Override
-    public void visitTableAnnotations(ModelAnnotationDiff modelAnnotationDiff) {
+    public void visitTableAnnotationDiff(ModelAnnotationDiff modelAnnotationDiff) {
         sourceModelAnnotation =
                 modelAnnotationDiff.getSourceModelAnnotation();
         targetModelAnnotation =
@@ -191,12 +200,12 @@ public class MessageDiffVisitor extends BaseDiffVisitor {
                 messages.add(difference);
             }
 
-            super.visitTableAnnotations(modelAnnotationDiff);
+            super.visitTableAnnotationDiff(modelAnnotationDiff);
         }
     }
 
     @Override
-    public void visitColumn(ColumnDiff columnDiff) {
+    public void visitColumnDiff(ColumnDiff columnDiff) {
         sourceColumn = columnDiff.getSourceColumn();
         targetColumn = columnDiff.getTargetColumn();
 
@@ -222,12 +231,12 @@ public class MessageDiffVisitor extends BaseDiffVisitor {
                 messages.add(difference);
             }
 
-            super.visitColumn(columnDiff);
+            super.visitColumnDiff(columnDiff);
         }
     }
 
     @Override
-    public void visitColumnAnnotations(ModelAnnotationDiff modelAnnotationDiff) {
+    public void visitColumnAnnotationDiff(ModelAnnotationDiff modelAnnotationDiff) {
         sourceModelAnnotation =
                 modelAnnotationDiff.getSourceModelAnnotation();
         targetModelAnnotation =
@@ -255,12 +264,12 @@ public class MessageDiffVisitor extends BaseDiffVisitor {
                 messages.add(difference);
             }
 
-            super.visitTableAnnotations(modelAnnotationDiff);
+            super.visitColumnAnnotationDiff(modelAnnotationDiff);
         }
     }
 
     @Override
-    public void visitPrimaryKey(PrimaryKeyDiff primaryKeyDiff) {
+    public void visitPrimaryKeyDiff(PrimaryKeyDiff primaryKeyDiff) {
         sourcePrimaryKey = primaryKeyDiff.getSourcePrimaryKey();
         targetPrimaryKey = primaryKeyDiff.getTargetPrimaryKey();
 
@@ -286,11 +295,157 @@ public class MessageDiffVisitor extends BaseDiffVisitor {
                 messages.add(difference);
             }
 
-            super.visitPrimaryKey(primaryKeyDiff);
+            super.visitPrimaryKeyDiff(primaryKeyDiff);
         }
     }
 
+    @Override
+    public void visitPrimaryKeyColumnDiff(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
+        sourcePrimaryKeyColumn =
+                primaryKeyColumnDiff.getSourcePrimaryKeyColumn();
+        targetPrimaryKeyColumn =
+                primaryKeyColumnDiff.getTargetPrimaryKeyColumn();
 
+        if (sourcePrimaryKeyColumn == null) {
+            String difference = MessageFormat.format(
+                    "Source table {0} primary key {1} does not contain column: {2}",
+                    sourceTable.getQualifiedName(),
+                    sourcePrimaryKey.getPrimaryKeyName(),
+                    targetPrimaryKeyColumn.getColumnName());
+            messages.add(difference);
+        } else if (targetPrimaryKeyColumn == null) {
+            String difference = MessageFormat.format(
+                    "Target table {0} primary key {1} does not contain column: {2}",
+                    targetTable.getQualifiedName(),
+                    targetPrimaryKey.getPrimaryKeyName(),
+                    sourcePrimaryKeyColumn.getColumnName());
+            messages.add(difference);
+        } else {
+            if (!ObjectUtils.equals(sourcePrimaryKeyColumn.getColumnName(),
+                    targetPrimaryKeyColumn.getColumnName())) {
+                String difference = MessageFormat.format(
+                        "Primary key names {0} / {1} are different",
+                        sourcePrimaryKeyColumn.getColumnName(),
+                        targetPrimaryKeyColumn.getColumnName());
+                messages.add(difference);
+            }
+
+            super.visitPrimaryKeyColumnDiff(primaryKeyColumnDiff);
+        }
+    }
+
+    @Override
+    public void visitForeignKeyDiff(ForeignKeyDiff foreignKeyDiff) {
+        sourceForeignKey =
+                foreignKeyDiff.getSourceForeignKey();
+        targetForeignKey =
+                foreignKeyDiff.getTargetForeignKey();
+
+        if (sourceForeignKey == null) {
+            String difference = MessageFormat.format(
+                    "Source table {0} does not contain foreign key: {1}",
+                    sourceTable.getQualifiedName(),
+                    targetForeignKey.getForeignKeyName());
+            messages.add(difference);
+        } else if (targetForeignKey == null) {
+            String difference = MessageFormat.format(
+                    "Target table {0} does not contain foreign key: {1}",
+                    targetTable.getQualifiedName(),
+                    sourceForeignKey.getForeignKeyName());
+            messages.add(difference);
+        } else {
+            if (!ObjectUtils.equals(sourceForeignKey.getForeignKeyName(),
+                    targetForeignKey.getForeignKeyName())) {
+                String difference = MessageFormat.format(
+                        "Foreign key names {0} / {1} are different",
+                        sourceForeignKey.getForeignKeyName(),
+                        targetForeignKey.getForeignKeyName());
+                messages.add(difference);
+            }
+
+            super.visitForeignKeyDiff(foreignKeyDiff);
+        }
+    }
+
+    @Override
+    public void visitReferenceDiff(ReferenceDiff referenceDiff) {
+        sourceReference =
+                referenceDiff.getSourceReference();
+        targetReference =
+                referenceDiff.getTargetReference();
+
+        if (sourceReference == null) {
+            String difference = MessageFormat.format(
+                    "Source table {0} foreign key: {1} does not contain reference: {2}->{3}",
+                    sourceTable.getQualifiedName(),
+                    sourceForeignKey.getForeignKeyName(),
+                    targetReference.getFromColumnName(),
+                    targetReference.getToColumnName());
+            messages.add(difference);
+        } else if (targetReference == null) {
+            String difference = MessageFormat.format(
+                    "Target table {0} foreign key: {1} does not contain reference: {2}->{3}",
+                    targetTable.getQualifiedName(),
+                    targetForeignKey.getForeignKeyName(),
+                    sourceReference.getFromColumnName(),
+                    sourceReference.getToColumnName());
+            messages.add(difference);
+        } else {
+            if (!ObjectUtils.equals(sourceReference.getFromColumnName(),
+                    targetReference.getFromColumnName())) {
+                String difference = MessageFormat.format(
+                        "Reference from column names {0} / {1} are different",
+                        sourceReference.getFromColumnName(),
+                        targetReference.getFromColumnName());
+                messages.add(difference);
+            }
+
+            if (!ObjectUtils.equals(sourceReference.getToColumnName(),
+                    targetReference.getToColumnName())) {
+                String difference = MessageFormat.format(
+                        "Reference to column names {0} / {1} are different",
+                        sourceReference.getToColumnName(),
+                        targetReference.getToColumnName());
+                messages.add(difference);
+            }
+
+            super.visitReferenceDiff(referenceDiff);
+        }
+    }
+
+    @Override
+    public void visitForeignKeyAnnotationDiff(ModelAnnotationDiff modelAnnotationDiff) {
+        sourceModelAnnotation =
+                modelAnnotationDiff.getSourceModelAnnotation();
+        targetModelAnnotation =
+                modelAnnotationDiff.getTargetModelAnnotation();
+
+        if (sourceModelAnnotation == null) {
+            String difference = MessageFormat.format(
+                    "Source foreign key {0} does not contain annotation of type: {1}",
+                    sourceForeignKey.getForeignKeyName(),
+                    targetModelAnnotation.getType());
+            messages.add(difference);
+        } else if (targetModelAnnotation == null) {
+            String difference = MessageFormat.format(
+                    "Target foreign key {0} does not contain annotation of type: {1}",
+                    targetForeignKey.getForeignKeyName(),
+                    sourceModelAnnotation.getType());
+            messages.add(difference);
+        } else {
+            if (!ObjectUtils.equals(sourceModelAnnotation.getType(),
+                    targetModelAnnotation.getType())) {
+                String difference = MessageFormat.format(
+                        "Annotation types {0} / {1} are different",
+                        sourceModelAnnotation.getType(),
+                        targetModelAnnotation.getType());
+                messages.add(difference);
+            }
+
+            super.visitForeignKeyAnnotationDiff(modelAnnotationDiff);
+        }
+    }
+    
     //--------------------------------------------------------------------------
     // Getter/setter
     //--------------------------------------------------------------------------

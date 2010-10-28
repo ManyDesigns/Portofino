@@ -29,39 +29,30 @@
 
 package com.manydesigns.portofino.model.diff;
 
-import com.manydesigns.portofino.model.datamodel.PrimaryKey;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.manydesigns.portofino.model.datamodel.Reference;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PrimaryKeyDiff {
+public class ReferenceDiff {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final PrimaryKey sourcePrimaryKey;
-    private final PrimaryKey targetPrimaryKey;
-    private final List<PrimaryKeyColumnDiff> primaryKeyColumnDiffs;
+    private final Reference sourceReference;
+    private final Reference targetReference;
 
-    public PrimaryKeyDiff(PrimaryKey sourcePrimaryKey, PrimaryKey targetPrimaryKey) {
-        this.sourcePrimaryKey = sourcePrimaryKey;
-        this.targetPrimaryKey = targetPrimaryKey;
-        primaryKeyColumnDiffs = new ArrayList<PrimaryKeyColumnDiff>();
+    public ReferenceDiff(Reference sourceReference, Reference targetReference) {
+        this.sourceReference = sourceReference;
+        this.targetReference = targetReference;
     }
 
-    public PrimaryKey getSourcePrimaryKey() {
-        return sourcePrimaryKey;
+    public Reference getSourceReference() {
+        return sourceReference;
     }
 
-    public PrimaryKey getTargetPrimaryKey() {
-        return targetPrimaryKey;
-    }
-
-    public List<PrimaryKeyColumnDiff> getPrimaryKeyColumnDiffs() {
-        return primaryKeyColumnDiffs;
+    public Reference getTargetReference() {
+        return targetReference;
     }
 }

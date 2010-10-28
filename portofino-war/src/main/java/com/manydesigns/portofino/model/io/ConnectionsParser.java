@@ -37,7 +37,6 @@ import com.manydesigns.portofino.xml.DocumentCallback;
 import com.manydesigns.portofino.xml.ElementCallback;
 import com.manydesigns.portofino.xml.XmlParser;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -64,10 +63,8 @@ public class ConnectionsParser extends XmlParser {
 
     public List<ConnectionProvider> parse(String resourceName) throws Exception {
         connections = new ArrayList<ConnectionProvider>();
-        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-        InputStream input = ReflectionUtil.getResourceAsStream(resourceName);
-        xmlStreamReader = inputFactory.createXMLStreamReader(input);
-        initParser(xmlStreamReader);
+        InputStream inputStream = ReflectionUtil.getResourceAsStream(resourceName);
+        initParser(inputStream);
         expectDocument(new ConnectionsDocumentCallback());
         return connections;
     }

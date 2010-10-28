@@ -47,6 +47,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Properties;
 import java.util.Timer;
@@ -259,6 +260,7 @@ public class PortofinoListener
                 "registering on servlet context...");
         // create and register the container first, without exceptions
 
+        try {
         ElementsThreadLocals.setupDefaultElementsContext();
 
         String managerClassName =
@@ -276,10 +278,24 @@ public class PortofinoListener
         context.loadConnectionsAsResource(
                 portofinoProperties.getProperty(
                         PortofinoProperties.CONNECTIONS_LOCATION_PROPERTY));
-        context.loadXmlModelAsResource(
-                portofinoProperties.getProperty(
-                        PortofinoProperties.MODEL_LOCATION_PROPERTY));
 
-        ElementsThreadLocals.removeElementsContext();
+        String modelLocation =
+                portofinoProperties.getProperty(
+                        PortofinoProperties.MODEL_LOCATION_PROPERTY);
+        String rootDirPath = servletContext.getRealPath("/");
+        File modelFile;
+        if (rootDirPath == null) {
+            modelFile = new File(modelLocation);
+        } else {
+            modelFile = new File (rootDirPath, modelLocation);
+        }
+        
+        context.loadXmlModel(modelFile);
+
+        } catch (Throwable e) {
+            LogUtil.severe(logger, "Exception caught", e);
+        } finally {
+            ElementsThreadLocals.removeElementsContext();
+        }
     }
 }

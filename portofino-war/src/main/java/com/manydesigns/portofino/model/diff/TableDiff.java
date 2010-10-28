@@ -49,6 +49,7 @@ public class TableDiff {
     private final List<ModelAnnotationDiff> modelAnnotationDiffs;
     private final List<ColumnDiff> columnDiffs;
     private final PrimaryKeyDiff primaryKeyDiff;
+    private final List<ForeignKeyDiff> foreignKeyDiffs;
 
     public TableDiff(Table sourceTable, Table targetTable) {
         this.sourceTable = sourceTable;
@@ -61,8 +62,13 @@ public class TableDiff {
         PrimaryKey targetPrimaryKey = (targetTable == null)
                 ? null
                 : targetTable.getPrimaryKey();
-        primaryKeyDiff = new PrimaryKeyDiff(sourcePrimaryKey,
-                targetPrimaryKey);
+        if (sourcePrimaryKey == null && targetPrimaryKey == null) {
+            primaryKeyDiff = null;
+        } else {
+            primaryKeyDiff =
+                    new PrimaryKeyDiff(sourcePrimaryKey, targetPrimaryKey);
+        }
+        foreignKeyDiffs = new ArrayList<ForeignKeyDiff>();
     }
 
     public Table getSourceTable() {
@@ -83,5 +89,9 @@ public class TableDiff {
 
     public PrimaryKeyDiff getPrimaryKeyDiff() {
         return primaryKeyDiff;
+    }
+
+    public List<ForeignKeyDiff> getForeignKeyDiffs() {
+        return foreignKeyDiffs;
     }
 }

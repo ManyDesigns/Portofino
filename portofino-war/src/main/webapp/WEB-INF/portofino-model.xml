@@ -25,9 +25,11 @@
                                         scale="0"
                                         nullable="false"
                                         propertyName="email"
+                                        autoincrement="false"
                                         searchable="true">
                                     <annotations>
-                                        <annotation type="com.manydesigns.elements.annotations.Email"/>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Email"/>
                                     </annotations>
                                 </column>
                                 <column columnName="pwd"
@@ -36,10 +38,12 @@
                                         length="50"
                                         scale="0"
                                         nullable="false"
+                                        autoincrement="false"
                                         searchable="false"
                                         >
                                     <annotations>
-                                        <annotation type="com.manydesigns.elements.annotations.Password"/>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Password"/>
                                     </annotations>
                                 </column>
 
@@ -49,6 +53,7 @@
                                         length="8"
                                         scale="0"
                                         nullable="false"
+                                        autoincrement="false"
                                         searchable="true"/>
                                 <column columnName="token"
                                         columnType="varchar"
@@ -56,6 +61,7 @@
                                         length="100"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="false"
                                         />
                                 <column columnName="remquestion"
@@ -65,6 +71,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="false"
+                                        autoincrement="false"
                                         propertyName="remQuestion"
                                         />
                                 <column columnName="remans"
@@ -73,6 +80,7 @@
                                         length="255"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="false"
                                         />
 
@@ -83,6 +91,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="userName"
                                         />
                                 <column columnName="firstname"
@@ -92,6 +101,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="firstName"
                                         />
                                 <column columnName="middlename"
@@ -101,6 +111,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="middleName"
                                         />
                                 <column columnName="lastname"
@@ -110,6 +121,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="lastName"
                                         />
                                 <column columnName="jobtitle"
@@ -119,6 +131,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="jobTitle"
                                         />
                                 <column columnName="defaultuser"
@@ -128,6 +141,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="defaultUser"
                                         />
                                 <column columnName="extauth"
@@ -137,6 +151,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="extAuth"
                                         />
 
@@ -147,6 +162,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="agreedToTerms"
                                         />
                                 <column columnName="creationdate"
@@ -156,6 +172,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="creationDate"
                                         />
                                 <column columnName="deletiondate"
@@ -164,6 +181,7 @@
                                         length="29"
                                         scale="6"
                                         searchable="true"
+                                        autoincrement="false"
                                         nullable="true"
                                         propertyName="deletionDate"
                                         />
@@ -173,6 +191,7 @@
                                         length="29"
                                         scale="6"
                                         searchable="true"
+                                        autoincrement="false"
                                         nullable="true"
                                         propertyName="modifiedDate"/>
                                 <column columnName="lastpwdmoddate"
@@ -182,6 +201,7 @@
                                         scale="6"
                                         searchable="true"
                                         nullable="true"
+                                        autoincrement="false"
                                         propertyName="pwdModDate"/>
                                 <column columnName="lastlogindate"
                                         columnType="timestamp"
@@ -190,6 +210,7 @@
                                         scale="6"
                                         searchable="true"
                                         nullable="true"
+                                        autoincrement="false"
                                         propertyName="lastLoginDate"/>
                                 <column columnName="lastfailedlogindate"
                                         columnType="timestamp"
@@ -198,6 +219,7 @@
                                         scale="6"
                                         searchable="true"
                                         nullable="true"
+                                        autoincrement="false"
                                         propertyName="lastFailedLoginDate"/>
                                 <column columnName="failedloginattempts"
                                         columnType="int4"
@@ -205,6 +227,7 @@
                                         length="10"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true"
                                         propertyName="failedLoginAttempts"
                                         />
@@ -214,6 +237,7 @@
                                         length="10"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true"
                                         propertyName="graceLoginCount"
                                         />
@@ -223,6 +247,7 @@
                                         length="10"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true"
                                         propertyName="bounced"
                                         />
@@ -254,6 +279,7 @@
                                         length="50"
                                         scale="0"
                                         nullable="false"
+                                        autoincrement="false"
                                         searchable="true"/>
                                 <column columnName="description"
                                         columnType="varchar"
@@ -261,9 +287,11 @@
                                         length="255"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true">
                                     <annotations>
-                                        <annotation type="com.manydesigns.elements.annotations.Status">
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Status">
                                             <value>admin</value>
                                             <value/>
                                             <value/>
@@ -277,6 +305,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="false"
+                                        autoincrement="false"
                                         propertyName="creatorId"/>
                                 <column columnName="deletiondate"
                                         columnType="timestamp"
@@ -285,6 +314,7 @@
                                         scale="6"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="deletionDate"/>
                                 <column columnName="creationdate"
                                         columnType="timestamp"
@@ -293,6 +323,7 @@
                                         scale="6"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="creationDate"/>
                             </columns>
                             <primaryKey primaryKeyName="pk_group">
@@ -314,13 +345,15 @@
                                 </foreignKey>
                             </foreignKeys>
                             <annotations>
-                                <annotation type="com.manydesigns.elements.annotations.ShortName">
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.ShortName">
                                     <value>%{name} (%{description})</value>
                                 </annotation>
                             </annotations>
                         </table>
-                        <table tableName="users_groups" manyToMany="true" javaClass="com.manydesigns.portofino.system.model.users.UsersGroups"
-                               >
+                        <table tableName="users_groups" manyToMany="true"
+                               javaClass="com.manydesigns.portofino.system.model.users.UsersGroups"
+                                >
                             <columns>
                                 <column columnName="userid"
                                         columnType="int8"
@@ -328,6 +361,7 @@
                                         length="8"
                                         scale="0"
                                         nullable="false"
+                                        autoincrement="false"
                                         searchable="true"/>
                                 <column columnName="groupid"
                                         columnType="int8"
@@ -335,6 +369,7 @@
                                         length="8"
                                         scale="0"
                                         nullable="false"
+                                        autoincrement="false"
                                         searchable="true"/>
                                 <column columnName="deletiondate"
                                         columnType="timestamp"
@@ -343,6 +378,7 @@
                                         scale="6"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="deletionDate"/>
                                 <column columnName="creationdate"
                                         columnType="timestamp"
@@ -351,14 +387,15 @@
                                         scale="6"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="creationDate"/>
-                                </columns>
-                                <primaryKey primaryKeyName="pk_group">
-                                    <column columnName="userid"/>
-                                    <column columnName="groupid"/>
-                                    <column columnName="creationdate"/>
-                                </primaryKey>
-                                <foreignKeys>
+                            </columns>
+                            <primaryKey primaryKeyName="pk_group">
+                                <column columnName="userid"/>
+                                <column columnName="groupid"/>
+                                <column columnName="creationdate"/>
+                            </primaryKey>
+                            <foreignKeys>
                                 <foreignKey foreignKeyName="fk_ug_1"
                                               toDatabase="portofino"
                                               toSchema="public"
@@ -372,7 +409,8 @@
                                                    toColumn="userid"/>
                                     </references>
                                     <annotations>
-                                        <annotation type="com.manydesigns.elements.annotations.Autocomplete">
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Autocomplete">
                                             <value>true</value>
                                         </annotation>
                                     </annotations>
@@ -401,6 +439,7 @@
                                         length="10"
                                         scale="0"
                                         nullable="false"
+                                        autoincrement="false"
                                         searchable="false"
                                         />
                                 <column columnName="name"
@@ -409,6 +448,7 @@
                                         length="75"
                                         scale="0"
                                         nullable="false"
+                                        autoincrement="false"
                                         searchable="true"
                                         />
                                 <column columnName="description"
@@ -417,6 +457,7 @@
                                         length="255"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true"
                                         />
                             </columns>
@@ -424,7 +465,8 @@
                                 <column columnName="id"/>
                             </primaryKey>
                         </table>
-                        <table tableName="emailqueue" javaClass="com.manydesigns.portofino.system.model.email.EmailBean">
+                        <table tableName="emailqueue"
+                               javaClass="com.manydesigns.portofino.system.model.email.EmailBean">
                             <columns>
                                 <column columnName="id"
                                         columnType="bigserial"
@@ -432,12 +474,14 @@
                                         length="10"
                                         scale="0"
                                         nullable="false"
+                                        autoincrement="false"
                                         searchable="false"/>
                                 <column columnName="subject"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="100"
                                         scale="0"
+                                        autoincrement="false"
                                         nullable="true"
                                         searchable="true"/>
                                 <column columnName="body"
@@ -446,6 +490,7 @@
                                         length="4000"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true"/>
                                 <column columnName="to_"
                                         columnType="varchar"
@@ -454,6 +499,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="to"/>
                                 <column columnName="attachmentpath"
                                         columnType="varchar"
@@ -462,6 +508,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="attachmentPath"/>
                                 <column columnName="attachmentdescription"
                                         columnType="varchar"
@@ -469,6 +516,7 @@
                                         length="255"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true"
                                         propertyName="attachmentDescription"/>
                                 <column columnName="attachmentname"
@@ -478,6 +526,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="attachmentName"/>
                                 <column columnName="from_"
                                         columnType="varchar"
@@ -486,6 +535,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="from"/>
                                 <column columnName="createdate"
                                         columnType="date"
@@ -494,6 +544,7 @@
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
+                                        autoincrement="false"
                                         propertyName="createDate"
                                         />
                                 <column columnName="state"
@@ -502,10 +553,11 @@
                                         length="10"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="pk_emailqueue">
-                                    <column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <foreignKeys>
                                 <foreignKey foreignKeyName="fk_emailqueue_1"
@@ -529,7 +581,7 @@
             <schemas>
                 <schema schemaName="public">
                     <tables>
-                         <table tableName="lineitem">
+                        <table tableName="lineitem">
                             <columns>
                                 <column columnName="orderid"
                                         columnType="int4"
@@ -537,6 +589,7 @@
                                         length="8"
                                         scale="0"
                                         nullable="false"
+                                        autoincrement="false"
                                         searchable="true"/>
                                 <column columnName="linenum"
                                         columnType="int4"
@@ -544,26 +597,30 @@
                                         length="8"
                                         scale="0"
                                         nullable="false"
+                                        autoincrement="false"
                                         searchable="true"/>
                                 <column columnName="itemid"
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="255"
                                         scale="0"
+                                        autoincrement="false"
                                         nullable="true"
-                                        searchable="true" />
+                                        searchable="true"/>
                                 <column columnName="quantity"
                                         columnType="int4"
                                         javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true"/>
                                 <column columnName="unitprice"
                                         columnType="numeric"
                                         javaType="java.math.BigDecimal"
                                         length="10"
                                         scale="2"
+                                        autoincrement="false"
                                         nullable="true"
                                         searchable="true"/>
                             </columns>
@@ -578,7 +635,8 @@
                                         columnType="varchar"
                                         javaType="java.lang.String"
                                         length="10"
-                                        scale = "0"
+                                        scale="0"
+                                        autoincrement="false"
                                         nullable="false"
                                         searchable="true"/>
                                 <column columnName="name"
@@ -587,6 +645,7 @@
                                         length="80"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true"/>
                                 <column columnName="descn"
                                         columnType="varchar"
@@ -594,11 +653,13 @@
                                         length="255"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true">
                                     <annotations>
-                                        <annotation type="com.manydesigns.elements.annotations.FileBlob"/>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.FileBlob"/>
                                     </annotations>
-                                        </column>
+                                </column>
                             </columns>
                             <primaryKey primaryKeyName="pk_category">
                                 <column columnName="catid"/>
@@ -612,6 +673,7 @@
                                         length="10"
                                         scale="0"
                                         nullable="false"
+                                        autoincrement="false"
                                         searchable="true"/>
                                 <column columnName="category"
                                         columnType="varchar"
@@ -619,6 +681,7 @@
                                         length="10"
                                         scale="0"
                                         nullable="false"
+                                        autoincrement="false"
                                         searchable="true"/>
                                 <column columnName="name"
                                         columnType="varchar"
@@ -626,6 +689,7 @@
                                         length="80"
                                         scale="0"
                                         nullable="false"
+                                        autoincrement="false"
                                         searchable="true"/>
                                 <column columnName="descn"
                                         columnType="varchar"
@@ -633,9 +697,11 @@
                                         length="255"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true">
                                     <annotations>
-                                        <annotation type="com.manydesigns.elements.annotations.Label">
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Label">
                                             <value>description</value>
                                         </annotation>
                                     </annotations>
@@ -682,6 +748,7 @@
                                         length="15"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="pk_table1">
@@ -704,6 +771,7 @@
                                         length="15"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="pk_table4">
@@ -734,6 +802,7 @@
                                         length="15"
                                         scale="0"
                                         nullable="true"
+                                        autoincrement="false"
                                         searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="pk_table2">
@@ -913,12 +982,13 @@
                                 <column columnName="protocollo"/>
                             </primaryKey>
                             <foreignKeys>
-                                <foreignKey foreignKeyName="domanda_regione_fkey"
-                                            toDatabase="hibernatetest"
-                                            toSchema="public"
-                                            toTable="comune"
-                                            onDelete="NO ACTION"
-                                            onUpdate="NO ACTION">
+                                <foreignKey
+                                        foreignKeyName="domanda_regione_fkey"
+                                        toDatabase="hibernatetest"
+                                        toSchema="public"
+                                        toTable="comune"
+                                        onDelete="NO ACTION"
+                                        onUpdate="NO ACTION">
                                     <references>
                                         <reference fromColumn="regione"
                                                    toColumn="regione"/>
@@ -936,36 +1006,58 @@
         </database>
     </databases>
     <siteNodes>
-        <siteNode type="simple" url="/Homepage.action" title="Homepage" description="Homepage"/>
-        <siteNode type="use-cases" url="/UseCase.action" title="Use cases" description="Use cases"/>
-        <siteNode url="/model/Index.action" title="Model" description="Model">
+        <siteNode type="simple" url="/Homepage.action" title="Homepage"
+                  description="Homepage"/>
+        <siteNode type="use-cases" url="/UseCase.action" title="Use cases"
+                  description="Use cases"/>
+        <siteNode type="simple" url="/model/Index.action" title="Model" description="Model">
             <childNodes>
-                <siteNode url="/model/ConnectionProviders.action" title="Connection providers" description="Connection providers"/>
-                <siteNode type="table-data" url="/model/TableData.action" title="Table data" description="Table data"/>
-                <siteNode type="table-design" url="/model/TableDesign.action" title="Table design" description="Table design"/>
-                <siteNode url="/model/PrintModel.action" title="Print model" description="Print model"/>
-                <siteNode url="/model/SelfTest.action" title="Self test" description="Self test"/>
-                <siteNode url="/model/SiteMap.action" title="Site map" description="Site map"/>
-                <siteNode url="/model/DDLWriter.action" title="DDL Writer" description="DDL Writer"/>
-                <siteNode type="portlet-design" url="/model/PortletDesign.action" title="Portlet design" description="Portlet design"/>
+                <siteNode type="simple" url="/model/ConnectionProviders.action"
+                          title="Connection providers"
+                          description="Connection providers"/>
+                <siteNode type="table-data" url="/model/TableData.action"
+                          title="Table data" description="Table data"/>
+                <siteNode type="table-design" url="/model/TableDesign.action"
+                          title="Table design" description="Table design"/>
+                <siteNode type="simple" url="/model/PrintModel.action" title="Print model"
+                          description="Print model"/>
+                <siteNode type="simple" url="/model/SelfTest.action" title="Self test"
+                          description="Self test"/>
+                <siteNode type="simple" url="/model/SiteMap.action" title="Site map"
+                          description="Site map"/>
+                <siteNode type="simple" url="/model/DDLWriter.action" title="DDL Writer"
+                          description="DDL Writer"/>
+                <siteNode type="portlet-design"
+                          url="/model/PortletDesign.action"
+                          title="Portlet design" description="Portlet design"/>
             </childNodes>
         </siteNode>
-        <siteNode url="/system-admin/Index.action" title="System administration" description="System administration">
+        <siteNode type="simple" url="/system-admin/Index.action" title="System administration"
+                  description="System administration">
             <childNodes>
-                <siteNode url="/system-admin/ServerInfo.action" title="Server info" description="Server info"/>
-                <siteNode url="/system-admin/ConfigurationProperties.action" title="Configuration properties" description="Configuration properties"/>
-                <siteNode url="/system-admin/Logs.action" title="Logs" description="Logs"/>
+                <siteNode type="simple" url="/system-admin/ServerInfo.action"
+                          title="Server info" description="Server info"/>
+                <siteNode type="simple" url="/system-admin/ConfigurationProperties.action"
+                          title="Configuration properties"
+                          description="Configuration properties"/>
+                <siteNode type="simple" url="/system-admin/Logs.action" title="Logs"
+                          description="Logs"/>
             </childNodes>
         </siteNode>
-        <siteNode url="/user/Index.action" title="Personal area" description="Personal area">
+        <siteNode type="simple" url="/user/Index.action" title="Personal area"
+                  description="Personal area">
             <childNodes>
-                <siteNode url="/user/Profile.action" title="Profile" description="Profile"/>
+                <siteNode type="simple" url="/user/Profile.action" title="Profile"
+                          description="Profile"/>
             </childNodes>
         </siteNode>
-        <siteNode url="/user-admin/Index.action" title="User admin" description="User administration">
+        <siteNode type="simple" url="/user-admin/Index.action" title="User admin"
+                  description="User administration">
             <childNodes>
-                <siteNode url="/user-admin/Users.action" title="Users" description="users"/>
-                <siteNode url="/user-admin/Groups.action" title="Groups" description="groups"/>
+                <siteNode type="simple" url="/user-admin/Users.action" title="Users"
+                          description="users"/>
+                <siteNode type="simple" url="/user-admin/Groups.action" title="Groups"
+                          description="groups"/>
             </childNodes>
         </siteNode>
     </siteNodes>
@@ -987,55 +1079,68 @@
             <properties>
                 <property name="productid">
                     <annotations>
-                        <annotation type="com.manydesigns.elements.annotations.Label">
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Label">
                             <value>product id</value>
                         </annotation>
-                        <annotation type="com.manydesigns.elements.annotations.InSummary">
+                        <annotation
+                                type="com.manydesigns.elements.annotations.InSummary">
                             <value>true</value>
                         </annotation>
-                        <annotation type="com.manydesigns.elements.annotations.Searchable">
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Searchable">
                             <value>true</value>
                         </annotation>
-                        <annotation type="com.manydesigns.elements.annotations.Access">
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Access">
                             <value>write</value>
                         </annotation>
                     </annotations>
                 </property>
                 <property name="category">
                     <annotations>
-                        <annotation type="com.manydesigns.elements.annotations.InSummary">
+                        <annotation
+                                type="com.manydesigns.elements.annotations.InSummary">
                             <value>false</value>
                         </annotation>
-                        <annotation type="com.manydesigns.elements.annotations.Searchable">
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Searchable">
                             <value>false</value>
                         </annotation>
-                        <annotation type="com.manydesigns.elements.annotations.Access">
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Access">
                             <value>read</value>
                         </annotation>
                     </annotations>
                 </property>
                 <property name="name">
                     <annotations>
-                        <annotation type="com.manydesigns.elements.annotations.InSummary">
+                        <annotation
+                                type="com.manydesigns.elements.annotations.InSummary">
                             <value>true</value>
                         </annotation>
-                        <annotation type="com.manydesigns.elements.annotations.Searchable">
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Searchable">
                             <value>true</value>
                         </annotation>
-                        <annotation type="com.manydesigns.elements.annotations.Access">
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Access">
                             <value>write</value>
                         </annotation>
                     </annotations>
                 </property>
                 <property name="descn">
                     <annotations>
-                        <annotation type="com.manydesigns.elements.annotations.InSummary">
+                        <annotation
+                                type="com.manydesigns.elements.annotations.InSummary">
                             <value>true</value>
                         </annotation>
-                        <annotation type="com.manydesigns.elements.annotations.Searchable">
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Searchable">
                             <value>true</value>
                         </annotation>
-                        <annotation type="com.manydesigns.elements.annotations.Access">
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Access">
                             <value>write</value>
                         </annotation>
                     </annotations>
