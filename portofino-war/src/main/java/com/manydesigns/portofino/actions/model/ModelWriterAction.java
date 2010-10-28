@@ -76,7 +76,6 @@ public class ModelWriterAction extends ActionSupport implements ContextAware {
         } catch (IOException e) {
             throw new Error(e);
         }
-
         return SUCCESS;
     }
 }

@@ -455,7 +455,7 @@
 
         <action name="Groups" class="com.manydesigns.portofino.actions.user.admin.GroupAction">
             <param name="skin">default</param>
-            <param name="qualifiedTableName">portofino.public.group_</param>
+            <param name="qualifiedTableName">portofino.public.groups</param>
             <result name="search">/skins/default/group/admin/search.jsp</result>
 
             <result name="read">/skins/default/group/admin/read.jsp</result>

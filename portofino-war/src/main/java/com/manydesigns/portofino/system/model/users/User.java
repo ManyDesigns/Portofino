@@ -46,20 +46,19 @@ import java.sql.Timestamp;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class User implements Serializable{
-    //Dati user_
+    //Dati
     Long uuid;
     String email;
     String pwd;
     Integer state;
 
 
-    Timestamp delDate;
+    Timestamp deletionDate;
     Timestamp modifiedDate;
     Timestamp pwdModDate;
-    Timestamp loginDate;
     Timestamp lastLoginDate;
     Timestamp lastFailedLoginDate;
-    Timestamp createDate;
+    Timestamp creationDate;
 
     Boolean defaultUser;
     Boolean agreedToTerms;
@@ -69,16 +68,11 @@ public class User implements Serializable{
     String token;
     String remQuestion;
     String remans;
-    String screenName;
-    String greeting;
-    String comments;
+    String userName;
     String firstName;
     String middleName;
     String lastName;
     String jobTitle;
-    String loginIp;
-    String lastLoginIp;
-
     Integer failedLoginAttempts;
     Integer bounced;
     Integer graceLoginCount;
@@ -141,12 +135,12 @@ public class User implements Serializable{
         this.state = state;
     }
 
-    public Date getDelDate() {
-        return delDate;
+    public Date getDeletionDate() {
+        return deletionDate;
     }
 
-    public void setDelDate(Timestamp delDate) {
-        this.delDate = delDate;
+    public void setDeletionDate(Timestamp deletionDate) {
+        this.deletionDate = deletionDate;
     }
 
     public Date getModifiedDate() {
@@ -205,28 +199,12 @@ public class User implements Serializable{
         this.remans = remans;
     }
 
-    public String getScreenName() {
-        return screenName;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setScreenName(String screenName) {
-        this.screenName = screenName;
-    }
-
-    public String getGreeting() {
-        return greeting;
-    }
-
-    public void setGreeting(String greeting) {
-        this.greeting = greeting;
-    }
-
-    public String getComments() {
-        return comments;
-    }
-
-    public void setComments(String comments) {
-        this.comments = comments;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getFirstName() {
@@ -261,36 +239,12 @@ public class User implements Serializable{
         this.jobTitle = jobTitle;
     }
 
-    public Date getLoginDate() {
-        return loginDate;
-    }
-
-    public void setLoginDate(Timestamp loginDate) {
-        this.loginDate = loginDate;
-    }
-
-    public String getLoginIp() {
-        return loginIp;
-    }
-
-    public void setLoginIp(String loginIp) {
-        this.loginIp = loginIp;
-    }
-
     public Date getLastLoginDate() {
         return lastLoginDate;
     }
 
     public void setLastLoginDate(Timestamp lastLoginDate) {
         this.lastLoginDate = lastLoginDate;
-    }
-
-    public String getLastLoginIp() {
-        return lastLoginIp;
-    }
-
-    public void setLastLoginIp(String lastLoginIp) {
-        this.lastLoginIp = lastLoginIp;
     }
 
     public Date getLastFailedLoginDate() {
@@ -317,12 +271,12 @@ public class User implements Serializable{
         this.agreedToTerms = agreedToTerms;
     }
 
-    public Date getCreateDate() {
-        return createDate;
+    public Date getCreationDate() {
+        return creationDate;
     }
 
-    public void setCreateDate(Timestamp createDate) {
-        this.createDate = createDate;
+    public void setCreationDate(Timestamp creationDate) {
+        this.creationDate = creationDate;
     }
 
     public Integer getGraceLoginCount() {

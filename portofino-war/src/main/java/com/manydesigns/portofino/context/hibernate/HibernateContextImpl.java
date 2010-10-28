@@ -94,6 +94,7 @@ public class HibernateContextImpl implements Context {
 
     public static final Logger logger =
             LogUtil.getLogger(HibernateContextImpl.class);
+    private static final String PORTOFINO_PUBLIC_USERS = "portofino.public.users";
 
     //**************************************************************************
     // Constructors
@@ -754,7 +755,7 @@ public class HibernateContextImpl implements Context {
     // User
     //**************************************************************************
     public User login(String email, String password) {
-        String qualifiedTableName = "portofino.public.user_";
+        String qualifiedTableName = PORTOFINO_PUBLIC_USERS;
         Session session = getSession(qualifiedTableName);
         org.hibernate.Criteria criteria = session.createCriteria(qualifiedTableName);
         criteria.add(Restrictions.eq("email", email));
@@ -775,7 +776,7 @@ public class HibernateContextImpl implements Context {
     }
 
     public User findUserByEmail(String email) {
-        String qualifiedTableName = "portofino.public.user_";
+        String qualifiedTableName = PORTOFINO_PUBLIC_USERS;
         Session session = getSession(qualifiedTableName);
         org.hibernate.Criteria criteria = session.createCriteria(qualifiedTableName);
         criteria.add(Restrictions.eq("email", email));
@@ -793,7 +794,7 @@ public class HibernateContextImpl implements Context {
     }
 
     public User findUserByToken(String token) {
-        String qualifiedTableName = "portofino.public.user_";
+        String qualifiedTableName = PORTOFINO_PUBLIC_USERS;
         Session session = getSession(qualifiedTableName);
         org.hibernate.Criteria criteria = session.createCriteria(qualifiedTableName);
         criteria.add(Restrictions.eq("token", token));

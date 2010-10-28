@@ -47,6 +47,7 @@ import java.util.Map;
  * @author Paolo     Predonzani - paolo.predonzani@manydesigns.com
  */
 public class HibernateTest extends AbstractPortofinoTest {
+    private static final String PORTOFINO_PUBLIC_USER = "portofino.public.users";
 
     @Override
     public void setUp() throws Exception {
@@ -67,19 +68,19 @@ public class HibernateTest extends AbstractPortofinoTest {
 
     public void testUsers() {
         List<Object> groupList =
-                context.getAllObjects("portofino.public.group_");
+                context.getAllObjects("portofino.public.groups");
         assertEquals( 2, groupList.size());
 
         List<Object> usergroups =
                 context.getAllObjects("portofino.public.users_groups");
-        assertEquals( 1, usergroups.size());
+        assertEquals( 3, usergroups.size());
 
         List<Object> users =
-                context.getAllObjects("portofino.public.user_");
+                context.getAllObjects(PORTOFINO_PUBLIC_USER);
         assertEquals("numero utenti", 2, users.size());
         User admin = (User) users.get(0);
         List<UsersGroups> groups = admin.getGroups();
-        assertEquals("numero gruppi per admin", 0, groups.size());
+        assertEquals("numero gruppi per admin",  2, groups.size());
         
 
     }
@@ -275,7 +276,7 @@ public class HibernateTest extends AbstractPortofinoTest {
             "123456789012345678901234567890123456789012345678901234567890" +
             "123456789012345678901234567890123456789012345678901234567890");
 
-            context.saveObject("portofino.public.user_", user);
+            context.saveObject(PORTOFINO_PUBLIC_USER, user);
             context.commit("portofino");
 
             fail();
@@ -287,7 +288,7 @@ public class HibernateTest extends AbstractPortofinoTest {
 
         //Faccio una seconda operazione
         try{
-            List<Object> users= context.getAllObjects("portofino.public.user_");
+            List<Object> users= context.getAllObjects(PORTOFINO_PUBLIC_USER);
             assertNotNull(users);
         }catch (Exception e){
             e.printStackTrace();
@@ -341,9 +342,9 @@ public class HibernateTest extends AbstractPortofinoTest {
 
 
         List<Object> listu =
-                context.getAllObjects("portofino.public.user_");
+                context.getAllObjects(PORTOFINO_PUBLIC_USER);
         List<Object> listg =
-                context.getAllObjects("portofino.public.group_");
+                context.getAllObjects("portofino.public.groups");
         List<Object> listug =
                 context.getAllObjects("portofino.public.users_groups");
     }

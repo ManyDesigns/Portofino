@@ -34,15 +34,14 @@ CREATE TABLE public.emailstate (
 -- Dependencies: 5
 -- Name: group_; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-DROP TABLE IF EXISTS group_;
-CREATE TABLE public.group_ (
+DROP TABLE IF EXISTS groups;
+CREATE TABLE public.groups (
     groupid identity NOT NULL,
     creatorid bigint,
-    parentgroupid bigint,
-    name character varying(75),
+    name character varying(50),
     description character varying(255),
-    active boolean,
-    deldate timestamp 
+    deletiondate timestamp,
+    creationdate timestamp
 );
 
 
@@ -55,12 +54,12 @@ CREATE TABLE public.group_ (
 DROP TABLE IF EXISTS msg;
 CREATE TABLE public.msg (
     id identity NOT NULL,
-    subject character varying(100),
+    subject character varying(255),
     body character varying(4000),
-    add_userid bigint,
-    sender_userid bigint,
+    to_ bigint,
+    from_ bigint,
     date date,
-    createdate date,
+    creationdate timestamp,
     state integer
 );
 
@@ -74,7 +73,7 @@ CREATE TABLE public.msg (
 DROP TABLE IF EXISTS msgstate;
 CREATE TABLE public.msgstate (
     id identity NOT NULL,
-    name character varying(75) NOT NULL,
+    name character varying(50) NOT NULL,
     description character varying(255)
 );
 
@@ -89,7 +88,7 @@ CREATE TABLE public.msgstate (
 DROP TABLE IF EXISTS oldpwd;
 CREATE TABLE public.oldpwd (
     id identity NOT NULL,
-    createdate numeric(31,0),
+    createdate timestamp,
     password character varying(30),
     userid integer
 );
@@ -102,37 +101,32 @@ CREATE TABLE public.oldpwd (
 -- Dependencies: 5
 -- Name: user_; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
-DROP TABLE IF EXISTS user_;
-CREATE TABLE public.user_ (
+DROP TABLE IF EXISTS users;
+CREATE TABLE public.users (
     userid identity NOT NULL,
-    deldate timestamp ,
-    modifieddate timestamp ,
+    deletiondate timestamp,
+    creationdate timestamp,
+    modifieddate timestamp,
     defaultuser boolean,
     extauth boolean,
-    pwd character varying(75),
-    pwdmoddate timestamp ,
-    token character varying(255),
-    remquestion character varying(75),
-    remans character varying(75),
-    gracelogincount integer,
-    screenname character varying(75),
-    emailaddress character varying(75),
-    greeting character varying(255),
-    comments character varying(255),
-    firstname character varying(75),
-    middlename character varying(75),
-    lastname character varying(75),
-    jobtitle character varying(100),
-    logindate timestamp ,
-    loginip character varying(75),
-    lastlogindate timestamp ,
-    lastloginip character varying(75),
-    lastfailedlogindate timestamp ,
+    pwd character varying(50),
+    lastpwdmoddate timestamp,
+    username character varying(50),
+    emailaddress character varying(100),
+    firstname character varying(50),
+    middlename character varying(50),
+    lastname character varying(50),
+    jobtitle character varying(50),
+    lastlogindate timestamp,
+    lastfailedlogindate timestamp,
     failedloginattempts integer,
     agreedtoterms boolean,
     state integer NOT NULL,
-    createdate timestamp ,
-    bounced integer
+    bounced integer,
+    token character varying(100),
+    remquestion character varying(255),
+    remans character varying(255),
+    gracelogincount integer
 );
 
 
@@ -164,24 +158,31 @@ CREATE TABLE public.userstate (
 );
 
 
+INSERT INTO users(userid, creationdate, pwd, username, emailaddress, firstname, lastname, state) VALUES (1, current_timestamp, 'admin', 'admin', 'giampiero.granatella@manydesigns.com', 'admin', 'admin', 1);
+INSERT INTO users(userid, creationdate, pwd, username, emailaddress, firstname, lastname, state) VALUES (2, current_timestamp, 'giampi', 'giampi', 'giampiero.granatella@manydesigns.com', 'giampi', 'giampi', 1);
 
 
-INSERT INTO public.group_ (groupid, creatorid, parentgroupid, name, description, active, deldate) VALUES (2, 1, NULL, 'users', 'user', true, NULL);
-INSERT INTO public.group_ (groupid, creatorid, parentgroupid, name, description, active, deldate) VALUES (1, 1, NULL, 'admin', 'admin', true, NULL);
+INSERT INTO public.groups (groupid, creatorid,  name, description,  creationdate) VALUES (2, 1,  'users', 'user',  current_timestamp);
+INSERT INTO public.groups (groupid, creatorid,  name, description,  creationdate) VALUES (1, 1,  'admin', 'admin', current_timestamp);
 
-INSERT INTO public.user_ (userid, deldate, modifieddate, defaultuser, extauth, pwd, pwdmoddate, token, remquestion, remans, gracelogincount, screenname, emailaddress, greeting, comments, firstname, middlename, lastname, jobtitle, logindate, loginip, lastlogindate, lastloginip, lastfailedlogindate, failedloginattempts,  agreedtoterms,  state, createdate, bounced) VALUES (11, NULL, NULL, NULL, NULL, 'piero74',  NULL, '', '', '', NULL, 'giampi', 'granatella@gmail.com', '', '-', '', '', '', '', NULL, '', NULL, '', NULL, NULL, true, 1, NULL, NULL);
-INSERT INTO public.user_ (userid, deldate, modifieddate, defaultuser, extauth, pwd, pwdmoddate, token, remquestion, remans, gracelogincount, screenname, emailaddress, greeting, comments, firstname, middlename, lastname, jobtitle, logindate, loginip, lastlogindate, lastloginip, lastfailedlogindate, failedloginattempts,  agreedtoterms,  state, createdate, bounced) VALUES (1, NULL, '2010-08-12 00:00:00', false, false, 'admin', '2010-09-24 15:48:09.458', NULL, '', NULL, 3, 'admin', 'admin@manydesigns.com', '', '', 'Giampiero', 'GG', 'Granatella', 'Ing.', NULL, '0:0:0:0:0:0:0:1%0', '2010-09-24 15:47:42.121', '', '2010-09-24 15:47:38.475', 0,  true, 1, '2009-09-29 00:00:00', NULL);
-
-
-
-INSERT INTO public.users_groups (groupid, userid, deletiondate, creationdate) VALUES (1, 1, NULL, '2010-09-14 00:00:00');
+INSERT INTO public.users_groups VALUES (1,1, null, current_timestamp);
+INSERT INTO public.users_groups VALUES (2,1, null, current_timestamp);
+INSERT INTO public.users_groups VALUES (2,2, null, current_timestamp);
 
 
-INSERT INTO public.userstate (id, name, description) VALUES (1, 'active', NULL);
+INSERT INTO userstate (id, name, description) VALUES (1, 'active', NULL);
+INSERT INTO userstate (id, name, description) VALUES (2, 'suspended', NULL);
+INSERT INTO userstate (id, name, description) VALUES (3, 'banned', NULL);
+INSERT INTO userstate (id, name, description) VALUES (4, 'selfregistred', NULL);
 
+INSERT INTO emailstate (id, name, description) VALUES (0, 'sending', NULL);
+INSERT INTO emailstate (id, name, description) VALUES (1, 'to be sent', NULL);
+INSERT INTO emailstate (id, name, description) VALUES (2, 'sent', NULL);
+INSERT INTO emailstate (id, name, description) VALUES (3, 'rejected', NULL);
+INSERT INTO emailstate (id, name, description) VALUES (4, 'bounced', NULL);
 
-
-
+INSERT INTO msgstate (id, name, description) VALUES (1, 'sent', NULL);
+INSERT INTO msgstate (id, name, description) VALUES (2, 'read', NULL);
 
 
 
@@ -206,8 +207,8 @@ ALTER TABLE  public.users_groups
 
 --
 
-ALTER TABLE  public.group_
-    ADD CONSTRAINT fk_group_1 FOREIGN KEY (creatorid) REFERENCES public.user_(userid) ;
+ALTER TABLE  public.groups
+    ADD CONSTRAINT fk_group_1 FOREIGN KEY (creatorid) REFERENCES public.users(userid) ;
 
 
 --
@@ -227,7 +228,7 @@ ALTER TABLE  public.msg
 --
 
 ALTER TABLE  public.msg
-    ADD CONSTRAINT fk_msg_2 FOREIGN KEY (add_userid) REFERENCES public.user_(userid) ;
+    ADD CONSTRAINT fk_msg_2 FOREIGN KEY (from_) REFERENCES public.users(userid) ;
 
 
 --
@@ -237,7 +238,7 @@ ALTER TABLE  public.msg
 --
 
 ALTER TABLE  public.msg
-    ADD CONSTRAINT fk_msg_3 FOREIGN KEY (sender_userid) REFERENCES public.user_(userid) ;
+    ADD CONSTRAINT fk_msg_3 FOREIGN KEY (to_) REFERENCES public.users(userid) ;
 
 
 --
@@ -247,7 +248,7 @@ ALTER TABLE  public.msg
 --
 
 ALTER TABLE  public.oldpwd
-    ADD CONSTRAINT fk_oldpwd_1 FOREIGN KEY (userid) REFERENCES public.user_(userid) ;
+    ADD CONSTRAINT fk_oldpwd_1 FOREIGN KEY (userid) REFERENCES public.users(userid) ;
 
 
 --
@@ -256,7 +257,7 @@ ALTER TABLE  public.oldpwd
 -- Name: fk_user_1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE  public.user_
+ALTER TABLE  public.users
     ADD CONSTRAINT fk_user_1 FOREIGN KEY (state) REFERENCES public.userstate(id) ;
 
 
@@ -267,7 +268,7 @@ ALTER TABLE  public.user_
 --
 
 ALTER TABLE  public.users_groups
-    ADD CONSTRAINT fk_usersgroups_1 FOREIGN KEY (userid) REFERENCES public.user_(userid);
+    ADD CONSTRAINT fk_usersgroups_1 FOREIGN KEY (userid) REFERENCES public.users(userid);
 
 
 -- Completed on 2010-09-27 09:27:34 CEST

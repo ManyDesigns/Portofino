@@ -30,7 +30,6 @@ package com.manydesigns.portofino.actions.user.admin;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
-import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.logging.LogUtil;
@@ -61,7 +60,6 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.io.StringBufferInputStream;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -89,8 +87,8 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     public final static String JSON_SELECT_FIELD_OPTIONS =
             "jsonSelectFieldOptions";
     public static final String EXPORT_FILENAME_FORMAT = "export-{0}";
-    private static final String userTable = "portofino.public.user_";
-    private static final String groupTable = "portofino.public.group_";
+    private static final String userTable = "portofino.public.users";
+    private static final String groupTable = "portofino.public.groups";
     private static final String usersGroupsTable = "portofino.public.users_groups";
 
     //**************************************************************************
@@ -414,7 +412,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
         try {
             TableAccessor groupAccessor = context.getTableAccessor(groupTable);
             Criteria criteria = new Criteria(groupAccessor);
-            criteria.eq(groupAccessor.getProperty("active"), true);
+            criteria.isNull(groupAccessor.getProperty("deletionDate"));
 
             List<Object> objects = context.getObjects(criteria);
 
@@ -536,8 +534,10 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
 
     public String delete() {
         setupTable();
-        Object pkObject = pkHelper.parsePkString(pk);
-        context.deleteObject(userTable, pkObject);
+        User pkUsr = new User(new Long(pk));
+        User aUser = (User) context.getObjectByPk(userTable, pkUsr);
+        aUser.setDeletionDate(new Timestamp(System.currentTimeMillis()));
+        context.saveObject(userTable, aUser);
         String databaseName = model.findTableByQualifiedName(userTable)
                 .getDatabaseName();
         context.commit(databaseName);
@@ -553,8 +553,10 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
             return CANCEL;
         }
         for (String current : selection) {
-            Object pkObject = pkHelper.parsePkString(current);
-            context.deleteObject(userTable, pkObject);
+            User pkUsr = new User(new Long(current));
+            User aUser = (User) context.getObjectByPk(userTable, pkUsr);
+            aUser.setDeletionDate(new Timestamp(System.currentTimeMillis()));
+            context.saveObject(userTable, aUser);
         }
         String databaseName = model.findTableByQualifiedName(userTable)
                 .getDatabaseName();
@@ -621,48 +623,8 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
         SessionMessages.addInfoMessage("Group added");
         return read();
     }
-    //**************************************************************************
-    // Ajax
-    //**************************************************************************
 
-    public String jsonSelectFieldOptions() {
-        return jsonOptions(true);
-    }
 
-    public String jsonAutocompleteOptions() {
-        return jsonOptions(false);
-    }
-
-    protected String jsonOptions(boolean includeSelectPrompt) {
-        setupTable();
-        Table table = model.findTableByQualifiedName(userTable);
-        ForeignKey relationship =
-                table.findForeignKeyByName(relName);
-
-        String[] fieldNames = createFieldNamesForRelationship(relationship);
-        SelectionProvider selectionProvider =
-                createSelectionProviderForRelationship(relationship);
-
-        Form form = new FormBuilder(tableAccessor)
-                .configFields(fieldNames)
-                .configSelectionProvider(selectionProvider, fieldNames)
-                .configMode(Mode.EDIT)
-                .build();
-        form.readFromRequest(req);
-
-        SelectField targetField =
-                (SelectField) form.get(0).get(optionProviderIndex);
-        targetField.setLabelSearch(labelSearch);
-
-        form.validate();
-
-        String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
-        LogUtil.infoMF(logger, "jsonSelectFieldOptions: {0}", text);
-
-        inputStream = new StringBufferInputStream(text);
-
-        return JSON_SELECT_FIELD_OPTIONS;
-    }
 
     //**************************************************************************
     // Utility methods

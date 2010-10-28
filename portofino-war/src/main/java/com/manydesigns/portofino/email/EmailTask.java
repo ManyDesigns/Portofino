@@ -67,6 +67,7 @@ public class EmailTask extends TimerTask {
     protected static final Logger logger =
             LogUtil.getLogger(TimerTask.class);
     protected final Context context;
+    private static final String PORTOFINO_PUBLIC_USER = "portofino.public.users";
 
 
     public EmailTask(Context context) {
@@ -180,7 +181,7 @@ public class EmailTask extends TimerTask {
 
     private void incrementBounce(String email) {
         try {
-            ClassAccessor accessor = context.getTableAccessor("portofino.public.user_");
+            ClassAccessor accessor = context.getTableAccessor(PORTOFINO_PUBLIC_USER);
             Criteria criteria = new Criteria(accessor);
             List<Object> users = context.getObjects(
                     criteria.gt(accessor.getProperty("email"), email));
@@ -196,7 +197,7 @@ public class EmailTask extends TimerTask {
                 value++;
             }
             user.setBounced(value);
-            context.saveObject("portofino.user_", user);
+            context.saveObject(PORTOFINO_PUBLIC_USER, user);
         } catch (NoSuchFieldException e) {
             LogUtil.warning(logger,"cannot increment bounce for user", e);
         }

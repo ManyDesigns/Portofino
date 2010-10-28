@@ -65,6 +65,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     //**************************************************************************
     public HttpServletRequest req;
     public List<Group> groups;
+    private static final String PORTOFINO_PUBLIC_USER = "portofino.public.users";
 
     public ProfileAction() {
         groups = new ArrayList<Group>();
@@ -90,11 +91,11 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
 
     private String read() {
         user = context.getCurrentUser();
-        ClassAccessor accessor = context.getTableAccessor("portofino.public.user_");
+        ClassAccessor accessor = context.getTableAccessor(PORTOFINO_PUBLIC_USER);
         FormBuilder formBuilder = new FormBuilder(accessor);
-        formBuilder.configFields("email", "screenName", "firstName",
-                "middleName", "lastName", "createDate");
-        User thisUser = (User) context.getObjectByPk("portofino.public.user_", user);
+        formBuilder.configFields("email", "userName", "firstName",
+                "middleName", "lastName", "creationDate");
+        User thisUser = (User) context.getObjectByPk(PORTOFINO_PUBLIC_USER, user);
         for (UsersGroups ug : thisUser.getGroups()){
             Group grp = ug.getGroup();
             groups.add(grp);
@@ -109,10 +110,10 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     public String edit() {
         user = context.getCurrentUser();
 
-        ClassAccessor accessor = context.getTableAccessor("portofino.public.user_");
+        ClassAccessor accessor = context.getTableAccessor(PORTOFINO_PUBLIC_USER);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
-                .configFields("email", "screenName", "firstName",
+                .configFields("email", "userName", "firstName",
                         "middleName", "lastName")
                 .configMode(Mode.EDIT)
                 .build();
@@ -123,10 +124,10 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     public String update() {
         user = context.getCurrentUser();
 
-        ClassAccessor accessor = context.getTableAccessor("portofino.public.user_");
+        ClassAccessor accessor = context.getTableAccessor(PORTOFINO_PUBLIC_USER);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
-                .configFields("email", "screenName", "firstName",
+                .configFields("email", "userName", "firstName",
                         "middleName", "lastName")
                 .configMode(Mode.EDIT)
                 .build();
@@ -135,7 +136,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
         
         if(form.validate()){
             form.writeToObject(user);
-            context.updateObject("portofino.public.user_", user);
+            context.updateObject(PORTOFINO_PUBLIC_USER, user);
             context.commit("portofino");
             LogUtil.finestMF(logger, "User {0} updated", user.getEmail());
             SessionMessages.addInfoMessage("Utente aggiornato correttamente");
@@ -167,7 +168,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
             if(bean.oldPwd.equals(user.getPwd())) {
                 user.setPwd(bean.pwd);
                 user.setPwdModDate(new Timestamp(new Date().getTime()));
-                context.updateObject("portofino.public.user_", user);
+                context.updateObject(PORTOFINO_PUBLIC_USER, user);
                 context.commit("portofino");
 
                 LogUtil.finestMF(logger, "User {0} updated", user.getEmail());

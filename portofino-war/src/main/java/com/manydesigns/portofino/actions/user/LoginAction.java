@@ -125,16 +125,15 @@ public class LoginAction extends PortofinoAction
         user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
         int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
         user.setFailedLoginAttempts(failedAttempts+1);
-        context.updateObject("portofino.public.user_", user);
+        context.updateObject("portofino.public.users", user);
         context.commit("portofino");
     }
 
     private void updateUser(User user) {
         user.setFailedLoginAttempts(0);
         user.setLastLoginDate(new Timestamp(new Date().getTime()));
-        user.setLoginIp(req.getRemoteHost());
         user.setToken(null);
-        context.updateObject("portofino.public.user_", user);
+        context.updateObject("portofino.public.users", user);
         context.commit("portofino");
     }
 

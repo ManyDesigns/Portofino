@@ -44,8 +44,8 @@ public class Group implements Serializable{
     String name;
     String description;
     Long creatorId;
-    Timestamp delDate;
-    Boolean active;
+    Timestamp deletionDate;
+    Timestamp creationDate;
 
     
     List<User> users = new ArrayList<User>();
@@ -98,20 +98,20 @@ public class Group implements Serializable{
         this.creatorId = creatorId;
     }
 
-    public Date getDelDate() {
-        return delDate;
+    public Date getDeletionDate() {
+        return deletionDate;
     }
 
-    public void setDelDate(Timestamp delDate) {
-        this.delDate = delDate;
+    public void setDeletionDate(Timestamp deletionDate) {
+        this.deletionDate = deletionDate;
     }
 
-    public Boolean getActive() {
-        return active;
+    public Timestamp getCreationDate() {
+        return creationDate;
     }
 
-    public void setActive(Boolean active) {
-        this.active = active;
+    public void setCreationDate(Timestamp creationDate) {
+        this.creationDate = creationDate;
     }
 
     @Override

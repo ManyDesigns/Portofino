@@ -5,7 +5,7 @@
             <schemas>
                 <schema schemaName="public">
                     <tables>
-                        <table tableName="user_"
+                        <table tableName="users"
                                javaClass="com.manydesigns.portofino.system.model.users.User">
                             <columns>
                                 <column columnName="userid"
@@ -33,7 +33,7 @@
                                 <column columnName="pwd"
                                         columnType="varchar"
                                         javaType="java.lang.String"
-                                        length="75"
+                                        length="50"
                                         scale="0"
                                         nullable="false"
                                         searchable="false"
@@ -53,7 +53,7 @@
                                 <column columnName="token"
                                         columnType="varchar"
                                         javaType="java.lang.String"
-                                        length="255"
+                                        length="100"
                                         scale="0"
                                         nullable="true"
                                         searchable="false"
@@ -61,7 +61,7 @@
                                 <column columnName="remquestion"
                                         columnType="varchar"
                                         javaType="java.lang.String"
-                                        length="75"
+                                        length="255"
                                         scale="0"
                                         nullable="true"
                                         searchable="false"
@@ -70,41 +70,25 @@
                                 <column columnName="remans"
                                         columnType="varchar"
                                         javaType="java.lang.String"
-                                        length="75"
-                                        scale="0"
-                                        nullable="true"
-                                        searchable="false"
-                                        />
-
-                                <column columnName="screenname"
-                                        columnType="varchar"
-                                        javaType="java.lang.String"
-                                        length="75"
-                                        scale="0"
-                                        nullable="true"
-                                        searchable="true"
-                                        propertyName="screenName"
-                                        />
-                                <column columnName="greeting"
-                                        columnType="varchar"
-                                        javaType="java.lang.String"
-                                        length="75"
-                                        scale="0"
-                                        nullable="true"
-                                        searchable="false"
-                                        />
-                                <column columnName="comments"
-                                        columnType="varchar"
-                                        javaType="java.lang.String"
                                         length="255"
                                         scale="0"
                                         nullable="true"
                                         searchable="false"
                                         />
+
+                                <column columnName="username"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="50"
+                                        scale="0"
+                                        nullable="true"
+                                        searchable="true"
+                                        propertyName="userName"
+                                        />
                                 <column columnName="firstname"
                                         columnType="varchar"
                                         javaType="java.lang.String"
-                                        length="75"
+                                        length="50"
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
@@ -113,7 +97,7 @@
                                 <column columnName="middlename"
                                         columnType="varchar"
                                         javaType="java.lang.String"
-                                        length="75"
+                                        length="50"
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
@@ -122,7 +106,7 @@
                                 <column columnName="lastname"
                                         columnType="varchar"
                                         javaType="java.lang.String"
-                                        length="75"
+                                        length="50"
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
@@ -131,29 +115,11 @@
                                 <column columnName="jobtitle"
                                         columnType="varchar"
                                         javaType="java.lang.String"
-                                        length="75"
+                                        length="50"
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
                                         propertyName="jobTitle"
-                                        />
-                                <column columnName="loginip"
-                                        columnType="varchar"
-                                        javaType="java.lang.String"
-                                        length="75"
-                                        scale="0"
-                                        nullable="true"
-                                        searchable="false"
-                                        propertyName="loginIp"
-                                        />
-                                <column columnName="lastloginip"
-                                        columnType="varchar"
-                                        javaType="java.lang.String"
-                                        length="75"
-                                        scale="0"
-                                        nullable="true"
-                                        searchable="false"
-                                        propertyName="lastLoginIp"
                                         />
                                 <column columnName="defaultuser"
                                         columnType="bool"
@@ -183,25 +149,23 @@
                                         searchable="true"
                                         propertyName="agreedToTerms"
                                         />
-
-
-                                <column columnName="createdate"
+                                <column columnName="creationdate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="15"
                                         scale="0"
                                         nullable="true"
                                         searchable="true"
-                                        propertyName="createDate"
+                                        propertyName="creationDate"
                                         />
-                                <column columnName="deldate"
+                                <column columnName="deletiondate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="29"
                                         scale="6"
                                         searchable="true"
                                         nullable="true"
-                                        propertyName="delDate"
+                                        propertyName="deletionDate"
                                         />
                                 <column columnName="modifieddate"
                                         columnType="timestamp"
@@ -211,7 +175,7 @@
                                         searchable="true"
                                         nullable="true"
                                         propertyName="modifiedDate"/>
-                                <column columnName="pwdmoddate"
+                                <column columnName="lastpwdmoddate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="29"
@@ -219,14 +183,6 @@
                                         searchable="true"
                                         nullable="true"
                                         propertyName="pwdModDate"/>
-                                <column columnName="logindate"
-                                        columnType="timestamp"
-                                        javaType="java.util.Date"
-                                        length="29"
-                                        scale="6"
-                                        searchable="true"
-                                        nullable="true"
-                                        propertyName="loginDate"/>
                                 <column columnName="lastlogindate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
@@ -276,11 +232,11 @@
                             </primaryKey>
                             <annotations>
                                 <annotation type="com.manydesigns.elements.annotations.ShortName">
-                                    <value>%{screenName} (%{email})</value>
+                                    <value>%{userName} (%{email})</value>
                                 </annotation>
                             </annotations>
                         </table>
-                        <table tableName="group_"
+                        <table tableName="groups"
                                javaClass="com.manydesigns.portofino.system.model.users.Group">
                             <columns>
                                 <column columnName="groupid"
@@ -295,7 +251,7 @@
                                 <column columnName="name"
                                         columnType="varchar"
                                         javaType="java.lang.String"
-                                        length="75"
+                                        length="50"
                                         scale="0"
                                         nullable="false"
                                         searchable="true"/>
@@ -322,21 +278,22 @@
                                         nullable="true"
                                         searchable="false"
                                         propertyName="creatorId"/>
-                                <column columnName="active"
-                                        columnType="bool"
-                                        javaType="java.lang.Boolean"
-                                        length="1"
-                                        scale="0"
-                                        nullable="true"
-                                        searchable="true"/>
-                                <column columnName="deldate"
+                                <column columnName="deletiondate"
                                         columnType="timestamp"
                                         javaType="java.util.Date"
                                         length="29"
                                         scale="6"
                                         nullable="true"
                                         searchable="true"
-                                        propertyName="delDate"/>
+                                        propertyName="deletionDate"/>
+                                <column columnName="creationdate"
+                                        columnType="timestamp"
+                                        javaType="java.util.Date"
+                                        length="29"
+                                        scale="6"
+                                        nullable="true"
+                                        searchable="true"
+                                        propertyName="creationDate"/>
                             </columns>
                             <primaryKey primaryKeyName="pk_group">
                                 <column columnName="groupid"/>
@@ -345,7 +302,7 @@
                                 <foreignKey foreignKeyName="fk_grp_1"
                                               toDatabase="portofino"
                                               toSchema="public"
-                                              toTable="user_"
+                                              toTable="users"
                                               onUpdate="NO ACTION"
                                               onDelete="NO ACTION"
                                               manyPropertyName="groupsCreated"
@@ -405,7 +362,7 @@
                                 <foreignKey foreignKeyName="fk_ug_1"
                                               toDatabase="portofino"
                                               toSchema="public"
-                                              toTable="user_"
+                                              toTable="users"
                                               onUpdate="NO ACTION"
                                               onDelete="NO ACTION"
                                               manyPropertyName="groups"
@@ -423,7 +380,7 @@
                                 <foreignKey foreignKeyName="fk_ug_2"
                                             toDatabase="portofino"
                                             toSchema="public"
-                                            toTable="group_"
+                                            toTable="groups"
                                             onUpdate="NO ACTION"
                                             onDelete="NO ACTION"
                                             manyPropertyName="users"

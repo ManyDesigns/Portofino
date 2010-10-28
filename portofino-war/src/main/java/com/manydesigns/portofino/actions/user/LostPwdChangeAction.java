@@ -87,7 +87,7 @@ public class LostPwdChangeAction extends PortofinoAction
                 User user = context.findUserByToken(token);
                 user.setPwd(pwd.pwd);
                 user.setPwdModDate(new Timestamp(new Date().getTime()));
-                context.updateObject("portofino.public.user_", user);
+                context.updateObject("portofino.public.users", user);
                 context.commit("portofino");
                 LogUtil.finestMF(logger, "User {0} updated", user.getEmail());
                 return SUCCESS;

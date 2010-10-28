@@ -58,6 +58,7 @@ public class PasswordGenerator extends TimerTask {
     protected final int port;
     public static final Logger logger =
             LogUtil.getLogger(PasswordGenerator.class);
+    private static final String PORTOFINO_PUBLIC_USER = "portofino.public.users";
 
 
     public PasswordGenerator(Context context) {
@@ -81,7 +82,7 @@ public class PasswordGenerator extends TimerTask {
             ElementsThreadLocals.setupDefaultElementsContext();
             context.openSession();
             ClassAccessor accessor = context
-                    .getTableAccessor("portofino.public.user_");
+                    .getTableAccessor(PORTOFINO_PUBLIC_USER);
             Criteria criteria = new Criteria(accessor);
             List<Object> users = context.getObjects(
                     criteria.isNull(accessor.getProperty("pwd")));
@@ -109,7 +110,7 @@ public class PasswordGenerator extends TimerTask {
             EmailTask em = new EmailTask(context);
             EmailHandler.addEmail(context, "subject", msg,
                 user.getEmail(), sender);
-            context.saveObject("portofino.public.user_", user);
+            context.saveObject(PORTOFINO_PUBLIC_USER, user);
             context.commit("portofino");
     }
 

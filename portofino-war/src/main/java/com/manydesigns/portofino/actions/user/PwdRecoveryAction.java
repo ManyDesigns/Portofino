@@ -74,7 +74,7 @@ public class PwdRecoveryAction extends PortofinoAction
                 return INPUT;
             }
             user.tokenGenerator();
-            context.updateObject("portofino.public.user_", user);
+            context.updateObject("portofino.public.users", user);
             context.commit("portofino");
         } catch (Exception e) {
             final String errore = "Errore nella verifica della email. " +
