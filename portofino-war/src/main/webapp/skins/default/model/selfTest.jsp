@@ -5,7 +5,7 @@
 %><s:include value="/skins/default/header.jsp"/>
 <div id="inner-content">
     <h1>Self test</h1>
-    Differences between "A" and "B":
+    Source model: on database. Target model: in memory. Reporting differences:
     <s:if test="messages.size() > 0">
         <s:form method="post">
             <table>

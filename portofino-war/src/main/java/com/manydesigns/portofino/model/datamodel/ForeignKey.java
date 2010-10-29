@@ -29,13 +29,12 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.util.Pair;
-import com.manydesigns.elements.logging.LogUtil;
 import org.apache.commons.lang.ObjectUtils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -237,7 +236,7 @@ public class ForeignKey {
         this.onePropertyName = onePropertyName;
     }
 
-    public Collection<ModelAnnotation> getModelAnnotations() {
+    public List<ModelAnnotation> getModelAnnotations() {
         return modelAnnotations;
     }
 

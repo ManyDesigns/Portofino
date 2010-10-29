@@ -44,8 +44,8 @@ public class TableDiff {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final Table sourceTable;
-    private final Table targetTable;
+    private Table sourceTable;
+    private Table targetTable;
     private final List<ModelAnnotationDiff> modelAnnotationDiffs;
     private final List<ColumnDiff> columnDiffs;
     private final PrimaryKeyDiff primaryKeyDiff;
@@ -75,8 +75,16 @@ public class TableDiff {
         return sourceTable;
     }
 
+    public void setSourceTable(Table sourceTable) {
+        this.sourceTable = sourceTable;
+    }
+
     public Table getTargetTable() {
         return targetTable;
+    }
+
+    public void setTargetTable(Table targetTable) {
+        this.targetTable = targetTable;
     }
 
     public List<ModelAnnotationDiff> getModelAnnotationDiffs() {

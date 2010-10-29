@@ -43,8 +43,8 @@ public class DatabaseDiff {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final Database sourceDatabase;
-    private final Database targetDatabase;
+    private Database sourceDatabase;
+    private Database targetDatabase;
     private final List<SchemaDiff> schemaDiffs;
 
     public DatabaseDiff(Database sourceDatabase, Database targetDatabase) {
@@ -57,8 +57,16 @@ public class DatabaseDiff {
         return sourceDatabase;
     }
 
+    public void setSourceDatabase(Database sourceDatabase) {
+        this.sourceDatabase = sourceDatabase;
+    }
+
     public Database getTargetDatabase() {
         return targetDatabase;
+    }
+
+    public void setTargetDatabase(Database targetDatabase) {
+        this.targetDatabase = targetDatabase;
     }
 
     public List<SchemaDiff> getSchemaDiffs() {

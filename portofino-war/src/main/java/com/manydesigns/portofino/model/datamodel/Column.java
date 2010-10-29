@@ -35,7 +35,6 @@ import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -216,7 +215,7 @@ public class Column {
         this.searchable = searchable;
     }
 
-    public Collection<ModelAnnotation> getModelAnnotations() {
+    public List<ModelAnnotation> getModelAnnotations() {
         return modelAnnotations;
     }
     

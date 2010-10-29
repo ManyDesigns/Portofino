@@ -43,8 +43,8 @@ public class SchemaDiff {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final Schema sourceSchema;
-    private final Schema targetSchema;
+    private Schema sourceSchema;
+    private Schema targetSchema;
     private final List<TableDiff> tableDiffs;
 
     public SchemaDiff(Schema sourceSchema, Schema targetSchema) {
@@ -57,8 +57,16 @@ public class SchemaDiff {
         return sourceSchema;
     }
 
+    public void setSourceSchema(Schema sourceSchema) {
+        this.sourceSchema = sourceSchema;
+    }
+
     public Schema getTargetSchema() {
         return targetSchema;
+    }
+
+    public void setTargetSchema(Schema targetSchema) {
+        this.targetSchema = targetSchema;
     }
 
     public List<TableDiff> getTableDiffs() {

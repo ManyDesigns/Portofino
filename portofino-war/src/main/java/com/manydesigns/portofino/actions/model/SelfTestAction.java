@@ -55,12 +55,13 @@ public class SelfTestAction extends PortofinoAction {
         MessageDiffVisitor visitor = new MessageDiffVisitor();
         model = context.getModel();
         for (ConnectionProvider current : context.getConnectionProviders()) {
-            Database database =
+            Database sourceDatabase = current.readModel();
+
+            Database targetDatabase =
                     model.findDatabaseByName(current.getDatabaseName());
-            Database targetDatabase = current.readModel();
 
             DatabaseDiff diff =
-                    DiffUtil.diff(database, targetDatabase);
+                    DiffUtil.diff(sourceDatabase, targetDatabase);
 
             visitor.visitDatabaseDiff(diff);
 

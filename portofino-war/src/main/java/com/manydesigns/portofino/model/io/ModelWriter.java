@@ -39,7 +39,6 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 /*
@@ -147,7 +146,7 @@ public class ModelWriter {
     }
 
     private void visit(Column column) throws XMLStreamException {
-        Collection<ModelAnnotation> modelAnnotations = column.getModelAnnotations();
+        List<ModelAnnotation> modelAnnotations = column.getModelAnnotations();
         if (modelAnnotations.isEmpty()) {
             w.writeEmptyElement(ModelParser.COLUMN);
             writeColumnAttributes(column);
@@ -171,7 +170,7 @@ public class ModelWriter {
         writeOptionalAttribute(ModelParser.COLUMN_JAVATYPE, column.getJavaTypeName());
     }
 
-    private void visitAnnotations(Collection<ModelAnnotation> modelAnnotations)
+    private void visitAnnotations(List<ModelAnnotation> modelAnnotations)
             throws XMLStreamException {
         if (!modelAnnotations.isEmpty()) {
             w.writeStartElement(ModelParser.ANNOTATIONS);
@@ -212,6 +211,8 @@ public class ModelWriter {
         w.writeStartElement(ModelParser.PRIMARYKEY);
         w.writeAttribute(ModelParser.PRIMARYKEY_PRIMARYKEYNAME,
                 primaryKey.getPrimaryKeyName());
+        writeOptionalAttribute(ModelParser.PRIMARYKEY_CLASSNAME,
+                primaryKey.getClassName());
 
         for (PrimaryKeyColumn column : primaryKey.getPrimaryKeyColumns()){
             w.writeEmptyElement(ModelParser.COLUMN);
