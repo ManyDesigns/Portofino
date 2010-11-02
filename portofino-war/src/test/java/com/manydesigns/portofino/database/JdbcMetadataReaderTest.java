@@ -35,7 +35,7 @@ import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;
-import com.manydesigns.portofino.model.diff.MessageDiffVisitor;
+import com.manydesigns.portofino.model.diff.MessageDiffer;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -92,8 +92,8 @@ public class JdbcMetadataReaderTest extends AbstractPortofinoTest {
                 DiffUtil.diff(database, pippoDatabase);
         assertNotNull(databaseComparison);
 
-        MessageDiffVisitor diffs = new MessageDiffVisitor();
-        diffs.visitDatabaseDiff(databaseComparison);
+        MessageDiffer diffs = new MessageDiffer();
+        diffs.diffDatabase(databaseComparison);
         List<String> diff = diffs.getMessages();
 
         assertEquals(30, diff.size());

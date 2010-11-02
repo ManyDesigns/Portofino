@@ -33,9 +33,9 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.diff.DiffUtil;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
-import com.manydesigns.portofino.model.diff.MessageDiffVisitor;
+import com.manydesigns.portofino.model.diff.DiffUtil;
+import com.manydesigns.portofino.model.diff.MessageDiffer;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -52,7 +52,7 @@ public class SelfTestAction extends PortofinoAction {
     public List<String> messages;
 
     public String execute() throws SQLException {
-        MessageDiffVisitor visitor = new MessageDiffVisitor();
+        MessageDiffer visitor = new MessageDiffer();
         model = context.getModel();
         for (ConnectionProvider current : context.getConnectionProviders()) {
             Database sourceDatabase = current.readModel();
@@ -63,7 +63,7 @@ public class SelfTestAction extends PortofinoAction {
             DatabaseDiff diff =
                     DiffUtil.diff(sourceDatabase, targetDatabase);
 
-            visitor.visitDatabaseDiff(diff);
+            visitor.diffDatabase(diff);
 
         }
         messages = visitor.getMessages();

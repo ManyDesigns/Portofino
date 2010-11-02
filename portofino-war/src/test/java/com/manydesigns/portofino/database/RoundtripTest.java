@@ -35,7 +35,7 @@ import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;
-import com.manydesigns.portofino.model.diff.MessageDiffVisitor;
+import com.manydesigns.portofino.model.diff.MessageDiffer;
 import com.manydesigns.portofino.model.io.ModelParser;
 import com.manydesigns.portofino.model.io.ModelWriter;
 
@@ -331,8 +331,8 @@ public class RoundtripTest extends AbstractPortofinoTest {
         // compare each database separately
         for (int i = 0; i < databases.size(); i++) {
             DatabaseDiff diff = DiffUtil.diff(databases.get(i), databases2.get(i));
-            MessageDiffVisitor visitor = new MessageDiffVisitor();
-            visitor.visitDatabaseDiff(diff);
+            MessageDiffer visitor = new MessageDiffer();
+            visitor.diffDatabase(diff);
             List<String> messages = visitor.getMessages();
             if (!messages.isEmpty()) {
                 for (String message : messages) {
