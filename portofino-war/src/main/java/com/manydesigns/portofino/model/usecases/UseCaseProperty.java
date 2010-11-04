@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model.usecases;
 
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,9 +57,13 @@ public class UseCaseProperty {
     // Constructors
     //**************************************************************************
 
-    public UseCaseProperty(String name) {
-        this.name = name;
+    public UseCaseProperty() {
         modelAnnotations = new ArrayList<ModelAnnotation>();
+    }
+
+    public UseCaseProperty(String name) {
+        this();
+        this.name = name;
     }
 
 
@@ -66,6 +71,7 @@ public class UseCaseProperty {
     // Getters/setters
     //**************************************************************************
 
+    @XmlAttribute(required = true)
     public String getName() {
         return name;
     }

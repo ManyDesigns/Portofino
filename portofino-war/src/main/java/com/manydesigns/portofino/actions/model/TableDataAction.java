@@ -61,8 +61,11 @@ import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
+import org.apache.fop.apps.FOPException;
+import org.apache.fop.apps.Fop;
+import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.MimeConstants;
 import org.apache.struts2.interceptor.ServletRequestAware;
-import org.apache.fop.apps.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.*;
@@ -682,8 +685,8 @@ public class TableDataAction extends PortofinoAction
         String[] fieldNames = new String[references.size()];
         int i = 0;
         for (Reference reference : references) {
-            Column column = reference.getFromColumn();
-            fieldNames[i] = column.getName();
+            Column column = reference.getActualFromColumn();
+            fieldNames[i] = column.getActualPropertyName();
             i++;
         }
         return fieldNames;
@@ -691,7 +694,7 @@ public class TableDataAction extends PortofinoAction
 
     protected SelectionProvider createSelectionProviderForRelationship(ForeignKey rel) {
         // retrieve the related objects
-        Table relatedTable = rel.getToTable();
+        Table relatedTable = rel.getActualToTable();
         ClassAccessor classAccessor =
                 context.getTableAccessor(relatedTable.getQualifiedName());
         List<Object> relatedObjects =

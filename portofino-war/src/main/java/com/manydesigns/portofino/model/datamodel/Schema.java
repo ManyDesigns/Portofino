@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Schema {
+public class Schema implements DatamodelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -50,8 +51,14 @@ public class Schema {
     //**************************************************************************
 
     protected final Database database;
-    protected String schemaName;
     protected final List<Table> tables;
+
+    protected String schemaName;
+
+    
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
 
     public static final Logger logger = LogUtil.getLogger(Schema.class);
 
@@ -59,10 +66,14 @@ public class Schema {
     //**************************************************************************
     // Constructors and init
     //**************************************************************************
-    public Schema(Database database, String schemaName) {
+    public Schema(Database database) {
         this.database = database;
-        this.schemaName = schemaName;
         this.tables = new ArrayList<Table>();
+    }
+
+    public Schema(Database database, String schemaName) {
+        this(database);
+        this.schemaName = schemaName;
     }
 
     public void init() {
@@ -83,6 +94,7 @@ public class Schema {
         return database.getDatabaseName();
     }
 
+    @XmlAttribute(required = true)
     public String getSchemaName() {
         return schemaName;
     }
@@ -95,6 +107,10 @@ public class Schema {
         return tables;
     }
 
+
+    //**************************************************************************
+    // DatamodelObject implementation
+    //**************************************************************************
 
     public String getQualifiedName() {
         return MessageFormat.format("{0}.{1}", getDatabaseName(), schemaName);
@@ -147,11 +163,12 @@ public class Schema {
     }
 
     //**************************************************************************
-    // Overrides
+    // toString() override
     //**************************************************************************
 
     @Override
     public String toString() {
-        return getQualifiedName();
+        return MessageFormat.format("schema {0}", getQualifiedName());
     }
+
 }

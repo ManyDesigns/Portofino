@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.util.logging.Logger;
 
@@ -45,8 +46,10 @@ public class PrimaryKeyColumn {
     //**************************************************************************
     // Fields
     //**************************************************************************
-    protected final PrimaryKey pk;
+    protected final PrimaryKey primaryKey;
+
     protected String columnName;
+
     protected Column column;
 
     public static final Logger logger =
@@ -56,17 +59,21 @@ public class PrimaryKeyColumn {
     // Constructors
     //**************************************************************************
 
-    public PrimaryKeyColumn(PrimaryKey pk, String columnName) {
-        this.pk = pk;
+    public PrimaryKeyColumn(PrimaryKey primaryKey) {
+        this.primaryKey = primaryKey;
+    }
+
+    public PrimaryKeyColumn(PrimaryKey primaryKey, String columnName) {
+        this(primaryKey);
         this.columnName = columnName;
     }
 
     public void init() {
-        column = pk.getTable().findColumnByName(columnName);
+        column = primaryKey.getTable().findColumnByName(columnName);
         if (column == null) {
             LogUtil.warningMF(logger,
                     "Cannor wire primary key column ''{0}'' to primary key ''{1}''",
-                    columnName, pk);
+                    columnName, primaryKey);
 
         }
     }
@@ -75,10 +82,11 @@ public class PrimaryKeyColumn {
     // Getters/setter
     //**************************************************************************
 
-    public PrimaryKey getPk() {
-        return pk;
+    public PrimaryKey getPrimaryKey() {
+        return primaryKey;
     }
 
+    @XmlAttribute(required = true)
     public String getColumnName() {
         return columnName;
     }

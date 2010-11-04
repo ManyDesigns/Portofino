@@ -15,7 +15,7 @@
     </div>
 </div>
 <script type="text/javascript">
-YAHOO.example.fixSideBar();
+/*YAHOO.example.fixSideBar();*/
 </script>
 </body>
 </html>

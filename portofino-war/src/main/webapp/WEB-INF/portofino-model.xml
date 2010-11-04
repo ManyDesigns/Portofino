@@ -330,7 +330,7 @@
                                 <column columnName="groupid"/>
                             </primaryKey>
                             <foreignKeys>
-                                <foreignKey foreignKeyName="fk_grp_1"
+                                <foreignKey foreignKeyName="fk_group_1"
                                               toDatabase="portofino"
                                               toSchema="public"
                                               toTable="users"
@@ -1019,8 +1019,6 @@
                           title="Table data" description="Table data"/>
                 <siteNode type="table-design" url="/model/TableDesign.action"
                           title="Table design" description="Table design"/>
-                <siteNode type="simple" url="/model/PrintModel.action" title="Print model"
-                          description="Print model"/>
                 <siteNode type="simple" url="/model/SelfTest.action" title="Self test"
                           description="Self test"/>
                 <siteNode type="simple" url="/model/SiteMap.action" title="Site map"

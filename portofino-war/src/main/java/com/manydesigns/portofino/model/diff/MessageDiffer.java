@@ -353,8 +353,8 @@ public class MessageDiffer extends AbstractDiffer {
                 "Source table {0} foreign key: {1} does not contain reference: {2}->{3}",
                 sourceTable.getQualifiedName(),
                 sourceForeignKey.getForeignKeyName(),
-                targetReference.getFromColumnName(),
-                targetReference.getToColumnName());
+                targetReference.getFromColumn(),
+                targetReference.getToColumn());
         messages.add(difference);
     }
 
@@ -363,27 +363,27 @@ public class MessageDiffer extends AbstractDiffer {
                 "Target table {0} foreign key: {1} does not contain reference: {2}->{3}",
                 targetTable.getQualifiedName(),
                 targetForeignKey.getForeignKeyName(),
-                sourceReference.getFromColumnName(),
-                sourceReference.getToColumnName());
+                sourceReference.getFromColumn(),
+                sourceReference.getToColumn());
         messages.add(difference);
     }
 
     public void diffReferenceSourceTarget(ReferenceDiff referenceDiff) {
-        if (!ObjectUtils.equals(sourceReference.getFromColumnName(),
-                targetReference.getFromColumnName())) {
+        if (!ObjectUtils.equals(sourceReference.getFromColumn(),
+                targetReference.getFromColumn())) {
             String difference = MessageFormat.format(
                     "Reference from column names {0} / {1} are different",
-                    sourceReference.getFromColumnName(),
-                    targetReference.getFromColumnName());
+                    sourceReference.getFromColumn(),
+                    targetReference.getFromColumn());
             messages.add(difference);
         }
 
-        if (!ObjectUtils.equals(sourceReference.getToColumnName(),
-                targetReference.getToColumnName())) {
+        if (!ObjectUtils.equals(sourceReference.getToColumn(),
+                targetReference.getToColumn())) {
             String difference = MessageFormat.format(
                     "Reference to column names {0} / {1} are different",
-                    sourceReference.getToColumnName(),
-                    targetReference.getToColumnName());
+                    sourceReference.getToColumn(),
+                    targetReference.getToColumn());
             messages.add(difference);
         }
         diffReferenceChildren(referenceDiff);

@@ -31,6 +31,7 @@ package com.manydesigns.portofino.model.usecases;
 
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,32 +50,36 @@ public class UseCase {
     // Fields
     //**************************************************************************
 
-    protected String name;
-    protected String title;
-    protected String tableName;
-    protected String filter;
     protected final List<UseCaseProperty> properties;
     protected final List<ModelAnnotation> modelAnnotations;
+
+    protected String name;
+    protected String title;
+    protected String table;
+    protected String filter;
 
     //**************************************************************************
     // Fields for wire-up
     //**************************************************************************
 
-    protected Table table;
+    protected Table actualTable;
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public UseCase(String name, String title, String tableName, String filter) {
-        this.name = name;
-        this.title = title;
-        this.tableName = tableName;
-        this.filter = filter;
+    public UseCase() {
         properties = new ArrayList<UseCaseProperty>();
         modelAnnotations = new ArrayList<ModelAnnotation>();
     }
 
+    public UseCase(String name, String title, String table, String filter) {
+        this();
+        this.name = name;
+        this.title = title;
+        this.table = table;
+        this.filter = filter;
+    }
 
     public void init() {}
 
@@ -83,6 +88,7 @@ public class UseCase {
     // Getters/setters
     //**************************************************************************
 
+    @XmlAttribute(required = true)
     public String getName() {
         return name;
     }
@@ -91,6 +97,7 @@ public class UseCase {
         this.name = name;
     }
 
+    @XmlAttribute(required = true)
     public String getTitle() {
         return title;
     }
@@ -99,22 +106,24 @@ public class UseCase {
         this.title = title;
     }
 
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
-
-    public Table getTable() {
+    @XmlAttribute(required = true)
+    public String getTable() {
         return table;
     }
 
-    public void setTable(Table table) {
+    public void setTable(String table) {
         this.table = table;
     }
 
+    public Table getActualTable() {
+        return actualTable;
+    }
+
+    public void setActualTable(Table actualTable) {
+        this.actualTable = actualTable;
+    }
+
+    @XmlAttribute(required = true)
     public String getFilter() {
         return filter;
     }

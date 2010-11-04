@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
+import com.manydesigns.portofino.xml.XmlAttribute;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -43,25 +45,27 @@ public class Reference {
     //**************************************************************************
 
     protected final ForeignKey foreignKey;
-    protected String fromColumnName;
-    protected String toColumnName;
+    protected String fromColumn;
+    protected String toColumn;
 
-    protected Column fromColumn;
-    protected Column toColumn;
+    protected Column actualFromColumn;
+    protected Column actualToColumn;
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public Reference(ForeignKey foreignKey,
-                     String fromColumnName,
-                     String toColumnName) {
+    public Reference(ForeignKey foreignKey) {
         this.foreignKey = foreignKey;
-        this.fromColumnName = fromColumnName;
-        this.toColumnName = toColumnName;
     }
 
+    public Reference(ForeignKey foreignKey,
+                     String fromColumn, String toColumn) {
+        this(foreignKey);
+        this.fromColumn = fromColumn;
+        this.toColumn = toColumn;
+    }
 
     //**************************************************************************
     // Getters/setter
@@ -79,39 +83,41 @@ public class Reference {
         return foreignKey.getFromTableName();
     }
 
-    public String getFromColumnName() {
-        return fromColumnName;
-    }
-
-    public void setFromColumnName(String fromColumnName) {
-        this.fromColumnName = fromColumnName;
-    }
-
-    public String getToDatabaseName() {
-        return foreignKey.getToDatabaseName();
-    }
-
-    public String getToSchemaName() {
-        return foreignKey.getToSchemaName();
-    }
-
-    public String getToTableName() {
-        return foreignKey.getToTableName();
-    }
-
-    public String getToColumnName() {
-        return toColumnName;
-    }
-
-    public void setToColumnName(String toColumnName) {
-        this.toColumnName = toColumnName;
-    }
-
-    public Column getFromColumn() {
+    @XmlAttribute(required = true)
+    public String getFromColumn() {
         return fromColumn;
     }
 
-    public Column getToColumn() {
+    public void setFromColumn(String fromColumn) {
+        this.fromColumn = fromColumn;
+    }
+
+    public String getToDatabaseName() {
+        return foreignKey.getToDatabase();
+    }
+
+    public String getToSchemaName() {
+        return foreignKey.getToSchema();
+    }
+
+    public String getToTableName() {
+        return foreignKey.getToTable();
+    }
+
+    @XmlAttribute(required = true)
+    public String getToColumn() {
         return toColumn;
+    }
+
+    public void setToColumn(String toColumn) {
+        this.toColumn = toColumn;
+    }
+
+    public Column getActualFromColumn() {
+        return actualFromColumn;
+    }
+
+    public Column getActualToColumn() {
+        return actualToColumn;
     }
 }

@@ -176,8 +176,8 @@ public class DBParserTest extends AbstractPortofinoTest {
     private void checkReference(List<Reference> references, int idx,
                                 String fromColumn, String toColumn) {
         Reference ref = references.get(idx);
-        assertEquals(fromColumn, ref.getFromColumnName());
-        assertEquals(toColumn, ref.getToColumnName());
+        assertEquals(fromColumn, ref.getFromColumn());
+        assertEquals(toColumn, ref.getToColumn());
     }
 
     private void checkRelationships(List<ForeignKey> relationships, int idx, String name,
@@ -185,8 +185,8 @@ public class DBParserTest extends AbstractPortofinoTest {
                                     String onUpdate, String onDelete) {
         ForeignKey rel = relationships.get(idx);
         assertEquals(name, rel.getForeignKeyName());
-        assertEquals(toSchema, rel.getToSchemaName());
-        assertEquals(toTable, rel.getToTableName());
+        assertEquals(toSchema, rel.getToSchema());
+        assertEquals(toTable, rel.getToTable());
         assertEquals(onUpdate, rel.getOnUpdate());
         assertEquals(onDelete, rel.getOnDelete());
 
@@ -202,7 +202,7 @@ public class DBParserTest extends AbstractPortofinoTest {
         assertEquals(tableName, column.getTableName());
         assertEquals(columnName, column.getColumnName());
         assertEquals(propertyName, column.getPropertyName());
-        assertEquals(name, column.getName());
+        assertEquals(name, column.getActualPropertyName());
         assertEquals(columnType.toUpperCase(), column.getColumnType().toUpperCase());
         assertEquals(nullable, column.isNullable());
         assertEquals(length, column.getLength());

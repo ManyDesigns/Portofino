@@ -32,6 +32,7 @@ package com.manydesigns.portofino.model.datamodel;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Column {
+public class Column implements DatamodelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -64,7 +65,7 @@ public class Column {
     // Fields (logical)
     //**************************************************************************
 
-    protected String javaTypeName;
+    protected String javaType;
     protected String propertyName;
     protected final List<ModelAnnotation> modelAnnotations;
 
@@ -72,21 +73,23 @@ public class Column {
     // Fields for wire-up
     //**************************************************************************
 
-    protected String name;
-    protected Class javaType;
+    protected String actualPropertyName;
+    protected Class actualJavaType;
 
     public static final Logger logger = LogUtil.getLogger(Column.class);
 
     //**************************************************************************
     // Constructors and init
     //**************************************************************************
-    public Column(Table table, String columnName,
-                  String columnType,
-                  boolean nullable,
-                  boolean autoincrement,
-                  int length, int scale,
-                  boolean searchable) {
+    public Column(Table table) {
         this.table = table;
+        modelAnnotations = new ArrayList<ModelAnnotation>();
+    }
+
+    public Column(Table table, String columnName, String columnType,
+                  boolean nullable, boolean autoincrement,
+                  int length, int scale, boolean searchable) {
+        this(table);
         this.columnName = columnName;
         this.columnType = columnType;
         this.nullable = nullable;
@@ -94,20 +97,35 @@ public class Column {
         this.length = length;
         this.scale = scale;
         this.searchable = searchable;
-        modelAnnotations = new ArrayList<ModelAnnotation>();
+    }
+
+    public Column(Table table,
+                  String columnName,
+                  String columnType,
+                  boolean nullable,
+                  boolean autoincrement,
+                  int length,
+                  int scale,
+                  boolean searchable,
+                  String javaType,
+                  String propertyName) {
+        this(table, columnName, columnType, nullable,
+                autoincrement, length, scale, searchable);
+        this.javaType = javaType;
+        this.propertyName = propertyName;
     }
 
     public void init() {
         if (propertyName == null) {
-            name = columnName;
+            actualPropertyName = columnName;
         } else {
-            name = propertyName;
+            actualPropertyName = propertyName;
         }
 
-        javaType = ReflectionUtil.loadClass(javaTypeName);
-        if (javaType == null) {
+        actualJavaType = ReflectionUtil.loadClass(javaType);
+        if (actualJavaType == null) {
             LogUtil.warningMF(logger,
-                    "Cannot load column java type: {0}", javaTypeName);
+                    "Cannot load column java type: {0}", javaType);
         }
 
         for (ModelAnnotation modelAnnotation : modelAnnotations) {
@@ -135,6 +153,7 @@ public class Column {
         return table.getTableName();
     }
 
+    @XmlAttribute(required = true)
     public String getColumnName() {
         return columnName;
     }
@@ -143,6 +162,7 @@ public class Column {
         this.columnName = columnName;
     }
 
+    @XmlAttribute(required = true)
     public String getColumnType() {
         return columnType;
     }
@@ -151,6 +171,7 @@ public class Column {
         this.columnType = columnType;
     }
 
+    @XmlAttribute(required = true)
     public boolean isNullable() {
         return nullable;
     }
@@ -159,6 +180,7 @@ public class Column {
         this.nullable = nullable;
     }
 
+    @XmlAttribute(required = true)
     public int getLength() {
         return length;
     }
@@ -167,6 +189,7 @@ public class Column {
         this.length = length;
     }
 
+    @XmlAttribute(required = true)
     public int getScale() {
         return scale;
     }
@@ -175,18 +198,20 @@ public class Column {
         this.scale = scale;
     }
 
-    public Class getJavaType() {
+    public Class getActualJavaType() {
+        return actualJavaType;
+    }
+
+    @XmlAttribute(required = false)
+    public String getJavaType() {
         return javaType;
     }
 
-    public String getJavaTypeName() {
-        return javaTypeName;
+    public void setJavaType(String javaType) {
+        this.javaType = javaType;
     }
 
-    public void setJavaTypeName(String javaTypeName) {
-        this.javaTypeName = javaTypeName;
-    }
-
+    @XmlAttribute(required = true)
     public boolean isAutoincrement() {
         return autoincrement;
     }
@@ -195,10 +220,11 @@ public class Column {
         this.autoincrement = autoincrement;
     }
 
-    public String getName() {
-        return name;
+    public String getActualPropertyName() {
+        return actualPropertyName;
     }
 
+    @XmlAttribute(required = false)
     public String getPropertyName() {
         return propertyName;
     }
@@ -207,6 +233,7 @@ public class Column {
         this.propertyName = propertyName;
     }
 
+    @XmlAttribute(required = true)
     public boolean isSearchable() {
         return searchable;
     }
@@ -221,12 +248,21 @@ public class Column {
     
     @Override
     public String toString() {
-        return MessageFormat.format("{0} {1}({2},{3}){4}",
+        return MessageFormat.format("column {0} {1}({2},{3}){4}",
                 getQualifiedName(),
                 columnType,
                 Integer.toString(length),
                 Integer.toString(scale),
                 nullable ? "" : " NOT NULL");
+    }
+
+    //**************************************************************************
+    // DatamodelObject implementation
+    //**************************************************************************
+
+    public String getQualifiedName() {
+        return MessageFormat.format("{0}.{1}",
+                table.getQualifiedName(), columnName);
     }
 
     //**************************************************************************
@@ -244,11 +280,6 @@ public class Column {
                 columnName);
     }
 
-    public String getQualifiedName() {
-        return MessageFormat.format("{0}.{1}",
-                table.getQualifiedName(), columnName);
-    }
-
     public ModelAnnotation findModelAnnotationByType(String annotationType) {
         for (ModelAnnotation modelAnnotation : modelAnnotations) {
             if (modelAnnotation.getType().equals(annotationType)) {
@@ -257,7 +288,6 @@ public class Column {
         }
         return null;
     }
-
 
 
 }

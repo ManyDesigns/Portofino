@@ -5,7 +5,7 @@
             <schemas>
                 <schema schemaName="public">
                     <tables>
-                        <table tableName="users"
+                        <table table="users"
                                javaClass="com.manydesigns.portofino.system.model.users.User">
                             <columns>
                                 <column columnName="userid"
@@ -258,7 +258,7 @@
                                 </annotation>
                             </annotations>
                         </table>
-                        <table tableName="groups"
+                        <table table="groups"
                                javaClass="com.manydesigns.portofino.system.model.users.Group">
                             <columns>
                                 <column columnName="groupid"
@@ -326,14 +326,14 @@
                                 <column columnName="groupid"/>
                             </primaryKey>
                             <foreignKeys>
-                                <foreignKey foreignKeyName="fk_grp_1"
-                                              toDatabase="portofino"
-                                              toSchema="public"
-                                              toTable="users"
-                                              onUpdate="NO ACTION"
-                                              onDelete="NO ACTION"
-                                              manyPropertyName="groupsCreated"
-                                              onePropertyName="creatorId">
+                                <foreignKey foreignKeyName="fk_group_1"
+                                            toDatabase="portofino"
+                                            toSchema="public"
+                                            toTable="users"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION"
+                                            manyPropertyName="groupsCreated"
+                                            onePropertyName="creatorId">
                                     <references>
                                         <reference fromColumn="creatorid"
                                                    toColumn="uuid"/>
@@ -346,7 +346,7 @@
                                 </annotation>
                             </annotations>
                         </table>
-                        <table tableName="users_groups" manyToMany="true" javaClass="com.manydesigns.portofino.system.model.users.UsersGroups"
+                        <table table="users_groups" manyToMany="true" javaClass="com.manydesigns.portofino.system.model.users.UsersGroups"
                                >
                             <columns>
                                 <column columnName="userid"
@@ -424,7 +424,7 @@
                             </foreignKeys>
                         </table>
 
-                        <table tableName="emailstate">
+                        <table table="emailstate">
                             <columns>
                                 <column columnName="id"
                                         columnType="IDENTITY"
@@ -458,7 +458,7 @@
                                 <column columnName="id"/>
                             </primaryKey>
                         </table>
-                        <table tableName="emailqueue" javaClass="com.manydesigns.portofino.system.model.email.EmailBean">
+                        <table table="emailqueue" javaClass="com.manydesigns.portofino.system.model.email.EmailBean">
                             <columns>
                                 <column columnName="id"
                                         columnType="IDENTITY"
@@ -573,7 +573,7 @@
             <schemas>
                 <schema schemaName="public">
                     <tables>
-                         <table tableName="lineitem">
+                         <table table="lineitem">
                             <columns>
                                 <column columnName="orderid"
                                         columnType="INTEGER"
@@ -621,7 +621,7 @@
                                 <column columnName="linenum"/>
                             </primaryKey>
                         </table>
-                        <table tableName="category">
+                        <table table="category">
                             <columns>
                                 <column columnName="catid"
                                         columnType="varchar"
@@ -652,7 +652,7 @@
                                 <column columnName="catid"/>
                             </primaryKey>
                         </table>
-                        <table tableName="product">
+                        <table table="product">
                             <columns>
                                 <column columnName="productid"
                                         columnType="varchar"
@@ -718,7 +718,7 @@
             <schemas>
                 <schema schemaName="public">
                     <tables>
-                        <table tableName="table1">
+                        <table table="table1">
                             <columns>
                                 <column columnName="id"
                                         columnType="IDENTITY"
@@ -741,7 +741,7 @@
                                 <column columnName="id"/>
                             </primaryKey>
                         </table>
-                        <table tableName="table4">
+                        <table table="table4">
                             <columns>
                                 <column columnName="id"
                                         columnType="IDENTITY"
@@ -764,7 +764,7 @@
                                 <column columnName="id"/>
                             </primaryKey>
                         </table>
-                        <table tableName="table2">
+                        <table table="table2">
                             <columns>
                                 <column columnName="id1"
                                         columnType="varchar"
@@ -796,7 +796,7 @@
                                 <column columnName="id2"/>
                             </primaryKey>
                         </table>
-                        <table tableName="table3" manyToMany="true">
+                        <table table="table3" manyToMany="true">
                             <columns>
                                 <column columnName="id"
                                         columnType="IDENTITY"
@@ -880,7 +880,7 @@
                                 </foreignKey>
                             </foreignKeys>
                         </table>
-                        <table tableName="comune">
+                        <table table="comune">
                             <columns>
                                 <column columnName="regione"
                                         columnType="varchar"
@@ -913,7 +913,7 @@
                                 <column columnName="comune"/>
                             </primaryKey>
                         </table>
-                        <table tableName="domanda">
+                        <table table="domanda">
                             <columns>
                                 <column columnName="protocollo"
                                         columnType="varchar"
@@ -998,7 +998,6 @@
                 <siteNode type="simple" url="/model/ConnectionProviders.action" title="Connection providers" description="Connection providers"/>
                 <siteNode type="table-data" url="/model/TableData.action" title="Table data" description="Table data"/>
                 <siteNode type="table-design" url="/model/TableDesign.action" title="Table design" description="Table design"/>
-                <siteNode type="simple" url="/model/PrintModel.action" title="Print model" description="Print model"/>
                 <siteNode type="simple" url="/model/SelfTest.action" title="Self test" description="Self test"/>
                 <siteNode type="simple" url="/model/SiteMap.action" title="Site map" description="Site map"/>
                 <siteNode type="simple" url="/model/DDLWriter.action" title="DDL Writer" description="DDL Writer"/>
@@ -1036,7 +1035,7 @@
     <useCases>
         <useCase name="usecase1"
                  title="Products in category: FISH"
-                 table="jpetstore.public.product"
+                 tableName="jpetstore.public.product"
                  filter="from jpetstore.public.product product where product.category = %{'FISH'}">
             <properties>
                 <property name="productid">

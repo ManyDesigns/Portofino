@@ -82,11 +82,11 @@ public class Model {
                 // wire up ForeignKey.toTable
                 String qualifiedToTableName =
                         Table.composeQualifiedName(
-                                foreignKey.getToDatabaseName(),
-                                foreignKey.getToSchemaName(),
-                                foreignKey.getToTableName());
+                                foreignKey.getToDatabase(),
+                                foreignKey.getToSchema(),
+                                foreignKey.getToTable());
                 Table toTable = findTableByQualifiedName(qualifiedToTableName);
-                foreignKey.setToTable(toTable);
+                foreignKey.setActualToTable(toTable);
                 if (toTable == null) {
                     LogUtil.warningMF(logger,
                             "Cannor wire foreign key ''{0}'' to table ''{1}''",
@@ -115,9 +115,9 @@ public class Model {
 
         // databases
         for (UseCase useCase : useCases) {
-            String qualifiedTableName = useCase.getTableName();
+            String qualifiedTableName = useCase.getTable();
             Table table = findTableByQualifiedName(qualifiedTableName);
-            useCase.setTable(table);
+            useCase.setActualTable(table);
             useCase.init();
         }
     }

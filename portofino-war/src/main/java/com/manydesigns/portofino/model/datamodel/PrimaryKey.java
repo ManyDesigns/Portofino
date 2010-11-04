@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PrimaryKey {
+public class PrimaryKey implements DatamodelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -50,9 +51,11 @@ public class PrimaryKey {
     //**************************************************************************
 
     protected final Table table;
-    protected String primaryKeyName;
-    protected String className;
     protected final List<PrimaryKeyColumn> primaryKeyColumns;
+
+    protected String primaryKeyName;
+
+    protected String className;
 
     //**************************************************************************
     // Fields for wire-up
@@ -66,15 +69,30 @@ public class PrimaryKey {
     // Constructors and wire up
     //**************************************************************************
 
-    public PrimaryKey(Table table, String primaryKeyName) {
+    public PrimaryKey(Table table) {
         this.table = table;
-        this.primaryKeyName = primaryKeyName;
         primaryKeyColumns = new ArrayList<PrimaryKeyColumn>();
         columns = new ArrayList<Column>();
     }
 
+    public PrimaryKey(Table table, String primaryKeyName) {
+        this(table);
+        this.primaryKeyName = primaryKeyName;
+    }
+
+    public PrimaryKey(Table table, String primaryKeyName, String className) {
+        this(table, primaryKeyName);
+        this.className = className;
+    }
+
     public void init() {
         columns.clear();
+
+        if (primaryKeyColumns.isEmpty()) {
+            throw new Error(MessageFormat.format(
+                    "Primary key {0} has no columns",
+                    getQualifiedName()));
+        }
 
         for (PrimaryKeyColumn pkc : primaryKeyColumns) {
             pkc.init();
@@ -102,6 +120,15 @@ public class PrimaryKey {
     }
 
     //**************************************************************************
+    // DatamodelObject implementation
+    //**************************************************************************
+
+    public String getQualifiedName() {
+        return MessageFormat.format("{0}#{1}",
+                table.getQualifiedName(), primaryKeyName);
+    }
+
+    //**************************************************************************
     // Getters/setter
     //**************************************************************************
 
@@ -125,6 +152,7 @@ public class PrimaryKey {
         return table.getTableName();
     }
 
+    @XmlAttribute(required = true)
     public String getPrimaryKeyName() {
         return primaryKeyName;
     }
@@ -137,6 +165,7 @@ public class PrimaryKey {
         return primaryKeyColumns;
     }
 
+    @XmlAttribute(required = false)
     public String getClassName() {
         return className;
     }
@@ -145,8 +174,12 @@ public class PrimaryKey {
         this.className = className;
     }
 
+    //**************************************************************************
+    // toString() override
+    //**************************************************************************
+
     @Override
     public String toString() {
-        return MessageFormat.format("PK {0} for {1}", primaryKeyName, table.toString());
+        return MessageFormat.format("primary key {0}", getQualifiedName());
     }
 }

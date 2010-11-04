@@ -32,6 +32,7 @@ package com.manydesigns.portofino.model.datamodel;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Table {
+public class Table implements DatamodelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -52,20 +53,23 @@ public class Table {
     //**************************************************************************
 
     protected final Schema schema;
-    protected String tableName;
-    protected boolean m2m;
-    protected String javaClassName;
-    protected List<Column> columns;
-    protected PrimaryKey primaryKey;
+    protected final List<Column> columns;
     protected final List<ForeignKey> foreignKeys;
     protected final List<ModelAnnotation> modelAnnotations;
+
+    protected String tableName;
+
+    protected Boolean manyToMany;
+    protected String javaClass;
+
+    protected PrimaryKey primaryKey;
 
     //**************************************************************************
     // Fields for wire-up
     //**************************************************************************
 
     protected final List<ForeignKey> oneToManyRelationships;
-    protected Class javaClass;
+    protected Class actualJavaClass;
 
     //**************************************************************************
     // Logging
@@ -76,19 +80,29 @@ public class Table {
     //**************************************************************************
     // Constructors and init
     //**************************************************************************
-    public Table(Schema schema, String tableName) {
+    public Table(Schema schema) {
         this.schema = schema;
-        this.tableName = tableName;
-        this.m2m = false;
         columns = new ArrayList<Column>();
         foreignKeys = new ArrayList<ForeignKey>();
         oneToManyRelationships = new ArrayList<ForeignKey>();
         modelAnnotations = new ArrayList<ModelAnnotation>();
     }
 
+    public Table(Schema schema, String tableName) {
+        this(schema);
+        this.tableName = tableName;
+    }
+
+    public Table(Schema schema, String tableName,
+                 Boolean manyToMany, String javaClass) {
+        this(schema, tableName);
+        this.manyToMany = manyToMany;
+        this.javaClass = javaClass;
+    }
+
     public void init() {
         // wire up javaClass
-        javaClass = ReflectionUtil.loadClass(javaClassName);
+        actualJavaClass = ReflectionUtil.loadClass(javaClass);
 
         for (Column column : columns) {
             column.init();
@@ -127,6 +141,7 @@ public class Table {
         return schema.getSchemaName();
     }
 
+    @XmlAttribute(required = true)
     public String getTableName() {
         return tableName;
     }
@@ -135,28 +150,26 @@ public class Table {
         this.tableName = tableName;
     }
 
-    public boolean isM2m() {
-        return m2m;
+    @XmlAttribute(required = false)
+    public Boolean getManyToMany() {
+        return manyToMany;
     }
 
-    public void setM2m(boolean m2m) {
-        this.m2m = m2m;
+    public void setManyToMany(Boolean manyToMany) {
+        this.manyToMany = manyToMany;
     }
 
-    public String getJavaClassName() {
-        return javaClassName;
+    @XmlAttribute(required = false)
+    public String getJavaClass() {
+        return javaClass;
     }
 
-    public void setJavaClassName(String javaClassName) {
-        this.javaClassName = javaClassName;
+    public void setJavaClass(String javaClass) {
+        this.javaClass = javaClass;
     }
 
     public List<Column> getColumns() {
         return columns;
-    }
-
-    public void setColumns(List<Column> columns) {
-        this.columns = columns;
     }
 
     public PrimaryKey getPrimaryKey() {
@@ -167,8 +180,8 @@ public class Table {
         this.primaryKey = primaryKey;
     }
 
-    public Class getJavaClass() {
-        return javaClass;
+    public Class getActualJavaClass() {
+        return actualJavaClass;
     }
 
     public List<ForeignKey> getForeignKeys() {
@@ -232,12 +245,12 @@ public class Table {
 
 
     //**************************************************************************
-    // Overrides
+    // toString() override
     //**************************************************************************
 
     @Override
     public String toString() {
-        return getQualifiedName();
+        return MessageFormat.format("table {0}", getQualifiedName());
     }
 
     //**************************************************************************
@@ -251,10 +264,14 @@ public class Table {
                 "{0}.{1}.{2}", databaseName, schemaName, tableName);
     }
 
+    //**************************************************************************
+    // DatamodelObject implementation
+    //**************************************************************************
+
     public String getQualifiedName() {
         return MessageFormat.format("{0}.{1}",
                 schema.getQualifiedName(), tableName);
     }
 
-    
+
 }

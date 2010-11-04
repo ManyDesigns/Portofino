@@ -248,7 +248,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 LogUtil.fineMF(logger, "Found column: {0} of type {1}",
                         column.getQualifiedName(),
                         column.getColumnType());
-                column.setJavaTypeName(type.getDefaultJavaType().getName());
+                column.setJavaType(type.getDefaultJavaType().getName());
 
                 table.getColumns().add(column);
             }

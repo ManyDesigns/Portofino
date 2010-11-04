@@ -32,8 +32,10 @@ package com.manydesigns.portofino.model.datamodel;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.util.Pair;
+import com.manydesigns.portofino.xml.XmlAttribute;
 import org.apache.commons.lang.ObjectUtils;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -43,7 +45,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ForeignKey {
+public class ForeignKey implements DatamodelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -58,24 +60,38 @@ public class ForeignKey {
     
 
     //**************************************************************************
-    // Fields
+    // Fields (physical JDBC)
     //**************************************************************************
 
     protected final Table fromTable;
+    protected final List<Reference> references;
+
     protected String foreignKeyName;
 
-    protected Table toTable;
-    protected String toDatabaseName;
-    protected String toSchemaName;
-    protected String toTableName;
+    protected String toDatabase;
+    protected String toSchema;
+    protected String toTable;
 
     protected String onUpdate;
     protected String onDelete;
-    
+
+
+    protected Table actualToTable;
+
+    //**************************************************************************
+    // Fields (logical)
+    //**************************************************************************
+
     protected String manyPropertyName;
     protected String onePropertyName;
 
-    protected final List<Reference> references;
+    //**************************************************************************
+    // Fields for wire-up
+    //**************************************************************************
+
+    protected String actualManyPropertyName;
+    protected String actualOnePropertyName;
+
     protected final List<ModelAnnotation> modelAnnotations;
 
     //**************************************************************************
@@ -88,38 +104,60 @@ public class ForeignKey {
     // Constructors and init
     //**************************************************************************
 
-    public ForeignKey(Table fromTable,
-                      String foreignKeyName,
-                      String toDatabaseName,
-                      String toSchemaName,
-                      String toTableName,
-                      String onUpdate, String onDelete) {
+    public ForeignKey(Table fromTable) {
         this.fromTable = fromTable;
-        this.foreignKeyName = foreignKeyName;
-
-        this.toDatabaseName = toDatabaseName;
-        this.toSchemaName = toSchemaName;
-        this.toTableName = toTableName;
-
-        this.onUpdate = onUpdate;
-        this.onDelete = onDelete;
-
         references = new ArrayList<Reference>();
         modelAnnotations = new ArrayList<ModelAnnotation>();
     }
 
+    public ForeignKey(Table fromTable, String foreignKeyName,
+                      String toDatabase, String toSchema,
+                      String toTable, String onUpdate, String onDelete) {
+        this(fromTable);
+        this.foreignKeyName = foreignKeyName;
+        this.toDatabase = toDatabase;
+        this.toSchema = toSchema;
+        this.toTable = toTable;
+        this.onUpdate = onUpdate;
+        this.onDelete = onDelete;
+    }
+
+    public ForeignKey(Table fromTable, String foreignKeyName,
+                      String toDatabase, String toSchema,
+                      String toTable, String onUpdate, String onDelete,
+                      String manyPropertyName, String onePropertyName) {
+        this(fromTable, foreignKeyName, toDatabase,
+                toSchema, toTable, onUpdate, onDelete);
+        this.manyPropertyName = manyPropertyName;
+        this.onePropertyName = onePropertyName;
+    }
+
     public void init() {
+        if (references.isEmpty()) {
+            throw new Error(MessageFormat.format(
+                    "Foreign key {0} has no referneces",
+                    getQualifiedName()));
+        }
+
         for (Reference reference : references) {
             // wire up Referenece.fromColumn
-            reference.fromColumn =
-                    fromTable.findColumnByName(reference.getFromColumnName());
+            reference.actualFromColumn =
+                    fromTable.findColumnByName(reference.getFromColumn());
 
             // wire up Referenece.toColumn
-            if (toTable != null) {
-                reference.toColumn =
-                        toTable.findColumnByName(reference.getToColumnName());
+            if (actualToTable != null) {
+                reference.actualToColumn =
+                        actualToTable.findColumnByName(reference.getToColumn());
             }
         }
+
+        actualManyPropertyName = (manyPropertyName == null)
+                ? foreignKeyName
+                : manyPropertyName;
+
+        actualOnePropertyName = (onePropertyName == null)
+                ? foreignKeyName
+                : onePropertyName;
     }
 
 
@@ -129,8 +167,8 @@ public class ForeignKey {
 
     public Reference findReferenceByColumnNamePair(Pair<String> columnNamePair) {
         for (Reference reference : references) {
-            if (ObjectUtils.equals(reference.getFromColumnName(), columnNamePair.left)
-                    && ObjectUtils.equals(reference.getToColumnName(), columnNamePair.right)) {
+            if (ObjectUtils.equals(reference.getFromColumn(), columnNamePair.left)
+                    && ObjectUtils.equals(reference.getToColumn(), columnNamePair.right)) {
                 return reference;
             }
         }
@@ -168,6 +206,7 @@ public class ForeignKey {
         return fromTable.getTableName();
     }
 
+    @XmlAttribute(required = true)
     public String getForeignKeyName() {
         return foreignKeyName;
     }
@@ -176,30 +215,34 @@ public class ForeignKey {
         this.foreignKeyName = foreignKeyName;
     }
 
-    public String getToDatabaseName() {
-        return toDatabaseName;
+    @XmlAttribute(required = true)
+    public String getToDatabase() {
+        return toDatabase;
     }
 
-    public void setToDatabaseName(String toDatabaseName) {
-        this.toDatabaseName = toDatabaseName;
+    public void setToDatabase(String toDatabase) {
+        this.toDatabase = toDatabase;
     }
 
-    public String getToSchemaName() {
-        return toSchemaName;
+    @XmlAttribute(required = true)
+    public String getToSchema() {
+        return toSchema;
     }
 
-    public void setToSchemaName(String toSchemaName) {
-        this.toSchemaName = toSchemaName;
+    public void setToSchema(String toSchema) {
+        this.toSchema = toSchema;
     }
 
-    public String getToTableName() {
-        return toTableName;
+    @XmlAttribute(required = true)
+    public String getToTable() {
+        return toTable;
     }
 
-    public void setToTableName(String toTableName) {
-        this.toTableName = toTableName;
+    public void setToTable(String toTable) {
+        this.toTable = toTable;
     }
 
+    @XmlAttribute(required = true)
     public String getOnUpdate() {
         return onUpdate;
     }
@@ -208,6 +251,7 @@ public class ForeignKey {
         this.onUpdate = onUpdate;
     }
 
+    @XmlAttribute(required = true)
     public String getOnDelete() {
         return onDelete;
     }
@@ -220,6 +264,7 @@ public class ForeignKey {
         return references;
     }
 
+    @XmlAttribute(required = false)
     public String getManyPropertyName() {
         return manyPropertyName;
     }
@@ -228,6 +273,7 @@ public class ForeignKey {
         this.manyPropertyName = manyPropertyName;
     }
 
+    @XmlAttribute(required = false)
     public String getOnePropertyName() {
         return onePropertyName;
     }
@@ -240,11 +286,46 @@ public class ForeignKey {
         return modelAnnotations;
     }
 
-    public Table getToTable() {
-        return toTable;
+    public Table getActualToTable() {
+        return actualToTable;
     }
 
-    public void setToTable(Table toTable) {
-        this.toTable = toTable;
+    public void setActualToTable(Table actualToTable) {
+        this.actualToTable = actualToTable;
     }
+
+    public String getActualManyPropertyName() {
+        return actualManyPropertyName;
+    }
+
+    public void setActualManyPropertyName(String actualManyPropertyName) {
+        this.actualManyPropertyName = actualManyPropertyName;
+    }
+
+    public String getActualOnePropertyName() {
+        return actualOnePropertyName;
+    }
+
+    public void setActualOnePropertyName(String actualOnePropertyName) {
+        this.actualOnePropertyName = actualOnePropertyName;
+    }
+
+    //**************************************************************************
+    // DatamodelObject implementation
+    //**************************************************************************
+
+    public String getQualifiedName() {
+        return MessageFormat.format("{0}${1}",
+                fromTable.getQualifiedName(), foreignKeyName);
+    }
+
+    //**************************************************************************
+    // toString() override
+    //**************************************************************************
+
+    @Override
+    public String toString() {
+        return MessageFormat.format("foreign key {0}", getQualifiedName());
+    }
+
 }

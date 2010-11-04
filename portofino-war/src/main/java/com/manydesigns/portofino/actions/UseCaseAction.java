@@ -244,7 +244,7 @@ public class UseCaseAction extends PortofinoAction
 
     private void setupCriteria() {
         TableAccessor tableAccessor =
-                context.getTableAccessor(useCase.getTableName());
+                context.getTableAccessor(useCase.getTable());
         Criteria criteria = new Criteria(tableAccessor);
         searchForm.configureCriteria(criteria);
         objects = context.getObjects(useCase.getFilter(), criteria);
@@ -297,7 +297,7 @@ public class UseCaseAction extends PortofinoAction
 
         setupCriteria();
 
-        object = context.getObjectByPk(useCase.getTableName(), pkObject);
+        object = context.getObjectByPk(useCase.getTable(), pkObject);
         if (!objects.contains(object)) {
             errorMessage = "Object not found";
             return STATUS_404;
@@ -337,8 +337,8 @@ public class UseCaseAction extends PortofinoAction
         if (form.validate()) {
             object = useCaseAccessor.newInstance();
             form.writeToObject(object);
-            context.saveObject(useCase.getTableName(), object);
-            String databaseName = useCase.getTable().getDatabaseName();
+            context.saveObject(useCase.getTable(), object);
+            String databaseName = useCase.getActualTable().getDatabaseName();
             context.commit(databaseName);
             pk = pkHelper.generatePkString(object);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
@@ -356,7 +356,7 @@ public class UseCaseAction extends PortofinoAction
         setupUseCase();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
-        object = context.getObjectByPk(useCase.getTableName(), pkObject);
+        object = context.getObjectByPk(useCase.getTable(), pkObject);
 
         FormBuilder formBuilder = new FormBuilder(useCaseAccessor);
         form = formBuilder
@@ -377,13 +377,13 @@ public class UseCaseAction extends PortofinoAction
                 .configMode(Mode.EDIT)
                 .build();
 
-        object = context.getObjectByPk(useCase.getTableName(), pkObject);
+        object = context.getObjectByPk(useCase.getTable(), pkObject);
         form.readFromObject(object);
         form.readFromRequest(req);
         if (form.validate()) {
             form.writeToObject(object);
-            context.updateObject(useCase.getTableName(), object);
-            String databaseName = useCase.getTable().getDatabaseName();
+            context.updateObject(useCase.getTable(), object);
+            String databaseName = useCase.getActualTable().getDatabaseName();
             context.commit(databaseName);
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
             return UPDATE;
@@ -425,12 +425,12 @@ public class UseCaseAction extends PortofinoAction
         if (form.validate()) {
             for (String current : selection) {
                 Serializable pkObject = pkHelper.parsePkString(current);
-                object = context.getObjectByPk(useCase.getTableName(), pkObject);
+                object = context.getObjectByPk(useCase.getTable(), pkObject);
                 form.writeToObject(object);
             }
             form.writeToObject(object);
-            context.updateObject(useCase.getTableName(), object);
-            String databaseName = useCase.getTable().getDatabaseName();
+            context.updateObject(useCase.getTable(), object);
+            String databaseName = useCase.getActualTable().getDatabaseName();
             context.commit(databaseName);
             SessionMessages.addInfoMessage(MessageFormat.format(
                     "UPDATE di {0} oggetti avvenuto con successo", selection.length));
@@ -447,8 +447,8 @@ public class UseCaseAction extends PortofinoAction
     public String delete() {
         setupUseCase();
         Object pkObject = pkHelper.parsePkString(pk);
-        context.deleteObject(useCase.getTableName(), pkObject);
-        String databaseName = useCase.getTable().getDatabaseName();
+        context.deleteObject(useCase.getTable(), pkObject);
+        String databaseName = useCase.getActualTable().getDatabaseName();
         context.commit(databaseName);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
         return DELETE;
@@ -463,9 +463,9 @@ public class UseCaseAction extends PortofinoAction
         }
         for (String current : selection) {
             Object pkObject = pkHelper.parsePkString(current);
-            context.deleteObject(useCase.getTableName(), pkObject);
+            context.deleteObject(useCase.getTable(), pkObject);
         }
-        String databaseName = useCase.getTable().getDatabaseName();
+        String databaseName = useCase.getActualTable().getDatabaseName();
         context.commit(databaseName);
         SessionMessages.addInfoMessage(MessageFormat.format(
                 "DELETE di {0} oggetti avvenuto con successo", selection.length));

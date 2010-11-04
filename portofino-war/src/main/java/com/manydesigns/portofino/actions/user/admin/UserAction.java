@@ -690,8 +690,8 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
         String[] fieldNames = new String[references.size()];
         int i = 0;
         for (Reference reference : references) {
-            Column column = reference.getFromColumn();
-            fieldNames[i] = column.getName();
+            Column column = reference.getActualFromColumn();
+            fieldNames[i] = column.getActualPropertyName();
             i++;
         }
         return fieldNames;
@@ -699,7 +699,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
 
     protected SelectionProvider createSelectionProviderForRelationship(ForeignKey rel) {
         // retrieve the related objects
-        Table relatedTable = rel.getToTable();
+        Table relatedTable = rel.getActualToTable();
         ClassAccessor classAccessor =
                 context.getTableAccessor(relatedTable.getQualifiedName());
         List<Object> relatedObjects =

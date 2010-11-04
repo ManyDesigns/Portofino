@@ -35,10 +35,14 @@ import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;
-import com.manydesigns.portofino.model.diff.MessageDiffer;
+import com.manydesigns.portofino.model.io.ModelWriter;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.List;
+import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,10 +53,14 @@ public class SelfTestAction extends PortofinoAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public List<String> messages;
+    public TreeTableDiffer treeTableDiffer;
+    // result parameters
+    public InputStream inputStream;
+    public String contentType;
+    public String contentDisposition;
 
     public String execute() throws SQLException {
-        MessageDiffer visitor = new MessageDiffer();
+        treeTableDiffer = new TreeTableDiffer();
         model = context.getModel();
         for (ConnectionProvider current : context.getConnectionProviders()) {
             Database sourceDatabase = current.readModel();
@@ -63,16 +71,28 @@ public class SelfTestAction extends PortofinoAction {
             DatabaseDiff diff =
                     DiffUtil.diff(sourceDatabase, targetDatabase);
 
-            visitor.diffDatabase(diff);
-
+            treeTableDiffer.diffDatabase(diff);
         }
-        messages = visitor.getMessages();
         return SUCCESS;
     }
 
     public String sync() throws SQLException {
         context.syncDataModel();
         SessionMessages.addInfoMessage("In-memory model synchronized to database model");
-        return execute();
+        return "sync";
     }
+
+
+    public String export() throws IOException {
+        contentType= "text/xml";
+        contentDisposition= MessageFormat.format("inline; filename={0}.xml",
+                    "datamodel");
+        ModelWriter writer = new ModelWriter(model);
+        File tempFile = File.createTempFile("portofino", ".xml");
+        writer.write(tempFile);
+        inputStream = new FileInputStream(tempFile);
+
+        return EXPORT;
+    }
+
 }

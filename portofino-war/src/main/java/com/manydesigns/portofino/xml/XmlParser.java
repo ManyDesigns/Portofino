@@ -30,13 +30,15 @@
 package com.manydesigns.portofino.xml;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.util.Util;
 
 import javax.xml.stream.*;
 import java.io.InputStream;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 import java.util.logging.Logger;
 
 /*
@@ -62,6 +64,61 @@ public class XmlParser {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         xmlStreamReader = inputFactory.createXMLStreamReader(inputStream);
         next();
+    }
+
+    public void checkAndSetAttributes(Object object,
+                                      Map<String, String> attributes) {
+        Class javaClass = object.getClass();
+        ClassAccessor classAccessor =
+                JavaClassAccessor.getClassAccessor(javaClass);
+        Set<String> usedAttributeSet = new HashSet<String>();
+        for (PropertyAccessor propertyAccessor : classAccessor.getProperties()) {
+            XmlAttribute xmlAttribute =
+                    propertyAccessor.getAnnotation(XmlAttribute.class);
+            if (xmlAttribute == null) {
+                continue;
+            }
+
+            String name = propertyAccessor.getName();
+            usedAttributeSet.add(name);
+
+            String value = attributes.get(name);
+            if (xmlAttribute.required() && value == null) {
+                throw new Error(MessageFormat.format(
+                        "Attribute ''{0}'' required. {1}",
+                        name,
+                        getLocationString()));
+            }
+
+            Class type = propertyAccessor.getType();
+            Object castValue;
+            if (value == null) {
+                castValue = null;
+            } else if (type == String.class) {
+                castValue = value;
+            } else if (type == Boolean.class || type == Boolean.TYPE) {
+                castValue = Boolean.valueOf(value);
+            } else {
+                castValue = Util.convertValue(value, type);
+            }
+
+            try {
+                propertyAccessor.set(object, castValue);
+            } catch (Throwable e) {
+                LogUtil.warningMF(logger,
+                        "Cannot set attribute/property ''{0}''. {1}",
+                        e, name, getLocationString());
+            }
+        }
+
+        // look for any unused attributes
+        for (String attribute : attributes.keySet()) {
+            if (!usedAttributeSet.contains(attribute)) {
+                LogUtil.warningMF(logger,
+                        "Unknown attribute ''{0}''. {1}",
+                        attribute, getLocationString());
+            }
+        }
     }
 
     public void checkRequiredAttributes(Map<String, String> attributes,

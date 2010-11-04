@@ -3,20 +3,23 @@
 %><%@ taglib prefix="s" uri="/struts-tags"
 %><%@ taglib prefix="mdes" uri="/manydesigns-elements-struts2"
 %><s:include value="/skins/default/header.jsp"/>
-<div id="inner-content">
-    <h1>Self test</h1>
-    Source model: on database. Target model: in memory. Reporting differences:
-    <s:if test="messages.size() > 0">
-        <s:form method="post">
-            <table>
-                <s:iterator var="message" value="messages">
-                    <tr><td><s:property value="#message"/></td></tr>
-                </s:iterator>
-            </table>
-            <s:submit method="sync" value="Synchronize in-memory model"/>
-        </s:form>
-    </s:if><s:else>
-        there are no differences.
-    </s:else>
-</div>
+<s:form method="post">
+    <s:include value="/skins/default/model/selfTestButtonsBar.jsp"/>
+    <div id="inner-content">
+        <h1>Self test</h1>
+        Source model: on database. Target model: in memory. Reporting differences:
+        <table id="tree">
+            <thead>
+                <tr><th>Datamodel object</th><th>Type</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                <mdes:write value="treeTableDiffer"/>
+            </tbody>
+        </table>
+        <script type="text/javascript">
+            $("#tree").treeTable();
+        </script>
+    </div>
+    <s:include value="/skins/default/model/selfTestButtonsBar.jsp"/>
+</s:form>
 <s:include value="/skins/default/footer.jsp"/>

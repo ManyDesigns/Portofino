@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.model.site;
 
+import com.manydesigns.portofino.xml.XmlAttribute;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,22 +48,27 @@ public class SiteNode {
     // Fields
     //**************************************************************************
 
+    protected final ArrayList<SiteNode> childNodes;
+
     protected String type;
     protected String url;
     protected String title;
     protected String description;
-    protected final ArrayList<SiteNode> childNodes;
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
+    public SiteNode() {
+        childNodes = new ArrayList<SiteNode>();
+    }
+
     public SiteNode(String type, String url, String title, String description) {
+        this();
         this.type = type;
         this.url = url;
         this.title = title;
         this.description = description;
-        childNodes = new ArrayList<SiteNode>();
     }
 
     public void init() {}
@@ -70,6 +77,7 @@ public class SiteNode {
     // Getters/Setters
     //**************************************************************************
 
+    @XmlAttribute(required = true)
     public String getType() {
         return type;
     }
@@ -78,6 +86,7 @@ public class SiteNode {
         this.type = type;
     }
 
+    @XmlAttribute(required = true)
     public String getUrl() {
         return url;
     }
@@ -86,6 +95,7 @@ public class SiteNode {
         this.url = url;
     }
 
+    @XmlAttribute(required = true)
     public String getTitle() {
         return title;
     }
@@ -94,6 +104,7 @@ public class SiteNode {
         this.title = title;
     }
 
+    @XmlAttribute(required = true)
     public String getDescription() {
         return description;
     }

@@ -29,8 +29,15 @@
 
 package com.manydesigns.portofino.model.diff;
 
+import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.*;
+import com.manydesigns.portofino.xml.XmlAttribute;
+
+import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -58,14 +65,15 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffDatabaseTargetNull(DatabaseDiff databaseDiff) {
-        targetDatabase = new Database(sourceDatabase.getDatabaseName());
-        diffDatabaseChildren(databaseDiff);
+        targetDatabase = new Database();
+        diffDatabaseSourceTarget(databaseDiff);
     }
 
     public void diffDatabaseSourceTarget(DatabaseDiff databaseDiff) {
-        targetDatabase.setDatabaseName(sourceDatabase.getDatabaseName());
+        mergeProperties(sourceDatabase, targetDatabase);
         diffDatabaseChildren(databaseDiff);
     }
+
 
     //--------------------------------------------------------------------------
     // Schemas
@@ -76,13 +84,13 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffSchemaTargetNull(SchemaDiff schemaDiff) {
-        targetSchema = new Schema(targetDatabase, sourceSchema.getSchemaName());
+        targetSchema = new Schema(targetDatabase);
         targetDatabase.getSchemas().add(targetSchema);
-        diffSchemaChildren(schemaDiff);
+        diffSchemaSourceTarget(schemaDiff);
     }
 
     public void diffSchemaSourceTarget(SchemaDiff schemaDiff) {
-        targetSchema.setSchemaName(sourceSchema.getSchemaName());
+        mergeProperties(sourceSchema, targetSchema);
         diffSchemaChildren(schemaDiff);
     }
 
@@ -95,25 +103,14 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffTableTargetNull(TableDiff tableDiff) {
-        targetTable = new Table(targetSchema, sourceTable.getTableName());
-        mergeOptionalTableProperties();
+        targetTable = new Table(targetSchema);
         targetSchema.getTables().add(targetTable);
-        diffTableChildren(tableDiff);
+        diffTableSourceTarget(tableDiff);
     }
 
     public void diffTableSourceTarget(TableDiff tableDiff) {
-        mergeOptionalTableProperties();
+        mergeProperties(sourceTable, targetTable);
         diffTableChildren(tableDiff);
-    }
-
-    protected void mergeOptionalTableProperties() {
-        String sourceJavaClassName = sourceTable.getJavaClassName();
-        if (sourceJavaClassName != null) {
-            targetTable.setJavaClassName(sourceJavaClassName);
-        }
-
-        // TODO: isM2m() ha bisogno di una logica a 3 stati
-        targetTable.setM2m(sourceTable.isM2m());
     }
 
     //--------------------------------------------------------------------------
@@ -125,14 +122,13 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffTableAnnotationTargetNull(ModelAnnotationDiff modelAnnotationDiff) {
-        targetModelAnnotation =
-                new ModelAnnotation(sourceModelAnnotation.getType());
+        targetModelAnnotation = new ModelAnnotation();
         targetTable.getModelAnnotations().add(targetModelAnnotation);
-        diffTableAnnotationChildren(modelAnnotationDiff);
+        diffTableAnnotationSourceTarget(modelAnnotationDiff);
     }
 
     public void diffTableAnnotationSourceTarget(ModelAnnotationDiff modelAnnotationDiff) {
-        targetModelAnnotation.setType(sourceModelAnnotation.getType());
+        mergeProperties(sourceModelAnnotation, targetModelAnnotation);
         diffTableAnnotationChildren(modelAnnotationDiff);
     }
 
@@ -145,40 +141,14 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffColumnTargetNull(ColumnDiff columnDiff) {
-        targetColumn = new Column(targetTable,
-                sourceColumn.getColumnName(),
-                sourceColumn.getColumnType(),
-                sourceColumn.isNullable(),
-                sourceColumn.isAutoincrement(),
-                sourceColumn.getLength(),
-                sourceColumn.getScale(),
-                sourceColumn.isSearchable());
+        targetColumn = new Column(targetTable);
         targetTable.getColumns().add(targetColumn);
-        diffColumnChildren(columnDiff);
+        diffColumnSourceTarget(columnDiff);
     }
 
     public void diffColumnSourceTarget(ColumnDiff columnDiff) {
-        targetColumn.setColumnName(sourceColumn.getColumnName());
-        targetColumn.setColumnType(sourceColumn.getColumnType());
-        targetColumn.setNullable(sourceColumn.isNullable());
-        targetColumn.setAutoincrement(sourceColumn.isAutoincrement());
-        targetColumn.setLength(sourceColumn.getLength());
-        targetColumn.setScale(sourceColumn.getScale());
-        targetColumn.setSearchable(sourceColumn.isSearchable());
-        mergeOptionalColumnProperties();
+        mergeProperties(sourceColumn, targetColumn);
         diffColumnChildren(columnDiff);
-    }
-
-    protected void mergeOptionalColumnProperties() {
-        String sourcePropertyName = sourceColumn.getPropertyName();
-        if (sourcePropertyName != null) {
-            targetColumn.setPropertyName(sourcePropertyName);
-        }
-
-        String sourceJavaTypeName = sourceColumn.getJavaTypeName();
-        if (sourceJavaTypeName != null) {
-            targetColumn.setJavaTypeName(sourceJavaTypeName);
-        }
     }
 
     //--------------------------------------------------------------------------
@@ -190,14 +160,13 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffColumnAnnotationTargetNull(ModelAnnotationDiff modelAnnotationDiff) {
-        targetModelAnnotation =
-                new ModelAnnotation(sourceModelAnnotation.getType());
+        targetModelAnnotation = new ModelAnnotation();
         targetColumn.getModelAnnotations().add(targetModelAnnotation);
-        diffColumnAnnotationChildren(modelAnnotationDiff);
+        diffColumnAnnotationSourceTarget(modelAnnotationDiff);
     }
 
     public void diffColumnAnnotationSourceTarget(ModelAnnotationDiff modelAnnotationDiff) {
-        targetModelAnnotation.setType(sourceModelAnnotation.getType());
+        mergeProperties(sourceModelAnnotation, targetModelAnnotation);
         diffColumnAnnotationChildren(modelAnnotationDiff);
     }
 
@@ -206,43 +175,41 @@ public class MergeDiffer extends AbstractDiffer {
     //--------------------------------------------------------------------------
 
     public void diffPrimaryKeySourceNull(PrimaryKeyDiff primaryKeyDiff) {
-        diffPrimaryKeyChildren(primaryKeyDiff);
+        targetTable.setPrimaryKey(null);
+//        diffPrimaryKeyChildren(primaryKeyDiff);
     }
 
     public void diffPrimaryKeyTargetNull(PrimaryKeyDiff primaryKeyDiff) {
-        targetPrimaryKey = new PrimaryKey(
-                targetTable, sourcePrimaryKey.getPrimaryKeyName());
+        targetPrimaryKey = new PrimaryKey(targetTable);
         targetTable.setPrimaryKey(targetPrimaryKey);
-        diffPrimaryKeyChildren(primaryKeyDiff);
+        diffPrimaryKeySourceTarget(primaryKeyDiff);
     }
 
     public void diffPrimaryKeySourceTarget(PrimaryKeyDiff primaryKeyDiff) {
-        targetPrimaryKey.setPrimaryKeyName(
-                sourcePrimaryKey.getPrimaryKeyName());
-        mergeOptionalPrimaryKeyProperties();
+        mergeProperties(sourcePrimaryKey, targetPrimaryKey);
         diffPrimaryKeyChildren(primaryKeyDiff);
-    }
-
-    private void mergeOptionalPrimaryKeyProperties() {
-        String sourceClassname = sourcePrimaryKey.getClassName();
-        if (sourceClassname != null) {
-            targetPrimaryKey.setClassName(sourceClassname);
-        }
     }
 
     //--------------------------------------------------------------------------
     // Primary key columns
+    // Il merge delle colonne delle chiavi primarie prevede che alla fine
+    // source e target siano esattamente allineati.
+    // Il diff deve prevedere: aggiunta, modifica, rimozione.
     //--------------------------------------------------------------------------
 
     public void diffPrimaryKeyColumnSourceNull(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
+        targetPrimaryKey.getPrimaryKeyColumns().remove(targetPrimaryKeyColumn);
         diffPrimaryKeyColumnChildren(primaryKeyColumnDiff);
     }
 
     public void diffPrimaryKeyColumnTargetNull(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
-        diffPrimaryKeyColumnChildren(primaryKeyColumnDiff);
+        targetPrimaryKeyColumn = new PrimaryKeyColumn(targetPrimaryKey);
+        targetPrimaryKey.getPrimaryKeyColumns().add(targetPrimaryKeyColumn);
+        diffPrimaryKeyColumnSourceTarget(primaryKeyColumnDiff);
     }
 
     public void diffPrimaryKeyColumnSourceTarget(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
+        mergeProperties(sourcePrimaryKeyColumn, targetPrimaryKeyColumn);
         diffPrimaryKeyColumnChildren(primaryKeyColumnDiff);
     }
 
@@ -251,30 +218,41 @@ public class MergeDiffer extends AbstractDiffer {
     //--------------------------------------------------------------------------
 
     public void diffForeignKeySourceNull(ForeignKeyDiff foreignKeyDiff) {
-        diffForeignKeyChildren(foreignKeyDiff);
+        targetTable.getForeignKeys().remove(targetForeignKey);
+//        diffForeignKeyChildren(foreignKeyDiff);
     }
 
     public void diffForeignKeyTargetNull(ForeignKeyDiff foreignKeyDiff) {
-        diffForeignKeyChildren(foreignKeyDiff);
+        targetForeignKey = new ForeignKey(targetTable);
+        targetTable.getForeignKeys().add(targetForeignKey);
+        diffForeignKeySourceTarget(foreignKeyDiff);
     }
 
     public void diffForeignKeySourceTarget(ForeignKeyDiff foreignKeyDiff) {
+        mergeProperties(sourceForeignKey, targetForeignKey);
         diffForeignKeyChildren(foreignKeyDiff);
     }
 
     //--------------------------------------------------------------------------
     // References
+    // Il merge dei reference prevede che alla fine source e target
+    // siano esattamente allineati.
+    // Il diff deve prevedere: aggiunta, modifica, rimozione.
     //--------------------------------------------------------------------------
 
     public void diffReferenceSourceNull(ReferenceDiff referenceDiff) {
+        targetForeignKey.getReferences().remove(targetReference);
         diffReferenceChildren(referenceDiff);
     }
 
     public void diffReferenceTargetNull(ReferenceDiff referenceDiff) {
-        diffReferenceChildren(referenceDiff);
+        targetReference = new Reference(targetForeignKey);
+        targetForeignKey.getReferences().add(targetReference);
+        diffReferenceSourceTarget(referenceDiff);
     }
 
     public void diffReferenceSourceTarget(ReferenceDiff referenceDiff) {
+        mergeProperties(sourceReference, targetReference);
         diffReferenceChildren(referenceDiff);
     }
 
@@ -293,4 +271,49 @@ public class MergeDiffer extends AbstractDiffer {
     public void diffForeignKeyAnnotationSourceTarget(ModelAnnotationDiff modelAnnotationDiff) {
         diffForeignKeyAnnotationChildren(modelAnnotationDiff);
     }
+
+
+
+    //--------------------------------------------------------------------------
+    // Merge properties by reflection
+    //--------------------------------------------------------------------------
+
+    public void mergeProperties(Object source, Object target) {
+        Class javaClass = source.getClass();
+        ClassAccessor classAccessor =
+                JavaClassAccessor.getClassAccessor(javaClass);
+
+        for (PropertyAccessor propertyAccessor : classAccessor.getProperties()) {
+            XmlAttribute xmlAttribute =
+                    propertyAccessor.getAnnotation(XmlAttribute.class);
+            if (xmlAttribute == null) {
+                continue;
+            }
+
+            String name = propertyAccessor.getName();
+
+            Object value = null;
+            try {
+                value = propertyAccessor.get(source);
+            } catch (Throwable e) {
+                LogUtil.warningMF(logger,
+                        "Cannot get source attribute/property ''{0}''", e, name);
+            }
+
+            if (value == null) {
+                if (xmlAttribute.required()) {
+                    throw new Error(MessageFormat.format(
+                            "Attribute ''{0}'' required. {1}", name));
+                }
+            } else {
+                try {
+                    propertyAccessor.set(target, value);
+                } catch (Throwable e) {
+                    LogUtil.warningMF(logger,
+                            "Cannot set target attribute/property ''{0}''", e, name);
+                }
+            }
+        }
+    }
+
 }

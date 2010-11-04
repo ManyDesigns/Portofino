@@ -225,7 +225,9 @@ public abstract class AbstractDiffer {
     }
 
     public void diffTableAnnotationSourceTargetNull(ModelAnnotationDiff modelAnnotationDiff) {
-        logger.warning("Both source and target table annotations are null");
+        LogUtil.warningMF(logger, "Both source and target table " +
+                "annotations are null. Tables: {0}/{1}",
+                sourceTable, targetTable);
     }
     public abstract void diffTableAnnotationSourceNull(ModelAnnotationDiff modelAnnotationDiff);
     public abstract void diffTableAnnotationTargetNull(ModelAnnotationDiff modelAnnotationDiff);

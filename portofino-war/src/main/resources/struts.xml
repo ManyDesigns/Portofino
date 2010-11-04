@@ -242,18 +242,18 @@
             </result>
         </action>
 
-        <action name="PrintModel"
-                class="com.manydesigns.portofino.actions.model.ModelWriterAction">
-            <result name="success" type="stream">
+        <action name="SelfTest"
+                class="com.manydesigns.portofino.actions.model.SelfTestAction">
+            <result name="success">/skins/default/model/selfTest.jsp</result>
+            <result name="sync" type="redirectAction">
+                <param name="actionName">SelfTest</param>
+            </result>
+            <result name="export" type="stream">
                 <param name="contentType">%{contentType}</param>
                 <param name="contentDisposition">%{contentDisposition}</param>
                 <param name="inputName">inputStream</param>
                 <param name="bufferSize">1024</param>
             </result>
-        </action>
-        <action name="SelfTest"
-                class="com.manydesigns.portofino.actions.model.SelfTestAction">
-            <result name="success">/skins/default/model/selfTest.jsp</result>
         </action>
         <action name="SiteMap"
                 class="com.manydesigns.portofino.actions.model.SiteMap">

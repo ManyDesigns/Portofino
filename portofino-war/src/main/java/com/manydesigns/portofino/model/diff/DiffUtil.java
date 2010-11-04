@@ -151,7 +151,7 @@ public class DiffUtil {
             ModelAnnotation sourceModelAnnotation =
                     findModelAnnotation(sourceTable, annotationType);
             ModelAnnotation targetModelAnnotation =
-                    findModelAnnotation(sourceTable, annotationType);
+                    findModelAnnotation(targetTable, annotationType);
 
             ModelAnnotationDiff modelAnnotationDiff =
                     diff(sourceModelAnnotation, targetModelAnnotation);
@@ -400,8 +400,8 @@ public class DiffUtil {
         }
         for (Reference reference : foreignKey.getReferences()) {
             Pair<String> columnNamePair =
-                    new Pair<String>(reference.getFromColumnName(),
-                            reference.getToColumnName());
+                    new Pair<String>(reference.getFromColumn(),
+                            reference.getToColumn());
             columnNamePairs.add(columnNamePair);
         }
     }

@@ -30,6 +30,8 @@
     <script type="text/javascript"
             src="<s:url value="/jquery-ui-1.8.5/js/jquery-ui-1.8.5.custom.min.js"/>"></script>
     <script type="text/javascript"
+            src="<s:url value="/jquery-treetable-2.3.0/jquery.treeTable.min.js"/>"></script>
+    <script type="text/javascript"
             src="<s:url value="/elements.js"/>"></script>
     <script type="text/javascript"
             src="<s:url value="/skins/default/portofino.js"/>"></script>

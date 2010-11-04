@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model.portlets;
 
 import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.portofino.xml.XmlAttribute;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -48,6 +49,8 @@ public class Portlet {
     protected String sql;
     protected String urlExpression;
 
+    public Portlet() {}
+
     public Portlet(String name, String type, String title, String legend,
                    String database, String sql, String urlExpression) {
         this.name = name;
@@ -61,6 +64,7 @@ public class Portlet {
 
     public void init() {}
 
+    @XmlAttribute(required = true)
     public String getName() {
         return name;
     }
@@ -69,6 +73,7 @@ public class Portlet {
         this.name = name;
     }
 
+    @XmlAttribute(required = true)
     public String getType() {
         return type;
     }
@@ -77,6 +82,7 @@ public class Portlet {
         this.type = type;
     }
 
+    @XmlAttribute(required = true)
     public String getTitle() {
         return title;
     }
@@ -85,6 +91,7 @@ public class Portlet {
         this.title = title;
     }
 
+    @XmlAttribute(required = true)
     public String getLegend() {
         return legend;
     }
@@ -93,6 +100,7 @@ public class Portlet {
         this.legend = legend;
     }
 
+    @XmlAttribute(required = true)
     public String getDatabase() {
         return database;
     }
@@ -102,6 +110,7 @@ public class Portlet {
     }
 
     @Label("SQL")
+    @XmlAttribute(required = true)
     public String getSql() {
         return sql;
     }
@@ -111,6 +120,7 @@ public class Portlet {
     }
 
     @Label("URL expression")
+    @XmlAttribute(required = true)
     public String getUrlExpression() {
         return urlExpression;
     }

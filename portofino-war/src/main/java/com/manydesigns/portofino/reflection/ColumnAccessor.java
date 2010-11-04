@@ -93,11 +93,11 @@ public class ColumnAccessor
     //**************************************************************************
 
     public String getName() {
-        return column.getName();
+        return column.getActualPropertyName();
     }
 
     public Class getType() {
-        return column.getJavaType();
+        return column.getActualJavaType();
     }
 
     public int getModifiers() {
@@ -107,7 +107,7 @@ public class ColumnAccessor
     public Object get(Object obj)
             throws IllegalAccessException, InvocationTargetException {
         if (nestedPropertyAccessor == null) {
-            return ((Map)obj).get(column.getName());
+            return ((Map)obj).get(column.getActualPropertyName());
         } else {
             return nestedPropertyAccessor.get(obj);
         }
@@ -117,7 +117,7 @@ public class ColumnAccessor
     public void set(Object obj, Object value)
             throws IllegalAccessException, InvocationTargetException {
         if (nestedPropertyAccessor == null) {
-            ((Map)obj).put(column.getName(), value);
+            ((Map)obj).put(column.getActualPropertyName(), value);
         } else {
             nestedPropertyAccessor.set(obj, value);
         }

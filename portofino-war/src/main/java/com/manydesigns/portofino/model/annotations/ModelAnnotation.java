@@ -30,14 +30,15 @@
 package com.manydesigns.portofino.model.annotations;
 
 import com.manydesigns.elements.annotations.AnnotationsManager;
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.xml.XmlAttribute;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.lang.reflect.Constructor;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,9 +53,9 @@ public class ModelAnnotation {
     // Fields
     //**************************************************************************
 
-    protected String type;
     protected final List<String> values;
 
+    protected String type;
 
     //**************************************************************************
     // Fields for wire up
@@ -74,9 +75,13 @@ public class ModelAnnotation {
     // Contruction and init
     //**************************************************************************
 
-    public ModelAnnotation(String type) {
-        this.type = type;
+    public ModelAnnotation() {
         values = new ArrayList<String>();
+    }
+
+    public ModelAnnotation(String type) {
+        this();
+        this.type = type;
     }
 
     public void init() {
@@ -143,6 +148,7 @@ public class ModelAnnotation {
     // Getters and setters
     //**************************************************************************
 
+    @XmlAttribute(required = true)
     public String getType() {
         return type;
     }

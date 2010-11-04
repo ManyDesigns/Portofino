@@ -44,6 +44,9 @@ import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
+import com.manydesigns.portofino.model.diff.DatabaseDiff;
+import com.manydesigns.portofino.model.diff.DiffUtil;
+import com.manydesigns.portofino.model.diff.MergeDiffer;
 import com.manydesigns.portofino.model.io.ConnectionsParser;
 import com.manydesigns.portofino.model.io.ModelParser;
 import com.manydesigns.portofino.model.io.ModelWriter;
@@ -214,13 +217,23 @@ public class HibernateContextImpl implements Context {
     }
 
     public void syncDataModel() {
-        Model syncModel = new Model();
+        MergeDiffer mergeDiffer = new MergeDiffer();
+
         for (ConnectionProvider current : connectionProviders) {
-            Database syncDatabase = current.readModel();
-            syncModel.getDatabases().add(syncDatabase);
+            Database sourceDatabase = current.readModel();
+
+            Database targetDatabase =
+                    model.findDatabaseByName(current.getDatabaseName());
+
+            DatabaseDiff diff =
+                    DiffUtil.diff(sourceDatabase, targetDatabase);
+
+            mergeDiffer.diffDatabase(diff);
         }
-        syncModel.init();
-        installDataModel(syncModel);
+
+        model.init();
+        saveXmlModel();
+        installDataModel(model);
         saveXmlModel();
     }
 
@@ -262,11 +275,11 @@ public class HibernateContextImpl implements Context {
         org.hibernate.Criteria hibernateCriteria;
         Table table = model.findTableByQualifiedName(qualifiedTableName);
 
-        if (table.getJavaClassName() == null) {
+        if (table.getJavaClass() == null) {
             hibernateCriteria = session.createCriteria(qualifiedTableName);
         } else {
             hibernateCriteria = session.createCriteria
-                    (ReflectionUtil.loadClass(table.getJavaClassName()));
+                    (ReflectionUtil.loadClass(table.getJavaClass()));
         }
 
         startTimer();
@@ -644,7 +657,7 @@ public class HibernateContextImpl implements Context {
         ForeignKey relationship =
                 model.findOneToManyRelationship(
                         qualifiedTableName, oneToManyRelationshipName);
-        Table toTable = relationship.getToTable();
+        Table toTable = relationship.getActualToTable();
         Table fromTable = relationship.getFromTable();
         Session session = getSession(qualifiedTableName);
 
@@ -656,12 +669,12 @@ public class HibernateContextImpl implements Context {
                 org.hibernate.Criteria criteria =
                         session.createCriteria(fromTable.getQualifiedName());
                 for (Reference reference : relationship.getReferences()) {
-                    Column fromColumn = reference.getFromColumn();
-                    Column toColumn = reference.getToColumn();
+                    Column fromColumn = reference.getActualFromColumn();
+                    Column toColumn = reference.getActualToColumn();
                     PropertyAccessor toPropertyAccessor
-                            = toAccessor.getProperty(toColumn.getName());
+                            = toAccessor.getProperty(toColumn.getActualPropertyName());
                     Object toValue = toPropertyAccessor.get(obj);
-                    criteria.add(Restrictions.eq(fromColumn.getName(),
+                    criteria.add(Restrictions.eq(fromColumn.getActualPropertyName(),
                             toValue));
                 }
                 startTimer();
@@ -675,7 +688,7 @@ public class HibernateContextImpl implements Context {
                         e, oneToManyRelationshipName, qualifiedTableName);
             }
         } else {
-            String manyPropertyName = relationship.getManyPropertyName();
+            String manyPropertyName = relationship.getActualManyPropertyName();
 
             Class clazz = toTable.getClass();
             try {
@@ -761,7 +774,7 @@ public class HibernateContextImpl implements Context {
 
     public UseCaseAccessor getUseCaseAccessor(String useCaseName) {
         UseCase useCase = model.findUseCaseByName(useCaseName);
-        String qualifiedTableName = useCase.getTableName();
+        String qualifiedTableName = useCase.getTable();
         TableAccessor tableAccessor = getTableAccessor(qualifiedTableName);
         return new UseCaseAccessor(useCase, tableAccessor);
     }

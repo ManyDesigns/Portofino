@@ -286,3 +286,21 @@ div#login table tr td, div#login table tr th {
     background-color: #65a7db;
 }
 
+.treeTable {
+    width: 100%;
+}
+
+.treeTable tr td {
+    padding-left: 1.5em;
+}
+
+.treeTable tr td .expander {
+    background: url("../../jquery-treetable-2.3.0/toggle-expand-dark.png") no-repeat left center;
+    cursor: pointer;
+    padding: 0;
+}
+
+.treeTable tr.expanded td .expander {
+    background-image:url("../../jquery-treetable-2.3.0/toggle-collapse-dark.png");
+}
+

@@ -30,7 +30,9 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.xml.XmlAttribute;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -40,7 +42,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Database {
+public class Database implements DatamodelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -48,8 +50,14 @@ public class Database {
     // Fields
     //**************************************************************************
 
-    protected String databaseName;
     protected final List<Schema> schemas;
+
+    protected String databaseName;
+
+    
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
 
     public static final Logger logger = LogUtil.getLogger(Database.class);
 
@@ -57,9 +65,13 @@ public class Database {
     //**************************************************************************
     // Constructors and init
     //**************************************************************************
-    public Database(String databaseName) {
-        this.databaseName = databaseName;
+    public Database() {
         this.schemas = new ArrayList<Schema>();
+    }
+
+    public Database(String databaseName) {
+        this();
+        this.databaseName = databaseName;
     }
 
     public void init() {
@@ -69,9 +81,18 @@ public class Database {
     }
 
     //**************************************************************************
+    // DatamodelObject implementation
+    //**************************************************************************
+
+    public String getQualifiedName() {
+        return databaseName;
+    }
+
+    //**************************************************************************
     // Getters/setter
     //**************************************************************************
 
+    @XmlAttribute(required = true)
     public String getDatabaseName() {
         return databaseName;
     }
@@ -171,4 +192,14 @@ public class Database {
         return null;
     }
 
+    //**************************************************************************
+    // toString() override
+    //**************************************************************************
+
+    @Override
+    public String toString() {
+        return MessageFormat.format("database {0}", getQualifiedName());
+    }
+
+    
 }

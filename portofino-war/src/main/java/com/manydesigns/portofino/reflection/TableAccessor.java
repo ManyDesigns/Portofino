@@ -68,7 +68,7 @@ public class TableAccessor
 
     public TableAccessor(Table table) {
         super(table.getModelAnnotations());
-        Class clazz = table.getJavaClass();
+        Class clazz = table.getActualJavaClass();
         if (clazz != null) {
             javaClassAccessor = JavaClassAccessor.getClassAccessor(clazz);
         }
@@ -92,7 +92,7 @@ public class TableAccessor
             if (javaClassAccessor == null) {
                 nestedPropertyAccessor = null;
             } else {
-                String propertyName = current.getName();
+                String propertyName = current.getActualPropertyName();
                 try {
                     nestedPropertyAccessor =
                             javaClassAccessor.getProperty(propertyName);
