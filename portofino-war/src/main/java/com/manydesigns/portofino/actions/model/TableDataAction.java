@@ -30,32 +30,26 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.ShortName;
-import com.manydesigns.elements.blobs.Blob;
-import com.manydesigns.elements.blobs.BlobsManager;
-import com.manydesigns.elements.fields.*;
+import com.manydesigns.elements.fields.DateField;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.NumericField;
+import com.manydesigns.elements.fields.PasswordField;
 import com.manydesigns.elements.fields.search.Criteria;
-import com.manydesigns.elements.forms.*;
+import com.manydesigns.elements.forms.FieldSet;
+import com.manydesigns.elements.forms.SearchFormBuilder;
+import com.manydesigns.elements.forms.TableForm;
+import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.text.OgnlTextFormat;
-import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.actions.AbstractCrudAction;
 import com.manydesigns.portofino.actions.RelatedTableForm;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
-import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
-import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
 import jxl.Workbook;
 import jxl.write.*;
@@ -67,224 +61,56 @@ import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.math.BigDecimal;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableDataAction extends PortofinoAction
+public class TableDataAction extends AbstractCrudAction
         implements ServletRequestAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //**************************************************************************
-    // Constants
-    //**************************************************************************
 
-    public final static String REDIRECT_TO_TABLE = "redirectToTable";
-    public final static String NO_TABLES = "noTables";
-    public final static String JSON_SELECT_FIELD_OPTIONS =
-            "jsonSelectFieldOptions";
-    public static final String EXPORT_FILENAME_FORMAT = "export-{0}";
-    public final String ACTIONURL = "/TableData.action";
-    public final String BLOBACTIONURL = "/TableData!downloadBlob.action";
-    //**************************************************************************
-    // ServletRequestAware implementation
-    //**************************************************************************
-    public HttpServletRequest req;
-
-    public void setServletRequest(HttpServletRequest req) {
-        this.req = req;
-    }
-
-    //**************************************************************************
-    // Web parameters
-    //**************************************************************************
-
-    public String qualifiedTableName;
-    public String pk;
-    public String[] selection;
-    public String searchString;
-    public String cancelReturnUrl;
-    public String relName;
-    public int selectionProviderIndex;
-    public String labelSearch;
-    public String code;
-
-    //**************************************************************************
-    // Web parameters setters (for struts.xml inspections in IntelliJ)
-    //**************************************************************************
-
-    public void setQualifiedTableName(String qualifiedTableName) {
-        this.qualifiedTableName = qualifiedTableName;
-    }
-
-    //**************************************************************************
-    // Model metadata
-    //**************************************************************************
-
-    public ClassAccessor tableAccessor;
-
-    //**************************************************************************
-    // Model objects
-    //**************************************************************************
-
-    public Object object;
-    public List<Object> objects;
-
-
-    //**************************************************************************
-    // Presentation elements
-    //**************************************************************************
-
-    public TableForm tableForm;
-    public Form form;
-    public SearchForm searchForm;
-    public List<RelatedTableForm> relatedTableFormList;
-    public InputStream inputStream;
-
-    //**************************************************************************
-    // export parameters
-    //***************************************************************************
-
-    public String contentType;
-    public String fileName;
-    public Long contentLength;
-    public String chartId;
-
-    //**************************************************************************
-    // Other objects
-    //**************************************************************************
-
-    public PkHelper pkHelper;
-
-    public static final Logger logger =
-            LogUtil.getLogger(TableDataAction.class);
-
-    //**************************************************************************
-    // Action default execute method
-    //**************************************************************************
-
-    public String execute() {
-        if (qualifiedTableName == null) {
-            List<Table> tables = model.getAllTables();
-            if (tables.isEmpty()) {
-                return NO_TABLES;
-            } else {
-                qualifiedTableName = tables.get(0).getQualifiedName();
-                return REDIRECT_TO_TABLE;
-            }
+    @Override
+    public void setupMetadata() {
+        baseTable = model.findTableByQualifiedName(qualifiedName);
+        classAccessor = context.getTableAccessor(qualifiedName);
+        pkHelper = new PkHelper(classAccessor);
+        if (classAccessor == null) {
+            throw new ModelObjectNotFoundError(qualifiedName);
         }
-        if (pk == null) {
-            return searchFromString();
+    }
+
+
+    public String redirectToFirst() {
+        List<Table> tables = model.getAllTables();
+        if (tables.isEmpty()) {
+            return NO_CLASSES;
         } else {
-            return read();
+            qualifiedName = tables.get(0).getQualifiedName();
+            return REDIRECT_TO_FIRST;
         }
     }
 
-    //**************************************************************************
-    // Search
-    //**************************************************************************
-
-    public String searchFromString() {
-        setupTable();
-
-        SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
-        searchForm = searchFormBuilder.build();
-        configureSearchFormFromString();
-
-        return commonSearch();
-    }
-
-    protected void configureSearchFormFromString() {
-        if (searchString != null) {
-            DummyHttpServletRequest dummyRequest =
-                    new DummyHttpServletRequest();
-            String[] parts = searchString.split(",");
-            Pattern pattern = Pattern.compile("(.*)=(.*)");
-            for (String part : parts) {
-                Matcher matcher = pattern.matcher(part);
-                if (matcher.matches()) {
-                    String key = matcher.group(1);
-                    String value = matcher.group(2);
-                    LogUtil.fineMF(logger, "Matched part: {0}={1}", key, value);
-                    dummyRequest.setParameter(key, value);
-                } else {
-                    LogUtil.fineMF(logger, "Could not match part: {0}", part);
-                }
-            }
-            searchForm.readFromRequest(dummyRequest);
-        }
-    }
-
-    public String search() {
-        setupTable();
-
-        SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
-        searchForm = searchFormBuilder.build();
-        searchForm.readFromRequest(req);
-
-        return commonSearch();
-    }
-
-    protected String commonSearch() {
-        searchString = searchForm.toSearchString();
-        if (searchString.length() == 0) {
-            searchString = null;
-        }
-
-        Criteria criteria = new Criteria(tableAccessor);
-        searchForm.configureCriteria(criteria);
-        objects = context.getObjects(criteria);
-
-        String readLinkExpression = getReadLinkExpression();
-        OgnlTextFormat hrefFormat =
-                OgnlTextFormat.create(readLinkExpression);
-        hrefFormat.setUrl(true);
-
-        TableFormBuilder tableFormBuilder =
-                createTableFormBuilderWithSelectionProviders()
-                        .configNRows(objects.size())
-                        .configMode(Mode.VIEW);
-
-        // ogni colonna chiave primaria sarà clickabile
-        for (PropertyAccessor property : tableAccessor.getKeyProperties()) {
-            tableFormBuilder.configHyperlinkGenerators(
-                    property.getName(), hrefFormat, null);
-        }
-
-        tableForm = tableFormBuilder.build();
-        tableForm.setKeyGenerator(pkHelper.createPkGenerator());
-        tableForm.setSelectable(true);
-        tableForm.readFromObject(objects);
-
-        return SEARCH;
-    }
-
-
+    
+    @Override
     public String getReadLinkExpression() {
         StringBuilder sb = new StringBuilder("/model/");
-        sb.append(tableAccessor.getName());
-        sb.append(ACTIONURL + "?pk=");
+        sb.append(classAccessor.getName());
+        sb.append(actionUrl + "?pk=");
         boolean first = true;
-        for (PropertyAccessor property : tableAccessor.getKeyProperties()) {
+        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
             if (first) {
                 first = false;
             } else {
@@ -301,52 +127,9 @@ public class TableDataAction extends PortofinoAction
         return sb.toString();
     }
 
-    //**************************************************************************
-    // Return to search
-    //**************************************************************************
-
-    public String returnToSearch() {
-        setupTable();
-        return RETURN_TO_SEARCH;
-    }
-
-    //**************************************************************************
-    // Read
-    //**************************************************************************
-
-    public String read() {
-        setupTable();
-        Serializable pkObject = pkHelper.parsePkString(pk);
-
-        SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
-        searchForm = searchFormBuilder.build();
-        configureSearchFormFromString();
-
-        Criteria criteria = new Criteria(tableAccessor);
-        searchForm.configureCriteria(criteria);
-        objects = context.getObjects(criteria);
-
-        object = context.getObjectByPk(qualifiedTableName, pkObject);
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.VIEW)
-                .build();
-        form.readFromObject(object);
-        refreshBlobDownloadHref();
-
-        relatedTableFormList = new ArrayList<RelatedTableForm>();
-
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
-        for (ForeignKey relationship : table.getOneToManyRelationships()) {
-            setupRelatedTableForm(relationship);
-        }
-
-        return READ;
-    }
-
     protected void setupRelatedTableForm(ForeignKey relationship) {
         List<Object> relatedObjects =
-                context.getRelatedObjects(qualifiedTableName, object,
+                context.getRelatedObjects(qualifiedName, object,
                         relationship.getForeignKeyName());
 
         String qualifiedFromTableName =
@@ -366,40 +149,10 @@ public class TableDataAction extends PortofinoAction
         relatedTableFormList.add(relatedTableForm);
     }
 
-
-    //**************************************************************************
-    // Blobs
-    //**************************************************************************
-
-    public String downloadBlob() throws IOException {
-        Blob blob = BlobsManager.getManager().loadBlob(code);
-        contentLength = blob.getSize();
-        contentType = blob.getContentType();
-        inputStream = new FileInputStream(blob.getDataFile());
-        fileName = blob.getFilename();
-        return EXPORT;
-    }
-
-    protected void refreshBlobDownloadHref() {
-
-        for (FieldSet fieldSet : form) {
-            for (Field field : fieldSet) {
-                if (field instanceof FileBlobField) {
-                    FileBlobField fileBlobField = (FileBlobField) field;
-                    Blob blob = fileBlobField.getBlob();
-                    if (blob != null) {
-                        String url = getBlobDownloadUrl(blob.getCode());
-                        field.setHref(url);
-                    }
-                }
-            }
-        }
-    }
-
     public String getBlobDownloadUrl(String code) {
         StringBuilder sb = new StringBuilder("/model/");
-        sb.append(tableAccessor.getName());
-        sb.append(BLOBACTIONURL);
+        sb.append(classAccessor.getName());
+        sb.append(blobActionUrl);
         sb.append("?code=");
         sb.append(Util.urlencode(code));
         return Util.getAbsoluteUrl(sb.toString());
@@ -407,326 +160,22 @@ public class TableDataAction extends PortofinoAction
 
 
     //**************************************************************************
-    // Create/Save
-    //**************************************************************************
-
-    public String create() {
-        setupTable();
-
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.CREATE)
-                .build();
-
-        return CREATE;
-    }
-
-    public String save() {
-        setupTable();
-
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.CREATE)
-                .build();
-
-        form.readFromRequest(req);
-        if (form.validate()) {
-            object = tableAccessor.newInstance();
-            form.writeToObject(object);
-            context.saveObject(qualifiedTableName, object);
-            String databaseName = model
-                    .findTableByQualifiedName(qualifiedTableName)
-                    .getDatabaseName();
-            context.commit(databaseName);
-            pk = pkHelper.generatePkString(object);
-            SessionMessages.addInfoMessage("SAVE avvenuto con successo");
-            return SAVE;
-        } else {
-            return CREATE;
-        }
-    }
-
-    //**************************************************************************
-    // Edit/Update
-    //**************************************************************************
-
-    public String edit() {
-        setupTable();
-        Serializable pkObject = pkHelper.parsePkString(pk);
-
-        object = context.getObjectByPk(qualifiedTableName, pkObject);
-
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.EDIT)
-                .build();
-
-        form.readFromObject(object);
-
-        return EDIT;
-    }
-
-    public String update() {
-        setupTable();
-        Serializable pkObject = pkHelper.parsePkString(pk);
-
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.EDIT)
-                .build();
-
-        object = context.getObjectByPk(qualifiedTableName, pkObject);
-        form.readFromObject(object);
-        form.readFromRequest(req);
-        if (form.validate()) {
-            form.writeToObject(object);
-            context.updateObject(qualifiedTableName, object);
-            String databaseName = model
-                    .findTableByQualifiedName(qualifiedTableName).getDatabaseName();
-            context.commit(databaseName);
-            SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
-            return UPDATE;
-        } else {
-            return EDIT;
-        }
-    }
-
-    //**************************************************************************
-    // Bulk Edit/Update
-    //**************************************************************************
-
-    public String bulkEdit() {
-        if (selection == null || selection.length == 0) {
-            SessionMessages.addWarningMessage(
-                    "Nessun oggetto selezionato");
-            return CANCEL;
-        }
-
-        if (selection.length == 1) {
-            pk = selection[0];
-            return edit();
-        }
-
-        setupTable();
-
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.BULK_EDIT)
-                .build();
-
-        return BULK_EDIT;
-    }
-
-    public String bulkUpdate() {
-        setupTable();
-
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.BULK_EDIT)
-                .build();
-        form.readFromRequest(req);
-        if (form.validate()) {
-            for (String current : selection) {
-                Serializable pkObject = pkHelper.parsePkString(current);
-                object = context.getObjectByPk(qualifiedTableName, pkObject);
-                form.writeToObject(object);
-            }
-            form.writeToObject(object);
-            context.updateObject(qualifiedTableName, object);
-            String databaseName = model.findTableByQualifiedName(qualifiedTableName)
-                    .getDatabaseName();
-            context.commit(databaseName);
-            SessionMessages.addInfoMessage(MessageFormat.format(
-                    "UPDATE di {0} oggetti avvenuto con successo", selection.length));
-            return BULK_UPDATE;
-        } else {
-            return BULK_EDIT;
-        }
-    }
-
-    //**************************************************************************
-    // Delete
-    //**************************************************************************
-
-    public String delete() {
-        setupTable();
-        Object pkObject = pkHelper.parsePkString(pk);
-        context.deleteObject(qualifiedTableName, pkObject);
-        String databaseName = model.findTableByQualifiedName(qualifiedTableName)
-                .getDatabaseName();
-        context.commit(databaseName);
-        SessionMessages.addInfoMessage("DELETE avvenuto con successo");
-        return DELETE;
-    }
-
-    public String bulkDelete() {
-        setupTable();
-        if (selection == null) {
-            SessionMessages.addWarningMessage(
-                    "DELETE non avvenuto: nessun oggetto selezionato");
-            return CANCEL;
-        }
-        for (String current : selection) {
-            Object pkObject = pkHelper.parsePkString(current);
-            context.deleteObject(qualifiedTableName, pkObject);
-        }
-        String databaseName = model.findTableByQualifiedName(qualifiedTableName)
-                .getDatabaseName();
-        context.commit(databaseName);
-        SessionMessages.addInfoMessage(MessageFormat.format(
-                "DELETE di {0} oggetti avvenuto con successo", selection.length));
-        return DELETE;
-    }
-
-    //**************************************************************************
-    // Cancel
-    //**************************************************************************
-
-    public String cancel() {
-        return CANCEL;
-    }
-
-    //**************************************************************************
-    // Ajax
-    //**************************************************************************
-
-    public String jsonSelectFieldOptions() {
-        return jsonOptions(true);
-    }
-
-    public String jsonAutocompleteOptions() {
-        return jsonOptions(false);
-    }
-
-    protected String jsonOptions(boolean includeSelectPrompt) {
-        setupTable();
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
-        ForeignKey relationship =
-                table.findForeignKeyByName(relName);
-
-        String[] fieldNames = createFieldNamesForRelationship(relationship);
-        SelectionProvider selectionProvider =
-                createSelectionProviderForRelationship(relationship);
-
-        Form form = new FormBuilder(tableAccessor)
-                .configFields(fieldNames)
-                .configSelectionProvider(selectionProvider, fieldNames)
-                .configMode(Mode.EDIT)
-                .build();
-        form.readFromRequest(req);
-
-        SelectField targetField =
-                (SelectField) form.get(0).get(selectionProviderIndex);
-        targetField.setLabelSearch(labelSearch);
-
-        String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
-        LogUtil.infoMF(logger, "jsonSelectFieldOptions: {0}", text);
-
-        inputStream = new StringBufferInputStream(text);
-
-        return JSON_SELECT_FIELD_OPTIONS;
-    }
-
-    //**************************************************************************
     // Utility methods
     //**************************************************************************
-
-    public void setupTable() {
-        tableAccessor = context.getTableAccessor(qualifiedTableName);
-        pkHelper = new PkHelper(tableAccessor);
-        if (tableAccessor == null) {
-            throw new ModelObjectNotFoundError(qualifiedTableName);
-        }
-    }
-
-    protected FormBuilder createFormBuilderWithSelectionProviders() {
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
-
-        // setup relationship lookups
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
-        for (ForeignKey rel : table.getForeignKeys()) {
-            String[] fieldNames = createFieldNamesForRelationship(rel);
-            SelectionProvider selectionProvider =
-                    createSelectionProviderForRelationship(rel);
-            boolean autocomplete = false;
-            for (ModelAnnotation current : rel.getModelAnnotations()) {
-                if ("com.manydesigns.elements.annotations.Autocomplete"
-                        .equals(current.getType())) {
-                    autocomplete = true;
-                }
-            }
-            selectionProvider.setAutocomplete(autocomplete);
-
-            formBuilder.configSelectionProvider(selectionProvider, fieldNames);
-        }
-
-        return formBuilder;
-    }
-
-    protected TableFormBuilder createTableFormBuilderWithSelectionProviders() {
-        TableFormBuilder tableFormBuilder = new TableFormBuilder(tableAccessor);
-
-        // setup relationship lookups
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
-        for (ForeignKey rel : table.getForeignKeys()) {
-            String[] fieldNames = createFieldNamesForRelationship(rel);
-            SelectionProvider selectionProvider =
-                    createSelectionProviderForRelationship(rel);
-            boolean autocomplete = false;
-            for (ModelAnnotation current : rel.getModelAnnotations()) {
-                if ("com.manydesigns.elements.annotations.Autocomplete"
-                        .equals(current.getType())) {
-                    autocomplete = true;
-                }
-            }
-            selectionProvider.setAutocomplete(autocomplete);
-
-            tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
-        }
-        return tableFormBuilder;
-    }
-
-    protected String[] createFieldNamesForRelationship(ForeignKey rel) {
-        List<Reference> references = rel.getReferences();
-        String[] fieldNames = new String[references.size()];
-        int i = 0;
-        for (Reference reference : references) {
-            Column column = reference.getActualFromColumn();
-            fieldNames[i] = column.getActualPropertyName();
-            i++;
-        }
-        return fieldNames;
-    }
-
-    protected SelectionProvider createSelectionProviderForRelationship(ForeignKey rel) {
-        // retrieve the related objects
-        Table relatedTable = rel.getActualToTable();
-        ClassAccessor classAccessor =
-                context.getTableAccessor(relatedTable.getQualifiedName());
-        List<Object> relatedObjects =
-                context.getAllObjects(relatedTable.getQualifiedName());
-        ShortName shortNameAnnotation =
-                classAccessor.getAnnotation(ShortName.class);
-        TextFormat[] textFormats = null;
-        if (shortNameAnnotation != null) {
-            textFormats = new TextFormat[] {
-                OgnlTextFormat.create(shortNameAnnotation.value())
-            };
-        }
-        SelectionProvider selectionProvider =
-                DefaultSelectionProvider.create(rel.getForeignKeyName(),
-                        relatedObjects, classAccessor, textFormats);
-        return selectionProvider;
-    }
-
 
     //**************************************************************************
     // ExportSearch
     //**************************************************************************
 
     public String exportSearchExcel() {
-        setupTable();
+        setupMetadata();
 
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
+                new SearchFormBuilder(classAccessor);
         searchForm = searchFormBuilder.build();
         searchForm.readFromRequest(req);
 
-        Criteria criteria = new Criteria(tableAccessor);
+        Criteria criteria = new Criteria(classAccessor);
         searchForm.configureCriteria(criteria);
         objects = context.getObjects(criteria);
 
@@ -747,7 +196,7 @@ public class TableDataAction extends PortofinoAction
         WritableWorkbook workbook = null;
         try {
             workbook = Workbook.createWorkbook(fileTemp);
-            WritableSheet sheet = workbook.createSheet(qualifiedTableName, 0);
+            WritableSheet sheet = workbook.createSheet(qualifiedName, 0);
 
             addHeaderToSheet(sheet);
 
@@ -785,19 +234,19 @@ public class TableDataAction extends PortofinoAction
     //**************************************************************************
 
     public String exportReadExcel() {
-        setupTable();
+        setupMetadata();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
+                new SearchFormBuilder(classAccessor);
         searchForm = searchFormBuilder.build();
         configureSearchFormFromString();
 
-        Criteria criteria = new Criteria(tableAccessor);
+        Criteria criteria = new Criteria(classAccessor);
         searchForm.configureCriteria(criteria);
         objects = context.getObjects(criteria);
 
-        object = context.getObjectByPk(qualifiedTableName, pkObject);
+        object = context.getObjectByPk(qualifiedName, pkObject);
 
         TableFormBuilder tableFormBuilder =
             createTableFormBuilderWithSelectionProviders()
@@ -812,7 +261,7 @@ public class TableDataAction extends PortofinoAction
         form.readFromObject(object);
 
         relatedTableFormList = new ArrayList<RelatedTableForm>();
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        Table table = model.findTableByQualifiedName(qualifiedName);
         for (ForeignKey relationship : table.getOneToManyRelationships()) {
             setupRelatedTableForm(relationship);
         }
@@ -828,7 +277,7 @@ public class TableDataAction extends PortofinoAction
         WritableWorkbook workbook = null;
         try {
             workbook = Workbook.createWorkbook(fileTemp);
-            WritableSheet sheet = workbook.createSheet(qualifiedTableName, 0);
+            WritableSheet sheet = workbook.createSheet(qualifiedName, 0);
 
             addHeaderToSheet(sheet);
 
@@ -908,7 +357,7 @@ public class TableDataAction extends PortofinoAction
 
     private File createExportTempFile() {
          String exportId = RandomUtil.createRandomCode();
-         return RandomUtil.getTempCodeFile(EXPORT_FILENAME_FORMAT, exportId);
+         return RandomUtil.getTempCodeFile(exportFilenameFormat, exportId);
      }
 
 
@@ -991,14 +440,14 @@ public class TableDataAction extends PortofinoAction
 
     public String exportSearchPdf() throws FOPException,
             IOException, TransformerException {
-        setupTable();
+        setupMetadata();
 
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
+                new SearchFormBuilder(classAccessor);
         searchForm = searchFormBuilder.build();
         searchForm.readFromRequest(req);
 
-        Criteria criteria = new Criteria(tableAccessor);
+        Criteria criteria = new Criteria(classAccessor);
         searchForm.configureCriteria(criteria);
         objects = context.getObjects(criteria);
 
@@ -1071,7 +520,7 @@ public class TableDataAction extends PortofinoAction
         StringBuffer sb = new StringBuffer();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         sb.append("<class>");
-        sb.append("<table>" + qualifiedTableName + "</table>");
+        sb.append("<table>" + qualifiedName + "</table>");
         for (TableForm.Row row : tableForm.getRows()) {
             for (Field field : row.getFields()) {
                 sb.append("<header>");

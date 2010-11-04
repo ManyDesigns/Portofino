@@ -180,7 +180,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     //**************************************************************************
 
     public String searchFromString() {
-        setupTable();
+        setupMetadata();
 
 
         SearchFormBuilder searchFormBuilder =
@@ -214,7 +214,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     }
 
     public String search() {
-        setupTable();
+        setupMetadata();
 
         SearchFormBuilder searchFormBuilder =
                 new SearchFormBuilder(tableAccessor);
@@ -286,7 +286,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     //**************************************************************************
 
     public String returnToSearch() {
-        setupTable();
+        setupMetadata();
         return RETURN_TO_SEARCH;
     }
 
@@ -295,7 +295,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     //**************************************************************************
 
     public String read() {
-        setupTable();
+        setupMetadata();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
         SearchFormBuilder searchFormBuilder =
@@ -444,7 +444,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     //**************************************************************************
 
     public String create() {
-        setupTable();
+        setupMetadata();
 
         final FormBuilder builder = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.CREATE);
@@ -456,7 +456,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     }
 
     public String save() {
-        setupTable();
+        setupMetadata();
 
         final FormBuilder builder = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.CREATE);
@@ -486,7 +486,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     //**************************************************************************
 
     public String edit() {
-        setupTable();
+        setupMetadata();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
         user = (User) context.getObjectByPk(userTable, pkObject);
@@ -502,7 +502,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     }
 
     public String update() {
-        setupTable();
+        setupMetadata();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
         FormBuilder builder = createFormBuilderWithSelectionProviders()
@@ -533,7 +533,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     //**************************************************************************
 
     public String delete() {
-        setupTable();
+        setupMetadata();
         User pkUsr = new User(new Long(pk));
         User aUser = (User) context.getObjectByPk(userTable, pkUsr);
         aUser.setDeletionDate(new Timestamp(System.currentTimeMillis()));
@@ -546,7 +546,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     }
 
     public String bulkDelete() {
-        setupTable();
+        setupMetadata();
         if (selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
@@ -630,7 +630,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     // Utility methods
     //**************************************************************************
 
-    public void setupTable() {
+    public void setupMetadata() {
         tableAccessor = context.getTableAccessor(userTable);
         pkHelper = new PkHelper(tableAccessor);
         if (tableAccessor == null) {

@@ -16,7 +16,18 @@
             <interceptor name="portofino"
                          class="com.manydesigns.portofino.interceptors.PortofinoInterceptor" />
             <interceptor-stack name="mdstack">
-                <interceptor-ref name="defaultStack" />
+<!-- customized interceptor stack based on struts-default.xml in Struts 2.2.1 -->
+                <interceptor-ref name="exception"/>
+                <interceptor-ref name="i18n"/>
+                <interceptor-ref name="checkbox"/>
+                <interceptor-ref name="servletConfig"/>
+                <interceptor-ref name="params"/>
+<!--
+For security reasons, it is important that staticParams be after params.
+This ensures that static parameters (specified as "param" in an action mapping)
+are not overridden by values from the request.
+ -->
+                <interceptor-ref name="staticParams"/>
                 <interceptor-ref name="elements-struts2" />
                 <interceptor-ref name="portofino" />
             </interceptor-stack>
@@ -73,16 +84,15 @@
 
         <action name="UseCase"
                 class="com.manydesigns.portofino.actions.UseCaseAction">
-            <result name="redirectToUseCase" type="redirectAction">
-                <param name="actionName">%{useCaseName}/UseCase</param>
+            <result name="redirectToFirst" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/UseCase</param>
             </result>
-            <result name="noUseCases">/skins/default/useCase/noUseCases.jsp</result>
+            <result name="noClasses">/skins/default/useCase/noUseCases.jsp</result>
         </action>
 
         <action name="*/UseCase"
                 class="com.manydesigns.portofino.actions.UseCaseAction">
-            <param name="skin">default</param>
-            <param name="useCaseName">{1}</param>
+            <param name="qualifiedName">{1}</param>
 
             <result name="search">/skins/default/useCase/search.jsp</result>
 
@@ -91,14 +101,14 @@
             <result name="create">/skins/default/useCase/create.jsp</result>
 
             <result name="save" type="redirectAction">
-                <param name="actionName">%{useCaseName}/UseCase</param>
+                <param name="actionName">%{qualifiedName}/UseCase</param>
                 <param name="pk">%{pk}</param>
             </result>
 
             <result name="edit">/skins/default/useCase/edit.jsp</result>
 
             <result name="update" type="redirectAction">
-                <param name="actionName">%{useCaseName}/UseCase</param>
+                <param name="actionName">%{qualifiedName}/UseCase</param>
                 <param name="pk">%{pk}</param>
                 <param name="searchString">%{searchString}</param>
             </result>
@@ -106,17 +116,17 @@
             <result name="bulkEdit">/skins/default/useCase/bulkEdit.jsp</result>
 
             <result name="bulkUpdate" type="redirectAction">
-                <param name="actionName">%{useCaseName}/UseCase</param>
+                <param name="actionName">%{qualifiedName}/UseCase</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="returnToSearch" type="redirectAction">
-                <param name="actionName">%{useCaseName}/UseCase</param>
+                <param name="actionName">%{qualifiedName}/UseCase</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="delete" type="redirectAction">
-                <param name="actionName">%{useCaseName}/UseCase</param>
+                <param name="actionName">%{qualifiedName}/UseCase</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
@@ -156,15 +166,17 @@
         
         <action name="TableData"
                 class="com.manydesigns.portofino.actions.model.TableDataAction">
-            <result name="redirectToTable" type="redirectAction">
-                <param name="actionName">%{qualifiedTableName}/TableData</param>
+            <result name="redirectToFirst" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/TableData</param>
             </result>
+            <result name="noClasses">/skins/default/model/tableData/noTables.jsp</result>
         </action>
 
         <action name="*/TableData"
                 class="com.manydesigns.portofino.actions.model.TableDataAction">
-            <param name="skin">default</param>
-            <param name="qualifiedTableName">{1}</param>
+            <param name="qualifiedName">{1}</param>
+            <param name="actionUrl">/TableData.action</param>
+            <param name="blobActionUrl">/TableData!downloadBlob.action</param>
 
             <result name="search">/skins/default/model/tableData/search.jsp</result>
 
@@ -173,14 +185,14 @@
             <result name="create">/skins/default/model/tableData/create.jsp</result>
 
             <result name="save" type="redirectAction">
-                <param name="actionName">%{qualifiedTableName}/TableData</param>
+                <param name="actionName">%{qualifiedName}/TableData</param>
                 <param name="pk">%{pk}</param>
             </result>
 
             <result name="edit">/skins/default/model/tableData/edit.jsp</result>
 
             <result name="update" type="redirectAction">
-                <param name="actionName">%{qualifiedTableName}/TableData</param>
+                <param name="actionName">%{qualifiedName}/TableData</param>
                 <param name="pk">%{pk}</param>
                 <param name="searchString">%{searchString}</param>
             </result>
@@ -188,17 +200,17 @@
             <result name="bulkEdit">/skins/default/model/tableData/bulkEdit.jsp</result>
 
             <result name="bulkUpdate" type="redirectAction">
-                <param name="actionName">%{qualifiedTableName}/TableData</param>
+                <param name="actionName">%{qualifiedName}/TableData</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="returnToSearch" type="redirectAction">
-                <param name="actionName">%{qualifiedTableName}/TableData</param>
+                <param name="actionName">%{qualifiedName}/TableData</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="delete" type="redirectAction">
-                <param name="actionName">%{qualifiedTableName}/TableData</param>
+                <param name="actionName">%{qualifiedName}/TableData</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
@@ -225,7 +237,7 @@
 
         <action name="TableDesign"
                 class="com.manydesigns.portofino.actions.model.TableDesignAction">
-            <result name="redirectToTable" type="redirectAction">
+            <result name="redirectToFirst" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableDesign</param>
             </result>
         </action>
@@ -267,7 +279,7 @@
 
         <action name="PortletDesign"
                 class="com.manydesigns.portofino.actions.model.PortletDesignAction">
-            <result name="redirectToPortlet" type="redirectAction">
+            <result name="redirectToFirst" type="redirectAction">
                 <param name="actionName">%{portletName}/PortletDesign</param>
             </result>
         </action>
@@ -456,7 +468,7 @@
 
         <action name="Groups" class="com.manydesigns.portofino.actions.user.admin.GroupAction">
             <param name="skin">default</param>
-            <param name="qualifiedTableName">portofino.public.groups</param>
+            <param name="qualifiedName">portofino.public.groups</param>
             <result name="search">/skins/default/group/admin/search.jsp</result>
 
             <result name="read">/skins/default/group/admin/read.jsp</result>

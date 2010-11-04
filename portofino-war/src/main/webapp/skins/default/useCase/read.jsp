@@ -14,7 +14,7 @@
         </s:if>
         <s:url var="cancelReturnUrl"
                namespace="/"
-               action="%{useCaseName}/UseCase"
+               action="%{qualifiedName}/UseCase"
                escapeAmp="false">
             <s:param name="pk" value="%{pk}"/>
             <s:param name="searchString" value="%{searchString}"/>

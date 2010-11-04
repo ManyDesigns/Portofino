@@ -6,7 +6,7 @@
 <s:form method="post">
     <s:include value="/skins/default/model/tableData/searchButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1>Search: <s:property value="qualifiedTableName"/></h1>
+        <h1>Search: <s:property value="qualifiedName"/></h1>
         <s:if test="!searchForm.isEmpty()">
             <div class="search_form">
                 <mdes:write value="searchForm"/>
@@ -20,7 +20,7 @@
         </s:if>
         <s:url var="cancelReturnUrl"
                namespace="/model"
-               action="%{qualifiedTableName}/TableData"
+               action="%{qualifiedName}/TableData"
                escapeAmp="false">
             <s:param name="searchString" value="%{searchString}"/>
         </s:url>

@@ -92,7 +92,7 @@ public class SelfTestAction extends PortofinoAction {
         writer.write(tempFile);
         inputStream = new FileInputStream(tempFile);
 
-        return EXPORT;
+        return "export";
     }
 
 }

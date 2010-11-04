@@ -7,7 +7,7 @@
         enctype="%{form.multipartRequest ? 'multipart/form-data' : 'application/x-www-form-urlencoded'}">
     <s:include value="/skins/default/model/tableData/editButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1>Edit: <s:property value="qualifiedTableName"/></h1>
+        <h1>Edit: <s:property value="qualifiedName"/></h1>
         <s:if test="form.requiredFieldsPresent">
             Fields marked with a "*" are required.
         </s:if>

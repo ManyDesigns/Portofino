@@ -26,11 +26,16 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.actions.user.admin;
+
+package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
-import com.manydesigns.elements.fields.*;
+import com.manydesigns.elements.blobs.Blob;
+import com.manydesigns.elements.blobs.BlobsManager;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.FileBlobField;
+import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.logging.LogUtil;
@@ -41,31 +46,18 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
-import com.manydesigns.elements.util.RandomUtil;
-import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.actions.RelatedTableForm;
-import com.manydesigns.portofino.actions.model.TableDataAction;
-import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
-import jxl.Workbook;
-import jxl.write.*;
-import jxl.write.Number;
-import jxl.write.biff.RowsExceededException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -76,22 +68,21 @@ import java.util.regex.Pattern;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class GroupAction extends TableDataAction{
-
-
+public abstract class AbstractCrudAction extends PortofinoAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    //**************************************************************************
+    // Common action results
+    //**************************************************************************
+
 
     //**************************************************************************
     // Constants
     //**************************************************************************
 
-    public final static String REDIRECT_TO_TABLE = "redirectToTable";
-    public final static String NO_TABLES = "noTables";
-    public final static String JSON_SELECT_FIELD_OPTIONS =
-            "jsonSelectFieldOptions";
-    public static final String EXPORT_FILENAME_FORMAT = "export-{0}";
-    public static final String ACTIONURL = "Groups.action";
+    public final String DEFAULT_EXPORT_FILENAME_FORMAT = "export-{0}";
+
     //**************************************************************************
     // ServletRequestAware implementation
     //**************************************************************************
@@ -102,31 +93,49 @@ public class GroupAction extends TableDataAction{
     }
 
     //**************************************************************************
+    // Configuration parameters and setters (for struts.xml inspections in IntelliJ)
+    //**************************************************************************
+
+    public String qualifiedName;
+    public String exportFilenameFormat = DEFAULT_EXPORT_FILENAME_FORMAT;
+    public String actionUrl;
+    public String blobActionUrl;
+
+    public void setQualifiedName(String qualifiedName) {
+        this.qualifiedName = qualifiedName;
+    }
+
+    public void setExportFilenameFormat(String exportFilenameFormat) {
+        this.exportFilenameFormat = exportFilenameFormat;
+    }
+
+    public void setActionUrl(String actionUrl) {
+        this.actionUrl = actionUrl;
+    }
+
+    public void setBlobActionUrl(String blobActionUrl) {
+        this.blobActionUrl = blobActionUrl;
+    }
+
+    //**************************************************************************
     // Web parameters
     //**************************************************************************
 
-    public String qualifiedTableName;
     public String pk;
     public String[] selection;
     public String searchString;
     public String cancelReturnUrl;
     public String relName;
-    public int optionProviderIndex;
+    public int selectionProviderIndex;
     public String labelSearch;
-
-    //**************************************************************************
-    // Web parameters setters (for struts.xml inspections in IntelliJ)
-    //**************************************************************************
-
-    public void setQualifiedTableName(String qualifiedTableName) {
-        this.qualifiedTableName = qualifiedTableName;
-    }
+    public String code;
 
     //**************************************************************************
     // Model metadata
     //**************************************************************************
 
-    public ClassAccessor tableAccessor;
+    public ClassAccessor classAccessor;
+    public Table baseTable;
 
     //**************************************************************************
     // Model objects
@@ -145,6 +154,7 @@ public class GroupAction extends TableDataAction{
     public SearchForm searchForm;
     public List<RelatedTableForm> relatedTableFormList;
     public InputStream inputStream;
+    public String errorMessage;
 
     //**************************************************************************
     // export parameters
@@ -162,28 +172,23 @@ public class GroupAction extends TableDataAction{
     public PkHelper pkHelper;
 
     public static final Logger logger =
-            LogUtil.getLogger(TableDataAction.class);
+            LogUtil.getLogger(AbstractCrudAction.class);
 
     //**************************************************************************
     // Action default execute method
     //**************************************************************************
 
     public String execute() {
-        if (qualifiedTableName == null) {
-            List<Table> tables = model.getAllTables();
-            if (tables.isEmpty()) {
-                return NO_TABLES;
-            } else {
-                qualifiedTableName = tables.get(0).getQualifiedName();
-                return REDIRECT_TO_TABLE;
-            }
-        }
-        if (pk == null) {
+        if (qualifiedName == null) {
+            return redirectToFirst();
+        } else if (pk == null) {
             return searchFromString();
         } else {
             return read();
         }
     }
+
+    public abstract String redirectToFirst();
 
     //**************************************************************************
     // Search
@@ -193,7 +198,7 @@ public class GroupAction extends TableDataAction{
         setupMetadata();
 
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
+                new SearchFormBuilder(classAccessor);
         searchForm = searchFormBuilder.build();
         configureSearchFormFromString();
 
@@ -225,7 +230,7 @@ public class GroupAction extends TableDataAction{
         setupMetadata();
 
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
+                new SearchFormBuilder(classAccessor);
         searchForm = searchFormBuilder.build();
         searchForm.readFromRequest(req);
 
@@ -238,9 +243,7 @@ public class GroupAction extends TableDataAction{
             searchString = null;
         }
 
-        Criteria criteria = new Criteria(tableAccessor);
-        searchForm.configureCriteria(criteria);
-        objects = context.getObjects(criteria);
+        setupCriteria();
 
         String readLinkExpression = getReadLinkExpression();
         OgnlTextFormat hrefFormat =
@@ -253,7 +256,7 @@ public class GroupAction extends TableDataAction{
                         .configMode(Mode.VIEW);
 
         // ogni colonna chiave primaria sarà clickabile
-        for (PropertyAccessor property : tableAccessor.getKeyProperties()) {
+        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
             tableFormBuilder.configHyperlinkGenerators(
                     property.getName(), hrefFormat, null);
         }
@@ -266,28 +269,13 @@ public class GroupAction extends TableDataAction{
         return SEARCH;
     }
 
-
-    public String getReadLinkExpression() {
-        StringBuilder sb = new StringBuilder("/model/");
-        sb.append(tableAccessor.getName());
-        sb.append(ACTIONURL + "?pk=");
-        boolean first = true;
-        for (PropertyAccessor property : tableAccessor.getKeyProperties()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(",");
-            }
-            sb.append("%{");
-            sb.append(property.getName());
-            sb.append("}");
-        }
-        if (searchString != null) {
-            sb.append("&searchString=");
-            sb.append(Util.urlencode(searchString));
-        }
-        return sb.toString();
+    public void setupCriteria() {
+        Criteria criteria = new Criteria(classAccessor);
+        searchForm.configureCriteria(criteria);
+        objects = context.getObjects(criteria);
     }
+
+    public abstract String getReadLinkExpression();
 
     //**************************************************************************
     // Return to search
@@ -307,51 +295,65 @@ public class GroupAction extends TableDataAction{
         Serializable pkObject = pkHelper.parsePkString(pk);
 
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
+                new SearchFormBuilder(classAccessor);
         searchForm = searchFormBuilder.build();
         configureSearchFormFromString();
 
-        Criteria criteria = new Criteria(tableAccessor);
-        searchForm.configureCriteria(criteria);
-        objects = context.getObjects(criteria);
+        setupCriteria();
 
-        object = context.getObjectByPk(qualifiedTableName, pkObject);
+        object = context.getObjectByPk(
+                baseTable.getQualifiedName(), pkObject);
+        if (!objects.contains(object)) {
+            errorMessage = "Object not found";
+            return STATUS_404;
+        }
         form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.VIEW)
                 .build();
         form.readFromObject(object);
+        refreshBlobDownloadHref();
 
         relatedTableFormList = new ArrayList<RelatedTableForm>();
 
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
-        for (ForeignKey relationship : table.getOneToManyRelationships()) {
+        for (ForeignKey relationship : baseTable.getOneToManyRelationships()) {
             setupRelatedTableForm(relationship);
         }
 
         return READ;
     }
 
-    protected void setupRelatedTableForm(ForeignKey relationship) {
-        List<Object> relatedObjects =
-                context.getRelatedObjects(qualifiedTableName, object,
-                        relationship.getForeignKeyName());
+    protected abstract void setupRelatedTableForm(ForeignKey relationship);
 
-        String qualifiedFromTableName =
-                relationship.getFromTable().getQualifiedName();
-        TableAccessor relatedTableAccessor =
-                context.getTableAccessor(qualifiedFromTableName);
-        TableFormBuilder tableFormBuilder =
-                new TableFormBuilder(relatedTableAccessor);
-        tableFormBuilder.configNRows(relatedObjects.size());
-        TableForm tableForm = tableFormBuilder
-                .configMode(Mode.VIEW)
-                .build();
-        tableForm.readFromObject(relatedObjects);
+    //**************************************************************************
+    // Blobs
+    //**************************************************************************
 
-        RelatedTableForm relatedTableForm =
-                new RelatedTableForm(relationship, tableForm, relatedObjects);
-        relatedTableFormList.add(relatedTableForm);
+    public String downloadBlob() throws IOException {
+        Blob blob = BlobsManager.getManager().loadBlob(code);
+        contentLength = blob.getSize();
+        contentType = blob.getContentType();
+        inputStream = new FileInputStream(blob.getDataFile());
+        fileName = blob.getFilename();
+        return EXPORT;
     }
+
+    protected void refreshBlobDownloadHref() {
+        for (FieldSet fieldSet : form) {
+            for (Field field : fieldSet) {
+                if (field instanceof FileBlobField) {
+                    FileBlobField fileBlobField = (FileBlobField) field;
+                    Blob blob = fileBlobField.getBlob();
+                    if (blob != null) {
+                        String url = getBlobDownloadUrl(blob.getCode());
+                        field.setHref(url);
+                    }
+                }
+            }
+        }
+    }
+
+    public abstract String getBlobDownloadUrl(String code);
+
 
     //**************************************************************************
     // Create/Save
@@ -376,13 +378,10 @@ public class GroupAction extends TableDataAction{
 
         form.readFromRequest(req);
         if (form.validate()) {
-            object = tableAccessor.newInstance();
+            object = classAccessor.newInstance();
             form.writeToObject(object);
-            context.saveObject(qualifiedTableName, object);
-            String databaseName = model
-                    .findTableByQualifiedName(qualifiedTableName)
-                    .getDatabaseName();
-            context.commit(databaseName);
+            context.saveObject(baseTable.getQualifiedName(), object);
+            context.commit(baseTable.getDatabaseName());
             pk = pkHelper.generatePkString(object);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
             return SAVE;
@@ -399,7 +398,8 @@ public class GroupAction extends TableDataAction{
         setupMetadata();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
-        object = context.getObjectByPk(qualifiedTableName, pkObject);
+        object = context.getObjectByPk(
+                baseTable.getQualifiedName(), pkObject);
 
         form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.EDIT)
@@ -418,15 +418,14 @@ public class GroupAction extends TableDataAction{
                 .configMode(Mode.EDIT)
                 .build();
 
-        object = context.getObjectByPk(qualifiedTableName, pkObject);
+        object = context.getObjectByPk(
+                baseTable.getQualifiedName(), pkObject);
         form.readFromObject(object);
         form.readFromRequest(req);
         if (form.validate()) {
             form.writeToObject(object);
-            context.updateObject(qualifiedTableName, object);
-            String databaseName = model
-                    .findTableByQualifiedName(qualifiedTableName).getDatabaseName();
-            context.commit(databaseName);
+            context.updateObject(baseTable.getQualifiedName(), object);
+            context.commit(baseTable.getDatabaseName());
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
             return UPDATE;
         } else {
@@ -469,16 +468,16 @@ public class GroupAction extends TableDataAction{
         if (form.validate()) {
             for (String current : selection) {
                 Serializable pkObject = pkHelper.parsePkString(current);
-                object = context.getObjectByPk(qualifiedTableName, pkObject);
+                object = context.getObjectByPk(
+                        baseTable.getQualifiedName(), pkObject);
                 form.writeToObject(object);
             }
             form.writeToObject(object);
-            context.updateObject(qualifiedTableName, object);
-            String databaseName = model.findTableByQualifiedName(qualifiedTableName)
-                    .getDatabaseName();
-            context.commit(databaseName);
+            context.updateObject(baseTable.getQualifiedName(), object);
+            context.commit(baseTable.getDatabaseName());
             SessionMessages.addInfoMessage(MessageFormat.format(
-                    "UPDATE di {0} oggetti avvenuto con successo", selection.length));
+                    "UPDATE di {0} oggetti avvenuto con successo",
+                    selection.length));
             return BULK_UPDATE;
         } else {
             return BULK_EDIT;
@@ -492,10 +491,8 @@ public class GroupAction extends TableDataAction{
     public String delete() {
         setupMetadata();
         Object pkObject = pkHelper.parsePkString(pk);
-        context.deleteObject(qualifiedTableName, pkObject);
-        String databaseName = model.findTableByQualifiedName(qualifiedTableName)
-                .getDatabaseName();
-        context.commit(databaseName);
+        context.deleteObject(baseTable.getQualifiedName(), pkObject);
+        context.commit(baseTable.getDatabaseName());
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
         return DELETE;
     }
@@ -509,13 +506,12 @@ public class GroupAction extends TableDataAction{
         }
         for (String current : selection) {
             Object pkObject = pkHelper.parsePkString(current);
-            context.deleteObject(qualifiedTableName, pkObject);
+            context.deleteObject(baseTable.getQualifiedName(), pkObject);
         }
-        String databaseName = model.findTableByQualifiedName(qualifiedTableName)
-                .getDatabaseName();
-        context.commit(databaseName);
+        context.commit(baseTable.getDatabaseName());
         SessionMessages.addInfoMessage(MessageFormat.format(
-                "DELETE di {0} oggetti avvenuto con successo", selection.length));
+                "DELETE di {0} oggetti avvenuto con successo",
+                selection.length));
         return DELETE;
     }
 
@@ -541,15 +537,14 @@ public class GroupAction extends TableDataAction{
 
     protected String jsonOptions(boolean includeSelectPrompt) {
         setupMetadata();
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
         ForeignKey relationship =
-                table.findForeignKeyByName(relName);
+                baseTable.findForeignKeyByName(relName);
 
         String[] fieldNames = createFieldNamesForRelationship(relationship);
         SelectionProvider selectionProvider =
                 createSelectionProviderForRelationship(relationship);
 
-        Form form = new FormBuilder(tableAccessor)
+        Form form = new FormBuilder(classAccessor)
                 .configFields(fieldNames)
                 .configSelectionProvider(selectionProvider, fieldNames)
                 .configMode(Mode.EDIT)
@@ -557,7 +552,7 @@ public class GroupAction extends TableDataAction{
         form.readFromRequest(req);
 
         SelectField targetField =
-                (SelectField) form.get(0).get(optionProviderIndex);
+                (SelectField) form.get(0).get(selectionProviderIndex);
         targetField.setLabelSearch(labelSearch);
 
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
@@ -568,24 +563,13 @@ public class GroupAction extends TableDataAction{
         return JSON_SELECT_FIELD_OPTIONS;
     }
 
-    //**************************************************************************
-    // Utility methods
-    //**************************************************************************
-
-    public void setupMetadata() {
-        tableAccessor = context.getTableAccessor(qualifiedTableName);
-        pkHelper = new PkHelper(tableAccessor);
-        if (tableAccessor == null) {
-            throw new ModelObjectNotFoundError(qualifiedTableName);
-        }
-    }
+    public abstract void setupMetadata();
 
     protected FormBuilder createFormBuilderWithSelectionProviders() {
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
+        FormBuilder formBuilder = new FormBuilder(classAccessor);
 
         // setup relationship lookups
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
-        for (ForeignKey rel : table.getForeignKeys()) {
+        for (ForeignKey rel : baseTable.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
             SelectionProvider selectionProvider =
                     createSelectionProviderForRelationship(rel);
@@ -605,11 +589,10 @@ public class GroupAction extends TableDataAction{
     }
 
     protected TableFormBuilder createTableFormBuilderWithSelectionProviders() {
-        TableFormBuilder tableFormBuilder = new TableFormBuilder(tableAccessor);
+        TableFormBuilder tableFormBuilder = new TableFormBuilder(classAccessor);
 
         // setup relationship lookups
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
-        for (ForeignKey rel : table.getForeignKeys()) {
+        for (ForeignKey rel : baseTable.getForeignKeys()) {
             String[] fieldNames = createFieldNamesForRelationship(rel);
             SelectionProvider selectionProvider =
                     createSelectionProviderForRelationship(rel);
@@ -661,271 +644,4 @@ public class GroupAction extends TableDataAction{
     }
 
 
-    //**************************************************************************
-    // ExportSearch
-    //**************************************************************************
-
-    public String exportSearchExcel() {
-        setupMetadata();
-
-        SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
-        searchForm = searchFormBuilder.build();
-        searchForm.readFromRequest(req);
-
-        Criteria criteria = new Criteria(tableAccessor);
-        searchForm.configureCriteria(criteria);
-        objects = context.getObjects(criteria);
-
-        TableFormBuilder tableFormBuilder =
-            createTableFormBuilderWithSelectionProviders()
-                            .configNRows(objects.size());
-        tableForm = tableFormBuilder.configMode(Mode.VIEW)
-                .build();
-        tableForm.readFromObject(objects);
-
-        writeFileSearchExcel();
-
-        return EXPORT;
-    }
-
-    private void writeFileSearchExcel() {
-        File fileTemp = createExportTempFile();
-        WritableWorkbook workbook = null;
-        try {
-            workbook = Workbook.createWorkbook(fileTemp);
-            WritableSheet sheet = workbook.createSheet(qualifiedTableName, 0);
-
-            addHeaderToSheet(sheet);
-
-            int i = 1;
-            for ( TableForm.Row row : tableForm.getRows()) {
-                exportRows(sheet, i, row);
-                i++;
-            }
-
-            workbook.write();
-        } catch (IOException e) {
-            LogUtil.warning(logger, "IOException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        } catch (RowsExceededException e) {
-            LogUtil.warning(logger, "RowsExceededException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        } catch (WriteException e) {
-            LogUtil.warning(logger, "WriteException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        } finally {
-            try {
-                if (workbook != null)
-                    workbook.close();
-            }
-            catch (Exception e) {
-                LogUtil.warning(logger, "IOException", e);
-                SessionMessages.addErrorMessage(e.getMessage());
-            }
-        }
-        paramExport(fileTemp);
-    }
-
-    //**************************************************************************
-    // ExportRead
-    //**************************************************************************
-
-    public String exportReadExcel() {
-        setupMetadata();
-        Serializable pkObject = pkHelper.parsePkString(pk);
-
-        SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
-        searchForm = searchFormBuilder.build();
-        configureSearchFormFromString();
-
-        Criteria criteria = new Criteria(tableAccessor);
-        searchForm.configureCriteria(criteria);
-        objects = context.getObjects(criteria);
-
-        object = context.getObjectByPk(qualifiedTableName, pkObject);
-
-        TableFormBuilder tableFormBuilder =
-            createTableFormBuilderWithSelectionProviders()
-                            .configMode(Mode.VIEW)
-                            .configNRows(objects.size());
-        tableForm = tableFormBuilder.build();
-        tableForm.readFromObject(object);
-
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.VIEW)
-                .build();
-        form.readFromObject(object);
-
-        relatedTableFormList = new ArrayList<RelatedTableForm>();
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
-        for (ForeignKey relationship : table.getOneToManyRelationships()) {
-            setupRelatedTableForm(relationship);
-        }
-
-        writeFileReadExcel();
-
-        return EXPORT;
-    }
-
-
-    private void writeFileReadExcel() {
-        File fileTemp = createExportTempFile();
-        WritableWorkbook workbook = null;
-        try {
-            workbook = Workbook.createWorkbook(fileTemp);
-            WritableSheet sheet = workbook.createSheet(qualifiedTableName, 0);
-
-            addHeaderToSheet(sheet);
-
-            int i = 1;
-            for (FieldSet fieldset : form) {
-                int j = 0;
-                for (Field field : fieldset) {
-                    addFieldToCell(sheet, i, j, field);
-                    j++;
-                }
-                i++;
-            }
-
-            //Aggiungo le relazioni/sheet
-           int k = 1;
-           WritableCellFormat formatCell = headerExcel();
-           for (RelatedTableForm relTabForm : relatedTableFormList) {
-                sheet = workbook.createSheet("sheet " + k , k);
-                k++;
-                int m = 0;
-                for (TableForm.Column col : relTabForm.tableForm.getColumns()) {
-                    sheet.addCell(new Label(m, 0, col.getLabel(), formatCell));
-                    m++;
-                }
-                i = 1;
-                for (TableForm.Row row : relTabForm.tableForm.getRows()) {
-                    int j = 0;
-                    for (Field field : Arrays.asList(row.getFields())) {
-                        addFieldToCell(sheet, i, j, field);
-                        j++;
-                    }
-                    i++;
-                }
-            }
-
-            workbook.write();
-        } catch (IOException e) {
-            LogUtil.warning(logger, "IOException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        } catch (RowsExceededException e) {
-            LogUtil.warning(logger, "RowsExceededException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        } catch (WriteException e) {
-            LogUtil.warning(logger, "WriteException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        } finally {
-            try {
-                if (workbook != null)
-                    workbook.close();
-            }
-            catch (Exception e) {
-                LogUtil.warning(logger, "IOException", e);
-                SessionMessages.addErrorMessage(e.getMessage());
-            }
-        }
-
-        paramExport(fileTemp);
-    }
-
-
-    private WritableCellFormat headerExcel() {
-        WritableFont fontCell = new WritableFont(WritableFont.ARIAL, 12,
-             WritableFont.BOLD, true);
-        return new WritableCellFormat (fontCell);
-    }
-
-    private void exportRows(WritableSheet sheet, int i,
-                            TableForm.Row row) throws WriteException {
-        int j = 0;
-        for (Field field : row.getFields()) {
-            addFieldToCell(sheet, i, j, field);
-
-            j++;
-        }
-    }
-
-    private File createExportTempFile() {
-         String exportId = RandomUtil.createRandomCode();
-         return RandomUtil.getTempCodeFile(EXPORT_FILENAME_FORMAT, exportId);
-     }
-
-
-    private void paramExport(File fileTemp) {
-        contentType = "application/ms-excel; charset=UTF-8";
-        fileName = fileTemp.getName() + ".xls";
-
-        contentLength = fileTemp.length();
-
-        try {
-            inputStream = new FileInputStream(fileTemp);
-        } catch (IOException e) {
-            LogUtil.warning(logger, "IOException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
-        }
-    }
-
-    private void addHeaderToSheet(WritableSheet sheet) throws WriteException {
-        WritableCellFormat formatCell = headerExcel();
-        int l = 0;
-        for (TableForm.Column col : tableForm.getColumns()) {
-            sheet.addCell(new Label(l, 0, col.getLabel(), formatCell));
-            l++;
-        }
-    }
-
-    private void addFieldToCell(WritableSheet sheet, int i, int j,
-                                Field field) throws WriteException {
-        if (field instanceof NumericField) {
-            NumericField numField = (NumericField) field;
-            if (numField.getDecimalValue() != null) {
-                Number number;
-                BigDecimal decimalValue = numField.getDecimalValue();
-                if (numField.getDecimalFormat() == null) {
-                    number = new Number(j, i,
-                            decimalValue == null
-                                    ? null : decimalValue.doubleValue());
-                } else {
-                    NumberFormat numberFormat = new NumberFormat(
-                            numField.getDecimalFormat().toPattern());
-                    WritableCellFormat writeCellNumberFormat =
-                            new WritableCellFormat(numberFormat);
-                    number = new Number(j, i,
-                            decimalValue == null
-                                    ? null : decimalValue.doubleValue(),
-                            writeCellNumberFormat);
-                }
-                sheet.addCell(number);
-            }
-        } else if (field instanceof PasswordField) {
-            Label label = new Label(j, i,
-                    PasswordField.PASSWORD_PLACEHOLDER);
-            sheet.addCell(label);
-        } else if (field instanceof DateField) {
-            DateField dateField = (DateField) field;
-            DateTime dateCell = null;
-            Date date = dateField.getDateValue();
-            if (date != null) {
-                DateFormat dateFormat = new DateFormat(
-                        dateField.getDatePattern());
-                WritableCellFormat wDateFormat =
-                        new WritableCellFormat(dateFormat);
-                dateCell = new DateTime(j, i,
-                        dateField.getDateValue() == null
-                                ? null : dateField.getDateValue(),
-                        wDateFormat);
-                sheet.addCell(dateCell);
-            }
-        } else {
-            Label label = new Label(j, i, field.getStringValue());
-            sheet.addCell(label);
-        }
-    }
 }
