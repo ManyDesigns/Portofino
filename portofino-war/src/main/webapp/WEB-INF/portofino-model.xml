@@ -15,7 +15,7 @@
                                         length="8"
                                         scale="0"
                                         nullable="false"
-                                        propertyName="uuid"
+                                        propertyName="userId"
                                         searchable="true">
                                 </column>
                                 <column columnName="emailaddress"
@@ -46,11 +46,10 @@
                                                 type="com.manydesigns.elements.annotations.Password"/>
                                     </annotations>
                                 </column>
-
                                 <column columnName="state"
-                                        columnType="int4"
-                                        javaType="java.lang.Integer"
-                                        length="8"
+                                        columnType="int8"
+                                        javaType="java.lang.Long"
+                                        length="19"
                                         scale="0"
                                         nullable="false"
                                         autoincrement="false"
@@ -83,7 +82,6 @@
                                         autoincrement="false"
                                         searchable="false"
                                         />
-
                                 <column columnName="username"
                                         columnType="varchar"
                                         javaType="java.lang.String"
@@ -255,6 +253,21 @@
                             <primaryKey primaryKeyName="pk_user">
                                 <column columnName="userid"/>
                             </primaryKey>
+                            <foreignKeys>
+                                <foreignKey foreignKeyName="fk_user_1"
+                                            toDatabase="portofino"
+                                            toSchema="public"
+                                            toTable="userstate"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION"
+                                            manyPropertyName="users"
+                                            onePropertyName="state">
+                                    <references>
+                                        <reference fromColumn="state"
+                                                   toColumn="id"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
                             <annotations>
                                 <annotation type="com.manydesigns.elements.annotations.ShortName">
                                     <value>%{userName} (%{email})</value>
@@ -340,7 +353,7 @@
                                               onePropertyName="creatorId">
                                     <references>
                                         <reference fromColumn="creatorid"
-                                                   toColumn="uuid"/>
+                                                   toColumn="userid"/>
                                     </references>
                                 </foreignKey>
                             </foreignKeys>
@@ -572,6 +585,38 @@
                                     </references>
                                 </foreignKey>
                             </foreignKeys>
+                        </table>
+                        <table tableName="userstate"
+                               javaClass="com.manydesigns.portofino.system.model.users.UserState">
+                            <columns>
+                                <column autoincrement="true"
+                                        columnName="id"
+                                        columnType="bigserial"
+                                        javaType="java.lang.Long"
+                                        length="19"
+                                        nullable="false"
+                                        scale="0"
+                                        searchable="true"/>
+                                <column autoincrement="false"
+                                        columnName="description"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        nullable="true"
+                                        scale="0"
+                                        searchable="true"/>
+                                <column autoincrement="false"
+                                        columnName="name"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="75"
+                                        nullable="false"
+                                        scale="0"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="userstate_pkey">
+                                <column columnName="id"/>
+                            </primaryKey>
                         </table>
                     </tables>
                 </schema>

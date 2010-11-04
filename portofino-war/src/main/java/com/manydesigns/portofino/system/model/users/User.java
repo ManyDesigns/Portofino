@@ -46,11 +46,12 @@ import java.sql.Timestamp;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class User implements Serializable{
+    public static final String copyright
+            = "Copyright (c) 2005-2010, ManyDesigns srl";
     //Dati
-    Long uuid;
-    String email;
-    String pwd;
-    Integer state;
+    Long userId;
+
+    Long state;
 
 
     Timestamp deletionDate;
@@ -64,7 +65,8 @@ public class User implements Serializable{
     Boolean agreedToTerms;
     Boolean extAuth;
 
-
+    String email;
+    String pwd;
     String token;
     String remQuestion;
     String remans;
@@ -73,6 +75,7 @@ public class User implements Serializable{
     String middleName;
     String lastName;
     String jobTitle;
+
     Integer failedLoginAttempts;
     Integer bounced;
     Integer graceLoginCount;
@@ -87,16 +90,16 @@ public class User implements Serializable{
 
     }
     
-    public User(Long uuid){
-        this.uuid=uuid;
+    public User(Long userId){
+        this.userId = userId;
     }
 
-    public Long getUuid() {
-        return uuid;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUuid(Long uuid) {
-        this.uuid = uuid;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getEmail() {
@@ -125,13 +128,11 @@ public class User implements Serializable{
         this.groups = groups;
     }
 
-    public Integer getState() {
-        //TODO eliminare lo stato fisso
-        state=1;
+    public Long getState() {
         return state;
     }
 
-    public void setState(Integer state) {
+    public void setState(Long state) {
         this.state = state;
     }
 
@@ -340,7 +341,7 @@ public class User implements Serializable{
 
         User user = (User) o;
 
-        if (uuid != null ? !uuid.equals(user.uuid) : user.uuid != null)
+        if (userId != null ? !userId.equals(user.userId) : user.userId != null)
             return false;
 
         return true;
@@ -348,7 +349,7 @@ public class User implements Serializable{
 
     @Override
     public int hashCode() {
-        int result = uuid.hashCode();
+        int result = userId.hashCode();
         return result;
     }
 }

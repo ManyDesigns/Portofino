@@ -40,6 +40,8 @@ import java.sql.Timestamp;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class Group implements Serializable{
+    public static final String copyright
+            = "Copyright (c) 2005-2010, ManyDesigns srl";
     Long groupId;
     String name;
     String description;

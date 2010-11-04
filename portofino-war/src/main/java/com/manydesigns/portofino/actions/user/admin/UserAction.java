@@ -326,7 +326,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
         try {
             TableAccessor ugAccessor = context.getTableAccessor(usersGroupsTable);
             Criteria criteria = new Criteria(ugAccessor);
-            criteria.eq(ugAccessor.getProperty("userid"), user.getUuid());
+            criteria.eq(ugAccessor.getProperty("userid"), user.getUserId());
             criteria.isNull(ugAccessor.getProperty("deletionDate"));
             users = context.getObjects(criteria);
 
@@ -372,7 +372,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
             TableAccessor ugAccessor = context.getTableAccessor(usersGroupsTable);
 
             Criteria criteria = new Criteria(ugAccessor);
-            criteria.eq(ugAccessor.getProperty("userid"), user.getUuid());
+            criteria.eq(ugAccessor.getProperty("userid"), user.getUserId());
             criteria.isNotNull(ugAccessor.getProperty("deletionDate"));
             List<Object> objects = context.getObjects(criteria);
 

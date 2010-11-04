@@ -103,7 +103,7 @@ public class LoginAction extends PortofinoAction
         final String email = user.getEmail();
         final String password = user.getPwd();
         user = context.login(email, password);
-        if (null!=user && user.getUuid()!=0) {
+        if (null!=user && user.getUserId()!=0) {
             LogUtil.fineMF(logger, "User {0} login", user.getEmail());
             updateUser(user);
             return SUCCESS;

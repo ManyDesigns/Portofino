@@ -408,7 +408,7 @@ public class HibernateConfig {
         // nelle relazioni
         set.setLazy(LAZY);
 
-        set.setRole(relationship.getActualManyPropertyName());
+        set.setRole(relationship.getActualToTable()+"."+relationship.getActualManyPropertyName());
         set.setNodeName(relationship.getActualManyPropertyName());
         set.setCollectionTable(clazzMany.getTable());
         OneToMany oneToMany = new OneToMany(set.getOwner());

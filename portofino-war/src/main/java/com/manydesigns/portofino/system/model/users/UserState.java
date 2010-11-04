@@ -28,72 +28,53 @@
  */
 package com.manydesigns.portofino.system.model.users;
 
-import java.util.Date;
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UsersGroups implements Serializable {
-    public static final String copyright
-            = "Copyright (c) 2005-2010, ManyDesigns srl";
-    Group group;
-    User user;
-    Timestamp creationDate;
-    Timestamp deletionDate;
-    Long userid;
-    Long groupid;
+public class UserState implements Serializable{
+    public static final String copyright =
+            "Copyright (c) 2005-2010, ManyDesigns srl";
+    protected String name;
+    protected String description;
+    protected Long id;
 
+    List<User> users;
 
-    public Group getGroup() {
-        return group;
+    public Long getId() {
+        return id;
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Timestamp getCreationDate() {
-        return creationDate;
+    public String getName() {
+        return name;
     }
 
-    public void setCreationDate(Timestamp creationDate) {
-        this.creationDate = creationDate;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public User getUser() {
-        return user;
+    public String getDescription() {
+        return description;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public Long getUserid() {
-        return userid;
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setUserid(Long userid) {
-        this.userid = userid;
-    }
-
-    public Long getGroupid() {
-        return groupid;
-    }
-
-    public void setGroupid(Long groupid) {
-        this.groupid = groupid;
-    }
-
-    public Date getDeletionDate() {
-        return deletionDate;
-    }
-
-    public void setDeletionDate(Timestamp deletionDate) {
-        this.deletionDate = deletionDate;
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 
     @Override
@@ -101,20 +82,16 @@ public class UsersGroups implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        UsersGroups that = (UsersGroups) o;
+        UserState userState = (UserState) o;
 
-        if (!groupid.equals(that.groupid)) return false;
-        if (!userid.equals(that.userid)) return false;
+        if (id != null ? !id.equals(userState.id) : userState.id != null)
+            return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = userid.hashCode();
-        result = 31 * result + groupid.hashCode();
-        return result;
+        return id != null ? id.hashCode() : 0;
     }
 }
-
-

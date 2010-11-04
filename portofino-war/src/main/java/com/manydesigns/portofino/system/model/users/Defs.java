@@ -34,4 +34,6 @@ package com.manydesigns.portofino.system.model.users;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class Defs {
+    public static final String copyright
+            = "Copyright (c) 2005-2010, ManyDesigns srl";
 }

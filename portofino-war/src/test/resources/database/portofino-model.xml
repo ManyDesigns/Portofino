@@ -52,7 +52,8 @@
                                         scale="0"
                                         nullable="false"
                                         autoincrement="false"
-                                        searchable="true"/>
+                                        searchable="true"
+                                        propertyName="stateId"/>
                                 <column columnName="token"
                                         columnType="varchar"
                                         javaType="java.lang.String"
@@ -257,6 +258,21 @@
                                     <value>%{userName} (%{email})</value>
                                 </annotation>
                             </annotations>
+                            <foreignKeys>
+                                <foreignKey foreignKeyName="fk_user_1"
+                                            toDatabase="portofino"
+                                            toSchema="public"
+                                            toTable="userstate"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION"
+                                            manyPropertyName="users"
+                                            onePropertyName="state">
+                                    <references>
+                                        <reference fromColumn="creatorid"
+                                                   toColumn="uuid"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
                         </table>
                         <table table="groups"
                                javaClass="com.manydesigns.portofino.system.model.users.Group">
@@ -564,6 +580,38 @@
                                     </references>
                                 </foreignKey>
                             </foreignKeys>
+                        </table>
+                        <table tableName="userstate"
+                               javaClass="com.manydesigns.portofino.system.model.users.UserState">
+                            <columns>
+                                <column autoincrement="true"
+                                        columnName="id"
+                                        columnType="bigserial"
+                                        javaType="java.lang.Long"
+                                        length="19"
+                                        nullable="false"
+                                        scale="0"
+                                        searchable="true"/>
+                                <column autoincrement="false"
+                                        columnName="description"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        nullable="true"
+                                        scale="0"
+                                        searchable="true"/>
+                                <column autoincrement="false"
+                                        columnName="name"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="75"
+                                        nullable="false"
+                                        scale="0"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="userstate_pkey">
+                                <column columnName="id"/>
+                            </primaryKey>
                         </table>
                     </tables>
                 </schema>

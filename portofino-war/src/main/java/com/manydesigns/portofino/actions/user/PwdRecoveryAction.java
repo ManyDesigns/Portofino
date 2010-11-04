@@ -48,6 +48,8 @@ import java.util.logging.Logger;
 */
 public class PwdRecoveryAction extends PortofinoAction
         implements ServletRequestAware, LoginUnAware{
+    public static final String copyright
+            = "Copyright (c) 2005-2010, ManyDesigns srl";
 
     HttpServletRequest req;
         public void setServletRequest(HttpServletRequest req) {
