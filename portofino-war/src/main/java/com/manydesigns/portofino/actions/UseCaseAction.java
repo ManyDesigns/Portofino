@@ -30,8 +30,6 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.fields.search.Criteria;
-import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.usecases.UseCase;
@@ -92,34 +90,8 @@ public class UseCaseAction extends AbstractCrudAction
     }
 
 
-    public String getReadLinkExpression() {
-        StringBuilder sb = new StringBuilder("/");
-        sb.append(qualifiedName);
-        sb.append("/UseCase.action?pk=");
-        boolean first = true;
-        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(",");
-            }
-            sb.append("%{");
-            sb.append(property.getName());
-            sb.append("}");
-        }
-        if (searchString != null) {
-            sb.append("&searchString=");
-            sb.append(Util.urlencode(searchString));
-        }
-        return sb.toString();
-    }
-
     protected void setupRelatedTableForm(ForeignKey relationship) {
         //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public String getBlobDownloadUrl(String code) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
 }

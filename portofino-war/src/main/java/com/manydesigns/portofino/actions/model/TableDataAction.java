@@ -41,9 +41,7 @@ import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.RandomUtil;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.AbstractCrudAction;
 import com.manydesigns.portofino.actions.RelatedTableForm;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
@@ -104,29 +102,6 @@ public class TableDataAction extends AbstractCrudAction
     }
 
     
-    @Override
-    public String getReadLinkExpression() {
-        StringBuilder sb = new StringBuilder("/model/");
-        sb.append(classAccessor.getName());
-        sb.append(actionUrl + "?pk=");
-        boolean first = true;
-        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(",");
-            }
-            sb.append("%{");
-            sb.append(property.getName());
-            sb.append("}");
-        }
-        if (searchString != null) {
-            sb.append("&searchString=");
-            sb.append(Util.urlencode(searchString));
-        }
-        return sb.toString();
-    }
-
     protected void setupRelatedTableForm(ForeignKey relationship) {
         List<Object> relatedObjects =
                 context.getRelatedObjects(qualifiedName, object,
@@ -149,14 +124,6 @@ public class TableDataAction extends AbstractCrudAction
         relatedTableFormList.add(relatedTableForm);
     }
 
-    public String getBlobDownloadUrl(String code) {
-        StringBuilder sb = new StringBuilder("/model/");
-        sb.append(classAccessor.getName());
-        sb.append(blobActionUrl);
-        sb.append("?code=");
-        sb.append(Util.urlencode(code));
-        return Util.getAbsoluteUrl(sb.toString());
-    }
 
 
     //**************************************************************************

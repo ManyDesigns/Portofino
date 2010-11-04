@@ -744,6 +744,9 @@
                                                 type="com.manydesigns.elements.annotations.Label">
                                             <value>description</value>
                                         </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.FileBlob">
+                                        </annotation>
                                     </annotations>
                                 </column>
                             </columns>

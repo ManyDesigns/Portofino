@@ -175,8 +175,6 @@ are not overridden by values from the request.
         <action name="*/TableData"
                 class="com.manydesigns.portofino.actions.model.TableDataAction">
             <param name="qualifiedName">{1}</param>
-            <param name="actionUrl">/TableData.action</param>
-            <param name="blobActionUrl">/TableData!downloadBlob.action</param>
 
             <result name="search">/skins/default/model/tableData/search.jsp</result>
 

@@ -46,6 +46,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
@@ -53,6 +54,9 @@ import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
+import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionInvocation;
+import com.opensymphony.xwork2.ActionProxy;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -98,8 +102,6 @@ public abstract class AbstractCrudAction extends PortofinoAction {
 
     public String qualifiedName;
     public String exportFilenameFormat = DEFAULT_EXPORT_FILENAME_FORMAT;
-    public String actionUrl;
-    public String blobActionUrl;
 
     public void setQualifiedName(String qualifiedName) {
         this.qualifiedName = qualifiedName;
@@ -107,14 +109,6 @@ public abstract class AbstractCrudAction extends PortofinoAction {
 
     public void setExportFilenameFormat(String exportFilenameFormat) {
         this.exportFilenameFormat = exportFilenameFormat;
-    }
-
-    public void setActionUrl(String actionUrl) {
-        this.actionUrl = actionUrl;
-    }
-
-    public void setBlobActionUrl(String blobActionUrl) {
-        this.blobActionUrl = blobActionUrl;
     }
 
     //**************************************************************************
@@ -275,7 +269,50 @@ public abstract class AbstractCrudAction extends PortofinoAction {
         objects = context.getObjects(criteria);
     }
 
-    public abstract String getReadLinkExpression();
+    public String getReadLinkExpression() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(buildActionUrl(null));
+        sb.append("?pk=");
+        boolean first = true;
+        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(",");
+            }
+            sb.append("%{");
+            sb.append(property.getName());
+            sb.append("}");
+        }
+        if (searchString != null) {
+            sb.append("&searchString=");
+            sb.append(Util.urlencode(searchString));
+        }
+        return sb.toString();
+    }
+
+    private String buildActionUrl(String method) {
+        ActionContext actionContext = ActionContext.getContext();
+        ActionInvocation actionInvocation = actionContext.getActionInvocation();
+        ActionProxy actionProxy = actionInvocation.getProxy();
+        String namespace = actionProxy.getNamespace();
+        String actionName = actionProxy.getActionName();
+
+        StringBuilder sb = new StringBuilder();
+        if ("/".equals(namespace)) {
+            sb.append("/");
+        } else {
+            sb.append(namespace);
+            sb.append("/");
+        }
+        sb.append(actionName);
+        if (method != null) {
+            sb.append("!");
+            sb.append(method);
+        }
+        sb.append(".action");
+        return sb.toString();
+    }
 
     //**************************************************************************
     // Return to search
@@ -352,7 +389,13 @@ public abstract class AbstractCrudAction extends PortofinoAction {
         }
     }
 
-    public abstract String getBlobDownloadUrl(String code);
+    public String getBlobDownloadUrl(String code) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(buildActionUrl("downloadBlob"));
+        sb.append("?code=");
+        sb.append(Util.urlencode(code));
+        return Util.getAbsoluteUrl(sb.toString());
+    }
 
 
     //**************************************************************************
