@@ -410,7 +410,7 @@ are not overridden by values from the request.
             </result>
         </action>
         <action name="Users" class="com.manydesigns.portofino.actions.user.admin.UserAction">
-            <param name="qualifiedTableName">portofino.public.users</param>
+            <param name="qualifiedName">portofino.public.users</param>
             <result name="search">/skins/default/user/admin/search.jsp</result>
             <result name="read">/skins/default/user/admin/read.jsp</result>
             <result name="create">/skins/default/user/admin/create.jsp</result>
@@ -465,7 +465,6 @@ are not overridden by values from the request.
         </action>
 
         <action name="Groups" class="com.manydesigns.portofino.actions.user.admin.GroupAction">
-            <param name="qualifiedTableName">portofino.public.users</param>
             <param name="skin">default</param>
             <param name="qualifiedName">portofino.public.groups</param>
             <result name="search">/skins/default/group/admin/search.jsp</result>
