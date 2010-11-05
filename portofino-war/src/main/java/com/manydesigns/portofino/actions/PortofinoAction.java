@@ -47,6 +47,12 @@ public class PortofinoAction extends ActionSupport
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
+    // Constants
+    //**************************************************************************
+
+    public final static String DEFAULT_SKIN = "default";
+
+    //**************************************************************************
     // Common action results
     //**************************************************************************
 
@@ -55,6 +61,7 @@ public class PortofinoAction extends ActionSupport
     public final static String STATUS_403 = "403";
     public final static String STATUS_404 = "404";
     public final static String STATUS_500 = "500";
+    public final static String CANCEL = "cancel";
 
     public final static String SEARCH = "search";
     public final static String LIST = "list";
@@ -71,10 +78,12 @@ public class PortofinoAction extends ActionSupport
     public final static String DELETE = "delete";
     public final static String SUMMARY = "summary";
     public final static String CHART = "chart";
-    public final static String CANCEL = "cancel";
     public final static String EXPORT = "export";
+    public final static String REDIRECT_TO_FIRST = "redirectToFirst";
+    public final static String NO_CLASSES = "noClasses";
+    public final static String JSON_SELECT_FIELD_OPTIONS = "jsonSelectFieldOptions";
 
-
+    
     //**************************************************************************
     // ContextAware implementation
     //**************************************************************************
@@ -97,15 +106,11 @@ public class PortofinoAction extends ActionSupport
         this.navigation = navigation;
     }
 
-//**************************************************************************
-    // Skin
+    //**************************************************************************
+    // Configuration and setters
     //**************************************************************************
 
-    public String skin;
-
-    public String getSkin() {
-        return skin;
-    }
+    public String skin = DEFAULT_SKIN;
 
     public void setSkin(String skin) {
         this.skin = skin;

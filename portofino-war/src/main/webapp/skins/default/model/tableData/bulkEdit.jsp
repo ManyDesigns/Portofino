@@ -6,7 +6,7 @@
 <s:form method="post">
     <s:include value="/skins/default/model/tableData/bulkEditButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1>Bulk edit: <s:property value="qualifiedTableName"/></h1>
+        <h1>Bulk edit: <s:property value="qualifiedName"/></h1>
         In the first column, select the fields you want to edit. Then, fill in their values.
         <mdes:write value="form"/>
         <s:iterator var="#current" value="selection">

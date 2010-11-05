@@ -127,9 +127,9 @@ public class UserAction extends TableDataAction {
     //**************************************************************************
 
     public String searchFromString() {
-        setupTable();
+        setupMetadata();
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
+                new SearchFormBuilder(classAccessor);
         searchFormBuilder.configFields("userId","email","state","lastName", "firstName");
         searchForm = searchFormBuilder.build();
         configureSearchFormFromString();
@@ -159,10 +159,10 @@ public class UserAction extends TableDataAction {
     }
 
     public String search() {
-        setupTable();
+        setupMetadata();
 
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
+                new SearchFormBuilder(classAccessor);
         searchForm = searchFormBuilder.build();
         searchForm.readFromRequest(req);
         return commonSearch();
@@ -174,7 +174,7 @@ public class UserAction extends TableDataAction {
             searchString = null;
         }
 
-        Criteria criteria = new Criteria(tableAccessor);
+        Criteria criteria = new Criteria(classAccessor);
         searchForm.configureCriteria(criteria);
         users = context.getObjects(criteria);
 
@@ -191,7 +191,7 @@ public class UserAction extends TableDataAction {
                 "lastName", "firstName");
 
         // ogni colonna chiave primaria sarà clickabile
-        for (PropertyAccessor property : tableAccessor.getKeyProperties()) {
+        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
             tableFormBuilder.configHyperlinkGenerators(
                     property.getName(), hrefFormat, null);
         }
@@ -208,7 +208,7 @@ public class UserAction extends TableDataAction {
     public String getReadLinkExpression() {
         StringBuilder sb = new StringBuilder("/user-admin/Users.action?pk=");
         boolean first = true;
-        for (PropertyAccessor property : tableAccessor.getKeyProperties()) {
+        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
             if (first) {
                 first = false;
             } else {
@@ -230,15 +230,15 @@ public class UserAction extends TableDataAction {
     //**************************************************************************
 
     public String read() {
-        setupTable();
+        setupMetadata();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
         SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(tableAccessor);
+                new SearchFormBuilder(classAccessor);
         searchForm = searchFormBuilder.build();
         configureSearchFormFromString();
 
-        Criteria criteria = new Criteria(tableAccessor);
+        Criteria criteria = new Criteria(classAccessor);
         searchForm.configureCriteria(criteria);
         users = context.getObjects(criteria);
 
@@ -379,7 +379,7 @@ public class UserAction extends TableDataAction {
     //**************************************************************************
 
     public String create() {
-        setupTable();
+        setupMetadata();
 
         final FormBuilder builder = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.CREATE);
@@ -391,7 +391,7 @@ public class UserAction extends TableDataAction {
     }
 
     public String save() {
-        setupTable();
+        setupMetadata();
 
         final FormBuilder builder = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.CREATE);
@@ -401,7 +401,7 @@ public class UserAction extends TableDataAction {
 
         form.readFromRequest(req);
         if (form.validate()) {
-            user = (User) tableAccessor.newInstance();
+            user = (User) classAccessor.newInstance();
             form.writeToObject(user);
             context.saveObject(userTable, user);
             String databaseName = model
@@ -421,7 +421,7 @@ public class UserAction extends TableDataAction {
     //**************************************************************************
 
     public String edit() {
-        setupTable();
+        setupMetadata();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
         user = (User) context.getObjectByPk(userTable, pkObject);
@@ -437,7 +437,7 @@ public class UserAction extends TableDataAction {
     }
 
     public String update() {
-        setupTable();
+        setupMetadata();
         Serializable pkObject = pkHelper.parsePkString(pk);
 
         FormBuilder builder = createFormBuilderWithSelectionProviders()
@@ -468,7 +468,7 @@ public class UserAction extends TableDataAction {
     //**************************************************************************
 
     public String delete() {
-        setupTable();
+        setupMetadata();
         User pkUsr = new User(new Long(pk));
         User aUser = (User) context.getObjectByPk(userTable, pkUsr);
         aUser.setDeletionDate(new Timestamp(System.currentTimeMillis()));
@@ -481,7 +481,7 @@ public class UserAction extends TableDataAction {
     }
 
     public String bulkDelete() {
-        setupTable();
+        setupMetadata();
         if (selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
@@ -550,4 +550,5 @@ public class UserAction extends TableDataAction {
         SessionMessages.addInfoMessage("Group added");
         return read();
     }
+
 }

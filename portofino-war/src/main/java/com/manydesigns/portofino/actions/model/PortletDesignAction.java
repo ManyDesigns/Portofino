@@ -172,7 +172,7 @@ public class PortletDesignAction extends PortofinoAction {
             SessionMessages.addErrorMessage(e.getMessage());
         }
 
-        return SUMMARY;
+        return "summary";
     }
 
     private void generateChart() {
@@ -267,7 +267,7 @@ public class PortletDesignAction extends PortofinoAction {
             LogUtil.warning(logger, "Could not create chart input stream", e);
         }
 
-        return CHART;
+        return "chart";
     }
 
 

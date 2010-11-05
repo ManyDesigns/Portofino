@@ -48,10 +48,11 @@ public class GroupAction extends TableDataAction{
 
 
 
+
     public String getReadLinkExpression() {
         StringBuilder sb = new StringBuilder("/user-admin/Groups.action?pk=");
         boolean first = true;
-        for (PropertyAccessor property : tableAccessor.getKeyProperties()) {
+        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
             if (first) {
                 first = false;
             } else {
@@ -73,12 +74,12 @@ public class GroupAction extends TableDataAction{
     //**************************************************************************
 
     public String delete() {
-        setupTable();
+        setupMetadata();
         Group pkGrp = new Group(new Long(pk));
-        Group aGroup = (Group) context.getObjectByPk(qualifiedTableName, pkGrp);
+        Group aGroup = (Group) context.getObjectByPk(qualifiedName, pkGrp);
         aGroup.setDeletionDate(new Timestamp(System.currentTimeMillis()));
-        context.saveObject(qualifiedTableName, aGroup);
-        String databaseName = model.findTableByQualifiedName(qualifiedTableName)
+        context.saveObject(qualifiedName, aGroup);
+        String databaseName = model.findTableByQualifiedName(qualifiedName)
                 .getDatabaseName();
         context.commit(databaseName);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
@@ -86,7 +87,7 @@ public class GroupAction extends TableDataAction{
     }
 
     public String bulkDelete() {
-        setupTable();
+        setupMetadata();
         if (selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
@@ -94,15 +95,15 @@ public class GroupAction extends TableDataAction{
         }
         for (String current : selection) {Group pkGrp = new Group(new Long(current));
 
-            Group aGroup = (Group) context.getObjectByPk(qualifiedTableName, pkGrp);
+            Group aGroup = (Group) context.getObjectByPk(qualifiedName, pkGrp);
             aGroup.setDeletionDate(new Timestamp(System.currentTimeMillis()));
-            context.saveObject(qualifiedTableName, aGroup);
-            String databaseName = model.findTableByQualifiedName(qualifiedTableName)
+            context.saveObject(qualifiedName, aGroup);
+            String databaseName = model.findTableByQualifiedName(qualifiedName)
                     .getDatabaseName();
             context.commit(databaseName);
             SessionMessages.addInfoMessage("DELETE avvenuto con successo");
         }
-        String databaseName = model.findTableByQualifiedName(qualifiedTableName)
+        String databaseName = model.findTableByQualifiedName(qualifiedName)
                 .getDatabaseName();
         context.commit(databaseName);
         SessionMessages.addInfoMessage(MessageFormat.format(
@@ -112,4 +113,3 @@ public class GroupAction extends TableDataAction{
 
 
 }
-

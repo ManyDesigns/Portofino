@@ -6,7 +6,7 @@
 <s:form method="post">
     <s:include value="/skins/default/model/tableData/readButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1>Read: <s:property value="qualifiedTableName"/></h1>
+        <h1>Read: <s:property value="qualifiedName"/></h1>
         <mdes:write value="form"/>
         <s:iterator var="current" value="relatedTableFormList">
             <s:set name="rel" value="#current.relationship"/>
@@ -19,7 +19,7 @@
         </s:if>
         <s:url var="cancelReturnUrl"
                namespace="/model"
-               action="%{qualifiedTableName}/TableData"
+               action="%{qualifiedName}/TableData"
                escapeAmp="false">
             <s:param name="pk" value="%{pk}"/>
             <s:param name="searchString" value="%{searchString}"/>

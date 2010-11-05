@@ -706,12 +706,7 @@
                                         scale="0"
                                         nullable="true"
                                         autoincrement="false"
-                                        searchable="true">
-                                    <annotations>
-                                        <annotation
-                                                type="com.manydesigns.elements.annotations.FileBlob"/>
-                                    </annotations>
-                                </column>
+                                        searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="pk_category">
                                 <column columnName="catid"/>
@@ -755,6 +750,9 @@
                                         <annotation
                                                 type="com.manydesigns.elements.annotations.Label">
                                             <value>description</value>
+                                        </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.FileBlob">
                                         </annotation>
                                     </annotations>
                                 </column>
@@ -1196,6 +1194,31 @@
                     </annotations>
                 </property>
             </properties>
+        </useCase>
+        <useCase name="usecase2"
+                 title="Categories and products"
+                 table="jpetstore.public.category"
+                 filter="from jpetstore.public.category">
+            <properties>
+                <property name="catid"/>
+                <property name="name"/>
+                <property name="descn"/>
+            </properties>
+            <!--
+            <subUseCases>
+                <useCase name="usecase3"
+                         title="Products in category: FISH"
+                         table="jpetstore.public.product"
+                         filter="from jpetstore.public.product product where product.category = %{catid}">
+                    <properties>
+                        <property name="productid"/>
+                        <property name="category"/>
+                        <property name="name"/>
+                        <property name="descn"/>
+                    </properties>
+                </useCase>
+            </subUseCases>
+            -->
         </useCase>
     </useCases>
 </model>
