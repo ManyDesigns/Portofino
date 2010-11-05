@@ -30,6 +30,9 @@
 package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.annotations.Required;
+import sun.misc.BASE64Encoder;
+
+import java.security.MessageDigest;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -47,4 +50,15 @@ public class ChangePasswordFormBean {
     @Required
     @com.manydesigns.elements.annotations.Password(confirmationRequired = true)
     public String pwd;
+
+    public String getEncOldPwd(){
+    try {
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+            md.update(oldPwd.getBytes("UTF-8"));
+            byte raw[] = md.digest();
+            return (new BASE64Encoder()).encode(raw);
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
 }

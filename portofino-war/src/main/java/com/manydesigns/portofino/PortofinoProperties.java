@@ -75,6 +75,7 @@ public class PortofinoProperties {
             "database.platforms.list";
 
     //Email properties
+    public static final String MAIL_ENABLED = "mail.enabled";
     public static final String MAIL_SMTP_SENDER = "mail.smtp.sender";
     public static final String MAIL_SMTP_HOST = "mail.smtp.host";
     public static final String MAIL_SMTP_PORT = "mail.smtp.port";

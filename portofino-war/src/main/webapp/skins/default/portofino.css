@@ -277,14 +277,17 @@ Login
 *******************************************************************************/
 div#content-login {
     margin-left: 0em;
-    border: 3px solid #65a7db;
+    border: 3px double #000;
+    background-color: #65a7db;
+    heigh: 180px;
+    width: 400px;
+
 }
 div#login {
-    width:400px;
-    height:450px;
-    margin-left:50px;
-    margin-bottom:20px;
-    margin-top:30px;
+    width: 395px;
+    height: 175px;
+    margin-left:20px;
+    
 }
 div#login table tr td, div#login table tr th {
     border: 0pt;

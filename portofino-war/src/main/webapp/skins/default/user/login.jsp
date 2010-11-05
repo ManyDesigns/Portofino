@@ -65,7 +65,7 @@
                             <h1>Login</h1>
                             <p/>
                             <mdes:write value="form"/>
-
+                            <p/>
                             <s:submit id="loginButton" method="login" value="Login" />
                             <p>
                             <s:if test="recoverPwd">

@@ -40,8 +40,10 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.Util;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.RelatedTableForm;
 import com.manydesigns.portofino.actions.model.TableDataAction;
+import com.manydesigns.portofino.email.EmailHandler;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.Table;
@@ -58,6 +60,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,7 +80,8 @@ public class UserAction extends TableDataAction {
     private static final String userTable = "portofino.public.users";
     private static final String groupTable = "portofino.public.groups";
     private static final String usersGroupsTable = "portofino.public.users_groups";
-
+    private final int pwdLength;
+    private final Boolean enc;
 
 
     //**************************************************************************
@@ -108,6 +112,13 @@ public class UserAction extends TableDataAction {
 
     public static final Logger logger =
             LogUtil.getLogger(UserAction.class);
+
+    public UserAction() {
+        this.pwdLength = Integer.parseInt(PortofinoProperties.getProperties()
+                .getProperty("pwd.lenght.min","6"));
+        enc = Boolean.parseBoolean(PortofinoProperties.getProperties()
+                .getProperty(PortofinoProperties.PWD_ENCRYPTED, "false"));
+    }
 
     //**************************************************************************
     // Action default execute method
@@ -548,6 +559,42 @@ public class UserAction extends TableDataAction {
         }
         context.commit("portofino");
         SessionMessages.addInfoMessage("Group added");
+        return read();
+    }
+
+    //**************************************************************************
+    // ResetPassword
+    //**************************************************************************
+
+    public String resetPassword() {
+        setupMetadata();
+        Serializable pkObject = pkHelper.parsePkString(pk);
+        user =  (User)context.getObjectByPk(userTable, pkObject);
+        user.passwordGenerator(pwdLength);
+        String generatedPwd = user.getPwd();
+
+        final Properties properties = PortofinoProperties.getProperties();
+
+        boolean mailEnabled = Boolean.parseBoolean(
+                properties.getProperty(PortofinoProperties.MAIL_ENABLED, "false"));
+
+        if (mailEnabled) {
+        String msg = "La tua nuova password è " + generatedPwd;
+        EmailHandler.addEmail(context, "new password", msg,
+                user.getEmail(), context.getCurrentUser().getEmail());
+
+        } else {
+           SessionMessages.addInfoMessage("La nuova password per l'utente è "+generatedPwd); 
+        }
+        if (enc){
+            user.encryptPwd();
+        }
+        String databaseName = model
+                .findTableByQualifiedName(userTable).getDatabaseName();
+        context.updateObject(userTable, user);
+        context.commit(databaseName);
+
+        SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
         return read();
     }
 
