@@ -275,8 +275,13 @@ General
 /*******************************************************************************
 Login
 *******************************************************************************/
+div#content-login {
+    margin-left: 0em;
+    border: 3px solid #65a7db;
+}
 div#login {
     width:400px;
+    height:450px;
     margin-left:50px;
     margin-bottom:20px;
     margin-top:30px;

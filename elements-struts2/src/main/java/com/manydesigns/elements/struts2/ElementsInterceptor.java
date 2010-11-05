@@ -31,6 +31,7 @@ package com.manydesigns.elements.struts2;
 
 import com.manydesigns.elements.ElementsContext;
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.ognl.CustomTypeConverter;
 import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.elements.text.BasicTextProvider;
 import com.opensymphony.xwork2.ActionContext;
@@ -68,6 +69,10 @@ public class ElementsInterceptor implements Interceptor {
         ServletContext servletContext =
                 (ServletContext)context.get(StrutsStatics.SERVLET_CONTEXT);
         OgnlContext ognlContext = (OgnlContext)context.getContextMap();
+
+        CustomTypeConverter converter
+                = new CustomTypeConverter(ognlContext.getTypeConverter());
+        ognlContext.setTypeConverter(converter);
 
         ElementsContext elementsContext =
                 ElementsThreadLocals.getElementsContext();

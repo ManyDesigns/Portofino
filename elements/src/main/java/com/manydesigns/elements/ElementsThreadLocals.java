@@ -29,10 +29,12 @@
 
 package com.manydesigns.elements;
 
-import com.manydesigns.elements.text.BasicTextProvider;
 import com.manydesigns.elements.i18n.TextProvider;
+import com.manydesigns.elements.text.BasicTextProvider;
+import com.manydesigns.elements.ognl.CustomTypeConverter;
 import ognl.Ognl;
 import ognl.OgnlContext;
+import ognl.TypeConverter;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -127,6 +129,8 @@ public final class ElementsThreadLocals {
 
     public static void setupDefaultElementsContext() {
         OgnlContext ognlContext = (OgnlContext) Ognl.createDefaultContext(null);
+        TypeConverter conv = ognlContext.getTypeConverter();
+        ognlContext.setTypeConverter(new CustomTypeConverter(conv));
         TextProvider textProvider = new BasicTextProvider(Locale.ENGLISH);
 
         ElementsContext elementsContext = getElementsContext();

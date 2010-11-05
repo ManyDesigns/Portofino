@@ -29,10 +29,9 @@
 package com.manydesigns.portofino.system.model.users;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -100,7 +99,7 @@ public class Group implements Serializable{
         this.creatorId = creatorId;
     }
 
-    public Date getDeletionDate() {
+    public Timestamp getDeletionDate() {
         return deletionDate;
     }
 

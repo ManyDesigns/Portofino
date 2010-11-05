@@ -37,7 +37,7 @@
                                         javaType="java.lang.String"
                                         length="50"
                                         scale="0"
-                                        nullable="false"
+                                        nullable="true"
                                         autoincrement="false"
                                         searchable="false"
                                         >
@@ -165,7 +165,7 @@
                                         />
                                 <column columnName="creationdate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="15"
                                         scale="0"
                                         nullable="true"
@@ -175,7 +175,7 @@
                                         />
                                 <column columnName="deletiondate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         searchable="true"
@@ -185,7 +185,7 @@
                                         />
                                 <column columnName="modifieddate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         searchable="true"
@@ -194,7 +194,7 @@
                                         propertyName="modifiedDate"/>
                                 <column columnName="lastpwdmoddate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         searchable="true"
@@ -203,7 +203,7 @@
                                         propertyName="pwdModDate"/>
                                 <column columnName="lastlogindate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         searchable="true"
@@ -212,7 +212,7 @@
                                         propertyName="lastLoginDate"/>
                                 <column columnName="lastfailedlogindate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         searchable="true"
@@ -322,7 +322,7 @@
                                         propertyName="creatorId"/>
                                 <column columnName="deletiondate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         nullable="true"
@@ -331,7 +331,7 @@
                                         propertyName="deletionDate"/>
                                 <column columnName="creationdate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         nullable="true"
@@ -360,7 +360,7 @@
                             <annotations>
                                 <annotation
                                         type="com.manydesigns.elements.annotations.ShortName">
-                                    <value>%{name} (%{description})</value>
+                                    <value>%{name} </value>
                                 </annotation>
                             </annotations>
                         </table>
@@ -386,7 +386,7 @@
                                         searchable="true"/>
                                 <column columnName="deletiondate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         nullable="true"
@@ -477,6 +477,7 @@
                             <primaryKey primaryKeyName="emailstate_pkey">
                                 <column columnName="id"/>
                             </primaryKey>
+
                         </table>
                         <table tableName="emailqueue"
                                javaClass="com.manydesigns.portofino.system.model.email.EmailBean">
@@ -617,6 +618,12 @@
                             <primaryKey primaryKeyName="userstate_pkey">
                                 <column columnName="id"/>
                             </primaryKey>
+                            <annotations>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.ShortName">
+                                    <value>%{name}</value>
+                                </annotation>
+                            </annotations>
                         </table>
                     </tables>
                 </schema>

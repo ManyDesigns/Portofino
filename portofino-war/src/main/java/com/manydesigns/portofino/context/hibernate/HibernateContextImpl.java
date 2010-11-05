@@ -796,7 +796,6 @@ public class HibernateContextImpl implements Context {
 
         if (result.size() == 1) {
             User authUser = (User) result.get(0);
-            setCurrentUser(authUser);
             return authUser;
         } else {
             return null;

@@ -332,6 +332,7 @@
 
     <package name="portofino-user" extends="portofino-default" namespace="/user">
         <action name="Index">
+            <param name="qualifiedTableName">portofino.public.users</param>
             <result name="success" type="redirectAction">
                 <param name="actionName">Profile</param>
             </result>
@@ -399,12 +400,11 @@
             </result>
         </action>
         <action name="Users" class="com.manydesigns.portofino.actions.user.admin.UserAction">
+            <param name="qualifiedTableName">portofino.public.users</param>
             <result name="search">/skins/default/user/admin/search.jsp</result>
-
             <result name="read">/skins/default/user/admin/read.jsp</result>
-
             <result name="create">/skins/default/user/admin/create.jsp</result>
-
+            
             <result name="save" type="redirectAction">
                 <param name="actionName">Users</param>
                 <param name="namespace">/user-admin</param>
@@ -455,6 +455,7 @@
         </action>
 
         <action name="Groups" class="com.manydesigns.portofino.actions.user.admin.GroupAction">
+            <param name="qualifiedTableName">portofino.public.users</param>
             <param name="skin">default</param>
             <param name="qualifiedTableName">portofino.public.groups</param>
             <result name="search">/skins/default/group/admin/search.jsp</result>
@@ -463,7 +464,7 @@
 
             <result name="create">/skins/default/group/admin/create.jsp</result>
 
-        <result name="save" type="redirectAction">
+            <result name="save" type="redirectAction">
                 <param name="actionName">Groups</param>
                 <param name="namespace">/user-admin</param>
                 <param name="pk">%{pk}</param>

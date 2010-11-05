@@ -33,6 +33,8 @@ import com.manydesigns.elements.AbstractElementsTest;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.util.Date;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -207,6 +209,12 @@ public class UtilTest extends AbstractElementsTest {
         } catch (NumberFormatException e) {
             assertNull(e.getMessage());
         }
+
+        //Testo la conversione da Timestamp a Date
+        Date date = new Date();
+        Timestamp target = new Timestamp(date.getTime());
+
+        assertEquals(target, Util.convertValue(date, Timestamp.class));
     }
 
 }

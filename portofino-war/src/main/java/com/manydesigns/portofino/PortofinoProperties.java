@@ -90,6 +90,9 @@ public class PortofinoProperties {
     public static final String MAIL_POP3_SSL_ENABLED = "mail.pop3.ssl.enabled";
     public static final String KEEP_SENT = "mail.keep.sent";
 
+    //Password properties
+    public static final String PWD_ENCRYPTED = "pwd.encrypted";
+
     
 
     //**************************************************************************

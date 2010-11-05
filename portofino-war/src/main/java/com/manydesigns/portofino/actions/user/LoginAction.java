@@ -34,6 +34,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.system.model.users.UserDefs;
 import com.manydesigns.portofino.PortofinoProperties;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
@@ -58,6 +59,7 @@ public class LoginAction extends PortofinoAction
     //**************************************************************************
     public HttpServletRequest req;
 
+
     public void setServletRequest(HttpServletRequest req) {
         this.req = req;
     }
@@ -78,42 +80,56 @@ public class LoginAction extends PortofinoAction
         builder.configFields("email", "pwd");
 
         form = builder.build();
-        recoverPwd = false;
-    }
-
-    public String execute () {
-        recoverPwd();
-
-        return INPUT;
-    }
-
-    private void recoverPwd() {
         String smtp = PortofinoProperties.getProperties().
                 getProperty(PortofinoProperties.MAIL_SMTP_HOST);
         if (null!=smtp) {
             recoverPwd=true;
+        } else {
+            recoverPwd=false;
         }
     }
 
+    public String execute () {
+        context.logout();
+        return INPUT;
+    }
+
     public String login (){
-        recoverPwd();
         form.readFromRequest(req);
         User user = new User();
         form.writeToObject(user);
-        final String email = user.getEmail();
-        final String password = user.getPwd();
+        Boolean enc = Boolean.parseBoolean(PortofinoProperties.getProperties()
+                .getProperty(PortofinoProperties.PWD_ENCRYPTED, "false"));
+
+        if (enc) {
+            user.encryptPwd();
+        }
+        String email = user.getEmail();
+        String password = user.getPwd();
         user = context.login(email, password);
-        if (null!=user && user.getUserId()!=0) {
-            LogUtil.fineMF(logger, "User {0} login", user.getEmail());
-            updateUser(user);
-            return SUCCESS;
-        } else {
+
+        if (user==null) {
             String errMsg = MessageFormat.format("FAILED AUTH for user {0}", email);
-            SessionMessages.addInfoMessage(errMsg);            
+            SessionMessages.addInfoMessage(errMsg);
             LogUtil.warningMF(logger, errMsg);
             updateFailedUser(email);
             return INPUT;
         }
+
+        if (!user.getState().equals(UserDefs.ACTIVE)) {
+            String errMsg = MessageFormat.format("User {0} is not active. " +
+                    "Please contact the administrator", email);
+            SessionMessages.addInfoMessage(errMsg);
+            LogUtil.warningMF(logger, errMsg);
+            return INPUT;
+        }
+
+
+        LogUtil.fineMF(logger, "User {0} login", user.getEmail());
+        context.setCurrentUser(user);
+        updateUser(user);
+        return SUCCESS;
+
     }
 
     private void updateFailedUser(String email) {
@@ -125,7 +141,7 @@ public class LoginAction extends PortofinoAction
         user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
         int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
         user.setFailedLoginAttempts(failedAttempts+1);
-        context.updateObject("portofino.public.users", user);
+        context.updateObject(UserDefs.USERTABLE, user);
         context.commit("portofino");
     }
 
@@ -133,12 +149,11 @@ public class LoginAction extends PortofinoAction
         user.setFailedLoginAttempts(0);
         user.setLastLoginDate(new Timestamp(new Date().getTime()));
         user.setToken(null);
-        context.updateObject("portofino.public.users", user);
+        context.updateObject(UserDefs.USERTABLE, user);
         context.commit("portofino");
     }
 
     public String logout(){
-        recoverPwd();
         context.logout();
         return INPUT;
     }

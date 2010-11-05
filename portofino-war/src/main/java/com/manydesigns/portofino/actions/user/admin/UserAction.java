@@ -29,25 +29,21 @@
 package com.manydesigns.portofino.actions.user.admin;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.fields.search.Criteria;
-import com.manydesigns.elements.forms.*;
+import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.forms.SearchFormBuilder;
+import com.manydesigns.elements.forms.TableForm;
+import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
-import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.RelatedTableForm;
 import com.manydesigns.portofino.actions.model.TableDataAction;
-import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
-import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
-import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
@@ -55,10 +51,7 @@ import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
-import org.apache.struts2.interceptor.ServletRequestAware;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
@@ -74,53 +67,23 @@ import java.util.regex.Pattern;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UserAction extends TableDataAction implements ServletRequestAware {
+public class UserAction extends TableDataAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
     // Constants
     //**************************************************************************
-
-    public final static String REDIRECT_TO_TABLE = "redirectToTable";
-    public final static String NO_TABLES = "noTables";
-    public final static String JSON_SELECT_FIELD_OPTIONS =
-            "jsonSelectFieldOptions";
-    public static final String EXPORT_FILENAME_FORMAT = "export-{0}";
     private static final String userTable = "portofino.public.users";
     private static final String groupTable = "portofino.public.groups";
     private static final String usersGroupsTable = "portofino.public.users_groups";
 
-    //**************************************************************************
-    // ServletRequestAware implementation
-    //**************************************************************************
-    public HttpServletRequest req;
 
-
-    public void setServletRequest(HttpServletRequest req) {
-        this.req = req;
-    }
 
     //**************************************************************************
     // Web parameters
     //**************************************************************************
-
-    public String pk;
-    public String[] selection;
     public String[] ng_selection;
-    public String searchString;
-    public String cancelReturnUrl;
-    public String relName;
-    public int optionProviderIndex;
-    public String labelSearch;
-
-
-
-    //**************************************************************************
-    // Model metadata
-    //**************************************************************************
-
-    public ClassAccessor tableAccessor;
 
     //**************************************************************************
     // Model objects
@@ -135,29 +98,13 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     //**************************************************************************
     // Presentation elements
     //**************************************************************************
-
-    public TableForm tableForm;
-    public Form form;
-    public SearchForm searchForm;
     public TableForm activeGroupsForm;
     public TableForm deletedGroupsForm;
     public TableForm newGroupsForm;
-    public List<RelatedTableForm> relatedTableFormList;
-    public InputStream inputStream;
 
     //**************************************************************************
-    // export parameters
-    //***************************************************************************
-
-    public String contentType;
-    public String fileName;
-    public Long contentLength;
-    public String chartId;
-
     // Other objects
     //**************************************************************************
-
-    public PkHelper pkHelper;
 
     public static final Logger logger =
             LogUtil.getLogger(UserAction.class);
@@ -181,11 +128,9 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
 
     public String searchFromString() {
         setupTable();
-
-
         SearchFormBuilder searchFormBuilder =
                 new SearchFormBuilder(tableAccessor);
-        searchFormBuilder.configFields("uuid","email","state","lastName", "firstName");
+        searchFormBuilder.configFields("userId","email","state","lastName", "firstName");
         searchForm = searchFormBuilder.build();
         configureSearchFormFromString();
 
@@ -220,7 +165,6 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
                 new SearchFormBuilder(tableAccessor);
         searchForm = searchFormBuilder.build();
         searchForm.readFromRequest(req);
-
         return commonSearch();
     }
 
@@ -243,7 +187,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
                 createTableFormBuilderWithSelectionProviders()
                         .configNRows(users.size())
                         .configMode(Mode.VIEW);
-        tableFormBuilder.configFields("uuid","email","state",
+        tableFormBuilder.configFields("userId","email","state",
                 "lastName", "firstName");
 
         // ogni colonna chiave primaria sarà clickabile
@@ -282,15 +226,6 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     }
 
     //**************************************************************************
-    // Return to search
-    //**************************************************************************
-
-    public String returnToSearch() {
-        setupTable();
-        return RETURN_TO_SEARCH;
-    }
-
-    //**************************************************************************
     // Read
     //**************************************************************************
 
@@ -310,7 +245,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
         user = (User) context.getObjectByPk(userTable, pkObject);
         FormBuilder builder = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.VIEW);
-        builder.configFields("uuid","email","state",
+        builder.configFields("userId","email","state",
                 "lastName", "firstName");
         form = builder.build();
         form.readFromObject(user);
@@ -448,7 +383,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
 
         final FormBuilder builder = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.CREATE);
-        builder.configFields("uuid","email","state",
+        builder.configFields("userId","email","state",
                 "lastName", "firstName");
         form = builder.build();
 
@@ -460,7 +395,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
 
         final FormBuilder builder = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.CREATE);
-        builder.configFields("uuid","email","state",
+        builder.configFields("userId","email","state",
                 "lastName", "firstName");
         form = builder.build();
 
@@ -493,7 +428,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
 
         FormBuilder builder = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.EDIT);
-        builder.configFields("uuid","email","state",
+        builder.configFields("userId","email","state",
                 "lastName", "firstName");
         form = builder.build();
 
@@ -507,7 +442,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
 
         FormBuilder builder = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.EDIT);
-        builder.configFields("uuid","email","state",
+        builder.configFields("userId","email","state",
                 "lastName", "firstName");
         form = builder.build();
 
@@ -567,14 +502,6 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     }
 
     //**************************************************************************
-    // Cancel
-    //**************************************************************************
-
-    public String cancel() {
-        return CANCEL;
-    }
-
-    //**************************************************************************
     // Remove user from Group
     //**************************************************************************
     
@@ -598,7 +525,7 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
     }
 
     //**************************************************************************
-    // Add user from Group
+    // Add user to Group
     //**************************************************************************
 
     public String addGroups(){
@@ -623,100 +550,4 @@ public class UserAction extends TableDataAction implements ServletRequestAware {
         SessionMessages.addInfoMessage("Group added");
         return read();
     }
-
-
-
-    //**************************************************************************
-    // Utility methods
-    //**************************************************************************
-
-    public void setupTable() {
-        tableAccessor = context.getTableAccessor(userTable);
-        pkHelper = new PkHelper(tableAccessor);
-        if (tableAccessor == null) {
-            throw new ModelObjectNotFoundError(userTable);
-        }
-    }
-
-    protected FormBuilder createFormBuilderWithSelectionProviders() {
-        FormBuilder formBuilder = new FormBuilder(tableAccessor);
-
-        // setup relationship lookups
-        Table table = model.findTableByQualifiedName(userTable);
-        for (ForeignKey rel : table.getForeignKeys()) {
-            String[] fieldNames = createFieldNamesForRelationship(rel);
-            SelectionProvider selectionProvider =
-                    createSelectionProviderForRelationship(rel);
-            boolean autocomplete = false;
-            for (ModelAnnotation current : rel.getModelAnnotations()) {
-                if ("com.manydesigns.elements.annotations.Autocomplete"
-                        .equals(current.getType())) {
-                    autocomplete = true;
-                }
-            }
-            selectionProvider.setAutocomplete(autocomplete);
-
-            formBuilder.configSelectionProvider(selectionProvider, fieldNames);
-        }
-
-        return formBuilder;
-    }
-
-    protected TableFormBuilder createTableFormBuilderWithSelectionProviders() {
-        TableFormBuilder tableFormBuilder = new TableFormBuilder(tableAccessor);
-
-        // setup relationship lookups
-        Table table = model.findTableByQualifiedName(userTable);
-        for (ForeignKey rel : table.getForeignKeys()) {
-            String[] fieldNames = createFieldNamesForRelationship(rel);
-            SelectionProvider selectionProvider =
-                    createSelectionProviderForRelationship(rel);
-            boolean autocomplete = false;
-            for (ModelAnnotation current : rel.getModelAnnotations()) {
-                if ("com.manydesigns.elements.annotations.Autocomplete"
-                        .equals(current.getType())) {
-                    autocomplete = true;
-                }
-            }
-            selectionProvider.setAutocomplete(autocomplete);
-
-            tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
-        }
-        return tableFormBuilder;
-    }
-
-    protected String[] createFieldNamesForRelationship(ForeignKey rel) {
-        List<Reference> references = rel.getReferences();
-        String[] fieldNames = new String[references.size()];
-        int i = 0;
-        for (Reference reference : references) {
-            Column column = reference.getActualFromColumn();
-            fieldNames[i] = column.getActualPropertyName();
-            i++;
-        }
-        return fieldNames;
-    }
-
-    protected SelectionProvider createSelectionProviderForRelationship(ForeignKey rel) {
-        // retrieve the related objects
-        Table relatedTable = rel.getActualToTable();
-        ClassAccessor classAccessor =
-                context.getTableAccessor(relatedTable.getQualifiedName());
-        List<Object> relatedObjects =
-                context.getAllObjects(relatedTable.getQualifiedName());
-        ShortName shortNameAnnotation =
-                classAccessor.getAnnotation(ShortName.class);
-        TextFormat[] textFormat = null;
-        if (shortNameAnnotation != null) {
-            textFormat = new TextFormat[] {
-                OgnlTextFormat.create(shortNameAnnotation.value())
-            };
-        }
-        return
-                DefaultSelectionProvider.create(rel.getForeignKeyName(),
-                        relatedObjects, classAccessor, textFormat);
-
-    }
-
-
 }

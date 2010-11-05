@@ -163,5 +163,4 @@ public class Util {
                 || type == Float.TYPE
                 || type == Double.TYPE;
     }
-
 }
