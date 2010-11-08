@@ -104,6 +104,7 @@ public abstract class AbstractCrudAction extends PortofinoAction {
     //**************************************************************************
     // ServletRequestAware implementation
     //**************************************************************************
+
     public HttpServletRequest req;
 
     public void setServletRequest(HttpServletRequest req) {
