@@ -30,6 +30,8 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.util.Pair;
 import com.manydesigns.portofino.xml.XmlAttribute;
@@ -45,7 +47,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ForeignKey implements DatamodelObject {
+public class ForeignKey implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -65,6 +67,7 @@ public class ForeignKey implements DatamodelObject {
 
     protected final Table fromTable;
     protected final List<Reference> references;
+    protected final List<ModelAnnotation> modelAnnotations;
 
     protected String foreignKeyName;
 
@@ -76,7 +79,6 @@ public class ForeignKey implements DatamodelObject {
     protected String onDelete;
 
 
-    protected Table actualToTable;
 
     //**************************************************************************
     // Fields (logical)
@@ -89,10 +91,9 @@ public class ForeignKey implements DatamodelObject {
     // Fields for wire-up
     //**************************************************************************
 
+    protected Table actualToTable;
     protected String actualManyPropertyName;
     protected String actualOnePropertyName;
-
-    protected final List<ModelAnnotation> modelAnnotations;
 
     //**************************************************************************
     // Logging
@@ -132,7 +133,39 @@ public class ForeignKey implements DatamodelObject {
         this.onePropertyName = onePropertyName;
     }
 
-    public void init() {
+    //**************************************************************************
+    // ModelObject implementation
+    //**************************************************************************
+
+    public String getQualifiedName() {
+        return MessageFormat.format("{0}${1}",
+                fromTable.getQualifiedName(), foreignKeyName);
+    }
+
+    public void reset() {
+        actualToTable = null;
+        actualManyPropertyName = null;
+        actualOnePropertyName = null;
+
+        for (Reference reference : references) {
+            reference.reset();
+        }
+    }
+
+    public void init(Model model) {
+        // wire up ForeignKey.toTable
+        String qualifiedToTableName =
+                Table.composeQualifiedName(toDatabase, toSchema, toTable);
+        actualToTable = model.findTableByQualifiedName(qualifiedToTableName);
+        if (actualToTable == null) {
+            LogUtil.warningMF(logger,
+                    "Cannor wire ''{0}'' to table ''{1}''",
+                    this, qualifiedToTableName);
+        } else {
+            // wire up Table.oneToManyRelationships
+            actualToTable.getOneToManyRelationships().add(this);
+        }
+
         if (references.isEmpty()) {
             throw new Error(MessageFormat.format(
                     "Foreign key {0} has no referneces",
@@ -140,15 +173,7 @@ public class ForeignKey implements DatamodelObject {
         }
 
         for (Reference reference : references) {
-            // wire up Referenece.fromColumn
-            reference.actualFromColumn =
-                    fromTable.findColumnByName(reference.getFromColumn());
-
-            // wire up Referenece.toColumn
-            if (actualToTable != null) {
-                reference.actualToColumn =
-                        actualToTable.findColumnByName(reference.getToColumn());
-            }
+            reference.init(model);
         }
 
         actualManyPropertyName = (manyPropertyName == null)
@@ -308,15 +333,6 @@ public class ForeignKey implements DatamodelObject {
 
     public void setActualOnePropertyName(String actualOnePropertyName) {
         this.actualOnePropertyName = actualOnePropertyName;
-    }
-
-    //**************************************************************************
-    // DatamodelObject implementation
-    //**************************************************************************
-
-    public String getQualifiedName() {
-        return MessageFormat.format("{0}${1}",
-                fromTable.getQualifiedName(), foreignKeyName);
     }
 
     //**************************************************************************

@@ -31,6 +31,8 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
@@ -44,7 +46,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Table implements DatamodelObject {
+public class Table implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -100,28 +102,59 @@ public class Table implements DatamodelObject {
         this.javaClass = javaClass;
     }
 
-    public void init() {
+    //**************************************************************************
+    // DatamodelObject implementation
+    //**************************************************************************
+
+    public String getQualifiedName() {
+        return MessageFormat.format("{0}.{1}",
+                schema.getQualifiedName(), tableName);
+    }
+
+
+    public void reset() {
+        actualJavaClass = null;
+        oneToManyRelationships.clear();
+
+        for (Column column : columns) {
+            column.reset();
+        }
+
+        if (primaryKey != null) {
+            primaryKey.reset();
+        }
+
+        for (ForeignKey foreignKey : foreignKeys) {
+            foreignKey.reset();
+        }
+
+        for (ModelAnnotation modelAnnotation : modelAnnotations) {
+            modelAnnotation.reset();
+        }
+    }
+
+    public void init(Model model) {
         // wire up javaClass
         actualJavaClass = ReflectionUtil.loadClass(javaClass);
 
         for (Column column : columns) {
-            column.init();
+            column.init(model);
         }
 
         if (primaryKey == null) {
             LogUtil.warningMF(logger,
                     "Table {0} has no primary key", toString());
         } else {
-            primaryKey.init();
+            primaryKey.init(model);
         }
 
         for (ForeignKey foreignKey : foreignKeys) {
-            foreignKey.init();
+            foreignKey.init(model);
         }
 
 
         for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.init();
+            modelAnnotation.init(model);
         }
     }
 
@@ -262,15 +295,6 @@ public class Table implements DatamodelObject {
                                               String tableName) {
         return MessageFormat.format(
                 "{0}.{1}.{2}", databaseName, schemaName, tableName);
-    }
-
-    //**************************************************************************
-    // DatamodelObject implementation
-    //**************************************************************************
-
-    public String getQualifiedName() {
-        return MessageFormat.format("{0}.{1}",
-                schema.getQualifiedName(), tableName);
     }
 
 

@@ -29,8 +29,6 @@
 package com.manydesigns.portofino.actions.user.admin;
 
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.model.TableDataAction;
 import com.manydesigns.portofino.system.model.users.Group;
 
@@ -42,32 +40,11 @@ import java.text.MessageFormat;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class GroupAction extends TableDataAction{
+public class GroupAction extends TableDataAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
 
-
-
-    public String getReadLinkExpression() {
-        StringBuilder sb = new StringBuilder("/user-admin/Groups.action?pk=");
-        boolean first = true;
-        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(",");
-            }
-            sb.append("%{");
-            sb.append(property.getName());
-            sb.append("}");
-        }
-        if (searchString != null) {
-            sb.append("&searchString=");
-            sb.append(Util.urlencode(searchString));
-        }
-        return sb.toString();
-    }
 
     //**************************************************************************
     // Delete

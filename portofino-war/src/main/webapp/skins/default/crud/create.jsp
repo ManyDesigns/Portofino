@@ -3,16 +3,17 @@
 %><%@ taglib prefix="s" uri="/struts-tags"
 %><%@ taglib prefix="mdes" uri="/manydesigns-elements-struts2"
 %><s:include value="/skins/default/header.jsp"/>
-<s:form method="post">
-    <s:include value="/skins/default/useCase/createButtonsBar.jsp"/>
+<s:form method="post"
+        enctype="%{form.multipartRequest ? 'multipart/form-data' : 'application/x-www-form-urlencoded'}">
+    <s:include value="/skins/default/crud/createButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1>Create: <s:property value="useCase.title"/></h1>
+        <h1><s:property value="createTitle"/></h1>
         <s:if test="form.requiredFieldsPresent">
             Fields marked with a "*" are required.
         </s:if>
         <mdes:write value="form"/>
         <s:hidden name="cancelReturnUrl" value="%{cancelReturnUrl}"/>
     </div>
-    <s:include value="/skins/default/useCase/createButtonsBar.jsp"/>
+    <s:include value="/skins/default/crud/createButtonsBar.jsp"/>
 </s:form>
 <s:include value="/skins/default/footer.jsp"/>

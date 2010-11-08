@@ -1121,9 +1121,12 @@
     </portlets>
     <useCases>
         <useCase name="usecase1"
-                 title="Products in category: FISH"
                  table="jpetstore.public.product"
-                 filter="from jpetstore.public.product product where product.category = %{'FISH'}">
+                 filter="from jpetstore.public.product product where product.category = %{'FISH'}"
+                 searchTitle="Products in category FISH"
+                 createTitle="Create product in category FISH"
+                 readTitle="Product in category FISH"
+                 editTitle="Edit product in category FISH">
             <properties>
                 <property name="productid">
                     <annotations>
@@ -1196,20 +1199,22 @@
             </properties>
         </useCase>
         <useCase name="usecase2"
-                 title="Categories and products"
                  table="jpetstore.public.category"
-                 filter="from jpetstore.public.category">
+                 filter="from jpetstore.public.category"
+                 searchTitle="Categories"
+                 createTitle="Create new category"
+                 readTitle="Category"
+                 editTitle="Edit category">
             <properties>
                 <property name="catid"/>
                 <property name="name"/>
                 <property name="descn"/>
             </properties>
-            <!--
             <subUseCases>
                 <useCase name="usecase3"
-                         title="Products in category: FISH"
                          table="jpetstore.public.product"
-                         filter="from jpetstore.public.product product where product.category = %{catid}">
+                         filter="from jpetstore.public.product product where product.category = %{catid}"
+                         searchTitle="Products in category">
                     <properties>
                         <property name="productid"/>
                         <property name="category"/>
@@ -1218,7 +1223,6 @@
                     </properties>
                 </useCase>
             </subUseCases>
-            -->
         </useCase>
     </useCases>
 </model>

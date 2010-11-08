@@ -12,34 +12,22 @@
     <s:if test="#position >= 0">
         <div style="float: right;">
             <s:if test="#position > 0">
-                <s:url var="firstUrl" namespace="/" action="%{qualifiedName}/UseCase">
-                    <s:param name="pk"
-                             value="%{pkHelper.generatePkString(objects.get(0))}" />
-                    <s:param name="searchString" value="%{searchString}" />
-                </s:url>
+                <s:set name="firstUrl"
+                       value="%{pkHelper.generateUrl(objects.get(0), searchString)}" />
                 <s:a id="first" href="%{#firstUrl}">first</s:a>
-                <s:url var="previousUrl" namespace="/" action="%{qualifiedName}/UseCase">
-                    <s:param name="pk"
-                             value="%{pkHelper.generatePkString(objects.get(#position-1))}" />
-                    <s:param name="searchString" value="%{searchString}" />
-                </s:url>
+                <s:set name="previousUrl"
+                       value="%{pkHelper.generateUrl(objects.get(#position-1), searchString)}" />
                 <s:a id="previous" href="%{#previousUrl}">previous</s:a>
             </s:if><s:else>
                 <span class="disabled">first</span> <span class="disabled">previous</span>
             </s:else>
             <s:property value="#position+1"/> of <s:property value="objects.size()"/>
             <s:if test="#position < #size-1">
-                <s:url var="nextUrl" namespace="/" action="%{qualifiedName}/UseCase">
-                    <s:param name="pk"
-                             value="%{pkHelper.generatePkString(objects.get(#position+1))}" />
-                    <s:param name="searchString" value="%{searchString}" />
-                </s:url>
+                <s:set name="nextUrl"
+                       value="%{pkHelper.generateUrl(objects.get(#position+1), searchString)}" />
                 <s:a id="next" href="%{#nextUrl}">next</s:a>
-                <s:url var="lastUrl" namespace="/" action="%{qualifiedName}/UseCase">
-                    <s:param name="pk"
-                             value="%{pkHelper.generatePkString(objects.get(#size - 1))}" />
-                    <s:param name="searchString" value="%{searchString}" />
-                </s:url>
+                <s:set name="lastUrl"
+                       value="%{pkHelper.generateUrl(objects.get(#size - 1), searchString)}" />
                 <s:a id="last" href="%{#lastUrl}">last</s:a>
             </s:if><s:else>
                 <span class="disabled">next</span> <span class="disabled">last</span>
@@ -52,5 +40,5 @@
               onclick="return confirm ('Are you sure?');"/>
     <s:submit id="Table_duplicate" method="duplicate" value="Duplicate" disabled="true"/>
     <s:submit id="Table_print" method="print" value="Print" disabled="true"/>
-    <s:submit id="Table_export" method="export" value="Export" disabled="true"/>
+    <s:submit id="Table_export" method="exportRead" value="Export" disabled="false"/>
 </div>

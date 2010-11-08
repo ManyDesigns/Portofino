@@ -84,7 +84,11 @@ public interface Context {
 
     List<Object> getObjects(Criteria criteria);
 
+    List<Object> getObjects(String queryString, Object rootObject);
+
     List<Object> getObjects(String queryString);
+
+    List<Object> getObjects(String queryString, Criteria criteria, Object rootObject);
 
     List<Object> getObjects(String queryString, Criteria criteria);
 

@@ -29,10 +29,13 @@
 
 package com.manydesigns.portofino.model.usecases;
 
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +44,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCase {
+public class UseCase implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
     
@@ -50,13 +53,18 @@ public class UseCase {
     // Fields
     //**************************************************************************
 
+    protected final UseCase parentUseCase;
     protected final List<UseCaseProperty> properties;
     protected final List<ModelAnnotation> modelAnnotations;
+    protected final List<UseCase> subUseCases;
 
     protected String name;
-    protected String title;
     protected String table;
     protected String filter;
+    protected String searchTitle;
+    protected String createTitle;
+    protected String readTitle;
+    protected String editTitle;
 
     //**************************************************************************
     // Fields for wire-up
@@ -68,25 +76,77 @@ public class UseCase {
     // Constructors
     //**************************************************************************
 
-    public UseCase() {
+    public UseCase(UseCase parentUseCase) {
+        this.parentUseCase = parentUseCase;
         properties = new ArrayList<UseCaseProperty>();
         modelAnnotations = new ArrayList<ModelAnnotation>();
+        subUseCases = new ArrayList<UseCase>();
     }
 
-    public UseCase(String name, String title, String table, String filter) {
-        this();
+    public UseCase(UseCase parentUseCase,
+                   String name, String table, String filter,
+                   String searchTitle, String createTitle,
+                   String readTitle, String editTitle) {
+        this(parentUseCase);
         this.name = name;
-        this.title = title;
         this.table = table;
         this.filter = filter;
+        this.searchTitle = searchTitle;
+        this.createTitle = createTitle;
+        this.readTitle = readTitle;
+        this.editTitle = editTitle;
     }
 
-    public void init() {}
+    //**************************************************************************
+    // ModelObject implementation
+    //**************************************************************************
+
+    public void reset() {
+        actualTable = null;
+
+        for (UseCase subUseCase : subUseCases) {
+            subUseCase.reset();
+        }
+    }
+
+    public void init(Model model) {
+        actualTable = model.findTableByQualifiedName(table);
+
+        for (UseCase subUseCase : subUseCases) {
+            subUseCase.init(model);
+        }
+    }
+
+    public String getQualifiedName() {
+        if (parentUseCase == null) {
+            return name;
+        } else {
+            return MessageFormat.format("{0}.{1}",
+                    parentUseCase.getQualifiedName(), name);
+        }
+    }
 
 
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
+
+    public UseCase getParentUseCase() {
+        return parentUseCase;
+    }
+
+    public List<UseCaseProperty> getProperties() {
+        return properties;
+    }
+
+    public List<ModelAnnotation> getModelAnnotations() {
+        return modelAnnotations;
+    }
+
+    public List<UseCase> getSubUseCases() {
+        return subUseCases;
+    }
+
 
     @XmlAttribute(required = true)
     public String getName() {
@@ -95,15 +155,6 @@ public class UseCase {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @XmlAttribute(required = true)
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     @XmlAttribute(required = true)
@@ -132,11 +183,39 @@ public class UseCase {
         this.filter = filter;
     }
 
-    public List<UseCaseProperty> getProperties() {
-        return properties;
+    @XmlAttribute(required = false)
+    public String getSearchTitle() {
+        return searchTitle;
     }
 
-    public List<ModelAnnotation> getAnnotations() {
-        return modelAnnotations;
+    public void setSearchTitle(String searchTitle) {
+        this.searchTitle = searchTitle;
+    }
+
+    @XmlAttribute(required = false)
+    public String getCreateTitle() {
+        return createTitle;
+    }
+
+    public void setCreateTitle(String createTitle) {
+        this.createTitle = createTitle;
+    }
+
+    @XmlAttribute(required = false)
+    public String getReadTitle() {
+        return readTitle;
+    }
+
+    public void setReadTitle(String readTitle) {
+        this.readTitle = readTitle;
+    }
+
+    @XmlAttribute(required = false)
+    public String getEditTitle() {
+        return editTitle;
+    }
+
+    public void setEditTitle(String editTitle) {
+        this.editTitle = editTitle;
     }
 }

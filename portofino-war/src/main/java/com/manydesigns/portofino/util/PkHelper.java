@@ -32,12 +32,14 @@ package com.manydesigns.portofino.util;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.struts2.Struts2Util;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.logging.Logger;
 
 /*
@@ -133,5 +135,21 @@ public class PkHelper {
         return sb.toString();
     }
 
+    public String generateUrl(Object object, String searchString) {
+        String actionUrl = Struts2Util.buildActionUrl(null);
+        String pkString = generatePkString(object);
+        String url;
+        if (searchString == null) {
+            url = MessageFormat.format("{0}?pk={1}",
+                    actionUrl,
+                    Util.urlencode(pkString));
+        } else {
+            url = MessageFormat.format("{0}?pk={1}&searchString={2}",
+                    actionUrl,
+                    Util.urlencode(pkString),
+                    Util.urlencode(searchString));
+        }
+        return Util.getAbsoluteUrl(url);
+    }
 
 }

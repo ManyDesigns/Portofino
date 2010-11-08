@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
+import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
 /*
@@ -36,7 +38,7 @@ import com.manydesigns.portofino.xml.XmlAttribute;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Reference {
+public class Reference implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -47,6 +49,10 @@ public class Reference {
     protected final ForeignKey foreignKey;
     protected String fromColumn;
     protected String toColumn;
+
+    //**************************************************************************
+    // Fields for wire-up
+    //**************************************************************************
 
     protected Column actualFromColumn;
     protected Column actualToColumn;
@@ -68,6 +74,29 @@ public class Reference {
     }
 
     //**************************************************************************
+    // ModelObject implementation
+    //**************************************************************************
+
+    public void reset() {
+        actualFromColumn = null;
+        actualToColumn = null;
+    }
+
+    public void init(Model model) {
+        actualFromColumn =
+                foreignKey.getFromTable().findColumnByName(fromColumn);
+
+        Table actualToTable = foreignKey.getActualToTable();
+        if (actualToTable != null) {
+            actualToColumn = actualToTable.findColumnByName(toColumn);
+        }
+    }
+
+    public String getQualifiedName() {
+        return null;
+    }
+
+//**************************************************************************
     // Getters/setter
     //**************************************************************************
 

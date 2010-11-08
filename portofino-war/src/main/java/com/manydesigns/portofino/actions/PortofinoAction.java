@@ -61,8 +61,8 @@ public class PortofinoAction extends ActionSupport
     public final static String STATUS_403 = "403";
     public final static String STATUS_404 = "404";
     public final static String STATUS_500 = "500";
-    public final static String CANCEL = "cancel";
 
+    public final static String CANCEL = "cancel";
     public final static String SEARCH = "search";
     public final static String LIST = "list";
     public final static String RETURN_TO_SEARCH = "returnToSearch";

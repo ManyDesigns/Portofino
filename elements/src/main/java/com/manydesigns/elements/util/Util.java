@@ -65,7 +65,7 @@ public class Util {
     public static final Logger logger = LogUtil.getLogger(Util.class);
 
     public static String getAbsoluteUrl(HttpServletRequest req,
-                                         String url) {
+                                        String url) {
         StringBuilder sb = new StringBuilder();
 
         Matcher matcher = pattern.matcher(url);
@@ -86,11 +86,11 @@ public class Util {
         return sb.toString();
     }
 
-    public static String getAbsoluteUrl(String link) {
+    public static String getAbsoluteUrl(String url) {
         HttpServletRequest req =
                 ElementsThreadLocals.getHttpServletRequest();
 
-        return getAbsoluteUrl(req, link);
+        return getAbsoluteUrl(req, url);
     }
 
     public static String camelCaseToWords(String s) {

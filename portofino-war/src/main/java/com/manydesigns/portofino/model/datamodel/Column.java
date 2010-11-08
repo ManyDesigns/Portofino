@@ -31,6 +31,8 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
@@ -44,7 +46,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Column implements DatamodelObject {
+public class Column implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -115,7 +117,25 @@ public class Column implements DatamodelObject {
         this.propertyName = propertyName;
     }
 
-    public void init() {
+    //**************************************************************************
+    // ModelObject implementation
+    //**************************************************************************
+
+    public String getQualifiedName() {
+        return MessageFormat.format("{0}.{1}",
+                table.getQualifiedName(), columnName);
+    }
+
+    public void reset() {
+        actualPropertyName = null;
+        actualJavaType = null;
+
+        for (ModelAnnotation modelAnnotation : modelAnnotations) {
+            modelAnnotation.reset();
+        }
+    }
+
+    public void init(Model model) {
         if (propertyName == null) {
             actualPropertyName = columnName;
         } else {
@@ -129,7 +149,7 @@ public class Column implements DatamodelObject {
         }
 
         for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.init();
+            modelAnnotation.init(model);
         }
     }
 
@@ -254,15 +274,6 @@ public class Column implements DatamodelObject {
                 Integer.toString(length),
                 Integer.toString(scale),
                 nullable ? "" : " NOT NULL");
-    }
-
-    //**************************************************************************
-    // DatamodelObject implementation
-    //**************************************************************************
-
-    public String getQualifiedName() {
-        return MessageFormat.format("{0}.{1}",
-                table.getQualifiedName(), columnName);
     }
 
     //**************************************************************************

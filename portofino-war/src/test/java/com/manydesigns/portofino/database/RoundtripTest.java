@@ -109,7 +109,6 @@ public class RoundtripTest extends AbstractPortofinoTest {
         catidColumn.setJavaType("java.lang.String");
 
         PrimaryKey categoryPrimaryKey = categoryTable.getPrimaryKey();
-        categoryPrimaryKey.setClassName("com.example.CategoryPk");
 
         // product table
         Table productTable = model.findTableByQualifiedName("mydb.PUBLIC.PRODUCT");
@@ -227,7 +226,6 @@ public class RoundtripTest extends AbstractPortofinoTest {
         PrimaryKey categoryPrimaryKey2 = categoryTable2.getPrimaryKey();
         assertNotNull(categoryPrimaryKey2);
         assertEquals("category_pk", categoryPrimaryKey2.getPrimaryKeyName());
-        assertEquals("com.example.CategoryPk", categoryPrimaryKey2.getClassName());
         List<PrimaryKeyColumn> categoryPrimaryKeyColumns =
                 categoryPrimaryKey2.getPrimaryKeyColumns();
         assertEquals(1, categoryPrimaryKeyColumns.size());

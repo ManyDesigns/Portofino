@@ -19,17 +19,14 @@
 <!-- customized interceptor stack based on struts-default.xml in Struts 2.2.1 -->
                 <interceptor-ref name="exception"/>
                 <interceptor-ref name="i18n"/>
-                <interceptor-ref name="checkbox"/>
                 <interceptor-ref name="servletConfig"/>
-                <interceptor-ref name="params"/>
-<!--
-For security reasons, it is important that staticParams be after params.
-This ensures that static parameters (specified as "param" in an action mapping)
-are not overridden by values from the request.
- -->
-                <interceptor-ref name="staticParams"/>
                 <interceptor-ref name="elements-struts2" />
                 <interceptor-ref name="portofino" />
+                <interceptor-ref name="staticParams"/>
+                <interceptor-ref name="prepare"/>
+                <interceptor-ref name="modelDriven"/>
+                <interceptor-ref name="params"/>
+                <interceptor-ref name="checkbox"/>
             </interceptor-stack>
         </interceptors>
         <default-interceptor-ref name="mdstack"/>
@@ -87,25 +84,25 @@ are not overridden by values from the request.
             <result name="redirectToFirst" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/UseCase</param>
             </result>
-            <result name="noClasses">/skins/default/useCase/noUseCases.jsp</result>
+            <result name="noClasses">/skins/default/crud/noClasses.jsp</result>
         </action>
 
         <action name="*/UseCase"
                 class="com.manydesigns.portofino.actions.UseCaseAction">
             <param name="qualifiedName">{1}</param>
 
-            <result name="search">/skins/default/useCase/search.jsp</result>
+            <result name="search">/skins/default/crud/search.jsp</result>
 
-            <result name="read">/skins/default/useCase/read.jsp</result>
+            <result name="read">/skins/default/crud/read.jsp</result>
 
-            <result name="create">/skins/default/useCase/create.jsp</result>
+            <result name="create">/skins/default/crud/create.jsp</result>
 
             <result name="save" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/UseCase</param>
                 <param name="pk">%{pk}</param>
             </result>
 
-            <result name="edit">/skins/default/useCase/edit.jsp</result>
+            <result name="edit">/skins/default/crud/edit.jsp</result>
 
             <result name="update" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/UseCase</param>
@@ -113,7 +110,7 @@ are not overridden by values from the request.
                 <param name="searchString">%{searchString}</param>
             </result>
 
-            <result name="bulkEdit">/skins/default/useCase/bulkEdit.jsp</result>
+            <result name="bulkEdit">/skins/default/crud/bulkEdit.jsp</result>
 
             <result name="bulkUpdate" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/UseCase</param>
@@ -169,25 +166,25 @@ are not overridden by values from the request.
             <result name="redirectToFirst" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>
             </result>
-            <result name="noClasses">/skins/default/model/tableData/noTables.jsp</result>
+            <result name="noClasses">/skins/default/crud/noClasses.jsp</result>
         </action>
 
         <action name="*/TableData"
                 class="com.manydesigns.portofino.actions.model.TableDataAction">
             <param name="qualifiedName">{1}</param>
 
-            <result name="search">/skins/default/model/tableData/search.jsp</result>
+            <result name="search">/skins/default/crud/search.jsp</result>
 
-            <result name="read">/skins/default/model/tableData/read.jsp</result>
+            <result name="read">/skins/default/crud/read.jsp</result>
 
-            <result name="create">/skins/default/model/tableData/create.jsp</result>
+            <result name="create">/skins/default/crud/create.jsp</result>
 
             <result name="save" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>
-                <param name="pk">%{pk}</param>
+                <param name="pk">%{rootCrudUnit.pk}</param>
             </result>
 
-            <result name="edit">/skins/default/model/tableData/edit.jsp</result>
+            <result name="edit">/skins/default/crud/edit.jsp</result>
 
             <result name="update" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>
@@ -195,7 +192,7 @@ are not overridden by values from the request.
                 <param name="searchString">%{searchString}</param>
             </result>
 
-            <result name="bulkEdit">/skins/default/model/tableData/bulkEdit.jsp</result>
+            <result name="bulkEdit">/skins/default/crud/bulkEdit.jsp</result>
 
             <result name="bulkUpdate" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>

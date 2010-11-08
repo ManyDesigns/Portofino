@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.model.site;
 
+import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.util.ArrayList;
@@ -39,7 +41,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SiteNode {
+public class SiteNode implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -72,6 +74,26 @@ public class SiteNode {
     }
 
     public void init() {}
+
+    //**************************************************************************
+    // ModelObject implementation
+    //**************************************************************************
+
+    public void reset() {
+        for (SiteNode childNode : childNodes) {
+            childNode.reset();
+        }
+    }
+
+    public void init(Model model) {
+        for (SiteNode childNode : childNodes) {
+            childNode.init(model);
+        }
+    }
+
+    public String getQualifiedName() {
+        return null;
+    }
 
     //**************************************************************************
     // Getters/Setters

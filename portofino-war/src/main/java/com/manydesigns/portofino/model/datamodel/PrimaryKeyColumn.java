@@ -30,6 +30,8 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.util.logging.Logger;
@@ -39,7 +41,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PrimaryKeyColumn {
+public class PrimaryKeyColumn implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -50,7 +52,15 @@ public class PrimaryKeyColumn {
 
     protected String columnName;
 
-    protected Column column;
+    //**************************************************************************
+    // Fields for wire-up
+    //**************************************************************************
+
+    protected Column actualColumn;
+
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
 
     public static final Logger logger =
             LogUtil.getLogger(PrimaryKeyColumn.class);
@@ -68,9 +78,21 @@ public class PrimaryKeyColumn {
         this.columnName = columnName;
     }
 
-    public void init() {
-        column = primaryKey.getTable().findColumnByName(columnName);
-        if (column == null) {
+    //**************************************************************************
+    // ModelObject implementation
+    //**************************************************************************
+
+    public void reset() {
+        actualColumn = null;
+    }
+
+    public String getQualifiedName() {
+        return null;
+    }
+
+    public void init(Model model) {
+        actualColumn = primaryKey.getTable().findColumnByName(columnName);
+        if (actualColumn == null) {
             LogUtil.warningMF(logger,
                     "Cannor wire primary key column ''{0}'' to primary key ''{1}''",
                     columnName, primaryKey);
@@ -95,7 +117,7 @@ public class PrimaryKeyColumn {
         this.columnName = columnName;
     }
 
-    public Column getColumn() {
-        return column;
+    public Column getActualColumn() {
+        return actualColumn;
     }
 }

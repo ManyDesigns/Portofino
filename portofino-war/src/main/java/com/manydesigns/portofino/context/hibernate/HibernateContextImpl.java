@@ -439,12 +439,16 @@ public class HibernateContextImpl implements Context {
     }
 
 
-    public List<Object> getObjects(String queryString) {
+    public List<Object> getObjects(String queryString, Object rootObject) {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
         String formatString = sqlFormat.getFormatString();
-        Object[] parameters = sqlFormat.evaluateOgnlExpressions(null);
+        Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
 
         return runHqlQuery(formatString, parameters);
+    }
+
+    public List<Object> getObjects(String queryString) {
+        return getObjects(queryString, null);
     }
 
     protected String getQualifiedTableNameFromQueryString(String queryString) {
@@ -457,9 +461,16 @@ public class HibernateContextImpl implements Context {
     }
 
     public List<Object> getObjects(String queryString, Criteria criteria) {
+        return getObjects(queryString, criteria, null);
+    }
+
+    public List<Object> getObjects(String queryString,
+                                   Criteria criteria,
+                                   Object rootObject) {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
         String formatString = sqlFormat.getFormatString();
-        Object[] parameters = sqlFormat.evaluateOgnlExpressions(null);
+        Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
+        boolean formatStringContainsWhere = formatString.contains(WHERE_STRING);
 
         QueryStringWithParameters criteriaQuery =
                 getQueryStringWithParametersForCriteria(criteria);
@@ -479,10 +490,17 @@ public class HibernateContextImpl implements Context {
 
         String fullQueryString;
         if (criteriaWhereClause.length() > 0) {
-            fullQueryString = MessageFormat.format(
-                    "{0} AND {1}",
-                    formatString,
-                    criteriaWhereClause);
+            if (formatStringContainsWhere) {
+                fullQueryString = MessageFormat.format(
+                        "{0} AND {1}",
+                        formatString,
+                        criteriaWhereClause);
+            } else {
+                fullQueryString = MessageFormat.format(
+                        "{0} WHERE {1}",
+                        formatString,
+                        criteriaWhereClause);
+            }
         } else {
             fullQueryString = formatString;
         }
@@ -773,7 +791,7 @@ public class HibernateContextImpl implements Context {
     }
 
     public UseCaseAccessor getUseCaseAccessor(String useCaseName) {
-        UseCase useCase = model.findUseCaseByName(useCaseName);
+        UseCase useCase = model.findUseCaseByQualifiedName(useCaseName);
         String qualifiedTableName = useCase.getTable();
         TableAccessor tableAccessor = getTableAccessor(qualifiedTableName);
         return new UseCaseAccessor(useCase, tableAccessor);

@@ -74,11 +74,6 @@ public class TableDesignAction extends PortofinoAction {
 
 
     //**************************************************************************
-    // Model objects
-    //**************************************************************************
-
-
-    //**************************************************************************
     // Presentation elements
     //**************************************************************************
 
@@ -99,7 +94,7 @@ public class TableDesignAction extends PortofinoAction {
     public String execute() {
         if (qualifiedTableName == null) {
             qualifiedTableName = model.getAllTables().get(0).getQualifiedName();
-            return "redirectToTable";
+            return REDIRECT_TO_FIRST;
         }
 
         setupTable();

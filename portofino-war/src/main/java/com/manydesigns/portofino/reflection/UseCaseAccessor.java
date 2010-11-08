@@ -67,7 +67,7 @@ public class UseCaseAccessor
     //**************************************************************************
 
     public UseCaseAccessor(UseCase useCase, TableAccessor tableAccessor) {
-        super(useCase.getAnnotations());
+        super(useCase.getModelAnnotations());
         this.useCase = useCase;
         this.tableAccessor = tableAccessor;
         List<UseCaseProperty> properties = useCase.getProperties();

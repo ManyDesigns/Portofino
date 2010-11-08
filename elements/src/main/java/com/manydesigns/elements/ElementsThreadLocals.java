@@ -35,6 +35,7 @@ import com.manydesigns.elements.ognl.CustomTypeConverter;
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.TypeConverter;
+import ognl.ClassResolver;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;

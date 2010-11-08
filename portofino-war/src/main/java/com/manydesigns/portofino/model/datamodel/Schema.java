@@ -30,6 +30,8 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.text.MessageFormat;
@@ -42,7 +44,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Schema implements DatamodelObject {
+public class Schema implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -76,9 +78,23 @@ public class Schema implements DatamodelObject {
         this.schemaName = schemaName;
     }
 
-    public void init() {
+    //**************************************************************************
+    // DatamodelObject implementation
+    //**************************************************************************
+
+    public String getQualifiedName() {
+        return MessageFormat.format("{0}.{1}", getDatabaseName(), schemaName);
+    }
+
+    public void reset() {
         for (Table table : tables) {
-            table.init();
+            table.reset();
+        }
+    }
+
+    public void init(Model model) {
+        for (Table table : tables) {
+            table.init(model);
         }
     }
 
@@ -107,14 +123,6 @@ public class Schema implements DatamodelObject {
         return tables;
     }
 
-
-    //**************************************************************************
-    // DatamodelObject implementation
-    //**************************************************************************
-
-    public String getQualifiedName() {
-        return MessageFormat.format("{0}.{1}", getDatabaseName(), schemaName);
-    }
 
     //**************************************************************************
     // Get all objects of a certain kind

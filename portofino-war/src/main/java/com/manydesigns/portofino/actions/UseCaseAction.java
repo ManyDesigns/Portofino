@@ -29,13 +29,10 @@
 
 package com.manydesigns.portofino.actions;
 
-import com.manydesigns.elements.fields.search.Criteria;
+import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
-import com.manydesigns.portofino.model.datamodel.ForeignKey;
+import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.usecases.UseCase;
-import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.util.PkHelper;
-import org.apache.struts2.interceptor.ServletRequestAware;
 
 import java.util.List;
 
@@ -44,16 +41,52 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCaseAction extends AbstractCrudAction
-        implements ServletRequestAware {
+public class UseCaseAction extends AbstractCrudAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // Model metadata
+    // Setup
     //**************************************************************************
 
-    public UseCase useCase;
+    @Override
+    public void setupMetadata() {
+        if (qualifiedName == null) {
+            return;
+        }
+        UseCase rootUseCase = model.findUseCaseByQualifiedName(qualifiedName);
+        if (rootUseCase == null) {
+            throw new ModelObjectNotFoundError(qualifiedName);
+        }
+        rootCrudUnit = setupUseCaseInstance(rootUseCase);
+    }
+
+    private CrudUnit setupUseCaseInstance(UseCase useCase) {
+        ClassAccessor classAccessor =
+                    context.getUseCaseAccessor(useCase.getQualifiedName());
+        Table baseTable = useCase.getActualTable();
+        String query = useCase.getFilter();
+        CrudUnit result = new CrudUnit(classAccessor, baseTable, query,
+                useCase.getSearchTitle(), useCase.getCreateTitle(),
+                useCase.getReadTitle(), useCase.getEditTitle());
+
+        // inject values
+        result.context = context;
+        result.model = model;
+        result.req = req;
+
+        // expand recursively
+        for (UseCase subUseCase : useCase.getSubUseCases()) {
+            CrudUnit subCrudUnit = setupUseCaseInstance(subUseCase);
+            result.subCrudUnits.add(subCrudUnit);
+        }
+        return result;
+    }
+
+
+    //**************************************************************************
+    // Redirect to first use case
+    //**************************************************************************
 
     @Override
     public String redirectToFirst() {
@@ -66,32 +99,5 @@ public class UseCaseAction extends AbstractCrudAction
         }
     }
 
-    //**************************************************************************
-    // Common methods
-    //**************************************************************************
-
-    public void setupMetadata() {
-        useCase = model.findUseCaseByName(qualifiedName);
-        baseTable = useCase.getActualTable();
-        classAccessor = context.getUseCaseAccessor(qualifiedName);
-        pkHelper = new PkHelper(classAccessor);
-        if (useCase == null || classAccessor == null) {
-            throw new ModelObjectNotFoundError(qualifiedName);
-        }
-    }
-
-    @Override
-    public void setupCriteria() {
-        TableAccessor tableAccessor =
-                context.getTableAccessor(useCase.getTable());
-        Criteria criteria = new Criteria(tableAccessor);
-        searchForm.configureCriteria(criteria);
-        objects = context.getObjects(useCase.getFilter(), criteria);
-    }
-
-
-    protected void setupRelatedTableForm(ForeignKey relationship) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 
 }

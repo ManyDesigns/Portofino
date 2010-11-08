@@ -70,55 +70,53 @@ public class Model {
         this.useCases = new ArrayList<UseCase>();
     }
 
-    public void init() {
-        List<Table> allTables = getAllTables();
-        // reset collections
-        for (Table table : allTables) {
-            table.getOneToManyRelationships().clear();
-        }
-        // wire-up relationships and references
-        for (Table table : allTables) {
-            for (ForeignKey foreignKey : table.getForeignKeys()) {
-                // wire up ForeignKey.toTable
-                String qualifiedToTableName =
-                        Table.composeQualifiedName(
-                                foreignKey.getToDatabase(),
-                                foreignKey.getToSchema(),
-                                foreignKey.getToTable());
-                Table toTable = findTableByQualifiedName(qualifiedToTableName);
-                foreignKey.setActualToTable(toTable);
-                if (toTable == null) {
-                    LogUtil.warningMF(logger,
-                            "Cannor wire foreign key ''{0}'' to table ''{1}''",
-                            foreignKey, qualifiedToTableName);
-                } else {
-                    // wire up Table.oneToManyRelationships
-                    toTable.getOneToManyRelationships().add(foreignKey);
-                }
-            }
-        }
+    //**************************************************************************
+    // Reset / init
+    //**************************************************************************
 
+    protected void reset() {
         // databases
         for (Database database : databases) {
-            database.init();
+            database.reset();
         }
 
         // site nodes
         for (SiteNode siteNode : siteNodes) {
-            siteNode.init();
+            siteNode.reset();
         }
 
-        // databases
+        // portlets
         for (Portlet portlet : portlets) {
-            portlet.init();
+            portlet.reset();
         }
 
-        // databases
+        // use cases
         for (UseCase useCase : useCases) {
-            String qualifiedTableName = useCase.getTable();
-            Table table = findTableByQualifiedName(qualifiedTableName);
-            useCase.setActualTable(table);
-            useCase.init();
+            useCase.reset();
+        }
+    }
+
+    public void init() {
+        reset();
+        
+        // databases
+        for (Database database : databases) {
+            database.init(this);
+        }
+
+        // site nodes
+        for (SiteNode siteNode : siteNodes) {
+            siteNode.init(this);
+        }
+
+        // portlets
+        for (Portlet portlet : portlets) {
+            portlet.init(this);
+        }
+
+        // use cases
+        for (UseCase useCase : useCases) {
+            useCase.init(this);
         }
     }
 
@@ -269,10 +267,24 @@ public class Model {
         return useCases;
     }
 
-    public UseCase findUseCaseByName(String useCaseName) {
-        for (UseCase current : useCases) {
-            if (current.getName().equals(useCaseName)) {
-                return current;
+    public UseCase findUseCaseByQualifiedName(String useCaseName) {
+        return findUseCaseByQualifiedName(useCases, useCaseName);
+    }
+
+    public UseCase findUseCaseByQualifiedName(List<UseCase> useCaseList, String useCaseName) {
+        int firstIndex = useCaseName.indexOf(".");
+        String firstName = (firstIndex > 0)
+                ? useCaseName.substring(0, firstIndex)
+                : useCaseName;
+        for (UseCase current : useCaseList) {
+            if (current.getName().equals(firstName)) {
+                if (firstIndex > 0) {
+                    List<UseCase> subUseCases = current.getSubUseCases();
+                    String rest = useCaseName.substring(firstIndex + 1);
+                    return findUseCaseByQualifiedName(subUseCases, rest);
+                } else {
+                    return current;
+                }
             }
         }
         return null;

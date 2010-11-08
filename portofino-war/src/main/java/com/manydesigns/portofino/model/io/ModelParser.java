@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.logging.Logger;
 
 /**
@@ -59,6 +60,7 @@ public class ModelParser extends XmlParser {
     public static final String PORTLET = "portlet";
     public static final String USECASES = "useCases";
     public static final String USECASE = "useCase";
+    public static final String SUBUSECASE = "subUseCases";
     public static final String PROPERTIES = "properties";
     public static final String PROPERTY = "property";
     public static final String ANNOTATIONS = "annotations";
@@ -76,7 +78,7 @@ public class ModelParser extends XmlParser {
     Column currentColumn;
     PrimaryKey currentPk;
     ForeignKey currentFk;
-    UseCase currentUseCase;
+    Stack<UseCase> useCaseStack;
 
     Collection<ModelAnnotation> currentModelAnnotations;
     ModelAnnotation currentModelAnnotation;
@@ -111,6 +113,7 @@ public class ModelParser extends XmlParser {
 
     private Model parse(InputStream inputStream) throws XMLStreamException {
         model = new Model();
+        useCaseStack = new Stack<UseCase>();
         initParser(inputStream);
         expectDocument(new ModelDocumentCallback());
         model.init();
@@ -350,19 +353,32 @@ public class ModelParser extends XmlParser {
     private class UseCaseCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            currentUseCase = new UseCase();
-            checkAndSetAttributes(currentUseCase, attributes);
-            model.getUseCases().add(currentUseCase);
+            UseCase parentUseCase;
+            if (useCaseStack.isEmpty()) {
+                parentUseCase = null;
+            } else {
+                parentUseCase = useCaseStack.peek();
+            }
 
-            // TODO: replace this with init() code
-            Table table = model.findTableByQualifiedName(
-                    currentUseCase.getTable());
-            currentUseCase.setActualTable(table);
+            UseCase currentUseCase = new UseCase(parentUseCase);
+            if (parentUseCase == null) {
+                model.getUseCases().add(currentUseCase);
+            } else {
+                parentUseCase.getSubUseCases().add(currentUseCase);
+            }
+            useCaseStack.push(currentUseCase);
+
+            checkAndSetAttributes(currentUseCase, attributes);
 
             expectElement(PROPERTIES, 0, 1, new PropertiesCallback());
             
-            currentModelAnnotations = currentUseCase.getAnnotations();
+            currentModelAnnotations = currentUseCase.getModelAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
+
+            expectElement(SUBUSECASE, 0, 1, new SubUseCasesCallback());
+
+            UseCase poppedUsedCase = useCaseStack.pop();
+            assert(poppedUsedCase == currentUseCase);
         }
     }
 
@@ -378,7 +394,7 @@ public class ModelParser extends XmlParser {
                 throws XMLStreamException {
             UseCaseProperty useCaseProperty = new UseCaseProperty();
             checkAndSetAttributes(useCaseProperty, attributes);
-            currentUseCase.getProperties().add(useCaseProperty);
+            useCaseStack.peek().getProperties().add(useCaseProperty);
 
             currentModelAnnotations = useCaseProperty.getAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
@@ -413,6 +429,13 @@ public class ModelParser extends XmlParser {
             implements CharactersCallback {
         public void doCharacters(String text) throws XMLStreamException {
             currentModelAnnotation.getValues().add(text);
+        }
+    }
+
+    private class SubUseCasesCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(USECASE, 0, null, new UseCaseCallback());
         }
     }
 

@@ -33,6 +33,8 @@ import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.lang.reflect.Constructor;
@@ -45,7 +47,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ModelAnnotation {
+public class ModelAnnotation implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -72,7 +74,7 @@ public class ModelAnnotation {
             LogUtil.getLogger(ModelAnnotation.class);
 
     //**************************************************************************
-    // Contruction and init
+    // Contruction
     //**************************************************************************
 
     public ModelAnnotation() {
@@ -84,8 +86,16 @@ public class ModelAnnotation {
         this.type = type;
     }
 
-    public void init() {
+    //**************************************************************************
+    // ModelObject implementation
+    //**************************************************************************
+
+    public void reset() {
         javaAnnotation = null;
+        javaAnnotationClass = null;
+    }
+
+    public void init(Model model) {
         javaAnnotationClass = ReflectionUtil.loadClass(type);
         if (javaAnnotationClass == null) {
             LogUtil.warningMF(logger,
@@ -143,6 +153,11 @@ public class ModelAnnotation {
                     "Cannot instanciate annotation: {0}", javaAnnotationClass);
         }
     }
+
+    public String getQualifiedName() {
+        return null;
+    }
+
 
     //**************************************************************************
     // Getters and setters

@@ -30,6 +30,9 @@
 package com.manydesigns.portofino.model.portlets;
 
 import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
 /*
@@ -37,9 +40,13 @@ import com.manydesigns.portofino.xml.XmlAttribute;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Portlet {
+public class Portlet implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
 
     protected String name;
     protected String type;
@@ -48,6 +55,17 @@ public class Portlet {
     protected String database;
     protected String sql;
     protected String urlExpression;
+
+    //**************************************************************************
+    // Fields for wire-up
+    //**************************************************************************
+
+    protected Database actualDatabase;
+
+    //**************************************************************************
+    // Constructors
+    //**************************************************************************
+
 
     public Portlet() {}
 
@@ -62,7 +80,25 @@ public class Portlet {
         this.urlExpression = urlExpression;
     }
 
-    public void init() {}
+    //**************************************************************************
+    // ModelObject implementation
+    //**************************************************************************
+
+    public void reset() {
+        actualDatabase = null;
+    }
+
+    public void init(Model model) {
+        actualDatabase = model.findDatabaseByName(database);
+    }
+
+    public String getQualifiedName() {
+        return null;
+    }
+
+    //**************************************************************************
+    // Getters/setters
+    //**************************************************************************
 
     @XmlAttribute(required = true)
     public String getName() {
@@ -128,5 +164,12 @@ public class Portlet {
     public void setUrlExpression(String urlExpression) {
         this.urlExpression = urlExpression;
     }
-    
+
+    public Database getActualDatabase() {
+        return actualDatabase;
+    }
+
+    public void setActualDatabase(Database actualDatabase) {
+        this.actualDatabase = actualDatabase;
+    }
 }

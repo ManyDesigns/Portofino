@@ -3,21 +3,20 @@
 %><%@ taglib prefix="s" uri="/struts-tags"
 %><%@ taglib prefix="mdes" uri="/manydesigns-elements-struts2"
 %><s:include value="/skins/default/header.jsp"/>
-<s:form method="post"
-        enctype="%{form.multipartRequest ? 'multipart/form-data' : 'application/x-www-form-urlencoded'}">
-    <s:include value="/skins/default/model/tableData/editButtonsBar.jsp"/>
+<s:form method="post">
+    <s:include value="/skins/default/crud/bulkEditButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1>Edit: <s:property value="qualifiedName"/></h1>
-        <s:if test="form.requiredFieldsPresent">
-            Fields marked with a "*" are required.
-        </s:if>
+        <h1><s:property value="editTitle"/></h1>
+        In the first column, select the fields you want to edit. Then, fill in their values.
         <mdes:write value="form"/>
-        <s:hidden name="pk" value="%{pk}"/>
+        <s:iterator var="#current" value="selection">
+            <s:hidden name="selection" value="%{#current}"/>
+        </s:iterator>
         <s:if test="searchString != null">
             <s:hidden name="searchString" value="%{searchString}"/>
         </s:if>
         <s:hidden name="cancelReturnUrl" value="%{cancelReturnUrl}"/>
     </div>
-    <s:include value="/skins/default/model/tableData/editButtonsBar.jsp"/>
+    <s:include value="/skins/default/crud/bulkEditButtonsBar.jsp"/>
 </s:form>
 <s:include value="/skins/default/footer.jsp"/>

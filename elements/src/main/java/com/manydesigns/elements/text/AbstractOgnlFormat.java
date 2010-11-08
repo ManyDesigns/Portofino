@@ -31,7 +31,9 @@ package com.manydesigns.elements.text;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.logging.LogUtil;
+import ognl.ClassResolver;
 import ognl.Ognl;
+import ognl.OgnlContext;
 import ognl.OgnlException;
 
 import java.text.MessageFormat;
@@ -112,7 +114,8 @@ public abstract class AbstractOgnlFormat {
                                        String ognlExpression);
 
     public Object[] evaluateOgnlExpressions(Object root) {
-        Map ognlContext = ElementsThreadLocals.getOgnlContext();
+        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+        ClassResolver cr = ognlContext.getClassResolver();
         Object[] result = new Object[parsedOgnlExpressions.length];
         for (int i = 0; i < result.length; i++) {
             evaluateOneOgnlExpression(root, ognlContext, result, i);

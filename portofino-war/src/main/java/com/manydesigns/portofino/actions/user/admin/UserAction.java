@@ -28,42 +28,15 @@
  */
 package com.manydesigns.portofino.actions.user.admin;
 
-import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.fields.search.Criteria;
-import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.forms.SearchFormBuilder;
 import com.manydesigns.elements.forms.TableForm;
-import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.text.OgnlTextFormat;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.RelatedTableForm;
 import com.manydesigns.portofino.actions.model.TableDataAction;
-import com.manydesigns.portofino.email.EmailHandler;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
-import com.manydesigns.portofino.model.datamodel.ForeignKey;
-import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
-import com.manydesigns.portofino.system.model.users.UsersGroups;
-import com.manydesigns.portofino.util.DummyHttpServletRequest;
-import com.manydesigns.portofino.util.PkHelper;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -123,6 +96,7 @@ public class UserAction extends TableDataAction {
     //**************************************************************************
     // Action default execute method
     //**************************************************************************
+/*
 
     public String execute() {
 
@@ -132,7 +106,6 @@ public class UserAction extends TableDataAction {
             return read();
         }
     }
-
     //**************************************************************************
     // Search
     //**************************************************************************
@@ -597,5 +570,5 @@ public class UserAction extends TableDataAction {
         SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
         return read();
     }
-
+*/
 }

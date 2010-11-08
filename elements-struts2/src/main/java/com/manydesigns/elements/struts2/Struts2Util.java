@@ -27,16 +27,43 @@
  *
  */
 
-package com.manydesigns.portofino.model.datamodel;
+package com.manydesigns.elements.struts2;
+
+import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionInvocation;
+import com.opensymphony.xwork2.ActionProxy;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface DatamodelObject {
+public class Struts2Util {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    String getQualifiedName();
+    public static String buildActionUrl(String method) {
+        ActionContext actionContext = ActionContext.getContext();
+        ActionInvocation actionInvocation = actionContext.getActionInvocation();
+        ActionProxy actionProxy = actionInvocation.getProxy();
+        String namespace = actionProxy.getNamespace();
+        String actionName = actionProxy.getActionName();
+
+        StringBuilder sb = new StringBuilder();
+        if ("/".equals(namespace)) {
+            sb.append("/");
+        } else {
+            sb.append(namespace);
+            sb.append("/");
+        }
+        sb.append(actionName);
+        if (method != null) {
+            sb.append("!");
+            sb.append(method);
+        }
+        sb.append(".action");
+        return sb.toString();
+    }
+
+    
 }

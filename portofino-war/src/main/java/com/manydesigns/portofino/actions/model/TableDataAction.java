@@ -29,18 +29,16 @@
 
 package com.manydesigns.portofino.actions.model;
 
-import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.forms.TableForm;
-import com.manydesigns.elements.forms.TableFormBuilder;
+import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.actions.AbstractCrudAction;
-import com.manydesigns.portofino.actions.RelatedTableForm;
+import com.manydesigns.portofino.actions.CrudUnit;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
+import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
+import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.util.PkHelper;
-import org.apache.struts2.interceptor.ServletRequestAware;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 /*
@@ -48,23 +46,95 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableDataAction extends AbstractCrudAction
-        implements ServletRequestAware {
+public class TableDataAction extends AbstractCrudAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
 
+    //**************************************************************************
+    // Setup
+    //**************************************************************************
+
     @Override
     public void setupMetadata() {
-        baseTable = model.findTableByQualifiedName(qualifiedName);
-        classAccessor = context.getTableAccessor(qualifiedName);
-        pkHelper = new PkHelper(classAccessor);
-        if (classAccessor == null) {
+        if (qualifiedName == null) {
+            return;
+        }
+        Table table = model.findTableByQualifiedName(qualifiedName);
+        if (table == null) {
             throw new ModelObjectNotFoundError(qualifiedName);
         }
+        rootCrudUnit = setupUseCaseInstance(table);
+    }
+
+    private CrudUnit setupUseCaseInstance(Table table) {
+        String qualifiedTableName = table.getQualifiedName();
+        ClassAccessor classAccessor =
+                    context.getTableAccessor(qualifiedTableName);
+        String query = MessageFormat.format(
+                "FROM {0}", qualifiedTableName);
+        String searchTitle = MessageFormat.format(
+                "Search: {0}", qualifiedTableName);
+        String createTitle = MessageFormat.format(
+                "Create: {0}", qualifiedTableName);
+        String readTitle = MessageFormat.format(
+                "Read: {0}", qualifiedTableName);
+        String updateTitle = MessageFormat.format(
+                "Update: {0}", qualifiedTableName);
+        CrudUnit result = new CrudUnit(classAccessor, table, query,
+                searchTitle, createTitle, readTitle, updateTitle);
+
+        // inject values
+        result.context = context;
+        result.model = model;
+        result.req = req;
+
+        for (ForeignKey foreignKey : table.getOneToManyRelationships()) {
+            Table subTable = foreignKey.getFromTable();
+            ClassAccessor subClassAccessor =
+                    context.getTableAccessor(subTable.getQualifiedName());
+            StringBuilder sb = new StringBuilder();
+            sb.append("FROM ");
+            sb.append(subTable.getQualifiedName());
+            boolean first = true;
+            for (Reference reference : foreignKey.getReferences()) {
+                if (first) {
+                    sb.append(" WHERE ");
+                    first = false;
+                } else {
+                    sb.append(" AND ");
+                }
+                Column fromColumn = reference.getActualFromColumn();
+                String fromPropertyName = fromColumn.getActualPropertyName();
+                Column toColumn = reference.getActualToColumn();
+                String toPropertyName = toColumn.getActualPropertyName();
+
+                sb.append(MessageFormat.format("{0}=%'{'{1}'}'",
+                        fromPropertyName, toPropertyName));
+            }
+            String subQuery = sb.toString();
+            String subSearchTitle = MessageFormat.format(
+                    "Objects related through foreign key: {0}",
+                    foreignKey.getForeignKeyName());
+
+            CrudUnit subCrudUnit =
+                    new CrudUnit(subClassAccessor, subTable, subQuery,
+                            subSearchTitle, null, null, null);
+            subCrudUnit.context = context;
+            subCrudUnit.model = model;
+            subCrudUnit.req = req;
+            result.subCrudUnits.add(subCrudUnit);
+        }
+
+        return result;
     }
 
 
+    //**************************************************************************
+    // Redirect to first use case
+    //**************************************************************************
+
+    @Override
     public String redirectToFirst() {
         List<Table> tables = model.getAllTables();
         if (tables.isEmpty()) {
@@ -73,29 +143,6 @@ public class TableDataAction extends AbstractCrudAction
             qualifiedName = tables.get(0).getQualifiedName();
             return REDIRECT_TO_FIRST;
         }
-    }
-
-    
-    protected void setupRelatedTableForm(ForeignKey relationship) {
-        List<Object> relatedObjects =
-                context.getRelatedObjects(qualifiedName, object,
-                        relationship.getForeignKeyName());
-
-        String qualifiedFromTableName =
-                relationship.getFromTable().getQualifiedName();
-        TableAccessor relatedTableAccessor =
-                context.getTableAccessor(qualifiedFromTableName);
-        TableFormBuilder tableFormBuilder =
-                new TableFormBuilder(relatedTableAccessor);
-        tableFormBuilder.configNRows(relatedObjects.size());
-        TableForm tableForm = tableFormBuilder
-                .configMode(Mode.VIEW)
-                .build();
-        tableForm.readFromObject(relatedObjects);
-
-        RelatedTableForm relatedTableForm =
-                new RelatedTableForm(relationship, tableForm, relatedObjects);
-        relatedTableFormList.add(relatedTableForm);
     }
 
 }
