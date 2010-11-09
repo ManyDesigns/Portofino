@@ -134,14 +134,14 @@ public class PortletDesignAction extends PortofinoAction {
     public String execute() {
         if (portletName == null) {
             portletName = model.getPortlets().get(0).getName();
-            return "redirectToPortlet";
+            return REDIRECT_TO_FIRST;
         }
 
         setupPortlet();
 
         form = new FormBuilder(Portlet.class)
                 .configFields("name", "title", "legend", "database",
-                        "sql", "urlExpression")
+                        "query", "urlExpression")
                 .configMode(Mode.VIEW)
                 .build();
         form.readFromObject(portlet);

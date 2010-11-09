@@ -32,6 +32,12 @@ package com.manydesigns.elements.struts2;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.ActionProxy;
+import com.opensymphony.xwork2.util.ValueStack;
+import com.opensymphony.xwork2.util.CompoundRoot;
+import com.manydesigns.elements.ElementsThreadLocals;
+import ognl.OgnlContext;
+import ognl.Ognl;
+import ognl.OgnlException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -65,5 +71,16 @@ public class Struts2Util {
         return sb.toString();
     }
 
-    
+    public static ValueStack getValueStack() {
+        ActionContext actionContext = ActionContext.getContext();
+        return actionContext.getValueStack();
+    }
+
+    public static Object getValue(String expression) throws OgnlException {
+        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+        ValueStack valueStack = Struts2Util.getValueStack();
+        CompoundRoot root = valueStack.getRoot();
+        return Ognl.getValue(expression, ognlContext, root);
+
+    }
 }

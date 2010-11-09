@@ -43,6 +43,12 @@ public class Button implements ModelObject {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
+    // Constants
+    //**************************************************************************
+
+    public final static String DEFAULT_BUTTON_METHOD = "button";
+
+    //**************************************************************************
     // Fields
     //**************************************************************************
 
@@ -50,6 +56,15 @@ public class Button implements ModelObject {
 
     protected String name;
     protected String label;
+    protected String method;
+    protected String guard;
+    protected String script;
+
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
+    protected String actualMethod;
 
     //**************************************************************************
     // Constructors
@@ -65,13 +80,26 @@ public class Button implements ModelObject {
         this.label = label;
     }
 
+    public Button(UseCase useCase, String name, String label,
+                  String guard, String script) {
+        this(useCase, name, label);
+        this.guard = guard;
+        this.script = script;
+    }
+
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
 
-    public void reset() {}
+    public void reset() {
+        actualMethod = null;
+    }
 
-    public void init(Model model) {}
+    public void init(Model model) {
+        actualMethod = (method == null)
+                ? DEFAULT_BUTTON_METHOD
+                : method;
+    }
 
     public String getQualifiedName() {
         return String.format("%s*%s", useCase.getQualifiedName(), name);
@@ -101,5 +129,40 @@ public class Button implements ModelObject {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    @XmlAttribute(required = false)
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    @XmlAttribute(required = false)
+    public String getGuard() {
+        return guard;
+    }
+
+    public void setGuard(String guard) {
+        this.guard = guard;
+    }
+
+    @XmlAttribute(required = false)
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
+    }
+
+    public String getActualMethod() {
+        return actualMethod;
+    }
+
+    public void setActualMethod(String actualMethod) {
+        this.actualMethod = actualMethod;
     }
 }

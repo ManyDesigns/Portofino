@@ -34,6 +34,8 @@ import com.manydesigns.portofino.interceptors.ContextAware;
 import com.manydesigns.portofino.interceptors.NavigationAware;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.navigation.Navigation;
+import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.opensymphony.xwork2.ActionSupport;
 
 /*
@@ -104,6 +106,34 @@ public class PortofinoAction extends ActionSupport
 
     public void setNavigation(Navigation navigation) {
         this.navigation = navigation;
+    }
+
+    //**************************************************************************
+    // Simplified access to SessionMessages
+    //**************************************************************************
+
+    public void addInfoMessage(String message) {
+        SessionMessages.addInfoMessage(message);
+    }
+
+    public void addInfoMessage(XhtmlBuffer xb) {
+        SessionMessages.addInfoMessage(xb);
+    }
+
+    public void addWarningMessage(String message) {
+        SessionMessages.addWarningMessage(message);
+    }
+
+    public void addWarningMessage(XhtmlBuffer xb) {
+        SessionMessages.addWarningMessage(xb);
+    }
+
+    public void addErrorMessage(String message) {
+        SessionMessages.addErrorMessage(message);
+    }
+
+    public void addErrorMessage(XhtmlBuffer xb) {
+        SessionMessages.addErrorMessage(xb);
     }
 
     //**************************************************************************

@@ -1211,7 +1211,11 @@
                 <property name="descn"/>
             </properties>
             <buttons>
-                <button name="customButton1" label="Custom button"/>
+                <button name="customButton1" method="customButton1" label="Custom button 1"/>
+                <button name="customButton2"
+                        label="Custom button 2"
+                        script="addInfoMessage('Button pressed!'), search()"
+                        guard=""/>
             </buttons>
             <subUseCases>
                 <useCase name="usecase3"

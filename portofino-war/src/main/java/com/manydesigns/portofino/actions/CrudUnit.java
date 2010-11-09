@@ -54,11 +54,12 @@ import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.usecases.Button;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
-import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.util.CompoundRoot;
 import com.opensymphony.xwork2.util.ValueStack;
+import ognl.OgnlException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -82,13 +83,6 @@ public class CrudUnit {
     // Fields
     //--------------------------------------------------------------------------
 
-    public Context context;
-    public Model model;
-    public HttpServletRequest req;
-    public String pk;
-    public String[] selection;
-    public String searchString;
-
     public final ClassAccessor classAccessor;
     public final Table baseTable;
     public final String query;
@@ -98,6 +92,15 @@ public class CrudUnit {
     public final String editTitle;
     public final PkHelper pkHelper;
     public final List<CrudUnit> subCrudUnits;
+    public final List<Button> buttons;
+
+    public Context context;
+    public Model model;
+    public HttpServletRequest req;
+    public String pk;
+    public String[] selection;
+    public String searchString;
+
     public List objects;
     public Object object;
     public SearchForm searchForm;
@@ -126,6 +129,7 @@ public class CrudUnit {
                     String readTitle,
                     String editTitle
     ) {
+        this.buttons = new ArrayList<Button>();
         this.classAccessor = classAccessor;
         this.baseTable = baseTable;
         this.query = query;
@@ -206,8 +210,7 @@ public class CrudUnit {
     }
 
     public void setupCriteria() {
-        ActionContext actionContext = ActionContext.getContext();
-        ValueStack valueStack = actionContext.getValueStack();
+        ValueStack valueStack = Struts2Util.getValueStack();
         CompoundRoot root = valueStack.getRoot();
 
         Criteria criteria = new Criteria(classAccessor);
@@ -288,8 +291,7 @@ public class CrudUnit {
         refreshBlobDownloadHref();
 
 
-        ActionContext actionContext = ActionContext.getContext();
-        ValueStack valueStack = actionContext.getValueStack();
+        ValueStack valueStack = Struts2Util.getValueStack();
 
         valueStack.push(object);
         for (CrudUnit subCrudUnit : subCrudUnits) {
@@ -469,6 +471,21 @@ public class CrudUnit {
                 "DELETE di {0} oggetti avvenuto con successo",
                 selection.length));
         return PortofinoAction.DELETE;
+    }
+
+    //**************************************************************************
+    // Button
+    //**************************************************************************
+
+    public String button() throws OgnlException {
+        String value = req.getParameter("method:button");
+        for (Button button : buttons) {
+            if (button.getLabel().equals(value)) {
+                String script = button.getScript();
+                return (String) Struts2Util.getValue(script);
+            }
+        }
+        throw new Error("No button found");
     }
 
     //**************************************************************************

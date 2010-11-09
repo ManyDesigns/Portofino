@@ -34,6 +34,7 @@ import com.manydesigns.elements.blobs.BlobsManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.opensymphony.xwork2.ModelDriven;
 import com.opensymphony.xwork2.Preparable;
+import ognl.OgnlException;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,7 +50,7 @@ import java.util.logging.Logger;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public abstract class AbstractCrudAction extends PortofinoAction
-        implements ServletRequestAware, Preparable, ModelDriven {
+        implements ServletRequestAware, Preparable, ModelDriven<CrudUnit> {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -62,6 +63,7 @@ public abstract class AbstractCrudAction extends PortofinoAction
     //**************************************************************************
     // ServletRequestAware implementation
     //**************************************************************************
+
     public HttpServletRequest req;
 
     public void setServletRequest(HttpServletRequest req) {
@@ -238,6 +240,14 @@ public abstract class AbstractCrudAction extends PortofinoAction
 
     public String cancel() {
         return CANCEL;
+    }
+
+    //**************************************************************************
+    // Button
+    //**************************************************************************
+
+    public String button() throws OgnlException {
+        return rootCrudUnit.button();
     }
 
     //**************************************************************************
