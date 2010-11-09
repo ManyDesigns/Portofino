@@ -121,7 +121,7 @@ CREATE TABLE public.users (
     lastfailedlogindate timestamp,
     failedloginattempts integer,
     agreedtoterms boolean,
-    state integer NOT NULL,
+    state long NOT NULL,
     bounced integer,
     token character varying(100),
     remquestion character varying(255),

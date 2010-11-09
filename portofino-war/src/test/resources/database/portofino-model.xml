@@ -5,7 +5,7 @@
             <schemas>
                 <schema schemaName="public">
                     <tables>
-                        <table table="users"
+                        <table tableName="users"
                                javaClass="com.manydesigns.portofino.system.model.users.User">
                             <columns>
                                 <column columnName="userid"
@@ -14,7 +14,7 @@
                                         length="8"
                                         scale="0"
                                         nullable="false"
-                                        propertyName="uuid"
+                                        propertyName="userId"
                                         autoincrement="true"
                                         searchable="true">
                                 </column>
@@ -36,7 +36,7 @@
                                         javaType="java.lang.String"
                                         length="50"
                                         scale="0"
-                                        nullable="false"
+                                        nullable="true"
                                         autoincrement="false"
                                         searchable="false"
                                         >
@@ -46,14 +46,14 @@
                                 </column>
 
                                 <column columnName="state"
-                                        columnType="INTEGER"
-                                        javaType="java.lang.Integer"
-                                        length="8"
+                                        columnType="bigint"
+                                        javaType="java.lang.Long"
+                                        length="19"
                                         scale="0"
                                         nullable="false"
                                         autoincrement="false"
                                         searchable="true"
-                                        propertyName="stateId"/>
+                                        />
                                 <column columnName="token"
                                         columnType="varchar"
                                         javaType="java.lang.String"
@@ -165,7 +165,7 @@
                                         /> 
                                 <column columnName="creationdate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="15"
                                         scale="0"
                                         nullable="true"
@@ -175,7 +175,7 @@
                                         />
                                 <column columnName="deletiondate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         autoincrement="false"
@@ -185,7 +185,7 @@
                                         />
                                 <column columnName="modifieddate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         autoincrement="false"
@@ -194,7 +194,7 @@
                                         propertyName="modifiedDate"/>
                                 <column columnName="lastpwdmoddate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         autoincrement="false"
@@ -203,7 +203,7 @@
                                         propertyName="pwdModDate"/>
                                 <column columnName="lastlogindate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         autoincrement="false"
@@ -212,7 +212,7 @@
                                         propertyName="lastLoginDate"/>
                                 <column columnName="lastfailedlogindate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         autoincrement="false"
@@ -253,11 +253,6 @@
                             <primaryKey primaryKeyName="pk_user">
                                 <column columnName="userid"/>
                             </primaryKey>
-                            <annotations>
-                                <annotation type="com.manydesigns.elements.annotations.ShortName">
-                                    <value>%{userName} (%{email})</value>
-                                </annotation>
-                            </annotations>
                             <foreignKeys>
                                 <foreignKey foreignKeyName="fk_user_1"
                                             toDatabase="portofino"
@@ -268,19 +263,24 @@
                                             manyPropertyName="users"
                                             onePropertyName="state">
                                     <references>
-                                        <reference fromColumn="creatorid"
-                                                   toColumn="uuid"/>
+                                        <reference fromColumn="state"
+                                                   toColumn="id"/>
                                     </references>
                                 </foreignKey>
                             </foreignKeys>
+                            <annotations>
+                                <annotation type="com.manydesigns.elements.annotations.ShortName">
+                                    <value>%{userName} (%{email})</value>
+                                </annotation>
+                            </annotations>
                         </table>
-                        <table table="groups"
+                        <table tableName="groups"
                                javaClass="com.manydesigns.portofino.system.model.users.Group">
                             <columns>
                                 <column columnName="groupid"
                                         autoincrement="true"
                                         columnType="IDENTITY"
-                                        javaType="java.lang.Integer"
+                                        javaType="java.lang.Long"
                                         length="8"
                                         scale="0"
                                         nullable="false"
@@ -321,7 +321,7 @@
                                         propertyName="creatorId"/>
                                 <column columnName="deletiondate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.util.Timestamp"
                                         length="29"
                                         scale="6"
                                         nullable="true"
@@ -330,7 +330,7 @@
                                         propertyName="deletionDate"/>
                                 <column columnName="creationdate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.util.Timestamp"
                                         length="29"
                                         scale="6"
                                         nullable="true"
@@ -352,7 +352,7 @@
                                             onePropertyName="creatorId">
                                     <references>
                                         <reference fromColumn="creatorid"
-                                                   toColumn="uuid"/>
+                                                   toColumn="userid"/>
                                     </references>
                                 </foreignKey>
                             </foreignKeys>
@@ -362,7 +362,7 @@
                                 </annotation>
                             </annotations>
                         </table>
-                        <table table="users_groups" manyToMany="true" javaClass="com.manydesigns.portofino.system.model.users.UsersGroups"
+                        <table tableName="users_groups" manyToMany="true" javaClass="com.manydesigns.portofino.system.model.users.UsersGroups"
                                >
                             <columns>
                                 <column columnName="userid"
@@ -440,7 +440,7 @@
                             </foreignKeys>
                         </table>
 
-                        <table table="emailstate">
+                        <table tableName="emailstate">
                             <columns>
                                 <column columnName="id"
                                         columnType="IDENTITY"
@@ -474,7 +474,7 @@
                                 <column columnName="id"/>
                             </primaryKey>
                         </table>
-                        <table table="emailqueue" javaClass="com.manydesigns.portofino.system.model.email.EmailBean">
+                        <table tableName="emailqueue" javaClass="com.manydesigns.portofino.system.model.email.EmailBean">
                             <columns>
                                 <column columnName="id"
                                         columnType="IDENTITY"
@@ -586,7 +586,7 @@
                             <columns>
                                 <column autoincrement="true"
                                         columnName="id"
-                                        columnType="bigserial"
+                                        columnType="identity"
                                         javaType="java.lang.Long"
                                         length="19"
                                         nullable="false"
@@ -621,7 +621,7 @@
             <schemas>
                 <schema schemaName="public">
                     <tables>
-                         <table table="lineitem">
+                         <table tableName="lineitem">
                             <columns>
                                 <column columnName="orderid"
                                         columnType="INTEGER"
@@ -669,7 +669,7 @@
                                 <column columnName="linenum"/>
                             </primaryKey>
                         </table>
-                        <table table="category">
+                        <table tableName="category">
                             <columns>
                                 <column columnName="catid"
                                         columnType="varchar"
@@ -700,7 +700,7 @@
                                 <column columnName="catid"/>
                             </primaryKey>
                         </table>
-                        <table table="product">
+                        <table tableName="product">
                             <columns>
                                 <column columnName="productid"
                                         columnType="varchar"
@@ -766,7 +766,7 @@
             <schemas>
                 <schema schemaName="public">
                     <tables>
-                        <table table="table1">
+                        <table tableName="table1">
                             <columns>
                                 <column columnName="id"
                                         columnType="IDENTITY"
@@ -789,7 +789,7 @@
                                 <column columnName="id"/>
                             </primaryKey>
                         </table>
-                        <table table="table4">
+                        <table tableName="table4">
                             <columns>
                                 <column columnName="id"
                                         columnType="IDENTITY"
@@ -812,7 +812,7 @@
                                 <column columnName="id"/>
                             </primaryKey>
                         </table>
-                        <table table="table2">
+                        <table tableName="table2">
                             <columns>
                                 <column columnName="id1"
                                         columnType="varchar"
@@ -844,7 +844,7 @@
                                 <column columnName="id2"/>
                             </primaryKey>
                         </table>
-                        <table table="table3" manyToMany="true">
+                        <table tableName="table3" manyToMany="true">
                             <columns>
                                 <column columnName="id"
                                         columnType="IDENTITY"
@@ -928,7 +928,7 @@
                                 </foreignKey>
                             </foreignKeys>
                         </table>
-                        <table table="comune">
+                        <table tableName="comune">
                             <columns>
                                 <column columnName="regione"
                                         columnType="varchar"
@@ -961,7 +961,7 @@
                                 <column columnName="comune"/>
                             </primaryKey>
                         </table>
-                        <table table="domanda">
+                        <table tableName="domanda">
                             <columns>
                                 <column columnName="protocollo"
                                         columnType="varchar"
@@ -1083,7 +1083,7 @@
     <useCases>
         <useCase name="usecase1"
                  title="Products in category: FISH"
-                 tableName="jpetstore.public.product"
+                 table="jpetstore.public.product"
                  filter="from jpetstore.public.product product where product.category = %{'FISH'}">
             <properties>
                 <property name="productid">
