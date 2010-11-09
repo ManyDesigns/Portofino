@@ -27,12 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.model.portlets;
+package com.manydesigns.portofino.model.usecases;
 
-import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
 /*
@@ -40,7 +38,7 @@ import com.manydesigns.portofino.xml.XmlAttribute;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Portlet implements ModelObject {
+public class Button implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -48,57 +46,44 @@ public class Portlet implements ModelObject {
     // Fields
     //**************************************************************************
 
+    protected final UseCase useCase;
+
     protected String name;
-    protected String type;
-    protected String title;
-    protected String legend;
-    protected String database;
-    protected String query;
-    protected String urlExpression;
-
-    //**************************************************************************
-    // Fields for wire-up
-    //**************************************************************************
-
-    protected Database actualDatabase;
+    protected String label;
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
+    public Button(UseCase useCase) {
+        this.useCase = useCase;
+    }
 
-    public Portlet() {}
-
-    public Portlet(String name, String type, String title, String legend,
-                   String database, String query, String urlExpression) {
+    public Button(UseCase useCase, String name, String label) {
+        this(useCase);
         this.name = name;
-        this.type = type;
-        this.title = title;
-        this.legend = legend;
-        this.database = database;
-        this.query = query;
-        this.urlExpression = urlExpression;
+        this.label = label;
     }
 
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
 
-    public void reset() {
-        actualDatabase = null;
-    }
+    public void reset() {}
 
-    public void init(Model model) {
-        actualDatabase = model.findDatabaseByName(database);
-    }
+    public void init(Model model) {}
 
     public String getQualifiedName() {
-        return null;
+        return String.format("%s*%s", useCase.getQualifiedName(), name);
     }
 
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
+
+    public UseCase getUseCase() {
+        return useCase;
+    }
 
     @XmlAttribute(required = true)
     public String getName() {
@@ -110,66 +95,11 @@ public class Portlet implements ModelObject {
     }
 
     @XmlAttribute(required = true)
-    public String getType() {
-        return type;
+    public String getLabel() {
+        return label;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @XmlAttribute(required = true)
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    @XmlAttribute(required = true)
-    public String getLegend() {
-        return legend;
-    }
-
-    public void setLegend(String legend) {
-        this.legend = legend;
-    }
-
-    @XmlAttribute(required = true)
-    public String getDatabase() {
-        return database;
-    }
-
-    public void setDatabase(String database) {
-        this.database = database;
-    }
-
-    @Label("SQL")
-    @XmlAttribute(required = true)
-    public String getQuery() {
-        return query;
-    }
-
-    public void setQuery(String query) {
-        this.query = query;
-    }
-
-    @Label("URL expression")
-    @XmlAttribute(required = true)
-    public String getUrlExpression() {
-        return urlExpression;
-    }
-
-    public void setUrlExpression(String urlExpression) {
-        this.urlExpression = urlExpression;
-    }
-
-    public Database getActualDatabase() {
-        return actualDatabase;
-    }
-
-    public void setActualDatabase(Database actualDatabase) {
-        this.actualDatabase = actualDatabase;
+    public void setLabel(String label) {
+        this.label = label;
     }
 }

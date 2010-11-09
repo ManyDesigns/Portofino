@@ -56,11 +56,12 @@ public class UseCase implements ModelObject {
     protected final UseCase parentUseCase;
     protected final List<UseCaseProperty> properties;
     protected final List<ModelAnnotation> modelAnnotations;
+    protected final List<Button> buttons;
     protected final List<UseCase> subUseCases;
 
     protected String name;
     protected String table;
-    protected String filter;
+    protected String query;
     protected String searchTitle;
     protected String createTitle;
     protected String readTitle;
@@ -80,17 +81,18 @@ public class UseCase implements ModelObject {
         this.parentUseCase = parentUseCase;
         properties = new ArrayList<UseCaseProperty>();
         modelAnnotations = new ArrayList<ModelAnnotation>();
+        buttons = new ArrayList<Button>();
         subUseCases = new ArrayList<UseCase>();
     }
 
     public UseCase(UseCase parentUseCase,
-                   String name, String table, String filter,
+                   String name, String table, String query,
                    String searchTitle, String createTitle,
                    String readTitle, String editTitle) {
         this(parentUseCase);
         this.name = name;
         this.table = table;
-        this.filter = filter;
+        this.query = query;
         this.searchTitle = searchTitle;
         this.createTitle = createTitle;
         this.readTitle = readTitle;
@@ -107,6 +109,10 @@ public class UseCase implements ModelObject {
         for (UseCase subUseCase : subUseCases) {
             subUseCase.reset();
         }
+
+        for (Button button : buttons) {
+            button.reset();
+        }
     }
 
     public void init(Model model) {
@@ -114,6 +120,10 @@ public class UseCase implements ModelObject {
 
         for (UseCase subUseCase : subUseCases) {
             subUseCase.init(model);
+        }
+
+        for (Button button : buttons) {
+            button.init(model);
         }
     }
 
@@ -137,6 +147,10 @@ public class UseCase implements ModelObject {
 
     public List<UseCaseProperty> getProperties() {
         return properties;
+    }
+
+    public List<Button> getButtons() {
+        return buttons;
     }
 
     public List<ModelAnnotation> getModelAnnotations() {
@@ -175,12 +189,12 @@ public class UseCase implements ModelObject {
     }
 
     @XmlAttribute(required = true)
-    public String getFilter() {
-        return filter;
+    public String getQuery() {
+        return query;
     }
 
-    public void setFilter(String filter) {
-        this.filter = filter;
+    public void setQuery(String query) {
+        this.query = query;
     }
 
     @XmlAttribute(required = false)

@@ -7,6 +7,7 @@ import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.portlets.Portlet;
 import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.usecases.Button;
 import com.manydesigns.portofino.model.usecases.UseCase;
 import com.manydesigns.portofino.model.usecases.UseCaseProperty;
 import com.manydesigns.portofino.xml.CharactersCallback;
@@ -60,6 +61,8 @@ public class ModelParser extends XmlParser {
     public static final String PORTLET = "portlet";
     public static final String USECASES = "useCases";
     public static final String USECASE = "useCase";
+    public static final String BUTTONS = "buttons";
+    public static final String BUTTON = "button";
     public static final String SUBUSECASE = "subUseCases";
     public static final String PROPERTIES = "properties";
     public static final String PROPERTY = "property";
@@ -371,7 +374,9 @@ public class ModelParser extends XmlParser {
             checkAndSetAttributes(currentUseCase, attributes);
 
             expectElement(PROPERTIES, 0, 1, new PropertiesCallback());
-            
+
+            expectElement(BUTTONS, 0, 1, new ButtonsCallback());
+
             currentModelAnnotations = currentUseCase.getModelAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
 
@@ -398,6 +403,23 @@ public class ModelParser extends XmlParser {
 
             currentModelAnnotations = useCaseProperty.getAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
+        }
+    }
+
+    private class ButtonsCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(BUTTON, 0, null, new ButtonCallback());
+        }
+    }
+
+    private class ButtonCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            UseCase currentUseCase = useCaseStack.peek();
+            Button button = new Button(currentUseCase);
+            checkAndSetAttributes(button, attributes);
+            currentUseCase.getButtons().add(button);
         }
     }
 

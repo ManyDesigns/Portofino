@@ -1115,14 +1115,14 @@
                  title="Title 1"
                  legend="category"
                  database="jpetstore"
-                 sql="select category, count(*) from product where %{'pippo'} is not null group by category order by category"
+                 query="select category, count(*) from product where %{'pippo'} is not null group by category order by category"
                  urlExpression="http://www.google.com/search?q=%{key}"
                 />
     </portlets>
     <useCases>
         <useCase name="usecase1"
                  table="jpetstore.public.product"
-                 filter="from jpetstore.public.product product where product.category = %{'FISH'}"
+                 query="from jpetstore.public.product product where product.category = %{'FISH'}"
                  searchTitle="Products in category FISH"
                  createTitle="Create product in category FISH"
                  readTitle="Product in category FISH"
@@ -1200,7 +1200,7 @@
         </useCase>
         <useCase name="usecase2"
                  table="jpetstore.public.category"
-                 filter="from jpetstore.public.category"
+                 query="from jpetstore.public.category"
                  searchTitle="Categories"
                  createTitle="Create new category"
                  readTitle="Category"
@@ -1210,10 +1210,13 @@
                 <property name="name"/>
                 <property name="descn"/>
             </properties>
+            <buttons>
+                <button name="customButton1" label="Custom button"/>
+            </buttons>
             <subUseCases>
                 <useCase name="usecase3"
                          table="jpetstore.public.product"
-                         filter="from jpetstore.public.product product where product.category = %{catid}"
+                         query="from jpetstore.public.product product where product.category = %{catid}"
                          searchTitle="Products in category">
                     <properties>
                         <property name="productid"/>

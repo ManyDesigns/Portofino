@@ -179,7 +179,7 @@ public class PortletDesignAction extends PortofinoAction {
         DefaultPieDataset dataset = new DefaultPieDataset();
         java.util.List<Object[]> result;
         try {
-            result = context.runSql(portlet.getDatabase(), portlet.getSql());
+            result = context.runSql(portlet.getDatabase(), portlet.getQuery());
             for (Object[] current : result) {
                 dataset.setValue((Comparable)current[0], (Number)current[1]);
             }
