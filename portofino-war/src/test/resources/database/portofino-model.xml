@@ -14,7 +14,7 @@
                                         length="8"
                                         scale="0"
                                         nullable="false"
-                                        propertyName="uuid"
+                                        propertyName="userId"
                                         autoincrement="true"
                                         searchable="true">
                                 </column>
@@ -36,7 +36,7 @@
                                         javaType="java.lang.String"
                                         length="50"
                                         scale="0"
-                                        nullable="false"
+                                        nullable="true"
                                         autoincrement="false"
                                         searchable="false"
                                         >
@@ -46,14 +46,14 @@
                                 </column>
 
                                 <column columnName="state"
-                                        columnType="INTEGER"
-                                        javaType="java.lang.Integer"
-                                        length="8"
+                                        columnType="bigint"
+                                        javaType="java.lang.Long"
+                                        length="19"
                                         scale="0"
                                         nullable="false"
                                         autoincrement="false"
                                         searchable="true"
-                                        propertyName="stateId"/>
+                                        />
                                 <column columnName="token"
                                         columnType="varchar"
                                         javaType="java.lang.String"
@@ -165,7 +165,7 @@
                                         /> 
                                 <column columnName="creationdate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="15"
                                         scale="0"
                                         nullable="true"
@@ -175,7 +175,7 @@
                                         />
                                 <column columnName="deletiondate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         autoincrement="false"
@@ -185,7 +185,7 @@
                                         />
                                 <column columnName="modifieddate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         autoincrement="false"
@@ -194,7 +194,7 @@
                                         propertyName="modifiedDate"/>
                                 <column columnName="lastpwdmoddate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         autoincrement="false"
@@ -203,7 +203,7 @@
                                         propertyName="pwdModDate"/>
                                 <column columnName="lastlogindate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         autoincrement="false"
@@ -212,7 +212,7 @@
                                         propertyName="lastLoginDate"/>
                                 <column columnName="lastfailedlogindate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         autoincrement="false"
@@ -263,8 +263,8 @@
                                             manyPropertyName="users"
                                             onePropertyName="state">
                                     <references>
-                                        <reference fromColumn="creatorid"
-                                                   toColumn="uuid"/>
+                                        <reference fromColumn="state"
+                                                   toColumn="id"/>
                                     </references>
                                 </foreignKey>
                             </foreignKeys>
@@ -280,7 +280,7 @@
                                 <column columnName="groupid"
                                         autoincrement="true"
                                         columnType="IDENTITY"
-                                        javaType="java.lang.Integer"
+                                        javaType="java.lang.Long"
                                         length="8"
                                         scale="0"
                                         nullable="false"
@@ -321,7 +321,7 @@
                                         propertyName="creatorId"/>
                                 <column columnName="deletiondate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.util.Timestamp"
                                         length="29"
                                         scale="6"
                                         nullable="true"
@@ -330,7 +330,7 @@
                                         propertyName="deletionDate"/>
                                 <column columnName="creationdate"
                                         columnType="timestamp"
-                                        javaType="java.util.Date"
+                                        javaType="java.util.Timestamp"
                                         length="29"
                                         scale="6"
                                         nullable="true"
@@ -352,7 +352,7 @@
                                             onePropertyName="creatorId">
                                     <references>
                                         <reference fromColumn="creatorid"
-                                                   toColumn="uuid"/>
+                                                   toColumn="userid"/>
                                     </references>
                                 </foreignKey>
                             </foreignKeys>
@@ -586,7 +586,7 @@
                             <columns>
                                 <column autoincrement="true"
                                         columnName="id"
-                                        columnType="bigserial"
+                                        columnType="identity"
                                         javaType="java.lang.Long"
                                         length="19"
                                         nullable="false"
