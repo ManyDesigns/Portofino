@@ -40,7 +40,7 @@
               onclick="return confirm ('Are you sure?');"/>
     <s:submit id="Table_duplicate" method="duplicate" value="Duplicate" disabled="true"/>
     <s:submit id="Table_print" method="print" value="Print" disabled="true"/>
-    <s:submit id="Table_export" method="exportRead" value="Export" disabled="false"/>
+    <s:submit id="Table_export" method="exportReadExcel" value="Export" disabled="false"/>
     <s:iterator var="button" value="buttons">
         <s:submit id="%{#button.name}" method="%{#button.actualMethod}" value="%{#button.label}"/>
     </s:iterator>

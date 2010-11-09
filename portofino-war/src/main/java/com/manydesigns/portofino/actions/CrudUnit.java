@@ -32,9 +32,7 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.blobs.Blob;
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.FileBlobField;
-import com.manydesigns.elements.fields.SelectField;
+import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.logging.LogUtil;
@@ -59,12 +57,26 @@ import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
 import com.opensymphony.xwork2.util.CompoundRoot;
 import com.opensymphony.xwork2.util.ValueStack;
+import jxl.Workbook;
+import jxl.write.*;
+import jxl.write.Number;
+import jxl.write.biff.RowsExceededException;
 import ognl.OgnlException;
+import org.apache.fop.apps.FOPException;
+import org.apache.fop.apps.Fop;
+import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.MimeConstants;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.Serializable;
+import javax.xml.transform.*;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -183,7 +195,7 @@ public class CrudUnit {
             searchString = null;
         }
 
-        setupCriteria();
+        loadObjectsFromCriteria();
 
         String readLinkExpression = getReadLinkExpression();
         OgnlTextFormat hrefFormat =
@@ -209,7 +221,7 @@ public class CrudUnit {
         return PortofinoAction.SEARCH;
     }
 
-    public void setupCriteria() {
+    public void loadObjectsFromCriteria() {
         ValueStack valueStack = Struts2Util.getValueStack();
         CompoundRoot root = valueStack.getRoot();
 
@@ -272,12 +284,10 @@ public class CrudUnit {
     public String read() {
         Serializable pkObject = pkHelper.parsePkString(pk);
 
-        SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(classAccessor);
-        searchForm = searchFormBuilder.build();
+        buildSearchForm();
         configureSearchFormFromString();
 
-        setupCriteria();
+        loadObjectsFromCriteria();
 
         object = context.getObjectByPk(
                 baseTable.getQualifiedName(), pkObject);
@@ -361,10 +371,7 @@ public class CrudUnit {
     //**************************************************************************
 
     public String edit() {
-        Serializable pkObject = pkHelper.parsePkString(pk);
-
-        object = context.getObjectByPk(
-                baseTable.getQualifiedName(), pkObject);
+        loadObject(pk);
 
         form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.EDIT)
@@ -376,14 +383,11 @@ public class CrudUnit {
     }
 
     public String update() {
-        Serializable pkObject = pkHelper.parsePkString(pk);
-
         form = createFormBuilderWithSelectionProviders()
                 .configMode(Mode.EDIT)
                 .build();
 
-        object = context.getObjectByPk(
-                baseTable.getQualifiedName(), pkObject);
+        loadObject();
         form.readFromObject(object);
         form.readFromRequest(req);
         if (form.validate()) {
@@ -427,9 +431,7 @@ public class CrudUnit {
         form.readFromRequest(req);
         if (form.validate()) {
             for (String current : selection) {
-                Serializable pkObject = pkHelper.parsePkString(current);
-                object = context.getObjectByPk(
-                        baseTable.getQualifiedName(), pkObject);
+                loadObject(current);
                 form.writeToObject(object);
             }
             form.writeToObject(object);
@@ -442,6 +444,15 @@ public class CrudUnit {
         } else {
             return PortofinoAction.BULK_EDIT;
         }
+    }
+
+    private void loadObject() {
+        loadObject(pk);
+    }
+
+    private void loadObject(String pk) {
+        Serializable pkObject = pkHelper.parsePkString(pk);
+        object = context.getObjectByPk(baseTable.getQualifiedName(), pkObject);
     }
 
     //**************************************************************************
@@ -601,6 +612,321 @@ public class CrudUnit {
     }
 
 
+
+    //**************************************************************************
+    // ExportSearch
+    //**************************************************************************
+
+    public void exportSearchExcel(File fileTemp) {
+        buildSearchForm();
+        searchForm.readFromRequest(req);
+
+        loadObjectsFromCriteria();
+
+        TableFormBuilder tableFormBuilder =
+            createTableFormBuilderWithSelectionProviders()
+                            .configNRows(objects.size());
+        tableForm = tableFormBuilder.configMode(Mode.VIEW)
+                .build();
+        tableForm.readFromObject(objects);
+
+        writeFileSearchExcel(fileTemp);
+    }
+
+    private void writeFileSearchExcel(File fileTemp) {
+        WritableWorkbook workbook = null;
+        try {
+            workbook = Workbook.createWorkbook(fileTemp);
+            WritableSheet sheet =
+                    workbook.createSheet(classAccessor.getName(), 0);
+
+            addHeaderToSheet(sheet);
+
+            int i = 1;
+            for ( TableForm.Row row : tableForm.getRows()) {
+                exportRows(sheet, i, row);
+                i++;
+            }
+
+            workbook.write();
+        } catch (IOException e) {
+            LogUtil.warning(logger, "IOException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } catch (RowsExceededException e) {
+            LogUtil.warning(logger, "RowsExceededException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } catch (WriteException e) {
+            LogUtil.warning(logger, "WriteException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } finally {
+            try {
+                if (workbook != null)
+                    workbook.close();
+            }
+            catch (Exception e) {
+                LogUtil.warning(logger, "IOException", e);
+                SessionMessages.addErrorMessage(e.getMessage());
+            }
+        }
+    }
+
+    //**************************************************************************
+    // ExportRead
+    //**************************************************************************
+
+    public void exportReadExcel(WritableWorkbook workbook)
+            throws IOException, WriteException {
+        buildSearchForm();
+        configureSearchFormFromString();
+
+        loadObjectsFromCriteria();
+        loadObject();
+
+        TableFormBuilder tableFormBuilder =
+            createTableFormBuilderWithSelectionProviders()
+                            .configMode(Mode.VIEW)
+                            .configNRows(objects.size());
+        tableForm = tableFormBuilder.build();
+        tableForm.readFromObject(object);
+
+        form = createFormBuilderWithSelectionProviders()
+                .configMode(Mode.VIEW)
+                .build();
+        form.readFromObject(object);
+
+        writeFileReadExcel(workbook);
+    }
+
+
+    private void writeFileReadExcel(WritableWorkbook workbook)
+            throws IOException, WriteException {
+        WritableSheet sheet =
+                workbook.createSheet(classAccessor.getName(),
+                        workbook.getNumberOfSheets());
+
+        addHeaderToSheet(sheet);
+
+        int i = 1;
+        for (FieldSet fieldset : form) {
+            int j = 0;
+            for (Field field : fieldset) {
+                addFieldToCell(sheet, i, j, field);
+                j++;
+            }
+            i++;
+        }
+
+        ValueStack valueStack = Struts2Util.getValueStack();
+        valueStack.push(object);
+
+        //Aggiungo le relazioni/sheet
+        WritableCellFormat formatCell = headerExcel();
+        for (CrudUnit subCrudUnit: subCrudUnits) {
+            subCrudUnit.buildSearchForm();
+            subCrudUnit.loadObjectsFromCriteria();
+            TableFormBuilder tableFormBuilder =
+                    subCrudUnit.createTableFormBuilderWithSelectionProviders();
+            TableForm subTableForm = tableFormBuilder
+                    .configNRows(subCrudUnit.objects.size())
+                    .build();
+            subTableForm.readFromObject(subCrudUnit.objects);
+
+            sheet = workbook.createSheet(subCrudUnit.searchTitle ,
+                    workbook.getNumberOfSheets());
+
+            int m = 0;
+            for (TableForm.Column col : subTableForm.getColumns()) {
+                sheet.addCell(new Label(m, 0, col.getLabel(), formatCell));
+                m++;
+            }
+            i = 1;
+            for (TableForm.Row row : subTableForm.getRows()) {
+                int j = 0;
+                for (Field field : Arrays.asList(row.getFields())) {
+                    addFieldToCell(sheet, i, j, field);
+                    j++;
+                }
+                i++;
+            }
+        }
+        
+        valueStack.pop();
+
+        workbook.write();
+    }
+
+
+    private WritableCellFormat headerExcel() {
+        WritableFont fontCell = new WritableFont(WritableFont.ARIAL, 12,
+             WritableFont.BOLD, true);
+        return new WritableCellFormat (fontCell);
+    }
+
+    private void exportRows(WritableSheet sheet, int i,
+                            TableForm.Row row) throws WriteException {
+        int j = 0;
+        for (Field field : row.getFields()) {
+            addFieldToCell(sheet, i, j, field);
+
+            j++;
+        }
+    }
+
+
+    private void addHeaderToSheet(WritableSheet sheet) throws WriteException {
+        WritableCellFormat formatCell = headerExcel();
+        int l = 0;
+        for (TableForm.Column col : tableForm.getColumns()) {
+            sheet.addCell(new Label(l, 0, col.getLabel(), formatCell));
+            l++;
+        }
+    }
+
+    private void addFieldToCell(WritableSheet sheet, int i, int j,
+                                Field field) throws WriteException {
+        if (field instanceof NumericField) {
+            NumericField numField = (NumericField) field;
+            if (numField.getDecimalValue() != null) {
+                Number number;
+                BigDecimal decimalValue = numField.getDecimalValue();
+                if (numField.getDecimalFormat() == null) {
+                    number = new Number(j, i,
+                            decimalValue == null
+                                    ? null : decimalValue.doubleValue());
+                } else {
+                    NumberFormat numberFormat = new NumberFormat(
+                            numField.getDecimalFormat().toPattern());
+                    WritableCellFormat writeCellNumberFormat =
+                            new WritableCellFormat(numberFormat);
+                    number = new Number(j, i,
+                            decimalValue == null
+                                    ? null : decimalValue.doubleValue(),
+                            writeCellNumberFormat);
+                }
+                sheet.addCell(number);
+            }
+        } else if (field instanceof PasswordField) {
+            Label label = new Label(j, i,
+                    PasswordField.PASSWORD_PLACEHOLDER);
+            sheet.addCell(label);
+        } else if (field instanceof DateField) {
+            DateField dateField = (DateField) field;
+            DateTime dateCell;
+            Date date = dateField.getDateValue();
+            if (date != null) {
+                DateFormat dateFormat = new DateFormat(
+                        dateField.getDatePattern());
+                WritableCellFormat wDateFormat =
+                        new WritableCellFormat(dateFormat);
+                dateCell = new DateTime(j, i,
+                        dateField.getDateValue() == null
+                                ? null : dateField.getDateValue(),
+                        wDateFormat);
+                sheet.addCell(dateCell);
+            }
+        } else {
+            Label label = new Label(j, i, field.getStringValue());
+            sheet.addCell(label);
+        }
+    }
+
+
+
+    //**************************************************************************
+    // ExportReadPdf
+    //**************************************************************************
+
+    public void exportSearchPdf(File tempPdfFile) throws FOPException,
+            IOException, TransformerException {
+        buildSearchForm();
+        searchForm.readFromRequest(req);
+
+        loadObjectsFromCriteria();
+
+        TableFormBuilder tableFormBuilder =
+            createTableFormBuilderWithSelectionProviders()
+                            .configNRows(objects.size());
+        tableForm = tableFormBuilder.configMode(Mode.VIEW)
+                .build();
+        tableForm.readFromObject(objects);
+
+        FopFactory fopFactory = FopFactory.newInstance();
+
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(tempPdfFile);
+
+            Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
+
+            ClassLoader cl = getClass().getClassLoader();
+            InputStream xsltStream = cl.getResourceAsStream(
+                   "templateFOP.xsl");
+
+            // Setup XSLT
+            TransformerFactory Factory = TransformerFactory.newInstance();
+            Transformer transformer = Factory.newTransformer(new StreamSource(
+                    xsltStream));
+
+            // Set the value of a <param> in the stylesheet
+            transformer.setParameter("versionParam", "2.0");
+
+            // Setup input for XSLT transformation
+            String xml = composeXml();
+            Source src = new StreamSource(new StringReader(xml));
+
+            // Resulting SAX events (the generated FO) must be piped through to
+            // FOP
+            Result res = new SAXResult(fop.getDefaultHandler());
+
+            // Start XSLT transformation and FOP processing
+            transformer.transform(src, res);
+
+            out.flush();
+        } catch (Exception e) {
+            LogUtil.warning(logger, "IOException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } finally {
+            try {
+                if (out != null)
+                    out.close();
+            }
+            catch (Exception e) {
+                LogUtil.warning(logger, "IOException", e);
+                SessionMessages.addErrorMessage(e.getMessage());
+            }
+        }
+    }
+
+    public String composeXml() {
+        // TODO: per favore usa XmlBuffer
+        StringBuffer sb = new StringBuffer();
+        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        sb.append("<class>");
+        sb.append("<table>");
+        sb.append(classAccessor.getName());
+        sb.append("</table>");
+        for (TableForm.Row row : tableForm.getRows()) {
+            for (Field field : row.getFields()) {
+                sb.append("<header>");
+                sb.append("<nameColumn>");
+                sb.append(field.getLabel());
+                sb.append("</nameColumn>");
+                sb.append("</header>");
+            }
+        }
+
+        for (TableForm.Row row : tableForm.getRows()) {
+            for (Field field : row.getFields()) {
+                sb.append("<row>");
+                sb.append("<value>");
+                sb.append(field.getStringValue());
+                sb.append("</value>");
+                sb.append("</row>");
+            }
+        }
+        sb.append("</class>");
+        return sb.toString();
+    }
 
 
 }
