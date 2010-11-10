@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.fields.*;
@@ -871,8 +872,8 @@ public class CrudUnit {
             transformer.setParameter("versionParam", "2.0");
 
             // Setup input for XSLT transformation
-            String xml = composeXml();
-            Source src = new StreamSource(new StringReader(xml));
+            Source src = new StreamSource(new StringReader(
+                    composeXml().toString()));
 
             // Resulting SAX events (the generated FO) must be piped through to
             // FOP
@@ -897,35 +898,43 @@ public class CrudUnit {
         }
     }
 
-    public String composeXml() {
-        // TODO: per favore usa XmlBuffer
-        StringBuffer sb = new StringBuffer();
-        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        sb.append("<class>");
-        sb.append("<table>");
-        sb.append(classAccessor.getName());
-        sb.append("</table>");
-        for (TableForm.Row row : tableForm.getRows()) {
-            for (Field field : row.getFields()) {
-                sb.append("<header>");
-                sb.append("<nameColumn>");
-                sb.append(field.getLabel());
-                sb.append("</nameColumn>");
-                sb.append("</header>");
-            }
-        }
+    public XmlBuffer composeXml() {
+        XmlBuffer xb = new XmlBuffer();
+        xb.writeNoHtmlEscape("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        xb.openElement("class");
+        xb.openElement("table");
+        xb.write(classAccessor.getName());
+        xb.closeElement("table");
 
+        boolean firstRun = true;
+        
         for (TableForm.Row row : tableForm.getRows()) {
-            for (Field field : row.getFields()) {
-                sb.append("<row>");
-                sb.append("<value>");
-                sb.append(field.getStringValue());
-                sb.append("</value>");
-                sb.append("</row>");
+            if ( firstRun) {
+
+                for (Field field : row.getFields()) {
+                    xb.openElement("header");
+                    xb.openElement("nameColumn");
+                    xb.write(field.getLabel());
+                    xb.closeElement("nameColumn");
+                    xb.closeElement("header");
+                }
+
+                firstRun = false;
             }
+            xb.openElement("rows");
+            for (Field field : row.getFields()) {
+                xb.openElement("row");
+                xb.openElement("value");
+                xb.write(field.getStringValue());
+                xb.closeElement("value");
+                xb.closeElement("row");
+            }
+            xb.closeElement("rows");
+
         }
-        sb.append("</class>");
-        return sb.toString();
+        xb.closeElement("class");
+        System.out.println(xb);
+        return xb;
     }
 
 
