@@ -68,7 +68,7 @@ public class UseCaseAction extends AbstractCrudAction {
         String query = useCase.getQuery();
         CrudUnit result = new CrudUnit(classAccessor, baseTable, query,
                 useCase.getSearchTitle(), useCase.getCreateTitle(),
-                useCase.getReadTitle(), useCase.getEditTitle());
+                useCase.getReadTitle(), useCase.getEditTitle(), useCase.getName());
         result.buttons.addAll(useCase.getButtons());
 
         // inject values

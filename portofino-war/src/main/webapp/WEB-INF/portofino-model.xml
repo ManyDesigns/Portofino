@@ -1231,5 +1231,71 @@
                 </useCase>
             </subUseCases>
         </useCase>
+        <useCase name="userAdmin"
+                 table="portofino.public.users"
+                 query="from portofino.public.users"
+                 searchTitle="Users"
+                 createTitle="Create new user"
+                 readTitle="User"
+                 editTitle="Edit user">
+            <properties>
+                <property name="userId"/>
+                <property name="userName"/>
+                <property name="email"/>
+                <property name="jobTitle"/>
+                <property name="firstName"/>
+                <property name="middleName"/>
+                <property name="lastName"/>
+                <property name="state"/>
+            </properties>
+            <buttons>
+                <button name="add_group"
+                        label="Add selected groups"
+                        script="addInfoMessage('Button pressed!'), search()"
+                        guard=""/>
+                <button name="rem_group"
+                        label="Remove  selected groups"
+                        script="addInfoMessage('Button pressed!'), search()"
+                        guard=""/>
+                <button name="reset"
+                        label="Reset password"
+                        script="resetPassword(), search()"
+                        guard=""/>
+            </buttons>
+            <subUseCases>
+                <useCase name="active"
+                         table="portofino.public.groups"
+                         query="from portofino.public.groups groups where groups.groupId not in (select groups2.groupId from portofino.public.users_groups ug inner join ug.group groups2 where ug.userid=%{userId} and ug.deletionDate is null) "
+                         searchTitle="Active groups">
+                    <properties>
+                        <property name="groupId"/>
+                        <property name="name"/>
+                        <property name="description"/>
+                    </properties>
+                </useCase>
+                <useCase name="current"
+                         table="portofino.public.groups"
+                         query="from portofino.public.groups groups where groups.groupId in (select groups2.groupId from portofino.public.users_groups ug inner join ug.group groups2 where ug.userid=%{userId} and ug.deletionDate is null) "
+                         searchTitle="Current groups">
+                    <properties>
+                        <property name="groupId"/>
+                        <property name="name"/>
+                        <property name="description"/>
+                    </properties>
+                </useCase>
+
+                <useCase name="past"
+                         table="portofino.public.users_groups"
+                         query="from portofino.public.users_groups ug where ug.userid=%{userId} and ug.deletionDate is not null"
+                         searchTitle="Past groups">
+                    <properties>
+                        <property name="userid"/>
+                        <property name="groupid"/>
+                        <property name="creationDate"/>
+                        <property name="deletionDate"/>
+                    </properties>
+                </useCase>
+            </subUseCases>
+        </useCase>
     </useCases>
 </model>

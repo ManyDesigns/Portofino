@@ -67,6 +67,7 @@ import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
+import org.apache.commons.lang.ArrayUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.*;
@@ -98,6 +99,7 @@ public class CrudUnit {
 
     public final ClassAccessor classAccessor;
     public final Table baseTable;
+    public final String name;
     public final String query;
     public final String searchTitle;
     public final String createTitle;
@@ -140,8 +142,8 @@ public class CrudUnit {
                     String searchTitle,
                     String createTitle,
                     String readTitle,
-                    String editTitle
-    ) {
+                    String editTitle,
+                    String name) {
         this.buttons = new ArrayList<Button>();
         this.classAccessor = classAccessor;
         this.baseTable = baseTable;
@@ -150,6 +152,7 @@ public class CrudUnit {
         this.createTitle = createTitle;
         this.readTitle = readTitle;
         this.editTitle = editTitle;
+        this.name=name;
         pkHelper = new PkHelper(classAccessor);
         subCrudUnits = new ArrayList<CrudUnit>();
     }
@@ -214,7 +217,7 @@ public class CrudUnit {
                     property.getName(), hrefFormat, null);
         }
 
-        tableForm = tableFormBuilder.build();
+        tableForm = tableFormBuilder.configPrefix(this.name).build();
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
         tableForm.setSelectable(true);
         tableForm.readFromObject(objects);
@@ -594,10 +597,24 @@ public class CrudUnit {
                 }
             }
             selectionProvider.setAutocomplete(autocomplete);
+            if (fieldsInProperties(fieldNames)) {
+                tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
+            }
 
-            tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
+
         }
         return tableFormBuilder;
+    }
+
+    private boolean fieldsInProperties(String[] fieldNames) {
+        int size = classAccessor.getProperties().length;
+        int i=0;
+        for (PropertyAccessor prop : classAccessor.getProperties() ){
+            if (ArrayUtils.contains(fieldNames, prop.getName())){
+                i++;
+            }
+        }
+        return size==i;
     }
 
     protected String[] createFieldNamesForRelationship(ForeignKey rel) {

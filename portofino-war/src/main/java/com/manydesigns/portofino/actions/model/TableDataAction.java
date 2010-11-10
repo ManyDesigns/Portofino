@@ -82,7 +82,7 @@ public class TableDataAction extends AbstractCrudAction {
         String updateTitle = MessageFormat.format(
                 "Update: {0}", qualifiedTableName);
         CrudUnit result = new CrudUnit(classAccessor, table, query,
-                searchTitle, createTitle, readTitle, updateTitle);
+                searchTitle, createTitle, readTitle, updateTitle, null);
 
         // inject values
         result.context = context;
@@ -119,7 +119,7 @@ public class TableDataAction extends AbstractCrudAction {
 
             CrudUnit subCrudUnit =
                     new CrudUnit(subClassAccessor, subTable, subQuery,
-                            subSearchTitle, null, null, null);
+                            subSearchTitle, null, null, null, null);
             subCrudUnit.context = context;
             subCrudUnit.model = model;
             subCrudUnit.req = req;

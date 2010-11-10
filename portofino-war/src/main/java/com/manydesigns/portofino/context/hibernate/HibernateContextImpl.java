@@ -85,6 +85,9 @@ public class HibernateContextImpl implements Context {
     protected static final Pattern FROM_PATTERN =
             Pattern.compile("[fF][rR][oO][mM]\\s+(\\S+\\.\\S+\\.\\S+).*");
 
+    protected static final Pattern SELECT_PATTERN =
+            Pattern.compile("[sS][eE][lL][eE][cC][tT]\\s+(\\S+\\.\\S+\\.\\S+).*");
+
 
     //**************************************************************************
     // Fields
@@ -447,6 +450,14 @@ public class HibernateContextImpl implements Context {
         return runHqlQuery(formatString, parameters);
     }
 
+    public List<Object> getObjects(String qualifiedTableName, String queryString, Object rootObject) {
+        OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
+        String formatString = sqlFormat.getFormatString();
+        Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
+
+        return runHqlQuery(qualifiedTableName, formatString, parameters);
+    }
+
     public List<Object> getObjects(String queryString) {
         return getObjects(queryString, null);
     }
@@ -518,6 +529,21 @@ public class HibernateContextImpl implements Context {
     private List<Object> runHqlQuery(String queryString, Object[] parameters) {
         String qualifiedTableName =
                 getQualifiedTableNameFromQueryString(queryString);
+        Session session = getSession(qualifiedTableName);
+
+        Query query = session.createQuery(queryString);
+        for (int i = 0; i < parameters.length; i++) {
+            query.setParameter(i, parameters[i]);
+        }
+
+        startTimer();
+        //noinspection unchecked
+        List<Object> result = query.list();
+        stopTimer();
+        return result;
+    }
+
+    private List<Object> runHqlQuery(String qualifiedTableName, String queryString, Object[] parameters) {
         Session session = getSession(qualifiedTableName);
 
         Query query = session.createQuery(queryString);
