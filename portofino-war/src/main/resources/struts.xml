@@ -163,6 +163,12 @@
                 <param name="searchString">%{searchString}</param>
             </result>
 
+            <result name="returnToRead" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="pk">%{pk}</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
             <result name="returnToSearch" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/UseCase</param>
                 <param name="searchString">%{searchString}</param>

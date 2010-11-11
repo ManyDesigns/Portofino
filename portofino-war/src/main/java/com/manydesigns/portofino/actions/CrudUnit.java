@@ -295,6 +295,7 @@ public class CrudUnit {
 
         object = context.getObjectByPk(
                 baseTable.getQualifiedName(), pkObject);
+
         if (!objects.contains(object)) {
             throw new Error("Object not found");
         }

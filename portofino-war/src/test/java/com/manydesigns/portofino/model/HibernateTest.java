@@ -349,15 +349,7 @@ public class HibernateTest extends AbstractPortofinoTest {
                 context.getAllObjects("portofino.public.users_groups");
     }
 
-    public void testM2MQuery() {
-
-        List<Object> list = context.getObjects("portofino.public.groups", "select distinct groups " +
-                "from portofino.public.users_groups ug join ug.group groups " +
-                "where groups.deletionDate is null and groups.groupId not in (ug.userid = 3 and ug.deletionDate is null)", null);
-        list.size();
-
-    }
-
+ 
 }
 
 

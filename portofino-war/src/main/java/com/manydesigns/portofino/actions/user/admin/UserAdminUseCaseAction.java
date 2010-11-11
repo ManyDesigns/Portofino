@@ -29,20 +29,20 @@
 package com.manydesigns.portofino.actions.user.admin;
 
 
+import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.context.ModelObjectNotFoundError;
-import com.manydesigns.portofino.model.usecases.UseCase;
-import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.actions.UseCaseAction;
-import com.manydesigns.portofino.actions.CrudUnit;
 import com.manydesigns.portofino.email.EmailHandler;
+import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.system.model.users.UsersGroups;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 /*
@@ -62,42 +62,12 @@ public class UserAdminUseCaseAction extends UseCaseAction {
     private final int pwdLength;
     private final Boolean enc;
 
-    public PkHelper pkHelper;
 
-    @Override
-    public void setupMetadata() {
-
-        UseCase rootUseCase = model.findUseCaseByQualifiedName(qualifiedName);
-        if (rootUseCase == null) {
-            throw new ModelObjectNotFoundError(qualifiedName);
-        }
-        rootCrudUnit = setupUseCaseInstance(rootUseCase);
-        TableAccessor classAccessor = context.getTableAccessor(rootUseCase.getActualTable().getQualifiedName());
-        pkHelper = new PkHelper(classAccessor);
-    }
-
-    private CrudUnit setupUseCaseInstance(UseCase useCase) {
-        ClassAccessor classAccessor =
-                    context.getUseCaseAccessor(useCase.getQualifiedName());
-        Table baseTable = useCase.getActualTable();
-        String query = useCase.getQuery();
-        CrudUnit result = new CrudUnit(classAccessor, baseTable, query,
-                useCase.getSearchTitle(), useCase.getCreateTitle(),
-                useCase.getReadTitle(), useCase.getEditTitle(), useCase.getName());
-        result.buttons.addAll(useCase.getButtons());
-
-        // inject values
-        result.context = context;
-        result.model = model;
-        result.req = req;
-
-        // expand recursively
-        for (UseCase subUseCase : useCase.getSubUseCases()) {
-            CrudUnit subCrudUnit = setupUseCaseInstance(subUseCase);
-            result.subCrudUnits.add(subCrudUnit);
-        }
-        return result;
-    }
+    //**************************************************************************
+    // Web parameters
+    //**************************************************************************
+    public String[] activeselection;
+    public String[] currentselection;
 
     public UserAdminUseCaseAction() {
         super();
@@ -109,45 +79,48 @@ public class UserAdminUseCaseAction extends UseCaseAction {
     }
 
 
-    //**************************************************************************
-    // Setup
-    //**************************************************************************
 
-  /*  
     //**************************************************************************
     // Remove user from Group
     //**************************************************************************
 
-    public String removeGroups(){
-
-        if (null==selection) {
+    public void removeGroups() throws NoSuchFieldException {
+        String pk = rootCrudUnit.pk;
+        if (null==currentselection) {
             SessionMessages.addInfoMessage("No group selected");
-            return read();
+            return;
         }
-        for (String current : selection) {
+        for (String current : currentselection) {
             TableAccessor ugAccessor = context.getTableAccessor(usersGroupsTable);
-            PkHelper agPkHelper = new PkHelper(ugAccessor);
-            UsersGroups ug = (UsersGroups) agPkHelper.parsePkString(current);
-            ug = (UsersGroups) context.getObjectByPk(usersGroupsTable,ug);
-            ug.setDeletionDate(new Timestamp(new Date().getTime()));
-            context.updateObject(usersGroupsTable, ug);
+
+            Criteria criteria = new Criteria(ugAccessor);
+            criteria.eq(ugAccessor.getProperty("userid"), Long.parseLong(pk));
+            criteria.eq(ugAccessor.getProperty("groupid"), Long.parseLong(current));
+            criteria.isNull(ugAccessor.getProperty("deletionDate"));
+            
+            List<Object> ugList = context.getObjects(criteria);
+            for(Object obj : ugList) {
+                UsersGroups ug = (UsersGroups) obj;
+                ug.setDeletionDate(new Timestamp(new Date().getTime()));
+                context.updateObject(usersGroupsTable, ug);
+            }
         }
         context.commit("portofino");
         SessionMessages.addInfoMessage("Group(s) removed");
-        return read();
+
     }
 
     //**************************************************************************
     // Add user to Group
     //**************************************************************************
 
-    public String addGroups(){
-
-        if (null==ng_selection) {
+    public void addGroups(){
+        String pk = rootCrudUnit.pk;
+        if (null==activeselection) {
             SessionMessages.addInfoMessage("No group selected");
-            return read();
+            return;
         }
-        for (String current : ng_selection) {
+        for (String current : activeselection) {
             UsersGroups newUg = new UsersGroups();
             newUg.setCreationDate(new Timestamp(new Date().getTime()));
             newUg.setGroupid(Long.valueOf(current));
@@ -161,8 +134,7 @@ public class UserAdminUseCaseAction extends UseCaseAction {
         }
         context.commit("portofino");
         SessionMessages.addInfoMessage("Group added");
-        return read();
-    }*/
+    }
 
 
     //**************************************************************************
@@ -170,9 +142,8 @@ public class UserAdminUseCaseAction extends UseCaseAction {
     //**************************************************************************
 
     public void resetPassword() {
-        setupMetadata();
-
-        Serializable pkObject = pkHelper.parsePkString(pk);
+        String pk = rootCrudUnit.pk;
+        Serializable pkObject = rootCrudUnit.pkHelper.parsePkString(pk);
         User user =  (User)context.getObjectByPk(userTable, pkObject);
         user.passwordGenerator(pwdLength);
         String generatedPwd = user.getPwd();

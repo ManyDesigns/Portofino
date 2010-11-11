@@ -1252,15 +1252,15 @@
             <buttons>
                 <button name="add_group"
                         label="Add selected groups"
-                        script="addInfoMessage('Button pressed!'), search()"
+                        script="addGroups(), 'returnToRead'"
                         guard=""/>
                 <button name="rem_group"
                         label="Remove  selected groups"
-                        script="addInfoMessage('Button pressed!'), search()"
+                        script="removeGroups(), 'returnToRead'"
                         guard=""/>
                 <button name="reset"
                         label="Reset password"
-                        script="resetPassword(), search()"
+                        script="resetPassword(), 'returnToRead'"
                         guard=""/>
             </buttons>
             <subUseCases>

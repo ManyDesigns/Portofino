@@ -103,7 +103,10 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
         User thisUser = (User) context.getObjectByPk(UserDefs.USERTABLE, user);
         for (UsersGroups ug : thisUser.getGroups()){
             Group grp = ug.getGroup();
-            groups.add(grp);
+
+            if(ug.getDeletionDate()==null){
+                groups.add(grp);
+            }
         }
         form = formBuilder
                 .configMode(Mode.VIEW)
