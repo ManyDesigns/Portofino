@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.fields.*;
@@ -46,6 +45,7 @@ import com.manydesigns.elements.struts2.Struts2Util;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
+import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
@@ -54,6 +54,7 @@ import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.usecases.Button;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
 import com.opensymphony.xwork2.util.CompoundRoot;
@@ -62,12 +63,11 @@ import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
-import ognl.OgnlException;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
-import org.apache.commons.lang.ArrayUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.*;
@@ -492,12 +492,13 @@ public class CrudUnit {
     // Button
     //**************************************************************************
 
-    public String button() throws OgnlException {
+    public String button() throws Exception {
         String value = req.getParameter("method:button");
         for (Button button : buttons) {
             if (button.getLabel().equals(value)) {
                 String script = button.getScript();
-                return (String) Struts2Util.getValue(script);
+                String scriptLanguage = button.getActualScriptLanguage();
+                return (String) ScriptingUtil.runScript(script, scriptLanguage);
             }
         }
         throw new Error("No button found");

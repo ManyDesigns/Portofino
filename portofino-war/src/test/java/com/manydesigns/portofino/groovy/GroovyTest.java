@@ -27,48 +27,42 @@
  *
  */
 
-package com.manydesigns.elements.struts2;
+package com.manydesigns.portofino.groovy;
 
-import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.ActionInvocation;
-import com.opensymphony.xwork2.ActionProxy;
-import com.opensymphony.xwork2.util.ValueStack;
+import com.manydesigns.elements.AbstractElementsTest;
+import com.manydesigns.elements.ElementsThreadLocals;
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+import ognl.OgnlContext;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Struts2Util {
+public class GroovyTest extends AbstractElementsTest {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public static String buildActionUrl(String method) {
-        ActionContext actionContext = ActionContext.getContext();
-        ActionInvocation actionInvocation = actionContext.getActionInvocation();
-        ActionProxy actionProxy = actionInvocation.getProxy();
-        String namespace = actionProxy.getNamespace();
-        String actionName = actionProxy.getActionName();
-
-        StringBuilder sb = new StringBuilder();
-        if ("/".equals(namespace)) {
-            sb.append("/");
-        } else {
-            sb.append(namespace);
-            sb.append("/");
-        }
-        sb.append(actionName);
-        if (method != null) {
-            sb.append("!");
-            sb.append(method);
-        }
-        sb.append(".action");
-        return sb.toString();
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
     }
 
-    public static ValueStack getValueStack() {
-        ActionContext actionContext = ActionContext.getContext();
-        return actionContext.getValueStack();
-    }
 
+    public void testOgnlBinding() {
+        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+
+        Binding binding = new Binding(ognlContext);
+
+        ognlContext.put("foo", 2);
+        assertEquals(2, binding.getVariable("foo"));
+
+        GroovyShell shell = new GroovyShell(binding);
+
+        Object value = shell.evaluate(
+                "println 'Hello World!'; x = 123; return foo * 10");
+        assertEquals(20, value);
+        assertEquals(123, binding.getVariable("x"));
+    }
 }

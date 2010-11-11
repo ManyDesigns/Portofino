@@ -40,7 +40,6 @@ import jxl.Workbook;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
-import ognl.OgnlException;
 import org.apache.fop.apps.FOPException;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
@@ -251,7 +250,7 @@ public abstract class AbstractCrudAction extends PortofinoAction
     // Button
     //**************************************************************************
 
-    public String button() throws OgnlException {
+    public String button() throws Exception {
         return rootCrudUnit.button();
     }
 

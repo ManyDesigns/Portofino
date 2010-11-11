@@ -27,48 +27,43 @@
  *
  */
 
-package com.manydesigns.elements.struts2;
+package com.manydesigns.portofino.scripting;
 
-import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.ActionInvocation;
-import com.opensymphony.xwork2.ActionProxy;
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.struts2.Struts2Util;
+import com.opensymphony.xwork2.util.CompoundRoot;
 import com.opensymphony.xwork2.util.ValueStack;
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+import ognl.Ognl;
+import ognl.OgnlContext;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Struts2Util {
+public class ScriptingUtil {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public static String buildActionUrl(String method) {
-        ActionContext actionContext = ActionContext.getContext();
-        ActionInvocation actionInvocation = actionContext.getActionInvocation();
-        ActionProxy actionProxy = actionInvocation.getProxy();
-        String namespace = actionProxy.getNamespace();
-        String actionName = actionProxy.getActionName();
-
-        StringBuilder sb = new StringBuilder();
-        if ("/".equals(namespace)) {
-            sb.append("/");
+    public static Object runScript(String script, String scriptLanguage)
+            throws Exception {
+        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+        ValueStack valueStack = Struts2Util.getValueStack();
+        CompoundRoot root = valueStack.getRoot();
+        if ("ognl".equals(scriptLanguage)) {
+            return Ognl.getValue(script, ognlContext, root);
+        } else if ("groovy".equals(scriptLanguage)) {
+            ognlContext.put("root", root);
+            Binding binding = new Binding(ognlContext);
+            GroovyShell shell = new GroovyShell(binding);
+            return shell.evaluate(script);
         } else {
-            sb.append(namespace);
-            sb.append("/");
+            String msg = String.format(
+                    "Unrecognised script language: %s", scriptLanguage);
+            throw new IllegalArgumentException(msg);
         }
-        sb.append(actionName);
-        if (method != null) {
-            sb.append("!");
-            sb.append(method);
-        }
-        sb.append(".action");
-        return sb.toString();
-    }
-
-    public static ValueStack getValueStack() {
-        ActionContext actionContext = ActionContext.getContext();
-        return actionContext.getValueStack();
     }
 
 }

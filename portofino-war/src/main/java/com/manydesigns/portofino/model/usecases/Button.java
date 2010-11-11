@@ -29,8 +29,8 @@
 
 package com.manydesigns.portofino.model.usecases;
 
-import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
 /*
@@ -47,6 +47,7 @@ public class Button implements ModelObject {
     //**************************************************************************
 
     public final static String DEFAULT_BUTTON_METHOD = "button";
+    public final static String DEFAULT_SCRIPT_LANGUAGE = "ognl";
 
     //**************************************************************************
     // Fields
@@ -59,12 +60,14 @@ public class Button implements ModelObject {
     protected String method;
     protected String guard;
     protected String script;
+    protected String scriptLanguage;
 
     //**************************************************************************
     // Fields
     //**************************************************************************
 
     protected String actualMethod;
+    protected String actualScriptLanguage;
 
     //**************************************************************************
     // Constructors
@@ -81,7 +84,7 @@ public class Button implements ModelObject {
     }
 
     public Button(UseCase useCase, String name, String label,
-                  String guard, String script) {
+                  String guard, String script, String scriptLanguage) {
         this(useCase, name, label);
         this.guard = guard;
         this.script = script;
@@ -93,12 +96,17 @@ public class Button implements ModelObject {
 
     public void reset() {
         actualMethod = null;
+        actualScriptLanguage = null;
     }
 
     public void init(Model model) {
         actualMethod = (method == null)
                 ? DEFAULT_BUTTON_METHOD
                 : method;
+
+        actualScriptLanguage = (scriptLanguage == null)
+                ? DEFAULT_SCRIPT_LANGUAGE
+                : scriptLanguage;
     }
 
     public String getQualifiedName() {
@@ -158,11 +166,28 @@ public class Button implements ModelObject {
         this.script = script;
     }
 
+    @XmlAttribute(required = false)
+    public String getScriptLanguage() {
+        return scriptLanguage;
+    }
+
+    public void setScriptLanguage(String scriptLanguage) {
+        this.scriptLanguage = scriptLanguage;
+    }
+
     public String getActualMethod() {
         return actualMethod;
     }
 
     public void setActualMethod(String actualMethod) {
         this.actualMethod = actualMethod;
+    }
+
+    public String getActualScriptLanguage() {
+        return actualScriptLanguage;
+    }
+
+    public void setActualScriptLanguage(String actualScriptLanguage) {
+        this.actualScriptLanguage = actualScriptLanguage;
     }
 }

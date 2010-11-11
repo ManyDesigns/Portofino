@@ -102,6 +102,12 @@
             <version>${slf4j.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>${groovy.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- stuff for testing -->
         <dependency>
             <groupId>junit</groupId>
