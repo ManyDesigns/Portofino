@@ -134,7 +134,7 @@
         </action>
 
         <action name="userAdmin/UseCase"
-                class="com.manydesigns.portofino.actions.user.admin.UserAdminUseCaseAction">
+                class="com.manydesigns.portofino.actions.user.admin.UserAdminAction">
             <param name="qualifiedName">userAdmin</param>
 
             <result name="search">/skins/default/crud/search.jsp</result>

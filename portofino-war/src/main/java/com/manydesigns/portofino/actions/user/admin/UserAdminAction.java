@@ -50,7 +50,7 @@ import java.util.Properties;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UserAdminUseCaseAction extends UseCaseAction {
+public class UserAdminAction extends UseCaseAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
     //**************************************************************************
@@ -63,13 +63,8 @@ public class UserAdminUseCaseAction extends UseCaseAction {
     private final Boolean enc;
 
 
-    //**************************************************************************
-    // Web parameters
-    //**************************************************************************
-    public String[] activeselection;
-    public String[] currentselection;
 
-    public UserAdminUseCaseAction() {
+    public UserAdminAction() {
         super();
         this.pwdLength = Integer.parseInt(PortofinoProperties.getProperties()
                 .getProperty("pwd.lenght.min","6"));
@@ -79,18 +74,17 @@ public class UserAdminUseCaseAction extends UseCaseAction {
     }
 
 
-
     //**************************************************************************
     // Remove user from Group
     //**************************************************************************
 
     public String removeGroups() throws NoSuchFieldException {
         String pk = rootCrudUnit.pk;
-        if (null==currentselection) {
+        if (null==rootCrudUnit.subCrudUnits.get(1).selection) {
             SessionMessages.addInfoMessage("No group selected");
             return RETURN_TO_READ;
         }
-        for (String current : currentselection) {
+        for (String current : rootCrudUnit.subCrudUnits.get(1).selection) {
             TableAccessor ugAccessor = context.getTableAccessor(usersGroupsTable);
 
             Criteria criteria = new Criteria(ugAccessor);
@@ -116,11 +110,11 @@ public class UserAdminUseCaseAction extends UseCaseAction {
 
     public String addGroups(){
         String pk = rootCrudUnit.pk;
-        if (null==activeselection) {
+        if (null==rootCrudUnit.subCrudUnits.get(0).selection) {
             SessionMessages.addInfoMessage("No group selected");
             return RETURN_TO_READ;
         }
-        for (String current : activeselection) {
+        for (String current : rootCrudUnit.subCrudUnits.get(0).selection) {
             UsersGroups newUg = new UsersGroups();
             newUg.setCreationDate(new Timestamp(new Date().getTime()));
             newUg.setGroupid(Long.valueOf(current));

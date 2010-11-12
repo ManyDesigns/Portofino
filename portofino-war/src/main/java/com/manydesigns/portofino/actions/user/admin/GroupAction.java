@@ -31,6 +31,7 @@ package com.manydesigns.portofino.actions.user.admin;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.UseCaseAction;
 import com.manydesigns.portofino.system.model.users.Group;
+import com.manydesigns.portofino.system.model.users.UserDefs;
 
 import java.sql.Timestamp;
 import java.text.MessageFormat;
@@ -46,46 +47,48 @@ public class GroupAction extends UseCaseAction {
 
 
 
+
     //**************************************************************************
     // Delete
     //**************************************************************************
 
     public String delete() {
-        setupMetadata();
-        Group pkGrp = new Group(new Long(rootCrudUnit.pk));
-        Group aGroup = (Group) context.getObjectByPk(qualifiedName, pkGrp);
+        Group pkGrp = new Group(Long.parseLong(rootCrudUnit.pk));
+        Group aGroup = (Group) context.getObjectByPk(UserDefs.GROUPTABLE, pkGrp);
         aGroup.setDeletionDate(new Timestamp(System.currentTimeMillis()));
-        context.saveObject(qualifiedName, aGroup);
-        String databaseName = model.findTableByQualifiedName(qualifiedName)
+        context.saveObject(UserDefs.GROUPTABLE, aGroup);
+        String databaseName = model.findTableByQualifiedName(UserDefs.GROUPTABLE)
                 .getDatabaseName();
         context.commit(databaseName);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
-        return DELETE;
+        return RETURN_TO_READ;
     }
 
-    public String bulkDelete() {
-        setupMetadata();
+    public String bulkDelete() {        
         if (rootCrudUnit.selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
             return CANCEL;
         }
-        for (String current : selection) {Group pkGrp = new Group(new Long(current));
-
-            Group aGroup = (Group) context.getObjectByPk(qualifiedName, pkGrp);
+        for (String current : rootCrudUnit.selection) {
+            Group pkGrp = new Group(new Long(current));
+            Group aGroup = (Group) context
+                    .getObjectByPk(UserDefs.GROUPTABLE, pkGrp);
             aGroup.setDeletionDate(new Timestamp(System.currentTimeMillis()));
-            context.saveObject(qualifiedName, aGroup);
-            String databaseName = model.findTableByQualifiedName(qualifiedName)
+            context.saveObject(UserDefs.GROUPTABLE, aGroup);
+            String databaseName = model
+                    .findTableByQualifiedName(UserDefs.GROUPTABLE)
                     .getDatabaseName();
-            context.commit(databaseName);
             SessionMessages.addInfoMessage("DELETE avvenuto con successo");
         }
-        String databaseName = model.findTableByQualifiedName(qualifiedName)
+        String databaseName = model
+                .findTableByQualifiedName(UserDefs.GROUPTABLE)
                 .getDatabaseName();
         context.commit(databaseName);
         SessionMessages.addInfoMessage(MessageFormat.format(
-                "DELETE di {0} oggetti avvenuto con successo", selection.length));
-        return DELETE;
+                "DELETE di {0} oggetti avvenuto con successo",
+                rootCrudUnit.selection.length));
+        return RETURN_TO_SEARCH;
     }
 
 
