@@ -78,6 +78,8 @@ public class ForeignKey implements ModelObject {
     protected String onUpdate;
     protected String onDelete;
 
+    protected boolean virtual;
+
 
 
     //**************************************************************************
@@ -120,17 +122,18 @@ public class ForeignKey implements ModelObject {
         this.toSchema = toSchema;
         this.toTable = toTable;
         this.onUpdate = onUpdate;
-        this.onDelete = onDelete;
+        this.onDelete = onDelete;        
     }
 
     public ForeignKey(Table fromTable, String foreignKeyName,
                       String toDatabase, String toSchema,
                       String toTable, String onUpdate, String onDelete,
-                      String manyPropertyName, String onePropertyName) {
+                      String manyPropertyName, String onePropertyName, boolean virtual) {
         this(fromTable, foreignKeyName, toDatabase,
                 toSchema, toTable, onUpdate, onDelete);
         this.manyPropertyName = manyPropertyName;
         this.onePropertyName = onePropertyName;
+        this.virtual = virtual;
     }
 
     //**************************************************************************
@@ -301,6 +304,15 @@ public class ForeignKey implements ModelObject {
     @XmlAttribute(required = false)
     public String getOnePropertyName() {
         return onePropertyName;
+    }
+
+    @XmlAttribute(required = true)
+    public boolean isVirtual() {
+        return virtual;
+    }
+
+    public void setVirtual(boolean virtual) {
+        this.virtual = virtual;
     }
 
     public void setOnePropertyName(String onePropertyName) {

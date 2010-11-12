@@ -73,6 +73,8 @@ public class PortofinoProperties {
             "database.platforms.manager";
     public static final String DATABASE_PLATFORMS_LIST_PROPERTY =
             "database.platforms.list";
+    public static final String SECURITY_TYPE_PROPERTY =
+            "security.type";
 
     //Email properties
     public static final String MAIL_ENABLED = "mail.enabled";

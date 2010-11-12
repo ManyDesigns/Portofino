@@ -390,10 +390,17 @@ public class HibernateConfig {
             Configuration config,
             Mappings mappings,
             ForeignKey relationship) {
+
         com.manydesigns.portofino.model.datamodel.Table manyMDTable =
                 relationship.getFromTable();
         com.manydesigns.portofino.model.datamodel.Table oneMDTable =
                 relationship.getActualToTable();
+
+        //relazione virtuali fra Database differenti
+        if(!manyMDTable.getDatabaseName().equalsIgnoreCase(oneMDTable.getDatabaseName())){
+            return;
+        }
+
         String manyMDQualifiedTableName = manyMDTable.getQualifiedName();
         String oneMDQualifiedTableName = oneMDTable.getQualifiedName();
 

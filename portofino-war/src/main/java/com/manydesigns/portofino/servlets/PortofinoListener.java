@@ -149,12 +149,14 @@ public class PortofinoListener
         }
         if (success) {
             String securityType = (String) portofinoProperties
-                    .getProperty("security.type", "application");
+                    .getProperty(PortofinoProperties.SECURITY_TYPE_PROPERTY, "application");
             String mailHost = (String) portofinoProperties
-                    .getProperty("mail.smtp.host");
+                    .getProperty(PortofinoProperties.MAIL_SMTP_HOST);
             String mailSender = (String) portofinoProperties
-                    .getProperty("mail.smtp.sender");
-            if ("application".equals(securityType))
+                    .getProperty(PortofinoProperties.MAIL_SMTP_SENDER);
+            Boolean mailEnabled = Boolean.parseBoolean((String) portofinoProperties
+                    .getProperty(PortofinoProperties.MAIL_ENABLED, "false"));
+            if ("application".equals(securityType)&&mailEnabled)
             {
                 if (null==mailSender
                         || null == mailHost ) {

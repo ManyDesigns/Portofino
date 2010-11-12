@@ -84,11 +84,11 @@ public class UserAdminUseCaseAction extends UseCaseAction {
     // Remove user from Group
     //**************************************************************************
 
-    public void removeGroups() throws NoSuchFieldException {
+    public String removeGroups() throws NoSuchFieldException {
         String pk = rootCrudUnit.pk;
         if (null==currentselection) {
             SessionMessages.addInfoMessage("No group selected");
-            return;
+            return RETURN_TO_READ;
         }
         for (String current : currentselection) {
             TableAccessor ugAccessor = context.getTableAccessor(usersGroupsTable);
@@ -107,18 +107,18 @@ public class UserAdminUseCaseAction extends UseCaseAction {
         }
         context.commit("portofino");
         SessionMessages.addInfoMessage("Group(s) removed");
-
+        return RETURN_TO_READ;
     }
 
     //**************************************************************************
     // Add user to Group
     //**************************************************************************
 
-    public void addGroups(){
+    public String addGroups(){
         String pk = rootCrudUnit.pk;
         if (null==activeselection) {
             SessionMessages.addInfoMessage("No group selected");
-            return;
+            return RETURN_TO_READ;
         }
         for (String current : activeselection) {
             UsersGroups newUg = new UsersGroups();
@@ -134,6 +134,7 @@ public class UserAdminUseCaseAction extends UseCaseAction {
         }
         context.commit("portofino");
         SessionMessages.addInfoMessage("Group added");
+        return RETURN_TO_READ;
     }
 
 
@@ -141,7 +142,7 @@ public class UserAdminUseCaseAction extends UseCaseAction {
     // ResetPassword
     //**************************************************************************
 
-    public void resetPassword() {
+    public String resetPassword() {
         String pk = rootCrudUnit.pk;
         Serializable pkObject = rootCrudUnit.pkHelper.parsePkString(pk);
         User user =  (User)context.getObjectByPk(userTable, pkObject);
@@ -170,5 +171,6 @@ public class UserAdminUseCaseAction extends UseCaseAction {
         context.commit(databaseName);
 
         SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
+        return RETURN_TO_READ;
     }
 }

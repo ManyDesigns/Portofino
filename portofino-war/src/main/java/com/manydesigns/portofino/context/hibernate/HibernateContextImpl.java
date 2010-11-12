@@ -34,7 +34,6 @@ import com.manydesigns.elements.fields.search.Criterion;
 import com.manydesigns.elements.fields.search.TextMatchMode;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
@@ -703,54 +702,33 @@ public class HibernateContextImpl implements Context {
                         qualifiedTableName, oneToManyRelationshipName);
         Table toTable = relationship.getActualToTable();
         Table fromTable = relationship.getFromTable();
-        Session session = getSession(qualifiedTableName);
+        //Session session = getSession(qualifiedTableName);
+        Session session = getSession(fromTable.getQualifiedName());
 
         ClassAccessor toAccessor = getTableAccessor(qualifiedTableName);
-        
-        boolean virtualRelationship = true;
-        if (virtualRelationship) {
-            try {
-                org.hibernate.Criteria criteria =
-                        session.createCriteria(fromTable.getQualifiedName());
-                for (Reference reference : relationship.getReferences()) {
-                    Column fromColumn = reference.getActualFromColumn();
-                    Column toColumn = reference.getActualToColumn();
-                    PropertyAccessor toPropertyAccessor
-                            = toAccessor.getProperty(toColumn.getActualPropertyName());
-                    Object toValue = toPropertyAccessor.get(obj);
-                    criteria.add(Restrictions.eq(fromColumn.getActualPropertyName(),
-                            toValue));
-                }
-                startTimer();
-                //noinspection unchecked
-                List<Object> result = criteria.list();
-                stopTimer();
-                return result;
-            } catch (Throwable e) {
-                LogUtil.warningMF(logger,
-                        "Cannot access relationship {0} on table {1}",
-                        e, oneToManyRelationshipName, qualifiedTableName);
-            }
-        } else {
-            String manyPropertyName = relationship.getActualManyPropertyName();
 
-            Class clazz = toTable.getClass();
-            try {
-                if (clazz == null) {
-                    Map<String, Object> map = (Map<String, Object>) obj;
-                    return (List<Object>) map.get(oneToManyRelationshipName);
-                } else {
-                    ClassAccessor accessor2 =
-                            JavaClassAccessor.getClassAccessor(clazz);
-                        PropertyAccessor propertyAccessor
-                                = accessor2.getProperty(manyPropertyName);
-                        return (List<Object>) propertyAccessor.get(obj);
-                }
-            } catch (Throwable e) {
-                LogUtil.warningMF(logger,
-                        "Cannot access relationship {0} on table {1}",
-                        e, oneToManyRelationshipName, qualifiedTableName);
+        boolean sameDB = toTable.getDatabaseName().equals(fromTable.getDatabaseName());
+        try {
+            org.hibernate.Criteria criteria =
+                    session.createCriteria(fromTable.getQualifiedName());
+            for (Reference reference : relationship.getReferences()) {
+                Column fromColumn = reference.getActualFromColumn();
+                Column toColumn = reference.getActualToColumn();
+                PropertyAccessor toPropertyAccessor
+                        = toAccessor.getProperty(toColumn.getActualPropertyName());
+                Object toValue = toPropertyAccessor.get(obj);
+                criteria.add(Restrictions.eq(fromColumn.getActualPropertyName(),
+                        toValue));
             }
+            startTimer();
+            //noinspection unchecked
+            List<Object> result = criteria.list();
+            stopTimer();
+            return result;
+        } catch (Throwable e) {
+            LogUtil.warningMF(logger,
+                    "Cannot access relationship {0} on table {1}",
+                    e, oneToManyRelationshipName, qualifiedTableName);
         }
         return null;
     }

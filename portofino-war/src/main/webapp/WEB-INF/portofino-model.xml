@@ -255,6 +255,7 @@
                             </primaryKey>
                             <foreignKeys>
                                 <foreignKey foreignKeyName="fk_user_1"
+                                            virtual="false"
                                             toDatabase="portofino"
                                             toSchema="public"
                                             toTable="userstate"
@@ -344,6 +345,7 @@
                             </primaryKey>
                             <foreignKeys>
                                 <foreignKey foreignKeyName="fk_group_1"
+                                              virtual="false"
                                               toDatabase="portofino"
                                               toSchema="public"
                                               toTable="users"
@@ -410,6 +412,7 @@
                             </primaryKey>
                             <foreignKeys>
                                 <foreignKey foreignKeyName="fk_ug_1"
+                                        virtual="false"
                                               toDatabase="portofino"
                                               toSchema="public"
                                               toTable="users"
@@ -429,6 +432,7 @@
                                     </annotations>
                                 </foreignKey>
                                 <foreignKey foreignKeyName="fk_ug_2"
+                                        virtual="false"
                                             toDatabase="portofino"
                                             toSchema="public"
                                             toTable="groups"
@@ -575,6 +579,7 @@
                             </primaryKey>
                             <foreignKeys>
                                 <foreignKey foreignKeyName="fk_emailqueue_1"
+                                            virtual="false"
                                             toDatabase="portofino"
                                             toTable="emailstate"
                                             toSchema="public"
@@ -762,6 +767,7 @@
                             </primaryKey>
                             <foreignKeys>
                                 <foreignKey foreignKeyName="fk_product_1"
+                                            virtual="false"
                                             toDatabase="jpetstore"
                                             toSchema="public"
                                             toTable="category"
@@ -908,6 +914,7 @@
                             </primaryKey>
                             <foreignKeys>
                                 <foreignKey foreignKeyName="fk_tb_2"
+                                            virtual="false"
                                             toDatabase="hibernatetest"
                                             toSchema="public"
                                             toTable="table2"
@@ -921,6 +928,7 @@
                                     </references>
                                 </foreignKey>
                                 <foreignKey foreignKeyName="fk_tb_1"
+                                            virtual="false"
                                             toDatabase="hibernatetest"
                                             toSchema="public"
                                             toTable="table1"
@@ -932,6 +940,7 @@
                                     </references>
                                 </foreignKey>
                                 <foreignKey foreignKeyName="fk_tb_4"
+                                            virtual="false"
                                             toDatabase="hibernatetest"
                                             toSchema="public"
                                             toTable="table4"
@@ -1034,6 +1043,7 @@
                             <foreignKeys>
                                 <foreignKey
                                         foreignKeyName="domanda_regione_fkey"
+                                        virtual="false"
                                         toDatabase="hibernatetest"
                                         toSchema="public"
                                         toTable="comune"
@@ -1097,15 +1107,6 @@
             <childNodes>
                 <siteNode type="simple" url="/user/Profile.action" title="Profile"
                           description="Profile"/>
-            </childNodes>
-        </siteNode>
-        <siteNode type="simple" url="/user-admin/Index.action" title="User admin"
-                  description="User administration">
-            <childNodes>
-                <siteNode type="simple" url="/user-admin/Users.action" title="Users"
-                          description="users"/>
-                <siteNode type="simple" url="/user-admin/Groups.action" title="Groups"
-                          description="groups"/>
             </childNodes>
         </siteNode>
     </siteNodes>
@@ -1252,15 +1253,15 @@
             <buttons>
                 <button name="add_group"
                         label="Add selected groups"
-                        script="addGroups(), 'returnToRead'"
+                        method="addGroups"
                         guard=""/>
                 <button name="rem_group"
                         label="Remove  selected groups"
-                        script="removeGroups(), 'returnToRead'"
+                        method="removeGroups"
                         guard=""/>
                 <button name="reset"
                         label="Reset password"
-                        script="resetPassword(), 'returnToRead'"
+                        method="resetPassword"
                         guard=""/>
             </buttons>
             <subUseCases>
@@ -1297,6 +1298,22 @@
                     </properties>
                 </useCase>
             </subUseCases>
+        </useCase>
+        <useCase name="groupAdmin"
+                 table="portofino.public.groups"
+                 query="from portofino.public.groups"
+                 searchTitle="Groups"
+                 createTitle="Create new group"
+                 readTitle="Group"
+                 editTitle="Edit group">
+            <properties>
+                <property name="groupId"/>
+                <property name="name"/>
+                <property name="description"/>
+                <property name="deletionDate"/>
+                <property name="creationDate"/>
+                <property name="creatorId"/>
+            </properties>
         </useCase>
     </useCases>
 </model>

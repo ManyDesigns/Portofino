@@ -255,6 +255,7 @@
                             </primaryKey>
                             <foreignKeys>
                                 <foreignKey foreignKeyName="fk_user_1"
+                                            virtual="false"
                                             toDatabase="portofino"
                                             toSchema="public"
                                             toTable="userstate"
@@ -343,6 +344,7 @@
                             </primaryKey>
                             <foreignKeys>
                                 <foreignKey foreignKeyName="fk_group_1"
+                                            virtual="false"
                                             toDatabase="portofino"
                                             toSchema="public"
                                             toTable="users"
@@ -407,6 +409,7 @@
                                 </primaryKey>
                                 <foreignKeys>
                                 <foreignKey foreignKeyName="fk_ug_1"
+                                            virtual="false"
                                               toDatabase="portofino"
                                               toSchema="public"
                                               toTable="users"
@@ -425,6 +428,7 @@
                                     </annotations>
                                 </foreignKey>
                                 <foreignKey foreignKeyName="fk_ug_2"
+                                            virtual="false"
                                             toDatabase="portofino"
                                             toSchema="public"
                                             toTable="groups"
@@ -569,6 +573,7 @@
                             </primaryKey>
                             <foreignKeys>
                                 <foreignKey foreignKeyName="fk_emailqueue_1"
+                                            virtual="false"
                                             toDatabase="portofino"
                                             toTable="emailstate"
                                             toSchema="public"
@@ -746,6 +751,7 @@
                             </primaryKey>
                             <foreignKeys>
                                 <foreignKey foreignKeyName="fk_product_1"
+                                            virtual="false"
                                             toDatabase="jpetstore"
                                             toSchema="public"
                                             toTable="category"
@@ -848,8 +854,8 @@
                             <columns>
                                 <column columnName="id"
                                         columnType="IDENTITY"
-                                        javaType="java.lang.Integer"
-                                        length="8"
+                                        javaType="java.lang.Long"
+                                        length="19"
                                         scale="0"
                                         nullable="false"
                                         autoincrement="true"
@@ -892,6 +898,7 @@
                             </primaryKey>
                             <foreignKeys>
                                 <foreignKey foreignKeyName="fk_tb_2"
+                                            virtual="false"
                                             toDatabase="hibernatetest"
                                             toSchema="public"
                                             toTable="table2"
@@ -905,6 +912,7 @@
                                     </references>
                                 </foreignKey>
                                 <foreignKey foreignKeyName="fk_tb_1"
+                                            virtual="false"
                                             toDatabase="hibernatetest"
                                             toSchema="public"
                                             toTable="table1"
@@ -916,6 +924,7 @@
                                     </references>
                                 </foreignKey>
                                 <foreignKey foreignKeyName="fk_tb_4"
+                                            virtual="false"
                                             toDatabase="hibernatetest"
                                             toSchema="public"
                                             toTable="table4"
@@ -960,6 +969,92 @@
                                 <column columnName="provincia"/>
                                 <column columnName="comune"/>
                             </primaryKey>
+                        </table>
+                        <table tableName="delibera">
+                            <columns>
+                               <column columnName="id"
+                                        columnType="IDENTITY"
+                                        javaType="java.lang.Long"
+                                        length="19"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="true"
+                                        searchable="true"/>
+                                <column columnName="testo"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="regione"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="provincia"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="comune"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="catid"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="10"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="deliber_pk">
+                                <column columnName="id"/>
+                            </primaryKey>
+                            <foreignKeys>
+                                <foreignKey foreignKeyName="fk_delibera_1"
+                                            virtual="true"
+                                            toDatabase="hibernatetest"
+                                            toSchema="public"
+                                            toTable="comune"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION">
+                                    <references>
+                                        <reference fromColumn="comune"
+                                                   toColumn="comune"/>
+                                        <reference fromColumn="provincia"
+                                                   toColumn="provincia"/>
+                                        <reference fromColumn="regione"
+                                                   toColumn="regione"/>
+                                    </references>
+                                </foreignKey>
+
+                                <foreignKey foreignKeyName="fk_delibera_2"
+                                            virtual="true"
+                                            toDatabase="jpetstore"
+                                            toSchema="public"
+                                            toTable="category"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION">
+                                    <references>
+                                        <reference fromColumn="catid"
+                                                   toColumn="catid"/>                                        
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
                         </table>
                         <table tableName="domanda">
                             <columns>
@@ -1017,6 +1112,7 @@
                             </primaryKey>
                             <foreignKeys>
                                 <foreignKey foreignKeyName="domanda_regione_fkey"
+                                            virtual="false"
                                             toDatabase="hibernatetest"
                                             toSchema="public"
                                             toTable="comune"

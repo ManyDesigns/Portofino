@@ -29,7 +29,7 @@
 package com.manydesigns.portofino.actions.user.admin;
 
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.actions.model.TableDataAction;
+import com.manydesigns.portofino.actions.UseCaseAction;
 import com.manydesigns.portofino.system.model.users.Group;
 
 import java.sql.Timestamp;
@@ -40,7 +40,7 @@ import java.text.MessageFormat;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class GroupAction extends TableDataAction {
+public class GroupAction extends UseCaseAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -52,7 +52,7 @@ public class GroupAction extends TableDataAction {
 
     public String delete() {
         setupMetadata();
-        Group pkGrp = new Group(new Long(pk));
+        Group pkGrp = new Group(new Long(rootCrudUnit.pk));
         Group aGroup = (Group) context.getObjectByPk(qualifiedName, pkGrp);
         aGroup.setDeletionDate(new Timestamp(System.currentTimeMillis()));
         context.saveObject(qualifiedName, aGroup);
@@ -65,7 +65,7 @@ public class GroupAction extends TableDataAction {
 
     public String bulkDelete() {
         setupMetadata();
-        if (selection == null) {
+        if (rootCrudUnit.selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
             return CANCEL;

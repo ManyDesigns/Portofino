@@ -80,13 +80,9 @@ public class LoginAction extends PortofinoAction
         builder.configFields("email", "pwd");
 
         form = builder.build();
-        String smtp = PortofinoProperties.getProperties().
-                getProperty(PortofinoProperties.MAIL_SMTP_HOST);
-        if (null!=smtp) {
-            recoverPwd=true;
-        } else {
-            recoverPwd=false;
-        }
+        recoverPwd = Boolean.parseBoolean(PortofinoProperties.getProperties().
+                getProperty(PortofinoProperties.MAIL_ENABLED, "false"));
+
     }
 
     public String execute () {

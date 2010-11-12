@@ -9,7 +9,7 @@
         <version>4.0.beta2</version>
     </parent>
     <artifactId>portofino-war</artifactId>
-    <packaging>war</packaging>
+    <packaging>war</packaging> 
     <name>manydesigns-portofino-war</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>

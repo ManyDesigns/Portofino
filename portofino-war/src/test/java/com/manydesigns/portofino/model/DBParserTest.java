@@ -104,7 +104,7 @@ public class DBParserTest extends AbstractPortofinoTest {
         List<Column> pkColumns0 = primaryKey0.getColumns();
         assertEquals(1, pkColumns0.size());
         assertEquals(columns0.get(0), pkColumns0.get(0));
-        assertEquals(1, table0.getOneToManyRelationships().size());
+        assertEquals(2, table0.getOneToManyRelationships().size());
         checkRelationships(table0.getOneToManyRelationships()
                 , 0, "fk_product_1", "public" ,
                 "category", "NO ACTION", "NO ACTION");

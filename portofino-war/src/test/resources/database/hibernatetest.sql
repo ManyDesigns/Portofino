@@ -65,6 +65,19 @@ CREATE TABLE table4 (
 );
 
 
+--
+-- Name: table4; Type: TABLE; Schema: public; Owner: -; Tablespace:
+--
+DROP TABLE IF EXISTS delibera;
+CREATE TABLE delibera (
+    id IDENTITY NOT NULL,
+    testo character varying(255) NOT NULL,
+    regione character varying(30) NOT NULL,
+    provincia character varying(30) NOT NULL,
+    comune character varying(30) NOT NULL,
+    catid varchar(10) not null   
+);
+
 
 
 INSERT INTO comune VALUES ('liguria', 'genova', 'genova');
@@ -77,6 +90,11 @@ INSERT INTO comune VALUES ('liguria', 'imperia', 'imperia');
 INSERT INTO comune VALUES ('liguria', 'imperia', 'san remo');
 INSERT INTO comune VALUES ('liguria', 'la spezia', 'la spezia');
 
+--
+-- Data for Name: delibera; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+INSERT INTO delibera (testo, regione, provincia, comune, catid) VALUES ('delibera1','liguria', 'genova', 'genova', 'FISH');
 
 --
 -- Data for Name: domanda; Type: TABLE DATA; Schema: public; Owner: -
