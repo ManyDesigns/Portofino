@@ -100,6 +100,7 @@ public class CrudUnit {
     public final ClassAccessor classAccessor;
     public final Table baseTable;
     public final String name;
+    public final String prefix;
     public final String query;
     public final String searchTitle;
     public final String createTitle;
@@ -143,7 +144,8 @@ public class CrudUnit {
                     String createTitle,
                     String readTitle,
                     String editTitle,
-                    String name) {
+                    String name,
+                    String prefix) {
         this.buttons = new ArrayList<Button>();
         this.classAccessor = classAccessor;
         this.baseTable = baseTable;
@@ -153,6 +155,7 @@ public class CrudUnit {
         this.readTitle = readTitle;
         this.editTitle = editTitle;
         this.name=name;
+        this.prefix = prefix;
         pkHelper = new PkHelper(classAccessor);
         subCrudUnits = new ArrayList<CrudUnit>();
     }
@@ -183,7 +186,9 @@ public class CrudUnit {
     private void buildSearchForm() {
         SearchFormBuilder searchFormBuilder =
                 new SearchFormBuilder(classAccessor);
-        searchForm = searchFormBuilder.build();
+        searchForm = searchFormBuilder
+                .configPrefix(prefix)
+                .build();
     }
 
     public String search() {
@@ -217,7 +222,9 @@ public class CrudUnit {
                     property.getName(), hrefFormat, null);
         }
 
-        tableForm = tableFormBuilder.configPrefix(this.name).build();
+        tableForm = tableFormBuilder
+                .configPrefix(prefix)
+                .build();
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
         tableForm.setSelectable(true);
         tableForm.readFromObject(objects);
@@ -521,6 +528,7 @@ public class CrudUnit {
         Form form = new FormBuilder(classAccessor)
                 .configFields(fieldNames)
                 .configSelectionProvider(selectionProvider, fieldNames)
+                .configPrefix(prefix)
                 .configMode(Mode.EDIT)
                 .build();
         form.readFromRequest(req);
@@ -558,6 +566,7 @@ public class CrudUnit {
 
             formBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
+        formBuilder.configPrefix(prefix);
 
         return formBuilder;
     }
@@ -605,6 +614,7 @@ public class CrudUnit {
 
 
         }
+        tableFormBuilder.configPrefix(prefix);
         return tableFormBuilder;
     }
 
@@ -748,6 +758,7 @@ public class CrudUnit {
                     subCrudUnit.createTableFormBuilderWithSelectionProviders();
             TableForm subTableForm = tableFormBuilder
                     .configNRows(subCrudUnit.objects.size())
+                    .configPrefix(prefix)
                     .build();
             subTableForm.readFromObject(subCrudUnit.objects);
 

@@ -81,14 +81,16 @@ public class TableDataAction extends AbstractCrudAction {
                 "Read: {0}", qualifiedTableName);
         String updateTitle = MessageFormat.format(
                 "Update: {0}", qualifiedTableName);
+        String prefix = null;
         CrudUnit result = new CrudUnit(classAccessor, table, query,
-                searchTitle, createTitle, readTitle, updateTitle, null);
+                searchTitle, createTitle, readTitle, updateTitle, null, prefix);
 
         // inject values
         result.context = context;
         result.model = model;
         result.req = req;
 
+        int index = 0;
         for (ForeignKey foreignKey : table.getOneToManyRelationships()) {
             Table subTable = foreignKey.getFromTable();
             ClassAccessor subClassAccessor =
@@ -116,14 +118,17 @@ public class TableDataAction extends AbstractCrudAction {
             String subSearchTitle = MessageFormat.format(
                     "Objects related through foreign key: {0}",
                     foreignKey.getForeignKeyName());
+            String subPrefix = MessageFormat.format("subCrudUnits[{0}].", index);
 
             CrudUnit subCrudUnit =
                     new CrudUnit(subClassAccessor, subTable, subQuery,
-                            subSearchTitle, null, null, null, null);
+                            subSearchTitle, null, null, null, null, subPrefix);
             subCrudUnit.context = context;
             subCrudUnit.model = model;
             subCrudUnit.req = req;
             result.subCrudUnits.add(subCrudUnit);
+
+            index++;
         }
 
         return result;

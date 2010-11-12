@@ -88,6 +88,7 @@ public class Button implements ModelObject {
         this(useCase, name, label);
         this.guard = guard;
         this.script = script;
+        this.scriptLanguage = scriptLanguage;
     }
 
     //**************************************************************************

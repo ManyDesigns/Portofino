@@ -18,12 +18,8 @@
         <s:if test="searchString != null">
             <s:hidden name="searchString" value="%{searchString}"/>
         </s:if>
-        <s:url var="cancelReturnUrl"
-               namespace="/model"
-               action="%{qualifiedName}/TableData"
-               escapeAmp="false">
-            <s:param name="searchString" value="%{searchString}"/>
-        </s:url>
+        <s:set name="cancelReturnUrl"
+               value="%{pkHelper.generateSearchUrl(searchString)}"/>
         <s:hidden name="cancelReturnUrl" value="%{#cancelReturnUrl}"/>
     </div>
     <s:include value="/skins/default/crud/searchButtonsBar.jsp"/>

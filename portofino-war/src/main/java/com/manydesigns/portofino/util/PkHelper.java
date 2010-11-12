@@ -39,7 +39,8 @@ import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
-import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /*
@@ -136,19 +137,18 @@ public class PkHelper {
     }
 
     public String generateUrl(Object object, String searchString) {
-        String actionUrl = Struts2Util.buildActionUrl(null);
         String pkString = generatePkString(object);
-        String url;
-        if (searchString == null) {
-            url = MessageFormat.format("{0}?pk={1}",
-                    actionUrl,
-                    Util.urlencode(pkString));
-        } else {
-            url = MessageFormat.format("{0}?pk={1}&searchString={2}",
-                    actionUrl,
-                    Util.urlencode(pkString),
-                    Util.urlencode(searchString));
-        }
+        Map<String,String> params = new HashMap<String,String>();
+        params.put("pk", pkString);
+        params.put("searchString", searchString);
+        String url = Struts2Util.buildActionUrl(null, params);
+        return Util.getAbsoluteUrl(url);
+    }
+
+    public String generateSearchUrl(String searchString) {
+        Map<String,String> params = new HashMap<String,String>();
+        params.put("searchString", searchString);
+        String url = Struts2Util.buildActionUrl(null, params);
         return Util.getAbsoluteUrl(url);
     }
 

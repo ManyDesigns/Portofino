@@ -331,6 +331,35 @@ ALTER TABLE ONLY table3
     ADD CONSTRAINT table3_tb4_id_fkey FOREIGN KEY (tb4_id) REFERENCES table4(id);
 
 
+
+
+
+
+CREATE TABLE persona (
+    id integer primary key,
+    nome character varying(30) NOT NULL
+);
+
+CREATE TABLE familiare (
+    id integer primary key,
+    nome character varying(30) NOT NULL,
+    persona_id integer NOT NULL REFERENCES persona(id)
+);
+
+CREATE TABLE rimborso (
+    id integer primary key,
+    persona_id integer NOT NULL REFERENCES persona(id),
+    familiare_id integer NOT NULL REFERENCES familiare(id)
+);
+
+insert into persona (id, nome) values (1, 'Giovanni');
+insert into persona (id, nome) values (2, 'Filippo');
+
+insert into familiare (id, nome, persona_id) values (1, 'Figlio di Giovanni', 1);
+insert into familiare (id, nome, persona_id) values (2, 'Moglie di Giovanni', 1);
+insert into familiare (id, nome, persona_id) values (3, 'Figlia di Filippo', 2);
+insert into familiare (id, nome, persona_id) values (4, 'Moglie di Filippo', 2);
+
 --
 -- PostgreSQL database dump complete
 --

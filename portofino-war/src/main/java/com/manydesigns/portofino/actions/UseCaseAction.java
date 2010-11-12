@@ -34,6 +34,7 @@ import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.usecases.UseCase;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 /*
@@ -58,17 +59,17 @@ public class UseCaseAction extends AbstractCrudAction {
         if (rootUseCase == null) {
             throw new ModelObjectNotFoundError(qualifiedName);
         }
-        rootCrudUnit = setupUseCaseInstance(rootUseCase);
+        rootCrudUnit = setupUseCaseInstance(rootUseCase, null);
     }
 
-    private CrudUnit setupUseCaseInstance(UseCase useCase) {
+    private CrudUnit setupUseCaseInstance(UseCase useCase, String prefix) {
         ClassAccessor classAccessor =
                     context.getUseCaseAccessor(useCase.getQualifiedName());
         Table baseTable = useCase.getActualTable();
         String query = useCase.getQuery();
         CrudUnit result = new CrudUnit(classAccessor, baseTable, query,
                 useCase.getSearchTitle(), useCase.getCreateTitle(),
-                useCase.getReadTitle(), useCase.getEditTitle(), useCase.getName());
+                useCase.getReadTitle(), useCase.getEditTitle(), useCase.getName(), prefix);
         result.buttons.addAll(useCase.getButtons());
 
         // inject values
@@ -77,9 +78,18 @@ public class UseCaseAction extends AbstractCrudAction {
         result.req = req;
 
         // expand recursively
+        int index = 0;
         for (UseCase subUseCase : useCase.getSubUseCases()) {
-            CrudUnit subCrudUnit = setupUseCaseInstance(subUseCase);
+            String tmp = MessageFormat.format("subCrudUnits[{0}].", index);
+            String subPrefix;
+            if (prefix == null) {
+                subPrefix = tmp;
+            } else {
+                subPrefix = prefix + "." + tmp;
+            }
+            CrudUnit subCrudUnit = setupUseCaseInstance(subUseCase, subPrefix);
             result.subCrudUnits.add(subCrudUnit);
+            index++;
         }
         return result;
     }

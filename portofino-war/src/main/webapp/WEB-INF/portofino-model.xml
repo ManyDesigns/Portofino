@@ -1211,7 +1211,7 @@
                 <property name="descn"/>
             </properties>
             <buttons>
-                <button name="customButton1" label="Custom button 1"/>
+                <button name="customButton1" method="someMethod" label="Custom button 1"/>
                 <button name="customButton2"
                         label="Custom button 2"
                         script="action.addInfoMessage('Button pressed!'); return 'returnToSearch';"

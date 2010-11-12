@@ -29,10 +29,14 @@
 
 package com.manydesigns.elements.struts2;
 
+import com.manydesigns.elements.util.Util;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.ActionProxy;
 import com.opensymphony.xwork2.util.ValueStack;
+
+import java.util.Collections;
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -44,6 +48,11 @@ public class Struts2Util {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public static String buildActionUrl(String method) {
+        return buildActionUrl(method, Collections.EMPTY_MAP);
+    }
+
+    public static String buildActionUrl(String method, 
+                                        Map<String,String> parameters) {
         ActionContext actionContext = ActionContext.getContext();
         ActionInvocation actionInvocation = actionContext.getActionInvocation();
         ActionProxy actionProxy = actionInvocation.getProxy();
@@ -63,6 +72,32 @@ public class Struts2Util {
             sb.append(method);
         }
         sb.append(".action");
+
+        // add parameters
+        boolean first = true;
+        for (Map.Entry<String,String> parameter : parameters.entrySet()) {
+            String parameterName = parameter.getKey();
+            String parameterValue = parameter.getValue();
+
+            // parameters with null value are ignored
+            if (parameterValue == null) {
+                continue;
+            }
+
+            if (first) {
+                sb.append("?");
+                sb.append(Util.urlencode(parameterName));
+                sb.append("=");
+                sb.append(Util.urlencode(parameterValue));
+                first = false;
+            } else {
+                sb.append("&");
+                sb.append(Util.urlencode(parameterName));
+                sb.append("=");
+                sb.append(Util.urlencode(parameterValue));
+            }
+        }
+
         return sb.toString();
     }
 
