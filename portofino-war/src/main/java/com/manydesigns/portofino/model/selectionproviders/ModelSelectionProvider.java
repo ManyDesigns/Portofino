@@ -27,31 +27,38 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.model.selectionproviders;
 
-import com.manydesigns.elements.forms.TableForm;
-import com.manydesigns.portofino.model.datamodel.ForeignKey;
-
-import java.util.List;
+import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.Model;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class RelatedTableForm {
+public class ModelSelectionProvider implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public ForeignKey relationship;
-    public TableForm tableForm;
-    public List<Object> objects;
+    //**************************************************************************
+    // Constructors
+    //**************************************************************************
 
-    public RelatedTableForm(ForeignKey relationship,
-                          TableForm tableForm,
-                          List<Object> objects) {
-        this.relationship = relationship;
-        this.tableForm = tableForm;
-        this.objects = objects;
+
+    //**************************************************************************
+    // ModelObject implementation
+    //**************************************************************************
+
+    public void reset() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void init(Model model) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getQualifiedName() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

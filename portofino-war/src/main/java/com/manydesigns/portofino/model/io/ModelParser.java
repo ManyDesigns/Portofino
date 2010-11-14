@@ -397,9 +397,12 @@ public class ModelParser extends XmlParser {
     private class PropertyCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            UseCaseProperty useCaseProperty = new UseCaseProperty();
+            UseCase currentUseCase = useCaseStack.peek();
+
+            UseCaseProperty useCaseProperty =
+                    new UseCaseProperty(currentUseCase);
             checkAndSetAttributes(useCaseProperty, attributes);
-            useCaseStack.peek().getProperties().add(useCaseProperty);
+            currentUseCase.getProperties().add(useCaseProperty);
 
             currentModelAnnotations = useCaseProperty.getAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());

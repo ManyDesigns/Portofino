@@ -1060,6 +1060,54 @@
                                 </foreignKey>
                             </foreignKeys>
                         </table>
+                        <table tableName="persona">
+                            <columns>
+                                <column autoincrement="false" columnName="id" columnType="int4" javaType="java.lang.Integer" length="10" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="nome" columnType="varchar" javaType="java.lang.String" length="30" nullable="false" scale="0" searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="persona_pkey">
+                                <column columnName="id"/>
+                            </primaryKey>
+                        </table>
+                        <table tableName="familiare">
+                            <columns>
+                                <column autoincrement="false" columnName="id" columnType="int4" javaType="java.lang.Integer" length="10" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="nome" columnType="varchar" javaType="java.lang.String" length="30" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="persona_id" columnType="int4" javaType="java.lang.Integer" length="10" nullable="false" scale="0" searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="familiare_pkey">
+                                <column columnName="id"/>
+                            </primaryKey>
+                            <foreignKeys>
+                                <foreignKey virtual="false" foreignKeyName="familiare_persona_id_fkey" onDelete="NO ACTION" onUpdate="NO ACTION" toDatabase="hibernatetest" toSchema="public" toTable="persona">
+                                    <references>
+                                        <reference fromColumn="persona_id" toColumn="id"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
+                        </table>
+                        <table tableName="rimborso">
+                            <columns>
+                                <column autoincrement="false" columnName="familiare_id" columnType="int4" javaType="java.lang.Integer" length="10" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="id" columnType="int4" javaType="java.lang.Integer" length="10" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="persona_id" columnType="int4" javaType="java.lang.Integer" length="10" nullable="false" scale="0" searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="rimborso_pkey">
+                                <column columnName="id"/>
+                            </primaryKey>
+                            <foreignKeys>
+                                <foreignKey virtual="false" foreignKeyName="rimborso_familiare_id_fkey" onDelete="NO ACTION" onUpdate="NO ACTION" toDatabase="hibernatetest" toSchema="public" toTable="familiare">
+                                    <references>
+                                        <reference fromColumn="familiare_id" toColumn="id"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey virtual="false" foreignKeyName="rimborso_persona_id_fkey" onDelete="NO ACTION" onUpdate="NO ACTION" toDatabase="hibernatetest" toSchema="public" toTable="persona">
+                                    <references>
+                                        <reference fromColumn="persona_id" toColumn="id"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
+                        </table>
                     </tables>
                 </schema>
             </schemas>

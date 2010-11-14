@@ -50,8 +50,7 @@ public class UseCaseAction extends AbstractCrudAction {
     // Setup
     //**************************************************************************
 
-    @Override
-    public void setupMetadata() {
+    public void prepare() {
         if (qualifiedName == null) {
             return;
         }

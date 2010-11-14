@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.model.usecases;
 
+import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
@@ -40,7 +42,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCaseProperty {
+public class UseCaseProperty implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -48,6 +50,8 @@ public class UseCaseProperty {
     //**************************************************************************
     // Fields
     //**************************************************************************
+
+    protected final UseCase useCase;
 
     protected String name;
     protected final List<ModelAnnotation> modelAnnotations;
@@ -57,15 +61,35 @@ public class UseCaseProperty {
     // Constructors
     //**************************************************************************
 
-    public UseCaseProperty() {
+    public UseCaseProperty(UseCase useCase) {
+        this.useCase = useCase;
         modelAnnotations = new ArrayList<ModelAnnotation>();
     }
 
-    public UseCaseProperty(String name) {
-        this();
+    public UseCaseProperty(UseCase useCase, String name) {
+        this(useCase);
         this.name = name;
     }
 
+    //**************************************************************************
+    // ModelObject implementation
+    //**************************************************************************
+
+    public void reset() {
+        for (ModelAnnotation modelAnnotation : modelAnnotations) {
+            modelAnnotation.reset();
+        }
+    }
+
+    public void init(Model model) {
+        for (ModelAnnotation modelAnnotation : modelAnnotations) {
+            modelAnnotation.init(model);
+        }
+    }
+
+    public String getQualifiedName() {
+        return String.format("%s.%s", useCase.getQualifiedName(), name);
+    }
 
     //**************************************************************************
     // Getters/setters
