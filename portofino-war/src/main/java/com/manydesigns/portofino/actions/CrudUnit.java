@@ -56,7 +56,6 @@ import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
@@ -491,10 +490,8 @@ public class CrudUnit {
             SelectionProvider selectionProvider =
                     current.getSelectionProvider();
             String[] fieldNames = current.getFieldNames();
-            if (fieldsInProperties(fieldNames)) {
-                tableFormBuilder.configSelectionProvider(
-                        selectionProvider, fieldNames);
-            }
+            tableFormBuilder.configSelectionProvider(
+                    selectionProvider, fieldNames);
         }
 
         // ogni colonna chiave primaria sarà clickabile
@@ -536,18 +533,6 @@ public class CrudUnit {
         return sb.toString();
     }
 
-
-
-    protected boolean fieldsInProperties(String[] fieldNames) {
-        int size = classAccessor.getProperties().length;
-        int i=0;
-        for (PropertyAccessor prop : classAccessor.getProperties() ){
-            if (ArrayUtils.contains(fieldNames, prop.getName())){
-                i++;
-            }
-        }
-        return size==i;
-    }
 
     //**************************************************************************
     // Object loading

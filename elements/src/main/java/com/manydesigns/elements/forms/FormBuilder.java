@@ -211,6 +211,10 @@ public class FormBuilder {
             configReflectiveFields();
         }
 
+        // remove unused (or partially used) selection providers
+        removeUnusedSelectionProviders();
+
+
         // create the form/fieldset/field sructure
         Map<String,Field> fieldMap = new HashMap<String,Field>();
         for (int i = 0; i < groupedPropertyAccessors.size(); i++) {
@@ -241,6 +245,26 @@ public class FormBuilder {
 
         LogUtil.exiting(logger, "build");
         return form;
+    }
+
+    protected void removeUnusedSelectionProviders() {
+        List<String[]> removeList = new ArrayList<String[]>();
+        for (String[] current : selectionProviders.keySet()) {
+            int matches = 0;
+            for (ArrayList<PropertyAccessor> group : groupedPropertyAccessors) {
+                for (PropertyAccessor propertyAccessor : group) {
+                    if (ArrayUtils.contains(current, propertyAccessor.getName())) {
+                       matches++;
+                    }
+                }
+            }
+            if (matches != current.length) {
+                removeList.add(current);
+            }
+        }
+        for (String[] current : removeList) {
+            selectionProviders.remove(current);
+        }
     }
 
     protected void buildFieldGroup(Form form,

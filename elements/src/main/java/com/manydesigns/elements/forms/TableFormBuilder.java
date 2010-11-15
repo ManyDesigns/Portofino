@@ -177,6 +177,9 @@ public class TableFormBuilder {
             configReflectiveFields();
         }
 
+        // remove unused (or partially used) selection providers
+        removeUnusedSelectionProviders();
+
         PropertyAccessor[] propertyAccessorsArray =
                 new PropertyAccessor[propertyAccessors.size()];
         propertyAccessors.toArray(propertyAccessorsArray);
@@ -195,6 +198,26 @@ public class TableFormBuilder {
 
         return tableForm;
     }
+
+    protected void removeUnusedSelectionProviders() {
+        List<String[]> removeList = new ArrayList<String[]>();
+        for (String[] current : selectionProviders.keySet()) {
+            int matches = 0;
+            for (PropertyAccessor propertyAccessor : propertyAccessors) {
+                if (ArrayUtils.contains(current, propertyAccessor.getName())) {
+                   matches++;
+                }
+            }
+            if (matches != current.length) {
+                removeList.add(current);
+            }
+        }
+        for (String[] current : removeList) {
+            selectionProviders.remove(current);
+        }
+    }
+
+
 
     protected void setupColumns(TableForm tableForm) {
         for (TableForm.Column column : tableForm.getColumns()) {
