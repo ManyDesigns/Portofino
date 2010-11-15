@@ -26,38 +26,12 @@
  * Boston, MA  02111-1307  USA
  *
  */
-
-package com.manydesigns.portofino.model.usecases;
+package com.manydesigns.portofino.model.site;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public enum Access {
-    NONE("none"),
-    READ("read"),
-    WRITE("write");
-
-    public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
-
-    private final String name;
-
-    Access(String name) {
-        this.name = name;
-    }
-
-    public static Access parseAccess(String s) {
-        for (Access current : values()) {
-            if (current.getName().equals(s)) {
-                return current;
-            }
-        }
-        throw new IllegalArgumentException("Invalid access format: " + s);
-    }
-
-    public String getName() {
-        return name;
-    }
+public class RootSiteNode extends SiteNode{
 }

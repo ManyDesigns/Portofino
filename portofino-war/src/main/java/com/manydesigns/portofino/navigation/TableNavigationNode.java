@@ -31,6 +31,7 @@ package com.manydesigns.portofino.navigation;
 
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.site.SiteNode;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -40,7 +41,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableNavigationNode implements NavigationNode {
+public class TableNavigationNode extends SimpleNavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -58,10 +59,11 @@ public class TableNavigationNode implements NavigationNode {
     // Constructors
     //**************************************************************************
 
-    public TableNavigationNode(Table table,
+    public TableNavigationNode(SiteNode siteNode, Table table,
                                String urlFormat,
                                String titleFormat,
                                String descriptionFormat) {
+        super(siteNode);
         this.table = table;
         this.url =
                 Util.getAbsoluteUrl(
@@ -72,6 +74,8 @@ public class TableNavigationNode implements NavigationNode {
         this.description = MessageFormat.format(
                 descriptionFormat, table.getQualifiedName());
     }
+
+
 
 
     //**************************************************************************

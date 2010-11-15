@@ -489,6 +489,7 @@
         <action name="Help" class="com.manydesigns.portofino.actions.user.HelpAction">
             <result name="success">/skins/default/user/help.jsp</result>
         </action>
+
         <action name="Login" class="com.manydesigns.portofino.actions.user.LoginAction">
             <result name="input">/skins/default/user/login.jsp</result>
             <result name="success" type="redirectAction">

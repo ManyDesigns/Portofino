@@ -27,12 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.navigation;
+package com.manydesigns.portofino.model.site.usecases;
 
-import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.usecases.UseCase;
+import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +40,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCasesNavigationNode  implements NavigationNode {
+public class UseCaseProperty {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -51,49 +49,38 @@ public class UseCasesNavigationNode  implements NavigationNode {
     // Fields
     //**************************************************************************
 
-    protected final SiteNode siteNode;
-    protected final List<NavigationNode> childNodes;
-    protected final String url;
+    protected String name;
+    protected final List<ModelAnnotation> modelAnnotations;
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public UseCasesNavigationNode(Context context, SiteNode siteNode) {
-        this.siteNode = siteNode;
-        childNodes = new ArrayList<NavigationNode>();
+    public UseCaseProperty() {
+        modelAnnotations = new ArrayList<ModelAnnotation>();
+    }
 
-        List<UseCase> useCases = context.getModel().getUseCases();
-        for (UseCase useCase : useCases) {
-            UseCaseNavigationNode node =
-                    new UseCaseNavigationNode(useCase,
-                            "/{0}/UseCase.action",
-                            "{0}",
-                            "Use case: {0}");
-            childNodes.add(node);
-        }
-        url = Util.getAbsoluteUrl(siteNode.getUrl());
+    public UseCaseProperty(String name) {
+        this();
+        this.name = name;
     }
 
 
     //**************************************************************************
-    // NavigationNode implementation
+    // Getters/setters
     //**************************************************************************
 
-    public String getUrl() {
-        return url;
+    @XmlAttribute(required = true)
+    public String getName() {
+        return name;
     }
 
-    public String getTitle() {
-        return siteNode.getTitle();
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getDescription() {
-        return siteNode.getDescription();
-    }
-
-    public List<NavigationNode> getChildNodes() {
-        return childNodes;
+    public List<ModelAnnotation> getAnnotations() {
+        return modelAnnotations;
     }
 }

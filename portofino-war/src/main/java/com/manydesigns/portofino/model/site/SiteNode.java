@@ -41,7 +41,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SiteNode implements ModelObject {
+public abstract class SiteNode implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -51,8 +51,6 @@ public class SiteNode implements ModelObject {
     //**************************************************************************
 
     protected final ArrayList<SiteNode> childNodes;
-
-    protected String type;
     protected String url;
     protected String title;
     protected String description;
@@ -65,9 +63,8 @@ public class SiteNode implements ModelObject {
         childNodes = new ArrayList<SiteNode>();
     }
 
-    public SiteNode(String type, String url, String title, String description) {
+    public SiteNode( String url, String title, String description) {
         this();
-        this.type = type;
         this.url = url;
         this.title = title;
         this.description = description;
@@ -98,15 +95,6 @@ public class SiteNode implements ModelObject {
     //**************************************************************************
     // Getters/Setters
     //**************************************************************************
-
-    @XmlAttribute(required = true)
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
 
     @XmlAttribute(required = true)
     public String getUrl() {

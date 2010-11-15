@@ -27,10 +27,12 @@
  *
  */
 
-package com.manydesigns.portofino.model.usecases;
+package com.manydesigns.portofino.model.site.portlets;
 
+import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
 /*
@@ -38,57 +40,44 @@ import com.manydesigns.portofino.xml.XmlAttribute;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Button implements ModelObject {
+public class Portlet extends SiteNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // Constants
-    //**************************************************************************
-
-    public final static String DEFAULT_BUTTON_METHOD = "button";
-    public final static String DEFAULT_SCRIPT_LANGUAGE = "ognl";
-
-    //**************************************************************************
     // Fields
     //**************************************************************************
-
-    protected final UseCase useCase;
 
     protected String name;
-    protected String label;
-    protected String method;
-    protected String guard;
-    protected String script;
-    protected String scriptLanguage;
+    protected String type;
+    protected String title;
+    protected String legend;
+    protected String database;
+    protected String query;
+    protected String urlExpression;
 
     //**************************************************************************
-    // Fields
+    // Fields for wire-up
     //**************************************************************************
 
-    protected String actualMethod;
-    protected String actualScriptLanguage;
+    protected Database actualDatabase;
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public Button(UseCase useCase) {
-        this.useCase = useCase;
-    }
 
-    public Button(UseCase useCase, String name, String label) {
-        this(useCase);
+    public Portlet() {}
+
+    public Portlet(String name, String type, String title, String legend,
+                   String database, String query, String urlExpression) {
         this.name = name;
-        this.label = label;
-    }
-
-    public Button(UseCase useCase, String name, String label,
-                  String guard, String script, String scriptLanguage) {
-        this(useCase, name, label);
-        this.guard = guard;
-        this.script = script;
-        this.scriptLanguage = scriptLanguage;
+        this.type = type;
+        this.title = title;
+        this.legend = legend;
+        this.database = database;
+        this.query = query;
+        this.urlExpression = urlExpression;
     }
 
     //**************************************************************************
@@ -96,31 +85,20 @@ public class Button implements ModelObject {
     //**************************************************************************
 
     public void reset() {
-        actualMethod = null;
-        actualScriptLanguage = null;
+        actualDatabase = null;
     }
 
     public void init(Model model) {
-        actualMethod = (method == null)
-                ? DEFAULT_BUTTON_METHOD
-                : method;
-
-        actualScriptLanguage = (scriptLanguage == null)
-                ? DEFAULT_SCRIPT_LANGUAGE
-                : scriptLanguage;
+        actualDatabase = model.findDatabaseByName(database);
     }
 
     public String getQualifiedName() {
-        return String.format("%s*%s", useCase.getQualifiedName(), name);
+        return null;
     }
 
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
-
-    public UseCase getUseCase() {
-        return useCase;
-    }
 
     @XmlAttribute(required = true)
     public String getName() {
@@ -132,63 +110,66 @@ public class Button implements ModelObject {
     }
 
     @XmlAttribute(required = true)
-    public String getLabel() {
-        return label;
+    public String getType() {
+        return type;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    @XmlAttribute(required = false)
-    public String getMethod() {
-        return method;
+    @XmlAttribute(required = true)
+    public String getTitle() {
+        return title;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    @XmlAttribute(required = false)
-    public String getGuard() {
-        return guard;
+    @XmlAttribute(required = true)
+    public String getLegend() {
+        return legend;
     }
 
-    public void setGuard(String guard) {
-        this.guard = guard;
+    public void setLegend(String legend) {
+        this.legend = legend;
     }
 
-    @XmlAttribute(required = false)
-    public String getScript() {
-        return script;
+    @XmlAttribute(required = true)
+    public String getDatabase() {
+        return database;
     }
 
-    public void setScript(String script) {
-        this.script = script;
+    public void setDatabase(String database) {
+        this.database = database;
     }
 
-    @XmlAttribute(required = false)
-    public String getScriptLanguage() {
-        return scriptLanguage;
+    @Label("SQL")
+    @XmlAttribute(required = true)
+    public String getQuery() {
+        return query;
     }
 
-    public void setScriptLanguage(String scriptLanguage) {
-        this.scriptLanguage = scriptLanguage;
+    public void setQuery(String query) {
+        this.query = query;
     }
 
-    public String getActualMethod() {
-        return actualMethod;
+    @Label("URL expression")
+    @XmlAttribute(required = true)
+    public String getUrlExpression() {
+        return urlExpression;
     }
 
-    public void setActualMethod(String actualMethod) {
-        this.actualMethod = actualMethod;
+    public void setUrlExpression(String urlExpression) {
+        this.urlExpression = urlExpression;
     }
 
-    public String getActualScriptLanguage() {
-        return actualScriptLanguage;
+    public Database getActualDatabase() {
+        return actualDatabase;
     }
 
-    public void setActualScriptLanguage(String actualScriptLanguage) {
-        this.actualScriptLanguage = actualScriptLanguage;
+    public void setActualDatabase(Database actualDatabase) {
+        this.actualDatabase = actualDatabase;
     }
 }

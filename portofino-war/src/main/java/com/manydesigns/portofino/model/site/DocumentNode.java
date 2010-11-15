@@ -26,33 +26,12 @@
  * Boston, MA  02111-1307  USA
  *
  */
-
-package com.manydesigns.portofino.navigation;
-
-import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.system.model.users.Group;
-
-import java.util.List;
+package com.manydesigns.portofino.model.site;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface NavigationNode {
-    public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
-
-    String getUrl();
-    String getTitle();
-    String getDescription();
-    List<NavigationNode> getChildNodes();
-    SiteNode getSiteNode();
-    
-    //**************************************************************************
-    // Permission
-    //**************************************************************************
-    List<Group> getAllowGroups();
-    List<Group> getParentAllowGroup();
-    List<Group> getDenyGroups();    
+public class DocumentNode extends SiteNode{
 }

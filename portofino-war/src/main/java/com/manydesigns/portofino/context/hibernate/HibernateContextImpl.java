@@ -50,7 +50,7 @@ import com.manydesigns.portofino.model.io.ConnectionsParser;
 import com.manydesigns.portofino.model.io.ModelParser;
 import com.manydesigns.portofino.model.io.ModelWriter;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.usecases.UseCase;
+import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.UseCaseAccessor;
 import com.manydesigns.portofino.system.model.users.User;

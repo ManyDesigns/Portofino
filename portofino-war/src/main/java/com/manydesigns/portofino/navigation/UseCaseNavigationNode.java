@@ -30,7 +30,8 @@
 package com.manydesigns.portofino.navigation;
 
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.model.usecases.UseCase;
+import com.manydesigns.portofino.model.site.usecases.UseCase;
+import com.manydesigns.portofino.model.site.SiteNode;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -40,7 +41,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCaseNavigationNode implements NavigationNode {
+public class UseCaseNavigationNode extends AbstractNavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -48,7 +49,7 @@ public class UseCaseNavigationNode implements NavigationNode {
     // Fields
     //**************************************************************************
 
-    protected final UseCase useCase;
+    protected final UseCase siteNode;
     protected final String url;
     protected final String title;
     protected final String description;
@@ -58,19 +59,19 @@ public class UseCaseNavigationNode implements NavigationNode {
     // Constructors
     //**************************************************************************
 
-    public UseCaseNavigationNode(UseCase useCase,
+    public UseCaseNavigationNode(UseCase siteNode,
                                  String urlFormat,
                                  String titleFormat,
                                  String descriptionFormat) {
-        this.useCase = useCase;
+        this.siteNode = siteNode;
         this.url =
                 Util.getAbsoluteUrl(
                         MessageFormat.format(
-                                urlFormat, useCase.getName()));
+                                urlFormat, siteNode.getName()));
         this.title = MessageFormat.format(
-                titleFormat, useCase.getName());
+                titleFormat, siteNode.getName());
         this.description = MessageFormat.format(
-                descriptionFormat, useCase.getName());
+                descriptionFormat, siteNode.getName());
     }
 
 
@@ -92,5 +93,9 @@ public class UseCaseNavigationNode implements NavigationNode {
 
     public List<NavigationNode> getChildNodes() {
         return null;
+    }
+
+    public SiteNode getSiteNode() {
+        return this.siteNode;
     }
 }

@@ -42,7 +42,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableDesignNavigationNode implements NavigationNode {
+public class TableDesignNavigationNode extends AbstractNavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -67,7 +67,7 @@ public class TableDesignNavigationNode implements NavigationNode {
         List<Table> tables = context.getModel().getAllTables();
         for (Table table : tables) {
             TableNavigationNode node =
-                    new TableNavigationNode(table,
+                    new TableNavigationNode(siteNode,table,
                             "/model/{0}/TableDesign.action",
                             "{0}",
                             "Table design: {0}");
@@ -95,5 +95,9 @@ public class TableDesignNavigationNode implements NavigationNode {
 
     public List<NavigationNode> getChildNodes() {
         return childNodes;
+    }
+
+    public SiteNode getSiteNode() {
+        return this.siteNode;
     }
 }

@@ -26,10 +26,8 @@
  * Boston, MA  02111-1307  USA
  *
  */
-
 package com.manydesigns.portofino.navigation;
 
-import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.system.model.users.Group;
 
 import java.util.List;
@@ -39,20 +37,32 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface NavigationNode {
-    public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+public abstract class AbstractNavigationNode implements NavigationNode{
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+    protected List<NavigationNode> childNodes;
 
-    String getUrl();
-    String getTitle();
-    String getDescription();
-    List<NavigationNode> getChildNodes();
-    SiteNode getSiteNode();
-    
-    //**************************************************************************
-    // Permission
-    //**************************************************************************
-    List<Group> getAllowGroups();
-    List<Group> getParentAllowGroup();
-    List<Group> getDenyGroups();    
+    protected List<Group> allowGroups;
+    protected List<Group> parentAllowGroups;
+    protected List<Group> denyGroups;
+
+
+    public List<NavigationNode> getChildNodes() {
+        return this.childNodes;
+    }
+
+    public List<Group> getAllowGroups() {
+        return this.getAllowGroups();
+    }
+
+    public List<Group> getParentAllowGroup() {
+        return this.parentAllowGroups;
+    }
+
+    public List<Group> getDenyGroups() {
+        return this.denyGroups;
+    }
+
+
 }

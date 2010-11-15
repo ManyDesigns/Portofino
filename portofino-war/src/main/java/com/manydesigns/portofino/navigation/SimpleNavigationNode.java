@@ -40,7 +40,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SimpleNavigationNode implements NavigationNode {
+public class SimpleNavigationNode extends AbstractNavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -63,7 +63,6 @@ public class SimpleNavigationNode implements NavigationNode {
         url = Util.getAbsoluteUrl(siteNode.getUrl());
     }
 
-
     //**************************************************************************
     // NavigationNode implementation
     //**************************************************************************
@@ -82,5 +81,9 @@ public class SimpleNavigationNode implements NavigationNode {
 
     public List<NavigationNode> getChildNodes() {
         return childNodes;
+    }
+
+    public SiteNode getSiteNode() {
+        return this.siteNode;
     }
 }

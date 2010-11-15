@@ -39,7 +39,7 @@ import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
-import com.manydesigns.portofino.model.portlets.Portlet;
+import com.manydesigns.portofino.model.site.portlets.Portlet;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;

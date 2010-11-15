@@ -31,7 +31,7 @@ package com.manydesigns.portofino.reflection;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.model.usecases.UseCaseProperty;
+import com.manydesigns.portofino.model.site.usecases.UseCaseProperty;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;

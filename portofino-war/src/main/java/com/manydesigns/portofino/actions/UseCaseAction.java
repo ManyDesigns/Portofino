@@ -32,7 +32,7 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.model.usecases.UseCase;
+import com.manydesigns.portofino.model.site.usecases.UseCase;
 
 import java.text.MessageFormat;
 import java.util.List;

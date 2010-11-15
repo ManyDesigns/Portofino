@@ -31,9 +31,9 @@ package com.manydesigns.portofino.model;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.portlets.Portlet;
+import com.manydesigns.portofino.model.site.portlets.Portlet;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.usecases.UseCase;
+import com.manydesigns.portofino.model.site.usecases.UseCase;
 
 import java.util.ArrayList;
 import java.util.List;

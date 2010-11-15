@@ -27,60 +27,37 @@
  *
  */
 
-package com.manydesigns.portofino.model.usecases;
-
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
-import com.manydesigns.portofino.xml.XmlAttribute;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.manydesigns.portofino.model.site.usecases;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCaseProperty {
+public enum Access {
+    NONE("none"),
+    READ("read"),
+    WRITE("write");
+
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    private final String name;
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    protected String name;
-    protected final List<ModelAnnotation> modelAnnotations;
-
-
-    //**************************************************************************
-    // Constructors
-    //**************************************************************************
-
-    public UseCaseProperty() {
-        modelAnnotations = new ArrayList<ModelAnnotation>();
-    }
-
-    public UseCaseProperty(String name) {
-        this();
+    Access(String name) {
         this.name = name;
     }
 
+    public static Access parseAccess(String s) {
+        for (Access current : values()) {
+            if (current.getName().equals(s)) {
+                return current;
+            }
+        }
+        throw new IllegalArgumentException("Invalid access format: " + s);
+    }
 
-    //**************************************************************************
-    // Getters/setters
-    //**************************************************************************
-
-    @XmlAttribute(required = true)
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<ModelAnnotation> getAnnotations() {
-        return modelAnnotations;
     }
 }
