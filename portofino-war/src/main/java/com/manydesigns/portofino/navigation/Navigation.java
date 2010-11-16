@@ -33,7 +33,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.site.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,34 +80,36 @@ public class Navigation implements XhtmlFragment {
         Stack<NavigationNode> stack = new Stack<NavigationNode>();
         foundPath = new ArrayList<NavigationNode>();
         rootNodes = new ArrayList<NavigationNode>();
-        generateNavigationNodes(context.getModel().getSiteNodes(), rootNodes);
+        generateNavigationNodes(context.getModel().getRoot().getChildNodes(), rootNodes);
         searchPath(rootNodes, stack);
     }
 
     protected void generateNavigationNodes(List<SiteNode> siteNodes,
                                            List<NavigationNode> navigationNodes) {
         for (SiteNode siteNode : siteNodes) {
-            String type = siteNode.getType();
             NavigationNode navigationNode;
-            if ("simple".equals(type)) {
+            if (siteNode instanceof DocumentNode || siteNode instanceof PortletNode
+                    || siteNode instanceof UseCaseNode || siteNode instanceof FolderNode
+                    || siteNode instanceof CustomNode) {
                 navigationNode = new SimpleNavigationNode(siteNode);
                 generateNavigationNodes(siteNode.getChildNodes(),
                         navigationNode.getChildNodes());
-            } else if ("table-data".equals(type)) {
-                navigationNode =
+            } else if (siteNode instanceof CustomFolderNode) {
+                CustomFolderNode node = (CustomFolderNode) siteNode;
+                if("table-data".equals(node.getType())) {
+                    navigationNode =
                         new TableDataNavigationNode(context, siteNode);
-            } else if ("table-design".equals(type)) {
-                navigationNode =
+                } else if("table-design".equals(node.getType())) {
+                    navigationNode =
                         new TableDesignNavigationNode(context, siteNode);
-            } else if ("portlet-design".equals(type)) {
-                navigationNode =
-                        new PortletDesignNavigationNode(context, siteNode);
-            } else if ("use-cases".equals(type)) {
-                navigationNode =
-                        new UseCasesNavigationNode(context, siteNode);
+                } else {
+                LogUtil.warningMF(logger,
+                        "Unrecognized site node type: {0}", siteNode.getClass().getName());
+                continue;
+                }
             } else {
                 LogUtil.warningMF(logger,
-                        "Unrecognized site node type: {0}", type);
+                        "Unrecognized site node type: {0}", siteNode.getClass().getName());
                 continue;
             }
             navigationNodes.add(navigationNode);

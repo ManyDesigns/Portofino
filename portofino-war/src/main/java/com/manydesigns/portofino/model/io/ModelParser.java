@@ -5,8 +5,7 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.site.portlets.Portlet;
-import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.site.*;
 import com.manydesigns.portofino.model.site.usecases.Button;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.model.site.usecases.UseCaseProperty;
@@ -54,8 +53,6 @@ public class ModelParser extends XmlParser {
     public static final String FOREIGNKEY = "foreignKey";
     public static final String REFERENCES = "references";
     public static final String REFERENCE = "reference";
-    public static final String SITENODES = "siteNodes";
-    public static final String SITENODE = "siteNode";
     public static final String CHILDNODES = "childNodes";
     public static final String PORTLETS = "portlets";
     public static final String PORTLET = "portlet";
@@ -69,6 +66,19 @@ public class ModelParser extends XmlParser {
     public static final String ANNOTATIONS = "annotations";
     public static final String ANNOTATION = "annotation";
     public static final String VALUE = "value";
+    public static final String ROOTNODE = "rootNode";
+    public static final String DOCUMENTNODE = "documentNode";
+    public static final String FOLDER = "folder";
+    public static final String CUSTOMNODE = "customNode";
+    public static final String CUSTOMFOLDER = "customFolder";
+    public static final String USECASENODE = "useCaseNode";
+    public static final String PORTLETNODE = "portletNode";
+    public static final String PERMISSIONS = "permissions";
+    public static final String ALLOW = "allow";
+    public static final String DENY = "deny";
+    public static final String GROUP = "group";
+    private static final String NAME = "name";
+
 
     //--------------------------------------------------------------------------
     // Fields
@@ -133,9 +143,7 @@ public class ModelParser extends XmlParser {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             expectElement(DATABASES, 0, 1, new DatabasesCallback());
-            expectElement(SITENODES, 0, 1, new SiteNodesCallback());
-            expectElement(PORTLETS, 0, 1, new PortletsCallback());
-            expectElement(USECASES, 0, 1, new UseCasesCallback());
+            expectElement(ROOTNODE, 0, 1, new RootNodeCallback());
         }
     }
 
@@ -281,64 +289,146 @@ public class ModelParser extends XmlParser {
     // Site nodes
     //**************************************************************************
 
-    private class SiteNodesCallback implements ElementCallback {
+    private class RootNodeCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(SITENODE, 1, null,
-                    new SiteNodeCallback(model.getSiteNodes()));
-        }
-    }
-
-    private class SiteNodeCallback implements ElementCallback {
-        private final List<SiteNode> parentNodes;
-
-        private SiteNodeCallback(List<SiteNode> parentNodes) {
-            this.parentNodes = parentNodes;
-        }
-
-        public void doElement(Map<String, String> attributes)
-                throws XMLStreamException {
-            SiteNode currentSiteNode = new SiteNode();
-            checkAndSetAttributes(currentSiteNode, attributes);
-            parentNodes.add(currentSiteNode);
+            RootNode root = new RootNode();
+            model.setRoot(root);
+            checkAndSetAttributes(root, attributes);
             expectElement(CHILDNODES, 0, 1,
-                    new ChildNodesCallback(currentSiteNode.getChildNodes()));
+                    new ChildNodesCallback(root));
+            expectElement(PERMISSIONS, 0, 1,
+                    new PermissionsCallback(root));
         }
     }
 
     private class ChildNodesCallback implements ElementCallback {
-        private final List<SiteNode> parentNodes;
+        private final SiteNode parent;
 
-        private ChildNodesCallback(List<SiteNode> parentNodes) {
-            this.parentNodes = parentNodes;
+        private ChildNodesCallback(SiteNode parent) {
+            this.parent = parent;
         }
 
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(SITENODE, 1, null, new SiteNodeCallback(parentNodes));
+            String[] expectedTags = {DOCUMENTNODE, FOLDER, CUSTOMNODE,
+                    CUSTOMFOLDER, USECASENODE, PORTLETNODE};
+            ElementCallback[] callbackArray = {
+                    new DocumentNodeCallback(parent), new FolderCallback(parent),
+                    new CustomNodeCallback(parent), new CustomFolderCallback(parent),
+                    new UseCaseNodeCallback(parent), new PortletCallback(parent)};
+            expectElement(expectedTags, 0, null,
+                    callbackArray);
         }
     }
 
+    private class FolderCallback implements ElementCallback {
+        SiteNode parentNode;
 
-    //**************************************************************************
-    // Portlets
-    //**************************************************************************
+        private FolderCallback(SiteNode parent) {
+            this.parentNode = parent;
+        }
 
-    private class PortletsCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(PORTLET, 0, null, new PortletCallback());
+            FolderNode node = new FolderNode(parentNode);
+            checkAndSetAttributes(node, attributes);
+            parentNode.getChildNodes().add(node);
+            expectElement(CHILDNODES, 0, 1,
+                    new ChildNodesCallback(node));
+            expectElement(PERMISSIONS, 0, 1,
+                    new PermissionsCallback(node));
+        }
+    }
+
+    private class DocumentNodeCallback implements ElementCallback {
+        SiteNode parentNode;
+
+        private DocumentNodeCallback(SiteNode parent) {
+            this.parentNode = parent;
+        }
+
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            DocumentNode node = new DocumentNode(parentNode);
+            checkAndSetAttributes(node, attributes);
+            parentNode.getChildNodes().add(node);
+            expectElement(PERMISSIONS, 0, 1,
+                    new PermissionsCallback(node));
+        }
+    }
+
+    private class CustomNodeCallback implements ElementCallback {
+        SiteNode parentNode;
+
+        private CustomNodeCallback(SiteNode parent) {
+            this.parentNode = parent;
+        }
+
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            CustomNode node = new CustomNode(parentNode);
+            checkAndSetAttributes(node, attributes);
+            parentNode.getChildNodes().add(node);
+            expectElement(PERMISSIONS, 0, 1,
+                    new PermissionsCallback(node));
+        }
+    }
+
+    private class CustomFolderCallback implements ElementCallback {
+        SiteNode parentNode;
+
+        private CustomFolderCallback(SiteNode parent) {
+            this.parentNode = parent;
+        }
+
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            CustomFolderNode node = new CustomFolderNode(parentNode);
+            checkAndSetAttributes(node, attributes);
+            parentNode.getChildNodes().add(node);
+            expectElement(PERMISSIONS, 0, 1,
+                    new PermissionsCallback(node));
         }
     }
 
     private class PortletCallback implements ElementCallback {
+        SiteNode parentNode;
+
+        private PortletCallback(SiteNode parent) {
+            this.parentNode = parent;
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            Portlet portlet = new Portlet();
-            checkAndSetAttributes(portlet, attributes);
-            model.getPortlets().add(portlet);
+            PortletNode node = new PortletNode(parentNode);
+            checkAndSetAttributes(node, attributes);
+            parentNode.getChildNodes().add(node);
+            expectElement(PERMISSIONS, 0, 1,
+                    new PermissionsCallback(node));
         }
     }
+
+    private class UseCaseNodeCallback implements ElementCallback {
+        SiteNode parentNode;
+
+        private UseCaseNodeCallback(SiteNode parent) {
+            this.parentNode = parent;
+        }
+
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            UseCaseNode node = new UseCaseNode(parentNode);
+            checkAndSetAttributes(node, attributes);
+            parentNode.getChildNodes().add(node);
+            expectElement(USECASE, 1, null, new UseCaseCallback(node));
+            expectElement(PERMISSIONS, 0, 1,
+                    new PermissionsCallback(node));   
+        }
+    }
+
+
+
 
 
 
@@ -346,14 +436,12 @@ public class ModelParser extends XmlParser {
     // Use cases
     //**************************************************************************
 
-    private class UseCasesCallback implements ElementCallback {
-        public void doElement(Map<String, String> attributes)
-                throws XMLStreamException {
-            expectElement(USECASE, 0, null, new UseCaseCallback());
-        }
-    }
-
     private class UseCaseCallback implements ElementCallback {
+        UseCaseNode node;
+        private UseCaseCallback(UseCaseNode node){
+            this.node = node;
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             UseCase parentUseCase;
@@ -365,7 +453,7 @@ public class ModelParser extends XmlParser {
 
             UseCase currentUseCase = new UseCase(parentUseCase);
             if (parentUseCase == null) {
-                model.getUseCases().add(currentUseCase);
+                node.setUseCase(currentUseCase);
             } else {
                 parentUseCase.getSubUseCases().add(currentUseCase);
             }
@@ -457,7 +545,63 @@ public class ModelParser extends XmlParser {
     private class SubUseCasesCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(USECASE, 0, null, new UseCaseCallback());
+            expectElement(USECASE, 0, null, new UseCaseCallback(null));
+        }
+    }
+
+    //**************************************************************************
+    // Permissions
+    //**************************************************************************
+    private class PermissionsCallback implements ElementCallback {
+        SiteNode node;
+
+        private PermissionsCallback(SiteNode node) {
+            this.node = node;
+        }
+
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(ALLOW, 0, 1, new AllowCallback(node));
+            expectElement(DENY, 0, 1, new DenyCallback(node));
+        }
+    }
+    private class AllowCallback implements ElementCallback {
+        SiteNode node;
+
+        private AllowCallback(SiteNode node) {
+            this.node = node;
+        }
+
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(GROUP, 1, null, new GroupCallback(node.getAllowGroups()));
+        }
+    }
+
+    private class DenyCallback implements ElementCallback {
+        SiteNode node;
+
+        private DenyCallback(SiteNode node) {
+            this.node = node;
+        }
+
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(GROUP, 1, null, new GroupCallback(node.getDenyGroups()));
+        }
+    }
+
+    private class GroupCallback implements ElementCallback {
+        List<String> groups;
+
+        private GroupCallback(List<String> groups) {
+            this.groups = groups;
+        }
+
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            groups.add(attributes.get(NAME));
+
         }
     }
 

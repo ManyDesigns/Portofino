@@ -39,7 +39,7 @@ import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
-import com.manydesigns.portofino.model.site.portlets.Portlet;
+import com.manydesigns.portofino.model.site.PortletNode;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -103,7 +103,7 @@ public class PortletDesignAction extends PortofinoAction {
     // Model metadata
     //**************************************************************************
 
-    public Portlet portlet;
+    public PortletNode portlet;
 
     //**************************************************************************
     // Presentation elements
@@ -132,14 +132,14 @@ public class PortletDesignAction extends PortofinoAction {
     //**************************************************************************
 
     public String execute() {
-        if (portletName == null) {
+        /*if (portletName == null) {
             portletName = model.getPortlets().get(0).getName();
             return REDIRECT_TO_FIRST;
-        }
+        }*/
 
         setupPortlet();
 
-        form = new FormBuilder(Portlet.class)
+        form = new FormBuilder(PortletNode.class)
                 .configFields("name", "title", "legend", "database",
                         "query", "urlExpression")
                 .configMode(Mode.VIEW)
@@ -276,7 +276,7 @@ public class PortletDesignAction extends PortofinoAction {
     //**************************************************************************
 
     public void setupPortlet() {
-        portlet = model.findPortletByName(portletName);
+        portlet = (PortletNode) navigation.getSelectedNavigationNode();
         if (portlet == null) {
             throw new ModelObjectNotFoundError(portletName);
         }

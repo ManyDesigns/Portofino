@@ -27,22 +27,25 @@
  *
  */
 
-package com.manydesigns.portofino.model.site.portlets;
+package com.manydesigns.portofino.model.site;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.xml.XmlAttribute;
+
+import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Portlet extends SiteNode {
+public class PortletNode extends SiteNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    private final String urlFormat = "/{0}/Portlet.action";
 
     //**************************************************************************
     // Fields
@@ -67,10 +70,13 @@ public class Portlet extends SiteNode {
     //**************************************************************************
 
 
-    public Portlet() {}
+    public PortletNode(SiteNode parent) {
+        super(parent);
+    }
 
-    public Portlet(String name, String type, String title, String legend,
+    public PortletNode(SiteNode parent, String name, String type, String title, String legend,
                    String database, String query, String urlExpression) {
+        super(parent);
         this.name = name;
         this.type = type;
         this.title = title;
@@ -90,6 +96,7 @@ public class Portlet extends SiteNode {
 
     public void init(Model model) {
         actualDatabase = model.findDatabaseByName(database);
+        actualUrl = MessageFormat.format(urlFormat, actualId);        
     }
 
     public String getQualifiedName() {
@@ -172,4 +179,5 @@ public class Portlet extends SiteNode {
     public void setActualDatabase(Database actualDatabase) {
         this.actualDatabase = actualDatabase;
     }
+
 }

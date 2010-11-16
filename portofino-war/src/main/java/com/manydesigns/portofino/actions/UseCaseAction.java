@@ -32,10 +32,10 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.site.UseCaseNode;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 
 import java.text.MessageFormat;
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -55,7 +55,8 @@ public class UseCaseAction extends AbstractCrudAction {
         if (qualifiedName == null) {
             return;
         }
-        UseCase rootUseCase = model.findUseCaseByQualifiedName(qualifiedName);
+        UseCase rootUseCase = ((UseCaseNode) navigation.getSelectedNavigationNode())
+                .getUseCase();
         if (rootUseCase == null) {
             throw new ModelObjectNotFoundError(qualifiedName);
         }
@@ -64,7 +65,7 @@ public class UseCaseAction extends AbstractCrudAction {
 
     private CrudUnit setupUseCaseInstance(UseCase useCase, String prefix) {
         ClassAccessor classAccessor =
-                    context.getUseCaseAccessor(useCase.getQualifiedName());
+                    context.getUseCaseAccessor(useCase);
         Table baseTable = useCase.getActualTable();
         String query = useCase.getQuery();
         CrudUnit result = new CrudUnit(classAccessor, baseTable, query,
@@ -94,21 +95,13 @@ public class UseCaseAction extends AbstractCrudAction {
         return result;
     }
 
-
     //**************************************************************************
-    // Redirect to first use case
+    // Redirect to first use case -
     //**************************************************************************
 
+    //TODO da eliminare
     @Override
     public String redirectToFirst() {
-        List<UseCase> useCases = model.getUseCases();
-        if (useCases.isEmpty()) {
-            return NO_CLASSES;
-        } else {
-            qualifiedName = useCases.get(0).getName();
             return REDIRECT_TO_FIRST;
-        }
     }
-
-
 }

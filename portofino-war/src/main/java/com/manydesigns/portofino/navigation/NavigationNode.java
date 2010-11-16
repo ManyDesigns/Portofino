@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.navigation;
 
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.system.model.users.Group;
 
 import java.util.List;
 
@@ -48,11 +47,4 @@ public interface NavigationNode {
     String getDescription();
     List<NavigationNode> getChildNodes();
     SiteNode getSiteNode();
-    
-    //**************************************************************************
-    // Permission
-    //**************************************************************************
-    List<Group> getAllowGroups();
-    List<Group> getParentAllowGroup();
-    List<Group> getDenyGroups();    
 }

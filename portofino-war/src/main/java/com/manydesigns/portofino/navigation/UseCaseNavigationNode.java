@@ -30,10 +30,9 @@
 package com.manydesigns.portofino.navigation;
 
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.site.UseCaseNode;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 /*
@@ -41,7 +40,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCaseNavigationNode extends AbstractNavigationNode {
+public class UseCaseNavigationNode implements NavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -49,29 +48,16 @@ public class UseCaseNavigationNode extends AbstractNavigationNode {
     // Fields
     //**************************************************************************
 
-    protected final UseCase siteNode;
+    protected final UseCaseNode siteNode;
     protected final String url;
-    protected final String title;
-    protected final String description;
-
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public UseCaseNavigationNode(UseCase siteNode,
-                                 String urlFormat,
-                                 String titleFormat,
-                                 String descriptionFormat) {
+    public UseCaseNavigationNode(UseCaseNode siteNode) {
         this.siteNode = siteNode;
-        this.url =
-                Util.getAbsoluteUrl(
-                        MessageFormat.format(
-                                urlFormat, siteNode.getName()));
-        this.title = MessageFormat.format(
-                titleFormat, siteNode.getName());
-        this.description = MessageFormat.format(
-                descriptionFormat, siteNode.getName());
+        this.url = Util.getAbsoluteUrl(siteNode.getId());
     }
 
 
@@ -84,11 +70,11 @@ public class UseCaseNavigationNode extends AbstractNavigationNode {
     }
 
     public String getTitle() {
-        return title;
+        return siteNode.getTitle();
     }
 
     public String getDescription() {
-        return description;
+        return siteNode.getDescription();
     }
 
     public List<NavigationNode> getChildNodes() {

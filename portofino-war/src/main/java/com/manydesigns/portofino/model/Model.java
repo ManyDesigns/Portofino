@@ -31,9 +31,7 @@ package com.manydesigns.portofino.model;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.site.portlets.Portlet;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.site.usecases.UseCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,9 +51,8 @@ public class Model {
     //**************************************************************************
 
     protected final ArrayList<Database> databases;
-    protected final ArrayList<SiteNode> siteNodes;
-    protected final ArrayList<Portlet> portlets;
-    protected final ArrayList<UseCase> useCases;
+    protected SiteNode root;
+
 
     public static final Logger logger = LogUtil.getLogger(Model.class);
 
@@ -65,9 +62,6 @@ public class Model {
 
     public Model() {
         this.databases = new ArrayList<Database>();
-        this.siteNodes = new ArrayList<SiteNode>();
-        this.portlets = new ArrayList<Portlet>();
-        this.useCases = new ArrayList<UseCase>();
     }
 
     //**************************************************************************
@@ -81,19 +75,7 @@ public class Model {
         }
 
         // site nodes
-        for (SiteNode siteNode : siteNodes) {
-            siteNode.reset();
-        }
-
-        // portlets
-        for (Portlet portlet : portlets) {
-            portlet.reset();
-        }
-
-        // use cases
-        for (UseCase useCase : useCases) {
-            useCase.reset();
-        }
+        root.reset();
     }
 
     public void init() {
@@ -105,19 +87,7 @@ public class Model {
         }
 
         // site nodes
-        for (SiteNode siteNode : siteNodes) {
-            siteNode.init(this);
-        }
-
-        // portlets
-        for (Portlet portlet : portlets) {
-            portlet.init(this);
-        }
-
-        // use cases
-        for (UseCase useCase : useCases) {
-            useCase.init(this);
-        }
+        root.init(this);
     }
 
     //**************************************************************************
@@ -246,48 +216,11 @@ public class Model {
         return databases;
     }
 
-    public ArrayList<SiteNode> getSiteNodes() {
-        return siteNodes;
+    public SiteNode getRoot() {
+        return root;
     }
 
-    public ArrayList<Portlet> getPortlets() {
-        return portlets;
+    public void setRoot(SiteNode root) {
+        this.root = root;
     }
-
-    public Portlet findPortletByName(String portletName) {
-        for (Portlet current : portlets) {
-            if (current.getName().equals(portletName)) {
-                return current;
-            }
-        }
-        return null;
-    }
-
-    public ArrayList<UseCase> getUseCases() {
-        return useCases;
-    }
-
-    public UseCase findUseCaseByQualifiedName(String useCaseName) {
-        return findUseCaseByQualifiedName(useCases, useCaseName);
-    }
-
-    public UseCase findUseCaseByQualifiedName(List<UseCase> useCaseList, String useCaseName) {
-        int firstIndex = useCaseName.indexOf(".");
-        String firstName = (firstIndex > 0)
-                ? useCaseName.substring(0, firstIndex)
-                : useCaseName;
-        for (UseCase current : useCaseList) {
-            if (current.getName().equals(firstName)) {
-                if (firstIndex > 0) {
-                    List<UseCase> subUseCases = current.getSubUseCases();
-                    String rest = useCaseName.substring(firstIndex + 1);
-                    return findUseCaseByQualifiedName(subUseCases, rest);
-                } else {
-                    return current;
-                }
-            }
-        }
-        return null;
-    }
-
 }

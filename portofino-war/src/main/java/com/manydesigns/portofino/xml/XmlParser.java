@@ -34,6 +34,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
+import org.apache.commons.lang.ArrayUtils;
 
 import javax.xml.stream.*;
 import java.io.InputStream;
@@ -255,6 +256,45 @@ public class XmlParser {
             throw new Error(MessageFormat.format(
                     "Element ''{0}'' expected max: {1}  actual: {2}. {3}",
                     elementName, max, counter, getLocationString()));
+        }
+    }
+
+
+    public void expectElement(String[] elementNameArray, int min, Integer max,
+                               ElementCallback[] callbackArray) throws XMLStreamException {
+        int counter = 0;
+        while (true) {
+            skipSpacesAndComments();
+            int index = ArrayUtils.indexOf(elementNameArray, localName);
+            if (event == XMLStreamConstants.START_ELEMENT
+                    && index >= 0) {
+                Map<String, String> callbackAttributes = attributes;
+                next();
+                callbackArray[index].doElement(callbackAttributes);
+                skipSpacesAndComments();
+                String expectedElementName = elementNameArray[index];
+                if (event == XMLStreamConstants.END_ELEMENT
+                        && localName.equals(expectedElementName)) {
+                    next();
+                } else {
+                    throw new Error(MessageFormat.format(
+                            "Closing tag ''{0}'' not found. Found ''{1}'' instead. {2}",
+                            expectedElementName, localName, getLocationString()));
+                }
+            } else {
+                break;
+            }
+            counter = counter + 1;
+        }
+        if (counter < min) {
+            throw new Error(MessageFormat.format(
+                    "Element ''{0}'' expected min: {1}  actual: {2}. {3}",
+                    ArrayUtils.toString(elementNameArray), min, counter, getLocationString()));
+        }
+        if (max != null && counter > max) {
+            throw new Error(MessageFormat.format(
+                    "Element ''{0}'' expected max: {1}  actual: {2}. {3}",
+                    ArrayUtils.toString(elementNameArray), max, counter, getLocationString()));
         }
     }
 

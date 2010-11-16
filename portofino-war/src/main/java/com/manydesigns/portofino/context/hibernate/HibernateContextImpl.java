@@ -794,8 +794,7 @@ public class HibernateContextImpl implements Context {
         return new TableAccessor(table);
     }
 
-    public UseCaseAccessor getUseCaseAccessor(String useCaseName) {
-        UseCase useCase = model.findUseCaseByQualifiedName(useCaseName);
+    public UseCaseAccessor getUseCaseAccessor(UseCase useCase) {
         String qualifiedTableName = useCase.getTable();
         TableAccessor tableAccessor = getTableAccessor(qualifiedTableName);
         return new UseCaseAccessor(useCase, tableAccessor);
@@ -906,5 +905,4 @@ public class HibernateContextImpl implements Context {
             stopWatch.suspend();
         }
     }
-
 }

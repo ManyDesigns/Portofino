@@ -32,6 +32,7 @@ package com.manydesigns.portofino.context;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.UseCaseAccessor;
 import com.manydesigns.portofino.system.model.users.User;
@@ -130,7 +131,7 @@ public interface Context {
     //**************************************************************************
 
     public TableAccessor getTableAccessor(String qualifiedTableName);
-    public UseCaseAccessor getUseCaseAccessor(String useCaseName);
+    public UseCaseAccessor getUseCaseAccessor(UseCase useCase);
 
     //**************************************************************************
     // User

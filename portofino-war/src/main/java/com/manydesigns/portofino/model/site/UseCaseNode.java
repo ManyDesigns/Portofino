@@ -28,10 +28,33 @@
  */
 package com.manydesigns.portofino.model.site;
 
+import com.manydesigns.portofino.model.site.usecases.UseCase;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class RootSiteNode extends SiteNode{
+public class UseCaseNode extends SiteNode{
+    private final String urlFormat = "/{0}/UseCase.action";
+
+    protected UseCase useCase;
+
+    public UseCaseNode(SiteNode parent, UseCase useCase) {
+        this(parent);
+        this.useCase = useCase;
+    }
+
+    public UseCaseNode(SiteNode parent) {
+        super(parent);
+    }
+
+    public UseCase getUseCase() {
+        return useCase;
+    }
+
+    public void setUseCase(UseCase useCase) {
+        this.useCase = useCase;
+    }
+
 }

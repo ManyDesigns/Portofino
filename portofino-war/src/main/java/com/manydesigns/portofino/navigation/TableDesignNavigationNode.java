@@ -42,7 +42,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableDesignNavigationNode extends AbstractNavigationNode {
+public class TableDesignNavigationNode implements NavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -73,7 +73,7 @@ public class TableDesignNavigationNode extends AbstractNavigationNode {
                             "Table design: {0}");
             childNodes.add(node);
         }
-        url = Util.getAbsoluteUrl(siteNode.getUrl());
+        url = Util.getAbsoluteUrl(siteNode.getId());
     }
 
 

@@ -41,7 +41,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableNavigationNode extends SimpleNavigationNode {
+public class TableNavigationNode implements NavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -53,6 +53,8 @@ public class TableNavigationNode extends SimpleNavigationNode {
     protected final String url;
     protected final String title;
     protected final String description;
+    protected final SiteNode siteNode;
+    protected List<NavigationNode> childNodes;
 
 
     //**************************************************************************
@@ -63,7 +65,7 @@ public class TableNavigationNode extends SimpleNavigationNode {
                                String urlFormat,
                                String titleFormat,
                                String descriptionFormat) {
-        super(siteNode);
+        this.siteNode = siteNode;
         this.table = table;
         this.url =
                 Util.getAbsoluteUrl(
@@ -96,5 +98,9 @@ public class TableNavigationNode extends SimpleNavigationNode {
 
     public List<NavigationNode> getChildNodes() {
         return null;
+    }
+
+    public SiteNode getSiteNode() {
+        return siteNode;
     }
 }

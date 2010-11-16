@@ -32,7 +32,6 @@ package com.manydesigns.portofino.model.site.usecases;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.text.MessageFormat;
@@ -44,7 +43,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCase extends SiteNode {
+public class UseCase {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
     
