@@ -33,45 +33,38 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ModelSelectionProvider implements ModelObject {
+public class SelectionProperty implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    protected final List<SelectionProperty> selectionProperties;
+
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
+    protected final ModelSelectionProvider modelSelectionProvider;
 
     protected String name;
-    protected String database;
-    protected String sql;
-    protected String hql;
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public ModelSelectionProvider() {
-        selectionProperties = new ArrayList<SelectionProperty>();
+    public SelectionProperty(
+            ModelSelectionProvider modelSelectionProvider) {
+        this.modelSelectionProvider = modelSelectionProvider;
     }
 
-    public ModelSelectionProvider(String name, String database) {
-        this();
+    public SelectionProperty(
+            ModelSelectionProvider modelSelectionProvider, String name) {
+        this(modelSelectionProvider);
         this.name = name;
-        this.database = database;
-    }
-
-    public ModelSelectionProvider(String name, String database,
-                                  String sql, String hql) {
-        this(name, database);
-        this.sql = sql;
-        this.hql = hql;
     }
 
     //**************************************************************************
@@ -83,16 +76,13 @@ public class ModelSelectionProvider implements ModelObject {
     public void init(Model model) {}
 
     public String getQualifiedName() {
-        return name;
+        return String.format("%s.%s",
+                modelSelectionProvider.getQualifiedName(), name);
     }
 
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
-
-    public List<SelectionProperty> getSelectionProperties() {
-        return selectionProperties;
-    }
 
     @XmlAttribute(required = true)
     public String getName() {
@@ -101,32 +91,5 @@ public class ModelSelectionProvider implements ModelObject {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @XmlAttribute(required = true)
-    public String getDatabase() {
-        return database;
-    }
-
-    public void setDatabase(String database) {
-        this.database = database;
-    }
-
-    @XmlAttribute(required = false)
-    public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
-    }
-
-    @XmlAttribute(required = false)
-    public String getHql() {
-        return hql;
-    }
-
-    public void setHql(String hql) {
-        this.hql = hql;
     }
 }

@@ -31,9 +31,9 @@ package com.manydesigns.portofino.model.usecases;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.text.MessageFormat;
@@ -176,7 +176,7 @@ public class UseCase implements ModelObject {
         return properties;
     }
 
-    public List<ModelSelectionProvider> getSelectionProviders() {
+    public List<ModelSelectionProvider> getModelSelectionProviders() {
         return modelSelectionProviders;
     }
 

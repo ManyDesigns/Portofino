@@ -73,9 +73,8 @@ public class DefaultSelectionProvider implements SelectionProvider {
     //**************************************************************************
 
     public static DefaultSelectionProvider create(String name,
-                                               int fieldCount,
-                                               Object[] values,
-                                               String[] labels) {
+                                                  Object[] values,
+                                                  String[] labels) {
         Object[][] valuesArray = new Object[values.length][];
         for (int i = 0; i < values.length; i++) {
             valuesArray[i] = new Object[1];
@@ -87,6 +86,31 @@ public class DefaultSelectionProvider implements SelectionProvider {
             labelsArray[i] = new String[1];
             labelsArray[i][0] = labels[i];
         }
+
+        return create(name, 1, valuesArray, labelsArray);
+    }
+
+    public static DefaultSelectionProvider create(String name,
+                                               int fieldCount,
+                                               Collection<Object[]> valuesAndLabels) {
+        int size = valuesAndLabels.size();
+        Object[][] valuesArray = new Object[size][];
+        String[][] labelsArray = new String[size][];
+        int i = 0;
+        for (Object[] valueAndLabel : valuesAndLabels) {
+            Object[] values = new Object[fieldCount];
+            String[] labels = new String[fieldCount];
+            valuesArray[i] = values;
+            labelsArray[i] = labels;
+
+            for (int j = 0; j < fieldCount; j++) {
+                values[j] = valueAndLabel[j*2];
+                labels[j] = Util.convertValueToString(valueAndLabel[j*2+1]);
+            }
+
+            i++;
+        }
+
 
         return create(name, fieldCount, valuesArray, labelsArray);
     }

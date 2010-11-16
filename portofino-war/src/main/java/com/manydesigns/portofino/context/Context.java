@@ -114,7 +114,9 @@ public interface Context {
 
     void rollback();
 
-    List<Object> getRelatedObjects(String qualifiedTableName, 
+    String getQualifiedTableNameFromQueryString(String queryString);
+
+    List<Object> getRelatedObjects(String qualifiedTableName,
             Object obj, String oneToManyRelationshipName);
 
     void resetDbTimer();

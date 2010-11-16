@@ -301,6 +301,9 @@ public class HibernateContextImpl implements Context {
 
     public QueryStringWithParameters getQueryStringWithParametersForCriteria(
             Criteria criteria) {
+        if (criteria == null) {
+            return new QueryStringWithParameters("", new Object[0]);
+        }
         ClassAccessor classAccessor = criteria.getClassAccessor();
         String qualifiedTableName = classAccessor.getName();
 
@@ -461,7 +464,7 @@ public class HibernateContextImpl implements Context {
         return getObjects(queryString, null);
     }
 
-    protected String getQualifiedTableNameFromQueryString(String queryString) {
+    public String getQualifiedTableNameFromQueryString(String queryString) {
         Matcher matcher = FROM_PATTERN.matcher(queryString);
         if (matcher.matches()) {
             return matcher.group(1);

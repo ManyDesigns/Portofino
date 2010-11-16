@@ -29,12 +29,22 @@
 
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.elements.annotations.ShortName;
+import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
+import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
 import com.manydesigns.portofino.model.usecases.UseCase;
+import com.manydesigns.portofino.reflection.TableAccessor;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.List;
 
 /*
@@ -76,6 +86,10 @@ public class UseCaseAction extends AbstractCrudAction {
         result.model = model;
         result.req = req;
 
+        // set up selection providers
+
+        setupSelectionProviders(useCase, result);
+
         // expand recursively
         int index = 0;
         for (UseCase subUseCase : useCase.getSubUseCases()) {
@@ -91,6 +105,58 @@ public class UseCaseAction extends AbstractCrudAction {
             index++;
         }
         return result;
+    }
+
+    private void setupSelectionProviders(UseCase useCase, CrudUnit result) {
+        for (ModelSelectionProvider current : useCase.getModelSelectionProviders()) {
+            String name = current.getName();
+            String database = current.getDatabase();
+            String sql = current.getSql();
+            String hql = current.getHql();
+
+            String[] fieldNames =
+                    new String[current.getSelectionProperties().size()];
+
+            int i = 0;
+            for (SelectionProperty selectionProperty :
+                    current.getSelectionProperties()) {
+                fieldNames[i] = selectionProperty.getName();
+                i++;
+            }
+
+
+            SelectionProvider selectionProvider;
+            if (sql != null) {
+                Collection<Object[]> objects = context.runSql(database, sql);
+                selectionProvider = DefaultSelectionProvider.create(
+                        name, fieldNames.length, objects);
+            } else if (hql != null) {
+                Collection<Object> objects = context.getObjects(hql);
+                String qualifiedTableName = 
+                        context.getQualifiedTableNameFromQueryString(hql);
+                TableAccessor tableAccessor =
+                        context.getTableAccessor(qualifiedTableName);
+                ShortName shortNameAnnotation =
+                        tableAccessor.getAnnotation(ShortName.class);
+                TextFormat[] textFormats = null;
+                if (shortNameAnnotation != null) {
+                    textFormats = new TextFormat[] {
+                        OgnlTextFormat.create(shortNameAnnotation.value())
+                    };
+                }
+
+                selectionProvider = DefaultSelectionProvider.create(
+                        name, objects, tableAccessor, textFormats);
+            } else {
+                LogUtil.warningMF(logger, "ModelSelection provider '{0}':" +
+                        " both 'hql' and 'sql' are null", name);
+                break;
+            }
+
+            CrudSelectionProvider crudSelectionProvider =
+                    new CrudSelectionProvider(selectionProvider, fieldNames);
+            result.crudSelectionProviders.add(crudSelectionProvider);
+        }
     }
 
 

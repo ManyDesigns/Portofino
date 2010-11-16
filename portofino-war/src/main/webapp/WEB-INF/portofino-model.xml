@@ -1068,6 +1068,11 @@
                             <primaryKey primaryKeyName="persona_pkey">
                                 <column columnName="id"/>
                             </primaryKey>
+                            <annotations>
+                                <annotation type="com.manydesigns.elements.annotations.ShortName">
+                                    <value>%{nome}</value>
+                                </annotation>
+                            </annotations>
                         </table>
                         <table tableName="familiare">
                             <columns>
@@ -1085,6 +1090,11 @@
                                     </references>
                                 </foreignKey>
                             </foreignKeys>
+                            <annotations>
+                                <annotation type="com.manydesigns.elements.annotations.ShortName">
+                                    <value>%{nome}</value>
+                                </annotation>
+                            </annotations>
                         </table>
                         <table tableName="rimborso">
                             <columns>
@@ -1246,6 +1256,79 @@
                     </annotations>
                 </property>
             </properties>
+        </useCase>
+        <useCase name="rimborsi"
+                 table="hibernatetest.public.rimborso"
+                 query="from hibernatetest.public.rimborso rimborso"
+                 searchTitle="Rimborsi"
+                 createTitle="Crea rimborso"
+                 readTitle="Rimborso"
+                 editTitle="Modifica rimborso">
+            <properties>
+                <property name="id">
+                    <annotations>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.InSummary">
+                            <value>true</value>
+                        </annotation>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Searchable">
+                            <value>true</value>
+                        </annotation>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Access">
+                            <value>write</value>
+                        </annotation>
+                    </annotations>
+                </property>
+                <property name="persona_id">
+                    <annotations>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.InSummary">
+                            <value>false</value>
+                        </annotation>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Searchable">
+                            <value>false</value>
+                        </annotation>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Access">
+                            <value>read</value>
+                        </annotation>
+                    </annotations>
+                </property>
+                <property name="familiare_id">
+                    <annotations>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.InSummary">
+                            <value>true</value>
+                        </annotation>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Searchable">
+                            <value>true</value>
+                        </annotation>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Access">
+                            <value>write</value>
+                        </annotation>
+                    </annotations>
+                </property>
+            </properties>
+            <selectionProviders>
+                <selectionProvider name="mysel" database="hibernatetest" hql="FROM hibernatetest.public.familiare WHERE persona_id = 1">
+                    <selectionProperties>
+                        <selectionProperty name="familiare_id"/>
+                    </selectionProperties>
+                </selectionProvider>
+                <!--
+                <selectionProvider name="mysel" database="hibernatetest" sql="select p.id as a, p.nome as b, f.id as c, f.nome as d from public.persona p join public.familiare f on f.persona_id = p.id order by p.id, f.id">
+                    <selectionProperties>
+                        <selectionProperty name="persona_id"/>
+                        <selectionProperty name="familiare_id"/>
+                    </selectionProperties>
+                </selectionProvider>
+                -->
+            </selectionProviders>
         </useCase>
         <useCase name="usecase2"
                  table="jpetstore.public.category"
