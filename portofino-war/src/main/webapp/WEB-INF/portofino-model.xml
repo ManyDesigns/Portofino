@@ -456,7 +456,7 @@
                                         length="10"
                                         scale="0"
                                         nullable="false"
-                                        autoincrement="false"
+                                        autoincrement="true"
                                         searchable="false"
                                         />
                                 <column columnName="name"
@@ -566,8 +566,8 @@
                                         propertyName="createDate"
                                         />
                                 <column columnName="state"
-                                        columnType="int4"
-                                        javaType="java.lang.Integer"
+                                        columnType="int8"
+                                        javaType="java.lang.Long"
                                         length="10"
                                         scale="0"
                                         nullable="true"
@@ -791,8 +791,8 @@
                         <table tableName="table1">
                             <columns>
                                 <column columnName="id"
-                                        columnType="bigserial"
-                                        javaType="java.lang.Long"
+                                        columnType="serial"
+                                        javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
                                         nullable="false"
@@ -814,8 +814,8 @@
                         <table tableName="table4">
                             <columns>
                                 <column columnName="id"
-                                        columnType="bigserial"
-                                        javaType="java.lang.Long"
+                                        columnType="serial"
+                                        javaType="java.lang.Integer"
                                         length="8"
                                         scale="0"
                                         nullable="false"
@@ -866,93 +866,7 @@
                                 <column columnName="id2"/>
                             </primaryKey>
                         </table>
-                        <table tableName="table3" manyToMany="true">
-                            <columns>
-                                <column columnName="id"
-                                        columnType="bigserial"
-                                        javaType="java.lang.Long"
-                                        length="8"
-                                        scale="0"
-                                        nullable="false"
-                                        autoincrement="true"
-                                        searchable="true"/>
-                                <column columnName="t2_id1"
-                                        columnType="varchar"
-                                        javaType="java.lang.String"
-                                        length="3"
-                                        scale="0"
-                                        nullable="false"
-                                        autoincrement="false"
-                                        searchable="true"/>
-                                <column columnName="t2_id2"
-                                        columnType="varchar"
-                                        javaType="java.lang.String"
-                                        length="3"
-                                        scale="0"
-                                        nullable="false"
-                                        autoincrement="false"
-                                        searchable="true"/>
-                                <column columnName="tb1_id"
-                                        columnType="int4"
-                                        javaType="java.lang.Integer"
-                                        length="8"
-                                        scale="0"
-                                        nullable="false"
-                                        autoincrement="false"
-                                        searchable="true"/>
-                                <column columnName="tb4_id"
-                                        columnType="int4"
-                                        javaType="java.lang.Integer"
-                                        length="8"
-                                        scale="0"
-                                        nullable="false"
-                                        autoincrement="false"
-                                        searchable="true"/>
-                            </columns>
-                            <primaryKey primaryKeyName="pk_table3">
-                                <column columnName="id"/>
-                            </primaryKey>
-                            <foreignKeys>
-                                <foreignKey foreignKeyName="fk_tb_2"
-                                            virtual="false"
-                                            toDatabase="hibernatetest"
-                                            toSchema="public"
-                                            toTable="table2"
-                                            onUpdate="NO ACTION"
-                                            onDelete="NO ACTION">
-                                    <references>
-                                        <reference fromColumn="t2_id1"
-                                                   toColumn="id1"/>
-                                        <reference fromColumn="t2_id2"
-                                                   toColumn="id2"/>
-                                    </references>
-                                </foreignKey>
-                                <foreignKey foreignKeyName="fk_tb_1"
-                                            virtual="false"
-                                            toDatabase="hibernatetest"
-                                            toSchema="public"
-                                            toTable="table1"
-                                            onUpdate="NO ACTION"
-                                            onDelete="NO ACTION">
-                                    <references>
-                                        <reference fromColumn="tb1_id"
-                                                   toColumn="id"/>
-                                    </references>
-                                </foreignKey>
-                                <foreignKey foreignKeyName="fk_tb_4"
-                                            virtual="false"
-                                            toDatabase="hibernatetest"
-                                            toSchema="public"
-                                            toTable="table4"
-                                            onUpdate="NO ACTION"
-                                            onDelete="NO ACTION">
-                                    <references>
-                                        <reference fromColumn="tb4_id"
-                                                   toColumn="id"/>
-                                    </references>
-                                </foreignKey>
-                            </foreignKeys>
-                        </table>
+                        
                         <table tableName="comune">
                             <columns>
                                 <column columnName="regione"
@@ -1114,6 +1028,95 @@
                                 <foreignKey virtual="false" foreignKeyName="rimborso_persona_id_fkey" onDelete="NO ACTION" onUpdate="NO ACTION" toDatabase="hibernatetest" toSchema="public" toTable="persona">
                                     <references>
                                         <reference fromColumn="persona_id" toColumn="id"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
+                        </table>
+                        <!-- Tabella errata -->
+                        <table tableName="table3" >
+                            <columns>
+                                <column columnName="id"
+                                        columnType="serial"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="true"
+                                        searchable="true"/>
+                                <column columnName="t2_id1"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="3"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="t2_id2"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="3"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="tb1_id"
+                                        columnType="int4"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="tb4_id"
+                                        columnType="int4"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="pk_table3">
+                                <column columnName="id"/>
+                            </primaryKey>
+                            <foreignKeys>
+                                <foreignKey foreignKeyName="fk_tb_2"
+                                            virtual="false"
+                                            toDatabase="hibernatetest"
+                                            toSchema="public"
+                                            toTable="table2"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION"
+                                        >
+                                    <references>
+                                        <reference fromColumn="t2_id1"
+                                                   toColumn="id1" />
+                                        <reference fromColumn="t2_id2"
+                                                   toColumn="id2"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey foreignKeyName="fk_tb_1"
+                                            virtual="false"
+                                            toDatabase="hibernatetest"
+                                            toSchema="public"
+                                            toTable="table1"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION">
+                                    <references>
+                                        <reference fromColumn="tb1_id"
+                                                   toColumn="id"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey foreignKeyName="fk_tb_4"
+                                            virtual="false"
+                                            toDatabase="hibernatetest"
+                                            toSchema="public"
+                                            toTable="table4"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION">
+                                    <references>
+                                        <reference fromColumn="tb4_id"
+                                                   toColumn="id"/>
                                     </references>
                                 </foreignKey>
                             </foreignKeys>

@@ -44,15 +44,15 @@ public class EmailBean implements Serializable{
     String to;
     String from;
     Date createDate;
-    Integer state;
+    Long state;
     String attachmentPath;
     String attachmentDescription;
     String attachmentName;
 
-    public static final int TOBESENT  = 1;
-    public static final int SENT  = 2;
-    public static final int REJECTED  = 3;
-    public static final int BOUNCED  = 4;
+    public static final long TOBESENT  = 1;
+    public static final long SENT  = 2;
+    public static final long REJECTED  = 3;
+    public static final long BOUNCED  = 4;
 
     public EmailBean() {
     }
@@ -114,11 +114,11 @@ public class EmailBean implements Serializable{
         this.createDate = createDate;
     }
 
-    public Integer getState() {
+    public Long getState() {
         return state;
     }
 
-    public void setState(Integer state) {
+    public void setState(Long state) {
         this.state = state;
     }
 
