@@ -33,21 +33,20 @@ import com.manydesigns.elements.annotations.Searchable;
 import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SearchFormBuilder {
+public class SearchFormBuilder extends AbstractFormBuilder {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -55,12 +54,7 @@ public class SearchFormBuilder {
     // Fields
     //**************************************************************************
 
-    private final ClassAccessor classAccessor;
     protected List<PropertyAccessor> propertyAccessors;
-    protected String prefix;
-
-    public static final Logger logger =
-            LogUtil.getLogger(SearchFormBuilder.class);
 
     //**************************************************************************
     // Constructors
@@ -71,11 +65,7 @@ public class SearchFormBuilder {
     }
 
     public SearchFormBuilder(ClassAccessor classAccessor) {
-        LogUtil.entering(logger, "SearchFormBuilder", classAccessor);
-
-        this.classAccessor = classAccessor;
-
-        LogUtil.exiting(logger, "SearchFormBuilder");
+        super(classAccessor);
     }
 
     //**************************************************************************
@@ -109,15 +99,20 @@ public class SearchFormBuilder {
         return this;
     }
 
+    public SearchFormBuilder configSelectionProvider(SelectionProvider selectionProvider,
+                                            String... fieldNames) {
+        selectionProviders.put(fieldNames, selectionProvider);
+        return this;
+    }
+
+
     public SearchFormBuilder configReflectiveFields() {
         LogUtil.entering(logger, "configReflectiveFields");
 
         propertyAccessors = new ArrayList<PropertyAccessor>();
 
         for (PropertyAccessor current : classAccessor.getProperties()) {
-            // check if field is static
-            if (Modifier.isStatic(current.getModifiers())) {
-                logger.finer("Skipping static field: " + current.getName());
+            if (skippableProperty(current)) {
                 continue;
             }
 

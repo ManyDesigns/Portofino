@@ -33,7 +33,6 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.InSummary;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
-import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.SelectionProvider;
@@ -44,8 +43,10 @@ import com.manydesigns.elements.text.TextFormat;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
-import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /*
@@ -53,7 +54,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableFormBuilder {
+public class TableFormBuilder extends AbstractFormBuilder {
     public static final String copyright =
             "Copyright (c) 2005-2009, ManyDesigns srl";
 
@@ -63,14 +64,10 @@ public class TableFormBuilder {
     // Fields
     //**************************************************************************
 
-    protected final FieldsManager manager;
-    protected final ClassAccessor classAccessor;
     protected final Map<String, TextFormat> hrefGenerators;
     protected final Map<String, TextFormat> altGenerators;
-    protected final Map<String[], SelectionProvider> selectionProviders;
 
     protected List<PropertyAccessor> propertyAccessors;
-    protected String prefix;
     protected int nRows = DEFAULT_N_ROWS;
     protected Mode mode = Mode.EDIT;
 
@@ -87,11 +84,10 @@ public class TableFormBuilder {
     }
 
     public TableFormBuilder(ClassAccessor classAccessor) {
-        this.classAccessor = classAccessor;
+        super(classAccessor);
+
         hrefGenerators = new HashMap<String, TextFormat>();
         altGenerators = new HashMap<String, TextFormat>();
-        selectionProviders = new HashMap<String[], SelectionProvider>();
-        manager = FieldsManager.getManager();
     }
 
 
@@ -137,13 +133,8 @@ public class TableFormBuilder {
 
     public void configReflectiveFields() {
         propertyAccessors = new ArrayList<PropertyAccessor>();
-        List<String> blackList =
-                Arrays.asList(FormBuilder.PROPERTY_NAME_BLACKLIST);
         for (PropertyAccessor current : classAccessor.getProperties()) {
-            if (Modifier.isStatic(current.getModifiers())) {
-                continue;
-            }
-            if (blackList.contains(current.getName())) {
+            if (skippableProperty(current)) {
                 continue;
             }
 
@@ -178,7 +169,7 @@ public class TableFormBuilder {
         }
 
         // remove unused (or partially used) selection providers
-        removeUnusedSelectionProviders();
+        removeUnusedSelectionProviders(propertyAccessors);
 
         PropertyAccessor[] propertyAccessorsArray =
                 new PropertyAccessor[propertyAccessors.size()];
@@ -197,24 +188,6 @@ public class TableFormBuilder {
         setupRows(tableForm);
 
         return tableForm;
-    }
-
-    protected void removeUnusedSelectionProviders() {
-        List<String[]> removeList = new ArrayList<String[]>();
-        for (String[] current : selectionProviders.keySet()) {
-            int matches = 0;
-            for (PropertyAccessor propertyAccessor : propertyAccessors) {
-                if (ArrayUtils.contains(current, propertyAccessor.getName())) {
-                   matches++;
-                }
-            }
-            if (matches != current.length) {
-                removeList.add(current);
-            }
-        }
-        for (String[] current : removeList) {
-            selectionProviders.remove(current);
-        }
     }
 
 

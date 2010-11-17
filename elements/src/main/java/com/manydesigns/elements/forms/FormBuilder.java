@@ -33,7 +33,6 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.FieldSet;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
-import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.SelectionProvider;
@@ -42,37 +41,32 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import org.apache.commons.lang.ArrayUtils;
 
-import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class FormBuilder {
+public class FormBuilder extends AbstractFormBuilder {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //**************************************************************************
+    // Constants
+    //**************************************************************************
+
     public final static int DEFAULT_N_COLUMNS = 1;
-    public final static String[] PROPERTY_NAME_BLACKLIST = {"class"};
 
     //**************************************************************************
     // Fields
     //**************************************************************************
-
-    protected final FieldsManager manager;
-    protected final ClassAccessor classAccessor;
-    protected final Map<String[], SelectionProvider> selectionProviders;
 
     protected List<ArrayList<PropertyAccessor>> groupedPropertyAccessors;
     protected List<String> fieldSetNames;
     protected String prefix;
     protected int nColumns = DEFAULT_N_COLUMNS;
     protected Mode mode = Mode.EDIT;
-
-    public static final Logger logger = LogUtil.getLogger(FormBuilder.class);
 
     //**************************************************************************
     // Constructors
@@ -83,13 +77,7 @@ public class FormBuilder {
     }
 
     public FormBuilder(ClassAccessor classAccessor) {
-        LogUtil.entering(logger, "FormBuilder", classAccessor);
-
-        manager = FieldsManager.getManager();
-        this.classAccessor = classAccessor;
-        selectionProviders = new HashMap<String[], SelectionProvider>();
-
-        LogUtil.exiting(logger, "FormBuilder");
+        super(classAccessor);
     }
 
     //**************************************************************************
@@ -164,17 +152,13 @@ public class FormBuilder {
     public FormBuilder configReflectiveFields() {
         LogUtil.entering(logger, "configReflectiveFields");
 
-        List<String> blackList = Arrays.asList(PROPERTY_NAME_BLACKLIST);
         groupedPropertyAccessors = new ArrayList<ArrayList<PropertyAccessor>>();
         fieldSetNames = new ArrayList<String>();
 
         ArrayList<PropertyAccessor> currentGroup = null;
         String currentGroupName = null;
         for (PropertyAccessor current : classAccessor.getProperties()) {
-            if (Modifier.isStatic(current.getModifiers())) {
-                continue;
-            }
-            if (blackList.contains(current.getName())) {
+            if (skippableProperty(current)) {
                 continue;
             }
 
@@ -212,7 +196,12 @@ public class FormBuilder {
         }
 
         // remove unused (or partially used) selection providers
-        removeUnusedSelectionProviders();
+        List<PropertyAccessor> allPropertyAccessors =
+                new ArrayList<PropertyAccessor>();
+        for (ArrayList<PropertyAccessor> group : groupedPropertyAccessors) {
+            allPropertyAccessors.addAll(group);
+        }
+        removeUnusedSelectionProviders(allPropertyAccessors);
 
 
         // create the form/fieldset/field sructure
@@ -245,26 +234,6 @@ public class FormBuilder {
 
         LogUtil.exiting(logger, "build");
         return form;
-    }
-
-    protected void removeUnusedSelectionProviders() {
-        List<String[]> removeList = new ArrayList<String[]>();
-        for (String[] current : selectionProviders.keySet()) {
-            int matches = 0;
-            for (ArrayList<PropertyAccessor> group : groupedPropertyAccessors) {
-                for (PropertyAccessor propertyAccessor : group) {
-                    if (ArrayUtils.contains(current, propertyAccessor.getName())) {
-                       matches++;
-                    }
-                }
-            }
-            if (matches != current.length) {
-                removeList.add(current);
-            }
-        }
-        for (String[] current : removeList) {
-            selectionProviders.remove(current);
-        }
     }
 
     protected void buildFieldGroup(Form form,

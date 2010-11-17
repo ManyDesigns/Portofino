@@ -1315,19 +1315,21 @@
                 </property>
             </properties>
             <selectionProviders>
-                <selectionProvider name="mysel" database="hibernatetest" hql="FROM hibernatetest.public.familiare WHERE persona_id = 1">
+                <!-- Esempio con selection provider con hql
+                <selectionProvider name="mysel" database="hibernatetest"
+                                   hql="FROM hibernatetest.public.familiare WHERE persona_id = 1">
                     <selectionProperties>
                         <selectionProperty name="familiare_id"/>
                     </selectionProperties>
                 </selectionProvider>
-                <!--
-                <selectionProvider name="mysel" database="hibernatetest" sql="select p.id as a, p.nome as b, f.id as c, f.nome as d from public.persona p join public.familiare f on f.persona_id = p.id order by p.id, f.id">
+                -->
+                <selectionProvider name="mysel" database="hibernatetest"
+                                   sql="select p.id as a, p.nome as b, f.id as c, f.nome as d from public.persona p join public.familiare f on f.persona_id = p.id order by p.id, f.id">
                     <selectionProperties>
                         <selectionProperty name="persona_id"/>
                         <selectionProperty name="familiare_id"/>
                     </selectionProperties>
                 </selectionProvider>
-                -->
             </selectionProviders>
         </useCase>
         <useCase name="usecase2"
