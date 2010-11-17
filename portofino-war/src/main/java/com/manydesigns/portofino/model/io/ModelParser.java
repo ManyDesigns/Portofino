@@ -9,6 +9,9 @@ import com.manydesigns.portofino.model.site.*;
 import com.manydesigns.portofino.model.site.usecases.Button;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.model.site.usecases.UseCaseProperty;
+import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
+import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
+import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.xml.CharactersCallback;
 import com.manydesigns.portofino.xml.DocumentCallback;
 import com.manydesigns.portofino.xml.ElementCallback;
@@ -77,8 +80,11 @@ public class ModelParser extends XmlParser {
     public static final String ALLOW = "allow";
     public static final String DENY = "deny";
     public static final String GROUP = "group";
-    private static final String NAME = "name";
-
+    public static final String NAME = "name";
+    public static final String SELECTIONPROVIDERS = "selectionProviders";
+    public static final String SELECTIONPROVIDER = "selectionProvider";
+    public static final String SELECTIONPROPERTIES = "selectionProperties";
+    public static final String SELECTIONPROPERTY = "selectionProperty";
 
     //--------------------------------------------------------------------------
     // Fields
@@ -95,6 +101,7 @@ public class ModelParser extends XmlParser {
 
     Collection<ModelAnnotation> currentModelAnnotations;
     ModelAnnotation currentModelAnnotation;
+    ModelSelectionProvider currentModelSelectionProvider;
 
 
     //--------------------------------------------------------------------------
@@ -468,6 +475,9 @@ public class ModelParser extends XmlParser {
             currentModelAnnotations = currentUseCase.getModelAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
 
+            expectElement(SELECTIONPROVIDERS, 0, 1,
+                    new SelectionProvidersCallback());
+
             expectElement(SUBUSECASE, 0, 1, new SubUseCasesCallback());
 
             UseCase poppedUsedCase = useCaseStack.pop();
@@ -485,9 +495,12 @@ public class ModelParser extends XmlParser {
     private class PropertyCallback implements ElementCallback {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            UseCaseProperty useCaseProperty = new UseCaseProperty();
+            UseCase currentUseCase = useCaseStack.peek();
+
+            UseCaseProperty useCaseProperty =
+                    new UseCaseProperty(currentUseCase);
             checkAndSetAttributes(useCaseProperty, attributes);
-            useCaseStack.peek().getProperties().add(useCaseProperty);
+            currentUseCase.getProperties().add(useCaseProperty);
 
             currentModelAnnotations = useCaseProperty.getAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
@@ -605,5 +618,42 @@ public class ModelParser extends XmlParser {
         }
     }
 
+    private class SelectionProvidersCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(SELECTIONPROVIDER, 0, null, new SelectionProviderCallback());
+        }
+    }
+
+    private class SelectionProviderCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            currentModelSelectionProvider = new ModelSelectionProvider();
+            checkAndSetAttributes(currentModelSelectionProvider, attributes);
+            UseCase currentUseCase = useCaseStack.peek();
+            currentUseCase.getModelSelectionProviders()
+                    .add(currentModelSelectionProvider);
+            expectElement(SELECTIONPROPERTIES, 0, null,
+                    new SelectionPropertiesCallback());
+        }
+    }
+
+    private class SelectionPropertiesCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(SELECTIONPROPERTY, 0, null, new SelectionPropertyCallback());
+        }
+    }
+
+    private class SelectionPropertyCallback implements ElementCallback {
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            SelectionProperty selectionProperty =
+                    new SelectionProperty(currentModelSelectionProvider);
+            checkAndSetAttributes(selectionProperty, attributes);
+            currentModelSelectionProvider.getSelectionProperties()
+                    .add(selectionProperty);
+        }
+    }
 }
 

@@ -27,22 +27,18 @@
  *
  */
 
-package com.manydesigns.portofino.model.site.usecases;
+package com.manydesigns.portofino.model.selectionproviders;
 
-import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCaseProperty implements ModelObject {
+public class SelectionProperty implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -51,23 +47,23 @@ public class UseCaseProperty implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected final UseCase useCase;
+    protected final ModelSelectionProvider modelSelectionProvider;
 
     protected String name;
-    protected final List<ModelAnnotation> modelAnnotations;
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public UseCaseProperty(UseCase useCase) {
-        this.useCase = useCase;
-        modelAnnotations = new ArrayList<ModelAnnotation>();
+    public SelectionProperty(
+            ModelSelectionProvider modelSelectionProvider) {
+        this.modelSelectionProvider = modelSelectionProvider;
     }
 
-    public UseCaseProperty(UseCase useCase, String name) {
-        this(useCase);
+    public SelectionProperty(
+            ModelSelectionProvider modelSelectionProvider, String name) {
+        this(modelSelectionProvider);
         this.name = name;
     }
 
@@ -75,20 +71,13 @@ public class UseCaseProperty implements ModelObject {
     // ModelObject implementation
     //**************************************************************************
 
-    public void reset() {
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.reset();
-        }
-    }
+    public void reset() {}
 
-    public void init(Model model) {
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.init(model);
-        }
-    }
+    public void init(Model model) {}
 
     public String getQualifiedName() {
-        return String.format("%s.%s", useCase.getQualifiedName(), name);
+        return String.format("%s.%s",
+                modelSelectionProvider.getQualifiedName(), name);
     }
 
     //**************************************************************************
@@ -102,9 +91,5 @@ public class UseCaseProperty implements ModelObject {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<ModelAnnotation> getAnnotations() {
-        return modelAnnotations;
     }
 }

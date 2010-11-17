@@ -12,9 +12,10 @@ function updateSelectOptions(relName, selectionProviderIndex) {
         data[current.attr('name')] = current.attr('value');
     }
 
+    var postUrl = stripQueryString(location.href);
     jQuery.ajax({
         type: 'POST',
-        url: location.href,
+        url: postUrl,
         data: data,
         success: function(responseData) {
             var options = jQuery.parseJSON(responseData);
@@ -22,7 +23,6 @@ function updateSelectOptions(relName, selectionProviderIndex) {
             var selectField = $(selectFieldId);
             var selOptions = selectField.attr('options');
             selOptions.length = 0;
-//            selectField.empty();
 
             for (var i = 0; i < options.length; i++) {
                 var option = options[i];
@@ -56,10 +56,11 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex) {
                 data[current.attr('name')] = current.attr('value');
             }
 
+            var postUrl = stripQueryString(location.href);
             $.ajax({
                 type: 'POST',
                 dataType: 'json',
-                url: location.href,
+                url: postUrl,
                 data: data,
                 success: function( responseData ) {
                     response( $.map( responseData, function( item ) {
@@ -96,4 +97,9 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex) {
 function setupDatePicker(dateFieldId, dateFormat) {
     var dateField = $(dateFieldId);
     dateField.datepicker({ dateFormat: dateFormat });
+}
+
+function stripQueryString(url) {
+    var regexp = new RegExp("\\?.*");
+    return url.replace(regexp, "");
 }

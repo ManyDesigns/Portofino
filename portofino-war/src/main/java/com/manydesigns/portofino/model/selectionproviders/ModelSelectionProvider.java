@@ -27,11 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.model.site.usecases;
+package com.manydesigns.portofino.model.selectionproviders;
 
-import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.util.ArrayList;
@@ -42,58 +41,58 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCaseProperty implements ModelObject {
+public class ModelSelectionProvider implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    protected final UseCase useCase;
+    protected final List<SelectionProperty> selectionProperties;
 
     protected String name;
-    protected final List<ModelAnnotation> modelAnnotations;
+    protected String database;
+    protected String sql;
+    protected String hql;
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public UseCaseProperty(UseCase useCase) {
-        this.useCase = useCase;
-        modelAnnotations = new ArrayList<ModelAnnotation>();
+    public ModelSelectionProvider() {
+        selectionProperties = new ArrayList<SelectionProperty>();
     }
 
-    public UseCaseProperty(UseCase useCase, String name) {
-        this(useCase);
+    public ModelSelectionProvider(String name, String database) {
+        this();
         this.name = name;
+        this.database = database;
+    }
+
+    public ModelSelectionProvider(String name, String database,
+                                  String sql, String hql) {
+        this(name, database);
+        this.sql = sql;
+        this.hql = hql;
     }
 
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
 
-    public void reset() {
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.reset();
-        }
-    }
+    public void reset() {}
 
-    public void init(Model model) {
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.init(model);
-        }
-    }
+    public void init(Model model) {}
 
     public String getQualifiedName() {
-        return String.format("%s.%s", useCase.getQualifiedName(), name);
+        return name;
     }
 
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
+
+    public List<SelectionProperty> getSelectionProperties() {
+        return selectionProperties;
+    }
 
     @XmlAttribute(required = true)
     public String getName() {
@@ -104,7 +103,30 @@ public class UseCaseProperty implements ModelObject {
         this.name = name;
     }
 
-    public List<ModelAnnotation> getAnnotations() {
-        return modelAnnotations;
+    @XmlAttribute(required = true)
+    public String getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(String database) {
+        this.database = database;
+    }
+
+    @XmlAttribute(required = false)
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
+
+    @XmlAttribute(required = false)
+    public String getHql() {
+        return hql;
+    }
+
+    public void setHql(String hql) {
+        this.hql = hql;
     }
 }

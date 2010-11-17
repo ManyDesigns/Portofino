@@ -79,7 +79,7 @@ public class SelectField extends AbstractField {
             assert(values.length == labels.length);
             SelectionProvider selectionProvider =
                     DefaultSelectionProvider.create(
-                            accessor.getName(), 1, values, labels);
+                            accessor.getName(), values, labels);
             selectionModel = selectionProvider.createSelectionModel();
             selectionModelIndex = 0;
         }

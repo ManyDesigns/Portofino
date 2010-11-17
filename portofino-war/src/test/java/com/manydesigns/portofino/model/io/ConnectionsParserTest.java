@@ -53,6 +53,6 @@ public class ConnectionsParserTest extends TestCase {
     }
 
     public void testParse() throws Exception {
-        parser.parse("portofino-connections.xml");
+        parser.parse("database/portofino-connections.xml");
     }
 }

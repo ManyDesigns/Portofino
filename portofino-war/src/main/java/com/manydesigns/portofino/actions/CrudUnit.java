@@ -30,28 +30,21 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.struts2.Struts2Util;
 import com.manydesigns.elements.text.OgnlTextFormat;
-import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
-import com.manydesigns.portofino.model.datamodel.Column;
-import com.manydesigns.portofino.model.datamodel.ForeignKey;
-import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.site.usecases.Button;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
@@ -63,7 +56,6 @@ import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
@@ -109,20 +101,34 @@ public class CrudUnit {
     public final PkHelper pkHelper;
     public final List<CrudUnit> subCrudUnits;
     public final List<Button> buttons;
+    public final List<CrudSelectionProvider> crudSelectionProviders;
 
     public Context context;
     public Model model;
     public HttpServletRequest req;
+
+    //--------------------------------------------------------------------------
+    // Web parameters
+    //--------------------------------------------------------------------------
+
     public String pk;
     public String[] selection;
     public String searchString;
 
-    public List objects;
-    public Object object;
+    //--------------------------------------------------------------------------
+    // UI forms
+    //--------------------------------------------------------------------------
+
     public SearchForm searchForm;
     public TableForm tableForm;
     public Form form;
 
+    //--------------------------------------------------------------------------
+    // Data objects
+    //--------------------------------------------------------------------------
+
+    public List objects;
+    public Object object;
 
     
     //**************************************************************************
@@ -158,6 +164,7 @@ public class CrudUnit {
         this.prefix = prefix;
         pkHelper = new PkHelper(classAccessor);
         subCrudUnits = new ArrayList<CrudUnit>();
+        crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
     }
 
     //--------------------------------------------------------------------------
@@ -166,7 +173,7 @@ public class CrudUnit {
 
     public String execute() {
         if (pk == null) {
-            return searchFromString();
+            return search();
         } else {
             return read();
         }
@@ -176,139 +183,26 @@ public class CrudUnit {
     // Search
     //**************************************************************************
 
-    public String searchFromString() {
-        buildSearchForm();
-        configureSearchFormFromString();
-
-        return commonSearch();
-    }
-
-    private void buildSearchForm() {
-        SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(classAccessor);
-        searchForm = searchFormBuilder
-                .configPrefix(prefix)
-                .build();
-    }
-
     public String search() {
-        buildSearchForm();
-        searchForm.readFromRequest(req);
-
-        return commonSearch();
-    }
-
-    public String commonSearch() {
-        searchString = searchForm.toSearchString();
-        if (searchString.length() == 0) {
-            searchString = null;
-        }
-
-        loadObjectsFromCriteria();
-
-        String readLinkExpression = getReadLinkExpression();
-        OgnlTextFormat hrefFormat =
-                OgnlTextFormat.create(readLinkExpression);
-        hrefFormat.setUrl(true);
-
-        TableFormBuilder tableFormBuilder =
-                createTableFormBuilderWithSelectionProviders()
-                        .configNRows(objects.size())
-                        .configMode(Mode.VIEW);
-
-        // ogni colonna chiave primaria sarà clickabile
-        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
-            tableFormBuilder.configHyperlinkGenerators(
-                    property.getName(), hrefFormat, null);
-        }
-
-        tableForm = tableFormBuilder
-                .configPrefix(prefix)
-                .build();
-        tableForm.setKeyGenerator(pkHelper.createPkGenerator());
-        tableForm.setSelectable(true);
-        tableForm.readFromObject(objects);
-
+        setupSearchForm();
+        loadObjects();
+        setupTableForm(Mode.VIEW);
         return PortofinoAction.SEARCH;
     }
-
-    public void loadObjectsFromCriteria() {
-        ValueStack valueStack = Struts2Util.getValueStack();
-        CompoundRoot root = valueStack.getRoot();
-
-        Criteria criteria = new Criteria(classAccessor);
-        searchForm.configureCriteria(criteria);
-        objects = context.getObjects(query, criteria, root);
-    }
-
-    public String getReadLinkExpression() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(Struts2Util.buildActionUrl(null));
-        sb.append("?pk=");
-        boolean first = true;
-
-        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(",");
-            }
-            sb.append("%{");
-            sb.append(property.getName());
-            sb.append("}");
-        }
-        if (searchString != null) {
-            sb.append("&searchString=");
-            sb.append(Util.urlencode(searchString));
-        }
-        return sb.toString();
-    }
-
-    
-    protected void configureSearchFormFromString() {
-        if (searchString != null) {
-            DummyHttpServletRequest dummyRequest =
-                    new DummyHttpServletRequest();
-            String[] parts = searchString.split(",");
-            Pattern pattern = Pattern.compile("(.*)=(.*)");
-            for (String part : parts) {
-                Matcher matcher = pattern.matcher(part);
-                if (matcher.matches()) {
-                    String key = matcher.group(1);
-                    String value = matcher.group(2);
-                    LogUtil.fineMF(logger, "Matched part: {0}={1}", key, value);
-                    dummyRequest.setParameter(key, value);
-                } else {
-                    LogUtil.fineMF(logger, "Could not match part: {0}", part);
-                }
-            }
-            searchForm.readFromRequest(dummyRequest);
-        }
-    }
-
-
 
     //**************************************************************************
     // Read
     //**************************************************************************
 
     public String read() {
-        Serializable pkObject = pkHelper.parsePkString(pk);
-
-        buildSearchForm();
-        configureSearchFormFromString();
-
-        loadObjectsFromCriteria();
-
-        object = context.getObjectByPk(
-                baseTable.getQualifiedName(), pkObject);
+        setupSearchForm();
+        loadObjects();
+        loadObject();
 
         if (!objects.contains(object)) {
             throw new Error("Object not found");
         }
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.VIEW)
-                .build();
+        setupForm(Mode.VIEW);
         form.readFromObject(object);
         refreshBlobDownloadHref();
 
@@ -352,17 +246,13 @@ public class CrudUnit {
     //**************************************************************************
 
     public String create() {
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.CREATE)
-                .build();
+        setupForm(Mode.CREATE);
 
         return PortofinoAction.CREATE;
     }
 
     public String save() {
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.CREATE)
-                .build();
+        setupForm(Mode.CREATE);
 
         form.readFromRequest(req);
         if (form.validate()) {
@@ -383,22 +273,14 @@ public class CrudUnit {
     //**************************************************************************
 
     public String edit() {
-        loadObject(pk);
-
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.EDIT)
-                .build();
-
+        loadObject();
+        setupForm(Mode.EDIT);
         form.readFromObject(object);
-
         return PortofinoAction.EDIT;
     }
 
     public String update() {
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.EDIT)
-                .build();
-
+        setupForm(Mode.EDIT);
         loadObject();
         form.readFromObject(object);
         form.readFromRequest(req);
@@ -429,17 +311,13 @@ public class CrudUnit {
             return edit();
         }
 
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.BULK_EDIT)
-                .build();
+        setupForm(Mode.BULK_EDIT);
 
         return PortofinoAction.BULK_EDIT;
     }
 
     public String bulkUpdate() {
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.BULK_EDIT)
-                .build();
+        setupForm(Mode.BULK_EDIT);
         form.readFromRequest(req);
         if (form.validate()) {
             for (String current : selection) {
@@ -456,15 +334,6 @@ public class CrudUnit {
         } else {
             return PortofinoAction.BULK_EDIT;
         }
-    }
-
-    private void loadObject() {
-        loadObject(pk);
-    }
-
-    private void loadObject(String pk) {
-        Serializable pkObject = pkHelper.parsePkString(pk);
-        object = context.getObjectByPk(baseTable.getQualifiedName(), pkObject);
     }
 
     //**************************************************************************
@@ -516,14 +385,26 @@ public class CrudUnit {
     // Ajax
     //**************************************************************************
 
-    public String jsonOptions(String relName, int selectionProviderIndex,
-                              String labelSearch, boolean includeSelectPrompt) {
-        ForeignKey relationship =
-                baseTable.findForeignKeyByName(relName);
+    public String jsonOptions(String selectionProviderName,
+                              int selectionProviderIndex,
+                              String labelSearch,
+                              boolean includeSelectPrompt) {
+        CrudSelectionProvider crudSelectionProvider = null;
+        for (CrudSelectionProvider current : crudSelectionProviders) {
+            SelectionProvider selectionProvider =
+                    current.getSelectionProvider();
+            if (selectionProvider.getName().equals(selectionProviderName)) {
+                crudSelectionProvider = current;
+                break;
+            }
+        }
+        if (crudSelectionProvider == null) {
+            return PortofinoAction.ERROR;
+        }
 
-        String[] fieldNames = createFieldNamesForRelationship(relationship);
         SelectionProvider selectionProvider =
-                createSelectionProviderForRelationship(relationship);
+                crudSelectionProvider.getSelectionProvider();
+        String[] fieldNames = crudSelectionProvider.getFieldNames();
 
         Form form = new FormBuilder(classAccessor)
                 .configFields(fieldNames)
@@ -544,101 +425,135 @@ public class CrudUnit {
 
 
     //**************************************************************************
-    // Utility methods
+    // Setup methods
     //**************************************************************************
 
-    protected FormBuilder createFormBuilderWithSelectionProviders() {
+    protected void setupSearchForm() {
+        SearchFormBuilder searchFormBuilder =
+                new SearchFormBuilder(classAccessor);
+        searchForm = searchFormBuilder
+                .configPrefix(prefix)
+                .build();
+        if (searchString == null) {
+            searchForm.readFromRequest(req);
+            searchString = searchForm.toSearchString();
+            if (searchString.length() == 0) {
+                searchString = null;
+            }
+        } else {
+            DummyHttpServletRequest dummyRequest =
+                    new DummyHttpServletRequest();
+            String[] parts = searchString.split(",");
+            Pattern pattern = Pattern.compile("(.*)=(.*)");
+            for (String part : parts) {
+                Matcher matcher = pattern.matcher(part);
+                if (matcher.matches()) {
+                    String key = matcher.group(1);
+                    String value = matcher.group(2);
+                    LogUtil.fineMF(logger, "Matched part: {0}={1}", key, value);
+                    dummyRequest.setParameter(key, value);
+                } else {
+                    LogUtil.fineMF(logger, "Could not match part: {0}", part);
+                }
+            }
+            searchForm.readFromRequest(dummyRequest);
+        }
+    }
+
+    protected void setupForm(Mode mode) {
         FormBuilder formBuilder = new FormBuilder(classAccessor);
 
-        // setup relationship lookups
-        for (ForeignKey rel : baseTable.getForeignKeys()) {
-            String[] fieldNames = createFieldNamesForRelationship(rel);
+        // setup option providers
+        for (CrudSelectionProvider current : crudSelectionProviders) {
             SelectionProvider selectionProvider =
-                    createSelectionProviderForRelationship(rel);
-            boolean autocomplete = false;
-            for (ModelAnnotation current : rel.getModelAnnotations()) {
-                if ("com.manydesigns.elements.annotations.Autocomplete"
-                        .equals(current.getType())) {
-                    autocomplete = true;
-                }
-            }
-            selectionProvider.setAutocomplete(autocomplete);
-
+                    current.getSelectionProvider();
+            String[] fieldNames = current.getFieldNames();
             formBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
-        formBuilder.configPrefix(prefix);
 
-        return formBuilder;
+        form = formBuilder
+                .configPrefix(prefix)
+                .configMode(mode)
+                .build();
     }
 
-    protected SelectionProvider createSelectionProviderForRelationship(ForeignKey rel) {
-        // retrieve the related objects
-        Table relatedTable = rel.getActualToTable();
-        ClassAccessor classAccessor =
-                context.getTableAccessor(relatedTable.getQualifiedName());
-        List<Object> relatedObjects =
-                context.getAllObjects(relatedTable.getQualifiedName());
-        ShortName shortNameAnnotation =
-                classAccessor.getAnnotation(ShortName.class);
-        TextFormat[] textFormats = null;
-        if (shortNameAnnotation != null) {
-            textFormats = new TextFormat[] {
-                OgnlTextFormat.create(shortNameAnnotation.value())
-            };
-        }
-        SelectionProvider selectionProvider =
-                DefaultSelectionProvider.create(rel.getForeignKeyName(),
-                        relatedObjects, classAccessor, textFormats);
-        return selectionProvider;
-    }
+    protected void setupTableForm(Mode mode) {
+        String readLinkExpression = getReadLinkExpression();
+        OgnlTextFormat hrefFormat =
+                OgnlTextFormat.create(readLinkExpression);
+        hrefFormat.setUrl(true);
 
-    protected TableFormBuilder createTableFormBuilderWithSelectionProviders() {
         TableFormBuilder tableFormBuilder = new TableFormBuilder(classAccessor);
 
-        // setup relationship lookups
-        for (ForeignKey rel : baseTable.getForeignKeys()) {
-            String[] fieldNames = createFieldNamesForRelationship(rel);
+        // setup option providers
+        for (CrudSelectionProvider current : crudSelectionProviders) {
             SelectionProvider selectionProvider =
-                    createSelectionProviderForRelationship(rel);
-            boolean autocomplete = false;
-            for (ModelAnnotation current : rel.getModelAnnotations()) {
-                if ("com.manydesigns.elements.annotations.Autocomplete"
-                        .equals(current.getType())) {
-                    autocomplete = true;
-                }
-            }
-            selectionProvider.setAutocomplete(autocomplete);
-            if (fieldsInProperties(fieldNames)) {
-                tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
-            }
-
-
+                    current.getSelectionProvider();
+            String[] fieldNames = current.getFieldNames();
+            tableFormBuilder.configSelectionProvider(
+                    selectionProvider, fieldNames);
         }
-        tableFormBuilder.configPrefix(prefix);
-        return tableFormBuilder;
+
+        // ogni colonna chiave primaria sarà clickabile
+        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
+            tableFormBuilder.configHyperlinkGenerators(
+                    property.getName(), hrefFormat, null);
+        }
+
+        tableForm = tableFormBuilder
+                .configPrefix(prefix)
+                .configNRows(objects.size())
+                .configMode(mode)
+                .build();
+        tableForm.setKeyGenerator(pkHelper.createPkGenerator());
+        tableForm.setSelectable(true);
+        tableForm.readFromObject(objects);
     }
 
-    private boolean fieldsInProperties(String[] fieldNames) {
-        int size = classAccessor.getProperties().length;
-        int i=0;
-        for (PropertyAccessor prop : classAccessor.getProperties() ){
-            if (ArrayUtils.contains(fieldNames, prop.getName())){
-                i++;
+    protected String getReadLinkExpression() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Struts2Util.buildActionUrl(null));
+        sb.append("?pk=");
+        boolean first = true;
+
+        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(",");
             }
+            sb.append("%{");
+            sb.append(property.getName());
+            sb.append("}");
         }
-        return size==i;
+        if (searchString != null) {
+            sb.append("&searchString=");
+            sb.append(Util.urlencode(searchString));
+        }
+        return sb.toString();
     }
 
-    protected String[] createFieldNamesForRelationship(ForeignKey rel) {
-        List<Reference> references = rel.getReferences();
-        String[] fieldNames = new String[references.size()];
-        int i = 0;
-        for (Reference reference : references) {
-            Column column = reference.getActualFromColumn();
-            fieldNames[i] = column.getActualPropertyName();
-            i++;
-        }
-        return fieldNames;
+
+    //**************************************************************************
+    // Object loading
+    //**************************************************************************
+
+    public void loadObjects() {
+        ValueStack valueStack = Struts2Util.getValueStack();
+        CompoundRoot root = valueStack.getRoot();
+
+        Criteria criteria = new Criteria(classAccessor);
+        searchForm.configureCriteria(criteria);
+        objects = context.getObjects(query, criteria, root);
+    }
+
+    private void loadObject() {
+        loadObject(pk);
+    }
+
+    private void loadObject(String pk) {
+        Serializable pkObject = pkHelper.parsePkString(pk);
+        object = context.getObjectByPk(baseTable.getQualifiedName(), pkObject);
     }
 
 
@@ -648,17 +563,9 @@ public class CrudUnit {
     //**************************************************************************
 
     public void exportSearchExcel(File fileTemp) {
-        buildSearchForm();
-        searchForm.readFromRequest(req);
-
-        loadObjectsFromCriteria();
-
-        TableFormBuilder tableFormBuilder =
-            createTableFormBuilderWithSelectionProviders()
-                            .configNRows(objects.size());
-        tableForm = tableFormBuilder.configMode(Mode.VIEW)
-                .build();
-        tableForm.readFromObject(objects);
+        setupSearchForm();
+        loadObjects();
+        setupTableForm(Mode.VIEW);
 
         writeFileSearchExcel(fileTemp);
     }
@@ -706,22 +613,13 @@ public class CrudUnit {
 
     public void exportReadExcel(WritableWorkbook workbook)
             throws IOException, WriteException {
-        buildSearchForm();
-        configureSearchFormFromString();
+        setupSearchForm();
 
-        loadObjectsFromCriteria();
+        loadObjects();
         loadObject();
 
-        TableFormBuilder tableFormBuilder =
-            createTableFormBuilderWithSelectionProviders()
-                            .configMode(Mode.VIEW)
-                            .configNRows(objects.size());
-        tableForm = tableFormBuilder.build();
-        tableForm.readFromObject(object);
-
-        form = createFormBuilderWithSelectionProviders()
-                .configMode(Mode.VIEW)
-                .build();
+        setupTableForm(Mode.VIEW);
+        setupForm(Mode.VIEW);
         form.readFromObject(object);
 
         writeFileReadExcel(workbook);
@@ -752,26 +650,20 @@ public class CrudUnit {
         //Aggiungo le relazioni/sheet
         WritableCellFormat formatCell = headerExcel();
         for (CrudUnit subCrudUnit: subCrudUnits) {
-            subCrudUnit.buildSearchForm();
-            subCrudUnit.loadObjectsFromCriteria();
-            TableFormBuilder tableFormBuilder =
-                    subCrudUnit.createTableFormBuilderWithSelectionProviders();
-            TableForm subTableForm = tableFormBuilder
-                    .configNRows(subCrudUnit.objects.size())
-                    .configPrefix(prefix)
-                    .build();
-            subTableForm.readFromObject(subCrudUnit.objects);
+            subCrudUnit.setupSearchForm();
+            subCrudUnit.loadObjects();
+            subCrudUnit.setupTableForm(Mode.VIEW);
 
             sheet = workbook.createSheet(subCrudUnit.searchTitle ,
                     workbook.getNumberOfSheets());
 
             int m = 0;
-            for (TableForm.Column col : subTableForm.getColumns()) {
+            for (TableForm.Column col : subCrudUnit.tableForm.getColumns()) {
                 sheet.addCell(new Label(m, 0, col.getLabel(), formatCell));
                 m++;
             }
             i = 1;
-            for (TableForm.Row row : subTableForm.getRows()) {
+            for (TableForm.Row row : subCrudUnit.tableForm.getRows()) {
                 int j = 0;
                 for (Field field : Arrays.asList(row.getFields())) {
                     addFieldToCell(sheet, i, j, field);
@@ -869,17 +761,11 @@ public class CrudUnit {
 
     public void exportSearchPdf(File tempPdfFile) throws FOPException,
             IOException, TransformerException {
-        buildSearchForm();
-        searchForm.readFromRequest(req);
+        setupSearchForm();
 
-        loadObjectsFromCriteria();
+        loadObjects();
 
-        TableFormBuilder tableFormBuilder =
-            createTableFormBuilderWithSelectionProviders()
-                            .configNRows(objects.size());
-        tableForm = tableFormBuilder.configMode(Mode.VIEW)
-                .build();
-        tableForm.readFromObject(objects);
+        setupTableForm(Mode.VIEW);
 
         FopFactory fopFactory = FopFactory.newInstance();
 
@@ -930,7 +816,7 @@ public class CrudUnit {
 
     public XmlBuffer composeXml() {
         XmlBuffer xb = new XmlBuffer();
-        xb.writeNoHtmlEscape("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        xb.writeXmlHeader("UTF-8");
         xb.openElement("class");
         xb.openElement("table");
         xb.write(classAccessor.getName());

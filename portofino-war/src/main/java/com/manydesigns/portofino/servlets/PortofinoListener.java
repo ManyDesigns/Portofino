@@ -263,37 +263,40 @@ public class PortofinoListener
         // create and register the container first, without exceptions
 
         try {
-        ElementsThreadLocals.setupDefaultElementsContext();
+            ElementsThreadLocals.setupDefaultElementsContext();
 
-        String managerClassName =
-                portofinoProperties.getProperty(
-                        PortofinoProperties.CONTEXT_CLASS_PROPERTY);
-        InstanceBuilder<Context> builder =
-                new InstanceBuilder<Context>(
-                        Context.class,
-                        HibernateContextImpl.class,
-                        logger);
-        context = builder.createInstance(managerClassName);
+            String managerClassName =
+                    portofinoProperties.getProperty(
+                            PortofinoProperties.CONTEXT_CLASS_PROPERTY);
+            InstanceBuilder<Context> builder =
+                    new InstanceBuilder<Context>(
+                            Context.class,
+                            HibernateContextImpl.class,
+                            logger);
+            context = builder.createInstance(managerClassName);
 
-        servletContext.setAttribute(CONTEXT_ATTRIBUTE, context);
+            servletContext.setAttribute(CONTEXT_ATTRIBUTE, context);
 
-        context.loadConnectionsAsResource(
-                portofinoProperties.getProperty(
-                        PortofinoProperties.CONNECTIONS_LOCATION_PROPERTY));
+            String connectionsLocation =
+                    portofinoProperties.getProperty(
+                            PortofinoProperties.CONNECTIONS_LOCATION_PROPERTY);
+            String modelLocation =
+                    portofinoProperties.getProperty(
+                            PortofinoProperties.MODEL_LOCATION_PROPERTY);
 
-        String modelLocation =
-                portofinoProperties.getProperty(
-                        PortofinoProperties.MODEL_LOCATION_PROPERTY);
-        String rootDirPath = servletContext.getRealPath("/");
-        File modelFile;
-        if (rootDirPath == null) {
-            modelFile = new File(modelLocation);
-        } else {
-            modelFile = new File (rootDirPath, modelLocation);
-        }
-        
-        context.loadXmlModel(modelFile);
+            String rootDirPath = servletContext.getRealPath("/");
+            File connectionsFile;
+            File modelFile;
+            if (rootDirPath == null) {
+                connectionsFile = new File(connectionsLocation);
+                modelFile = new File(modelLocation);
+            } else {
+                connectionsFile = new File(rootDirPath, connectionsLocation);
+                modelFile = new File (rootDirPath, modelLocation);
+            }
 
+            context.loadConnections(connectionsFile);
+            context.loadXmlModel(modelFile);
         } catch (Throwable e) {
             LogUtil.severe(logger, "Exception caught", e);
         } finally {

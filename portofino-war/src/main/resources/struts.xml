@@ -130,6 +130,12 @@
                 <param name="location">${cancelReturnUrl}</param>
                 <param name="prependServletContext">false</param>
             </result>
+
+            <result name="jsonSelectFieldOptions" type="stream">
+                <param name="contentType">text/plain</param>
+                <param name="inputName">inputStream</param>
+                <param name="bufferSize">1024</param>
+            </result>
         </action>
         <action name="Profile" class="com.manydesigns.portofino.actions.user.ProfileAction">
             <result name="read">

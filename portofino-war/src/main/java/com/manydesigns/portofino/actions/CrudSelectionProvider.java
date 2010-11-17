@@ -29,29 +29,31 @@
 
 package com.manydesigns.portofino.actions;
 
-import com.manydesigns.elements.forms.TableForm;
-import com.manydesigns.portofino.model.datamodel.ForeignKey;
-
-import java.util.List;
+import com.manydesigns.elements.options.SelectionProvider;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class RelatedTableForm {
+public class CrudSelectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public ForeignKey relationship;
-    public TableForm tableForm;
-    public List<Object> objects;
+    protected final SelectionProvider selectionProvider;
+    protected final String[] fieldNames;
 
-    public RelatedTableForm(ForeignKey relationship,
-                          TableForm tableForm,
-                          List<Object> objects) {
-        this.relationship = relationship;
-        this.tableForm = tableForm;
-        this.objects = objects;
+    public CrudSelectionProvider(SelectionProvider selectionProvider,
+                                 String[] fieldNames) {
+        this.selectionProvider = selectionProvider;
+        this.fieldNames = fieldNames;
+    }
+
+    public SelectionProvider getSelectionProvider() {
+        return selectionProvider;
+    }
+
+    public String[] getFieldNames() {
+        return fieldNames;
     }
 }

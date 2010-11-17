@@ -55,7 +55,7 @@ public interface Context {
     // Model loading
     //**************************************************************************
 
-    void loadConnectionsAsResource(String resource);
+    void loadConnections(File file);
 
     void loadXmlModel(File file);
     void saveXmlModel();
@@ -115,7 +115,9 @@ public interface Context {
 
     void rollback();
 
-    List<Object> getRelatedObjects(String qualifiedTableName, 
+    String getQualifiedTableNameFromQueryString(String queryString);
+
+    List<Object> getRelatedObjects(String qualifiedTableName,
             Object obj, String oneToManyRelationshipName);
 
     void resetDbTimer();

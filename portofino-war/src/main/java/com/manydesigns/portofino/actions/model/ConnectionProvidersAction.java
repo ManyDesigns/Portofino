@@ -119,6 +119,7 @@ public class ConnectionProvidersAction extends PortofinoAction {
                     .configFields("databaseName", "driverClass",
                             "connectionURL", "username", "password",
                             "status", "errorMessage", "lastTested")
+                    .configMode(Mode.VIEW)
                     .build();
         } else {
             form = new FormBuilder(connectionProvider.getClass())

@@ -75,12 +75,8 @@ public abstract class AbstractCrudAction extends PortofinoAction
     }
 
     //**************************************************************************
-    // Preparable/ModelDriven implementation
+    // ModelDriven implementation
     //**************************************************************************
-
-    public void prepare() {
-        setupMetadata();
-    }
 
     public CrudUnit getModel() {
         return rootCrudUnit;
@@ -105,9 +101,6 @@ public abstract class AbstractCrudAction extends PortofinoAction
     // Web parameters
     //**************************************************************************
 
-    public String pk;
-    public String[] selection;
-    public String searchString;
     public String cancelReturnUrl;
     public String relName;
     public int selectionProviderIndex;
@@ -151,7 +144,6 @@ public abstract class AbstractCrudAction extends PortofinoAction
     }
 
     public abstract String redirectToFirst();
-    public abstract void setupMetadata();
 
     //**************************************************************************
     // Search

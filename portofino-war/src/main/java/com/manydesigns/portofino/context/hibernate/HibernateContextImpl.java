@@ -118,18 +118,18 @@ public class HibernateContextImpl implements Context {
     // Model loading
     //**************************************************************************
 
-    public void loadConnectionsAsResource(String resource) {
-        LogUtil.entering(logger, "loadConnectionsAsResource", resource);
+    public void loadConnections(File file) {
+        LogUtil.infoMF(logger, "Loading connections from file: {0}",
+                file.getAbsolutePath());
 
         ConnectionsParser parser = new ConnectionsParser();
         try {
-            connectionProviders = parser.parse(resource);
+            connectionProviders = parser.parse(file);
             for (ConnectionProvider current : connectionProviders) {
                 current.test();
             }
         } catch (Exception e) {
-            LogUtil.severeMF(logger, "Cannot load/parse connection: {0}", e,
-                    resource);
+            LogUtil.severeMF(logger, "Cannot load/parse file: {0}", e, file);
         }
 
         LogUtil.exiting(logger, "loadConnectionsAsResource");
@@ -301,6 +301,9 @@ public class HibernateContextImpl implements Context {
 
     public QueryStringWithParameters getQueryStringWithParametersForCriteria(
             Criteria criteria) {
+        if (criteria == null) {
+            return new QueryStringWithParameters("", new Object[0]);
+        }
         ClassAccessor classAccessor = criteria.getClassAccessor();
         String qualifiedTableName = classAccessor.getName();
 
@@ -461,7 +464,7 @@ public class HibernateContextImpl implements Context {
         return getObjects(queryString, null);
     }
 
-    protected String getQualifiedTableNameFromQueryString(String queryString) {
+    public String getQualifiedTableNameFromQueryString(String queryString) {
         Matcher matcher = FROM_PATTERN.matcher(queryString);
         if (matcher.matches()) {
             return matcher.group(1);
