@@ -50,8 +50,9 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     public Connection connPortofino;
     public Connection connDBTest;
     public Context context = null;
-    public File xmlModelFile;
 
+    public static final String PORTOFINO_CONNECTIONS_RESOURCE =
+            "database/portofino-connections.xml";
     public static final String PORTOFINO_MODEL_RESOURCE =
             "database/portofino-model.xml";
 
@@ -71,15 +72,12 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         super.setUp();
 
         context = new HibernateContextImpl();
-        context.loadConnectionsAsResource("database/portofino-connections.xml");
+        // copy portofino-model from classpath resource to temp file
+        File connectionsFile = copyResourceToTempFile(PORTOFINO_CONNECTIONS_RESOURCE);
+        context.loadConnections(connectionsFile);
 
         // copy portofino-model from classpath resource to temp file
-        InputStream is =
-                ReflectionUtil.getResourceAsStream(PORTOFINO_MODEL_RESOURCE);
-        xmlModelFile = File.createTempFile("portofino-model-", ".xml");
-        Writer writer = new FileWriter(xmlModelFile);
-        IOUtils.copy(is, writer);
-        IOUtils.closeQuietly(writer);
+        File xmlModelFile = copyResourceToTempFile(PORTOFINO_MODEL_RESOURCE);
         context.loadXmlModel(xmlModelFile);
 
         connPortofino = context.getConnectionProvider("portofino").acquireConnection();
@@ -100,6 +98,16 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         RunScript.execute(connDBTest,
                 new InputStreamReader(
                         cl.getResourceAsStream(TEST_DB)));
+    }
+
+    private File copyResourceToTempFile(String resource) throws IOException {
+        InputStream is =
+                ReflectionUtil.getResourceAsStream(resource);
+        File tempFile = File.createTempFile("portofino-model-", ".xml");
+        Writer writer = new FileWriter(tempFile);
+        IOUtils.copy(is, writer);
+        IOUtils.closeQuietly(writer);
+        return tempFile;
     }
 
 }

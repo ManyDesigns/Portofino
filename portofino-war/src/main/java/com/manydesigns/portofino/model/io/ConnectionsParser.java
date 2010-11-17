@@ -38,6 +38,8 @@ import com.manydesigns.portofino.xml.ElementCallback;
 import com.manydesigns.portofino.xml.XmlParser;
 
 import javax.xml.stream.XMLStreamException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,8 +64,20 @@ public class ConnectionsParser extends XmlParser {
             LogUtil.getLogger(ConnectionsParser.class);
 
     public List<ConnectionProvider> parse(String resourceName) throws Exception {
-        connections = new ArrayList<ConnectionProvider>();
         InputStream inputStream = ReflectionUtil.getResourceAsStream(resourceName);
+        return parse(inputStream);
+    }
+
+    public List<ConnectionProvider> parse(File file) throws Exception {
+        LogUtil.infoMF(logger, "Parsing file: {0}", file.getAbsolutePath());
+        InputStream input = new FileInputStream(file);
+        return parse(input);
+    }
+
+
+    public List<ConnectionProvider> parse(InputStream inputStream)
+            throws XMLStreamException {
+        connections = new ArrayList<ConnectionProvider>();
         initParser(inputStream);
         expectDocument(new ConnectionsDocumentCallback());
         return connections;

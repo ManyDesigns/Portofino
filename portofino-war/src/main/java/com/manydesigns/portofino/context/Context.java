@@ -54,7 +54,7 @@ public interface Context {
     // Model loading
     //**************************************************************************
 
-    void loadConnectionsAsResource(String resource);
+    void loadConnections(File file);
 
     void loadXmlModel(File file);
     void saveXmlModel();
