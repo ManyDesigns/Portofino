@@ -35,6 +35,7 @@ import com.manydesigns.portofino.xml.XmlAttribute;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -58,7 +59,7 @@ public abstract class SiteNode implements ModelObject {
     protected String actualUrl;
     protected String title;
     protected String description;
-
+    protected String url;
 
     //**************************************************************************
     // Permissions
@@ -106,7 +107,9 @@ public abstract class SiteNode implements ModelObject {
 
     public void init(Model model) {
         if (parent!=null){
-            actualId = parent.actualId+"/"+id;
+            actualId = parent.actualId;
+            actualId = (actualId.endsWith("/")?actualId:actualId+"/");
+            actualId = actualId+id;
         }else {
             actualId = id;
         }
@@ -114,7 +117,15 @@ public abstract class SiteNode implements ModelObject {
         for (SiteNode childNode : childNodes) {
             childNode.init(model);
         }
+
+        if (url==null){
+            actualUrl = MessageFormat.format(getUrlFormat(), actualId);
+        } else {
+            actualUrl = url;
+        }
     }
+
+    protected abstract String getUrlFormat();
 
     public String getQualifiedName() {
         return null;
@@ -161,5 +172,22 @@ public abstract class SiteNode implements ModelObject {
 
     public String getActualUrl() {
         return actualUrl;
+    }
+
+    public String getActualId() {
+        return actualId;
+    }
+
+    public void setActualId(String actualId) {
+        this.actualId = actualId;
+    }
+
+    @XmlAttribute(required = false)
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

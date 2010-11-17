@@ -28,10 +28,7 @@
  */
 package com.manydesigns.portofino.model.site;
 
-import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.xml.XmlAttribute;
-
-import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -39,12 +36,11 @@ import java.text.MessageFormat;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class CustomFolderNode extends SiteNode{
-    private final String urlFormat = "/{0}/Index.action";
+    private final String urlFormat = "{0}/Index.action";
 
     //**************************************************************************
     // Fields
     //**************************************************************************
-    protected String url;
     protected String type;
 
     public CustomFolderNode(SiteNode parent) {
@@ -60,22 +56,7 @@ public class CustomFolderNode extends SiteNode{
         this.type = type;
     }
 
-    @XmlAttribute(required = false)
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    @Override
-    public void init(Model model) {
-        super.init(model);
-        if (url==null){
-            actualUrl = MessageFormat.format(urlFormat, actualId);
-        } else {
-            actualUrl = parent.getActualUrl()+url;
-        }
+    protected String getUrlFormat() {
+        return urlFormat;
     }
 }

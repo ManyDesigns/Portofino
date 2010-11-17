@@ -86,8 +86,7 @@
             </result>
             <result name="noClasses">/skins/default/crud/noClasses.jsp</result>
         </action>
-
-        <action name="*/UseCase"
+        <action name="**/UseCase"
                 class="com.manydesigns.portofino.actions.UseCaseAction">
             <param name="qualifiedName">{1}</param>
 
@@ -132,111 +131,48 @@
                 <param name="prependServletContext">false</param>
             </result>
         </action>
-
-        <action name="userAdmin/UseCase"
-                class="com.manydesigns.portofino.actions.user.admin.UserAdminAction">
-            <param name="qualifiedName">userAdmin</param>
-
-            <result name="search">/skins/default/crud/search.jsp</result>
-
-            <result name="read">/skins/default/crud/read.jsp</result>
-
-            <result name="create">/skins/default/crud/create.jsp</result>
-
-            <result name="save" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
-                <param name="pk">%{pk}</param>
+        <action name="Profile" class="com.manydesigns.portofino.actions.user.ProfileAction">
+            <result name="read">
+                /skins/default/user/profile/read.jsp
             </result>
-
-            <result name="edit">/skins/default/crud/edit.jsp</result>
-
+            <result name="edit">
+                /skins/default/user/profile/edit.jsp
+            </result>
             <result name="update" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
-                <param name="pk">%{pk}</param>
-                <param name="searchString">%{searchString}</param>
+                <param name="actionName">Profile</param>
             </result>
-
-            <result name="bulkEdit">/skins/default/crud/bulkEdit.jsp</result>
-
-            <result name="bulkUpdate" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
-                <param name="searchString">%{searchString}</param>
+            <result name="changePwd">
+                /skins/default/user/profile/changePwd.jsp
             </result>
-
-            <result name="returnToRead" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
-                <param name="pk">%{pk}</param>
-                <param name="searchString">%{searchString}</param>
+            <result name="updatePwd" type="redirectAction">
+                <param name="actionName">Profile</param>
             </result>
-
-            <result name="returnToSearch" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
-                <param name="searchString">%{searchString}</param>
+        </action>
+        <action name="Portlet"
+                class="com.manydesigns.portofino.actions.model.PortletDesignAction">
+            <result name="redirectToFirst" type="redirectAction">
+                <param name="actionName">%{portletName}/PortletDesign</param>
             </result>
+        </action>
+        <action name="**/Portlet"
+                class="com.manydesigns.portofino.actions.model.PortletDesignAction">
+            <param name="skin">default</param>
+            <param name="portletName">{1}</param>
 
-            <result name="delete" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
-                <param name="searchString">%{searchString}</param>
-            </result>
+            <result name="summary">/skins/default/model/portletDesign/summary.jsp</result>
 
             <result name="cancel" type="redirect">
                 <param name="location">${cancelReturnUrl}</param>
                 <param name="prependServletContext">false</param>
             </result>
+
+            <result name="chart" type="stream">
+               <param name="contentType">image/png</param>
+               <param name="inputName">inputStream</param>
+               <param name="bufferSize">4096</param>
+               <param name="contentDisposition">filename="%{fileName}"</param>
+             </result>
         </action>
-
-        <action name="groupAdmin/UseCase"
-                class="com.manydesigns.portofino.actions.user.admin.GroupAction">
-            <param name="qualifiedName">groupAdmin</param>
-
-            <result name="search">/skins/default/crud/search.jsp</result>
-
-            <result name="read">/skins/default/crud/read.jsp</result>
-
-            <result name="create">/skins/default/crud/create.jsp</result>
-
-            <result name="save" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
-                <param name="pk">%{pk}</param>
-            </result>
-
-            <result name="edit">/skins/default/crud/edit.jsp</result>
-
-            <result name="update" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
-                <param name="pk">%{pk}</param>
-                <param name="searchString">%{searchString}</param>
-            </result>
-
-            <result name="bulkEdit">/skins/default/crud/bulkEdit.jsp</result>
-
-            <result name="bulkUpdate" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
-                <param name="searchString">%{searchString}</param>
-            </result>
-
-            <result name="returnToRead" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
-                <param name="pk">%{pk}</param>
-                <param name="searchString">%{searchString}</param>
-            </result>
-
-            <result name="returnToSearch" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
-                <param name="searchString">%{searchString}</param>
-            </result>
-
-            <result name="delete" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
-                <param name="searchString">%{searchString}</param>
-            </result>
-
-            <result name="cancel" type="redirect">
-                <param name="location">${cancelReturnUrl}</param>
-                <param name="prependServletContext">false</param>
-            </result>
-        </action>
-
     </package>
 
 
@@ -376,32 +312,6 @@
             <result name="success">/skins/default/model/ddl.jsp</result>
         </action>
 
-        <action name="PortletDesign"
-                class="com.manydesigns.portofino.actions.model.PortletDesignAction">
-            <result name="redirectToFirst" type="redirectAction">
-                <param name="actionName">%{portletName}/PortletDesign</param>
-            </result>
-        </action>
-        <action name="*/PortletDesign"
-                class="com.manydesigns.portofino.actions.model.PortletDesignAction">
-            <param name="skin">default</param>
-            <param name="portletName">{1}</param>
-
-            <result name="summary">/skins/default/model/portletDesign/summary.jsp</result>
-
-            <result name="cancel" type="redirect">
-                <param name="location">${cancelReturnUrl}</param>
-                <param name="prependServletContext">false</param>
-            </result>
-
-            <result name="chart" type="stream">
-               <param name="contentType">image/png</param>
-               <param name="inputName">inputStream</param>
-               <param name="bufferSize">4096</param>
-               <param name="contentDisposition">filename="%{fileName}"</param>
-             </result>
-
-        </action>
 
     </package>
 
@@ -442,29 +352,6 @@
     -->
 
     <package name="portofino-user" extends="portofino-default" namespace="/user">
-        <action name="Index">
-            <param name="qualifiedTableName">portofino.public.users</param>
-            <result name="success" type="redirectAction">
-                <param name="actionName">Profile</param>
-            </result>
-        </action>
-        <action name="Profile" class="com.manydesigns.portofino.actions.user.ProfileAction">
-            <result name="read">
-                /skins/default/user/profile/read.jsp
-            </result>
-            <result name="edit">
-                /skins/default/user/profile/edit.jsp
-            </result>
-            <result name="update" type="redirectAction">
-                <param name="actionName">Profile</param>
-            </result>
-            <result name="changePwd">
-                /skins/default/user/profile/changePwd.jsp
-            </result>
-            <result name="updatePwd" type="redirectAction">
-                <param name="actionName">Profile</param>
-            </result>
-        </action>
         <action name="PwdRecovery" class="com.manydesigns.portofino.actions.user.PwdRecoveryAction">
             <result name="input">
                 /skins/default/user/passwordRecovery.jsp
@@ -499,6 +386,115 @@
         </action>
     </package>
 
+    <package name="usersAdmin" extends="portofino-default" namespace="/usersAdmin">
+        <action name="Index">
+            <result name="success" type="redirectAction">
+                <param name="actionName">Users</param>
+            </result>
+        </action>
+        <action name="Users"
+                class="com.manydesigns.portofino.actions.user.admin.UserAdminAction">
+            <param name="qualifiedName">userAdmin</param>
 
+            <result name="search">/skins/default/crud/search.jsp</result>
+
+            <result name="read">/skins/default/crud/read.jsp</result>
+
+            <result name="create">/skins/default/crud/create.jsp</result>
+
+            <result name="save" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="pk">%{pk}</param>
+            </result>
+
+            <result name="edit">/skins/default/crud/edit.jsp</result>
+
+            <result name="update" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="pk">%{pk}</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="bulkEdit">/skins/default/crud/bulkEdit.jsp</result>
+
+            <result name="bulkUpdate" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="returnToRead" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="pk">%{pk}</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="returnToSearch" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="delete" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="cancel" type="redirect">
+                <param name="location">${cancelReturnUrl}</param>
+                <param name="prependServletContext">false</param>
+            </result>
+        </action>
+
+        <action name="Groups"
+                class="com.manydesigns.portofino.actions.user.admin.GroupAction">
+            <param name="qualifiedName">groupAdmin</param>
+
+            <result name="search">/skins/default/crud/search.jsp</result>
+
+            <result name="read">/skins/default/crud/read.jsp</result>
+
+            <result name="create">/skins/default/crud/create.jsp</result>
+
+            <result name="save" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="pk">%{pk}</param>
+            </result>
+
+            <result name="edit">/skins/default/crud/edit.jsp</result>
+
+            <result name="update" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="pk">%{pk}</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="bulkEdit">/skins/default/crud/bulkEdit.jsp</result>
+
+            <result name="bulkUpdate" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="returnToRead" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="pk">%{pk}</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="returnToSearch" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="delete" type="redirectAction">
+                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="searchString">%{searchString}</param>
+            </result>
+
+            <result name="cancel" type="redirect">
+                <param name="location">${cancelReturnUrl}</param>
+                <param name="prependServletContext">false</param>
+            </result>
+        </action>
+    </package>
 
 </struts>

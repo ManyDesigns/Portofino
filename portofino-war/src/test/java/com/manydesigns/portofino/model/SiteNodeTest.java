@@ -62,7 +62,7 @@ public class SiteNodeTest extends TestCase{
         n1_2_1.setDescription("TableData description");
         n1_2_1.setTitle("TableData title");
         n1_2_1.setId("TableData");
-        n1_2_1.setUrl("TableData.action");
+        n1_2_1.setUrl("/model/TableData.action");
         n1_2.getChildNodes().add(n1_2_1);
 
         CustomFolderNode n1_2_2 = new CustomFolderNode(n1_2);
@@ -70,8 +70,15 @@ public class SiteNodeTest extends TestCase{
         n1_2_2.setDescription("TableData design description");
         n1_2_2.setTitle("TableData design title");
         n1_2_2.setId("TableDesign");
-        n1_2_2.setUrl("TableDesign.action");
+        n1_2_2.setUrl("/model/TableDesign.action");
         n1_2.getChildNodes().add(n1_2_2);
+
+        CustomNode n1_2_3 = new CustomNode(n1_2);
+        n1_2_3.setDescription("Somewhere description");
+        n1_2_3.setTitle("Somewhere");
+        n1_2_3.setId("somewhere");
+        n1_2_3.setUrl("http://www.manydesigns.com/");
+        n1_2.getChildNodes().add(n1_2_3);
 
 
         //1.3
@@ -79,27 +86,47 @@ public class SiteNodeTest extends TestCase{
         n1_3.setDescription("Profile");
         n1_3.setTitle("Profile");
         n1_3.setId("Profile");
-        n1_3.setUrl("Profile.action");
+        n1_3.setUrl("/Profile.action");
 
         //1.4
         FolderNode n1_4 = new FolderNode(root);
         n1_4.setDescription("user administration");
         n1_4.setTitle("user admin");
         n1_4.setId("userAdmin");
-        UseCaseNode n1_4_1 = new UseCaseNode(n1_4);
-        n1_4_1.setDescription("user administration");
-        n1_4_1.setTitle("user admin");
-        n1_4_1.setId("userAdmin");
-        n1_4.getChildNodes().add(n1_4_1);
-
-
         //Aggiungo i nodi alla radice
         root.getChildNodes().add(n1_1);
         root.getChildNodes().add(n1_2);
         root.getChildNodes().add(n1_3);
         root.getChildNodes().add(n1_4);
+
+        model.setRoot(root);
+
+
+        root.reset();
         root.init(model);
 
-        SiteNode rootNode = model.getRoot();
+
+        assertEquals("/", root.getActualUrl());
+        assertEquals("/", root.getActualId());
+
+        assertEquals("/homepage/Document.action", n1_1.getActualUrl());
+        assertEquals("/homepage", n1_1.getActualId());
+
+        assertEquals("/model/TableData.action", n1_2.getActualUrl());
+        assertEquals("/model", n1_2.getActualId());
+
+        assertEquals("/model/TableData.action", n1_2_1.getActualUrl());
+        assertEquals("/model/TableData", n1_2_1.getActualId());
+
+        assertEquals("/model/TableDesign.action", n1_2_2.getActualUrl());
+        assertEquals("/model/TableDesign", n1_2_2.getActualId());
+
+        assertEquals("http://www.manydesigns.com/", n1_2_3.getActualUrl());
+        assertEquals("/model/somewhere", n1_2_3.getActualId());
+
+        assertEquals("/Profile.action", n1_3.getActualUrl());
+        assertEquals("/Profile", n1_3.getActualId());
+        assertEquals("/userAdmin/Index.action", n1_4.getActualUrl());
+        assertEquals("/userAdmin", n1_4.getActualId());
     }
 }

@@ -80,7 +80,8 @@ public class Navigation implements XhtmlFragment {
         Stack<NavigationNode> stack = new Stack<NavigationNode>();
         foundPath = new ArrayList<NavigationNode>();
         rootNodes = new ArrayList<NavigationNode>();
-        generateNavigationNodes(context.getModel().getRoot().getChildNodes(), rootNodes);
+        final List<SiteNode> rootChildNodes = context.getModel().getRoot().getChildNodes();
+        generateNavigationNodes(rootChildNodes, rootNodes);
         searchPath(rootNodes, stack);
     }
 
@@ -88,10 +89,15 @@ public class Navigation implements XhtmlFragment {
                                            List<NavigationNode> navigationNodes) {
         for (SiteNode siteNode : siteNodes) {
             NavigationNode navigationNode;
-            if (siteNode instanceof DocumentNode || siteNode instanceof PortletNode
-                    || siteNode instanceof UseCaseNode || siteNode instanceof FolderNode
+            if (siteNode instanceof DocumentNode
+                    || siteNode instanceof PortletNode
+                    || siteNode instanceof UseCaseNode
                     || siteNode instanceof CustomNode) {
                 navigationNode = new SimpleNavigationNode(siteNode);
+                generateNavigationNodes(siteNode.getChildNodes(),
+                        navigationNode.getChildNodes());
+            }else if (siteNode instanceof FolderNode) {
+                navigationNode = new FolderNavigationNode(siteNode);
                 generateNavigationNodes(siteNode.getChildNodes(),
                         navigationNode.getChildNodes());
             } else if (siteNode instanceof CustomFolderNode) {

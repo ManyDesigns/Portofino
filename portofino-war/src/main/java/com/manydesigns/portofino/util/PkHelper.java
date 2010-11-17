@@ -138,7 +138,7 @@ public class PkHelper {
 
     public String generateUrl(Object object, String searchString) {
         String pkString = generatePkString(object);
-        Map<String,String> params = new HashMap<String,String>();
+        Map<String,Object> params = new HashMap<String,Object>();
         params.put("pk", pkString);
         params.put("searchString", searchString);
         String url = Struts2Util.buildActionUrl(null, params);
@@ -146,7 +146,7 @@ public class PkHelper {
     }
 
     public String generateSearchUrl(String searchString) {
-        Map<String,String> params = new HashMap<String,String>();
+        Map<String,Object> params = new HashMap<String,Object>();
         params.put("searchString", searchString);
         String url = Struts2Util.buildActionUrl(null, params);
         return Util.getAbsoluteUrl(url);

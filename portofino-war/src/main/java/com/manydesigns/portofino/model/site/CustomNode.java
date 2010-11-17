@@ -28,45 +28,22 @@
  */
 package com.manydesigns.portofino.model.site;
 
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.xml.XmlAttribute;
-
-import java.text.MessageFormat;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class CustomNode extends SiteNode{
-    private final String urlFormat = "/{0}/Custom.action";
+    private final String urlFormat = "{0}/Custom.action";
 
     //**************************************************************************
     // Fields
     //**************************************************************************
-    protected String url;
-
     public CustomNode(SiteNode parent) {
         super(parent);
     }
 
-    @Override
-    public void init(Model model) {
-        super.init(model);
-        if (url==null){
-            actualUrl = MessageFormat.format(urlFormat, actualId);
-        } else {
-            actualUrl = parent.getActualUrl()+url;
-        }
+    protected String getUrlFormat() {
+        return urlFormat;
     }
-
-    @XmlAttribute(required = false)
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
 }

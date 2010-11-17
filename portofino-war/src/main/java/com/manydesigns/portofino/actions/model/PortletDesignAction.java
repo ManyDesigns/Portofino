@@ -35,6 +35,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.jfreechart.JBla;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.struts2.Struts2Util;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
@@ -60,7 +61,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 /*
@@ -157,10 +158,9 @@ public class PortletDesignAction extends PortofinoAction {
 
         chartId = RandomUtil.createRandomCode();
 
-        String portletUrl = Util.getAbsoluteUrl(
-                MessageFormat.format(
-                        "/model/{0}/PortletDesign!chart.action?chartId={1}",
-                        portletName, chartId));
+        HashMap<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("chartId", chartId);
+        String portletUrl = Util.getAbsoluteUrl(Struts2Util.buildActionUrl("chart", parameters));
 
         try {
             File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
@@ -276,7 +276,8 @@ public class PortletDesignAction extends PortofinoAction {
     //**************************************************************************
 
     public void setupPortlet() {
-        portlet = (PortletNode) navigation.getSelectedNavigationNode();
+        portlet = (PortletNode) navigation.getSelectedNavigationNode()
+                .getActualSiteNode();
         if (portlet == null) {
             throw new ModelObjectNotFoundError(portletName);
         }

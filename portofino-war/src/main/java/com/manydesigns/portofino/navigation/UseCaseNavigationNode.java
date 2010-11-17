@@ -84,4 +84,7 @@ public class UseCaseNavigationNode implements NavigationNode {
     public SiteNode getSiteNode() {
         return this.siteNode;
     }
+    public SiteNode getActualSiteNode() {
+        return siteNode;
+    }
 }

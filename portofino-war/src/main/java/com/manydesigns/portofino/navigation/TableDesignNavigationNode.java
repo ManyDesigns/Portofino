@@ -68,12 +68,12 @@ public class TableDesignNavigationNode implements NavigationNode {
         for (Table table : tables) {
             TableNavigationNode node =
                     new TableNavigationNode(siteNode,table,
-                            "/model/{0}/TableDesign.action",
+                            siteNode.getParent().getActualId()+"/{0}/TableDesign.action",
                             "{0}",
                             "Table design: {0}");
             childNodes.add(node);
         }
-        url = Util.getAbsoluteUrl(siteNode.getId());
+        url = Util.getAbsoluteUrl(siteNode.getActualUrl());
     }
 
 
@@ -100,4 +100,10 @@ public class TableDesignNavigationNode implements NavigationNode {
     public SiteNode getSiteNode() {
         return this.siteNode;
     }
+
+    public SiteNode getActualSiteNode() {
+        return siteNode;
+    }
+
+
 }

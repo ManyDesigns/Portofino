@@ -34,8 +34,6 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
-import java.text.MessageFormat;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -45,7 +43,7 @@ public class PortletNode extends SiteNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final String urlFormat = "/{0}/Portlet.action";
+    private final String urlFormat = "{0}/Portlet.action";
 
     //**************************************************************************
     // Fields
@@ -94,10 +92,6 @@ public class PortletNode extends SiteNode {
         actualDatabase = null;
     }
 
-    public void init(Model model) {
-        actualDatabase = model.findDatabaseByName(database);
-        actualUrl = MessageFormat.format(urlFormat, actualId);        
-    }
 
     public String getQualifiedName() {
         return null;
@@ -180,4 +174,13 @@ public class PortletNode extends SiteNode {
         this.actualDatabase = actualDatabase;
     }
 
+    @Override
+    public void init(Model model) {
+        super.init(model);
+        actualDatabase = model.findDatabaseByName(database);
+    }
+
+    protected String getUrlFormat() {
+        return urlFormat;
+    }
 }

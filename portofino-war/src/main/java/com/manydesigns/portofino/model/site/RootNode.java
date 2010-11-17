@@ -28,14 +28,28 @@
  */
 package com.manydesigns.portofino.model.site;
 
+import com.manydesigns.portofino.model.Model;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class RootNode extends SiteNode{
+    private final String urlFormat = "{0}/Index.action";
     public RootNode() {
         super(null);
     }
 
+    @Override
+    public void init(Model model) {
+        actualId="/";
+        super.init(model);
+        url="/";
+        actualUrl = "/";
+    }
+
+    protected String getUrlFormat() {
+        return urlFormat;
+    }
 }

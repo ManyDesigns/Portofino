@@ -52,7 +52,7 @@ public class Struts2Util {
     }
 
     public static String buildActionUrl(String method, 
-                                        Map<String,String> parameters) {
+                                        Map<String,Object> parameters) {
         ActionContext actionContext = ActionContext.getContext();
         ActionInvocation actionInvocation = actionContext.getActionInvocation();
         ActionProxy actionProxy = actionInvocation.getProxy();
@@ -75,9 +75,10 @@ public class Struts2Util {
 
         // add parameters
         boolean first = true;
-        for (Map.Entry<String,String> parameter : parameters.entrySet()) {
+        for (Map.Entry<String,Object> parameter : parameters.entrySet()) {
             String parameterName = parameter.getKey();
-            String parameterValue = parameter.getValue();
+            Object parameterValue = parameter.getValue();
+            String StringValue = Util.convertValueToString(parameterValue);
 
             // parameters with null value are ignored
             if (parameterValue == null) {
@@ -88,13 +89,13 @@ public class Struts2Util {
                 sb.append("?");
                 sb.append(Util.urlencode(parameterName));
                 sb.append("=");
-                sb.append(Util.urlencode(parameterValue));
+                sb.append(Util.urlencode(StringValue));
                 first = false;
             } else {
                 sb.append("&");
                 sb.append(Util.urlencode(parameterName));
                 sb.append("=");
-                sb.append(Util.urlencode(parameterValue));
+                sb.append(Util.urlencode(StringValue));
             }
         }
 

@@ -38,7 +38,7 @@ import java.text.MessageFormat;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class FolderNode extends SiteNode{
-    private final String urlFormat = "/{0}/Index.action";
+    private final String urlFormat = "{0}/Index.action";
 
     public FolderNode(SiteNode parent) {
         super(parent);
@@ -47,6 +47,17 @@ public class FolderNode extends SiteNode{
     @Override
     public void init(Model model) {
         super.init(model);
-        actualUrl = MessageFormat.format(urlFormat, actualId);
+        if (childNodes.size()>0){
+            actualUrl=childNodes.get(0).getActualUrl();
+        }
+        else if (url==null){
+            actualUrl = MessageFormat.format(urlFormat, actualId);
+        } else {
+            actualUrl = url;
+        }
+    }
+
+    protected String getUrlFormat() {
+        return urlFormat;
     }
 }

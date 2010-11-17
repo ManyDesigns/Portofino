@@ -85,4 +85,8 @@ public class SimpleNavigationNode implements NavigationNode {
     public SiteNode getSiteNode() {
         return this.siteNode;
     }
+
+    public SiteNode getActualSiteNode() {
+        return siteNode;
+    }
 }

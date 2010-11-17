@@ -28,6 +28,7 @@
  */
 package com.manydesigns.portofino.model.site;
 
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 
 /*
@@ -36,9 +37,12 @@ import com.manydesigns.portofino.model.site.usecases.UseCase;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class UseCaseNode extends SiteNode{
-    private final String urlFormat = "/{0}/UseCase.action";
+    private final String urlFormat = "{0}/UseCase.action";
 
     protected UseCase useCase;
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
 
     public UseCaseNode(SiteNode parent, UseCase useCase) {
         this(parent);
@@ -57,4 +61,13 @@ public class UseCaseNode extends SiteNode{
         this.useCase = useCase;
     }
 
+    @Override
+    public void init(Model model) {
+        super.init(model);
+        useCase.init(model);
+    }
+
+    protected String getUrlFormat() {
+        return urlFormat;
+    }
 }

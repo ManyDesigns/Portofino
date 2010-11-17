@@ -47,4 +47,5 @@ public interface NavigationNode {
     String getDescription();
     List<NavigationNode> getChildNodes();
     SiteNode getSiteNode();
+    SiteNode getActualSiteNode();
 }

@@ -30,10 +30,9 @@
 package com.manydesigns.portofino.navigation;
 
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.site.SiteNode;
 
-import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -41,7 +40,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableNavigationNode implements NavigationNode {
+public class FolderNavigationNode implements NavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -49,36 +48,19 @@ public class TableNavigationNode implements NavigationNode {
     // Fields
     //**************************************************************************
 
-    protected final Table table;
-    protected final String url;
-    protected final String title;
-    protected final String description;
     protected final SiteNode siteNode;
-    protected List<NavigationNode> childNodes;
-
+    protected final List<NavigationNode> childNodes;
+    protected final String url;
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public TableNavigationNode(SiteNode siteNode, Table table,
-                               String urlFormat,
-                               String titleFormat,
-                               String descriptionFormat) {
+    public FolderNavigationNode(SiteNode siteNode) {
         this.siteNode = siteNode;
-        this.table = table;
-        this.url =
-                Util.getAbsoluteUrl(
-                        MessageFormat.format(
-                                urlFormat, table.getQualifiedName()));
-        this.title = MessageFormat.format(
-                titleFormat, table.getQualifiedName());
-        this.description = MessageFormat.format(
-                descriptionFormat, table.getQualifiedName());
+        childNodes = new ArrayList<NavigationNode>();
+        url = Util.getAbsoluteUrl(siteNode.getActualUrl());
     }
-
-
-
 
     //**************************************************************************
     // NavigationNode implementation
@@ -89,22 +71,26 @@ public class TableNavigationNode implements NavigationNode {
     }
 
     public String getTitle() {
-        return title;
+        return siteNode.getTitle();
     }
 
     public String getDescription() {
-        return description;
+        return siteNode.getDescription();
     }
 
     public List<NavigationNode> getChildNodes() {
-        return null;
+        return childNodes;
     }
 
     public SiteNode getSiteNode() {
-        return siteNode;
+        return this.siteNode;
     }
 
     public SiteNode getActualSiteNode() {
-        return siteNode;
+        if (siteNode.getChildNodes().size()==0){
+            return siteNode;
+        } else {
+            return siteNode.getChildNodes().get(0);
+        }
     }
 }

@@ -1067,7 +1067,7 @@
     </databases>
     <rootNode title="Portofino4" description="portofino 4" id="/">
         <childNodes>
-        <documentNode id="homepage" title="Homepage" description="Homepage">
+        <documentNode id="homepage" title="Homepage" description="Homepage" url="Homepage.action">
             <permissions>
                 <allow>
                     <group name="anonymous"/>
@@ -1077,18 +1077,18 @@
         <folder id="model" title="Model" description="Model">
             <childNodes>
                 <customNode id="ConnectionProviders"
-                          url="ConnectionProviders.action"
+                          url="/model/ConnectionProviders.action"
                           title="Connection providers"
                           description="Connection providers"/>
-                <customFolder  id="TableData" url="TableData.action" type="table-data"
+                <customFolder  id="TableData" url="/model/TableData.action" type="table-data"
                           title="Table data" description="Table data"/>
-                <customFolder id="TabelDesign" url="TableDesign.action" type="table-design"
+                <customFolder id="TabelDesign" url="/model/TableDesign.action" type="table-design"
                           title="Table design" description="Table design"/>
-                <customNode  id="SelfTest" url="SelfTest.action" title="Self test"
+                <customNode  id="SelfTest" url="/model/SelfTest.action" title="Self test"
                           description="Self test"/>
-                <customNode id="SiteMap" url="SiteMap.action" title="Site map"
+                <customNode id="SiteMap" url="/model/SiteMap.action" title="Site map"
                           description="Site map"/>
-                <customNode type="simple" id="DDLWriter" url="DDLWriter.action" title="DDL Writer"
+                <customNode id="DDLWriter" url="/model/DDLWriter.action" title="DDL Writer"
                           description="DDL Writer"/>
             </childNodes>
             <permissions>
@@ -1100,12 +1100,12 @@
         <folder id="system-admin" title="System administration"
                   description="System administration">
             <childNodes>
-                <customNode id="ServerInfo" url="ServerInfo.action"
+                <customNode id="ServerInfo" url="/system-admin/ServerInfo.action"
                           title="Server info" description="Server info"/>
-                <customNode id="ConfigurationProperties" url="ConfigurationProperties.action"
+                <customNode id="ConfigurationProperties" url="/system-admin/ConfigurationProperties.action"
                           title="Configuration properties"
                           description="Configuration properties"/>
-                <customNode url="Logs.action" id="Logs" title="Logs"
+                <customNode url="/system-admin/Logs.action" id="Logs" title="Logs"
                           description="Logs"/>
             </childNodes>
             <permissions>
@@ -1114,18 +1114,18 @@
                 </allow>
             </permissions>
         </folder>
-        <customNode id="Profile" url="Profile.action" title="Profile" description="Profile">
+        <customNode id="Profile" url="/Profile.action" title="Profile" description="Profile">
             <permissions>
                 <allow>
                     <group name="registered"/>
                 </allow>
             </permissions>
         </customNode>
-        <folder id="user-admin" description="User admin" title="admin user">
+        <folder id="usersAdmin" description="User admin" title="admin user">
             <childNodes>
             <useCaseNode title="userAdmin"
                          id="userAdmin"
-                         description="user administration">
+                         description="user administration" url="/usersAdmin/Users.action">
                 <useCase name = "users"
                          table="portofino.public.users"
                          query="from portofino.public.users"
@@ -1195,7 +1195,7 @@
             </useCaseNode>
             <useCaseNode title="groupAdmin"
                          id="groupAdmin"
-                         description="groups administration">
+                         description="groups administration" url="/usersAdmin/Groups.action">
                 <useCase name="groupAdmin"
                          table="portofino.public.groups"
                          query="from portofino.public.groups"

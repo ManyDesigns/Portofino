@@ -55,7 +55,7 @@ public class UseCaseAction extends AbstractCrudAction {
         if (qualifiedName == null) {
             return;
         }
-        UseCase rootUseCase = ((UseCaseNode) navigation.getSelectedNavigationNode())
+        UseCase rootUseCase = ((UseCaseNode) navigation.getSelectedNavigationNode().getActualSiteNode())
                 .getUseCase();
         if (rootUseCase == null) {
             throw new ModelObjectNotFoundError(qualifiedName);

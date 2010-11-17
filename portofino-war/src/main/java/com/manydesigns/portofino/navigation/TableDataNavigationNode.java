@@ -68,12 +68,12 @@ public class TableDataNavigationNode implements NavigationNode {
         for (Table table : tables) {
             TableNavigationNode node =
                     new TableNavigationNode(siteNode,table,
-                            "/model/{0}/TableData.action",
+                            siteNode.getParent().getActualId()+"/{0}/TableData.action",
                             "{0}",
                             "Table data: {0}");
             childNodes.add(node);
         }
-        url = Util.getAbsoluteUrl(siteNode.getId());
+        url = Util.getAbsoluteUrl(siteNode.getActualUrl());
     }
 
 
@@ -99,5 +99,9 @@ public class TableDataNavigationNode implements NavigationNode {
 
     public SiteNode getSiteNode() {
         return this.siteNode;
+    }
+
+    public SiteNode getActualSiteNode() {
+        return siteNode;
     }
 }
