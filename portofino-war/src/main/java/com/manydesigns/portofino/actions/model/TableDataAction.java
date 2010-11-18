@@ -89,7 +89,7 @@ public class TableDataAction extends AbstractCrudAction {
                 "Update: {0}", qualifiedTableName);
         String prefix = null;
         CrudUnit result = new CrudUnit(classAccessor, table, query,
-                searchTitle, createTitle, readTitle, updateTitle, null, prefix);
+                searchTitle, createTitle, readTitle, updateTitle, null, prefix, true);
 
         // setup selection providers
         for (ForeignKey foreignKey : table.getForeignKeys()) {
@@ -194,7 +194,7 @@ public class TableDataAction extends AbstractCrudAction {
 
         CrudUnit subCrudUnit =
                 new CrudUnit(subClassAccessor, subTable, subQuery,
-                        subSearchTitle, null, null, null, null, subPrefix);
+                        subSearchTitle, null, null, null, null, subPrefix, false);
         injectValues(subCrudUnit);
         return subCrudUnit;
     }

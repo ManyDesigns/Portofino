@@ -409,14 +409,14 @@
             <result name="create">/skins/default/crud/create.jsp</result>
 
             <result name="save" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="actionName">Users</param>
                 <param name="pk">%{pk}</param>
             </result>
 
             <result name="edit">/skins/default/crud/edit.jsp</result>
 
             <result name="update" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="actionName">Users</param>
                 <param name="pk">%{pk}</param>
                 <param name="searchString">%{searchString}</param>
             </result>
@@ -424,23 +424,23 @@
             <result name="bulkEdit">/skins/default/crud/bulkEdit.jsp</result>
 
             <result name="bulkUpdate" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="actionName">Users</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="returnToRead" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="actionName">Users</param>
                 <param name="pk">%{pk}</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="returnToSearch" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="actionName">Users</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="delete" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="actionName">Users</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
@@ -461,14 +461,14 @@
             <result name="create">/skins/default/crud/create.jsp</result>
 
             <result name="save" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="actionName">Groups</param>
                 <param name="pk">%{pk}</param>
             </result>
 
             <result name="edit">/skins/default/crud/edit.jsp</result>
 
             <result name="update" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="actionName">Groups</param>
                 <param name="pk">%{pk}</param>
                 <param name="searchString">%{searchString}</param>
             </result>
@@ -476,23 +476,23 @@
             <result name="bulkEdit">/skins/default/crud/bulkEdit.jsp</result>
 
             <result name="bulkUpdate" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="actionName">Groups</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="returnToRead" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="actionName">Groups</param>
                 <param name="pk">%{pk}</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="returnToSearch" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="actionName">Groups</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="delete" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
+                <param name="actionName">Groups</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 

@@ -33,14 +33,15 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.system.model.users.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.logging.Logger;
-import java.sql.Timestamp;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -90,6 +91,7 @@ public class LostPwdChangeAction extends PortofinoAction
                 context.updateObject("portofino.public.users", user);
                 context.commit("portofino");
                 LogUtil.finestMF(logger, "User {0} updated", user.getEmail());
+                SessionMessages.addInfoMessage("Password updated");
                 return SUCCESS;
             } else {
                 return INPUT;

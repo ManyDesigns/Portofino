@@ -102,6 +102,7 @@ public class CrudUnit {
     public final List<CrudUnit> subCrudUnits;
     public final List<Button> buttons;
     public final List<CrudSelectionProvider> crudSelectionProviders;
+    private final boolean first;
 
     public Context context;
     public Model model;
@@ -139,6 +140,7 @@ public class CrudUnit {
             LogUtil.getLogger(AbstractCrudAction.class);
 
 
+
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
@@ -151,7 +153,8 @@ public class CrudUnit {
                     String readTitle,
                     String editTitle,
                     String name,
-                    String prefix) {
+                    String prefix,
+                    boolean first) {
         this.buttons = new ArrayList<Button>();
         this.classAccessor = classAccessor;
         this.baseTable = baseTable;
@@ -162,6 +165,7 @@ public class CrudUnit {
         this.editTitle = editTitle;
         this.name=name;
         this.prefix = prefix;
+        this.first = first;
         pkHelper = new PkHelper(classAccessor);
         subCrudUnits = new ArrayList<CrudUnit>();
         crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
@@ -434,29 +438,32 @@ public class CrudUnit {
         searchForm = searchFormBuilder
                 .configPrefix(prefix)
                 .build();
-        if (searchString == null) {
-            searchForm.readFromRequest(req);
-            searchString = searchForm.toSearchString();
-            if (searchString.length() == 0) {
-                searchString = null;
+        //TODO Giampiero fare un check:
+        // faccio prima passare dalla request e poi da searchstring 
+        //if (searchString == null) {
+        searchForm.readFromRequest(req);
+        searchString = searchForm.toSearchString();
+        if (searchString.length() == 0) {
+            searchString = null;
+        }
+        //} else {
+        if (searchString != null){
+        DummyHttpServletRequest dummyRequest =
+                new DummyHttpServletRequest();
+        String[] parts = searchString.split(",");
+        Pattern pattern = Pattern.compile("(.*)=(.*)");
+        for (String part : parts) {
+            Matcher matcher = pattern.matcher(part);
+            if (matcher.matches()) {
+                String key = matcher.group(1);
+                String value = matcher.group(2);
+                LogUtil.fineMF(logger, "Matched part: {0}={1}", key, value);
+                dummyRequest.setParameter(key, value);
+            } else {
+                LogUtil.fineMF(logger, "Could not match part: {0}", part);
             }
-        } else {
-            DummyHttpServletRequest dummyRequest =
-                    new DummyHttpServletRequest();
-            String[] parts = searchString.split(",");
-            Pattern pattern = Pattern.compile("(.*)=(.*)");
-            for (String part : parts) {
-                Matcher matcher = pattern.matcher(part);
-                if (matcher.matches()) {
-                    String key = matcher.group(1);
-                    String value = matcher.group(2);
-                    LogUtil.fineMF(logger, "Matched part: {0}={1}", key, value);
-                    dummyRequest.setParameter(key, value);
-                } else {
-                    LogUtil.fineMF(logger, "Could not match part: {0}", part);
-                }
-            }
-            searchForm.readFromRequest(dummyRequest);
+        }
+        searchForm.readFromRequest(dummyRequest);
         }
     }
 
@@ -495,9 +502,12 @@ public class CrudUnit {
         }
 
         // ogni colonna chiave primaria sarà clickabile
-        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
-            tableFormBuilder.configHyperlinkGenerators(
-                    property.getName(), hrefFormat, null);
+        //TODO rimuovere
+        if (first){
+            for (PropertyAccessor property : classAccessor.getKeyProperties()) {
+                tableFormBuilder.configHyperlinkGenerators(
+                        property.getName(), hrefFormat, null);
+            }
         }
 
         tableForm = tableFormBuilder
@@ -542,9 +552,16 @@ public class CrudUnit {
         ValueStack valueStack = Struts2Util.getValueStack();
         CompoundRoot root = valueStack.getRoot();
 
-        Criteria criteria = new Criteria(classAccessor);
-        searchForm.configureCriteria(criteria);
-        objects = context.getObjects(query, criteria, root);
+        //Se si passano dati sbagliati al criterio restituisco messaggio d'errore
+        // ma nessun risultato
+        try {
+            Criteria criteria = new Criteria(classAccessor);
+            searchForm.configureCriteria(criteria);
+            objects = context.getObjects(query, criteria, root);
+        } catch (ClassCastException e) {
+            objects=new ArrayList<Object>();
+            SessionMessages.addWarningMessage("Incorrect Field Type");
+        }
     }
 
     private void loadObject() {

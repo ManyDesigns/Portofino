@@ -483,7 +483,7 @@ public class HibernateContextImpl implements Context {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
         String formatString = sqlFormat.getFormatString();
         Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
-        boolean formatStringContainsWhere = formatString.contains(WHERE_STRING);
+        boolean formatStringContainsWhere = formatString.toUpperCase().contains(WHERE_STRING);
 
         QueryStringWithParameters criteriaQuery =
                 getQueryStringWithParametersForCriteria(criteria);
@@ -491,7 +491,7 @@ public class HibernateContextImpl implements Context {
         Object[] criteriaParameters = criteriaQuery.getParamaters();
 
         // merge the hql strings
-        int whereIndex = criteriaQueryString.indexOf(WHERE_STRING);
+        int whereIndex = criteriaQueryString.toUpperCase().indexOf(WHERE_STRING);
         String criteriaWhereClause;
         if (whereIndex >= 0) {
             criteriaWhereClause =

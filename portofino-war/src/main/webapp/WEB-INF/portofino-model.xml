@@ -1189,7 +1189,7 @@
                          description="user administration" url="/usersAdmin/Users.action">
                 <useCase name = "users"
                          table="portofino.public.users"
-                         query="from portofino.public.users"
+                         query="FROM portofino.public.users"
                          searchTitle="Users"
                          createTitle="Create new user"
                          readTitle="User"
@@ -1221,7 +1221,7 @@
                     <subUseCases>
                         <useCase name="active"
                                  table="portofino.public.groups"
-                                 query="from portofino.public.groups groups where groups.groupId not in (select groups2.groupId from portofino.public.users_groups ug inner join ug.group groups2 where ug.userid=%{userId} and ug.deletionDate is null) "
+                                 query="FROM portofino.public.groups groups WHERE groups.groupId NOT IN (SELECT groups2.groupId FROM portofino.public.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
                                  searchTitle="Active groups">
                             <properties>
                                 <property name="groupId"/>
@@ -1231,7 +1231,7 @@
                         </useCase>
                         <useCase name="current"
                                  table="portofino.public.groups"
-                                 query="from portofino.public.groups groups where groups.groupId in (select groups2.groupId from portofino.public.users_groups ug inner join ug.group groups2 where ug.userid=%{userId} and ug.deletionDate is null) "
+                                 query="FROM portofino.public.groups groups WHERE groups.groupId in (SELECT groups2.groupId FROM portofino.public.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
                                  searchTitle="Current groups">
                             <properties>
                                 <property name="groupId"/>
@@ -1242,7 +1242,7 @@
 
                         <useCase name="past"
                                  table="portofino.public.users_groups"
-                                 query="from portofino.public.users_groups ug where ug.userid=%{userId} and ug.deletionDate is not null"
+                                 query="FROM portofino.public.users_groups ug WHERE ug.userid=%{userId} AND ug.deletionDate IS NOT null"
                                  searchTitle="Past groups">
                             <properties>
                                 <property name="userid"/>
@@ -1288,7 +1288,7 @@
             <useCaseNode description="uc1" id="uc1" title="uc1">
                 <useCase name="usecase1"
                  table="jpetstore.public.product"
-                 query="from jpetstore.public.product product where product.category = %{'FISH'}"
+                 query="FROM jpetstore.public.product product where product.category = %{'FISH'}"
                  searchTitle="Products in category FISH"
                  createTitle="Create product in category FISH"
                  readTitle="Product in category FISH"
@@ -1368,7 +1368,7 @@
             <useCaseNode description="uc2" id="uc2" title="uc2">
                 <useCase name="usecase2"
                          table="jpetstore.public.category"
-                         query="from jpetstore.public.category"
+                         query="FROM jpetstore.public.category"
                          searchTitle="Categories"
                          createTitle="Create new category"
                          readTitle="Category"
@@ -1389,7 +1389,7 @@
                     <subUseCases>
                         <useCase name="usecase3"
                                  table="jpetstore.public.product"
-                                 query="from jpetstore.public.product product where product.category = %{catid}"
+                                 query="FROM jpetstore.public.product product WHERE product.category = %{catid}"
                                  searchTitle="Products in category">
                             <properties>
                                 <property name="productid"/>
@@ -1404,7 +1404,7 @@
             <useCaseNode description="rimborsi" title="rimborsi" id="rimborsi">
                 <useCase name="rimborsi"
                  table="hibernatetest.public.rimborso"
-                 query="from hibernatetest.public.rimborso rimborso"
+                 query="FROM hibernatetest.public.rimborso rimborso"
                  searchTitle="Rimborsi"
                  createTitle="Crea rimborso"
                  readTitle="Rimborso"
@@ -1469,7 +1469,7 @@
                 </selectionProvider>
                 -->
                 <selectionProvider name="mysel" database="hibernatetest"
-                                   sql="select p.id as a, p.nome as b, f.id as c, f.nome as d from public.persona p join public.familiare f on f.persona_id = p.id order by p.id, f.id">
+                                   sql="SELECT p.id AS a, p.nome as b, f.id AS c, f.nome AS d FROM public.persona p JOIN public.familiare f ON f.persona_id = p.id ORDER BY p.id, f.id">
                     <selectionProperties>
                         <selectionProperty name="persona_id"/>
                         <selectionProperty name="familiare_id"/>
@@ -1485,7 +1485,7 @@
                          title="Title 1"
                          legend="category"
                          database="jpetstore"
-                         query="select category, count(*) from product where %{'pippo'} is not null group by category order by category"
+                         query="SELECT category, count(*) FROM product WHERE %{'pippo'} IS NOT NULL GROUP BY category ORDER BY category"
                          urlExpression="http://www.google.com/search?q=%{key}"
                         />
             </childNodes>

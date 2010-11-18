@@ -38,7 +38,6 @@ import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
 import com.manydesigns.portofino.email.EmailTask;
-import com.manydesigns.portofino.email.PasswordGenerator;
 import org.apache.commons.lang.time.StopWatch;
 
 import javax.servlet.ServletContext;
@@ -164,8 +163,6 @@ public class PortofinoListener
                             " portofino-custom.properties");
                 } else {
                     scheduler = new java.util.Timer(true);
-                    //Password generator
-                    scheduler.schedule(new PasswordGenerator(context), DELAY, PERIOD);
                     try {
 
                         //Invio mail
