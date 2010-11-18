@@ -7,6 +7,6 @@
     <s:set var="buttonsBarBottom" value="true"/>
     <div class="buttons-bar-top">
 </s:else>
-    <s:submit id="TableDesign_rename" method="rename" value="Rename"/>
-    <s:submit id="TableDesign_drop" method="drop" value="Drop"/>
+    <s:submit id="TableDesign_rename" method="rename" value="Rename" disabled="true"/>
+    <s:submit id="TableDesign_drop" method="drop" value="Drop" disabled="true"/>
 </div>

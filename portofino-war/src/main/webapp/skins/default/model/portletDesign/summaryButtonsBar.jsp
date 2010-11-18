@@ -7,5 +7,5 @@
     <s:set var="buttonsBarBottom" value="true"/>
     <div class="buttons-bar-top">
 </s:else>
-    <s:submit id="PortletDesign_edit" method="edit" value="Edit"/>
+    <s:submit id="PortletDesign_edit" method="edit" value="Edit" disabled="true"/>
 </div>
