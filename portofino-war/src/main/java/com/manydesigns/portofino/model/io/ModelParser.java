@@ -5,13 +5,12 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.model.datamodel.*;
+import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
+import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
 import com.manydesigns.portofino.model.site.*;
 import com.manydesigns.portofino.model.site.usecases.Button;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.model.site.usecases.UseCaseProperty;
-import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
-import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
-import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.xml.CharactersCallback;
 import com.manydesigns.portofino.xml.DocumentCallback;
 import com.manydesigns.portofino.xml.ElementCallback;
@@ -63,7 +62,7 @@ public class ModelParser extends XmlParser {
     public static final String USECASE = "useCase";
     public static final String BUTTONS = "buttons";
     public static final String BUTTON = "button";
-    public static final String SUBUSECASE = "subUseCases";
+    public static final String SUBUSECASES = "subUseCases";
     public static final String PROPERTIES = "properties";
     public static final String PROPERTY = "property";
     public static final String ANNOTATIONS = "annotations";
@@ -71,9 +70,9 @@ public class ModelParser extends XmlParser {
     public static final String VALUE = "value";
     public static final String ROOTNODE = "rootNode";
     public static final String DOCUMENTNODE = "documentNode";
-    public static final String FOLDER = "folder";
+    public static final String FOLDERNODE = "folderNode";
     public static final String CUSTOMNODE = "customNode";
-    public static final String CUSTOMFOLDER = "customFolder";
+    public static final String CUSTOMFOLDERNODE = "customFolderNode";
     public static final String USECASENODE = "useCaseNode";
     public static final String PORTLETNODE = "portletNode";
     public static final String PERMISSIONS = "permissions";
@@ -318,8 +317,8 @@ public class ModelParser extends XmlParser {
 
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            String[] expectedTags = {DOCUMENTNODE, FOLDER, CUSTOMNODE,
-                    CUSTOMFOLDER, USECASENODE, PORTLETNODE};
+            String[] expectedTags = {DOCUMENTNODE, FOLDERNODE, CUSTOMNODE,
+                    CUSTOMFOLDERNODE, USECASENODE, PORTLETNODE};
             ElementCallback[] callbackArray = {
                     new DocumentNodeCallback(parent), new FolderCallback(parent),
                     new CustomNodeCallback(parent), new CustomFolderCallback(parent),
@@ -470,15 +469,15 @@ public class ModelParser extends XmlParser {
 
             expectElement(PROPERTIES, 0, 1, new PropertiesCallback());
 
-            expectElement(BUTTONS, 0, 1, new ButtonsCallback());
+            expectElement(SELECTIONPROVIDERS, 0, 1,
+                    new SelectionProvidersCallback());
 
             currentModelAnnotations = currentUseCase.getModelAnnotations();
             expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
 
-            expectElement(SELECTIONPROVIDERS, 0, 1,
-                    new SelectionProvidersCallback());
+            expectElement(BUTTONS, 0, 1, new ButtonsCallback());
 
-            expectElement(SUBUSECASE, 0, 1, new SubUseCasesCallback());
+            expectElement(SUBUSECASES, 0, 1, new SubUseCasesCallback());
 
             UseCase poppedUsedCase = useCaseStack.pop();
             assert(poppedUsedCase == currentUseCase);

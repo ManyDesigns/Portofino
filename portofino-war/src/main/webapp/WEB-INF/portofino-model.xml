@@ -1,4 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+Struttura dell'XML:
+
+-model
+ +-databases
+ | +-database
+ |   +-schemas
+ |     +-schema
+ |       +-tables
+ |         +-table
+ |           +-columns
+ |           | +-column
+ |           |   +-annotations
+ |           |     +-annotation
+ |           |       +-value
+ |           |
+ |           +-primaryKey
+ |           | +-column
+ |           |
+ |           +-foreignKeys
+ |           | +-foreignKey
+ |           | | +-references
+ |           | |   +-reference
+ |           | +-annotations
+ |           |   +-annotation
+ |           |     +-value
+ |           |
+ |           +-annotations
+ |             +-annotation
+ |               +-value
+ |
+ +-rootNode
+   +-childNodes (accetta i nodi figlio in qualunque ordine)
+   | +-folderNode
+   | | +-childNodes (come rootNode)
+   | | +-permissions (come rootNode)
+   | |
+   | +-documentNode
+   | | +-childNodes (come rootNode)
+   | | +-permissions (come rootNode)
+   | |
+   | +-customNode
+   | | +-childNodes (come rootNode)
+   | | +-permissions (come rootNode)
+   | |
+   | +-customFolderNode
+   | | +-childNodes (come rootNode)
+   | | +-permissions (come rootNode)
+   | |
+   | +-useCaseNode
+   | | +-useCase
+   | | | +-properties
+   | | | | +-property
+   | | | |   +-annotations
+   | | | |     +-annotation
+   | | | |       +-value
+   | | | |
+   | | | +-selectionProviders
+   | | | | +-selectionProvider
+   | | | |   +-selectionProperties
+   | | | |     +-selectionProperty
+   | | | |
+   | | | +-annotations
+   | | | | +-annotation
+   | | | |   +-value
+   | | | |
+   | | | +-buttons
+   | | | | +-button
+   | | | |
+   | | | +-subUseCases
+   | | |   +-useCase (ricorsivamente)
+   | | |
+   | | +-childNodes (come rootNode)
+   | | +-permissions (come rootNode)
+   | |
+   | +-portletNode
+   |   +-childNodes (come rootNode)
+   |   +-permissions (come rootNode)
+   |
+   |
+   +-permissions
+     +-allow
+     | +-group
+     |
+     +-deny
+       +-group
+
+
+-->
 <model>
     <databases>
         <database databaseName="portofino">
@@ -1135,15 +1224,15 @@
                 </allow>
             </permissions>
         </documentNode>
-        <folder id="model" title="Model" description="Model">
+        <folderNode id="model" title="Model" description="Model">
             <childNodes>
                 <customNode id="ConnectionProviders"
                           url="/model/ConnectionProviders.action"
                           title="Connection providers"
                           description="Connection providers"/>
-                <customFolder  id="TableData" url="/model/TableData.action" type="table-data"
+                <customFolderNode  id="TableData" url="/model/TableData.action" type="table-data"
                           title="Table data" description="Table data"/>
-                <customFolder id="TabelDesign" url="/model/TableDesign.action" type="table-design"
+                <customFolderNode id="TabelDesign" url="/model/TableDesign.action" type="table-design"
                           title="Table design" description="Table design"/>
                 <customNode  id="SelfTest" url="/model/SelfTest.action" title="Self test"
                           description="Self test"/>
@@ -1157,8 +1246,8 @@
                     <group name="admins" />
                 </allow>
             </permissions>
-        </folder>
-        <folder id="system-admin" title="System administration"
+        </folderNode>
+        <folderNode id="system-admin" title="System administration"
                   description="System administration">
             <childNodes>
                 <customNode id="ServerInfo" url="/system-admin/ServerInfo.action"
@@ -1174,7 +1263,7 @@
                     <group name="admins" />
                 </allow>
             </permissions>
-        </folder>
+        </folderNode>
         <customNode id="Profile" url="/Profile.action" title="Profile" description="Profile">
             <permissions>
                 <allow>
@@ -1182,7 +1271,7 @@
                 </allow>
             </permissions>
         </customNode>
-        <folder id="usersAdmin" description="User admin" title="admin user">
+        <folderNode id="usersAdmin" description="User admin" title="admin user">
             <childNodes>
             <useCaseNode title="userAdmin"
                          id="userAdmin"
@@ -1204,6 +1293,14 @@
                         <property name="lastName"/>
                         <property name="state"/>
                     </properties>                    
+                    <selectionProviders>
+                        <selectionProvider name="mysel" database="portofino"
+                                           hql="FROM portofino.public.userstate">
+                            <selectionProperties>
+                                <selectionProperty name="state"/>
+                            </selectionProperties>
+                        </selectionProvider>
+                    </selectionProviders>
                     <buttons>
                         <button name="add_group"
                                 label="Add selected groups"
@@ -1218,14 +1315,6 @@
                                 method="resetPassword"
                                 guard=""/>
                     </buttons>
-                    <selectionProviders>
-                        <selectionProvider name="mysel" database="portofino"
-                                           hql="FROM portofino.public.userstate">
-                            <selectionProperties>
-                                <selectionProperty name="state"/>
-                            </selectionProperties>
-                        </selectionProvider>
-                    </selectionProviders>
                     <subUseCases>
                         <useCase name="active"
                                  table="portofino.public.groups"
@@ -1280,11 +1369,10 @@
                         <property name="creationDate"/>
                         <property name="creatorId"/>
                     </properties>
-
                     <selectionProviders>
                         <selectionProvider name="mysel" database="portofino"
-                                           sql="SELECT userid, firstname ||' '|| lastname || '('|| emailaddress || ')' FROM users ORDER BY lastname, firstname">
-                            <!--hql="FROM portofino.public.users"-->
+                                           hql="FROM portofino.public.users">
+                        <!--sql="SELECT userid, firstname ||' '|| lastname || '('|| emailaddress || ')' FROM users ORDER BY lastname, firstname"-->
                             <selectionProperties>
                                 <selectionProperty name="creatorId"/>                                
                             </selectionProperties>
@@ -1299,8 +1387,8 @@
                 </allow>
             </permissions>
 
-        </folder>
-        <folder id="usecases" title="Use cases"
+        </folderNode>
+        <folderNode id="usecases" title="Use cases"
                   description="Use cases">
             <childNodes>
             <useCaseNode description="uc1" id="uc1" title="uc1">
@@ -1512,7 +1600,7 @@
                     <group name="users" />
                 </allow>
             </permissions>
-        </folder>
+        </folderNode>
         </childNodes>
         <permissions>
             <allow>

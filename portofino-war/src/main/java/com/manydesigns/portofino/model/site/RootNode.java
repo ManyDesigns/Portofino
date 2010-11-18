@@ -35,7 +35,7 @@ import com.manydesigns.portofino.model.Model;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class RootNode extends SiteNode{
+public class RootNode extends SiteNode {
     private final String urlFormat = "{0}/Index.action";
     public RootNode() {
         super(null);

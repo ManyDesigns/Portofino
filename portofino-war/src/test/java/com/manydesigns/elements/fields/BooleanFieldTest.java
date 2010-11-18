@@ -164,7 +164,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<select id=\"myBoolean\" name=\"myBoolean\">" +
-                "<option value=\"\" selected=\"selected\"></option>" +
+                "<option selected=\"selected\"></option>" +
                 "<option value=\"true\">Yes</option>" +
                 "<option value=\"false\">No</option>" +
                 "</select></td>", text);
@@ -175,7 +175,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<select id=\"myBoolean\" name=\"myBoolean\">" +
-                "<option value=\"\"></option>" +
+                "<option></option>" +
                 "<option value=\"true\">Yes</option>" +
                 "<option value=\"false\" selected=\"selected\">No</option>" +
                 "</select></td>", text);
@@ -186,7 +186,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<select id=\"myBoolean\" name=\"myBoolean\">" +
-                "<option value=\"\"></option>" +
+                "<option></option>" +
                 "<option value=\"true\" selected=\"selected\">Yes</option>" +
                 "<option value=\"false\">No</option>" +
                 "</select></td>", text);
@@ -247,7 +247,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<div class=\"value\" id=\"myBoolean\"></div>" +
-                "<input type=\"hidden\" name=\"myBoolean\" value=\"\"></input>" +
+                "<input type=\"hidden\" name=\"myBoolean\"></input>" +
                 "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\"></input>" +
                 "</td>", text);
 

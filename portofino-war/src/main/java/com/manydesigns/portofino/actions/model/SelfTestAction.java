@@ -87,9 +87,9 @@ public class SelfTestAction extends PortofinoAction {
         contentType= "text/xml";
         contentDisposition= MessageFormat.format("inline; filename={0}.xml",
                     "datamodel");
-        ModelWriter writer = new ModelWriter(model);
+        ModelWriter writer = new ModelWriter();
         File tempFile = File.createTempFile("portofino", ".xml");
-        writer.write(tempFile);
+        writer.write(model, tempFile);
         inputStream = new FileInputStream(tempFile);
 
         return "export";

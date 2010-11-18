@@ -75,7 +75,9 @@ public class Model {
         }
 
         // site nodes
-        root.reset();
+        if (root != null) {
+            root.reset();
+        }
     }
 
     public void init() {
@@ -87,7 +89,9 @@ public class Model {
         }
 
         // site nodes
-        root.init(this);
+        if (root != null) {
+            root.init(this);
+        }
     }
 
     //**************************************************************************

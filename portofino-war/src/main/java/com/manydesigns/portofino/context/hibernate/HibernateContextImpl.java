@@ -150,9 +150,9 @@ public class HibernateContextImpl implements Context {
     }
 
     public void saveXmlModel() {
-        ModelWriter modelWriter = new ModelWriter(model);
+        ModelWriter modelWriter = new ModelWriter();
         try {
-            modelWriter.write(xmlModelFile);
+            modelWriter.write(model, xmlModelFile);
             LogUtil.infoMF(logger,
                     "Saved xml model to file: {0}", xmlModelFile);
         } catch (Throwable e) {

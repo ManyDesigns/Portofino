@@ -313,9 +313,9 @@ public class RoundtripTest extends AbstractPortofinoTest {
 
     private Model doRoundtrip(Model model) throws Exception {
         // Save the model to a file
-        ModelWriter modelWriter = new ModelWriter(model);
+        ModelWriter modelWriter = new ModelWriter();
         File file = File.createTempFile("portofino-model", ".xml");
-        modelWriter.write(file);
+        modelWriter.write(model, file);
 
         // Parse the model from the file into model2
         ModelParser modelParser = new ModelParser();
