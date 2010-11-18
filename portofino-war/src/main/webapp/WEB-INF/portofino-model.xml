@@ -748,7 +748,7 @@ Struttura dell'XML:
                                 <column columnName="itemid"
                                         columnType="varchar"
                                         javaType="java.lang.String"
-                                        length="255"
+                                        length="10"
                                         scale="0"
                                         autoincrement="false"
                                         nullable="true"

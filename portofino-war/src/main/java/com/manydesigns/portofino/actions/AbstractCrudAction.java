@@ -53,7 +53,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public abstract class AbstractCrudAction extends PortofinoAction
+public abstract class  AbstractCrudAction extends PortofinoAction
         implements ServletRequestAware, Preparable, ModelDriven<CrudUnit> {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";

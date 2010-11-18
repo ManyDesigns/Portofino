@@ -56,6 +56,7 @@ import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
@@ -138,7 +139,7 @@ public class CrudUnit {
 
     public static final Logger logger =
             LogUtil.getLogger(AbstractCrudAction.class);
-
+    private static final String CONSTRAINT_VIOLATION = "Constraint violation";
 
 
     //--------------------------------------------------------------------------
@@ -263,7 +264,13 @@ public class CrudUnit {
             object = classAccessor.newInstance();
             form.writeToObject(object);
             context.saveObject(baseTable.getQualifiedName(), object);
-            context.commit(baseTable.getDatabaseName());
+            try {
+                context.commit(baseTable.getDatabaseName());
+            } catch (Throwable e) {
+                LogUtil.fine(logger, ExceptionUtils.getRootCauseMessage(e), e);
+                SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
+                return PortofinoAction.CREATE;
+            }
             pk = pkHelper.generatePkString(object);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
             return PortofinoAction.SAVE;
@@ -291,7 +298,13 @@ public class CrudUnit {
         if (form.validate()) {
             form.writeToObject(object);
             context.updateObject(baseTable.getQualifiedName(), object);
-            context.commit(baseTable.getDatabaseName());
+            try {
+                context.commit(baseTable.getDatabaseName());
+            } catch (Throwable e) {
+                LogUtil.fine(logger, ExceptionUtils.getRootCauseMessage(e), e);
+                SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
+                return PortofinoAction.EDIT;
+            }
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
             return PortofinoAction.UPDATE;
         } else {
@@ -330,7 +343,13 @@ public class CrudUnit {
             }
             form.writeToObject(object);
             context.updateObject(baseTable.getQualifiedName(), object);
-            context.commit(baseTable.getDatabaseName());
+            try {
+                context.commit(baseTable.getDatabaseName());
+            } catch (Throwable e) {
+                LogUtil.fine(logger, ExceptionUtils.getRootCauseMessage(e), e);
+                SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
+                return PortofinoAction.BULK_EDIT;
+            }
             SessionMessages.addInfoMessage(MessageFormat.format(
                     "UPDATE di {0} oggetti avvenuto con successo",
                     selection.length));
@@ -347,8 +366,13 @@ public class CrudUnit {
     public String delete() {
         Object pkObject = pkHelper.parsePkString(pk);
         context.deleteObject(baseTable.getQualifiedName(), pkObject);
-        context.commit(baseTable.getDatabaseName());
-        SessionMessages.addInfoMessage("DELETE avvenuto con successo");
+        try {
+            context.commit(baseTable.getDatabaseName());
+            SessionMessages.addInfoMessage("DELETE avvenuto con successo");
+        } catch (Exception e) {
+            LogUtil.fine(logger, ExceptionUtils.getRootCauseMessage(e), e);
+            SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
+        }
         return PortofinoAction.DELETE;
     }
 
@@ -362,7 +386,12 @@ public class CrudUnit {
             Object pkObject = pkHelper.parsePkString(current);
             context.deleteObject(baseTable.getQualifiedName(), pkObject);
         }
-        context.commit(baseTable.getDatabaseName());
+        try {
+                context.commit(baseTable.getDatabaseName());
+            } catch (Exception e) {
+                LogUtil.fine(logger, ExceptionUtils.getRootCauseMessage(e), e);
+                SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
+        }
         SessionMessages.addInfoMessage(MessageFormat.format(
                 "DELETE di {0} oggetti avvenuto con successo",
                 selection.length));

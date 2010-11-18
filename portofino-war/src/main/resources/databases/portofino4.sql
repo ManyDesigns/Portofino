@@ -96,21 +96,21 @@ CREATE TABLE userstate (
 INSERT INTO users(userid, creationdate, pwd, username, emailaddress, firstname, lastname, state) VALUES (1, current_timestamp, 'admin', 'admin', 'giampiero.granatella@manydesigns.com', 'admin', 'admin', 1);
 
 INSERT INTO emailstate (id, name, description) VALUES (0, 'sending', NULL);
-INSERT INTO emailstate (id, name, description) VALUES (1, 'to be sent', NULL);
-INSERT INTO emailstate (id, name, description) VALUES (2, 'sent', NULL);
-INSERT INTO emailstate (id, name, description) VALUES (3, 'rejected', NULL);
-INSERT INTO emailstate (id, name, description) VALUES (4, 'bounced', NULL);
+INSERT INTO emailstate (name, description) VALUES ( 'to be sent', NULL);
+INSERT INTO emailstate (name, description) VALUES ( 'sent', NULL);
+INSERT INTO emailstate (name, description) VALUES ( 'rejected', NULL);
+INSERT INTO emailstate (name, description) VALUES ( 'bounced', NULL);
 
-INSERT INTO msgstate (id, name, description) VALUES (1, 'sent', NULL);
-INSERT INTO msgstate (id, name, description) VALUES (2, 'read', NULL);
+INSERT INTO msgstate (name, description) VALUES ('sent', NULL);
+INSERT INTO msgstate (name, description) VALUES ('read', NULL);
 
 INSERT INTO groups (groupid, creatorid,  name, description, creationdate) VALUES (2, 1, 'users', 'user', current_timestamp);
 INSERT INTO groups (groupid, creatorid,  name, description, creationdate) VALUES (1, 1, 'admin', 'admin',  current_timestamp);
 
-INSERT INTO userstate (id, name, description) VALUES (1, 'active', NULL);
-INSERT INTO userstate (id, name, description) VALUES (2, 'suspended', NULL);
-INSERT INTO userstate (id, name, description) VALUES (3, 'banned', NULL);
-INSERT INTO userstate (id, name, description) VALUES (4, 'selfregistred', NULL);
+INSERT INTO userstate (name, description) VALUES ( 'active', NULL);
+INSERT INTO userstate (name, description) VALUES ( 'suspended', NULL);
+INSERT INTO userstate (name, description) VALUES ( 'banned', NULL);
+INSERT INTO userstate (name, description) VALUES ( 'selfregistred', NULL);
 
 ALTER TABLE ONLY emailqueue
     ADD CONSTRAINT "EmailQueue_pkey" PRIMARY KEY (id);
