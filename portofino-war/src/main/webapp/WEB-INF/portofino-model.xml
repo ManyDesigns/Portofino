@@ -1203,7 +1203,7 @@
                         <property name="middleName"/>
                         <property name="lastName"/>
                         <property name="state"/>
-                    </properties>
+                    </properties>                    
                     <buttons>
                         <button name="add_group"
                                 label="Add selected groups"
@@ -1218,6 +1218,14 @@
                                 method="resetPassword"
                                 guard=""/>
                     </buttons>
+                    <selectionProviders>
+                        <selectionProvider name="mysel" database="portofino"
+                                           hql="FROM portofino.public.userstate">
+                            <selectionProperties>
+                                <selectionProperty name="state"/>
+                            </selectionProperties>
+                        </selectionProvider>
+                    </selectionProviders>
                     <subUseCases>
                         <useCase name="active"
                                  table="portofino.public.groups"
@@ -1272,6 +1280,16 @@
                         <property name="creationDate"/>
                         <property name="creatorId"/>
                     </properties>
+
+                    <selectionProviders>
+                        <selectionProvider name="mysel" database="portofino"
+                                           hql="FROM portofino.public.users">
+                                           <!--sql="SELECT userid, firstname ||' '|| lastname || '('|| emailaddress || ')' FROM users ORDER BY lastname, firstname"> -->
+                            <selectionProperties>
+                                <selectionProperty name="creatorId"/>                                
+                            </selectionProperties>
+                        </selectionProvider>
+                    </selectionProviders>
                 </useCase>
             </useCaseNode>
             </childNodes>
