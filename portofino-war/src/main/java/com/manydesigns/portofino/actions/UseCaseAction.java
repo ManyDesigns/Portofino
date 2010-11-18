@@ -34,17 +34,20 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.model.site.UseCaseNode;
-import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
+import com.manydesigns.portofino.model.site.UseCaseNode;
+import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
+
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -116,15 +119,23 @@ public class UseCaseAction extends AbstractCrudAction {
             String database = current.getDatabase();
             String sql = current.getSql();
             String hql = current.getHql();
+            List<SelectionProperty> selectionProperties =
+                    current.getSelectionProperties();
 
-            String[] fieldNames =
-                    new String[current.getSelectionProperties().size()];
+            String[] fieldNames = new String[selectionProperties.size()];
+            Class[] fieldTypes = new Class[selectionProperties.size()];
 
             int i = 0;
-            for (SelectionProperty selectionProperty :
-                    current.getSelectionProperties()) {
-                fieldNames[i] = selectionProperty.getName();
-                i++;
+            for (SelectionProperty selectionProperty : selectionProperties) {
+                try {
+                    fieldNames[i] = selectionProperty.getName();
+                    PropertyAccessor propertyAccessor =
+                            result.classAccessor.getProperty(fieldNames[i]);
+                    fieldTypes[i] = propertyAccessor.getType();
+                    i++;
+                } catch (NoSuchFieldException e) {
+                    throw new Error(e);
+                }
             }
 
 
@@ -132,7 +143,7 @@ public class UseCaseAction extends AbstractCrudAction {
             if (sql != null) {
                 Collection<Object[]> objects = context.runSql(database, sql);
                 selectionProvider = DefaultSelectionProvider.create(
-                        name, fieldNames.length, objects);
+                        name, fieldNames.length, fieldTypes, objects);
             } else if (hql != null) {
                 Collection<Object> objects = context.getObjects(hql);
                 String qualifiedTableName = 

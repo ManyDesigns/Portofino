@@ -47,11 +47,25 @@ public class BooleanField extends AbstractField {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //**************************************************************************
+    // Costanti
+    //**************************************************************************
+
     public static final String CHECK_PREFIX = "__checkbox_";
-    public static final String NULL_VALUE = "";
+    public static final String CHECK_VALUE = "true";
+
+    public static final String NULL_VALUE = null;
+    public static final String NULL_LABEL_I18N = "elements.null";
+
     public static final String TRUE_VALUE = "true";
+    public static final String TRUE_LABEL_I18N = "elements.Yes";
+
     public static final String FALSE_VALUE = "false";
-    public static final String NULL_STRING_VALUE = "";
+    public static final String FALSE_LABEL_I18N = "elements.No";
+
+    //**************************************************************************
+    // Campi
+    //**************************************************************************
 
     protected Boolean booleanValue;
     protected String checkInputName;
@@ -108,13 +122,11 @@ public class BooleanField extends AbstractField {
     public void readFromObject(Object obj) {
         super.readFromObject(obj);
         try {
-            Boolean tmpValue;
             if (obj == null) {
-                tmpValue = null;
+                booleanValue = null;
             } else {
-                tmpValue = (Boolean)accessor.get(obj);
+                booleanValue = (Boolean)accessor.get(obj);
             }
-            booleanValue = tmpValue != null && tmpValue;
         } catch (IllegalAccessException e) {
             throw new Error(e);
         } catch (InvocationTargetException e) {
@@ -144,24 +156,24 @@ public class BooleanField extends AbstractField {
         if (required) {
             xb.writeInputCheckbox(id, inputName, TRUE_VALUE,
                     BooleanUtils.isTrue(booleanValue), false, "checkbox");
-            xb.writeInputHidden(checkInputName, TRUE_VALUE);
+            xb.writeInputHidden(checkInputName, CHECK_VALUE);
         } else {
             xb.openElement("select");
             xb.addAttribute("id", id);
             xb.addAttribute("name", inputName);
             xb.writeOption(NULL_VALUE, (booleanValue == null),
-                    NULL_STRING_VALUE);
+                    getText(NULL_LABEL_I18N));
             xb.writeOption(TRUE_VALUE, BooleanUtils.isTrue(booleanValue),
-                    getText("elements.Yes"));
+                    getText(TRUE_LABEL_I18N));
             xb.writeOption(FALSE_VALUE, BooleanUtils.isFalse(booleanValue),
-                    getText("elements.No"));
+                    getText(FALSE_LABEL_I18N));
             xb.closeElement("select");
         }
     }
 
     protected void valueToXhtmlHidden(XhtmlBuffer xb) {
-        xb.writeInputHidden(inputName, getOptionValue());
-        xb.writeInputHidden(checkInputName, TRUE_VALUE);
+        xb.writeInputHidden(inputName, getStringValue());
+        xb.writeInputHidden(checkInputName, CHECK_VALUE);
     }
 
     protected void valueToXhtmlPreview(XhtmlBuffer xb) {
@@ -177,25 +189,33 @@ public class BooleanField extends AbstractField {
             xb.openElement("a");
             xb.addAttribute("href", href);
         }
-        xb.write(getStringValue());
+        xb.write(getLabelValue());
         if (href != null) {
             xb.closeElement("a");
         }
         xb.closeElement("div");
     }
 
-    public String getOptionValue() {
-        if (booleanValue == null) {
-            return NULL_VALUE;
-        }
-        return booleanValue ? TRUE_VALUE : FALSE_VALUE;
-    }
-
     public String getStringValue() {
         if (booleanValue == null) {
-            return NULL_STRING_VALUE;
+            return NULL_VALUE;
+        } else if (booleanValue) {
+            return TRUE_VALUE;
+        } else {
+            return FALSE_VALUE;
         }
-        return booleanValue ? getText("elements.Yes") : getText("elements.No");
+    }
+
+    protected String getLabelValue() {
+        String labelI18N;
+        if (booleanValue == null) {
+            labelI18N = NULL_LABEL_I18N;
+        } else if (booleanValue) {
+            labelI18N = TRUE_LABEL_I18N;
+        } else {
+            labelI18N = FALSE_LABEL_I18N;
+        }
+        return getText(labelI18N);
     }
 
     //**************************************************************************

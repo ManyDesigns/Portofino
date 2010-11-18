@@ -1283,8 +1283,8 @@
 
                     <selectionProviders>
                         <selectionProvider name="mysel" database="portofino"
-                                           hql="FROM portofino.public.users">
-                                           <!--sql="SELECT userid, firstname ||' '|| lastname || '('|| emailaddress || ')' FROM users ORDER BY lastname, firstname"> -->
+                                           sql="SELECT userid, firstname ||' '|| lastname || '('|| emailaddress || ')' FROM users ORDER BY lastname, firstname">
+                            <!--hql="FROM portofino.public.users"-->
                             <selectionProperties>
                                 <selectionProperty name="creatorId"/>                                
                             </selectionProperties>

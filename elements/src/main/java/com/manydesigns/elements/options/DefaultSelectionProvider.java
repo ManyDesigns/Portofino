@@ -92,6 +92,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
     public static DefaultSelectionProvider create(String name,
                                                int fieldCount,
+                                               Class[] valueTypes,
                                                Collection<Object[]> valuesAndLabels) {
         int size = valuesAndLabels.size();
         Object[][] valuesArray = new Object[size][];
@@ -104,7 +105,8 @@ public class DefaultSelectionProvider implements SelectionProvider {
             labelsArray[i] = labels;
 
             for (int j = 0; j < fieldCount; j++) {
-                values[j] = valueAndLabel[j*2];
+                Class valueType = valueTypes[j];
+                values[j] = Util.convertValue(valueAndLabel[j*2], valueType);
                 labels[j] = Util.convertValueToString(valueAndLabel[j*2+1]);
             }
 

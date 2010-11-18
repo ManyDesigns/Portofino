@@ -30,10 +30,7 @@
 package com.manydesigns.elements.fields.search;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.annotations.Id;
-import com.manydesigns.elements.annotations.InputName;
-import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.LabelI18N;
+import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
@@ -56,6 +53,7 @@ public abstract class AbstractSearchField implements SearchField {
     protected String id;
     protected String inputName;
     protected String label;
+    protected boolean required;
 
     public static final Logger logger =
             LogUtil.getLogger(AbstractSearchField.class);
@@ -108,6 +106,14 @@ public abstract class AbstractSearchField implements SearchField {
         } else {
             label = Util.camelCaseToWords(accessor.getName());
             logger.finer("Setting label from property name: " + label);
+        }
+
+        Required requiredAnnotation = accessor.getAnnotation(Required.class);
+        if (requiredAnnotation != null) {
+            required = requiredAnnotation.value();
+            LogUtil.finerMF(logger,
+                    "Required annotation present with value: {0}",
+                    required);
         }
 
         LogUtil.exiting(logger, "AbstractSearchField");
