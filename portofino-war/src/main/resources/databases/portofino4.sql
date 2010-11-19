@@ -164,3 +164,6 @@ ALTER TABLE ONLY users
 ALTER TABLE ONLY users_groups
     ADD CONSTRAINT fk_usersgroups_1 FOREIGN KEY (userid) REFERENCES users(userid) DEFERRABLE INITIALLY DEFERRED;
 
+ALTER TABLE  public.users_groups
+    ADD CONSTRAINT fk_usersgroups_2 FOREIGN KEY (groupid) REFERENCES public.groups(groupid);
+

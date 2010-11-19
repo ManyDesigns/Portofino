@@ -270,7 +270,8 @@ ALTER TABLE  public.users
 ALTER TABLE  public.users_groups
     ADD CONSTRAINT fk_usersgroups_1 FOREIGN KEY (userid) REFERENCES public.users(userid);
 
-
+ALTER TABLE  public.users_groups
+    ADD CONSTRAINT fk_usersgroups_2 FOREIGN KEY (groupid) REFERENCES public.groups(groupid);
 -- Completed on 2010-09-27 09:27:34 CEST
 
 --
