@@ -35,6 +35,8 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.xml.XmlAttribute;
+import com.manydesigns.portofino.xml.XmlCollection;
+import com.manydesigns.portofino.xml.XmlElement;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -201,10 +203,12 @@ public class Table implements ModelObject {
         this.javaClass = javaClass;
     }
 
+    @XmlCollection(itemType = Column.class)
     public List<Column> getColumns() {
         return columns;
     }
 
+    @XmlElement
     public PrimaryKey getPrimaryKey() {
         return primaryKey;
     }
@@ -217,6 +221,7 @@ public class Table implements ModelObject {
         return actualJavaClass;
     }
 
+    @XmlCollection(itemType = ForeignKey.class)
     public List<ForeignKey> getForeignKeys() {
         return foreignKeys;
     }
@@ -225,6 +230,7 @@ public class Table implements ModelObject {
         return oneToManyRelationships;
     }
 
+    @XmlCollection(itemType = ModelAnnotation.class)
     public List<ModelAnnotation> getModelAnnotations() {
         return modelAnnotations;
     }

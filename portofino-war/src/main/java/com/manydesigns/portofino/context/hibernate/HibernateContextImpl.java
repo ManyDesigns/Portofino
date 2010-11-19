@@ -162,35 +162,31 @@ public class HibernateContextImpl implements Context {
     }
 
     private synchronized void installDataModel(Model newModel) {
-        try {
-            HashMap<String, HibernateDatabaseSetup> newSetups =
-                    new HashMap<String, HibernateDatabaseSetup>();
-            for (Database database : newModel.getDatabases()) {
-                String databaseName = database.getDatabaseName();
+        HashMap<String, HibernateDatabaseSetup> newSetups =
+                new HashMap<String, HibernateDatabaseSetup>();
+        for (Database database : newModel.getDatabases()) {
+            String databaseName = database.getDatabaseName();
 
-                ConnectionProvider connectionProvider =
-                        getConnectionProvider(databaseName);
-                if (connectionProvider.getStatus()
-                        .equals(ConnectionProvider.STATUS_CONNECTED)) {
-                    HibernateConfig builder =
-                            new HibernateConfig(connectionProvider);
-                    Configuration configuration =
-                            builder.buildSessionFactory(database);
-                    SessionFactoryImpl sessionFactory =
-                            (SessionFactoryImpl) configuration
-                                    .buildSessionFactory();
+            ConnectionProvider connectionProvider =
+                    getConnectionProvider(databaseName);
+            if (connectionProvider.getStatus()
+                    .equals(ConnectionProvider.STATUS_CONNECTED)) {
+                HibernateConfig builder =
+                        new HibernateConfig(connectionProvider);
+                Configuration configuration =
+                        builder.buildSessionFactory(database);
+                SessionFactoryImpl sessionFactory =
+                        (SessionFactoryImpl) configuration
+                                .buildSessionFactory();
 
-                    HibernateDatabaseSetup setup =
-                            new HibernateDatabaseSetup(
-                                    configuration, sessionFactory);
-                    newSetups.put(databaseName, setup);
-                }
+                HibernateDatabaseSetup setup =
+                        new HibernateDatabaseSetup(
+                                configuration, sessionFactory);
+                newSetups.put(databaseName, setup);
             }
-            setups = newSetups;
-            model = newModel;
-        } catch (Exception e) {
-            LogUtil.severe(logger, "Cannot install model", e);
         }
+        setups = newSetups;
+        model = newModel;
     }
 
     //**************************************************************************
@@ -234,7 +230,6 @@ public class HibernateContextImpl implements Context {
         }
 
         model.init();
-        saveXmlModel();
         installDataModel(model);
         saveXmlModel();
     }

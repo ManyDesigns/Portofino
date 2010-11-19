@@ -500,7 +500,7 @@ Struttura dell'XML:
                                 <column columnName="creationdate"/>
                             </primaryKey>
                             <foreignKeys>
-                                <foreignKey foreignKeyName="fk_ug_1"
+                                <foreignKey foreignKeyName="fk_usersgroups_1"
                                         virtual="false"
                                               toDatabase="portofino"
                                               toSchema="public"
@@ -520,7 +520,7 @@ Struttura dell'XML:
                                         </annotation>
                                     </annotations>
                                 </foreignKey>
-                                <foreignKey foreignKeyName="fk_ug_2"
+                                <foreignKey foreignKeyName="fk_usersgroups_2"
                                         virtual="false"
                                             toDatabase="portofino"
                                             toSchema="public"
@@ -1217,390 +1217,390 @@ Struttura dell'XML:
     </databases>
     <rootNode title="Portofino4" description="portofino 4" id="/">
         <childNodes>
-        <documentNode id="homepage" title="Homepage" description="Homepage" url="Homepage.action">
-            <permissions>
-                <allow>
-                    <group name="anonymous"/>
-                </allow>
-            </permissions>
-        </documentNode>
-        <folderNode id="model" title="Model" description="Model">
-            <childNodes>
-                <customNode id="ConnectionProviders"
-                          url="/model/ConnectionProviders.action"
-                          title="Connection providers"
-                          description="Connection providers"/>
-                <customFolderNode  id="TableData" url="/model/TableData.action" type="table-data"
-                          title="Table data" description="Table data"/>
-                <customFolderNode id="TabelDesign" url="/model/TableDesign.action" type="table-design"
-                          title="Table design" description="Table design"/>
-                <customNode  id="SelfTest" url="/model/SelfTest.action" title="Self test"
-                          description="Self test"/>
-                <customNode id="SiteMap" url="/model/SiteMap.action" title="Site map"
-                          description="Site map"/>
-                <customNode id="DDLWriter" url="/model/DDLWriter.action" title="DDL Writer"
-                          description="DDL Writer"/>
-            </childNodes>
-            <permissions>
-                <allow>
-                    <group name="admins" />
-                </allow>
-            </permissions>
-        </folderNode>
-        <folderNode id="system-admin" title="System administration"
-                  description="System administration">
-            <childNodes>
-                <customNode id="ServerInfo" url="/system-admin/ServerInfo.action"
-                          title="Server info" description="Server info"/>
-                <customNode id="ConfigurationProperties" url="/system-admin/ConfigurationProperties.action"
-                          title="Configuration properties"
-                          description="Configuration properties"/>
-                <customNode url="/system-admin/Logs.action" id="Logs" title="Logs"
-                          description="Logs"/>
-            </childNodes>
-            <permissions>
-                <allow>
-                    <group name="admins" />
-                </allow>
-            </permissions>
-        </folderNode>
-        <customNode id="Profile" url="/Profile.action" title="Profile" description="Profile">
-            <permissions>
-                <allow>
-                    <group name="registered"/>
-                </allow>
-            </permissions>
-        </customNode>
-        <folderNode id="usersAdmin" description="User admin" title="admin user">
-            <childNodes>
-            <useCaseNode title="userAdmin"
-                         id="userAdmin"
-                         description="user administration" url="/usersAdmin/Users.action">
-                <useCase name = "users"
-                         table="portofino.public.users"
-                         query="FROM portofino.public.users"
-                         searchTitle="Users"
-                         createTitle="Create new user"
-                         readTitle="User"
-                         editTitle="Edit user">
-                    <properties>
-                        <property name="userId"/>
-                        <property name="userName"/>
-                        <property name="email"/>
-                        <property name="jobTitle"/>
-                        <property name="firstName"/>
-                        <property name="middleName"/>
-                        <property name="lastName"/>
-                        <property name="state"/>
-                    </properties>                    
-                    <selectionProviders>
-                        <selectionProvider name="mysel" database="portofino"
-                                           hql="FROM portofino.public.userstate">
-                            <selectionProperties>
-                                <selectionProperty name="state"/>
-                            </selectionProperties>
-                        </selectionProvider>
-                    </selectionProviders>
-                    <buttons>
-                        <button name="add_group"
-                                label="Add selected groups"
-                                method="addGroups"
-                                guard=""/>
-                        <button name="rem_group"
-                                label="Remove  selected groups"
-                                method="removeGroups"
-                                guard=""/>
-                        <button name="reset"
-                                label="Reset password"
-                                method="resetPassword"
-                                guard=""/>
-                    </buttons>
-                    <subUseCases>
-                        <useCase name="active"
-                                 table="portofino.public.groups"
-                                 query="FROM portofino.public.groups groups WHERE groups.groupId NOT IN (SELECT groups2.groupId FROM portofino.public.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
-                                 searchTitle="Active groups">
-                            <properties>
-                                <property name="groupId"/>
-                                <property name="name"/>
-                                <property name="description"/>
-                            </properties>
-                        </useCase>
-                        <useCase name="current"
-                                 table="portofino.public.groups"
-                                 query="FROM portofino.public.groups groups WHERE groups.groupId in (SELECT groups2.groupId FROM portofino.public.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
-                                 searchTitle="Current groups">
-                            <properties>
-                                <property name="groupId"/>
-                                <property name="name"/>
-                                <property name="description"/>
-                            </properties>
-                        </useCase>
+            <documentNode id="homepage" title="Homepage" description="Homepage" url="Homepage.action">
+                <permissions>
+                    <allow>
+                        <group name="anonymous"/>
+                    </allow>
+                </permissions>
+            </documentNode>
+            <folderNode id="model" title="Model" description="Model">
+                <childNodes>
+                    <customNode id="ConnectionProviders"
+                              url="/model/ConnectionProviders.action"
+                              title="Connection providers"
+                              description="Connection providers"/>
+                    <customFolderNode  id="TableData" url="/model/TableData.action" type="table-data"
+                              title="Table data" description="Table data"/>
+                    <customFolderNode id="TabelDesign" url="/model/TableDesign.action" type="table-design"
+                              title="Table design" description="Table design"/>
+                    <customNode  id="SelfTest" url="/model/SelfTest.action" title="Self test"
+                              description="Self test"/>
+                    <customNode id="SiteMap" url="/model/SiteMap.action" title="Site map"
+                              description="Site map"/>
+                    <customNode id="DDLWriter" url="/model/DDLWriter.action" title="DDL Writer"
+                              description="DDL Writer"/>
+                </childNodes>
+                <permissions>
+                    <allow>
+                        <group name="admins" />
+                    </allow>
+                </permissions>
+            </folderNode>
+            <folderNode id="system-admin" title="System administration"
+                      description="System administration">
+                <childNodes>
+                    <customNode id="ServerInfo" url="/system-admin/ServerInfo.action"
+                              title="Server info" description="Server info"/>
+                    <customNode id="ConfigurationProperties" url="/system-admin/ConfigurationProperties.action"
+                              title="Configuration properties"
+                              description="Configuration properties"/>
+                    <customNode url="/system-admin/Logs.action" id="Logs" title="Logs"
+                              description="Logs"/>
+                </childNodes>
+                <permissions>
+                    <allow>
+                        <group name="admins" />
+                    </allow>
+                </permissions>
+            </folderNode>
+            <customNode id="Profile" url="/Profile.action" title="Profile" description="Profile">
+                <permissions>
+                    <allow>
+                        <group name="registered"/>
+                    </allow>
+                </permissions>
+            </customNode>
+            <folderNode id="usersAdmin" description="User admin" title="admin user">
+                <childNodes>
+                <useCaseNode title="userAdmin"
+                             id="userAdmin"
+                             description="user administration" url="/usersAdmin/Users.action">
+                    <useCase name = "users"
+                             table="portofino.public.users"
+                             query="FROM portofino.public.users"
+                             searchTitle="Users"
+                             createTitle="Create new user"
+                             readTitle="User"
+                             editTitle="Edit user">
+                        <properties>
+                            <property name="userId"/>
+                            <property name="userName"/>
+                            <property name="email"/>
+                            <property name="jobTitle"/>
+                            <property name="firstName"/>
+                            <property name="middleName"/>
+                            <property name="lastName"/>
+                            <property name="state"/>
+                        </properties>
+                        <selectionProviders>
+                            <selectionProvider name="mysel" database="portofino"
+                                               hql="FROM portofino.public.userstate">
+                                <selectionProperties>
+                                    <selectionProperty name="state"/>
+                                </selectionProperties>
+                            </selectionProvider>
+                        </selectionProviders>
+                        <buttons>
+                            <button name="add_group"
+                                    label="Add selected groups"
+                                    method="addGroups"
+                                    guard=""/>
+                            <button name="rem_group"
+                                    label="Remove  selected groups"
+                                    method="removeGroups"
+                                    guard=""/>
+                            <button name="reset"
+                                    label="Reset password"
+                                    method="resetPassword"
+                                    guard=""/>
+                        </buttons>
+                        <subUseCases>
+                            <useCase name="active"
+                                     table="portofino.public.groups"
+                                     query="FROM portofino.public.groups groups WHERE groups.groupId NOT IN (SELECT groups2.groupId FROM portofino.public.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
+                                     searchTitle="Active groups">
+                                <properties>
+                                    <property name="groupId"/>
+                                    <property name="name"/>
+                                    <property name="description"/>
+                                </properties>
+                            </useCase>
+                            <useCase name="current"
+                                     table="portofino.public.groups"
+                                     query="FROM portofino.public.groups groups WHERE groups.groupId in (SELECT groups2.groupId FROM portofino.public.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
+                                     searchTitle="Current groups">
+                                <properties>
+                                    <property name="groupId"/>
+                                    <property name="name"/>
+                                    <property name="description"/>
+                                </properties>
+                            </useCase>
 
-                        <useCase name="past"
-                                 table="portofino.public.users_groups"
-                                 query="FROM portofino.public.users_groups ug WHERE ug.userid=%{userId} AND ug.deletionDate IS NOT null"
-                                 searchTitle="Past groups">
-                            <properties>
-                                <property name="userid"/>
-                                <property name="groupid"/>
-                                <property name="creationDate"/>
-                                <property name="deletionDate"/>
-                            </properties>
-                        </useCase>
-                    </subUseCases>
-                </useCase>
-            </useCaseNode>
-            <useCaseNode title="groupAdmin"
-                         id="groupAdmin"
-                         description="groups administration" url="/usersAdmin/Groups.action">
-                <useCase name="groupAdmin"
-                         table="portofino.public.groups"
-                         query="from portofino.public.groups"
-                         searchTitle="Groups"
-                         createTitle="Create new group"
-                         readTitle="Group"
-                         editTitle="Edit group">
-                    <properties>
-                        <property name="groupId"/>
-                        <property name="name"/>
-                        <property name="description"/>
-                        <property name="deletionDate"/>
-                        <property name="creationDate"/>
-                        <property name="creatorId"/>
-                    </properties>
-                    <selectionProviders>
-                        <selectionProvider name="mysel" database="portofino"
-                                           hql="FROM portofino.public.users">
-                        <!--sql="SELECT userid, firstname ||' '|| lastname || '('|| emailaddress || ')' FROM users ORDER BY lastname, firstname"-->
-                            <selectionProperties>
-                                <selectionProperty name="creatorId"/>                                
-                            </selectionProperties>
-                        </selectionProvider>
-                    </selectionProviders>
-                </useCase>
-            </useCaseNode>
-            </childNodes>
-            <permissions>
-                <allow>
-                    <group name="users"/>
-                </allow>
-            </permissions>
+                            <useCase name="past"
+                                     table="portofino.public.users_groups"
+                                     query="FROM portofino.public.users_groups ug WHERE ug.userid=%{userId} AND ug.deletionDate IS NOT null"
+                                     searchTitle="Past groups">
+                                <properties>
+                                    <property name="userid"/>
+                                    <property name="groupid"/>
+                                    <property name="creationDate"/>
+                                    <property name="deletionDate"/>
+                                </properties>
+                            </useCase>
+                        </subUseCases>
+                    </useCase>
+                </useCaseNode>
+                <useCaseNode title="groupAdmin"
+                             id="groupAdmin"
+                             description="groups administration" url="/usersAdmin/Groups.action">
+                    <useCase name="groupAdmin"
+                             table="portofino.public.groups"
+                             query="from portofino.public.groups"
+                             searchTitle="Groups"
+                             createTitle="Create new group"
+                             readTitle="Group"
+                             editTitle="Edit group">
+                        <properties>
+                            <property name="groupId"/>
+                            <property name="name"/>
+                            <property name="description"/>
+                            <property name="deletionDate"/>
+                            <property name="creationDate"/>
+                            <property name="creatorId"/>
+                        </properties>
+                        <selectionProviders>
+                            <selectionProvider name="mysel" database="portofino"
+                                               hql="FROM portofino.public.users">
+                            <!--sql="SELECT userid, firstname ||' '|| lastname || '('|| emailaddress || ')' FROM users ORDER BY lastname, firstname"-->
+                                <selectionProperties>
+                                    <selectionProperty name="creatorId"/>
+                                </selectionProperties>
+                            </selectionProvider>
+                        </selectionProviders>
+                    </useCase>
+                </useCaseNode>
+                </childNodes>
+                <permissions>
+                    <allow>
+                        <group name="users"/>
+                    </allow>
+                </permissions>
 
-        </folderNode>
-        <folderNode id="usecases" title="Use cases"
-                  description="Use cases">
-            <childNodes>
-            <useCaseNode description="uc1" id="uc1" title="uc1">
-                <useCase name="usecase1"
-                 table="jpetstore.public.product"
-                 query="FROM jpetstore.public.product product where product.category = %{'FISH'}"
-                 searchTitle="Products in category FISH"
-                 createTitle="Create product in category FISH"
-                 readTitle="Product in category FISH"
-                 editTitle="Edit product in category FISH">
-                    <properties>
-                        <property name="productid">
-                            <annotations>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.Label">
-                                    <value>product id</value>
-                                </annotation>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.InSummary">
-                                    <value>true</value>
-                                </annotation>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.Searchable">
-                                    <value>true</value>
-                                </annotation>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.Access">
-                                    <value>write</value>
-                                </annotation>
-                            </annotations>
-                        </property>
-                        <property name="category">
-                            <annotations>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.InSummary">
-                                    <value>false</value>
-                                </annotation>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.Searchable">
-                                    <value>false</value>
-                                </annotation>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.Access">
-                                    <value>read</value>
-                                </annotation>
-                            </annotations>
-                        </property>
-                        <property name="name">
-                            <annotations>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.InSummary">
-                                    <value>true</value>
-                                </annotation>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.Searchable">
-                                    <value>true</value>
-                                </annotation>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.Access">
-                                    <value>write</value>
-                                </annotation>
-                            </annotations>
-                        </property>
-                        <property name="descn">
-                            <annotations>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.InSummary">
-                                    <value>true</value>
-                                </annotation>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.Searchable">
-                                    <value>true</value>
-                                </annotation>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.Access">
-                                    <value>write</value>
-                                </annotation>
-                            </annotations>
-                        </property>
-                    </properties>
-                </useCase>
-            </useCaseNode>
-            <useCaseNode description="uc2" id="uc2" title="uc2">
-                <useCase name="usecase2"
-                         table="jpetstore.public.category"
-                         query="FROM jpetstore.public.category"
-                         searchTitle="Categories"
-                         createTitle="Create new category"
-                         readTitle="Category"
-                         editTitle="Edit category">
-                    <properties>
-                        <property name="catid"/>
-                        <property name="name"/>
-                        <property name="descn"/>
-                    </properties>
-                    <buttons>
-                        <button name="customButton1" method="someMethod" label="Custom button 1"/>
-                        <button name="customButton2"
-                                label="Custom button 2"
-                                script="action.addInfoMessage('Button pressed!'); return 'returnToSearch';"
-                                scriptLanguage="groovy"
-                                guard=""/>
-                    </buttons>
-                    <subUseCases>
-                        <useCase name="usecase3"
-                                 table="jpetstore.public.product"
-                                 query="FROM jpetstore.public.product product WHERE product.category = %{catid}"
-                                 searchTitle="Products in category">
-                            <properties>
-                                <property name="productid"/>
-                                <property name="category"/>
-                                <property name="name"/>
-                                <property name="descn"/>
-                            </properties>
-                        </useCase>
-                    </subUseCases>
-                </useCase>
-            </useCaseNode>
-            <useCaseNode description="rimborsi" title="rimborsi" id="rimborsi">
-                <useCase name="rimborsi"
-                 table="hibernatetest.public.rimborso"
-                 query="FROM hibernatetest.public.rimborso rimborso"
-                 searchTitle="Rimborsi"
-                 createTitle="Crea rimborso"
-                 readTitle="Rimborso"
-                 editTitle="Modifica rimborso">
-            <properties>
-                <property name="id">
-                    <annotations>
-                        <annotation
-                                type="com.manydesigns.elements.annotations.InSummary">
-                            <value>true</value>
-                        </annotation>
-                        <annotation
-                                type="com.manydesigns.elements.annotations.Searchable">
-                            <value>true</value>
-                        </annotation>
-                        <annotation
-                                type="com.manydesigns.elements.annotations.Access">
-                            <value>write</value>
-                        </annotation>
-                    </annotations>
-                </property>
-                <property name="persona_id">
-                    <annotations>
-                        <annotation
-                                type="com.manydesigns.elements.annotations.InSummary">
-                            <value>false</value>
-                        </annotation>
-                        <annotation
-                                type="com.manydesigns.elements.annotations.Searchable">
-                            <value>false</value>
-                        </annotation>
-                        <annotation
-                                type="com.manydesigns.elements.annotations.Access">
-                            <value>read</value>
-                        </annotation>
-                    </annotations>
-                </property>
-                <property name="familiare_id">
-                    <annotations>
-                        <annotation
-                                type="com.manydesigns.elements.annotations.InSummary">
-                            <value>true</value>
-                        </annotation>
-                        <annotation
-                                type="com.manydesigns.elements.annotations.Searchable">
-                            <value>true</value>
-                        </annotation>
-                        <annotation
-                                type="com.manydesigns.elements.annotations.Access">
-                            <value>write</value>
-                        </annotation>
-                    </annotations>
-                </property>
-            </properties>
-            <selectionProviders>
-                <!-- Esempio con selection provider con hql
-                <selectionProvider name="mysel" database="hibernatetest"
-                                   hql="FROM hibernatetest.public.familiare WHERE persona_id = 1">
-                    <selectionProperties>
-                        <selectionProperty name="familiare_id"/>
-                    </selectionProperties>
-                </selectionProvider>
-                -->
-                <selectionProvider name="mysel" database="hibernatetest"
-                                   sql="SELECT p.id AS a, p.nome as b, f.id AS c, f.nome AS d FROM public.persona p JOIN public.familiare f ON f.persona_id = p.id ORDER BY p.id, f.id">
-                    <selectionProperties>
-                        <selectionProperty name="persona_id"/>
-                        <selectionProperty name="familiare_id"/>
-                    </selectionProperties>
-                </selectionProvider>
-            </selectionProviders>
-        </useCase>
-            </useCaseNode>
-            <portletNode name="portlet1"
-                         id="portlet1"
-                         description="portlet 1"
-                         type="pieChart"
-                         title="Title 1"
-                         legend="category"
-                         database="jpetstore"
-                         query="SELECT category, count(*) FROM product WHERE %{'pippo'} IS NOT NULL GROUP BY category ORDER BY category"
-                         urlExpression="http://www.google.com/search?q=%{key}"
-                        />
-            </childNodes>
-            <permissions>
-                <allow>
-                    <group name="users" />
-                </allow>
-            </permissions>
-        </folderNode>
+            </folderNode>
+            <folderNode id="usecases" title="Use cases"
+                      description="Use cases">
+                <childNodes>
+                <useCaseNode description="uc1" id="uc1" title="uc1">
+                    <useCase name="usecase1"
+                     table="jpetstore.public.product"
+                     query="FROM jpetstore.public.product product where product.category = %{'FISH'}"
+                     searchTitle="Products in category FISH"
+                     createTitle="Create product in category FISH"
+                     readTitle="Product in category FISH"
+                     editTitle="Edit product in category FISH">
+                        <properties>
+                            <property name="productid">
+                                <annotations>
+                                    <annotation
+                                            type="com.manydesigns.elements.annotations.Label">
+                                        <value>product id</value>
+                                    </annotation>
+                                    <annotation
+                                            type="com.manydesigns.elements.annotations.InSummary">
+                                        <value>true</value>
+                                    </annotation>
+                                    <annotation
+                                            type="com.manydesigns.elements.annotations.Searchable">
+                                        <value>true</value>
+                                    </annotation>
+                                    <annotation
+                                            type="com.manydesigns.elements.annotations.Access">
+                                        <value>write</value>
+                                    </annotation>
+                                </annotations>
+                            </property>
+                            <property name="category">
+                                <annotations>
+                                    <annotation
+                                            type="com.manydesigns.elements.annotations.InSummary">
+                                        <value>false</value>
+                                    </annotation>
+                                    <annotation
+                                            type="com.manydesigns.elements.annotations.Searchable">
+                                        <value>false</value>
+                                    </annotation>
+                                    <annotation
+                                            type="com.manydesigns.elements.annotations.Access">
+                                        <value>read</value>
+                                    </annotation>
+                                </annotations>
+                            </property>
+                            <property name="name">
+                                <annotations>
+                                    <annotation
+                                            type="com.manydesigns.elements.annotations.InSummary">
+                                        <value>true</value>
+                                    </annotation>
+                                    <annotation
+                                            type="com.manydesigns.elements.annotations.Searchable">
+                                        <value>true</value>
+                                    </annotation>
+                                    <annotation
+                                            type="com.manydesigns.elements.annotations.Access">
+                                        <value>write</value>
+                                    </annotation>
+                                </annotations>
+                            </property>
+                            <property name="descn">
+                                <annotations>
+                                    <annotation
+                                            type="com.manydesigns.elements.annotations.InSummary">
+                                        <value>true</value>
+                                    </annotation>
+                                    <annotation
+                                            type="com.manydesigns.elements.annotations.Searchable">
+                                        <value>true</value>
+                                    </annotation>
+                                    <annotation
+                                            type="com.manydesigns.elements.annotations.Access">
+                                        <value>write</value>
+                                    </annotation>
+                                </annotations>
+                            </property>
+                        </properties>
+                    </useCase>
+                </useCaseNode>
+                <useCaseNode description="uc2" id="uc2" title="uc2">
+                    <useCase name="usecase2"
+                             table="jpetstore.public.category"
+                             query="FROM jpetstore.public.category"
+                             searchTitle="Categories"
+                             createTitle="Create new category"
+                             readTitle="Category"
+                             editTitle="Edit category">
+                        <properties>
+                            <property name="catid"/>
+                            <property name="name"/>
+                            <property name="descn"/>
+                        </properties>
+                        <buttons>
+                            <button name="customButton1" method="someMethod" label="Custom button 1"/>
+                            <button name="customButton2"
+                                    label="Custom button 2"
+                                    script="action.addInfoMessage('Button pressed!'); return 'returnToSearch';"
+                                    scriptLanguage="groovy"
+                                    guard=""/>
+                        </buttons>
+                        <subUseCases>
+                            <useCase name="usecase3"
+                                     table="jpetstore.public.product"
+                                     query="FROM jpetstore.public.product product WHERE product.category = %{catid}"
+                                     searchTitle="Products in category">
+                                <properties>
+                                    <property name="productid"/>
+                                    <property name="category"/>
+                                    <property name="name"/>
+                                    <property name="descn"/>
+                                </properties>
+                            </useCase>
+                        </subUseCases>
+                    </useCase>
+                </useCaseNode>
+                <useCaseNode description="rimborsi" title="rimborsi" id="rimborsi">
+                    <useCase name="rimborsi"
+                     table="hibernatetest.public.rimborso"
+                     query="FROM hibernatetest.public.rimborso rimborso"
+                     searchTitle="Rimborsi"
+                     createTitle="Crea rimborso"
+                     readTitle="Rimborso"
+                     editTitle="Modifica rimborso">
+                <properties>
+                    <property name="id">
+                        <annotations>
+                            <annotation
+                                    type="com.manydesigns.elements.annotations.InSummary">
+                                <value>true</value>
+                            </annotation>
+                            <annotation
+                                    type="com.manydesigns.elements.annotations.Searchable">
+                                <value>true</value>
+                            </annotation>
+                            <annotation
+                                    type="com.manydesigns.elements.annotations.Access">
+                                <value>write</value>
+                            </annotation>
+                        </annotations>
+                    </property>
+                    <property name="persona_id">
+                        <annotations>
+                            <annotation
+                                    type="com.manydesigns.elements.annotations.InSummary">
+                                <value>false</value>
+                            </annotation>
+                            <annotation
+                                    type="com.manydesigns.elements.annotations.Searchable">
+                                <value>false</value>
+                            </annotation>
+                            <annotation
+                                    type="com.manydesigns.elements.annotations.Access">
+                                <value>read</value>
+                            </annotation>
+                        </annotations>
+                    </property>
+                    <property name="familiare_id">
+                        <annotations>
+                            <annotation
+                                    type="com.manydesigns.elements.annotations.InSummary">
+                                <value>true</value>
+                            </annotation>
+                            <annotation
+                                    type="com.manydesigns.elements.annotations.Searchable">
+                                <value>true</value>
+                            </annotation>
+                            <annotation
+                                    type="com.manydesigns.elements.annotations.Access">
+                                <value>write</value>
+                            </annotation>
+                        </annotations>
+                    </property>
+                </properties>
+                <selectionProviders>
+                    <!-- Esempio con selection provider con hql
+                    <selectionProvider name="mysel" database="hibernatetest"
+                                       hql="FROM hibernatetest.public.familiare">
+                        <selectionProperties>
+                            <selectionProperty name="familiare_id"/>
+                        </selectionProperties>
+                    </selectionProvider>
+                    -->
+                    <selectionProvider name="mysel" database="hibernatetest"
+                                       sql="SELECT p.id AS a, p.nome as b, f.id AS c, f.nome AS d FROM public.persona p JOIN public.familiare f ON f.persona_id = p.id ORDER BY p.id, f.id">
+                        <selectionProperties>
+                            <selectionProperty name="persona_id"/>
+                            <selectionProperty name="familiare_id"/>
+                        </selectionProperties>
+                    </selectionProvider>
+                </selectionProviders>
+            </useCase>
+                </useCaseNode>
+                <portletNode name="portlet1"
+                             id="portlet1"
+                             description="portlet 1"
+                             type="pieChart"
+                             title="Title 1"
+                             legend="category"
+                             database="jpetstore"
+                             query="SELECT category, count(*) FROM product WHERE %{'pippo'} IS NOT NULL GROUP BY category ORDER BY category"
+                             urlExpression="/usecases/uc2/UseCase.action?pk=%{key}"
+                            />
+                </childNodes>
+                <permissions>
+                    <allow>
+                        <group name="users" />
+                    </allow>
+                </permissions>
+            </folderNode>
         </childNodes>
         <permissions>
             <allow>

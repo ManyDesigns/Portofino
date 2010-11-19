@@ -33,6 +33,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
+import com.manydesigns.portofino.xml.XmlCollection;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -162,6 +163,7 @@ public class PrimaryKey implements ModelObject {
         this.primaryKeyName = primaryKeyName;
     }
 
+    @XmlCollection(itemType = PrimaryKeyColumn.class)
     public List<PrimaryKeyColumn> getPrimaryKeyColumns() {
         return primaryKeyColumns;
     }

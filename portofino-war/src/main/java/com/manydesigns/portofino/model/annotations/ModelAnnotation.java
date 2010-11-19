@@ -36,6 +36,7 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
+import com.manydesigns.portofino.xml.XmlCollection;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -172,6 +173,7 @@ public class ModelAnnotation implements ModelObject {
         this.type = type;
     }
 
+    @XmlCollection(itemType = String.class)
     public List<String> getValues() {
         return values;
     }

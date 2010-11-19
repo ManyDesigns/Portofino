@@ -32,6 +32,8 @@ package com.manydesigns.portofino.model;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.xml.XmlCollection;
+import com.manydesigns.portofino.xml.XmlElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -216,10 +218,12 @@ public class Model {
     // Getters/setter
     //**************************************************************************
 
+    @XmlCollection(itemType = Database.class)
     public List<Database> getDatabases() {
         return databases;
     }
 
+    @XmlElement(required = true)
     public SiteNode getRoot() {
         return root;
     }

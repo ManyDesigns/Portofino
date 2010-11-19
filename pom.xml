@@ -66,9 +66,9 @@
                 <version>2.2-beta-3</version>
                 <configuration>
                     <descriptors>
-                        <descriptor>src/main/assembly/os-src.xml</descriptor>
-                        <descriptor>src/main/assembly/os-bin.xml</descriptor>
-                        <descriptor>src/main/assembly/commercial-bin.xml</descriptor>
+                        <descriptor>assembly-os-src.xml</descriptor>
+                        <descriptor>assembly-os-bin.xml</descriptor>
+                        <descriptor>assembly-commercial-bin.xml</descriptor>
                     </descriptors>
                 </configuration>
             </plugin>

@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.actions.model;
 
+import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.database.ConnectionProvider;
@@ -36,6 +37,7 @@ import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;
 import com.manydesigns.portofino.model.io.ModelWriter;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -53,11 +56,25 @@ public class SelfTestAction extends PortofinoAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
+
     public TreeTableDiffer treeTableDiffer;
     // result parameters
     public InputStream inputStream;
     public String contentType;
     public String contentDisposition;
+
+    //--------------------------------------------------------------------------
+    // Logging
+    //--------------------------------------------------------------------------
+
+    public final static Logger logger = LogUtil.getLogger(SelfTestAction.class);
+
+    //--------------------------------------------------------------------------
+    // Action methods
+    //--------------------------------------------------------------------------
 
     public String execute() throws SQLException {
         treeTableDiffer = new TreeTableDiffer();
@@ -77,8 +94,14 @@ public class SelfTestAction extends PortofinoAction {
     }
 
     public String sync() throws SQLException {
-        context.syncDataModel();
-        SessionMessages.addInfoMessage("In-memory model synchronized to database model");
+        try {
+            context.syncDataModel();
+            SessionMessages.addInfoMessage("In-memory model synchronized to database model");
+        } catch (Throwable e) {
+            LogUtil.severe(logger, "Exception caught", e);
+            String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+            SessionMessages.addErrorMessage(rootCauseMessage);
+        }
         return "sync";
     }
 

@@ -35,6 +35,7 @@ import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.ModelAnnotation;
 import com.manydesigns.portofino.util.Pair;
 import com.manydesigns.portofino.xml.XmlAttribute;
+import com.manydesigns.portofino.xml.XmlCollection;
 import org.apache.commons.lang.ObjectUtils;
 
 import java.text.MessageFormat;
@@ -288,6 +289,7 @@ public class ForeignKey implements ModelObject {
         this.onDelete = onDelete;
     }
 
+    @XmlCollection(min = 1, itemType = Reference.class)
     public List<Reference> getReferences() {
         return references;
     }

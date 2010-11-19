@@ -33,6 +33,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
+import com.manydesigns.portofino.xml.XmlCollection;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -119,6 +120,7 @@ public class Schema implements ModelObject {
         this.schemaName = schemaName;
     }
 
+    @XmlCollection(itemType = Table.class)
     public List<Table> getTables() {
         return tables;
     }
