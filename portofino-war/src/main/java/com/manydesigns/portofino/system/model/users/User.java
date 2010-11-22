@@ -30,15 +30,16 @@ package com.manydesigns.portofino.system.model.users;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Password;
+import com.manydesigns.portofino.system.model.messages.Message;
 import org.apache.commons.lang.RandomStringUtils;
 import sun.misc.BASE64Encoder;
 
 import java.io.Serializable;
 import java.security.MessageDigest;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.sql.Timestamp;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -81,6 +82,9 @@ public class User implements Serializable{
     Integer graceLoginCount;
 
     List<Group> groupsCreated;
+    List<Message> messageIn;
+    List<Message> messageOut;
+    List<OldPassword> oldPwds;
 
 
     //gruppi di appartenenza
@@ -302,6 +306,30 @@ public class User implements Serializable{
 
     public void setGroupsCreated(List<Group> groupsCreated) {
         this.groupsCreated = groupsCreated;
+    }
+
+    public List<Message> getMessageIn() {
+        return messageIn;
+    }
+
+    public void setMessageIn(List<Message> messageIn) {
+        this.messageIn = messageIn;
+    }
+
+    public List<Message> getMessageOut() {
+        return messageOut;
+    }
+
+    public void setMessageOut(List<Message> messageOut) {
+        this.messageOut = messageOut;
+    }
+
+    public List<OldPassword> getOldPwds() {
+        return oldPwds;
+    }
+
+    public void setOldPwds(List<OldPassword> oldPwds) {
+        this.oldPwds = oldPwds;
     }
 
     public void encryptPwd() {

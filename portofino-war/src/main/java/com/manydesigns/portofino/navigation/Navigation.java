@@ -34,6 +34,8 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.site.*;
+import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.system.model.users.UserUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +90,13 @@ public class Navigation implements XhtmlFragment {
     protected void generateNavigationNodes(List<SiteNode> siteNodes,
                                            List<NavigationNode> navigationNodes) {
         for (SiteNode siteNode : siteNodes) {
+            User currentUser = context.getCurrentUser();
+            List<String> groups = UserUtils.manageGroups(context);
+            //se non sono autorizzato a vedere il nodo continuo
+            if (!siteNode.isAllowed(groups)){
+                continue;
+            }
+
             NavigationNode navigationNode;
             if (siteNode instanceof DocumentNode
                     || siteNode instanceof PortletNode

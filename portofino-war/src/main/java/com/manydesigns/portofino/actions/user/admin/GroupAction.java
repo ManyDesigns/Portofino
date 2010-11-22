@@ -31,7 +31,7 @@ package com.manydesigns.portofino.actions.user.admin;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.UseCaseAction;
 import com.manydesigns.portofino.system.model.users.Group;
-import com.manydesigns.portofino.system.model.users.UserDefs;
+import com.manydesigns.portofino.system.model.users.UserUtils;
 
 import java.sql.Timestamp;
 import java.text.MessageFormat;
@@ -54,10 +54,10 @@ public class GroupAction extends UseCaseAction {
 
     public String delete() {
         Group pkGrp = new Group(Long.parseLong(rootCrudUnit.pk));
-        Group aGroup = (Group) context.getObjectByPk(UserDefs.GROUPTABLE, pkGrp);
+        Group aGroup = (Group) context.getObjectByPk(UserUtils.GROUPTABLE, pkGrp);
         aGroup.setDeletionDate(new Timestamp(System.currentTimeMillis()));
-        context.saveObject(UserDefs.GROUPTABLE, aGroup);
-        String databaseName = model.findTableByQualifiedName(UserDefs.GROUPTABLE)
+        context.saveObject(UserUtils.GROUPTABLE, aGroup);
+        String databaseName = model.findTableByQualifiedName(UserUtils.GROUPTABLE)
                 .getDatabaseName();
         context.commit(databaseName);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
@@ -73,16 +73,16 @@ public class GroupAction extends UseCaseAction {
         for (String current : rootCrudUnit.selection) {
             Group pkGrp = new Group(new Long(current));
             Group aGroup = (Group) context
-                    .getObjectByPk(UserDefs.GROUPTABLE, pkGrp);
+                    .getObjectByPk(UserUtils.GROUPTABLE, pkGrp);
             aGroup.setDeletionDate(new Timestamp(System.currentTimeMillis()));
-            context.saveObject(UserDefs.GROUPTABLE, aGroup);
+            context.saveObject(UserUtils.GROUPTABLE, aGroup);
             String databaseName = model
-                    .findTableByQualifiedName(UserDefs.GROUPTABLE)
+                    .findTableByQualifiedName(UserUtils.GROUPTABLE)
                     .getDatabaseName();
             SessionMessages.addInfoMessage("DELETE avvenuto con successo");
         }
         String databaseName = model
-                .findTableByQualifiedName(UserDefs.GROUPTABLE)
+                .findTableByQualifiedName(UserUtils.GROUPTABLE)
                 .getDatabaseName();
         context.commit(databaseName);
         SessionMessages.addInfoMessage(MessageFormat.format(

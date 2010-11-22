@@ -30,6 +30,8 @@ package com.manydesigns.portofino.context.hibernate;
 
 
 import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
@@ -396,6 +398,29 @@ public class HibernateConfig {
         com.manydesigns.portofino.model.datamodel.Table oneMDTable =
                 relationship.getActualToTable();
 
+        //Se la classe One non è dinamica e
+        // non ha la proprietà non inserisco la relazione
+        if (oneMDTable.getJavaClass()!=null){
+            try {
+                Class oneClass = oneMDTable.getActualJavaClass();
+                JavaClassAccessor accessor = JavaClassAccessor
+                        .getClassAccessor(oneClass);
+                PropertyAccessor[] propertyAccessors = accessor.getProperties();
+                boolean found = false;
+                for (PropertyAccessor propertyAccessor : propertyAccessors){
+                    if (propertyAccessor.getName()
+                            .equals(relationship.getActualManyPropertyName())) {
+                        found=true;
+                    }
+                }
+                if(!found){
+                    return;
+                }
+            } catch (Exception e) {
+                //se non c'è non inserisco la relazione
+                return;
+            }
+        }
         //relazione virtuali fra Database differenti
         if(!manyMDTable.getDatabaseName().equalsIgnoreCase(oneMDTable.getDatabaseName())){
             return;

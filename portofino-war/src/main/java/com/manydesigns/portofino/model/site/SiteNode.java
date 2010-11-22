@@ -32,10 +32,11 @@ package com.manydesigns.portofino.model.site;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
+import com.manydesigns.portofino.system.model.users.Group;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -189,5 +190,31 @@ public abstract class SiteNode implements ModelObject {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public boolean isAllowed (String group) {
+        if (denyGroups.contains(group)) {
+                return false;
+        }
+        if (allowGroups.contains(Group.REGISTERED)
+                && !Group.ANONYMOUS.equals(group)){
+            return true;
+        }
+        if (allowGroups.size()>0){
+            return allowGroups.contains(group);
+        } else {
+            return true;
+        }
+    }
+
+    public boolean isAllowed (List<String> groups) {
+        boolean result = false;
+        for (String group : groups){
+            boolean parentAllowed= true;
+            if (parent != null){
+                parentAllowed= parent.isAllowed(groups);
+            }result = result || (parentAllowed && isAllowed(group));
+        }
+        return result;
     }
 }

@@ -34,7 +34,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.system.model.users.User;
-import com.manydesigns.portofino.system.model.users.UserDefs;
+import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
@@ -112,7 +112,7 @@ public class LoginAction extends PortofinoAction
             return INPUT;
         }
 
-        if (!user.getState().equals(UserDefs.ACTIVE)) {
+        if (!user.getState().equals(UserUtils.ACTIVE)) {
             String errMsg = MessageFormat.format("User {0} is not active. " +
                     "Please contact the administrator", email);
             SessionMessages.addInfoMessage(errMsg);
@@ -137,7 +137,7 @@ public class LoginAction extends PortofinoAction
         user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
         int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
         user.setFailedLoginAttempts(failedAttempts+1);
-        context.updateObject(UserDefs.USERTABLE, user);
+        context.updateObject(UserUtils.USERTABLE, user);
         context.commit("portofino");
     }
 
@@ -145,7 +145,7 @@ public class LoginAction extends PortofinoAction
         user.setFailedLoginAttempts(0);
         user.setLastLoginDate(new Timestamp(new Date().getTime()));
         user.setToken(null);
-        context.updateObject(UserDefs.USERTABLE, user);
+        context.updateObject(UserUtils.USERTABLE, user);
         context.commit("portofino");
     }
 

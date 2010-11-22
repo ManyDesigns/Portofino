@@ -30,11 +30,14 @@
 package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.user.LoginUnAware;
+import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.navigation.Navigation;
+import com.manydesigns.portofino.navigation.NavigationNode;
 import com.manydesigns.portofino.servlets.PortofinoListener;
+import com.manydesigns.portofino.system.model.users.Group;
+import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
@@ -43,6 +46,8 @@ import org.apache.struts2.StrutsStatics;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -56,6 +61,7 @@ public class PortofinoInterceptor implements Interceptor {
     public final static String STOP_WATCH_ATTRIBUTE = "stopWatch";
     public final static String NAVIGATION_ATTRIBUTE = "navigation";
     private static final String LOGIN_ACTION = "login";
+    private static final String UNAUTHORIZED = "unauthorized";
 
     public void destroy() {}
 
@@ -80,40 +86,57 @@ public class PortofinoInterceptor implements Interceptor {
         }
 
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
-
-        String requestUrl = Util.getAbsoluteUrl(req.getServletPath());
-        Navigation navigation = new Navigation(context, requestUrl);
-        req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
-
-        if (action instanceof ContextAware) {
-            ((ContextAware)action).setContext(context);
-        }
-
-        if (action instanceof NavigationAware) {
-            ((NavigationAware)action).setNavigation(navigation);
-        }
-
-        String result;
         try {
             context.resetDbTimer();
             context.openSession();
+            String requestUrl = Util.getAbsoluteUrl(req.getServletPath());
+            Navigation navigation = new Navigation(context, requestUrl);
+            req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
 
-            boolean userEnabled = Boolean.parseBoolean((String)
-                    PortofinoProperties.getProperties()
-                    .get("user.enabled"));
-            if (userEnabled &&
-                    context.getCurrentUser()==null
-                    && !(invocation.getAction() instanceof LoginUnAware)) {
-                return LOGIN_ACTION;
+            if (action instanceof ContextAware) {
+                ((ContextAware)action).setContext(context);
             }
-            result = invocation.invoke();
+
+            if (action instanceof NavigationAware) {
+                ((NavigationAware)action).setNavigation(navigation);
+            }
+
+            NavigationNode selectedNode = navigation.getSelectedNavigationNode();
+
+            if (!(invocation.getAction() instanceof PortofinoAction)
+                    ||selectedNode==null) {
+                stopWatch.stop();
+                return invocation.invoke();
+            }
+
+            List<String> groups = new ArrayList<String>();
+
+            SiteNode node =
+                        selectedNode.getActualSiteNode();
+
+            if (context.getCurrentUser()==null) {
+                groups.add(Group.ANONYMOUS);
+                if (node.isAllowed(groups)) {
+                    stopWatch.stop();
+                    return invocation.invoke();
+                } else {
+                    stopWatch.stop();
+                    return LOGIN_ACTION;
+                }
+            } else {
+                if(node.isAllowed(UserUtils.manageGroups(context))){
+                    stopWatch.stop();
+                    return invocation.invoke();
+                } else {
+                    stopWatch.stop();
+                    return UNAUTHORIZED;
+                }
+            }
+
 
         } finally {
             context.closeSession();
         }
 
-        stopWatch.stop();
-
-        return result;
     }
 }
