@@ -88,7 +88,7 @@ public class HibernateConfig {
                             jdbcConnectionProvider.getPassword())
                     .setProperty("hibernate.current_session_context_class",
                             "org.hibernate.context.ThreadLocalSessionContext")
-                    .setProperty("hibernate.globally_quoted_identifiers", "true");
+                    .setProperty("hibernate.globally_quoted_identifiers", "false");
             configuration.setProperty("hibernate.show_sql", SHOW_SQL);
             Mappings mappings = configuration.createMappings();
 
@@ -163,8 +163,8 @@ public class HibernateConfig {
 
         Table tab = mappings.addTable(aTable.getSchemaName(), null,
                 aTable.getTableName(), null, false);
-        tab.setName(aTable.getTableName());
-        tab.setSchema(aTable.getSchemaName());
+        tab.setName(escapeName(aTable.getTableName()));
+        tab.setSchema(escapeName(aTable.getSchemaName()));
         mappings.addTableBinding(aTable.getSchemaName(), null,
                 aTable.getTableName(), aTable.getTableName(), null);
 
@@ -211,7 +211,7 @@ public class HibernateConfig {
                                 Table tab,
                                 com.manydesigns.portofino.model.datamodel.Column column) {
         Column col = new Column();
-        col.setName(column.getColumnName());
+        col.setName(escapeName(column.getColumnName()));
         col.setLength(column.getLength());
         col.setPrecision(column.getLength());
         col.setScale(column.getScale());
@@ -595,7 +595,7 @@ public class HibernateConfig {
         m2o.createPropertyRefConstraints(persistentClasses);
         for (String columnName : columnNames) {
             Column col = new Column();
-            col.setName(columnName);
+            col.setName(escapeName(columnName));
             m2o.addColumn(col);
         }
 
@@ -619,5 +619,9 @@ public class HibernateConfig {
             refProp = clazzOne.getProperty(colToName);
         }
         return refProp;
+    }
+
+    private String escapeName(String name) {
+        return "`"+name+"`";
     }
 }

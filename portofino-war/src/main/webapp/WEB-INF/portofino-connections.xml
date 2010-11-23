@@ -3,7 +3,7 @@
             databaseName="mysql"
             type="jdbc"
             driver="com.mysql.jdbc.Driver"
-            url="jdbc:mysql://localhost/meta?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI"
+            url="jdbc:mysql://192.168.1.2/meta?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI"
             username="manydesigns"
             password="manydesigns"
             includeSchemas="frogpress.*"
