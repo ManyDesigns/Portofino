@@ -88,6 +88,15 @@ public class Navigation implements XhtmlFragment {
     protected void generateNavigationNodes(List<SiteNode> siteNodes,
                                            List<NavigationNode> navigationNodes) {
         for (SiteNode siteNode : siteNodes) {
+            //se non sono autorizzato a vedere il nodo continuo
+            //TODO riabilitare per i permessi
+            /*User currentUser = context.getCurrentUser();
+            List<String> groups = UserUtils.manageGroups(context);
+
+            if (!siteNode.isAllowed(groups)){
+                continue;
+            }*/
+
             NavigationNode navigationNode;
             if (siteNode instanceof DocumentNode
                     || siteNode instanceof PortletNode

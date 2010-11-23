@@ -537,7 +537,6 @@ Struttura dell'XML:
                                 </foreignKey>
                             </foreignKeys>
                         </table>
-
                         <table tableName="emailstate">
                             <columns>
                                 <column columnName="id"
@@ -719,6 +718,187 @@ Struttura dell'XML:
                                     <value>%{name}</value>
                                 </annotation>
                             </annotations>
+                        </table>
+                        <table tableName="msg"
+                               javaClass="com.manydesigns.portofino.system.model.messages.Message">
+                            <columns>
+                                <column autoincrement="false"
+                                        columnName="body"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="4000"
+                                        nullable="true"
+                                        scale="0"
+                                        searchable="true"/>
+                                <column autoincrement="false"
+                                        columnName="creationdate"
+                                        propertyName="creationDate"
+                                        columnType="timestamp"
+                                        javaType="java.util.Date"
+                                        length="29"
+                                        nullable="true"
+                                        scale="6"
+                                        searchable="true"/>
+                                <column autoincrement="false"
+                                        columnName="from_"
+                                        propertyName="fromId"
+                                        columnType="int8"
+                                        javaType="java.lang.Long"
+                                        length="19"
+                                        nullable="true"
+                                        scale="0"
+                                        searchable="true"/>
+                                <column autoincrement="true"
+                                        columnName="id"
+                                        columnType="bigserial"
+                                        javaType="java.lang.Long"
+                                        length="19"
+                                        nullable="false"
+                                        scale="0"
+                                        searchable="true"/>
+                                <column autoincrement="false"
+                                        columnName="state"
+                                        propertyName="stateId"
+                                        columnType="int4"
+                                        javaType="java.lang.Integer"
+                                        length="10"
+                                        nullable="true"
+                                        scale="0"
+                                        searchable="true"/>
+                                <column autoincrement="false"
+                                        columnName="subject"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        nullable="true"
+                                        scale="0"
+                                        searchable="true"/>
+                                <column autoincrement="false" 
+                                        columnName="to_"
+                                        propertyName="toId"
+                                        columnType="int8"
+                                        javaType="java.lang.Long"
+                                        length="19"
+                                        nullable="true"
+                                        scale="0"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="msg_pkey">
+                                <column columnName="id"/>
+                            </primaryKey>
+                            <foreignKeys>
+                                <foreignKey foreignKeyName="fk_msg_1"
+                                            onDelete="NO ACTION"
+                                            onUpdate="NO ACTION"
+                                            toDatabase="portofino"
+                                            toSchema="public"
+                                            toTable="msgstate"
+                                            onePropertyName="state"
+                                            manyPropertyName="messages"
+                                            virtual="false">
+                                    <references>
+
+                                        <reference fromColumn="state" toColumn="id"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey foreignKeyName="fk_msg_2"
+                                            onDelete="NO ACTION"
+                                            onUpdate="NO ACTION"
+                                            toDatabase="portofino"
+                                            toSchema="public"
+                                            toTable="users"
+                                            onePropertyName="from"
+                                            manyPropertyName="messageIn"
+                                            virtual="false">
+                                    <references>
+                                        <reference fromColumn="from_" toColumn="userid"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey foreignKeyName="fk_msg_3"
+                                            onDelete="NO ACTION"
+                                            onUpdate="NO ACTION"
+                                            toDatabase="portofino"
+                                            toSchema="public"
+                                            toTable="users"
+                                            virtual="false"
+                                            onePropertyName="to"
+                                            manyPropertyName="messageOut"
+                                        >
+
+                                    <references>
+                                        <reference fromColumn="to_" toColumn="userid"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
+                        </table>
+                        <table tableName="msgstate" javaClass="com.manydesigns.portofino.system.model.messages.State">
+                            <columns>
+                                <column autoincrement="false" columnName="description" columnType="varchar" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
+
+                                <column autoincrement="true" columnName="id" columnType="bigserial" javaType="java.lang.Long" length="19" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="name" columnType="varchar" javaType="java.lang.String" length="50" nullable="false" scale="0" searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="msgstate_pkey">
+                                <column columnName="id"/>
+                            </primaryKey>
+                        </table>
+                        <table tableName="oldpwd">
+                            <columns>
+
+                                <column autoincrement="false" columnName="createdate"
+                                        propertyName="createDate"
+                                        columnType="timestamp"
+                                        javaType="java.sql.Timestamp"
+                                        length="29"
+                                        nullable="true"
+                                        scale="6"
+                                        searchable="true"/>
+                                <column autoincrement="true"
+                                        columnName="id"
+                                        columnType="bigserial"
+                                        javaType="java.lang.Long"
+                                        length="19"
+                                        nullable="false"
+                                        scale="0"
+                                        searchable="true"/>
+                                <column autoincrement="false"
+                                        columnName="password"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        nullable="true"
+                                        scale="0"
+                                        searchable="true"/>
+                                <column autoincrement="false"
+                                        columnName="userid"
+                                        propertyName="userId"
+                                        columnType="int4"
+                                        javaType="java.lang.Integer"
+                                        length="10"
+                                        nullable="true"
+                                        scale="0"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="OldPwd_pkey">
+                                <column columnName="id"/>
+                            </primaryKey>
+                            <foreignKeys>
+
+                                <foreignKey
+                                        foreignKeyName="fk_oldpwd_1"
+                                        onDelete="NO ACTION"
+                                        onUpdate="NO ACTION"
+                                        toDatabase="portofino"
+                                        toSchema="public"
+                                        toTable="users"
+                                        virtual="false"
+                                        onePropertyName="user"
+                                        manyPropertyName="oldPwds">
+                                    <references>
+                                        <reference fromColumn="userid" toColumn="userid"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
                         </table>
                     </tables>
                 </schema>
@@ -3665,7 +3845,7 @@ Struttura dell'XML:
                 </childNodes>
                 <permissions>
                     <allow>
-                        <group name="users"/>
+                        <group name="admins"/>
                     </allow>
                 </permissions>
 

@@ -38,6 +38,8 @@ import java.io.Serializable;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class EmailBean implements Serializable{
+    public static final String copyright
+            = "Copyright (c) 2005-2010, ManyDesigns srl";
     Long id;
     String subject;
     String body;

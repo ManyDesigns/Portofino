@@ -39,7 +39,7 @@ import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
-import com.manydesigns.portofino.system.model.users.UserDefs;
+import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
@@ -96,11 +96,11 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
 
     private String read() {
         user = context.getCurrentUser();
-        ClassAccessor accessor = context.getTableAccessor(UserDefs.USERTABLE);
+        ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         formBuilder.configFields("email", "userName", "firstName",
                 "middleName", "lastName", "creationDate");
-        User thisUser = (User) context.getObjectByPk(UserDefs.USERTABLE, user);
+        User thisUser = (User) context.getObjectByPk(UserUtils.USERTABLE, user);
         for (UsersGroups ug : thisUser.getGroups()){
             Group grp = ug.getGroup();
 
@@ -118,7 +118,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     public String edit() {
         user = context.getCurrentUser();
 
-        ClassAccessor accessor = context.getTableAccessor(UserDefs.USERTABLE);
+        ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
                 .configFields("email", "userName", "firstName",
@@ -132,7 +132,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     public String update() {
         user = context.getCurrentUser();
 
-        ClassAccessor accessor = context.getTableAccessor(UserDefs.USERTABLE);
+        ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
                 .configFields("email", "userName", "firstName",
@@ -144,7 +144,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
         
         if(form.validate()){
             form.writeToObject(user);
-            context.updateObject(UserDefs.USERTABLE, user);
+            context.updateObject(UserUtils.USERTABLE, user);
             context.commit("portofino");
             LogUtil.finestMF(logger, "User {0} updated", user.getEmail());
             SessionMessages.addInfoMessage("Utente aggiornato correttamente");
@@ -181,7 +181,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
                     user.encryptPwd();
                 }
                 user.setPwdModDate(new Timestamp(new Date().getTime()));
-                context.updateObject(UserDefs.USERTABLE, user);
+                context.updateObject(UserUtils.USERTABLE, user);
                 context.commit("portofino");
 
                 LogUtil.finestMF(logger, "User {0} updated", user.getEmail());

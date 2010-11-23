@@ -28,20 +28,76 @@
  */
 package com.manydesigns.portofino.system.model.users;
 
+import java.sql.Timestamp;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UserDefs {
-    public static final String copyright
+public class OldPassword {
+        public static final String copyright
             = "Copyright (c) 2005-2010, ManyDesigns srl";
+    Long id;
+    Timestamp createDate;
+    Long userId;
+    User user;
+    String password;
 
-    public static final String USERTABLE = "portofino.public.users";
-    public static final String GROUPTABLE = "portofino.public.groups";
+    public Long getId() {
+        return id;
+    }
 
-    public static final Long ACTIVE = 1L;
-    public static final Long SUSPENDED = 2L;
-    public static final Long BANNED = 3L;
-    public static final Long SELFREGITRED = 4L;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Timestamp getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Timestamp createDate) {
+        this.createDate = createDate;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OldPassword that = (OldPassword) o;
+
+        if (!id.equals(that.id)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

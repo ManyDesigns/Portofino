@@ -26,97 +26,111 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.system.model.users;
+package com.manydesigns.portofino.system.model.messages;
+
+import com.manydesigns.portofino.system.model.users.User;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Group implements Serializable{
+public class Message implements Serializable {
     public static final String copyright
             = "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    Long groupId;
-    String name;
-    String description;
-    Long creatorId;
-    Timestamp deletionDate;
-    Timestamp creationDate;
+    Long id;
+    String subject;
+    String body;
+    String toId;
+    String fromId;
+    User from;
+    User to;
+    Date creationDate;
+    Long stateId;
+    State state;
 
-    //META GROUPS
-    public static String ANONYMOUS = "anonymous";
-    public static String REGISTERED = "registered";
-    
-    List<User> users = new ArrayList<User>();
-
-    public Group() {
-
-    }
-    
-    public Group(Long groupId){
-        this.groupId=groupId;
+    public Long getId() {
+        return id;
     }
 
-    public Long getGroupId() {
-        return groupId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
+    public String getSubject() {
+        return subject;
     }
 
-    public String getName() {
-        return name;
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getBody() {
+        return body;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public void setBody(String body) {
+        this.body = body;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
+    public String getToId() {
+        return toId;
     }
 
-    public String getDescription() {
-        return description;
+    public void setToId(String toId) {
+        this.toId = toId;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public String getFromId() {
+        return fromId;
     }
 
-    public Long getCreatorId() {
-        return creatorId;
+    public void setFromId(String fromId) {
+        this.fromId = fromId;
     }
 
-    public void setCreatorId(Long creatorId) {
-        this.creatorId = creatorId;
+    public User getFrom() {
+        return from;
     }
 
-    public Timestamp getDeletionDate() {
-        return deletionDate;
+    public void setFrom(User from) {
+        this.from = from;
     }
 
-    public void setDeletionDate(Timestamp deletionDate) {
-        this.deletionDate = deletionDate;
+    public User getTo() {
+        return to;
     }
 
-    public Timestamp getCreationDate() {
+    public void setTo(User to) {
+        this.to = to;
+    }
+
+    public Date getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Timestamp creationDate) {
+    public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public Long getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(Long stateId) {
+        this.stateId = stateId;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 
     @Override
@@ -124,15 +138,16 @@ public class Group implements Serializable{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Group group = (Group) o;
+        Message message = (Message) o;
 
-        return groupId.equals(group.groupId);
+        if (id != null ? !id.equals(message.id) : message.id != null)
+            return false;
 
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return groupId.hashCode();
+        return id != null ? id.hashCode() : 0;
     }
 }
-

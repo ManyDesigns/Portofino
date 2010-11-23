@@ -56,6 +56,7 @@ public class PortofinoInterceptor implements Interceptor {
     public final static String STOP_WATCH_ATTRIBUTE = "stopWatch";
     public final static String NAVIGATION_ATTRIBUTE = "navigation";
     private static final String LOGIN_ACTION = "login";
+    private static final String UNAUTHORIZED = "unauthorized";
 
     public void destroy() {}
 
@@ -98,9 +99,9 @@ public class PortofinoInterceptor implements Interceptor {
             context.resetDbTimer();
             context.openSession();
 
-            boolean userEnabled = Boolean.parseBoolean((String)
+            boolean userEnabled = Boolean.parseBoolean(
                     PortofinoProperties.getProperties()
-                    .get("user.enabled"));
+                    .getProperty("user.enabled", "false"));
             if (userEnabled &&
                     context.getCurrentUser()==null
                     && !(invocation.getAction() instanceof LoginUnAware)) {
@@ -115,5 +116,58 @@ public class PortofinoInterceptor implements Interceptor {
         stopWatch.stop();
 
         return result;
+        /*
+        try {
+            context.resetDbTimer();
+            context.openSession();
+            String requestUrl = Util.getAbsoluteUrl(req.getServletPath());
+            Navigation navigation = new Navigation(context, requestUrl);
+            req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
+
+            if (action instanceof ContextAware) {
+                ((ContextAware)action).setContext(context);
+            }
+
+            if (action instanceof NavigationAware) {
+                ((NavigationAware)action).setNavigation(navigation);
+            }
+
+            NavigationNode selectedNode = navigation.getSelectedNavigationNode();
+
+            if (!(invocation.getAction() instanceof PortofinoAction)
+                    ||selectedNode==null) {
+                stopWatch.stop();
+                return invocation.invoke();
+            }
+
+            List<String> groups = new ArrayList<String>();
+
+            SiteNode node =
+                        selectedNode.getActualSiteNode();
+
+            if (context.getCurrentUser()==null) {
+                groups.add(Group.ANONYMOUS);
+                if (node.isAllowed(groups)) {
+                    stopWatch.stop();
+                    return invocation.invoke();
+                } else {
+                    stopWatch.stop();
+                    return LOGIN_ACTION;
+                }
+            } else {
+                if(node.isAllowed(UserUtils.manageGroups(context))){
+                    stopWatch.stop();
+                    return invocation.invoke();
+                } else {
+                    stopWatch.stop();
+                    return UNAUTHORIZED;
+                }
+            }
+
+
+        } finally {
+            context.closeSession();
+        }*/
+
     }
 }

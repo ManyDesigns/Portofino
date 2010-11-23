@@ -26,49 +26,28 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.system.model.users;
+package com.manydesigns.portofino.system.model.messages;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Group implements Serializable{
+public class State implements Serializable {
     public static final String copyright
             = "Copyright (c) 2005-2010, ManyDesigns srl";
-
-    Long groupId;
+    Long id;
     String name;
     String description;
-    Long creatorId;
-    Timestamp deletionDate;
-    Timestamp creationDate;
 
-    //META GROUPS
-    public static String ANONYMOUS = "anonymous";
-    public static String REGISTERED = "registered";
-    
-    List<User> users = new ArrayList<User>();
-
-    public Group() {
-
-    }
-    
-    public Group(Long groupId){
-        this.groupId=groupId;
+    public Long getId() {
+        return id;
     }
 
-    public Long getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -79,14 +58,6 @@ public class Group implements Serializable{
         this.name = name;
     }
 
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -95,44 +66,20 @@ public class Group implements Serializable{
         this.description = description;
     }
 
-    public Long getCreatorId() {
-        return creatorId;
-    }
-
-    public void setCreatorId(Long creatorId) {
-        this.creatorId = creatorId;
-    }
-
-    public Timestamp getDeletionDate() {
-        return deletionDate;
-    }
-
-    public void setDeletionDate(Timestamp deletionDate) {
-        this.deletionDate = deletionDate;
-    }
-
-    public Timestamp getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Timestamp creationDate) {
-        this.creationDate = creationDate;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Group group = (Group) o;
+        State state = (State) o;
 
-        return groupId.equals(group.groupId);
+        if (!id.equals(state.id)) return false;
 
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return groupId.hashCode();
+        return id.hashCode();
     }
 }
-
