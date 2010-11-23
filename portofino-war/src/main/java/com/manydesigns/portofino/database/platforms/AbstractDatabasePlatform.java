@@ -56,6 +56,34 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
+    // Constants
+    //**************************************************************************
+
+    public final static String[] tableTypes = {"TABLE"};
+    public static final String TABLE_CAT = "TABLE_CAT";
+    public static final String TABLE_SCHEM = "TABLE_SCHEM";
+    public static final String TABLE_NAME = "TABLE_NAME";
+    public static final String COLUMN_NAME = "COLUMN_NAME";
+    public static final String KEY_SEQ = "KEY_SEQ";
+    public static final String PK_NAME = "PK_NAME";
+    public static final String TYPE_NAME = "TYPE_NAME";
+    public static final String NULLABLE = "NULLABLE";
+    public static final String COLUMN_SIZE = "COLUMN_SIZE";
+    public static final String DECIMAL_DIGITS = "DECIMAL_DIGITS";
+    public static final String FKTABLE_SCHEM = "FKTABLE_SCHEM";
+    public static final String FKTABLE_NAME = "FKTABLE_NAME";
+    public static final String FKCOLUMN_NAME = "FKCOLUMN_NAME";
+    public static final String PKTABLE_SCHEM = "PKTABLE_SCHEM";
+    public static final String PKTABLE_NAME = "PKTABLE_NAME";
+    public static final String PKCOLUMN_NAME = "PKCOLUMN_NAME";
+    public static final String UPDATE_RULE = "UPDATE_RULE";
+    public static final String DELETE_RULE = "DELETE_RULE";
+    public static final String DEFERRABILITY = "DEFERRABILITY";
+    public static final String FK_NAME = "FK_NAME";
+    public static final String FKTABLE_CAT = "FKTABLE_CAT";
+    public static final String PKTABLE_CAT = "PKTABLE_CAT";
+
+    //**************************************************************************
     // Fields
     //**************************************************************************
 
@@ -137,7 +165,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
         try {
             rs = metadata.getSchemas();
             while(rs.next()) {
-                String schemaName = rs.getString("TABLE_SCHEMA");
+                String schemaName = rs.getString(TABLE_SCHEM);
                 if (includePattern != null) {
                     Matcher includeMatcher = includePattern.matcher(schemaName);
                     if (!includeMatcher.matches()) {
@@ -192,11 +220,10 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 schema.getQualifiedName());
         ResultSet rs = null;
         try {
-            String[] args = {"TABLE"};
-            rs = metadata.getTables(null, expectedSchemaName, null, args);
+            rs = metadata.getTables(null, expectedSchemaName, null, tableTypes);
             while(rs.next()) {
-                String schemaName = rs.getString("TABLE_SCHEM");
-                String tableName = rs.getString("TABLE_NAME");
+                String schemaName = rs.getString(TABLE_SCHEM);
+                String tableName = rs.getString(TABLE_NAME);
 
                 // sanity check
                 if (!expectedSchemaName.equals(schemaName)) {
@@ -248,14 +275,14 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
             rs = metadata.getColumns(null, expectedSchemaName,
                     expectedTableName, null);
             while(rs.next()) {
-                String schemaName = rs.getString("TABLE_SCHEM");
-                String tableName = rs.getString("TABLE_NAME");
-                String columnName = rs.getString("COLUMN_NAME");
-                String columnType = rs.getString("TYPE_NAME");
-                boolean nullable = (rs.getInt("NULLABLE") ==
+                String schemaName = rs.getString(TABLE_SCHEM);
+                String tableName = rs.getString(TABLE_NAME);
+                String columnName = rs.getString(COLUMN_NAME);
+                String columnType = rs.getString(TYPE_NAME);
+                boolean nullable = (rs.getInt(NULLABLE) ==
                         DatabaseMetaData.columnNullable);
-                int length = rs.getInt("COLUMN_SIZE");
-                int scale = rs.getInt("DECIMAL_DIGITS");
+                int length = rs.getInt(COLUMN_SIZE);
+                int scale = rs.getInt(DECIMAL_DIGITS);
 
                 // sanity check
                 if (!expectedSchemaName.equals(schemaName) ||
@@ -321,11 +348,11 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
             rs = metadata.getPrimaryKeys(null, expectedSchemaName,
                     expectedTableName);
             while(rs.next()) {
-                String schemaName = rs.getString("TABLE_SCHEM");
-                String tableName = rs.getString("TABLE_NAME");
-                String columnName = rs.getString("COLUMN_NAME");
-                short keySeq = rs.getShort("KEY_SEQ");
-                String pkName = rs.getString("PK_NAME");
+                String schemaName = rs.getString(TABLE_SCHEM);
+                String tableName = rs.getString(TABLE_NAME);
+                String columnName = rs.getString(COLUMN_NAME);
+                short keySeq = rs.getShort(KEY_SEQ);
+                String pkName = rs.getString(PK_NAME);
 
                 // sanity check
                 if (!expectedSchemaName.equals(schemaName) ||
@@ -438,20 +465,20 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
             rs = metadata.getImportedKeys(null, expectedSchemaName,
                     expectedTableName);
             while(rs.next()) {
-                String schemaName = rs.getString("FKTABLE_SCHEM");
-                String tableName = rs.getString("FKTABLE_NAME");
-                String columnName = rs.getString("FKCOLUMN_NAME");
+                String schemaName = rs.getString(FKTABLE_SCHEM);
+                String tableName = rs.getString(FKTABLE_NAME);
+                String columnName = rs.getString(FKCOLUMN_NAME);
 
                 String referencedDatabaseName = expectedDatabaseName;
-                String referencedSchemaName = rs.getString("PKTABLE_SCHEM");
-                String referencedTableName = rs.getString("PKTABLE_NAME");
-                String referencedColumnName = rs.getString("PKCOLUMN_NAME");
+                String referencedSchemaName = rs.getString(PKTABLE_SCHEM);
+                String referencedTableName = rs.getString(PKTABLE_NAME);
+                String referencedColumnName = rs.getString(PKCOLUMN_NAME);
 
-                short keySeq = rs.getShort("KEY_SEQ");
-                short updateRule = rs.getShort("UPDATE_RULE");
-                short deleteRule = rs.getShort("DELETE_RULE");
-                short deferrability = rs.getShort("DEFERRABILITY");
-                String fkName = rs.getString("FK_NAME");
+                short keySeq = rs.getShort(KEY_SEQ);
+                short updateRule = rs.getShort(UPDATE_RULE);
+                short deleteRule = rs.getShort(DELETE_RULE);
+                short deferrability = rs.getShort(DEFERRABILITY);
+                String fkName = rs.getString(FK_NAME);
 
                 // sanity check
                 if (!expectedSchemaName.equals(schemaName) ||
