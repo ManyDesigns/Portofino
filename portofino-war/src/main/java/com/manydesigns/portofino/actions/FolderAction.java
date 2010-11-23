@@ -31,21 +31,33 @@ package com.manydesigns.portofino.actions;
 
 import com.manydesigns.portofino.navigation.NavigationNode;
 
+import java.util.List;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class IndexAction extends PortofinoAction {
+public class FolderAction extends PortofinoAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public String redirectUrl;
 
     public String execute() {
-        NavigationNode navigationNode = navigation.getRootNodes().get(0);
-        redirectUrl = navigationNode.getUrl();
-
-        return SUCCESS;
+        NavigationNode navigationNode = navigation.getSelectedNavigationNode();
+        List<NavigationNode> childNodes;
+        if (navigationNode == null) { // TODO: generalizzare e togliere questo if
+            childNodes = navigation.getRootNodes();
+        } else {
+            childNodes = navigationNode.getChildNodes();
+        }
+        if (childNodes.isEmpty()) {
+            return null;
+        } else {
+            NavigationNode firstChild = childNodes.get(0);
+            redirectUrl = firstChild.getUrl();
+            return SUCCESS;
+        }
     }
 }

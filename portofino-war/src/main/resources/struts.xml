@@ -68,7 +68,14 @@
 
     <package name="portofino" extends="portofino-default" namespace="/">
         <action name="Index"
-                class="com.manydesigns.portofino.actions.IndexAction">
+                class="com.manydesigns.portofino.actions.FolderAction">
+            <result name="success" type="redirect">
+                <param name="location">${redirectUrl}</param>
+                <param name="prependServletContext">false</param>
+            </result>
+        </action>
+        <action name="**/Index"
+                class="com.manydesigns.portofino.actions.FolderAction">
             <result name="success" type="redirect">
                 <param name="location">${redirectUrl}</param>
                 <param name="prependServletContext">false</param>

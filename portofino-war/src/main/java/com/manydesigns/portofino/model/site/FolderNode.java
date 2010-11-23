@@ -28,10 +28,6 @@
  */
 package com.manydesigns.portofino.model.site;
 
-import com.manydesigns.portofino.model.Model;
-
-import java.text.MessageFormat;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -42,19 +38,6 @@ public class FolderNode extends SiteNode{
 
     public FolderNode(SiteNode parent) {
         super(parent);
-    }
-
-    @Override
-    public void init(Model model) {
-        super.init(model);
-        if (childNodes.size()>0){
-            actualUrl=childNodes.get(0).getActualUrl();
-        }
-        else if (url==null){
-            actualUrl = MessageFormat.format(urlFormat, actualId);
-        } else {
-            actualUrl = url;
-        }
     }
 
     protected String getUrlFormat() {
