@@ -54,8 +54,11 @@ public class JndiConnectionProvider extends AbstractConnectionProvider {
     // Constructors
     //**************************************************************************
 
-    public JndiConnectionProvider(String databaseName, String jndiResource) {
-        super(databaseName);
+    public JndiConnectionProvider(String databaseName,
+                                  String jndiResource,
+                                  String includeSchemas,
+                                  String excludeSchemas) {
+        super(databaseName, includeSchemas, excludeSchemas);
         this.jndiResource = jndiResource;
     }
 

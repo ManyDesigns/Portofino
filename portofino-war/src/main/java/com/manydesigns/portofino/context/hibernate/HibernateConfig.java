@@ -117,7 +117,7 @@ public class HibernateConfig {
                         mappings, aTable);
                 mappings.addClass(clazz);
                 mappings.addImport(clazz.getEntityName(),
-                        aTable.getTableName());
+                        clazz.getEntityName()); // TODO: prima era aTable.getTableName() - Verificare!!!!
                 mappings.addImport(clazz.getEntityName(),
                         clazz.getEntityName());
             }

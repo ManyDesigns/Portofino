@@ -106,7 +106,9 @@ public class ConnectionsParser extends XmlParser {
                     attributes.get("driver"),
                     attributes.get("url"),
                     attributes.get("username"),
-                    attributes.get("password")
+                    attributes.get("password"),
+                    attributes.get("includeSchemas"),
+                    attributes.get("excludeSchemas")
             );
             connections.add(connection);
 

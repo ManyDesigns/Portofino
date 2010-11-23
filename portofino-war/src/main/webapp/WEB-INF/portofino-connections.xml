@@ -1,5 +1,16 @@
 <connections>
     <connection
+            databaseName="mysql"
+            type="jdbc"
+            driver="com.mysql.jdbc.Driver"
+            url="jdbc:mysql://localhost/meta?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI"
+            username="manydesigns"
+            password="manydesigns"
+            includeSchemas="frogpress.*"
+            excludeSchemas=""
+            />
+    <!--
+    <connection
             databaseName="jpetstore"
             type="jdbc"
             driver="org.postgresql.Driver"
@@ -29,4 +40,5 @@
             includeSchemas=".*"
             excludeSchemas=""
             />
+            -->
 </connections>

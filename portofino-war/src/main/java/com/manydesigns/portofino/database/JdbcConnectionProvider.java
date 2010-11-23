@@ -64,8 +64,10 @@ public class JdbcConnectionProvider extends AbstractConnectionProvider {
                                   String driverClass,
                                   String connectionURL,
                                   String username,
-                                  String password) {
-        super(databaseName);
+                                  String password,
+                                  String includeSchemas,
+                                  String excludeSchemas) {
+        super(databaseName, includeSchemas, excludeSchemas);
         this.driverClass = driverClass;
         this.connectionURL = connectionURL;
         this.username = username;

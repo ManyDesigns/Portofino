@@ -35,6 +35,7 @@ import com.manydesigns.portofino.model.datamodel.Database;
 
 import java.sql.Connection;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -74,6 +75,12 @@ public interface ConnectionProvider {
 
     public DatabasePlatform getDatabasePlatform();
     public void test();
+
+    public String getIncludeSchemas();
+    public String getExcludeSchemas();
+    public Pattern getIncludeSchemasPattern();
+    public Pattern getExcludeSchemasPattern();
+
     public Connection acquireConnection() throws Exception;
     public void releaseConnection(Connection conn);
 

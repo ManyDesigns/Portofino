@@ -170,7 +170,7 @@ public class Navigation implements XhtmlFragment {
                 xb.addAttribute("class", "path");
                 expand = current.getChildNodes();
             }
-            xb.writeAnchor(nodeUrl, current.getTitle());
+            xb.writeAnchor(nodeUrl, current.getTitle(), null, current.getDescription());
             xb.closeElement("li");
         }
         xb.closeElement("ul");

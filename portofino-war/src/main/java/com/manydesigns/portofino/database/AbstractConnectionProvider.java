@@ -43,6 +43,7 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -59,6 +60,14 @@ public abstract class AbstractConnectionProvider implements ConnectionProvider {
     //**************************************************************************
 
     protected final String databaseName;
+    protected final String includeSchemas;
+    protected final String excludeSchemas;
+
+    protected final Pattern includeSchemasPattern;
+    protected final Pattern excludeSchemasPattern;
+
+    protected final List<Type> types;
+
     protected String databaseProductName;
     protected String databaseProductVersion;
     protected Integer databaseMajorVersion;
@@ -72,7 +81,6 @@ public abstract class AbstractConnectionProvider implements ConnectionProvider {
     protected Integer JDBCMajorVersion;
     protected Integer JDBCMinorVersion;
     protected String JDBCMajorMinorVersion;
-    protected Type[] types;
     protected DatabasePlatform databasePlatform;
     protected String status;
     protected String errorMessage;
@@ -92,8 +100,27 @@ public abstract class AbstractConnectionProvider implements ConnectionProvider {
     // Constructors
     //**************************************************************************
 
-    public AbstractConnectionProvider(String databaseName) {
+    public AbstractConnectionProvider(String databaseName,
+                                      String includeSchemas,
+                                      String excludeSchemas) {
         this.databaseName = databaseName;
+        this.includeSchemas = includeSchemas;
+        this.excludeSchemas = excludeSchemas;
+
+        types = new ArrayList<Type>();
+
+        if (includeSchemas == null) {
+            includeSchemasPattern = null;
+        } else {
+            includeSchemasPattern = Pattern.compile(includeSchemas);
+        }
+
+        if (excludeSchemas == null) {
+            excludeSchemasPattern = null;
+        } else {
+            excludeSchemasPattern = Pattern.compile(excludeSchemas);
+        }
+
         status = STATUS_DISCONNECTED;
         errorMessage = null;
         lastTested = null;
@@ -163,14 +190,12 @@ public abstract class AbstractConnectionProvider implements ConnectionProvider {
             }
 
             // extract supported types
-            List<Type> typeList = new ArrayList<Type>();
+            types.clear();
             typeRs = metadata.getTypeInfo();
             while (typeRs.next()) {
-                readType(typeRs, typeList);
+                readType(typeRs);
             }
-            types = new Type[typeList.size()];
-            typeList.toArray(types);
-            Arrays.sort(types, new TypeComparator());
+            Collections.sort(types, new TypeComparator());
 
             DatabasePlatformsManager manager =
                     DatabasePlatformsManager.getManager();
@@ -198,7 +223,7 @@ public abstract class AbstractConnectionProvider implements ConnectionProvider {
         }
     }
 
-    protected void readType(ResultSet typeRs, List<Type> typeList)
+    protected void readType(ResultSet typeRs)
             throws SQLException {
         String typeName = typeRs.getString("TYPE_NAME");
         int dataType = typeRs.getInt("DATA_TYPE");
@@ -219,7 +244,23 @@ public abstract class AbstractConnectionProvider implements ConnectionProvider {
         Type type = new Type(typeName, dataType, maximumPrecision,
                 literalPrefix, literalSuffix, nullable, caseSensitive,
                 searchable, autoincrement, minimumScale, maximumScale);
-        typeList.add(type);
+        types.add(type);
+    }
+
+    public String getIncludeSchemas() {
+        return includeSchemas;
+    }
+
+    public String getExcludeSchemas() {
+        return excludeSchemas;
+    }
+
+    public Pattern getIncludeSchemasPattern() {
+        return includeSchemasPattern;
+    }
+
+    public Pattern getExcludeSchemasPattern() {
+        return excludeSchemasPattern;
     }
 
     public String getDatabaseProductName() {
@@ -278,21 +319,17 @@ public abstract class AbstractConnectionProvider implements ConnectionProvider {
     }
 
     public Type[] getTypes() {
-        if (types == null) {
-            return null;
-        }
-        return types.clone();
+        Type[] result = new Type[types.size()];
+        return types.toArray(result);
     }
 
     public Type getTypeByName(String typeName) {
-        if (types == null) {
-            return null;
-        }
         for (Type current : types) {
             if (current.getTypeName().equalsIgnoreCase(typeName)) {
                 return current;
             }
         }
+        LogUtil.severeMF(logger, "Could not find type: {0}", typeName);
         return null;
     }
 

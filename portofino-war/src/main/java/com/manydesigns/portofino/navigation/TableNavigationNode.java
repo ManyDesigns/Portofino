@@ -29,11 +29,11 @@
 
 package com.manydesigns.portofino.navigation;
 
+import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.site.SiteNode;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 /*
@@ -67,14 +67,9 @@ public class TableNavigationNode implements NavigationNode {
                                String descriptionFormat) {
         this.siteNode = siteNode;
         this.table = table;
-        this.url =
-                Util.getAbsoluteUrl(
-                        MessageFormat.format(
-                                urlFormat, table.getQualifiedName()));
-        this.title = MessageFormat.format(
-                titleFormat, table.getQualifiedName());
-        this.description = MessageFormat.format(
-                descriptionFormat, table.getQualifiedName());
+        this.url = Util.getAbsoluteUrl(OgnlTextFormat.format(urlFormat, table));
+        this.title = OgnlTextFormat.format(titleFormat, table);
+        this.description = OgnlTextFormat.format(descriptionFormat, table);
     }
 
 

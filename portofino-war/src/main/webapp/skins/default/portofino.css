@@ -42,6 +42,11 @@ Body and content layout
     border: 3px solid #65a7db;
 }
 
+.yui-t3 #yui-main div#content {
+    margin-left: 23.0769em;
+    border: 3px solid #65a7db;
+}
+
 div#inner-content {
     padding: 0 1em;
 }

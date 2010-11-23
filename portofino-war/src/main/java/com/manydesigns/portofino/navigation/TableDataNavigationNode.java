@@ -66,11 +66,13 @@ public class TableDataNavigationNode implements NavigationNode {
 
         List<Table> tables = context.getModel().getAllTables();
         for (Table table : tables) {
+            String urlFormat = siteNode.getParent().getActualId() +
+                    "/%{qualifiedName}/TableData.action";
             TableNavigationNode node =
                     new TableNavigationNode(siteNode,table,
-                            siteNode.getParent().getActualId()+"/{0}/TableData.action",
-                            "{0}",
-                            "Table data: {0}");
+                            urlFormat,
+                            "%{tableName}",
+                            "Table data: %{qualifiedName}");
             childNodes.add(node);
         }
         url = Util.getAbsoluteUrl(siteNode.getActualUrl());

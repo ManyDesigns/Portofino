@@ -119,20 +119,21 @@ public class Type {
                 return Short.class;
             case Types.TINYINT:
                 return Byte.class;
-            case Types.ARRAY:
             case Types.BINARY:
             case Types.BLOB:
             case Types.CLOB:
+            case Types.LONGVARBINARY:
+            case Types.LONGVARCHAR:
+            case Types.VARBINARY:
+                return byte[].class;
+            case Types.ARRAY:
             case Types.DATALINK:
             case Types.DISTINCT:
             case Types.JAVA_OBJECT:
-            case Types.LONGVARBINARY:
-            case Types.LONGVARCHAR:
             case Types.NULL:
             case Types.OTHER:
             case Types.REF:
             case Types.STRUCT:
-            case Types.VARBINARY:
             default:
                 throw new Error("Unsupported type: " + jdbcType);
         }
@@ -172,5 +173,22 @@ public class Type {
 
     public short getMaximumScale() {
         return maximumScale;
+    }
+
+    @Override
+    public String toString() {
+        return "Type{" +
+                "typeName='" + typeName + '\'' +
+                ", jdbcType=" + jdbcType +
+                ", autoincrement=" + autoincrement +
+                ", maximumPrecision=" + maximumPrecision +
+                ", literalPrefix='" + literalPrefix + '\'' +
+                ", literalSuffix='" + literalSuffix + '\'' +
+                ", nullable=" + nullable +
+                ", caseSensitive=" + caseSensitive +
+                ", searchable=" + searchable +
+                ", minimumScale=" + minimumScale +
+                ", maximumScale=" + maximumScale +
+                '}';
     }
 }

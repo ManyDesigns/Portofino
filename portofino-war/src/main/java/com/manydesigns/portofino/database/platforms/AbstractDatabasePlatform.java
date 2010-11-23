@@ -43,6 +43,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -103,11 +105,11 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
         try {
             conn = connectionProvider.acquireConnection();
             DatabaseMetaData metadata = conn.getMetaData();
-            readSchemas(metadata, database);
-            readTables(metadata, database);
-            readColumns(connectionProvider, metadata, database);
-            readPKs(metadata, database);
-            readFKs(metadata, database);
+            readSchemas(conn, connectionProvider, metadata, database);
+            readTables(conn, connectionProvider, metadata, database);
+            readColumns(conn, connectionProvider, metadata, database);
+            readPKs(conn, connectionProvider, metadata, database);
+            readFKs(conn, connectionProvider, metadata, database);
         } catch (Throwable e) {
             LogUtil.severeMF(logger, "Could not read model from {0}",
                     e, connectionProvider.getDatabaseName());
@@ -124,16 +126,40 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     // Read schemas
     //**************************************************************************
 
-    protected void readSchemas(DatabaseMetaData metadata, Database database)
+    protected void readSchemas(Connection conn,
+                               ConnectionProvider connectionProvider,
+                               DatabaseMetaData metadata, Database database)
             throws SQLException {
         logger.fine("Searching for schemas...");
         ResultSet rs = null;
+        Pattern includePattern = connectionProvider.getIncludeSchemasPattern();
+        Pattern excludePattern = connectionProvider.getExcludeSchemasPattern();
         try {
             rs = metadata.getSchemas();
             while(rs.next()) {
-                String schemaName = rs.getString("TABLE_SCHEM");
+                String schemaName = rs.getString("TABLE_SCHEMA");
+                if (includePattern != null) {
+                    Matcher includeMatcher = includePattern.matcher(schemaName);
+                    if (!includeMatcher.matches()) {
+                        LogUtil.infoMF(logger,
+                                "Schema ''{0}'' does not match include pattern ''{1}''. Skipping this schema.",
+                                schemaName,
+                                connectionProvider.getIncludeSchemas());
+                        continue;
+                    }
+                }
+                if (excludePattern != null) {
+                    Matcher excludeMatcher = excludePattern.matcher(schemaName);
+                    if (excludeMatcher.matches()) {
+                        LogUtil.infoMF(logger,
+                                "Schema ''{0}'' matches exclude pattern ''{1}''. Skipping this schema.",
+                                schemaName,
+                                connectionProvider.getExcludeSchemas());
+                        continue;
+                    }
+                }
                 Schema schema = new Schema(database, schemaName);
-                LogUtil.fineMF(logger, "Found schema: {0}",
+                LogUtil.infoMF(logger, "Found schema: {0}",
                         schema.getQualifiedName());
                 database.getSchemas().add(schema);
             }
@@ -147,14 +173,18 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     // Read tables
     //**************************************************************************
 
-    protected void readTables(DatabaseMetaData metadata, Database database)
+    protected void readTables(Connection conn,
+                              ConnectionProvider connectionProvider,
+                              DatabaseMetaData metadata, Database database)
             throws SQLException {
         for (Schema schema : database.getSchemas()) {
-            readTables(metadata, schema);
+            readTables(conn, connectionProvider, metadata, schema);
         }
     }
 
-    protected void readTables(DatabaseMetaData metadata, Schema schema)
+    protected void readTables(Connection conn,
+                              ConnectionProvider connectionProvider,
+                              DatabaseMetaData metadata, Schema schema)
             throws SQLException {
         String expectedDatabaseName = schema.getDatabaseName();
         String expectedSchemaName = schema.getSchemaName();
@@ -195,15 +225,17 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     // Read columns
     //**************************************************************************
 
-    protected void readColumns(ConnectionProvider connectionProvider,
+    protected void readColumns(Connection conn,
+                               ConnectionProvider connectionProvider,
                                DatabaseMetaData metadata, Database database)
             throws SQLException {
         for (Table table : database.getAllTables()) {
-            readColumns(connectionProvider, metadata, table);
+            readColumns(conn, connectionProvider, metadata, table);
         }
     }
 
-    protected void readColumns(ConnectionProvider connectionProvider,
+    protected void readColumns(Connection conn,
+                               ConnectionProvider connectionProvider,
                                DatabaseMetaData metadata, Table table)
             throws SQLException {
         String expectedDatabaseName = table.getDatabaseName();
@@ -263,14 +295,18 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     // Read Primary keys
     //**************************************************************************
 
-    protected void readPKs(DatabaseMetaData metadata, Database database)
+    protected void readPKs(Connection conn,
+                           ConnectionProvider connectionProvider,
+                           DatabaseMetaData metadata, Database database)
             throws SQLException {
         for (Table table : database.getAllTables()) {
-            readPKs(metadata, table);
+            readPKs(conn, connectionProvider, metadata, table);
         }
     }
 
-    protected void readPKs(DatabaseMetaData metadata, Table table)
+    protected void readPKs(Connection conn,
+                           ConnectionProvider connectionProvider,
+                           DatabaseMetaData metadata, Table table)
             throws SQLException {
         String expectedDatabaseName = table.getDatabaseName();
         String expectedSchemaName = table.getSchemaName();
@@ -377,14 +413,18 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     // Read foreign keys
     //**************************************************************************
 
-    protected void readFKs(DatabaseMetaData metadata, Database database)
+    protected void readFKs(Connection conn,
+                           ConnectionProvider connectionProvider,
+                           DatabaseMetaData metadata, Database database)
             throws SQLException {
         for (Table table : database.getAllTables()) {
-            readFKs(metadata, table);
+            readFKs(conn, connectionProvider, metadata, table);
         }
     }
 
-    protected void readFKs(DatabaseMetaData metadata,
+    protected void readFKs(Connection conn,
+                           ConnectionProvider connectionProvider,
+                           DatabaseMetaData metadata,
                            Table table) throws SQLException {
         String expectedDatabaseName = table.getDatabaseName();
         String expectedSchemaName = table.getSchemaName();

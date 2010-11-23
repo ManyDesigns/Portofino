@@ -8,7 +8,7 @@ YAHOO.example.fixSideBar = function() {
     var mainContainer = YAHOO.util.Dom.get('content');
     var sideBar = YAHOO.util.Dom.get('sidebar');
     if (mainContainer && sideBar && mainContainer.offsetHeight < sideBar.offsetHeight) {
-        YAHOO.util.Dom.setStyle(mainContainer, 'height', sideBar.offsetHeight + 'px');
+        YAHOO.util.Dom.setStyle(mainContainer, 'min-height', sideBar.offsetHeight + 'px');
     }
     ;
 };
