@@ -30,14 +30,11 @@
 package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.actions.user.LoginUnAware;
 import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.navigation.Navigation;
-import com.manydesigns.portofino.navigation.NavigationNode;
 import com.manydesigns.portofino.servlets.PortofinoListener;
-import com.manydesigns.portofino.system.model.users.Group;
-import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
@@ -46,8 +43,6 @@ import org.apache.struts2.StrutsStatics;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -86,6 +81,42 @@ public class PortofinoInterceptor implements Interceptor {
         }
 
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
+
+        String requestUrl = Util.getAbsoluteUrl(req.getServletPath());
+        Navigation navigation = new Navigation(context, requestUrl);
+        req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
+
+        if (action instanceof ContextAware) {
+            ((ContextAware)action).setContext(context);
+        }
+
+        if (action instanceof NavigationAware) {
+            ((NavigationAware)action).setNavigation(navigation);
+        }
+
+        String result;
+        try {
+            context.resetDbTimer();
+            context.openSession();
+
+            boolean userEnabled = Boolean.parseBoolean(
+                    PortofinoProperties.getProperties()
+                    .getProperty("user.enabled", "false"));
+            if (userEnabled &&
+                    context.getCurrentUser()==null
+                    && !(invocation.getAction() instanceof LoginUnAware)) {
+                return LOGIN_ACTION;
+            }
+            result = invocation.invoke();
+
+        } finally {
+            context.closeSession();
+        }
+
+        stopWatch.stop();
+
+        return result;
+        /*
         try {
             context.resetDbTimer();
             context.openSession();
@@ -136,7 +167,7 @@ public class PortofinoInterceptor implements Interceptor {
 
         } finally {
             context.closeSession();
-        }
+        }*/
 
     }
 }
