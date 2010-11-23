@@ -24,5 +24,29 @@
       <destName>portofino-war-${project.version}.war</destName>
       <fileMode>0644</fileMode>
     </file>
+    <file>
+      <source>portofino-war/src/main/resources/databases/portofino4.sql</source>
+      <outputDirectory>sql</outputDirectory>
+      <destName>portofino4-postgres.sql</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-war/src/main/resources/databases/hibernatetest.sql</source>
+      <outputDirectory>sql</outputDirectory>
+      <destName>hibernatetest-postgres.sql</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-war/src/main/resources/databases/jpetstore/postgresql/jpetstore-postgres-schema.sql</source>
+      <outputDirectory>sql</outputDirectory>
+      <destName>jpetstore-postgres-schema.sql</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-war/src/main/resources/databases/jpetstore/postgresql/jpetstore-postgres-dataload.sql</source>
+      <outputDirectory>sql</outputDirectory>
+      <destName>jpetstore-postgres-dataload.sql</destName>
+      <fileMode>0644</fileMode>
+    </file>
   </files>
 </assembly>

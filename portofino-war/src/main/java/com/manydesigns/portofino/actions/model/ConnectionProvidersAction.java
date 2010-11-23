@@ -118,6 +118,7 @@ public class ConnectionProvidersAction extends PortofinoAction {
             form = new FormBuilder(JdbcConnectionProvider.class)
                     .configFields("databaseName", "driverClass",
                             "connectionURL", "username", "password",
+                            "includeSchemas", "excludeSchemas",
                             "status", "errorMessage", "lastTested")
                     .configMode(Mode.VIEW)
                     .build();

@@ -3,7 +3,7 @@
             databaseName="mysql"
             type="jdbc"
             driver="com.mysql.jdbc.Driver"
-            url="jdbc:mysql://192.168.1.2/meta?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI"
+            url="jdbc:mysql://192.168.1.2/meta"
             username="manydesigns"
             password="manydesigns"
             includeSchemas="frogpress.*"
@@ -17,7 +17,7 @@
             url="jdbc:postgresql://127.0.0.1:5432/jpetstore"
             username="manydesigns"
             password="manydesigns"
-            includeSchemas=".*"
+            includeSchemas="public"
             excludeSchemas=""
             />
     <connection
@@ -27,7 +27,7 @@
             url="jdbc:postgresql://127.0.0.1:5432/hibernatetest"
             username="manydesigns"
             password="manydesigns"
-            includeSchemas=".*"
+            includeSchemas="public"
             excludeSchemas=""
             />
     <connection
@@ -37,7 +37,7 @@
             url="jdbc:postgresql://127.0.0.1:5432/portofino4"
             username="manydesigns"
             password="manydesigns"
-            includeSchemas=".*"
+            includeSchemas="public"
             excludeSchemas=""
             />
             -->

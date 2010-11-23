@@ -94,7 +94,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
         try {
             rs = metadata.getCatalogs();
             while(rs.next()) {
-                String schemaName = rs.getString("TABLE_CAT");
+                String schemaName = rs.getString(TABLE_CAT);
                 if (includePattern != null) {
                     Matcher includeMatcher = includePattern.matcher(schemaName);
                     if (!includeMatcher.matches()) {
@@ -140,11 +140,10 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                 schema.getQualifiedName());
         ResultSet rs = null;
         try {
-            String[] args = {"TABLE"};
-            rs = metadata.getTables(expectedSchemaName, null, null, args);
+            rs = metadata.getTables(expectedSchemaName, null, null, tableTypes);
             while(rs.next()) {
-                String schemaName = rs.getString("TABLE_CAT");
-                String tableName = rs.getString("TABLE_NAME");
+                String schemaName = rs.getString(TABLE_CAT);
+                String tableName = rs.getString(TABLE_NAME);
 
                 // sanity check
                 if (!expectedSchemaName.equals(schemaName)) {
@@ -240,11 +239,11 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
             rs = metadata.getPrimaryKeys(expectedSchemaName, null,
                     expectedTableName);
             while(rs.next()) {
-                String schemaName = rs.getString("TABLE_CAT");
-                String tableName = rs.getString("TABLE_NAME");
-                String columnName = rs.getString("COLUMN_NAME");
-                short keySeq = rs.getShort("KEY_SEQ");
-                String pkName = rs.getString("PK_NAME");
+                String schemaName = rs.getString(TABLE_CAT);
+                String tableName = rs.getString(TABLE_NAME);
+                String columnName = rs.getString(COLUMN_NAME);
+                short keySeq = rs.getShort(KEY_SEQ);
+                String pkName = rs.getString(PK_NAME);
 
                 // sanity check
                 if (!expectedSchemaName.equals(schemaName) ||
@@ -349,20 +348,20 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
             rs = metadata.getImportedKeys(expectedSchemaName, null,
                     expectedTableName);
             while(rs.next()) {
-                String schemaName = rs.getString("FKTABLE_CAT");
-                String tableName = rs.getString("FKTABLE_NAME");
-                String columnName = rs.getString("FKCOLUMN_NAME");
+                String schemaName = rs.getString(FKTABLE_CAT);
+                String tableName = rs.getString(FKTABLE_NAME);
+                String columnName = rs.getString(FKCOLUMN_NAME);
 
                 String referencedDatabaseName = expectedDatabaseName;
-                String referencedSchemaName = rs.getString("PKTABLE_CAT");
-                String referencedTableName = rs.getString("PKTABLE_NAME");
-                String referencedColumnName = rs.getString("PKCOLUMN_NAME");
+                String referencedSchemaName = rs.getString(PKTABLE_CAT);
+                String referencedTableName = rs.getString(PKTABLE_NAME);
+                String referencedColumnName = rs.getString(PKCOLUMN_NAME);
 
-                short keySeq = rs.getShort("KEY_SEQ");
-                short updateRule = rs.getShort("UPDATE_RULE");
-                short deleteRule = rs.getShort("DELETE_RULE");
-                short deferrability = rs.getShort("DEFERRABILITY");
-                String fkName = rs.getString("FK_NAME");
+                short keySeq = rs.getShort(KEY_SEQ);
+                short updateRule = rs.getShort(UPDATE_RULE);
+                short deleteRule = rs.getShort(DELETE_RULE);
+                short deferrability = rs.getShort(DEFERRABILITY);
+                String fkName = rs.getString(FK_NAME);
 
                 // sanity check
                 if (!expectedSchemaName.equals(schemaName) ||
