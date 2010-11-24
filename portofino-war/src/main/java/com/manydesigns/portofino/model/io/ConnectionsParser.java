@@ -34,7 +34,6 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.xml.DocumentCallback;
-import com.manydesigns.portofino.xml.ElementCallback;
 import com.manydesigns.portofino.xml.XmlParser;
 
 import javax.xml.stream.XMLStreamException;
@@ -85,18 +84,26 @@ public class ConnectionsParser extends XmlParser {
 
     private class ConnectionsDocumentCallback implements DocumentCallback {
         public void doDocument() throws XMLStreamException {
-            expectElement(CONNECTIONS, 1, 1, new ConnectionsCallback());
+            expectElement(new ConnectionsCallback());
         }
     }
 
-    private class ConnectionsCallback implements ElementCallback {
+    private class ConnectionsCallback extends ElementCallback {
+        private ConnectionsCallback() {
+            super(CONNECTIONS, 1, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(CONNECTION, 1, null, new ConnectionCallback());
+            expectElement(new ConnectionCallback());
         }
     }
 
-    private class ConnectionCallback implements ElementCallback {
+    private class ConnectionCallback extends ElementCallback {
+        private ConnectionCallback() {
+            super(CONNECTION, 1, -1);
+        }
+
         public void doElement(Map<String, String> attributes) {
             checkRequiredAttributes(attributes,
                     "databaseName", "url", "driver", "username", "password");

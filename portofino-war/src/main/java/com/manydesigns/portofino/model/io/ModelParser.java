@@ -13,7 +13,6 @@ import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.model.site.usecases.UseCaseProperty;
 import com.manydesigns.portofino.xml.CharactersCallback;
 import com.manydesigns.portofino.xml.DocumentCallback;
-import com.manydesigns.portofino.xml.ElementCallback;
 import com.manydesigns.portofino.xml.XmlParser;
 
 import javax.xml.stream.XMLStreamException;
@@ -141,15 +140,21 @@ public class ModelParser extends XmlParser {
 
     private class ModelDocumentCallback implements DocumentCallback {
         public void doDocument() throws XMLStreamException {
-            expectElement(MODEL, 1, 1, new ModelCallback());
+            expectElement(new ModelCallback());
         }
     }
 
-    private class ModelCallback implements ElementCallback {
+    private class ModelCallback extends ElementCallback {
+        private ModelCallback() {
+            super(null, Model.class, MODEL, 1, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(DATABASES, 0, 1, new DatabasesCallback());
-            expectElement(ROOTNODE, 0, 1, new RootNodeCallback());
+
+
+            expectElement(new DatabasesCallback(obj));
+            expectElement(new RootNodeCallback());
         }
     }
 
@@ -157,72 +162,104 @@ public class ModelParser extends XmlParser {
     // datamodel/databases
     //**************************************************************************
 
-    private class DatabasesCallback implements ElementCallback {
+    private class DatabasesCallback extends ElementCallback {
+        private DatabasesCallback(Object parent) {
+            super(parent, DATABASES, 0, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(DATABASE, 1, null, new DatabaseCallback());
+            expectElement(new DatabaseCallback());
         }
     }
 
-    private class DatabaseCallback implements ElementCallback {
+    private class DatabaseCallback extends ElementCallback {
+        private DatabaseCallback() {
+            super(Database.class, DATABASE, 1, -1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             currentDatabase = new Database();
             checkAndSetAttributes(currentDatabase, attributes);
             model.getDatabases().add(currentDatabase);
-            expectElement(SCHEMAS, 1, 1, new SchemasCallback());
+            expectElement(new SchemasCallback());
 
         }
     }
 
-    private class SchemasCallback implements ElementCallback {
+    private class SchemasCallback extends ElementCallback {
+        private SchemasCallback() {
+            super(SCHEMAS, 1, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(SCHEMA, 0, null, new SchemaCallback());
+            expectElement(new SchemaCallback());
         }
     }
 
-    private class SchemaCallback implements ElementCallback {
+    private class SchemaCallback extends ElementCallback {
+        private SchemaCallback() {
+            super(SCHEMA, 0, -1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             currentSchema = new Schema(currentDatabase);
             checkAndSetAttributes(currentSchema, attributes);
             currentDatabase.getSchemas().add(currentSchema);
-            expectElement(TABLES, 0, 1, new TablesCallback());
+            expectElement(new TablesCallback());
         }
     }
 
-    private class TablesCallback implements ElementCallback {
+    private class TablesCallback extends ElementCallback {
+        private TablesCallback() {
+            super(TABLES, 0, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(TABLE, 0, null, new TableCallback());
+            expectElement(new TableCallback());
         }
     }
 
-    private class TableCallback implements ElementCallback {
+    private class TableCallback extends ElementCallback {
+        private TableCallback() {
+            super(TABLE, 0, -1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             currentTable = new Table(currentSchema);
             checkAndSetAttributes(currentTable, attributes);
             currentSchema.getTables().add(currentTable);
 
-            expectElement(COLUMNS, 1, 1, new ColumnsCallback());
-            expectElement(PRIMARYKEY, 0, 1, new PrimaryKeyCallback());
-            expectElement(FOREIGNKEYS, 0, 1, new ForeignKeysCallback());
+            expectElement(new ColumnsCallback());
+            expectElement(new PrimaryKeyCallback());
+            expectElement(new ForeignKeysCallback());
 
             currentModelAnnotations = currentTable.getModelAnnotations();
-            expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
+            expectElement(new AnnotationsCallback());
         }
     }
 
-    private class ColumnsCallback implements ElementCallback {
+    private class ColumnsCallback extends ElementCallback {
+        private ColumnsCallback() {
+            super(COLUMNS, 1, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(COLUMN, 1, null, new ColumnCallback());
+            expectElement(new ColumnCallback());
         }
     }
 
-    private class ColumnCallback implements ElementCallback {
+    private class ColumnCallback extends ElementCallback {
+        private ColumnCallback() {
+            super(COLUMN, 1, -1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             currentColumn = new Column(currentTable);
@@ -230,22 +267,30 @@ public class ModelParser extends XmlParser {
             currentTable.getColumns().add(currentColumn);
 
             currentModelAnnotations = currentColumn.getModelAnnotations();
-            expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
+            expectElement(new AnnotationsCallback());
         }
     }
 
-    private class PrimaryKeyCallback implements ElementCallback {
+    private class PrimaryKeyCallback extends ElementCallback {
+        private PrimaryKeyCallback() {
+            super(PRIMARYKEY, 0, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             currentPk = new PrimaryKey(currentTable);
             checkAndSetAttributes(currentPk, attributes);
             currentTable.setPrimaryKey(currentPk);
 
-            expectElement(PRIMARYKEYCOLUMN, 1, null, new PrimaryKeyColumnCallback());
+            expectElement(new PrimaryKeyColumnCallback());
         }
     }
 
-    private class PrimaryKeyColumnCallback implements ElementCallback {
+    private class PrimaryKeyColumnCallback extends ElementCallback {
+        private PrimaryKeyColumnCallback() {
+            super(PRIMARYKEYCOLUMN, 1, -1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             PrimaryKeyColumn pkColumn = new PrimaryKeyColumn(currentPk);
@@ -254,35 +299,51 @@ public class ModelParser extends XmlParser {
         }
     }
 
-    private class ForeignKeysCallback implements ElementCallback {
+    private class ForeignKeysCallback extends ElementCallback {
+        private ForeignKeysCallback() {
+            super(FOREIGNKEYS, 0, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(FOREIGNKEY, 1, null, new ForeignKeyCallback());
+            expectElement(new ForeignKeyCallback());
         }
     }
 
-    private class ForeignKeyCallback implements ElementCallback {
+    private class ForeignKeyCallback extends ElementCallback {
+        private ForeignKeyCallback() {
+            super(FOREIGNKEY, 1, -1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             currentFk = new ForeignKey(currentTable);
             checkAndSetAttributes(currentFk, attributes);
             currentTable.getForeignKeys().add(currentFk);
 
-            expectElement(REFERENCES, 1, 1, new ReferencesCallback());
+            expectElement(new ReferencesCallback());
 
             currentModelAnnotations = currentFk.getModelAnnotations();
-            expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
+            expectElement(new AnnotationsCallback());
         }
     }
 
-    private class ReferencesCallback implements ElementCallback {
+    private class ReferencesCallback extends ElementCallback {
+        private ReferencesCallback() {
+            super(REFERENCES, 1, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(REFERENCE, 1, null, new ReferenceCallback());
+            expectElement(new ReferenceCallback());
         }
     }
 
-    private class ReferenceCallback implements ElementCallback {
+    private class ReferenceCallback extends ElementCallback {
+        private ReferenceCallback() {
+            super(REFERENCE, 1, -1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             Reference reference = new Reference(currentFk);
@@ -295,23 +356,26 @@ public class ModelParser extends XmlParser {
     // Site nodes
     //**************************************************************************
 
-    private class RootNodeCallback implements ElementCallback {
+    private class RootNodeCallback extends ElementCallback {
+        private RootNodeCallback() {
+            super(ROOTNODE, 0, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             RootNode root = new RootNode();
             model.setRoot(root);
             checkAndSetAttributes(root, attributes);
-            expectElement(CHILDNODES, 0, 1,
-                    new ChildNodesCallback(root));
-            expectElement(PERMISSIONS, 0, 1,
-                    new PermissionsCallback(root));
+            expectElement(new ChildNodesCallback(root));
+            expectElement(new PermissionsCallback(root));
         }
     }
 
-    private class ChildNodesCallback implements ElementCallback {
+    private class ChildNodesCallback extends ElementCallback {
         private final SiteNode parent;
 
         private ChildNodesCallback(SiteNode parent) {
+            super(CHILDNODES, 0, 1);
             this.parent = parent;
         }
 
@@ -328,10 +392,11 @@ public class ModelParser extends XmlParser {
         }
     }
 
-    private class FolderCallback implements ElementCallback {
+    private class FolderCallback extends ElementCallback {
         SiteNode parentNode;
 
         private FolderCallback(SiteNode parent) {
+            super(FOLDERNODE, 0, -1);
             this.parentNode = parent;
         }
 
@@ -340,17 +405,16 @@ public class ModelParser extends XmlParser {
             FolderNode node = new FolderNode(parentNode);
             checkAndSetAttributes(node, attributes);
             parentNode.getChildNodes().add(node);
-            expectElement(CHILDNODES, 0, 1,
-                    new ChildNodesCallback(node));
-            expectElement(PERMISSIONS, 0, 1,
-                    new PermissionsCallback(node));
+            expectElement(new ChildNodesCallback(node));
+            expectElement(new PermissionsCallback(node));
         }
     }
 
-    private class DocumentNodeCallback implements ElementCallback {
+    private class DocumentNodeCallback extends ElementCallback {
         SiteNode parentNode;
 
         private DocumentNodeCallback(SiteNode parent) {
+            super(DOCUMENTNODE, 0, -1);
             this.parentNode = parent;
         }
 
@@ -359,15 +423,15 @@ public class ModelParser extends XmlParser {
             DocumentNode node = new DocumentNode(parentNode);
             checkAndSetAttributes(node, attributes);
             parentNode.getChildNodes().add(node);
-            expectElement(PERMISSIONS, 0, 1,
-                    new PermissionsCallback(node));
+            expectElement(new PermissionsCallback(node));
         }
     }
 
-    private class CustomNodeCallback implements ElementCallback {
+    private class CustomNodeCallback extends ElementCallback {
         SiteNode parentNode;
 
         private CustomNodeCallback(SiteNode parent) {
+            super(CUSTOMNODE, 0, -1);
             this.parentNode = parent;
         }
 
@@ -376,15 +440,15 @@ public class ModelParser extends XmlParser {
             CustomNode node = new CustomNode(parentNode);
             checkAndSetAttributes(node, attributes);
             parentNode.getChildNodes().add(node);
-            expectElement(PERMISSIONS, 0, 1,
-                    new PermissionsCallback(node));
+            expectElement(new PermissionsCallback(node));
         }
     }
 
-    private class CustomFolderCallback implements ElementCallback {
+    private class CustomFolderCallback extends ElementCallback {
         SiteNode parentNode;
 
         private CustomFolderCallback(SiteNode parent) {
+            super(CUSTOMFOLDERNODE, 0, -1);
             this.parentNode = parent;
         }
 
@@ -393,15 +457,15 @@ public class ModelParser extends XmlParser {
             CustomFolderNode node = new CustomFolderNode(parentNode);
             checkAndSetAttributes(node, attributes);
             parentNode.getChildNodes().add(node);
-            expectElement(PERMISSIONS, 0, 1,
-                    new PermissionsCallback(node));
+            expectElement(new PermissionsCallback(node));
         }
     }
 
-    private class PortletCallback implements ElementCallback {
+    private class PortletCallback extends ElementCallback {
         SiteNode parentNode;
 
         private PortletCallback(SiteNode parent) {
+            super(PORTLETNODE, 0, -1);
             this.parentNode = parent;
         }
 
@@ -410,15 +474,15 @@ public class ModelParser extends XmlParser {
             PortletNode node = new PortletNode(parentNode);
             checkAndSetAttributes(node, attributes);
             parentNode.getChildNodes().add(node);
-            expectElement(PERMISSIONS, 0, 1,
-                    new PermissionsCallback(node));
+            expectElement(new PermissionsCallback(node));
         }
     }
 
-    private class UseCaseNodeCallback implements ElementCallback {
+    private class UseCaseNodeCallback extends ElementCallback {
         SiteNode parentNode;
 
         private UseCaseNodeCallback(SiteNode parent) {
+            super(USECASENODE, 0, -1);
             this.parentNode = parent;
         }
 
@@ -427,9 +491,8 @@ public class ModelParser extends XmlParser {
             UseCaseNode node = new UseCaseNode(parentNode);
             checkAndSetAttributes(node, attributes);
             parentNode.getChildNodes().add(node);
-            expectElement(USECASE, 1, null, new UseCaseCallback(node));
-            expectElement(PERMISSIONS, 0, 1,
-                    new PermissionsCallback(node));   
+            expectElement(new UseCaseCallback(node));
+            expectElement(new PermissionsCallback(node));
         }
     }
 
@@ -442,9 +505,10 @@ public class ModelParser extends XmlParser {
     // Use cases
     //**************************************************************************
 
-    private class UseCaseCallback implements ElementCallback {
+    private class UseCaseCallback extends ElementCallback {
         UseCaseNode node;
         private UseCaseCallback(UseCaseNode node){
+            super(USECASE, 1, -1);
             this.node = node;
         }
 
@@ -467,31 +531,38 @@ public class ModelParser extends XmlParser {
 
             checkAndSetAttributes(currentUseCase, attributes);
 
-            expectElement(PROPERTIES, 0, 1, new PropertiesCallback());
+            expectElement(new PropertiesCallback());
 
-            expectElement(SELECTIONPROVIDERS, 0, 1,
-                    new SelectionProvidersCallback());
+            expectElement(new SelectionProvidersCallback());
 
             currentModelAnnotations = currentUseCase.getModelAnnotations();
-            expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
+            expectElement(new AnnotationsCallback());
 
-            expectElement(BUTTONS, 0, 1, new ButtonsCallback());
+            expectElement(new ButtonsCallback());
 
-            expectElement(SUBUSECASES, 0, 1, new SubUseCasesCallback());
+            expectElement(new SubUseCasesCallback());
 
             UseCase poppedUsedCase = useCaseStack.pop();
             assert(poppedUsedCase == currentUseCase);
         }
     }
 
-    private class PropertiesCallback implements ElementCallback {
+    private class PropertiesCallback extends ElementCallback {
+        private PropertiesCallback() {
+            super(PROPERTIES, 0, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(PROPERTY, 0, null, new PropertyCallback());
+            expectElement(new PropertyCallback());
         }
     }
 
-    private class PropertyCallback implements ElementCallback {
+    private class PropertyCallback extends ElementCallback {
+        private PropertyCallback() {
+            super(PROPERTY, 0, -1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             UseCase currentUseCase = useCaseStack.peek();
@@ -502,18 +573,26 @@ public class ModelParser extends XmlParser {
             currentUseCase.getProperties().add(useCaseProperty);
 
             currentModelAnnotations = useCaseProperty.getAnnotations();
-            expectElement(ANNOTATIONS, 0, 1, new AnnotationsCallback());
+            expectElement(new AnnotationsCallback());
         }
     }
 
-    private class ButtonsCallback implements ElementCallback {
+    private class ButtonsCallback extends ElementCallback {
+        private ButtonsCallback() {
+            super(BUTTONS, 0, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(BUTTON, 0, null, new ButtonCallback());
+            expectElement(new ButtonCallback());
         }
     }
 
-    private class ButtonCallback implements ElementCallback {
+    private class ButtonCallback extends ElementCallback {
+        private ButtonCallback() {
+            super(BUTTON, 0, -1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             UseCase currentUseCase = useCaseStack.peek();
@@ -523,24 +602,37 @@ public class ModelParser extends XmlParser {
         }
     }
 
-    private class AnnotationsCallback implements ElementCallback {
+    private class AnnotationsCallback extends ElementCallback {
+        private AnnotationsCallback() {
+            super(ANNOTATIONS, 0, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(ANNOTATION, 0, null, new AnnotationCallback());
+
+            expectElement(new AnnotationCallback());
         }
     }
 
-    private class AnnotationCallback implements ElementCallback {
+    private class AnnotationCallback extends ElementCallback {
+        private AnnotationCallback() {
+            super(ANNOTATION, 0, -1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             currentModelAnnotation = new ModelAnnotation();
             checkAndSetAttributes(currentModelAnnotation, attributes);
             currentModelAnnotations.add(currentModelAnnotation);
-            expectElement(VALUE, 0, null, new AnnotationValueCallback());
+            expectElement(new AnnotationValueCallback());
         }
     }
 
-    private class AnnotationValueCallback implements ElementCallback {
+    private class AnnotationValueCallback extends ElementCallback {
+        private AnnotationValueCallback() {
+            super(VALUE, 0, -1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             expectCharacters(new AnnotationValueCharactersCallback());
@@ -554,59 +646,67 @@ public class ModelParser extends XmlParser {
         }
     }
 
-    private class SubUseCasesCallback implements ElementCallback {
+    private class SubUseCasesCallback extends ElementCallback {
+        private SubUseCasesCallback() {
+            super(SUBUSECASES, 0, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(USECASE, 0, null, new UseCaseCallback(null));
+            expectElement(new UseCaseCallback(null));
         }
     }
 
     //**************************************************************************
     // Permissions
     //**************************************************************************
-    private class PermissionsCallback implements ElementCallback {
+    private class PermissionsCallback extends ElementCallback {
         SiteNode node;
 
         private PermissionsCallback(SiteNode node) {
+            super(PERMISSIONS, 0, 1);
             this.node = node;
         }
 
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(ALLOW, 0, 1, new AllowCallback(node));
-            expectElement(DENY, 0, 1, new DenyCallback(node));
+            expectElement(new AllowCallback(node));
+            expectElement(new DenyCallback(node));
         }
     }
-    private class AllowCallback implements ElementCallback {
+    private class AllowCallback extends ElementCallback {
         SiteNode node;
 
         private AllowCallback(SiteNode node) {
+            super(ALLOW, 0, 1);
             this.node = node;
         }
 
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(GROUP, 1, null, new GroupCallback(node.getAllowGroups()));
+            expectElement(new GroupCallback(node.getAllowGroups()));
         }
     }
 
-    private class DenyCallback implements ElementCallback {
+    private class DenyCallback extends ElementCallback {
         SiteNode node;
 
         private DenyCallback(SiteNode node) {
+            super(DENY, 0, 1);
             this.node = node;
         }
 
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(GROUP, 1, null, new GroupCallback(node.getDenyGroups()));
+            expectElement(new GroupCallback(node.getDenyGroups()));
         }
     }
 
-    private class GroupCallback implements ElementCallback {
+    private class GroupCallback extends ElementCallback {
         List<String> groups;
 
         private GroupCallback(List<String> groups) {
+            super(GROUP, 1, -1);
             this.groups = groups;
         }
 
@@ -617,14 +717,22 @@ public class ModelParser extends XmlParser {
         }
     }
 
-    private class SelectionProvidersCallback implements ElementCallback {
+    private class SelectionProvidersCallback extends ElementCallback {
+        private SelectionProvidersCallback() {
+            super(SELECTIONPROVIDERS, 0, 1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(SELECTIONPROVIDER, 0, null, new SelectionProviderCallback());
+            expectElement(new SelectionProviderCallback());
         }
     }
 
-    private class SelectionProviderCallback implements ElementCallback {
+    private class SelectionProviderCallback extends ElementCallback {
+        private SelectionProviderCallback() {
+            super(SELECTIONPROVIDER, 0, -1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             currentModelSelectionProvider = new ModelSelectionProvider();
@@ -632,19 +740,26 @@ public class ModelParser extends XmlParser {
             UseCase currentUseCase = useCaseStack.peek();
             currentUseCase.getModelSelectionProviders()
                     .add(currentModelSelectionProvider);
-            expectElement(SELECTIONPROPERTIES, 0, null,
-                    new SelectionPropertiesCallback());
+            expectElement(new SelectionPropertiesCallback());
         }
     }
 
-    private class SelectionPropertiesCallback implements ElementCallback {
+    private class SelectionPropertiesCallback extends ElementCallback {
+        private SelectionPropertiesCallback() {
+            super(SELECTIONPROPERTIES, 0, -1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
-            expectElement(SELECTIONPROPERTY, 0, null, new SelectionPropertyCallback());
+            expectElement(new SelectionPropertyCallback());
         }
     }
 
-    private class SelectionPropertyCallback implements ElementCallback {
+    private class SelectionPropertyCallback extends ElementCallback {
+        private SelectionPropertyCallback() {
+            super(SELECTIONPROPERTY, 0, -1);
+        }
+
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             SelectionProperty selectionProperty =

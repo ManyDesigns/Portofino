@@ -31,6 +31,7 @@ package com.manydesigns.portofino.database;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Password;
+import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.sql.Connection;
@@ -90,7 +91,7 @@ public class JdbcConnectionProvider extends AbstractConnectionProvider {
     }
 
     public void releaseConnection(Connection conn) {
-        DbUtil.closeConnection(conn);
+        DbUtils.closeQuietly(conn);
     }
 
 

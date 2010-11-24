@@ -34,6 +34,7 @@ import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.datamodel.*;
+import org.apache.commons.dbutils.DbUtils;
 import org.hibernate.dialect.MySQLDialect;
 
 import java.sql.*;
@@ -211,7 +212,8 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                 table.getColumns().add(column);
             }
         } finally {
-            DbUtil.closeResultSetAndStatement(rs, st);
+            DbUtils.closeQuietly(rs);
+            DbUtils.closeQuietly(st);
         }
     }
 

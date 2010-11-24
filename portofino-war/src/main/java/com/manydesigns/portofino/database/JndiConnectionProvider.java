@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.database;
 
+import org.apache.commons.dbutils.DbUtils;
+
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -77,7 +79,7 @@ public class JndiConnectionProvider extends AbstractConnectionProvider {
     }
 
     public void releaseConnection(Connection conn) {
-        DbUtil.closeConnection(conn);
+        DbUtils.closeQuietly(conn);
     }
 
     //**************************************************************************

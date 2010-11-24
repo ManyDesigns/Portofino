@@ -33,11 +33,13 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.xml.stream.*;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Logger;
@@ -223,8 +225,10 @@ public class XmlParser {
         }
     }
 
-    public void expectElement(String elementName, int min, Integer max,
-                               ElementCallback callback) throws XMLStreamException {
+    public void expectElement(Callback callback) throws XMLStreamException {
+        String elementName = callback.getElementName();
+        int min = callback.getMin();
+        int max = callback.getMax();
         int counter = 0;
         while (true) {
             skipSpacesAndComments();
@@ -252,7 +256,7 @@ public class XmlParser {
                     "Element ''{0}'' expected min: {1}  actual: {2}. {3}",
                     elementName, min, counter, getLocationString()));
         }
-        if (max != null && counter > max) {
+        if (max >= 0 && counter > max) {
             throw new Error(MessageFormat.format(
                     "Element ''{0}'' expected max: {1}  actual: {2}. {3}",
                     elementName, max, counter, getLocationString()));
@@ -343,6 +347,141 @@ public class XmlParser {
             String attrvalue = xmlStreamReader.getAttributeValue(i);
             attributes.put(attrName, attrvalue);
             LogUtil.fineMF(logger, "Attribute {0} = {1}", attrName, attrvalue);
+        }
+    }
+
+    public abstract class Callback {
+        public static final String copyright =
+                "Copyright (c) 2005-2010, ManyDesigns srl";
+
+        protected final String elementName;
+        protected final int min;
+        protected final int max;
+
+        protected Callback(String elementName, int min, int max) {
+            this.elementName = elementName;
+            this.min = min;
+            this.max = max;
+        }
+
+        public abstract void doElement(Map<String, String> attributes)
+                throws XMLStreamException;
+
+        public String getElementName() {
+            return elementName;
+        }
+
+        public int getMin() {
+            return min;
+        }
+
+        public int getMax() {
+            return max;
+        }
+    }
+
+    public class ElementCallback extends Callback {
+        public static final String copyright =
+                "Copyright (c) 2005-2010, ManyDesigns srl";
+
+        protected final Object parent;
+        protected final Collection parentCollection;
+        protected final PropertyAccessor parentProperty;
+        protected final Class clazz;
+        protected Object obj;
+
+        protected ElementCallback(Object parent, Collection parentCollection,
+                                  PropertyAccessor parentProperty,
+                                  Class clazz, String elementName,
+                                  int min, int max) {
+            super(elementName, min, max);
+            this.parent = parent;
+            this.parentCollection = parentCollection;
+            this.parentProperty = parentProperty;
+            this.clazz = clazz;
+        }
+
+        protected ElementCallback(Class clazz, String elementName,
+                                  int min, int max) {
+            this(null, null, null, clazz, elementName, min, max);
+        }
+
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            // instanciate the class
+            if (parent == null) { // root object
+                obj = ReflectionUtil.newInstance(clazz);
+            } else {
+                Class parentClass = parent.getClass();
+                Constructor constructor =
+                        ReflectionUtil.getConstructor(clazz, parentClass);
+                if (constructor == null) {
+                    obj = ReflectionUtil.newInstance(clazz);
+                } else {
+                    obj = ReflectionUtil.newInstance(constructor, parent);
+                }
+                if (parentCollection != null) {
+                    parentCollection.add(obj);
+                } else if (parentProperty != null) {
+                    try {
+                        parentProperty.set(parent, obj);
+                    } catch (Throwable e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+                }
+            }
+            checkAndSetAttributes(obj, attributes);
+
+            ClassAccessor classAccessor =
+                    JavaClassAccessor.getClassAccessor(clazz);
+            // scan the properties looking for annotations
+            for (PropertyAccessor propertyAccessor
+                    : classAccessor.getProperties()) {
+                XmlElement xmlElementAnnotation =
+                        propertyAccessor.getAnnotation(XmlElement.class);
+                XmlCollection xmlCollectionAnnotation =
+                        propertyAccessor.getAnnotation(XmlCollection.class);
+
+                if (xmlElementAnnotation != null) {
+                } else if (xmlCollectionAnnotation != null) {
+                    Class itemType = xmlCollectionAnnotation.itemType();
+                    int min = xmlCollectionAnnotation.min();
+                    int max = xmlCollectionAnnotation.max();
+                    try {
+                        Collection collection =
+                                (Collection) propertyAccessor.get(obj);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    public class CollectionCallback extends Callback {
+        protected final Object parent;
+        protected final Collection parentCollection;
+        protected final Class itemClass;
+        protected final boolean required;
+        protected final int itemMin;
+        protected final int itemMax;
+
+        protected CollectionCallback(Object parent, Collection parentCollection,
+                                     Class itemClass, String elementName,
+                                     boolean required, int itemMin, int itemMax) {
+            super(elementName, 0, (required ? 0 : 1));
+            this.parent = parent;
+            this.parentCollection = parentCollection;
+            this.itemClass = itemClass;
+            this.required = required;
+            this.itemMin = itemMin;
+            this.itemMax = itemMax;
+        }
+
+        public void doElement(Map<String, String> attributes)
+                throws XMLStreamException {
+            expectElement(new ElementCallback(parent, parentCollection, null,
+                    itemClass, "", itemMin, itemMax));
         }
     }
 }
