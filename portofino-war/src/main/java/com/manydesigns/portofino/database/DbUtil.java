@@ -133,17 +133,17 @@ public class DbUtil {
             case Types.BINARY:
             case Types.BLOB:
             case Types.CLOB:
+            case Types.LONGVARBINARY:
+            case Types.LONGVARCHAR:
+            case Types.VARBINARY:
                 return Hibernate.CLOB;
             case Types.DATALINK:
             case Types.DISTINCT:
             case Types.JAVA_OBJECT:
-            case Types.LONGVARBINARY:
-            case Types.LONGVARCHAR:
             case Types.NULL:
             case Types.OTHER:
             case Types.REF:
             case Types.STRUCT:
-            case Types.VARBINARY:
             default:
                 throw new Error("Unsupported type: " + jdbcType);
         }

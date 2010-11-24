@@ -1403,13 +1403,13 @@ Struttura dell'XML:
                     <tables>
                         <table tableName="EmailQueue">
                             <columns>
-                                <column autoincrement="false" columnName="addressee" columnType="VARCHAR" javaType="java.lang.String" length="100" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="body" columnType="VARCHAR" javaType="java.lang.String" length="4000" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="date" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="sender" columnType="VARCHAR" javaType="java.lang.String" length="100" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="state" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="subject" columnType="VARCHAR" javaType="java.lang.String" length="100" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="body" columnType="VARCHAR" javaType="java.lang.String" length="4000" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="addressee" columnType="VARCHAR" javaType="java.lang.String" length="100" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="sender" columnType="VARCHAR" javaType="java.lang.String" length="100" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="date" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="state" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1417,8 +1417,8 @@ Struttura dell'XML:
                         </table>
                         <table tableName="OldPwd">
                             <columns>
-                                <column autoincrement="false" columnName="date" columnType="DECIMAL" javaType="java.math.BigDecimal" length="31" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="date" columnType="DECIMAL" javaType="java.math.BigDecimal" length="31" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="password" columnType="VARCHAR" javaType="java.lang.String" length="30" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="user" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                             </columns>
@@ -1436,17 +1436,17 @@ Struttura dell'XML:
                         <table tableName="User">
                             <columns>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="bouncing" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="creation date" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="email" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="false" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="failed attempts" propertyName="failed_attempts" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="last login date" propertyName="last_login_date" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="last pwd change date" propertyName="last_pwd_change_date" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="login" columnType="VARCHAR" javaType="java.lang.String" length="30" nullable="false" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="must change pwd" propertyName="must_change_pwd" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="password" columnType="VARCHAR" javaType="java.lang.String" length="30" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="email" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="creation date" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="last pwd change date" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="must change pwd" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="last login date" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="failed attempts" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="state" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="token" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="bouncing" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1465,7 +1465,7 @@ Struttura dell'XML:
                             <columns>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="user" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="user group" propertyName="user_group" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="user group" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1485,8 +1485,8 @@ Struttura dell'XML:
                         </table>
                         <table tableName="ad_agency">
                             <columns>
-                                <column autoincrement="false" columnName="ad_agency" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="ad_agency" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1494,37 +1494,37 @@ Struttura dell'XML:
                         </table>
                         <table tableName="analisi">
                             <columns>
-                                <column autoincrement="false" columnName="adv_total" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
-                                <column autoincrement="false" columnName="article_type" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="cover" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="cover_image_present" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="double_page" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="fashion_show" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="free_total" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
-                                <column autoincrement="false" columnName="full_page" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="image_present" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="insert" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="issue_date_max" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="issue_date_min" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="issue_number_max" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="issue_number_min" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="item" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="lock_time" columnType="VARCHAR" javaType="java.lang.String" length="32" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="lock_user" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="media" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="monograph" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="page_number_max" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="page_number_min" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="placement" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="product_line" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="review_name" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="roi" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
-                                <column autoincrement="false" columnName="season" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="title" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="total_look" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="value_max" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
+                                <column autoincrement="false" columnName="media" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="cover" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="article_type" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="lock_user" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="lock_time" columnType="VARCHAR" javaType="java.lang.String" length="32" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="free_total" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
+                                <column autoincrement="false" columnName="adv_total" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
+                                <column autoincrement="false" columnName="cover_image_present" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="image_present" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="placement" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="value_min" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
+                                <column autoincrement="false" columnName="value_max" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
+                                <column autoincrement="false" columnName="issue_date_min" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="issue_date_max" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="issue_number_min" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="issue_number_max" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="page_number_min" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="page_number_max" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="title" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="item" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="product_line" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="season" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="fashion_show" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="monograph" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="total_look" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="double_page" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="full_page" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="insert" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="roi" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1604,8 +1604,8 @@ Struttura dell'XML:
                         </table>
                         <table tableName="article_type">
                             <columns>
-                                <column autoincrement="false" columnName="article_type" columnType="VARCHAR" javaType="java.lang.String" length="20" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="article_type" columnType="VARCHAR" javaType="java.lang.String" length="20" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="weigth" columnType="DECIMAL" javaType="java.math.BigDecimal" length="5" nullable="false" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
@@ -1614,11 +1614,11 @@ Struttura dell'XML:
                         </table>
                         <table tableName="brand">
                             <columns>
-                                <column autoincrement="false" columnName="brand" columnType="VARCHAR" javaType="java.lang.String" length="100" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="company" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="brand" columnType="VARCHAR" javaType="java.lang.String" length="100" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="logo" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="logo_name" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="company" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1633,9 +1633,9 @@ Struttura dell'XML:
                         </table>
                         <table tableName="caricamento">
                             <columns>
+                                <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="file_excel" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="file_excel_name" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="label1" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="label2" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="label3" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
@@ -1676,8 +1676,8 @@ Struttura dell'XML:
                         </table>
                         <table tableName="category">
                             <columns>
-                                <column autoincrement="false" columnName="category" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="category" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1685,9 +1685,9 @@ Struttura dell'XML:
                         </table>
                         <table tableName="company">
                             <columns>
+                                <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="company" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="holding" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1702,8 +1702,8 @@ Struttura dell'XML:
                         </table>
                         <table tableName="country">
                             <columns>
-                                <column autoincrement="false" columnName="country" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="country" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1711,10 +1711,10 @@ Struttura dell'XML:
                         </table>
                         <table tableName="customization">
                             <columns>
+                                <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="company_name" columnType="VARCHAR" javaType="java.lang.String" length="100" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="company_logo" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="company_logo_name" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="company_name" columnType="VARCHAR" javaType="java.lang.String" length="100" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1722,11 +1722,11 @@ Struttura dell'XML:
                         </table>
                         <table tableName="evento">
                             <columns>
-                                <column autoincrement="false" columnName="date" columnType="DATE" javaType="java.util.Date" length="10" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="date" columnType="DATE" javaType="java.util.Date" length="10" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="used" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="user_id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="used" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1734,9 +1734,9 @@ Struttura dell'XML:
                         </table>
                         <table tableName="fotografo">
                             <columns>
-                                <column autoincrement="false" columnName="fotografo" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="fotografo" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1751,9 +1751,9 @@ Struttura dell'XML:
                         </table>
                         <table tableName="gender">
                             <columns>
+                                <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="gender" columnType="VARCHAR" javaType="java.lang.String" length="10" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="gender_short" columnType="VARCHAR" javaType="java.lang.String" length="1" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1761,8 +1761,8 @@ Struttura dell'XML:
                         </table>
                         <table tableName="holding">
                             <columns>
-                                <column autoincrement="false" columnName="holding" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="holding" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1770,12 +1770,12 @@ Struttura dell'XML:
                         </table>
                         <table tableName="image">
                             <columns>
-                                <column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="image" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="image_name" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="image_to_event" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="used" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="image_to_event" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1808,8 +1808,8 @@ Struttura dell'XML:
                         <table tableName="magazine_type">
                             <columns>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="issue_per_year" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="magazine_type" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="issue_per_year" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1817,16 +1817,16 @@ Struttura dell'XML:
                         </table>
                         <table tableName="media">
                             <columns>
-                                <column autoincrement="false" columnName="adv_total" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
-                                <column autoincrement="false" columnName="circulation" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="country" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="free_total" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
-                                <column autoincrement="false" columnName="gender" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="magazine_type" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" length="100" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="circulation" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="gender" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="magazine_type" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="country" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="publisher" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="roi" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
+                                <column autoincrement="false" columnName="free_total" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
+                                <column autoincrement="false" columnName="adv_total" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1892,8 +1892,8 @@ Struttura dell'XML:
                         <table tableName="product_line">
                             <columns>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="product_line" columnType="VARCHAR" javaType="java.lang.String" length="100" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="product_line_to_brand" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="product_line" columnType="VARCHAR" javaType="java.lang.String" length="100" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1908,10 +1908,10 @@ Struttura dell'XML:
                         </table>
                         <table tableName="publisher">
                             <columns>
-                                <column autoincrement="false" columnName="Adv_total" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
-                                <column autoincrement="false" columnName="Free_total" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="publisher" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="Free_total" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
+                                <column autoincrement="false" columnName="Adv_total" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
                                 <column autoincrement="false" columnName="roi" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
@@ -1920,13 +1920,13 @@ Struttura dell'XML:
                         </table>
                         <table tableName="publisher_cost">
                             <columns>
-                                <column autoincrement="false" columnName="amount" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
-                                <column autoincrement="false" columnName="effective_amount" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
-                                <column autoincrement="false" columnName="from" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="period" columnType="VARCHAR" javaType="java.lang.String" length="30" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="publisher" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="from" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="to" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="amount" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
+                                <column autoincrement="false" columnName="publisher" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="effective_amount" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1958,11 +1958,11 @@ Struttura dell'XML:
                         </table>
                         <table tableName="riga_caricamento">
                             <columns>
+                                <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="caricamento" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="field1" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="field2" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="field3" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -1977,12 +1977,12 @@ Struttura dell'XML:
                         </table>
                         <table tableName="search_result">
                             <columns>
-                                <column autoincrement="false" columnName="cost_value" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="included_in_review" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="result_item" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="return_value" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
                                 <column autoincrement="false" columnName="search_result" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="included_in_review" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="return_value" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
+                                <column autoincrement="false" columnName="cost_value" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -2011,9 +2011,9 @@ Struttura dell'XML:
                         </table>
                         <table tableName="sector">
                             <columns>
-                                <column autoincrement="false" columnName="category" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="sector" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="category" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -2046,8 +2046,8 @@ Struttura dell'XML:
                         <table tableName="three_state">
                             <columns>
                                 <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="state" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="state_name" columnType="VARCHAR" javaType="java.lang.String" length="20" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="state" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -2055,37 +2055,37 @@ Struttura dell'XML:
                         </table>
                         <table tableName="upload">
                             <columns>
-                                <column autoincrement="false" columnName="article_type" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="cost_value" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
+                                <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="edited_on" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="media" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="value" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
+                                <column autoincrement="false" columnName="created_on" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="fashion_show" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="cover" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="monograph" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="cover_img" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="cover_img_name" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="created_on" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="double_page" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="edited_on" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="fashion_show" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="full_page" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="image" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="image_name" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="image_to_clip" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="image_to_cover" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="insert" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="issue_date" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="issue_number" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="article_type" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="item" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="media" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="monograph" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="page_number" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="title" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="season" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="total_look" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="double_page" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="full_page" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="insert" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="placement" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="product_line" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="return_value" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
-                                <column autoincrement="false" columnName="season" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="title" columnType="VARCHAR" javaType="java.lang.String" length="50" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="total_look" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="upload_cover" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="cost_value" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
                                 <column autoincrement="false" columnName="upload_image" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="value" columnType="DECIMAL" javaType="java.math.BigDecimal" length="10" nullable="true" scale="2" searchable="true"/>
+                                <column autoincrement="false" columnName="upload_cover" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="image_to_cover" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="image_to_clip" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="issue_date" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -2135,12 +2135,12 @@ Struttura dell'XML:
                         </table>
                         <table tableName="uploaded_objects">
                             <columns>
+                                <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="uploaded_on" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="documento" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="documento_name" columnType="VARCHAR" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="id" columnType="INT" javaType="java.lang.Integer" length="11" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="object_name" columnType="VARCHAR" javaType="java.lang.String" length="100" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="related_objects" columnType="INT" javaType="java.lang.Integer" length="11" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="uploaded_on" columnType="DATE" javaType="java.util.Date" length="10" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -2157,7 +2157,7 @@ Struttura dell'XML:
                 </schema>
             </schemas>
         </database>
-    </databases>    
+    </databases>
     <rootNode title="Portofino4" description="portofino 4" id="/">
         <childNodes>
             <documentNode id="homepage" title="Homepage" description="Homepage" url="Homepage.action">
