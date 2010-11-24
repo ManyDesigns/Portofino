@@ -62,7 +62,7 @@
               - <s:a href="%{#loginUrl}">Log in</s:a>
             </s:if>
             <s:if test="#application.portofinoProperties['user.enabled'].equals('true')
-            && #application.context.getCurrentUser() != null">
+            && #application.context.getCurrentUserId() != null">
                 - <s:a href="%{#logoutUrl}">Log out</s:a>    
             </s:if>
 

@@ -79,7 +79,7 @@ public class PortofinoInterceptor implements Interceptor {
         if (context == null || context.getModel() == null) {
             return "modelNotFound";
         }
-
+        context.openSession();
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
 
         String requestUrl = Util.getAbsoluteUrl(req.getServletPath());
@@ -97,13 +97,13 @@ public class PortofinoInterceptor implements Interceptor {
         String result;
         try {
             context.resetDbTimer();
-            context.openSession();
+
 
             boolean userEnabled = Boolean.parseBoolean(
                     PortofinoProperties.getProperties()
                     .getProperty("user.enabled", "false"));
             if (userEnabled &&
-                    context.getCurrentUser()==null
+                    context.getCurrentUserId()==null
                     && !(invocation.getAction() instanceof LoginUnAware)) {
                 return LOGIN_ACTION;
             }

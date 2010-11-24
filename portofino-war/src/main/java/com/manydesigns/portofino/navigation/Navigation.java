@@ -34,6 +34,7 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.site.*;
+import com.manydesigns.portofino.system.model.users.UserUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,34 +90,30 @@ public class Navigation implements XhtmlFragment {
                                            List<NavigationNode> navigationNodes) {
         for (SiteNode siteNode : siteNodes) {
             //se non sono autorizzato a vedere il nodo continuo
-            //TODO riabilitare per i permessi
-            /*User currentUser = context.getCurrentUser();
             List<String> groups = UserUtils.manageGroups(context);
-
-            if (!siteNode.isAllowed(groups)){
-                continue;
-            }*/
+            boolean hidden;
+            hidden = !siteNode.isAllowed(groups);
 
             NavigationNode navigationNode;
             if (siteNode instanceof DocumentNode
                     || siteNode instanceof PortletNode
                     || siteNode instanceof UseCaseNode
                     || siteNode instanceof CustomNode) {
-                navigationNode = new SimpleNavigationNode(siteNode);
+                navigationNode = new SimpleNavigationNode(siteNode, hidden);
                 generateNavigationNodes(siteNode.getChildNodes(),
                         navigationNode.getChildNodes());
             }else if (siteNode instanceof FolderNode) {
-                navigationNode = new FolderNavigationNode(siteNode);
+                navigationNode = new FolderNavigationNode(siteNode, hidden);
                 generateNavigationNodes(siteNode.getChildNodes(),
                         navigationNode.getChildNodes());
             } else if (siteNode instanceof CustomFolderNode) {
                 CustomFolderNode node = (CustomFolderNode) siteNode;
                 if("table-data".equals(node.getType())) {
                     navigationNode =
-                        new TableDataNavigationNode(context, siteNode);
+                        new TableDataNavigationNode(context, siteNode, hidden);
                 } else if("table-design".equals(node.getType())) {
                     navigationNode =
-                        new TableDesignNavigationNode(context, siteNode);
+                        new TableDesignNavigationNode(context, siteNode, hidden);
                 } else {
                 LogUtil.warningMF(logger,
                         "Unrecognized site node type: {0}", siteNode.getClass().getName());
@@ -170,6 +167,9 @@ public class Navigation implements XhtmlFragment {
         xb.openElement("ul");
         List<NavigationNode> expand = null;
         for (NavigationNode current : nodes) {
+            if(current.isHidden()){
+                continue;
+            }
             xb.openElement("li");
             String nodeUrl = current.getUrl();
             if (normalizedRequestUrl.equals(nodeUrl)) {

@@ -205,7 +205,7 @@ public class CrudUnit {
         loadObject();
 
         if (!objects.contains(object)) {
-            throw new Error("Object not found");
+            //throw new Error("Object not found");
         }
         setupForm(Mode.VIEW);
         form.readFromObject(object);

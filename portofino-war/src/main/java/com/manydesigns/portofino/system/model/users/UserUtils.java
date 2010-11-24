@@ -51,20 +51,21 @@ public class UserUtils {
     public static final Long SELFREGITRED = 4L;
 
     public static  List<String> manageGroups(Context context) {
-        User currentUser = context.getCurrentUser();
+        Long currentUserId = context.getCurrentUserId();
         List<String> groups = new ArrayList<String>();
-        if(currentUser==null){
+        if(currentUserId==null){
                 groups.add(Group.ANONYMOUS);
             } else {
-            User u = (User) context.getObjectByPk(UserUtils.USERTABLE, currentUser);
-            groups.add(Group.ANONYMOUS);
-            groups.add(Group.REGISTERED);
+                User u = (User) context.getObjectByPk(UserUtils.USERTABLE,
+                        new User(currentUserId));
+                groups.add(Group.ANONYMOUS);
+                groups.add(Group.REGISTERED);
 
-            for (UsersGroups ug : u.getGroups()){
-                if (ug.getDeletionDate()==null){
-                    groups.add(ug.getGroup().getName());
+                for (UsersGroups ug : u.getGroups()){
+                    if (ug.getDeletionDate()==null){
+                        groups.add(ug.getGroup().getName());
+                    }
                 }
-            }
         }
         return groups;
     }

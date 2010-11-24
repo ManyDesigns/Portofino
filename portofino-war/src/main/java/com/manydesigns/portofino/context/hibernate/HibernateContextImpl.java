@@ -96,7 +96,7 @@ public class HibernateContextImpl implements Context {
     protected Model model;
     protected Map<String, HibernateDatabaseSetup> setups;
     protected final ThreadLocal<StopWatch> stopWatches;
-    protected final ThreadLocal<User> threadUsers;
+    protected final ThreadLocal<Long> threadUsers;
     protected final List<SiteNode> siteNodes;
     protected File xmlModelFile;
 
@@ -111,7 +111,7 @@ public class HibernateContextImpl implements Context {
     public HibernateContextImpl() {
         stopWatches = new ThreadLocal<StopWatch>();
         siteNodes = new ArrayList<SiteNode>();
-        threadUsers = new ThreadLocal<User>();
+        threadUsers = new ThreadLocal<Long>();
     }
 
     //**************************************************************************
@@ -257,6 +257,7 @@ public class HibernateContextImpl implements Context {
             Serializable key = (Serializable) propertyAccessor.get(pk);
             result = session.load(qualifiedTableName, key);
         } catch (Throwable e) {
+            e.printStackTrace();
             LogUtil.warningMF(logger,
                     "Cannot invoke property accessor for {0} on class {1}",
                     e, propertyAccessor.getName(), table.getName());
@@ -291,8 +292,6 @@ public class HibernateContextImpl implements Context {
         String databaseName = table.getDatabaseName();
         return setups.get(databaseName).getThreadSession();
     }
-
-
 
     public QueryStringWithParameters getQueryStringWithParametersForCriteria(
             Criteria criteria) {
@@ -861,12 +860,12 @@ public class HibernateContextImpl implements Context {
        setCurrentUser(null);
     }
 
-    public User getCurrentUser() {
+    public Long getCurrentUserId() {
         return threadUsers.get();
     }
 
-    public void setCurrentUser(User user) {
-        threadUsers.set(user);
+    public void setCurrentUser(Long userId) {
+        threadUsers.set(userId);
     }
 
 

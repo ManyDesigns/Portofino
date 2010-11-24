@@ -147,8 +147,8 @@ public interface Context {
 
     void logout();
 
-    User getCurrentUser();
+    Long getCurrentUserId();
 
-    void setCurrentUser(User user);
+    void setCurrentUser(Long userId);
 
 }

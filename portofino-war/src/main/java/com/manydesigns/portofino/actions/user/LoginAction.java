@@ -122,7 +122,7 @@ public class LoginAction extends PortofinoAction
 
 
         LogUtil.fineMF(logger, "User {0} login", user.getEmail());
-        context.setCurrentUser(user);
+        context.setCurrentUser(user.getUserId());
         updateUser(user);
         return SUCCESS;
 

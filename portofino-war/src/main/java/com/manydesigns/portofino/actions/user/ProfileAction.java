@@ -84,7 +84,6 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     //**************************************************************************
     // User
     //**************************************************************************
-    public User user;
     public Form form;
 
     public static final Logger logger =
@@ -95,12 +94,13 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     }
 
     private String read() {
-        user = context.getCurrentUser();
+        Long userId = context.getCurrentUserId();
+        User thisUser =
+            (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
         ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         formBuilder.configFields("email", "userName", "firstName",
                 "middleName", "lastName", "creationDate");
-        User thisUser = (User) context.getObjectByPk(UserUtils.USERTABLE, user);
         for (UsersGroups ug : thisUser.getGroups()){
             Group grp = ug.getGroup();
 
@@ -111,12 +111,14 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
         form = formBuilder
                 .configMode(Mode.VIEW)
                 .build();
-        form.readFromObject(user);
+        form.readFromObject(thisUser);
         return READ;
     }
 
     public String edit() {
-        user = context.getCurrentUser();
+        Long userId = context.getCurrentUserId();
+        User thisUser =
+            (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 
         ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
@@ -125,12 +127,14 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
                         "middleName", "lastName")
                 .configMode(Mode.EDIT)
                 .build();
-        form.readFromObject(user);
+        form.readFromObject(thisUser);
         return EDIT;
     }
 
     public String update() {
-        user = context.getCurrentUser();
+        Long userId = context.getCurrentUserId();
+        User thisUser =
+            (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 
         ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
@@ -139,14 +143,14 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
                         "middleName", "lastName")
                 .configMode(Mode.EDIT)
                 .build();
-        form.readFromObject(user);
+        form.readFromObject(thisUser);
         form.readFromRequest(req);
         
         if(form.validate()){
-            form.writeToObject(user);
-            context.updateObject(UserUtils.USERTABLE, user);
+            form.writeToObject(thisUser);
+            context.updateObject(UserUtils.USERTABLE, thisUser);
             context.commit("portofino");
-            LogUtil.finestMF(logger, "User {0} updated", user.getEmail());
+            LogUtil.finestMF(logger, "User {0} updated", thisUser.getEmail());
             SessionMessages.addInfoMessage("Utente aggiornato correttamente");
             return UPDATE;
         } else {
@@ -162,7 +166,9 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     }
 
     public String updatePwd() {
-        user = context.getCurrentUser();
+        Long userId = context.getCurrentUserId();
+        User thisUser =
+            (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)
@@ -173,18 +179,16 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
             ChangePasswordFormBean bean = new ChangePasswordFormBean();
             form.writeToObject(bean);
 
-            if(bean.getEncOldPwd().equals(user.getPwd())) {
-                user.setPwd(bean.pwd);
-
-
+            if(bean.getEncOldPwd().equals(thisUser.getPwd())) {
+                thisUser.setPwd(bean.pwd);
                 if (enc) {
-                    user.encryptPwd();
+                    thisUser.encryptPwd();
                 }
-                user.setPwdModDate(new Timestamp(new Date().getTime()));
-                context.updateObject(UserUtils.USERTABLE, user);
+                thisUser.setPwdModDate(new Timestamp(new Date().getTime()));
+                context.updateObject(UserUtils.USERTABLE, thisUser);
                 context.commit("portofino");
 
-                LogUtil.finestMF(logger, "User {0} updated", user.getEmail());
+                LogUtil.finestMF(logger, "User {0} updated", thisUser.getEmail());
                 SessionMessages.addInfoMessage("Password coorectely updated");
 
                 return UPDATE_PWD;
