@@ -3,7 +3,7 @@
     <databases>
         <database databaseName="portofino">
             <schemas>
-                <schema schemaName="public">
+                <schema schemaName="PUBLIC">
                     <tables>
                         <table tableName="users"
                                javaClass="com.manydesigns.portofino.system.model.users.User">
@@ -257,7 +257,7 @@
                                 <foreignKey foreignKeyName="fk_user_1"
                                             virtual="false"
                                             toDatabase="portofino"
-                                            toSchema="public"
+                                            toSchema="PUBLIC"
                                             toTable="userstate"
                                             onUpdate="NO ACTION"
                                             onDelete="NO ACTION"
@@ -346,7 +346,7 @@
                                 <foreignKey foreignKeyName="fk_group_1"
                                             virtual="false"
                                             toDatabase="portofino"
-                                            toSchema="public"
+                                            toSchema="PUBLIC"
                                             toTable="users"
                                             onUpdate="NO ACTION"
                                             onDelete="NO ACTION"
@@ -411,7 +411,7 @@
                                 <foreignKey foreignKeyName="fk_ug_1"
                                             virtual="false"
                                               toDatabase="portofino"
-                                              toSchema="public"
+                                              toSchema="PUBLIC"
                                               toTable="users"
                                               onUpdate="NO ACTION"
                                               onDelete="NO ACTION"
@@ -430,7 +430,7 @@
                                 <foreignKey foreignKeyName="fk_ug_2"
                                             virtual="false"
                                             toDatabase="portofino"
-                                            toSchema="public"
+                                            toSchema="PUBLIC"
                                             toTable="groups"
                                             onUpdate="NO ACTION"
                                             onDelete="NO ACTION"
@@ -576,7 +576,7 @@
                                             virtual="false"
                                             toDatabase="portofino"
                                             toTable="emailstate"
-                                            toSchema="public"
+                                            toSchema="PUBLIC"
                                             onDelete="NO ACTION"
                                             onUpdate="NO ACTION">
                                     <references>
@@ -624,7 +624,7 @@
         </database>
         <database databaseName="jpetstore">
             <schemas>
-                <schema schemaName="public">
+                <schema schemaName="PUBLIC">
                     <tables>
                          <table tableName="lineitem">
                             <columns>
@@ -753,7 +753,7 @@
                                 <foreignKey foreignKeyName="fk_product_1"
                                             virtual="false"
                                             toDatabase="jpetstore"
-                                            toSchema="public"
+                                            toSchema="PUBLIC"
                                             toTable="category"
                                             onUpdate="NO ACTION"
                                             onDelete="NO ACTION">
@@ -770,7 +770,7 @@
         </database>
         <database databaseName="hibernatetest">
             <schemas>
-                <schema schemaName="public">
+                <schema schemaName="PUBLIC">
                     <tables>
                         <table tableName="table1">
                             <columns>
@@ -900,7 +900,7 @@
                                 <foreignKey foreignKeyName="fk_tb_2"
                                             virtual="false"
                                             toDatabase="hibernatetest"
-                                            toSchema="public"
+                                            toSchema="PUBLIC"
                                             toTable="table2"
                                             onUpdate="NO ACTION"
                                             onDelete="NO ACTION">
@@ -914,7 +914,7 @@
                                 <foreignKey foreignKeyName="fk_tb_1"
                                             virtual="false"
                                             toDatabase="hibernatetest"
-                                            toSchema="public"
+                                            toSchema="PUBLIC"
                                             toTable="table1"
                                             onUpdate="NO ACTION"
                                             onDelete="NO ACTION">
@@ -926,7 +926,7 @@
                                 <foreignKey foreignKeyName="fk_tb_4"
                                             virtual="false"
                                             toDatabase="hibernatetest"
-                                            toSchema="public"
+                                            toSchema="PUBLIC"
                                             toTable="table4"
                                             onUpdate="NO ACTION"
                                             onDelete="NO ACTION">
@@ -1028,7 +1028,7 @@
                                 <foreignKey foreignKeyName="fk_delibera_1"
                                             virtual="true"
                                             toDatabase="hibernatetest"
-                                            toSchema="public"
+                                            toSchema="PUBLIC"
                                             toTable="comune"
                                             onUpdate="NO ACTION"
                                             onDelete="NO ACTION">
@@ -1045,7 +1045,7 @@
                                 <foreignKey foreignKeyName="fk_delibera_2"
                                             virtual="true"
                                             toDatabase="jpetstore"
-                                            toSchema="public"
+                                            toSchema="PUBLIC"
                                             toTable="category"
                                             onUpdate="NO ACTION"
                                             onDelete="NO ACTION">
@@ -1114,7 +1114,7 @@
                                 <foreignKey foreignKeyName="domanda_regione_fkey"
                                             virtual="false"
                                             toDatabase="hibernatetest"
-                                            toSchema="public"
+                                            toSchema="PUBLIC"
                                             toTable="comune"
                                             onDelete="NO ACTION"
                                             onUpdate="NO ACTION">
@@ -1196,8 +1196,8 @@
                          id="userAdmin"
                          description="user administration" url="/usersAdmin/Users.action">
                 <useCase name = "users"
-                         table="portofino.public.users"
-                         query="FROM portofino.public.users"
+                         table="portofino.PUBLIC.users"
+                         query="FROM portofino.PUBLIC.users"
                          searchTitle="Users"
                          createTitle="Create new user"
                          readTitle="User"
@@ -1214,7 +1214,7 @@
                     </properties>
                     <selectionProviders>
                         <selectionProvider name="mysel" database="portofino"
-                                           hql="FROM portofino.public.userstate">
+                                           hql="FROM portofino.PUBLIC.userstate">
                             <selectionProperties>
                                 <selectionProperty name="state"/>
                             </selectionProperties>
@@ -1236,8 +1236,8 @@
                     </buttons>
                     <subUseCases>
                         <useCase name="active"
-                                 table="portofino.public.groups"
-                                 query="FROM portofino.public.groups groups WHERE groups.groupId NOT IN (SELECT groups2.groupId FROM portofino.public.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
+                                 table="portofino.PUBLIC.groups"
+                                 query="FROM portofino.PUBLIC.groups groups WHERE groups.groupId NOT IN (SELECT groups2.groupId FROM portofino.PUBLIC.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
                                  searchTitle="Active groups">
                             <properties>
                                 <property name="groupId"/>
@@ -1246,8 +1246,8 @@
                             </properties>
                         </useCase>
                         <useCase name="current"
-                                 table="portofino.public.groups"
-                                 query="FROM portofino.public.groups groups WHERE groups.groupId in (SELECT groups2.groupId FROM portofino.public.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
+                                 table="portofino.PUBLIC.groups"
+                                 query="FROM portofino.PUBLIC.groups groups WHERE groups.groupId in (SELECT groups2.groupId FROM portofino.PUBLIC.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
                                  searchTitle="Current groups">
                             <properties>
                                 <property name="groupId"/>
@@ -1257,8 +1257,8 @@
                         </useCase>
 
                         <useCase name="past"
-                                 table="portofino.public.users_groups"
-                                 query="FROM portofino.public.users_groups ug WHERE ug.userid=%{userId} AND ug.deletionDate IS NOT null"
+                                 table="portofino.PUBLIC.users_groups"
+                                 query="FROM portofino.PUBLIC.users_groups ug WHERE ug.userid=%{userId} AND ug.deletionDate IS NOT null"
                                  searchTitle="Past groups">
                             <properties>
                                 <property name="userid"/>
@@ -1274,8 +1274,8 @@
                          id="groupAdmin"
                          description="groups administration" url="/usersAdmin/Groups.action">
                 <useCase name="groupAdmin"
-                         table="portofino.public.groups"
-                         query="from portofino.public.groups"
+                         table="portofino.PUBLIC.groups"
+                         query="from portofino.PUBLIC.groups"
                          searchTitle="Groups"
                          createTitle="Create new group"
                          readTitle="Group"
@@ -1290,7 +1290,7 @@
                     </properties>
                     <selectionProviders>
                         <selectionProvider name="mysel" database="portofino"
-                                           hql="FROM portofino.public.users">
+                                           hql="FROM portofino.PUBLIC.users">
                         <!--sql="SELECT userid, firstname ||' '|| lastname || '('|| emailaddress || ')' FROM users ORDER BY lastname, firstname"-->
                             <selectionProperties>
                                 <selectionProperty name="creatorId"/>
@@ -1312,8 +1312,8 @@
             <childNodes>
             <useCaseNode description="uc1" id="uc1" title="uc1">
                 <useCase name="usecase1"
-                 table="jpetstore.public.product"
-                 query="FROM jpetstore.public.product product where product.category = %{'FISH'}"
+                 table="jpetstore.PUBLIC.product"
+                 query="FROM jpetstore.PUBLIC.product product where product.category = %{'FISH'}"
                  searchTitle="Products in category FISH"
                  createTitle="Create product in category FISH"
                  readTitle="Product in category FISH"
@@ -1392,8 +1392,8 @@
             </useCaseNode>
             <useCaseNode description="uc2" id="uc2" title="uc2">
                 <useCase name="usecase2"
-                         table="jpetstore.public.category"
-                         query="FROM jpetstore.public.category"
+                         table="jpetstore.PUBLIC.category"
+                         query="FROM jpetstore.PUBLIC.category"
                          searchTitle="Categories"
                          createTitle="Create new category"
                          readTitle="Category"
@@ -1413,8 +1413,8 @@
                     </buttons>
                     <subUseCases>
                         <useCase name="usecase3"
-                                 table="jpetstore.public.product"
-                                 query="FROM jpetstore.public.product product WHERE product.category = %{catid}"
+                                 table="jpetstore.PUBLIC.product"
+                                 query="FROM jpetstore.PUBLIC.product product WHERE product.category = %{catid}"
                                  searchTitle="Products in category">
                             <properties>
                                 <property name="productid"/>
@@ -1428,8 +1428,8 @@
             </useCaseNode>
             <useCaseNode description="rimborsi" title="rimborsi" id="rimborsi">
                 <useCase name="rimborsi"
-                 table="hibernatetest.public.rimborso"
-                 query="FROM hibernatetest.public.rimborso rimborso"
+                 table="hibernatetest.PUBLIC.rimborso"
+                 query="FROM hibernatetest.PUBLIC.rimborso rimborso"
                  searchTitle="Rimborsi"
                  createTitle="Crea rimborso"
                  readTitle="Rimborso"
@@ -1487,14 +1487,14 @@
             <selectionProviders>
                 <!-- Esempio con selection provider con hql
                 <selectionProvider name="mysel" database="hibernatetest"
-                                   hql="FROM hibernatetest.public.familiare WHERE persona_id = 1">
+                                   hql="FROM hibernatetest.PUBLIC.familiare WHERE persona_id = 1">
                     <selectionProperties>
                         <selectionProperty name="familiare_id"/>
                     </selectionProperties>
                 </selectionProvider>
                 -->
                 <selectionProvider name="mysel" database="hibernatetest"
-                                   sql="SELECT p.id AS a, p.nome as b, f.id AS c, f.nome AS d FROM public.persona p JOIN public.familiare f ON f.persona_id = p.id ORDER BY p.id, f.id">
+                                   sql="SELECT p.id AS a, p.nome as b, f.id AS c, f.nome AS d FROM PUBLIC.persona p JOIN PUBLIC.familiare f ON f.persona_id = p.id ORDER BY p.id, f.id">
                     <selectionProperties>
                         <selectionProperty name="persona_id"/>
                         <selectionProperty name="familiare_id"/>

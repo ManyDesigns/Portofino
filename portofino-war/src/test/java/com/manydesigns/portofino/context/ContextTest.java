@@ -35,7 +35,7 @@ public class ContextTest extends AbstractPortofinoTest {
     }
 
     public void testFindSchemaByQualifiedName() {
-        String qualifiedName = "jpetstore.public";
+        String qualifiedName = "jpetstore.PUBLIC";
         Schema schema = model.findSchemaByQualifiedName(qualifiedName);
         assertNotNull(schema);
         assertEquals(qualifiedName, schema.getQualifiedName());
@@ -46,23 +46,23 @@ public class ContextTest extends AbstractPortofinoTest {
     }
 
     public void testFindTableByQualifiedName() {
-        String qualifiedName = "jpetstore.public.product";
+        String qualifiedName = "jpetstore.PUBLIC.product";
         Table table = model.findTableByQualifiedName(qualifiedName);
         assertNotNull(table);
         assertEquals(qualifiedName, table.getQualifiedName());
 
-        String dummyName = "jpetstore.public.foo";
+        String dummyName = "jpetstore.PUBLIC.foo";
         table = model.findTableByQualifiedName(dummyName);
         assertNull(table);
     }
 
     public void testFindColumnByQualifiedName() {
-        String qualifiedName = "jpetstore.public.product.category";
+        String qualifiedName = "jpetstore.PUBLIC.product.category";
         Column column = model.findColumnByQualifiedName(qualifiedName);
         assertNotNull(column);
         assertEquals(qualifiedName, column.getQualifiedName());
 
-        String dummyName = "jpetstore.public.product.foo";
+        String dummyName = "jpetstore.PUBLIC.product.foo";
         column = model.findColumnByQualifiedName(dummyName);
         assertNull(column);
     }

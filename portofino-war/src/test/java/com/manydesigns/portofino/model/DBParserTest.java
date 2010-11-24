@@ -76,27 +76,27 @@ public class DBParserTest extends AbstractPortofinoTest {
 
         Schema schema = schemas.get(0);
         assertEquals("jpetstore", schema.getDatabaseName());
-        assertEquals("public", schema.getSchemaName());
-        assertEquals("jpetstore.public", schema.getQualifiedName());
+        assertEquals("PUBLIC", schema.getSchemaName());
+        assertEquals("jpetstore.PUBLIC", schema.getQualifiedName());
 
         List<Table> tables = schema.getTables();
         assertEquals(3, tables.size());
 
         // tabella 0
         Table table0 = tables.get(1);
-        checkTable(table0, "jpetstore", "public", "category");
+        checkTable(table0, "jpetstore", "PUBLIC", "category");
 
         List<Column> columns0 = table0.getColumns();
         assertEquals(3, columns0.size());
 
         checkColumn(columns0.get(0),
-                "jpetstore", "public", "category", "catid", null,
+                "jpetstore", "PUBLIC", "category", "catid", null,
                 "catid", "varchar", false, 10, 0);
         checkColumn(columns0.get(1),
-                "jpetstore", "public", "category", "name", null,
+                "jpetstore", "PUBLIC", "category", "name", null,
                 "name", "varchar", true, 80, 0);
         checkColumn(columns0.get(2),
-                "jpetstore", "public", "category", "descn", null,
+                "jpetstore", "PUBLIC", "category", "descn", null,
                 "descn", "varchar", true, 255, 0);
 
         PrimaryKey primaryKey0 = table0.getPrimaryKey();
@@ -106,7 +106,7 @@ public class DBParserTest extends AbstractPortofinoTest {
         assertEquals(columns0.get(0), pkColumns0.get(0));
         assertEquals(2, table0.getOneToManyRelationships().size());
         checkRelationships(table0.getOneToManyRelationships()
-                , 0, "fk_product_1", "public" ,
+                , 0, "fk_product_1", "PUBLIC" ,
                 "category", "NO ACTION", "NO ACTION");
         List<Reference> references =
                 table0.getOneToManyRelationships().get(0).getReferences();
@@ -115,11 +115,11 @@ public class DBParserTest extends AbstractPortofinoTest {
 
         // tabella 1
         Table table1 = tables.get(2);
-        checkTable(table1, "jpetstore", "public", "product");
+        checkTable(table1, "jpetstore", "PUBLIC", "product");
 
         int idxRel = 0;
         checkRelationships(table1.getForeignKeys()
-                , idxRel, "fk_product_1", "public" ,
+                , idxRel, "fk_product_1", "PUBLIC" ,
                 "category", "NO ACTION", "NO ACTION");
         assertEquals(1, table1.getForeignKeys().size());
         List<Reference> references2 =
@@ -130,39 +130,39 @@ public class DBParserTest extends AbstractPortofinoTest {
         assertEquals(4, columns1.size());
 
         checkColumn(columns1.get(0),
-                "jpetstore", "public", "product", "productid", null,
+                "jpetstore", "PUBLIC", "product", "productid", null,
                 "productid", "varchar", false, 10, 0);
         checkColumn(columns1.get(1),
-                "jpetstore", "public", "product", "category", null,
+                "jpetstore", "PUBLIC", "product", "category", null,
                 "category", "varchar", false, 10, 0);
         checkColumn(columns1.get(2),
-                "jpetstore", "public", "product", "name", null,
+                "jpetstore", "PUBLIC", "product", "name", null,
                 "name", "varchar", true, 80, 0);
         checkColumn(columns1.get(3),
-                "jpetstore", "public", "product", "descn", null,
+                "jpetstore", "PUBLIC", "product", "descn", null,
                 "descn", "varchar", true, 255, 0);
 
         // tabella 2
         Table table2 = tables.get(0);
-        checkTable(table2, "jpetstore", "public", "lineitem");
+        checkTable(table2, "jpetstore", "PUBLIC", "lineitem");
 
         List<Column> columns2 = table2.getColumns();
         assertEquals(3, columns0.size());
 
         checkColumn(columns2.get(0),
-                "jpetstore", "public", "lineitem", "orderid", null,
+                "jpetstore", "PUBLIC", "lineitem", "orderid", null,
                 "orderid", "INTEGER", false, 8, 0);
         checkColumn(columns2.get(1),
-                "jpetstore", "public", "lineitem", "linenum", null,
+                "jpetstore", "PUBLIC", "lineitem", "linenum", null,
                 "linenum", "INTEGER", false, 8, 0);
         checkColumn(columns2.get(2),
-                "jpetstore", "public", "lineitem", "itemid", null,
+                "jpetstore", "PUBLIC", "lineitem", "itemid", null,
                 "itemid", "varchar", false, 255, 0);
         checkColumn(columns2.get(3),
-                "jpetstore", "public", "lineitem", "quantity", null,
+                "jpetstore", "PUBLIC", "lineitem", "quantity", null,
                 "quantity", "INTEGER", false, 8, 0);
         checkColumn(columns2.get(4),
-                "jpetstore", "public", "lineitem", "unitprice", null,
+                "jpetstore", "PUBLIC", "lineitem", "unitprice", null,
                 "unitprice", "numeric", false, 10, 2);
 
         PrimaryKey primaryKey2 = table2.getPrimaryKey();

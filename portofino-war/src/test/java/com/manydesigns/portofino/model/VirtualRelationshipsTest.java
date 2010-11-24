@@ -40,7 +40,7 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class VirtualRelationshipsTest  extends AbstractPortofinoTest {
-    private static final String PORTOFINO_PUBLIC_USER = "portofino.public.users";
+    private static final String PORTOFINO_PUBLIC_USER = "portofino.PUBLIC.users";
 
     @Override
     public void setUp() throws Exception {
@@ -73,9 +73,9 @@ public class VirtualRelationshipsTest  extends AbstractPortofinoTest {
         pk.put("provincia", "genova");
         pk.put("regione", "liguria");
         Object comune = context.getObjectByPk
-                ("hibernatetest.public.comune", pk);
+                ("hibernatetest.PUBLIC.comune", pk);
 
-        List objs = context.getRelatedObjects("hibernatetest.public.comune",
+        List objs = context.getRelatedObjects("hibernatetest.PUBLIC.comune",
                 comune, "fk_delibera_1");
         assertEquals(1, objs.size());
 
@@ -86,8 +86,8 @@ public class VirtualRelationshipsTest  extends AbstractPortofinoTest {
         HashMap<String, Object> pkCat = new HashMap<String, Object>();
         pkCat.put("catid", "FISH");
         Object catObj = context.getObjectByPk
-                ("jpetstore.public.category", pkCat);
-        List cats = context.getRelatedObjects("jpetstore.public.category",
+                ("jpetstore.PUBLIC.category", pkCat);
+        List cats = context.getRelatedObjects("jpetstore.PUBLIC.category",
                 catObj, "fk_delibera_2");
         assertNotNull(cats);
 
