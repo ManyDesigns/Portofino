@@ -35,7 +35,7 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
@@ -210,44 +210,44 @@ public class ModelWriter {
         }
 
         // Annotations
-        writeModelAnnotations(table.getModelAnnotations());
+        writeModelAnnotations(table.getAnnotations());
 
         w.writeEndElement(); //table
     }
 
     private void writeColumn(Column column) throws XMLStreamException {
-        List<ModelAnnotation> modelAnnotations = column.getModelAnnotations();
-        if (modelAnnotations.isEmpty()) {
+        List<Annotation> annotations = column.getAnnotations();
+        if (annotations.isEmpty()) {
             w.writeEmptyElement(ModelParser.COLUMN);
             writeAttributes(column);
         } else {
             w.writeStartElement(ModelParser.COLUMN);
             writeAttributes(column);
-            writeModelAnnotations(modelAnnotations);
+            writeModelAnnotations(annotations);
             w.writeEndElement(); //column
         }
     }
 
-    private void writeModelAnnotations(List<ModelAnnotation> modelAnnotations)
+    private void writeModelAnnotations(List<Annotation> annotations)
             throws XMLStreamException {
-        if (!modelAnnotations.isEmpty()) {
+        if (!annotations.isEmpty()) {
             w.writeStartElement(ModelParser.ANNOTATIONS);
-            for (ModelAnnotation modelAnnotation : modelAnnotations){
-                writeModelAnnotation(modelAnnotation);
+            for (Annotation annotation : annotations){
+                writeModelAnnotation(annotation);
             }
             w.writeEndElement(); // annotations
         }
     }
 
-    private void writeModelAnnotation(ModelAnnotation modelAnnotation)
+    private void writeModelAnnotation(Annotation annotation)
             throws XMLStreamException {
-        List<String> values= modelAnnotation.getValues();
+        List<String> values= annotation.getValues();
         if (values.isEmpty()) {
             w.writeEmptyElement(ModelParser.ANNOTATION);
-            writeAttributes(modelAnnotation);
+            writeAttributes(annotation);
         } else {
             w.writeStartElement(ModelParser.ANNOTATION);
-            writeAttributes(modelAnnotation);
+            writeAttributes(annotation);
             for (String value : values) {
                 if (value == null) {
                     w.writeEmptyElement(ModelParser.VALUE);                    

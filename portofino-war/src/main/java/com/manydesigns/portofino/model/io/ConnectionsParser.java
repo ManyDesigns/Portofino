@@ -32,8 +32,6 @@ package com.manydesigns.portofino.model.io;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.database.JdbcConnectionProvider;
-import com.manydesigns.portofino.xml.DocumentCallback;
 import com.manydesigns.portofino.xml.XmlParser;
 
 import javax.xml.stream.XMLStreamException;
@@ -42,7 +40,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /*
@@ -78,10 +75,10 @@ public class ConnectionsParser extends XmlParser {
             throws XMLStreamException {
         connections = new ArrayList<ConnectionProvider>();
         initParser(inputStream);
-        expectDocument(new ConnectionsDocumentCallback());
+//        expectDocument(new ConnectionsDocumentCallback());
         return connections;
     }
-
+/*
     private class ConnectionsDocumentCallback implements DocumentCallback {
         public void doDocument() throws XMLStreamException {
             expectElement(new ConnectionsCallback());
@@ -121,5 +118,5 @@ public class ConnectionsParser extends XmlParser {
 
         }
     }
-
+*/
 }

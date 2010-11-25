@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.model.diff;
 
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.util.Pair;
 
@@ -148,13 +148,13 @@ public class DiffUtil {
         Collections.sort(sortedAnnotationTypes);
 
         for (String annotationType : sortedAnnotationTypes) {
-            ModelAnnotation sourceModelAnnotation =
+            Annotation sourceAnnotation =
                     findModelAnnotation(sourceTable, annotationType);
-            ModelAnnotation targetModelAnnotation =
+            Annotation targetAnnotation =
                     findModelAnnotation(targetTable, annotationType);
 
             ModelAnnotationDiff modelAnnotationDiff =
-                    diff(sourceModelAnnotation, targetModelAnnotation);
+                    diff(sourceAnnotation, targetAnnotation);
             result.getModelAnnotationDiffs().add(modelAnnotationDiff);
         }
 
@@ -211,13 +211,13 @@ public class DiffUtil {
         Collections.sort(sortedAnnotationTypes);
 
         for (String annotationType : sortedAnnotationTypes) {
-            ModelAnnotation sourceModelAnnotation =
+            Annotation sourceAnnotation =
                     findModelAnnotation(sourceForeignKey, annotationType);
-            ModelAnnotation targetModelAnnotation =
+            Annotation targetAnnotation =
                     findModelAnnotation(sourceForeignKey, annotationType);
 
             ModelAnnotationDiff modelAnnotationDiff =
-                    diff(sourceModelAnnotation, targetModelAnnotation);
+                    diff(sourceAnnotation, targetAnnotation);
             result.getModelAnnotationDiffs().add(modelAnnotationDiff);
         }
 
@@ -247,23 +247,23 @@ public class DiffUtil {
         Collections.sort(sortedAnnotationTypes);
 
         for (String annotationType : sortedAnnotationTypes) {
-            ModelAnnotation sourceModelAnnotation =
+            Annotation sourceAnnotation =
                     findModelAnnotation(sourceColumn, annotationType);
-            ModelAnnotation targetModelAnnotation =
+            Annotation targetAnnotation =
                     findModelAnnotation(targetColumn, annotationType);
 
             ModelAnnotationDiff modelAnnotationDiff =
-                    diff(sourceModelAnnotation, targetModelAnnotation);
+                    diff(sourceAnnotation, targetAnnotation);
             result.getModelAnnotationDiffs().add(modelAnnotationDiff);
         }
 
         return result;
     }
 
-    public static ModelAnnotationDiff diff(ModelAnnotation sourceModelAnnotation,
-                                           ModelAnnotation targetModelAnnotation) {
+    public static ModelAnnotationDiff diff(Annotation sourceAnnotation,
+                                           Annotation targetAnnotation) {
         return new ModelAnnotationDiff(
-                sourceModelAnnotation, targetModelAnnotation);
+                sourceAnnotation, targetAnnotation);
     }
 
     //--------------------------------------------------------------------------
@@ -314,7 +314,7 @@ public class DiffUtil {
         return foreignKey.findReferenceByColumnNamePair(columnNamePair);
     }
 
-    public static ModelAnnotation findModelAnnotation(Table table,
+    public static Annotation findModelAnnotation(Table table,
                                                       String annotationType) {
         if (table == null) {
             return null;
@@ -322,7 +322,7 @@ public class DiffUtil {
         return table.findModelAnnotationByType(annotationType);
     }
 
-    public static ModelAnnotation findModelAnnotation(Column column,
+    public static Annotation findModelAnnotation(Column column,
                                                       String annotationType) {
         if (column == null) {
             return null;
@@ -330,7 +330,7 @@ public class DiffUtil {
         return column.findModelAnnotationByType(annotationType);
     }
 
-    public static ModelAnnotation findModelAnnotation(ForeignKey foreignKey,
+    public static Annotation findModelAnnotation(ForeignKey foreignKey,
                                                       String annotationType) {
         if (foreignKey == null) {
             return null;
@@ -412,8 +412,8 @@ public class DiffUtil {
         if (table == null) {
             return;
         }
-        for (ModelAnnotation modelAnnotation : table.getModelAnnotations()) {
-            annotationTypes.add(modelAnnotation.getType());
+        for (Annotation annotation : table.getAnnotations()) {
+            annotationTypes.add(annotation.getType());
         }
     }
 
@@ -422,8 +422,8 @@ public class DiffUtil {
         if (column == null) {
             return;
         }
-        for (ModelAnnotation modelAnnotation : column.getModelAnnotations()) {
-            annotationTypes.add(modelAnnotation.getType());
+        for (Annotation annotation : column.getAnnotations()) {
+            annotationTypes.add(annotation.getType());
         }
     }
 
@@ -432,8 +432,8 @@ public class DiffUtil {
         if (foreignKey == null) {
             return;
         }
-        for (ModelAnnotation modelAnnotation : foreignKey.getModelAnnotations()) {
-            annotationTypes.add(modelAnnotation.getType());
+        for (Annotation annotation : foreignKey.getModelAnnotations()) {
+            annotationTypes.add(annotation.getType());
         }
     }
 

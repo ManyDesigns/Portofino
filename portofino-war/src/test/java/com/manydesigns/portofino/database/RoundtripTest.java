@@ -31,7 +31,7 @@ package com.manydesigns.portofino.database;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;
@@ -115,19 +115,19 @@ public class RoundtripTest extends AbstractPortofinoTest {
         Table productTable = model.findTableByQualifiedName("mydb.PUBLIC.PRODUCT");
         productTable.setJavaClass("com.example.Product");
 
-        ModelAnnotation productAnnotation =
-                new ModelAnnotation("com.example.TableAnnotation");
-        productTable.getModelAnnotations().add(productAnnotation);
+        Annotation productAnnotation =
+                new Annotation("com.example.TableAnnotation");
+        productTable.getAnnotations().add(productAnnotation);
 
         Column descnColumn = productTable.findColumnByName("DESCN");
         descnColumn.setPropertyName("description");
         descnColumn.setJavaType("java.lang.String");
 
-        ModelAnnotation descnAnnotation =
-                new ModelAnnotation("com.example.ColumnAnnotation");
+        Annotation descnAnnotation =
+                new Annotation("com.example.ColumnAnnotation");
         descnAnnotation.getValues().add("value1");
         descnAnnotation.getValues().add("value2");
-        descnColumn.getModelAnnotations().add(descnAnnotation);
+        descnColumn.getAnnotations().add(descnAnnotation);
 
         Column productCatidColumn =
                 productTable.findColumnByName("PRODUCT_CATID");
@@ -137,8 +137,8 @@ public class RoundtripTest extends AbstractPortofinoTest {
         ForeignKey catidForeignKey =
                 productTable.findForeignKeyByName("catid_fk");
 
-        ModelAnnotation catidFkAnnotation =
-                new ModelAnnotation("com.example.ForeignKeyAnnotation");
+        Annotation catidFkAnnotation =
+                new Annotation("com.example.ForeignKeyAnnotation");
         catidForeignKey.getModelAnnotations().add(catidFkAnnotation);
 
         return model;
@@ -208,7 +208,7 @@ public class RoundtripTest extends AbstractPortofinoTest {
         assertEquals("CATEGORY", categoryTable2.getTableName());
         assertEquals("com.example.Category", categoryTable2.getJavaClass());
         assertNull(categoryTable2.getManyToMany());
-        assertEquals(0, categoryTable2.getModelAnnotations().size());
+        assertEquals(0, categoryTable2.getAnnotations().size());
 
         // check the column
         assertEquals(1, categoryTable2.getColumns().size());
@@ -242,8 +242,8 @@ public class RoundtripTest extends AbstractPortofinoTest {
         assertNull(productTable2.getManyToMany());
 
         // check the table annotations
-        assertEquals(1, productTable2.getModelAnnotations().size());
-        ModelAnnotation productAnnotation2 = productTable2.getModelAnnotations().get(0);
+        assertEquals(1, productTable2.getAnnotations().size());
+        Annotation productAnnotation2 = productTable2.getAnnotations().get(0);
         assertNotNull(productAnnotation2);
         assertEquals("com.example.TableAnnotation", productAnnotation2.getType());
         assertEquals(0, productAnnotation2.getValues().size());
@@ -265,8 +265,8 @@ public class RoundtripTest extends AbstractPortofinoTest {
         assertEquals("java.lang.String", descnColumn2.getJavaType());
 
         // check the column annotations
-        assertEquals(1, descnColumn2.getModelAnnotations().size());
-        ModelAnnotation columnAnnotation2 = descnColumn2.getModelAnnotations().get(0);
+        assertEquals(1, descnColumn2.getAnnotations().size());
+        Annotation columnAnnotation2 = descnColumn2.getAnnotations().get(0);
         assertNotNull(columnAnnotation2);
         assertEquals("com.example.ColumnAnnotation", columnAnnotation2.getType());
         assertEquals(2, columnAnnotation2.getValues().size());

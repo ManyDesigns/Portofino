@@ -32,7 +32,7 @@ package com.manydesigns.portofino.model.datamodel;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.util.Pair;
 import com.manydesigns.portofino.xml.XmlAttribute;
 import com.manydesigns.portofino.xml.XmlCollection;
@@ -68,7 +68,7 @@ public class ForeignKey implements ModelObject {
 
     protected final Table fromTable;
     protected final List<Reference> references;
-    protected final List<ModelAnnotation> modelAnnotations;
+    protected final List<Annotation> annotations;
 
     protected String foreignKeyName;
 
@@ -111,7 +111,7 @@ public class ForeignKey implements ModelObject {
     public ForeignKey(Table fromTable) {
         this.fromTable = fromTable;
         references = new ArrayList<Reference>();
-        modelAnnotations = new ArrayList<ModelAnnotation>();
+        annotations = new ArrayList<Annotation>();
     }
 
     public ForeignKey(Table fromTable, String foreignKeyName,
@@ -204,10 +204,10 @@ public class ForeignKey implements ModelObject {
         return null;
     }
 
-    public ModelAnnotation findModelAnnotationByType(String annotationType) {
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            if (modelAnnotation.getType().equals(annotationType)) {
-                return modelAnnotation;
+    public Annotation findModelAnnotationByType(String annotationType) {
+        for (Annotation annotation : annotations) {
+            if (annotation.getType().equals(annotationType)) {
+                return annotation;
             }
         }
         LogUtil.fineMF(logger,
@@ -289,7 +289,7 @@ public class ForeignKey implements ModelObject {
         this.onDelete = onDelete;
     }
 
-    @XmlCollection(min = 1, itemType = Reference.class)
+    @XmlCollection(itemMin = 1, itemClass = Reference.class, itemName = "reference")
     public List<Reference> getReferences() {
         return references;
     }
@@ -321,8 +321,8 @@ public class ForeignKey implements ModelObject {
         this.onePropertyName = onePropertyName;
     }
 
-    public List<ModelAnnotation> getModelAnnotations() {
-        return modelAnnotations;
+    public List<Annotation> getModelAnnotations() {
+        return annotations;
     }
 
     public Table getActualToTable() {

@@ -163,7 +163,7 @@ public class PrimaryKey implements ModelObject {
         this.primaryKeyName = primaryKeyName;
     }
 
-    @XmlCollection(itemType = PrimaryKeyColumn.class)
+    @XmlCollection(itemClass = PrimaryKeyColumn.class, itemName = "column")
     public List<PrimaryKeyColumn> getPrimaryKeyColumns() {
         return primaryKeyColumns;
     }

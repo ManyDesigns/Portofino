@@ -31,7 +31,7 @@ package com.manydesigns.portofino.database;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.database.platforms.AbstractDatabasePlatform;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;
@@ -79,9 +79,9 @@ public class JdbcMetadataReaderTest extends AbstractPortofinoTest {
         publicSchema.getTables().add(productTable);
         Column descnColumn = new Column(productTable, "DESCN", "varchar", true, false, 255, 0, true);
         productTable.getColumns().add(descnColumn);
-        ModelAnnotation modelAnnotation1 = new ModelAnnotation(
+        Annotation annotation1 = new Annotation(
                 com.manydesigns.elements.annotations.Label.class.getName());
-        descnColumn.getModelAnnotations().add(modelAnnotation1);
+        descnColumn.getAnnotations().add(annotation1);
 
         Table supplierTable = new Table(publicSchema, "SUPPLIER");
         publicSchema.getTables().add(supplierTable);

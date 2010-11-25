@@ -48,7 +48,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ModelAnnotation implements ModelObject {
+public class Annotation implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -72,17 +72,17 @@ public class ModelAnnotation implements ModelObject {
     //**************************************************************************
 
     public static final Logger logger =
-            LogUtil.getLogger(ModelAnnotation.class);
+            LogUtil.getLogger(Annotation.class);
 
     //**************************************************************************
     // Contruction
     //**************************************************************************
 
-    public ModelAnnotation() {
+    public Annotation() {
         values = new ArrayList<String>();
     }
 
-    public ModelAnnotation(String type) {
+    public Annotation(String type) {
         this();
         this.type = type;
     }
@@ -173,7 +173,7 @@ public class ModelAnnotation implements ModelObject {
         this.type = type;
     }
 
-    @XmlCollection(itemType = String.class)
+    @XmlCollection(itemClass = String.class, itemName = "value")
     public List<String> getValues() {
         return values;
     }

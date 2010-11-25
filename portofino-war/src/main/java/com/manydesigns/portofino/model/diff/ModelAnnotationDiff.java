@@ -1,6 +1,6 @@
 package com.manydesigns.portofino.model.diff;
 
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 
 /**
  * File created on Oct 26, 2010 at 12:09:28 PM
@@ -8,20 +8,20 @@ import com.manydesigns.portofino.model.annotations.ModelAnnotation;
  * All rights reserved
  */
 public class ModelAnnotationDiff {
-    private final ModelAnnotation sourceModelAnnotation;
-    private final ModelAnnotation targetModelAnnotation;
+    private final Annotation sourceAnnotation;
+    private final Annotation targetAnnotation;
 
-    public ModelAnnotationDiff(ModelAnnotation sourceModelAnnotation,
-                                     ModelAnnotation targetModelAnnotation) {
-        this.sourceModelAnnotation = sourceModelAnnotation;
-        this.targetModelAnnotation = targetModelAnnotation;
+    public ModelAnnotationDiff(Annotation sourceAnnotation,
+                                     Annotation targetAnnotation) {
+        this.sourceAnnotation = sourceAnnotation;
+        this.targetAnnotation = targetAnnotation;
     }
 
-    public ModelAnnotation getSourceModelAnnotation() {
-        return sourceModelAnnotation;
+    public Annotation getSourceModelAnnotation() {
+        return sourceAnnotation;
     }
 
-    public ModelAnnotation getTargetModelAnnotation() {
-        return targetModelAnnotation;
+    public Annotation getTargetModelAnnotation() {
+        return targetAnnotation;
     }
 }

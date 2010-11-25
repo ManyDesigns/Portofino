@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.model.site.usecases;
 
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.xml.XmlAttribute;
@@ -56,7 +56,7 @@ public class UseCase {
     protected final UseCase parentUseCase;
     protected final List<UseCaseProperty> properties;
     protected final List<ModelSelectionProvider> modelSelectionProviders;
-    protected final List<ModelAnnotation> modelAnnotations;
+    protected final List<Annotation> annotations;
     protected final List<Button> buttons;
     protected final List<UseCase> subUseCases;
 
@@ -82,7 +82,7 @@ public class UseCase {
         this.parentUseCase = parentUseCase;
         properties = new ArrayList<UseCaseProperty>();
         modelSelectionProviders = new ArrayList<ModelSelectionProvider>();
-        modelAnnotations = new ArrayList<ModelAnnotation>();
+        annotations = new ArrayList<Annotation>();
         buttons = new ArrayList<Button>();
         subUseCases = new ArrayList<UseCase>();
     }
@@ -116,8 +116,8 @@ public class UseCase {
             modelSelectionProvider.reset();
         }
 
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.reset();
+        for (Annotation annotation : annotations) {
+            annotation.reset();
         }
 
         for (Button button : buttons) {
@@ -140,8 +140,8 @@ public class UseCase {
             modelSelectionProvider.init(model);
         }
 
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.init(model);
+        for (Annotation annotation : annotations) {
+            annotation.init(model);
         }
 
         for (Button button : buttons) {
@@ -183,8 +183,8 @@ public class UseCase {
         return buttons;
     }
 
-    public List<ModelAnnotation> getModelAnnotations() {
-        return modelAnnotations;
+    public List<Annotation> getModelAnnotations() {
+        return annotations;
     }
 
     public List<UseCase> getSubUseCases() {

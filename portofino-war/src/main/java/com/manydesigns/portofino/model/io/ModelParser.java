@@ -3,15 +3,10 @@ package com.manydesigns.portofino.model.io;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
-import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
-import com.manydesigns.portofino.model.site.*;
-import com.manydesigns.portofino.model.site.usecases.Button;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
-import com.manydesigns.portofino.model.site.usecases.UseCaseProperty;
-import com.manydesigns.portofino.xml.CharactersCallback;
 import com.manydesigns.portofino.xml.DocumentCallback;
 import com.manydesigns.portofino.xml.XmlParser;
 
@@ -20,8 +15,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Logger;
 
@@ -97,8 +90,8 @@ public class ModelParser extends XmlParser {
     ForeignKey currentFk;
     Stack<UseCase> useCaseStack;
 
-    Collection<ModelAnnotation> currentModelAnnotations;
-    ModelAnnotation currentModelAnnotation;
+    Collection<Annotation> currentAnnotations;
+    Annotation currentAnnotation;
     ModelSelectionProvider currentModelSelectionProvider;
 
 
@@ -140,10 +133,10 @@ public class ModelParser extends XmlParser {
 
     private class ModelDocumentCallback implements DocumentCallback {
         public void doDocument() throws XMLStreamException {
-            expectElement(new ModelCallback());
+//            expectElement(new ModelCallback());
         }
     }
-
+/*
     private class ModelCallback extends ElementCallback {
         private ModelCallback() {
             super(null, Model.class, MODEL, 1, 1);
@@ -769,5 +762,6 @@ public class ModelParser extends XmlParser {
                     .add(selectionProperty);
         }
     }
+    */
 }
 

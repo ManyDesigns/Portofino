@@ -38,6 +38,8 @@ import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.xml.stream.*;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
@@ -443,13 +445,30 @@ public class XmlParser {
                         propertyAccessor.getAnnotation(XmlCollection.class);
 
                 if (xmlElementAnnotation != null) {
+                    boolean required = xmlElementAnnotation.required();
+                    Class itemClass = propertyAccessor.getType();
+                    String itemName = propertyAccessor.getName();
+                    ElementCallback callback =
+                            new ElementCallback(obj, null, propertyAccessor,
+                                    itemClass, itemName, (required ? 1 : 0), 1);
+                    expectElement(callback);
                 } else if (xmlCollectionAnnotation != null) {
-                    Class itemType = xmlCollectionAnnotation.itemType();
-                    int min = xmlCollectionAnnotation.min();
-                    int max = xmlCollectionAnnotation.max();
+                    boolean required = xmlCollectionAnnotation.required();
+                    String collectionName = propertyAccessor.getName();
+
+                    Class itemClass = xmlCollectionAnnotation.itemClass();
+                    String itemName = xmlCollectionAnnotation.itemName();
+                    int itemMin = xmlCollectionAnnotation.itemMin();
+                    int itemMax = xmlCollectionAnnotation.itemMax();
+
                     try {
                         Collection collection =
                                 (Collection) propertyAccessor.get(obj);
+                        CollectionCallback collectionCallBack =
+                                new CollectionCallback(obj,
+                                        collection, collectionName, required,
+                                        itemClass, itemName, itemMin, itemMax);
+                        expectElement(collectionCallBack);
                     } catch (Throwable e) {
                         e.printStackTrace();
                     }
@@ -461,18 +480,21 @@ public class XmlParser {
     public class CollectionCallback extends Callback {
         protected final Object parent;
         protected final Collection parentCollection;
-        protected final Class itemClass;
         protected final boolean required;
+        protected final Class itemClass;
+        protected final String itemName;
         protected final int itemMin;
         protected final int itemMax;
 
         protected CollectionCallback(Object parent, Collection parentCollection,
-                                     Class itemClass, String elementName,
-                                     boolean required, int itemMin, int itemMax) {
-            super(elementName, 0, (required ? 0 : 1));
+                                     String elementName, boolean required,
+                                     Class itemClass, String itemName,
+                                     int itemMin, int itemMax) {
+            super(elementName, (required ? 1 : 0), 1);
             this.parent = parent;
             this.parentCollection = parentCollection;
             this.itemClass = itemClass;
+            this.itemName = itemName;
             this.required = required;
             this.itemMin = itemMin;
             this.itemMax = itemMax;
@@ -481,7 +503,39 @@ public class XmlParser {
         public void doElement(Map<String, String> attributes)
                 throws XMLStreamException {
             expectElement(new ElementCallback(parent, parentCollection, null,
-                    itemClass, "", itemMin, itemMax));
+                    itemClass, itemName, itemMin, itemMax));
         }
     }
+
+
+    public Object parse(String resourceName, Class rootClass) throws Exception {
+        InputStream inputStream = ReflectionUtil.getResourceAsStream(resourceName);
+        return parse(inputStream, rootClass);
+    }
+
+    public Object parse(File file, Class rootClass) throws Exception {
+        LogUtil.infoMF(logger, "Parsing file: {0}", file.getAbsolutePath());
+        InputStream input = new FileInputStream(file);
+        return parse(input, rootClass);
+    }
+
+    private Object parse(InputStream inputStream, Class rootClass) throws XMLStreamException {
+        initParser(inputStream);
+        this.rootClass = rootClass;
+        expectDocument(new ModelDocumentCallback());
+        return model;
+    }
+
+    private Class rootClass;
+    private Object model;
+
+    private class ModelDocumentCallback implements DocumentCallback {
+        public void doDocument() throws XMLStreamException {
+            ElementCallback elementCallback =
+                    new ElementCallback(rootClass, "model", 1, 1);
+            expectElement(elementCallback);
+            model = elementCallback.obj;
+        }
+    }
+
 }

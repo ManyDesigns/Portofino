@@ -47,13 +47,13 @@ import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;
 import com.manydesigns.portofino.model.diff.MergeDiffer;
 import com.manydesigns.portofino.model.io.ConnectionsParser;
-import com.manydesigns.portofino.model.io.ModelParser;
 import com.manydesigns.portofino.model.io.ModelWriter;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.UseCaseAccessor;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.xml.XmlParser;
 import org.apache.commons.lang.time.StopWatch;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
@@ -139,9 +139,9 @@ public class HibernateContextImpl implements Context {
         LogUtil.infoMF(logger, "Loading xml model from file: {0}",
                 file.getAbsolutePath());
 
-        ModelParser parser = new ModelParser();
+        XmlParser parser = new XmlParser();
         try {
-            Model loadedModel = parser.parse(file);
+            Model loadedModel = (Model) parser.parse(file, Model.class);
             installDataModel(loadedModel);
             xmlModelFile = file;
         } catch (Exception e) {

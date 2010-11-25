@@ -33,7 +33,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.xml.XmlAttribute;
 import com.manydesigns.portofino.xml.XmlCollection;
 import com.manydesigns.portofino.xml.XmlElement;
@@ -59,7 +59,7 @@ public class Table implements ModelObject {
     protected final Schema schema;
     protected final List<Column> columns;
     protected final List<ForeignKey> foreignKeys;
-    protected final List<ModelAnnotation> modelAnnotations;
+    protected final List<Annotation> annotations;
 
     protected String tableName;
 
@@ -89,7 +89,7 @@ public class Table implements ModelObject {
         columns = new ArrayList<Column>();
         foreignKeys = new ArrayList<ForeignKey>();
         oneToManyRelationships = new ArrayList<ForeignKey>();
-        modelAnnotations = new ArrayList<ModelAnnotation>();
+        annotations = new ArrayList<Annotation>();
     }
 
     public Table(Schema schema, String tableName) {
@@ -130,8 +130,8 @@ public class Table implements ModelObject {
             foreignKey.reset();
         }
 
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.reset();
+        for (Annotation annotation : annotations) {
+            annotation.reset();
         }
     }
 
@@ -155,8 +155,8 @@ public class Table implements ModelObject {
         }
 
 
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.init(model);
+        for (Annotation annotation : annotations) {
+            annotation.init(model);
         }
     }
 
@@ -203,7 +203,7 @@ public class Table implements ModelObject {
         this.javaClass = javaClass;
     }
 
-    @XmlCollection(itemType = Column.class)
+    @XmlCollection(itemClass = Column.class, itemName = "column")
     public List<Column> getColumns() {
         return columns;
     }
@@ -221,7 +221,7 @@ public class Table implements ModelObject {
         return actualJavaClass;
     }
 
-    @XmlCollection(itemType = ForeignKey.class)
+    @XmlCollection(itemClass = ForeignKey.class, itemName = "foreignKey")
     public List<ForeignKey> getForeignKeys() {
         return foreignKeys;
     }
@@ -230,9 +230,9 @@ public class Table implements ModelObject {
         return oneToManyRelationships;
     }
 
-    @XmlCollection(itemType = ModelAnnotation.class)
-    public List<ModelAnnotation> getModelAnnotations() {
-        return modelAnnotations;
+    @XmlCollection(itemClass = Annotation.class, itemName = "annotation")
+    public List<Annotation> getAnnotations() {
+        return annotations;
     }
 
     //**************************************************************************
@@ -271,10 +271,10 @@ public class Table implements ModelObject {
         return null;
     }
 
-    public ModelAnnotation findModelAnnotationByType(String annotationType) {
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            if (modelAnnotation.getType().equals(annotationType)) {
-                return modelAnnotation;
+    public Annotation findModelAnnotationByType(String annotationType) {
+        for (Annotation annotation : annotations) {
+            if (annotation.getType().equals(annotationType)) {
+                return annotation;
             }
         }
         LogUtil.fineMF(logger,
