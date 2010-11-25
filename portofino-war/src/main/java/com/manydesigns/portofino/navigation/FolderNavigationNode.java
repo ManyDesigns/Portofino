@@ -40,8 +40,8 @@ public class FolderNavigationNode extends SimpleNavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public FolderNavigationNode(SiteNode siteNode, boolean hidden) {
-        super(siteNode, hidden);
+    public FolderNavigationNode(SiteNode siteNode, boolean allowed) {
+        super(siteNode, allowed);
     }
 
 

@@ -49,8 +49,9 @@ public class TableDataNavigationNode extends SimpleNavigationNode {
     // Constructors
     //**************************************************************************
 
-    public TableDataNavigationNode(Context context, SiteNode siteNode, boolean hidden) {
-        super(siteNode, hidden);
+    public TableDataNavigationNode(Context context, SiteNode siteNode,
+                                    boolean allowed) {
+        super(siteNode, allowed);
 
         List<Table> tables = context.getModel().getAllTables();
         for (Table table : tables) {
@@ -60,7 +61,7 @@ public class TableDataNavigationNode extends SimpleNavigationNode {
                     new TableNavigationNode(siteNode,table,
                             urlFormat,
                             "%{tableName}",
-                            "Table data: %{qualifiedName}", hidden);
+                            "Table data: %{qualifiedName}", allowed);
             childNodes.add(node);
         }
     }

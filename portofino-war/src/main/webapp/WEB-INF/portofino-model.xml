@@ -1043,6 +1043,7 @@ Struttura dell'XML:
                         </annotations>
                     </property>
                 </properties>
+
                 <selectionProviders>
                     <!-- Esempio con selection provider con hql
                     <selectionProvider name="mysel" database="hibernatetest"
@@ -1060,7 +1061,12 @@ Struttura dell'XML:
                         </selectionProperties>
                     </selectionProvider>
                 </selectionProviders>
-            </useCase>
+                </useCase>
+                <permissions>
+                    <allow>
+                        <group name="users" />
+                    </allow>
+                </permissions>
                 </useCaseNode>
                 <portletNode name="portlet1"
                              id="portlet1"
@@ -1071,11 +1077,17 @@ Struttura dell'XML:
                              database="jpetstore"
                              query="SELECT category, count(*) FROM product WHERE %{'pippo'} IS NOT NULL GROUP BY category ORDER BY category"
                              urlExpression="/usecases/uc2/UseCase.action?pk=%{key}"
-                            />
+                            >
+                        <permissions>
+                            <allow>
+                                <group name="admins" />
+                            </allow>
+                        </permissions>
+                    </portletNode>
                 </childNodes>
                 <permissions>
                     <allow>
-                        <group name="users" />
+                        <group name="registered" />
                     </allow>
                 </permissions>
             </folderNode>

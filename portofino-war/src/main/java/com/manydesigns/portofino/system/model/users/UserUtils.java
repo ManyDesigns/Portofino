@@ -30,8 +30,8 @@ package com.manydesigns.portofino.system.model.users;
 
 import com.manydesigns.portofino.context.Context;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,27 +45,30 @@ public class UserUtils {
     public static final String USERTABLE = "portofino.public.users";
     public static final String GROUPTABLE = "portofino.public.groups";
 
+    public static final String USERID = "userId";
+    public static final String USERNAME = "userName";
+    public static final String PASSWORD = "pwd";
+
     public static final Long ACTIVE = 1L;
     public static final Long SUSPENDED = 2L;
     public static final Long BANNED = 3L;
     public static final Long SELFREGITRED = 4L;
 
-    public static  List<String> manageGroups(Context context) {
-        Long currentUserId = context.getCurrentUserId();
+    public static List<String> manageGroups(Context context, Long userId) {
         List<String> groups = new ArrayList<String>();
-        if(currentUserId==null){
-                groups.add(Group.ANONYMOUS);
-            } else {
-                User u = (User) context.getObjectByPk(UserUtils.USERTABLE,
-                        new User(currentUserId));
-                groups.add(Group.ANONYMOUS);
-                groups.add(Group.REGISTERED);
+        if (userId == null) {
+            groups.add(Group.ANONYMOUS);
+        } else {
+            User u = (User) context.getObjectByPk(UserUtils.USERTABLE,
+                    new User(userId));
+            groups.add(Group.ANONYMOUS);
+            groups.add(Group.REGISTERED);
 
-                for (UsersGroups ug : u.getGroups()){
-                    if (ug.getDeletionDate()==null){
-                        groups.add(ug.getGroup().getName());
-                    }
+            for (UsersGroups ug : u.getGroups()) {
+                if (ug.getDeletionDate() == null) {
+                    groups.add(ug.getGroup().getName());
                 }
+            }
         }
         return groups;
     }

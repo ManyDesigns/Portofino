@@ -34,7 +34,6 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.site.*;
-import com.manydesigns.portofino.system.model.users.UserUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +58,7 @@ public class Navigation implements XhtmlFragment {
     protected final String normalizedRequestUrl;
     protected final List<NavigationNode> foundPath;
     protected final List<NavigationNode> rootNodes;
+    protected final List<String> groups;
 
     public static final Logger logger = LogUtil.getLogger(Navigation.class);
 
@@ -66,9 +66,10 @@ public class Navigation implements XhtmlFragment {
     // Constructors
     //**************************************************************************
 
-    public Navigation(Context context, String requestUrl) {
+    public Navigation(Context context, String requestUrl, List<String> groups) {
         this.context = context;
         this.requestUrl = requestUrl;
+        this.groups = groups;
         int i = requestUrl.lastIndexOf("!");
         int j = requestUrl.lastIndexOf(".");
         if (i >= 0 && j > i) {
@@ -89,39 +90,41 @@ public class Navigation implements XhtmlFragment {
     protected void generateNavigationNodes(List<SiteNode> siteNodes,
                                            List<NavigationNode> navigationNodes) {
         for (SiteNode siteNode : siteNodes) {
-            //se non sono autorizzato a vedere il nodo continuo
-            List<String> groups = UserUtils.manageGroups(context);
-            boolean hidden;
-            hidden = !siteNode.isAllowed(groups);
-
+            boolean allowed = siteNode.isAllowed(groups);
             NavigationNode navigationNode;
             if (siteNode instanceof DocumentNode
                     || siteNode instanceof PortletNode
                     || siteNode instanceof UseCaseNode
                     || siteNode instanceof CustomNode) {
-                navigationNode = new SimpleNavigationNode(siteNode, hidden);
+                navigationNode = new SimpleNavigationNode(siteNode,
+                        allowed);
                 generateNavigationNodes(siteNode.getChildNodes(),
                         navigationNode.getChildNodes());
             }else if (siteNode instanceof FolderNode) {
-                navigationNode = new FolderNavigationNode(siteNode, hidden);
+                navigationNode = new FolderNavigationNode(siteNode,
+                         allowed);
                 generateNavigationNodes(siteNode.getChildNodes(),
                         navigationNode.getChildNodes());
             } else if (siteNode instanceof CustomFolderNode) {
                 CustomFolderNode node = (CustomFolderNode) siteNode;
                 if("table-data".equals(node.getType())) {
                     navigationNode =
-                        new TableDataNavigationNode(context, siteNode, hidden);
+                        new TableDataNavigationNode(context, siteNode,
+                                 allowed);
                 } else if("table-design".equals(node.getType())) {
                     navigationNode =
-                        new TableDesignNavigationNode(context, siteNode, hidden);
+                        new TableDesignNavigationNode(context, siteNode,
+                                 allowed);
                 } else {
                 LogUtil.warningMF(logger,
-                        "Unrecognized site node type: {0}", siteNode.getClass().getName());
+                        "Unrecognized site node type: {0}",
+                        siteNode.getClass().getName());
                 continue;
                 }
             } else {
                 LogUtil.warningMF(logger,
-                        "Unrecognized site node type: {0}", siteNode.getClass().getName());
+                        "Unrecognized site node type: {0}",
+                        siteNode.getClass().getName());
                 continue;
             }
             navigationNodes.add(navigationNode);
@@ -167,7 +170,7 @@ public class Navigation implements XhtmlFragment {
         xb.openElement("ul");
         List<NavigationNode> expand = null;
         for (NavigationNode current : nodes) {
-            if(current.isHidden()){
+            if(!current.isAllowed()){
                 continue;
             }
             xb.openElement("li");

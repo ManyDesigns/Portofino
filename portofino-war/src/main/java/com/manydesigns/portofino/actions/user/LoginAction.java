@@ -77,7 +77,7 @@ public class LoginAction extends PortofinoAction
     public LoginAction(){
         FormBuilder builder =
             new FormBuilder(User.class);
-        builder.configFields("email", "pwd");
+        builder.configFields("userName", "pwd");
 
         form = builder.build();
         recoverPwd = Boolean.parseBoolean(PortofinoProperties.getProperties().
@@ -86,7 +86,8 @@ public class LoginAction extends PortofinoAction
     }
 
     public String execute () {
-        context.logout();
+        getSession().remove(UserUtils.USERID);
+        getSession().remove(UserUtils.USERNAME);
         return INPUT;
     }
 
@@ -100,21 +101,22 @@ public class LoginAction extends PortofinoAction
         if (enc) {
             user.encryptPwd();
         }
-        String email = user.getEmail();
+        String username = user.getUserName();
         String password = user.getPwd();
-        user = context.login(email, password);
+        user = context.login(username, password);
 
         if (user==null) {
-            String errMsg = MessageFormat.format("FAILED AUTH for user {0}", email);
+            String errMsg = MessageFormat.format("FAILED AUTH for user {0}",
+                    username);
             SessionMessages.addInfoMessage(errMsg);
             LogUtil.warningMF(logger, errMsg);
-            updateFailedUser(email);
+            updateFailedUser(username);
             return INPUT;
         }
 
         if (!user.getState().equals(UserUtils.ACTIVE)) {
             String errMsg = MessageFormat.format("User {0} is not active. " +
-                    "Please contact the administrator", email);
+                    "Please contact the administrator", username);
             SessionMessages.addInfoMessage(errMsg);
             LogUtil.warningMF(logger, errMsg);
             return INPUT;
@@ -122,15 +124,16 @@ public class LoginAction extends PortofinoAction
 
 
         LogUtil.fineMF(logger, "User {0} login", user.getEmail());
-        context.setCurrentUser(user.getUserId());
+        getSession().put(UserUtils.USERID, user.getUserId());
+        getSession().put(UserUtils.USERNAME, user.getUserName());
         updateUser(user);
         return SUCCESS;
 
     }
 
-    private void updateFailedUser(String email) {
+    private void updateFailedUser(String username) {
         User user;
-        user = context.findUserByEmail(email);
+        user = context.findUserByUserName(username);
         if (user == null) {
             return;
         }
@@ -150,7 +153,8 @@ public class LoginAction extends PortofinoAction
     }
 
     public String logout(){
-        context.logout();
-        return INPUT;
+        getSession().remove(UserUtils.USERID);
+        SessionMessages.addInfoMessage("User disconnetected");
+        return SUCCESS;
     }
 }

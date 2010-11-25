@@ -55,7 +55,7 @@ public class TableNavigationNode implements NavigationNode {
     protected final String description;
     protected final SiteNode siteNode;
     protected List<NavigationNode> childNodes;
-    protected final boolean hidden;
+    protected final boolean allowed;
 
     //**************************************************************************
     // Constructors
@@ -64,13 +64,14 @@ public class TableNavigationNode implements NavigationNode {
     public TableNavigationNode(SiteNode siteNode, Table table,
                                String urlFormat,
                                String titleFormat,
-                               String descriptionFormat, boolean hidden) {
+                               String descriptionFormat,
+                               boolean allowed) {
         this.siteNode = siteNode;
         this.table = table;
         this.url = Util.getAbsoluteUrl(OgnlTextFormat.format(urlFormat, table));
         this.title = OgnlTextFormat.format(titleFormat, table);
         this.description = OgnlTextFormat.format(descriptionFormat, table);
-        this.hidden = hidden;
+        this.allowed=allowed;
     }
 
 
@@ -108,7 +109,7 @@ public class TableNavigationNode implements NavigationNode {
         return table;
     }
 
-    public boolean isHidden() {
-        return hidden;
+    public boolean isAllowed() {
+        return allowed;
     }
 }

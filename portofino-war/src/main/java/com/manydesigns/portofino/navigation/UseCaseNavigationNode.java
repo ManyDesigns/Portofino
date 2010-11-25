@@ -43,7 +43,7 @@ public class UseCaseNavigationNode extends SimpleNavigationNode {
     //**************************************************************************
     // Constructors
     //**************************************************************************
-    public UseCaseNavigationNode(UseCaseNode siteNode, boolean hidden) {
-       super(siteNode, hidden);
+    public UseCaseNavigationNode(UseCaseNode siteNode, boolean allowed) {
+       super(siteNode, allowed);
     }
 }

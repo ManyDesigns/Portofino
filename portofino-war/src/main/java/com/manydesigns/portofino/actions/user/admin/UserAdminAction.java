@@ -152,7 +152,7 @@ public class UserAdminAction extends UseCaseAction {
 
         if (mailEnabled) {
             String msg = "La tua nuova password è " + generatedPwd;
-            Long userId = context.getCurrentUserId();
+            Long userId = (Long) getSession().get(UserUtils.USERID);
             User thisUser =
             (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
             EmailHandler.addEmail(context, "new password", msg,

@@ -50,15 +50,16 @@ public class TableDesignNavigationNode extends SimpleNavigationNode {
     // Constructors
     //**************************************************************************
 
-    public TableDesignNavigationNode(Context context, SiteNode siteNode, boolean hidden) {
-        super(siteNode, hidden);
+    public TableDesignNavigationNode(Context context, SiteNode siteNode,
+                                     boolean allowed) {
+        super(siteNode, allowed);
         List<Table> tables = context.getModel().getAllTables();
         for (Table table : tables) {
             TableNavigationNode node =
                     new TableNavigationNode(siteNode,table,
                             siteNode.getParent().getActualId()+"/{0}/TableDesign.action",
                             "{0}",
-                            "Table design: {0}", hidden);
+                            "Table design: {0}", allowed);
             childNodes.add(node);
         }
     }

@@ -139,16 +139,11 @@ public interface Context {
     // User
     //**************************************************************************
 
-    User login(String email, String password);
+    User login(String username, String password);
 
     public User findUserByEmail(String email);
 
+    public User findUserByUserName(String username);
+
     public User findUserByToken(String token);
-
-    void logout();
-
-    Long getCurrentUserId();
-
-    void setCurrentUser(Long userId);
-
 }

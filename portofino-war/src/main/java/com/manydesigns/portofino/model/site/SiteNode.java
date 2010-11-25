@@ -62,6 +62,7 @@ public abstract class SiteNode implements ModelObject {
     protected String description;
     protected String url;
 
+
     //**************************************************************************
     // Permissions
     //**************************************************************************
@@ -192,7 +193,7 @@ public abstract class SiteNode implements ModelObject {
         this.url = url;
     }
 
-    public boolean isAllowed (String group) {
+    public boolean checkPermission(String group) {
         if (denyGroups.contains(group)) {
                 return false;
         }
@@ -207,13 +208,14 @@ public abstract class SiteNode implements ModelObject {
         }
     }
 
-    public boolean isAllowed (List<String> groups) {
+    public boolean isAllowed(List<String> groups) {
         boolean result = false;
+        boolean parentAllowed= true;
+        if (parent != null){
+            parentAllowed= parent.isAllowed(groups);
+        }
         for (String group : groups){
-            boolean parentAllowed= true;
-            if (parent != null){
-                parentAllowed= parent.isAllowed(groups);
-            }result = result || (parentAllowed && isAllowed(group));
+            result = result || (parentAllowed && checkPermission(group));
         }
         return result;
     }

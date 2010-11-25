@@ -69,11 +69,13 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     public List<Group> groups;
 
     private Boolean enc;
+    private Long userId;
 
     public ProfileAction() {
         groups = new ArrayList<Group>();
         enc = Boolean.parseBoolean(PortofinoProperties.getProperties()
                 .getProperty(PortofinoProperties.PWD_ENCRYPTED, "false"));
+        userId = (Long) getSession().get(UserUtils.USERID);
     }
 
 
@@ -94,7 +96,6 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     }
 
     private String read() {
-        Long userId = context.getCurrentUserId();
         User thisUser =
             (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
         ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
@@ -116,7 +117,6 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     }
 
     public String edit() {
-        Long userId = context.getCurrentUserId();
         User thisUser =
             (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 
@@ -132,10 +132,8 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     }
 
     public String update() {
-        Long userId = context.getCurrentUserId();
         User thisUser =
             (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
-
         ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
@@ -166,7 +164,6 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     }
 
     public String updatePwd() {
-        Long userId = context.getCurrentUserId();
         User thisUser =
             (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 

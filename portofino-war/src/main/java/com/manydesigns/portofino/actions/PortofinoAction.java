@@ -37,6 +37,9 @@ import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.opensymphony.xwork2.ActionSupport;
+import org.apache.struts2.interceptor.SessionAware;
+
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -44,7 +47,7 @@ import com.opensymphony.xwork2.ActionSupport;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class PortofinoAction extends ActionSupport
-        implements ContextAware, NavigationAware {
+        implements ContextAware, NavigationAware, SessionAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -108,6 +111,18 @@ public class PortofinoAction extends ActionSupport
         this.navigation = navigation;
     }
 
+    //**************************************************************************
+    // SessionAware implmentation
+    //**************************************************************************
+
+    private Map<String, Object> session;
+    public void setSession(Map<String, Object> session) {
+        this.session = session;
+    }
+
+    public Map<String, Object> getSession() {
+        return session;
+    }
     //**************************************************************************
     // Simplified access to SessionMessages
     //**************************************************************************

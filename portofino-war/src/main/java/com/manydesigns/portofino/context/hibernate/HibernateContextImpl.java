@@ -54,6 +54,7 @@ import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.UseCaseAccessor;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.system.model.users.UserUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
@@ -96,7 +97,6 @@ public class HibernateContextImpl implements Context {
     protected Model model;
     protected Map<String, HibernateDatabaseSetup> setups;
     protected final ThreadLocal<StopWatch> stopWatches;
-    protected final ThreadLocal<Long> threadUsers;
     protected final List<SiteNode> siteNodes;
     protected File xmlModelFile;
 
@@ -111,7 +111,6 @@ public class HibernateContextImpl implements Context {
     public HibernateContextImpl() {
         stopWatches = new ThreadLocal<StopWatch>();
         siteNodes = new ArrayList<SiteNode>();
-        threadUsers = new ThreadLocal<Long>();
     }
 
     //**************************************************************************
@@ -800,12 +799,12 @@ public class HibernateContextImpl implements Context {
     //**************************************************************************
     // User
     //**************************************************************************
-    public User login(String email, String password) {
+    public User login(String username, String password) {
         String qualifiedTableName = PORTOFINO_PUBLIC_USERS;
         Session session = getSession(qualifiedTableName);
         org.hibernate.Criteria criteria = session.createCriteria(qualifiedTableName);
-        criteria.add(Restrictions.eq("email", email));
-        criteria.add(Restrictions.eq("pwd", password));
+        criteria.add(Restrictions.eq(UserUtils.USERNAME, username));
+        criteria.add(Restrictions.eq(UserUtils.PASSWORD, password));
         startTimer();
 
         @SuppressWarnings({"unchecked"})
@@ -838,6 +837,24 @@ public class HibernateContextImpl implements Context {
         }
     }
 
+    public User findUserByUserName(String username) {
+        String qualifiedTableName = PORTOFINO_PUBLIC_USERS;
+        Session session = getSession(qualifiedTableName);
+        org.hibernate.Criteria criteria = session.createCriteria(qualifiedTableName);
+        criteria.add(Restrictions.eq(UserUtils.USERNAME, username));
+        startTimer();
+        @SuppressWarnings({"unchecked"})
+        List<Object> result = (List<Object>) criteria.list();
+        stopTimer();
+
+        if (result.size() == 1) {
+            User user = (User) result.get(0);
+            return user;
+        } else {
+            return null;
+        }
+    }
+
     public User findUserByToken(String token) {
         String qualifiedTableName = PORTOFINO_PUBLIC_USERS;
         Session session = getSession(qualifiedTableName);
@@ -854,18 +871,6 @@ public class HibernateContextImpl implements Context {
         } else {
             return null;
         }
-    }
-
-    public void logout() {
-       setCurrentUser(null);
-    }
-
-    public Long getCurrentUserId() {
-        return threadUsers.get();
-    }
-
-    public void setCurrentUser(Long userId) {
-        threadUsers.set(userId);
     }
 
 
