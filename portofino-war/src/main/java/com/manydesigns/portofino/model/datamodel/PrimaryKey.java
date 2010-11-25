@@ -45,7 +45,8 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PrimaryKey implements ModelObject {
+@XmlCollection(itemClass = PrimaryKeyColumn.class, itemName = "column")
+public class PrimaryKey extends ArrayList<PrimaryKeyColumn> implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -54,7 +55,6 @@ public class PrimaryKey implements ModelObject {
     //**************************************************************************
 
     protected final Table table;
-    protected final List<PrimaryKeyColumn> primaryKeyColumns;
 
     protected String primaryKeyName;
 
@@ -72,7 +72,6 @@ public class PrimaryKey implements ModelObject {
 
     public PrimaryKey(Table table) {
         this.table = table;
-        primaryKeyColumns = new ArrayList<PrimaryKeyColumn>();
         columns = new ArrayList<Column>();
     }
 
@@ -93,19 +92,19 @@ public class PrimaryKey implements ModelObject {
     public void reset() {
         columns.clear();
 
-        for (PrimaryKeyColumn pkc : primaryKeyColumns) {
+        for (PrimaryKeyColumn pkc : this) {
             pkc.reset();
         }
     }
 
     public void init(Model model) {
-        if (primaryKeyColumns.isEmpty()) {
+        if (this.isEmpty()) {
             throw new Error(MessageFormat.format(
                     "Primary key {0} has no columns",
                     getQualifiedName()));
         }
 
-        for (PrimaryKeyColumn pkc : primaryKeyColumns) {
+        for (PrimaryKeyColumn pkc : this) {
             pkc.init(model);
             Column column = pkc.getActualColumn();
             columns.add(column);
@@ -122,7 +121,7 @@ public class PrimaryKey implements ModelObject {
     //**************************************************************************
 
     public PrimaryKeyColumn findPrimaryKeyColumnByName(String columnName) {
-        for (PrimaryKeyColumn primaryKeyColumn : primaryKeyColumns) {
+        for (PrimaryKeyColumn primaryKeyColumn : this) {
             if (primaryKeyColumn.getColumnName().equals(columnName)) {
                 return primaryKeyColumn;
             }
@@ -161,11 +160,6 @@ public class PrimaryKey implements ModelObject {
 
     public void setPrimaryKeyName(String primaryKeyName) {
         this.primaryKeyName = primaryKeyName;
-    }
-
-    @XmlCollection(itemClass = PrimaryKeyColumn.class, itemName = "column")
-    public List<PrimaryKeyColumn> getPrimaryKeyColumns() {
-        return primaryKeyColumns;
     }
 
     //**************************************************************************

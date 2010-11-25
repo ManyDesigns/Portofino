@@ -99,7 +99,7 @@ public class SiteNodeTest extends TestCase{
         root.getChildNodes().add(n1_3);
         root.getChildNodes().add(n1_4);
 
-        model.setRoot(root);
+        model.setRootNode(root);
 
 
         root.reset();
@@ -112,7 +112,7 @@ public class SiteNodeTest extends TestCase{
         assertEquals("/homepage/Document.action", n1_1.getActualUrl());
         assertEquals("/homepage", n1_1.getActualId());
 
-        assertEquals("/model/TableData.action", n1_2.getActualUrl());
+        assertEquals("/model/Index.action", n1_2.getActualUrl());
         assertEquals("/model", n1_2.getActualId());
 
         assertEquals("/model/TableData.action", n1_2_1.getActualUrl());

@@ -152,7 +152,7 @@ public class ModelWriter {
         }
         w.writeEndElement(); // databases
 
-        SiteNode rootNode = model.getRoot();
+        SiteNode rootNode = model.getRootNode();
         if (rootNode != null) {
             writeSiteNode(rootNode);
         }
@@ -241,14 +241,13 @@ public class ModelWriter {
 
     private void writeModelAnnotation(Annotation annotation)
             throws XMLStreamException {
-        List<String> values= annotation.getValues();
-        if (values.isEmpty()) {
+        if (annotation.isEmpty()) {
             w.writeEmptyElement(ModelParser.ANNOTATION);
             writeAttributes(annotation);
         } else {
             w.writeStartElement(ModelParser.ANNOTATION);
             writeAttributes(annotation);
-            for (String value : values) {
+            for (String value : (List<String>) annotation) {
                 if (value == null) {
                     w.writeEmptyElement(ModelParser.VALUE);                    
                 } else {
@@ -270,8 +269,7 @@ public class ModelWriter {
         w.writeStartElement(ModelParser.PRIMARYKEY);
         writeAttributes(primaryKey);
 
-        for (PrimaryKeyColumn primaryKeyColumn
-                : primaryKey.getPrimaryKeyColumns()) {
+        for (PrimaryKeyColumn primaryKeyColumn : primaryKey) {
             writePrimaryKeyColumn(primaryKeyColumn);
         }
         w.writeEndElement();//primaryKey
@@ -295,7 +293,7 @@ public class ModelWriter {
         w.writeEndElement(); // references
 
         // Annotations
-        writeModelAnnotations(foreignKey.getModelAnnotations());
+        writeModelAnnotations(foreignKey.getAnnotations());
         w.writeEndElement(); // foreign key
     }
 

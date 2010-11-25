@@ -218,7 +218,7 @@ public class XmlParser {
         }
     }
 
-    public void expectDocument(DocumentCallback callback) throws XMLStreamException {
+    public void expectDocument(DocumentCallback callback) throws Exception {
         callback.doDocument();
         if (event != XMLStreamConstants.END_DOCUMENT) {
             throw new Error(MessageFormat.format(
@@ -227,58 +227,27 @@ public class XmlParser {
         }
     }
 
-    public void expectElement(Callback callback) throws XMLStreamException {
-        String elementName = callback.getElementName();
-        int min = callback.getMin();
-        int max = callback.getMax();
-        int counter = 0;
-        while (true) {
-            skipSpacesAndComments();
-            if (event == XMLStreamConstants.START_ELEMENT
-                    && localName.equals(elementName)) {
-                Map<String, String> callbackAttributes = attributes;
-                next();
-                callback.doElement(callbackAttributes);
-                skipSpacesAndComments();
-                if (event == XMLStreamConstants.END_ELEMENT
-                        && localName.equals(elementName)) {
-                    next();
-                } else {
-                    throw new Error(MessageFormat.format(
-                            "Closing tag ''{0}'' not found. Found ''{1}'' instead. {2}",
-                            elementName, localName, getLocationString()));
-                }
-            } else {
-                break;
-            }
-            counter = counter + 1;
-        }
-        if (counter < min) {
-            throw new Error(MessageFormat.format(
-                    "Element ''{0}'' expected min: {1}  actual: {2}. {3}",
-                    elementName, min, counter, getLocationString()));
-        }
-        if (max >= 0 && counter > max) {
-            throw new Error(MessageFormat.format(
-                    "Element ''{0}'' expected max: {1}  actual: {2}. {3}",
-                    elementName, max, counter, getLocationString()));
-        }
-    }
+    public void expectElement(Callback... callbackArray) throws Exception {
+        int length = callbackArray.length;
+        String[] elementNameArray = new String[length];
+        int[] counter = new int[length];
 
+        for (int i = 0; i < length; i++) {
+            Callback callback = callbackArray[i];
+            elementNameArray[i] = callback.getElementName();
+        }
 
-    public void expectElement(String[] elementNameArray, int min, Integer max,
-                               ElementCallback[] callbackArray) throws XMLStreamException {
-        int counter = 0;
         while (true) {
             skipSpacesAndComments();
             int index = ArrayUtils.indexOf(elementNameArray, localName);
             if (event == XMLStreamConstants.START_ELEMENT
                     && index >= 0) {
+                Callback callback = callbackArray[index];
                 Map<String, String> callbackAttributes = attributes;
                 next();
-                callbackArray[index].doElement(callbackAttributes);
+                callback.doElement(callbackAttributes);
                 skipSpacesAndComments();
-                String expectedElementName = elementNameArray[index];
+                String expectedElementName = callback.getElementName();
                 if (event == XMLStreamConstants.END_ELEMENT
                         && localName.equals(expectedElementName)) {
                     next();
@@ -290,17 +259,24 @@ public class XmlParser {
             } else {
                 break;
             }
-            counter = counter + 1;
+            counter[index] = counter[index] + 1;
         }
-        if (counter < min) {
-            throw new Error(MessageFormat.format(
-                    "Element ''{0}'' expected min: {1}  actual: {2}. {3}",
-                    ArrayUtils.toString(elementNameArray), min, counter, getLocationString()));
-        }
-        if (max != null && counter > max) {
-            throw new Error(MessageFormat.format(
-                    "Element ''{0}'' expected max: {1}  actual: {2}. {3}",
-                    ArrayUtils.toString(elementNameArray), max, counter, getLocationString()));
+
+        for (int i = 0; i < length; i++) {
+            Callback callback = callbackArray[i];
+            String name = callback.getElementName();
+            int min = callback.getMin();
+            int max = callback.getMax();
+            if (counter[i] < min) {
+                throw new Error(MessageFormat.format(
+                        "Element ''{0}'' expected min: {1}  actual: {2}. {3}",
+                        name, min, counter[i], getLocationString()));
+            }
+            if (max >=0 && counter[i] > max) {
+                throw new Error(MessageFormat.format(
+                        "Element ''{0}'' expected max: {1}  actual: {2}. {3}",
+                        name, max, counter[i], getLocationString()));
+            }
         }
     }
 
@@ -323,14 +299,14 @@ public class XmlParser {
         }
     }
 
-    public void expectCharacters(CharactersCallback callback)
+    public String expectCharacters()
             throws XMLStreamException {
         if (event == XMLStreamConstants.CHARACTERS) {
             String callbackText = text;
             next();
-            callback.doCharacters(callbackText);
+            return callbackText;
         } else {
-            callback.doCharacters(null);
+            return "";
         }
     }
 
@@ -366,8 +342,7 @@ public class XmlParser {
             this.max = max;
         }
 
-        public abstract void doElement(Map<String, String> attributes)
-                throws XMLStreamException;
+        public abstract void doElement(Map<String, String> attributes) throws Exception;
 
         public String getElementName() {
             return elementName;
@@ -409,7 +384,18 @@ public class XmlParser {
         }
 
         public void doElement(Map<String, String> attributes)
-                throws XMLStreamException {
+                throws Exception {
+            // handle strings in a special way
+            if (clazz == String.class) {
+                obj = expectCharacters();
+                if (parentCollection != null) {
+                    parentCollection.add(obj);
+                } else if (parentProperty != null) {
+                    parentProperty.set(parent, obj);
+                }
+                return;
+            }
+
             // instanciate the class
             if (parent == null) { // root object
                 obj = ReflectionUtil.newInstance(clazz);
@@ -425,17 +411,31 @@ public class XmlParser {
                 if (parentCollection != null) {
                     parentCollection.add(obj);
                 } else if (parentProperty != null) {
-                    try {
-                        parentProperty.set(parent, obj);
-                    } catch (Throwable e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
+                    parentProperty.set(parent, obj);
                 }
             }
             checkAndSetAttributes(obj, attributes);
 
+            List<Callback> childCallbacks = new ArrayList<Callback>();
+
             ClassAccessor classAccessor =
                     JavaClassAccessor.getClassAccessor(clazz);
+
+            // see if the class is also a collection
+            XmlCollection xmlClassCollectionAnnotation =
+                    classAccessor.getAnnotation(XmlCollection.class);
+            if (xmlClassCollectionAnnotation != null) {
+                    Class itemClass = xmlClassCollectionAnnotation.itemClass();
+                    String itemName = xmlClassCollectionAnnotation.itemName();
+                    int itemMin = xmlClassCollectionAnnotation.itemMin();
+                    int itemMax = xmlClassCollectionAnnotation.itemMax();
+
+                    ElementCallback elementCallback =
+                            new ElementCallback(obj, (Collection) obj, null,
+                                    itemClass, itemName, itemMin, itemMax);
+                    childCallbacks.add(elementCallback);
+                }
+
             // scan the properties looking for annotations
             for (PropertyAccessor propertyAccessor
                     : classAccessor.getProperties()) {
@@ -451,7 +451,7 @@ public class XmlParser {
                     ElementCallback callback =
                             new ElementCallback(obj, null, propertyAccessor,
                                     itemClass, itemName, (required ? 1 : 0), 1);
-                    expectElement(callback);
+                    childCallbacks.add(callback);
                 } else if (xmlCollectionAnnotation != null) {
                     boolean required = xmlCollectionAnnotation.required();
                     String collectionName = propertyAccessor.getName();
@@ -461,19 +461,18 @@ public class XmlParser {
                     int itemMin = xmlCollectionAnnotation.itemMin();
                     int itemMax = xmlCollectionAnnotation.itemMax();
 
-                    try {
-                        Collection collection =
-                                (Collection) propertyAccessor.get(obj);
-                        CollectionCallback collectionCallBack =
-                                new CollectionCallback(obj,
-                                        collection, collectionName, required,
-                                        itemClass, itemName, itemMin, itemMax);
-                        expectElement(collectionCallBack);
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                    }
+                    Collection collection =
+                            (Collection) propertyAccessor.get(obj);
+                    CollectionCallback collectionCallBack =
+                            new CollectionCallback(obj,
+                                    collection, collectionName, required,
+                                    itemClass, itemName, itemMin, itemMax);
+                    childCallbacks.add(collectionCallBack);
                 }
             }
+            Callback[] callbackArray = new Callback[childCallbacks.size()];
+            childCallbacks.toArray(callbackArray);
+            expectElement(callbackArray);
         }
     }
 
@@ -501,7 +500,7 @@ public class XmlParser {
         }
 
         public void doElement(Map<String, String> attributes)
-                throws XMLStreamException {
+                throws Exception {
             expectElement(new ElementCallback(parent, parentCollection, null,
                     itemClass, itemName, itemMin, itemMax));
         }
@@ -519,7 +518,7 @@ public class XmlParser {
         return parse(input, rootClass);
     }
 
-    private Object parse(InputStream inputStream, Class rootClass) throws XMLStreamException {
+    private Object parse(InputStream inputStream, Class rootClass) throws Exception {
         initParser(inputStream);
         this.rootClass = rootClass;
         expectDocument(new ModelDocumentCallback());
@@ -530,7 +529,7 @@ public class XmlParser {
     private Object model;
 
     private class ModelDocumentCallback implements DocumentCallback {
-        public void doDocument() throws XMLStreamException {
+        public void doDocument() throws Exception {
             ElementCallback elementCallback =
                     new ElementCallback(rootClass, "model", 1, 1);
             expectElement(elementCallback);

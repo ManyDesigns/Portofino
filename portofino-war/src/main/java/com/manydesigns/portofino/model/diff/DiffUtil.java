@@ -102,13 +102,13 @@ public class DiffUtil {
                 new TableDiff(sourceTable, targetTable);
 
         // diff columns
-        Set<String> columnNames = new HashSet<String>();
+        // columns shold preserve their natural order like on the db
+        // i.e., NOT sorted alphabetically
+        Set<String> columnNames = new LinkedHashSet<String>();
         extractColumnNames(sourceTable, columnNames);
         extractColumnNames(targetTable, columnNames);
-        List<String> sortedColumnNames = new ArrayList<String>(columnNames);
-        Collections.sort(sortedColumnNames);
 
-        for (String columnName : sortedColumnNames) {
+        for (String columnName : columnNames) {
             Column sourceColumn = findColumn(sourceTable, columnName);
             Column targetColumn = findColumn(targetTable, columnName);
             ColumnDiff columnDiff = diff(sourceColumn, targetColumn);
@@ -377,8 +377,7 @@ public class DiffUtil {
         if (primaryKey == null) {
             return;
         }
-        for (PrimaryKeyColumn primaryKeyColumn :
-                primaryKey.getPrimaryKeyColumns()) {
+        for (PrimaryKeyColumn primaryKeyColumn : primaryKey) {
             columnNames.add(primaryKeyColumn.getColumnName());
         }
     }
@@ -432,7 +431,7 @@ public class DiffUtil {
         if (foreignKey == null) {
             return;
         }
-        for (Annotation annotation : foreignKey.getModelAnnotations()) {
+        for (Annotation annotation : foreignKey.getAnnotations()) {
             annotationTypes.add(annotation.getType());
         }
     }

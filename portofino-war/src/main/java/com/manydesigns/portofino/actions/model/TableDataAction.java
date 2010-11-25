@@ -141,7 +141,7 @@ public class TableDataAction extends AbstractCrudAction {
                 DefaultSelectionProvider.create(foreignKey.getForeignKeyName(),
                         relatedObjects, classAccessor, textFormats);
         boolean autocomplete = false;
-        for (Annotation current : foreignKey.getModelAnnotations()) {
+        for (Annotation current : foreignKey.getAnnotations()) {
             if ("com.manydesigns.elements.annotations.Autocomplete"
                     .equals(current.getType())) {
                 autocomplete = true;

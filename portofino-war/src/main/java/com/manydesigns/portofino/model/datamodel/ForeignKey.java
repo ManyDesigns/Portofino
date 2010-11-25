@@ -321,7 +321,8 @@ public class ForeignKey implements ModelObject {
         this.onePropertyName = onePropertyName;
     }
 
-    public List<Annotation> getModelAnnotations() {
+    @XmlCollection(itemClass = Annotation.class, itemName = "annotation")
+    public List<Annotation> getAnnotations() {
         return annotations;
     }
 

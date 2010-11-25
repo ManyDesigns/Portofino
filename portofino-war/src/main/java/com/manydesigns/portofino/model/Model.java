@@ -53,7 +53,7 @@ public class Model {
     //**************************************************************************
 
     protected final ArrayList<Database> databases;
-    protected SiteNode root;
+    protected SiteNode rootNode;
 
 
     public static final Logger logger = LogUtil.getLogger(Model.class);
@@ -77,8 +77,8 @@ public class Model {
         }
 
         // site nodes
-        if (root != null) {
-            root.reset();
+        if (rootNode != null) {
+            rootNode.reset();
         }
     }
 
@@ -91,8 +91,8 @@ public class Model {
         }
 
         // site nodes
-        if (root != null) {
-            root.init(this);
+        if (rootNode != null) {
+            rootNode.init(this);
         }
     }
 
@@ -224,11 +224,11 @@ public class Model {
     }
 
     @XmlElement(required = true)
-    public SiteNode getRoot() {
-        return root;
+    public SiteNode getRootNode() {
+        return rootNode;
     }
 
-    public void setRoot(SiteNode root) {
-        this.root = root;
+    public void setRootNode(SiteNode rootNode) {
+        this.rootNode = rootNode;
     }
 }

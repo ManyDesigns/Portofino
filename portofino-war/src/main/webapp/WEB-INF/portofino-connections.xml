@@ -1,16 +1,5 @@
 <connections>
     <connection
-            databaseName="mysql"
-            type="jdbc"
-            driver="com.mysql.jdbc.Driver"
-            url="jdbc:mysql://192.168.1.2/meta"
-            username="manydesigns"
-            password="manydesigns"
-            includeSchemas="frogpress.*"
-            excludeSchemas=""
-            />
-    <!--
-    <connection
             databaseName="jpetstore"
             type="jdbc"
             driver="org.postgresql.Driver"
@@ -40,5 +29,16 @@
             includeSchemas="public"
             excludeSchemas=""
             />
-            -->
+    <!--
+    <connection
+            databaseName="mysql"
+            type="jdbc"
+            driver="com.mysql.jdbc.Driver"
+            url="jdbc:mysql://192.168.1.2/meta"
+            username="manydesigns"
+            password="manydesigns"
+            includeSchemas="frogpress_model"
+            excludeSchemas=""
+            />
+    -->
 </connections>

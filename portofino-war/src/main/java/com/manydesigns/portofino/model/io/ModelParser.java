@@ -122,7 +122,7 @@ public class ModelParser extends XmlParser {
         return parse(input);
     }
 
-    private Model parse(InputStream inputStream) throws XMLStreamException {
+    private Model parse(InputStream inputStream) throws Exception {
         model = new Model();
         useCaseStack = new Stack<UseCase>();
         initParser(inputStream);

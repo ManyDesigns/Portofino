@@ -125,8 +125,8 @@ public class RoundtripTest extends AbstractPortofinoTest {
 
         Annotation descnAnnotation =
                 new Annotation("com.example.ColumnAnnotation");
-        descnAnnotation.getValues().add("value1");
-        descnAnnotation.getValues().add("value2");
+        descnAnnotation.add("value1");
+        descnAnnotation.add("value2");
         descnColumn.getAnnotations().add(descnAnnotation);
 
         Column productCatidColumn =
@@ -139,7 +139,7 @@ public class RoundtripTest extends AbstractPortofinoTest {
 
         Annotation catidFkAnnotation =
                 new Annotation("com.example.ForeignKeyAnnotation");
-        catidForeignKey.getModelAnnotations().add(catidFkAnnotation);
+        catidForeignKey.getAnnotations().add(catidFkAnnotation);
 
         return model;
     }
@@ -175,7 +175,7 @@ public class RoundtripTest extends AbstractPortofinoTest {
 
         PrimaryKey categoryPrimaryKey =
                 new PrimaryKey(categoryTable, "category_pk");
-        categoryPrimaryKey.getPrimaryKeyColumns().add(
+        categoryPrimaryKey.add(
                 new PrimaryKeyColumn(categoryPrimaryKey, "CATID")
         );
         categoryTable.setPrimaryKey(categoryPrimaryKey);
@@ -227,10 +227,8 @@ public class RoundtripTest extends AbstractPortofinoTest {
         PrimaryKey categoryPrimaryKey2 = categoryTable2.getPrimaryKey();
         assertNotNull(categoryPrimaryKey2);
         assertEquals("category_pk", categoryPrimaryKey2.getPrimaryKeyName());
-        List<PrimaryKeyColumn> categoryPrimaryKeyColumns =
-                categoryPrimaryKey2.getPrimaryKeyColumns();
-        assertEquals(1, categoryPrimaryKeyColumns.size());
-        assertEquals("CATID", categoryPrimaryKeyColumns.get(0).getColumnName());
+        assertEquals(1, categoryPrimaryKey2.size());
+        assertEquals("CATID", categoryPrimaryKey2.get(0).getColumnName());
 
         // check foreign key
         assertTrue(categoryTable2.getForeignKeys().isEmpty());
@@ -246,7 +244,7 @@ public class RoundtripTest extends AbstractPortofinoTest {
         Annotation productAnnotation2 = productTable2.getAnnotations().get(0);
         assertNotNull(productAnnotation2);
         assertEquals("com.example.TableAnnotation", productAnnotation2.getType());
-        assertEquals(0, productAnnotation2.getValues().size());
+        assertEquals(0, productAnnotation2.size());
 
         // check the columns
         assertEquals(2, productTable2.getColumns().size());
@@ -269,9 +267,9 @@ public class RoundtripTest extends AbstractPortofinoTest {
         Annotation columnAnnotation2 = descnColumn2.getAnnotations().get(0);
         assertNotNull(columnAnnotation2);
         assertEquals("com.example.ColumnAnnotation", columnAnnotation2.getType());
-        assertEquals(2, columnAnnotation2.getValues().size());
-        assertEquals("value1", columnAnnotation2.getValues().get(0));
-        assertEquals("value2", columnAnnotation2.getValues().get(1));
+        assertEquals(2, columnAnnotation2.size());
+        assertEquals("value1", columnAnnotation2.get(0));
+        assertEquals("value2", columnAnnotation2.get(1));
 
         // check product catid column
         Column productCatidColumn2 = productTable2.getColumns().get(1);

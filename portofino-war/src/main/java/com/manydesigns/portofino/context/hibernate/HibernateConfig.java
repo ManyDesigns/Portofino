@@ -88,6 +88,7 @@ public class HibernateConfig {
                             jdbcConnectionProvider.getPassword())
                     .setProperty("hibernate.current_session_context_class",
                             "org.hibernate.context.ThreadLocalSessionContext")
+                    .setProperty("org.hibernate.hql.ast.AST", "true")
                     .setProperty("hibernate.globally_quoted_identifiers", "false");
             configuration.setProperty("hibernate.show_sql", SHOW_SQL);
             Mappings mappings = configuration.createMappings();
@@ -119,8 +120,8 @@ public class HibernateConfig {
                 RootClass clazz = createTableMapping(
                         mappings, aTable);
                 mappings.addClass(clazz);
-                mappings.addImport(clazz.getEntityName(),
-                        clazz.getEntityName()); // TODO: prima era aTable.getTableName() - Verificare!!!!
+                //mappings.addImport(clazz.getEntityName(),
+                //        aTable.getTableName()); // TODO: prima era aTable.getTableName() - Verificare!!!!
                 mappings.addImport(clazz.getEntityName(),
                         clazz.getEntityName());
             }
@@ -276,7 +277,7 @@ public class HibernateConfig {
         for (com.manydesigns.portofino.model.datamodel.Column
                 column : columnPKList) {
             Column col = new Column();
-            col.setName(column.getColumnName());
+            col.setName(escapeName(column.getColumnName()));
             String columnType = column.getColumnType();
 
             Type type = connectionProvider.getTypeByName(columnType);
@@ -324,7 +325,7 @@ public class HibernateConfig {
 
         id.setTypeName(column.getColumnType());
         Column col = new Column();
-        col.setName(column.getColumnName());
+        col.setName(escapeName(column.getColumnName()));
         String columnType = column.getColumnType();
         col.setValue(id);
         col.setLength(column.getLength());
@@ -362,7 +363,7 @@ public class HibernateConfig {
         clazz.addProperty(prop);
 
 
-        if (type.isAutoincrement()) {
+        if (column.isAutoincrement()) {
             manageAutoIncrementTypes(mappings, tab, id);
         }
 

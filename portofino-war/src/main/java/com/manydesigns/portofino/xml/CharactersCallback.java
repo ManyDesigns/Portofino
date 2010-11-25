@@ -36,9 +36,17 @@ import javax.xml.stream.XMLStreamException;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface CharactersCallback {
+public class CharactersCallback {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public void doCharacters(String text) throws XMLStreamException;
+    private String text;
+
+    public void doCharacters(String text) throws XMLStreamException {
+        this.text = text;
+    }
+
+    public String getText() {
+        return text;
+    }
 }

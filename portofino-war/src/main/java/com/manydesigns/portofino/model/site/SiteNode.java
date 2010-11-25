@@ -32,6 +32,7 @@ package com.manydesigns.portofino.model.site;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
+import com.manydesigns.portofino.xml.XmlCollection;
 import com.manydesigns.portofino.system.model.users.Group;
 
 import java.text.MessageFormat;
@@ -163,6 +164,7 @@ public abstract class SiteNode implements ModelObject {
         this.description = description;
     }
 
+    @XmlCollection(itemClass = SiteNode.class, itemName = "childNode")
     public List<SiteNode> getChildNodes() {
         return childNodes;
     }

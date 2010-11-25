@@ -416,10 +416,10 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 if (current == null) {
                     continue;
                 }
-                primaryKey.getPrimaryKeyColumns().add(current);
+                primaryKey.add(current);
             }
             // sanity check
-            if (primaryKey.getPrimaryKeyColumns().size() == 0) {
+            if (primaryKey.size() == 0) {
                 LogUtil.warningMF(logger,
                         "Primary key {0} is empty. Discarding.",
                         primaryKey.getPrimaryKeyName());
@@ -429,7 +429,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
             LogUtil.fineMF(logger,
                     "Installed PK {0} with number of columns: {1}",
                     primaryKey.getPrimaryKeyName(),
-                    primaryKey.getPrimaryKeyColumns().size());
+                    primaryKey.size());
         } finally {
             DbUtil.closeResultSetAndStatement(rs);
         }

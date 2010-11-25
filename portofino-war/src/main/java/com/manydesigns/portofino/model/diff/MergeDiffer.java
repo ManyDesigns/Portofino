@@ -198,13 +198,13 @@ public class MergeDiffer extends AbstractDiffer {
     //--------------------------------------------------------------------------
 
     public void diffPrimaryKeyColumnSourceNull(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
-        targetPrimaryKey.getPrimaryKeyColumns().remove(targetPrimaryKeyColumn);
+        targetPrimaryKey.remove(targetPrimaryKeyColumn);
         diffPrimaryKeyColumnChildren(primaryKeyColumnDiff);
     }
 
     public void diffPrimaryKeyColumnTargetNull(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
         targetPrimaryKeyColumn = new PrimaryKeyColumn(targetPrimaryKey);
-        targetPrimaryKey.getPrimaryKeyColumns().add(targetPrimaryKeyColumn);
+        targetPrimaryKey.add(targetPrimaryKeyColumn);
         diffPrimaryKeyColumnSourceTarget(primaryKeyColumnDiff);
     }
 
