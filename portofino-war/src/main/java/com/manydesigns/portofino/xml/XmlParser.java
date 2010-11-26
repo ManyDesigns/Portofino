@@ -402,7 +402,7 @@ public class XmlParser {
             } else {
                 Class parentClass = parent.getClass();
                 Constructor constructor =
-                        ReflectionUtil.getConstructor(clazz, parentClass);
+                        ReflectionUtil.getBestMatchConstructor(clazz, parentClass);
                 if (constructor == null) {
                     obj = ReflectionUtil.newInstance(clazz);
                 } else {
@@ -413,6 +413,9 @@ public class XmlParser {
                 } else if (parentProperty != null) {
                     parentProperty.set(parent, obj);
                 }
+            }
+            if (obj == null) {
+                throw new Exception("Could not instanciate: " + clazz);
             }
             checkAndSetAttributes(obj, attributes);
 
@@ -425,16 +428,18 @@ public class XmlParser {
             XmlCollection xmlClassCollectionAnnotation =
                     classAccessor.getAnnotation(XmlCollection.class);
             if (xmlClassCollectionAnnotation != null) {
-                    Class itemClass = xmlClassCollectionAnnotation.itemClass();
-                    String itemName = xmlClassCollectionAnnotation.itemName();
-                    int itemMin = xmlClassCollectionAnnotation.itemMin();
-                    int itemMax = xmlClassCollectionAnnotation.itemMax();
+                Class[] itemClass = xmlClassCollectionAnnotation.itemClass();
+                String[] itemName = xmlClassCollectionAnnotation.itemName();
+                int itemMin = xmlClassCollectionAnnotation.itemMin();
+                int itemMax = xmlClassCollectionAnnotation.itemMax();
 
+                for (int i = 0; i < itemClass.length; i++) {
                     ElementCallback elementCallback =
                             new ElementCallback(obj, (Collection) obj, null,
-                                    itemClass, itemName, itemMin, itemMax);
+                                    itemClass[i], itemName[i], itemMin, itemMax);
                     childCallbacks.add(elementCallback);
                 }
+            }
 
             // scan the properties looking for annotations
             for (PropertyAccessor propertyAccessor
@@ -456,18 +461,20 @@ public class XmlParser {
                     boolean required = xmlCollectionAnnotation.required();
                     String collectionName = propertyAccessor.getName();
 
-                    Class itemClass = xmlCollectionAnnotation.itemClass();
-                    String itemName = xmlCollectionAnnotation.itemName();
+                    Class[] itemClass = xmlCollectionAnnotation.itemClass();
+                    String[] itemName = xmlCollectionAnnotation.itemName();
                     int itemMin = xmlCollectionAnnotation.itemMin();
                     int itemMax = xmlCollectionAnnotation.itemMax();
 
                     Collection collection =
                             (Collection) propertyAccessor.get(obj);
-                    CollectionCallback collectionCallBack =
-                            new CollectionCallback(obj,
-                                    collection, collectionName, required,
-                                    itemClass, itemName, itemMin, itemMax);
-                    childCallbacks.add(collectionCallBack);
+                    for (int i = 0; i < itemClass.length; i++) {
+                        CollectionCallback collectionCallBack =
+                                new CollectionCallback(obj,
+                                        collection, collectionName, required,
+                                        itemClass[i], itemName[i], itemMin, itemMax);
+                        childCallbacks.add(collectionCallBack);
+                    }
                 }
             }
             Callback[] callbackArray = new Callback[childCallbacks.size()];

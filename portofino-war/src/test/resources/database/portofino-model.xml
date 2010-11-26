@@ -1139,7 +1139,7 @@
         <documentNode id="homepage" title="Homepage" description="Homepage" url="Homepage.action">
             <permissions>
                 <allow>
-                    <group name="anonymous"/>
+                    <group>anonymous</group>
                 </allow>
             </permissions>
         </documentNode>
@@ -1162,7 +1162,7 @@
             </childNodes>
             <permissions>
                 <allow>
-                    <group name="admins" />
+                    <group>admins</group>
                 </allow>
             </permissions>
         </folderNode>
@@ -1179,14 +1179,14 @@
             </childNodes>
             <permissions>
                 <allow>
-                    <group name="admins" />
+                    <group>admins</group>
                 </allow>
             </permissions>
         </folderNode>
         <customNode id="Profile" url="/Profile.action" title="Profile" description="Profile">
             <permissions>
                 <allow>
-                    <group name="registered"/>
+                    <group>registered</group>
                 </allow>
             </permissions>
         </customNode>
@@ -1302,7 +1302,7 @@
             </childNodes>
             <permissions>
                 <allow>
-                    <group name="users"/>
+                    <group>users</group>
                 </allow>
             </permissions>
 
@@ -1516,14 +1516,14 @@
             </childNodes>
             <permissions>
                 <allow>
-                    <group name="users" />
+                    <group>users</group>
                 </allow>
             </permissions>
         </folderNode>
         </childNodes>
         <permissions>
             <allow>
-                <group name="anonymous"/>
+                <group>anonymous</group>
             </allow>
         </permissions>
     </rootNode>

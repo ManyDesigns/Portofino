@@ -45,8 +45,8 @@ public @interface XmlCollection {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    Class itemClass();
-    String itemName();
+    Class[] itemClass();
+    String[] itemName();
     boolean required() default false;
     int itemMin() default 0;
     int itemMax() default -1;

@@ -31,7 +31,7 @@ package com.manydesigns.portofino.model;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.site.RootNode;
 import com.manydesigns.portofino.xml.XmlCollection;
 import com.manydesigns.portofino.xml.XmlElement;
 
@@ -53,7 +53,7 @@ public class Model {
     //**************************************************************************
 
     protected final ArrayList<Database> databases;
-    protected SiteNode rootNode;
+    protected RootNode rootNode;
 
 
     public static final Logger logger = LogUtil.getLogger(Model.class);
@@ -224,11 +224,11 @@ public class Model {
     }
 
     @XmlElement(required = true)
-    public SiteNode getRootNode() {
+    public RootNode getRootNode() {
         return rootNode;
     }
 
-    public void setRootNode(SiteNode rootNode) {
+    public void setRootNode(RootNode rootNode) {
         this.rootNode = rootNode;
     }
 }
