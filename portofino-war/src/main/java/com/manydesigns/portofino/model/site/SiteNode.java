@@ -32,7 +32,6 @@ package com.manydesigns.portofino.model.site;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
-import com.manydesigns.portofino.system.model.users.Group;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -193,16 +192,12 @@ public abstract class  SiteNode implements ModelObject {
         this.url = url;
     }
 
-    public boolean checkPermission(String group) {
+    public Boolean checkPermission(String group) {
         if (denyGroups.contains(group)) {
-                return false;
+                return null;
         }
-        if (allowGroups.contains(Group.REGISTERED)
-                && !Group.ANONYMOUS.equals(group)){
-            return true;
-        }
-        if (allowGroups.size()>0){
-            return allowGroups.contains(group);
+        if (!allowGroups.contains(group) && allowGroups.size()>0 ) {
+            return false;
         } else {
             return true;
         }
@@ -215,7 +210,12 @@ public abstract class  SiteNode implements ModelObject {
             parentAllowed= parent.isAllowed(groups);
         }
         for (String group : groups){
-            result = result || (parentAllowed && checkPermission(group));
+            Boolean check = checkPermission(group);
+            if (null==check) {
+                return false;
+            } else {
+                result = (check && parentAllowed)||result;
+            }
         }
         return result;
     }
