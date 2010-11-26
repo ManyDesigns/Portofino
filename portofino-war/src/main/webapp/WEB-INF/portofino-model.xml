@@ -1092,10 +1092,5 @@ Struttura dell'XML:
                 </permissions>
             </folderNode>
         </childNodes>
-        <permissions>
-            <allow>
-                <group name="anonymous"/>
-            </allow>
-        </permissions>
     </rootNode>
 </model>

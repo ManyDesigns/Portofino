@@ -93,7 +93,7 @@ CREATE TABLE userstate (
     description character varying(255)
 );
 
-INSERT INTO users(userid, creationdate, pwd, username, emailaddress, firstname, lastname, state) VALUES (1, current_timestamp, 'admin', 'admin', 'giampiero.granatella@manydesigns.com', 'admin', 'admin', 1);
+INSERT INTO users( creationdate, pwd, username, emailaddress, firstname, lastname, state) VALUES (current_timestamp, 'admin', 'admin', 'giampiero.granatella@manydesigns.com', 'admin', 'admin', 1);
 
 INSERT INTO emailstate (id, name, description) VALUES (0, 'sending', NULL);
 INSERT INTO emailstate (name, description) VALUES ( 'to be sent', NULL);
@@ -104,13 +104,18 @@ INSERT INTO emailstate (name, description) VALUES ( 'bounced', NULL);
 INSERT INTO msgstate (name, description) VALUES ('sent', NULL);
 INSERT INTO msgstate (name, description) VALUES ('read', NULL);
 
-INSERT INTO groups (groupid, creatorid,  name, description, creationdate) VALUES (2, 1, 'users', 'user', current_timestamp);
-INSERT INTO groups (groupid, creatorid,  name, description, creationdate) VALUES (1, 1, 'admin', 'admin',  current_timestamp);
+INSERT INTO groups ( creatorid,  name, description, creationdate) VALUES (1, 'admins', 'admins',  current_timestamp);
+INSERT INTO groups ( creatorid,  name, description, creationdate) VALUES (1, 'users', 'user', current_timestamp);
+
 
 INSERT INTO userstate (name, description) VALUES ( 'active', NULL);
 INSERT INTO userstate (name, description) VALUES ( 'suspended', NULL);
 INSERT INTO userstate (name, description) VALUES ( 'banned', NULL);
 INSERT INTO userstate (name, description) VALUES ( 'selfregistred', NULL);
+
+INSERT INTO users_groups(
+            groupid, userid, deletiondate, creationdate)
+    VALUES (1, 1, null, current_timestamp);
 
 ALTER TABLE ONLY emailqueue
     ADD CONSTRAINT "EmailQueue_pkey" PRIMARY KEY (id);
