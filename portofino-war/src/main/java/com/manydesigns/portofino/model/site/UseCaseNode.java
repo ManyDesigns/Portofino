@@ -30,6 +30,7 @@ package com.manydesigns.portofino.model.site;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
+import com.manydesigns.portofino.xml.XmlElement;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -53,6 +54,7 @@ public class UseCaseNode extends SiteNode{
         super(parent);
     }
 
+    @XmlElement
     public UseCase getUseCase() {
         return useCase;
     }

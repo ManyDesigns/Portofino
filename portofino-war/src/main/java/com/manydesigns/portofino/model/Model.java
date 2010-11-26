@@ -31,7 +31,7 @@ package com.manydesigns.portofino.model;
 
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.site.RootNode;
 import com.manydesigns.portofino.xml.XmlCollection;
 import com.manydesigns.portofino.xml.XmlElement;
 
@@ -53,7 +53,7 @@ public class Model {
     //**************************************************************************
 
     protected final ArrayList<Database> databases;
-    protected SiteNode root;
+    protected RootNode rootNode;
 
 
     public static final Logger logger = LogUtil.getLogger(Model.class);
@@ -77,8 +77,8 @@ public class Model {
         }
 
         // site nodes
-        if (root != null) {
-            root.reset();
+        if (rootNode != null) {
+            rootNode.reset();
         }
     }
 
@@ -91,8 +91,8 @@ public class Model {
         }
 
         // site nodes
-        if (root != null) {
-            root.init(this);
+        if (rootNode != null) {
+            rootNode.init(this);
         }
     }
 
@@ -218,17 +218,17 @@ public class Model {
     // Getters/setter
     //**************************************************************************
 
-    @XmlCollection(itemType = Database.class)
+    @XmlCollection(itemClass = Database.class, itemName = "database")
     public List<Database> getDatabases() {
         return databases;
     }
 
-    @XmlElement(required = true)
-    public SiteNode getRoot() {
-        return root;
+    @XmlElement(required = false)
+    public RootNode getRootNode() {
+        return rootNode;
     }
 
-    public void setRoot(SiteNode root) {
-        this.root = root;
+    public void setRootNode(RootNode rootNode) {
+        this.rootNode = rootNode;
     }
 }

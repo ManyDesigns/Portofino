@@ -114,7 +114,7 @@ public class UseCaseAction extends AbstractCrudAction {
     }
 
     private void setupSelectionProviders(UseCase useCase, CrudUnit result) {
-        for (ModelSelectionProvider current : useCase.getModelSelectionProviders()) {
+        for (ModelSelectionProvider current : useCase.getSelectionProviders()) {
             String name = current.getName();
             String database = current.getDatabase();
             String sql = current.getSql();

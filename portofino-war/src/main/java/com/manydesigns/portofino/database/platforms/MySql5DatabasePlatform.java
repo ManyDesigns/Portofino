@@ -34,6 +34,7 @@ import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.datamodel.*;
+import org.apache.commons.dbutils.DbUtils;
 import org.hibernate.dialect.MySQLDialect;
 
 import java.sql.*;
@@ -211,7 +212,8 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                 table.getColumns().add(column);
             }
         } finally {
-            DbUtil.closeResultSetAndStatement(rs, st);
+            DbUtils.closeQuietly(rs);
+            DbUtils.closeQuietly(st);
         }
     }
 
@@ -307,10 +309,10 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                 if (current == null) {
                     continue;
                 }
-                primaryKey.getPrimaryKeyColumns().add(current);
+                primaryKey.add(current);
             }
             // sanity check
-            if (primaryKey.getPrimaryKeyColumns().size() == 0) {
+            if (primaryKey.size() == 0) {
                 LogUtil.warningMF(logger,
                         "Primary key {0} is empty. Discarding.",
                         primaryKey.getPrimaryKeyName());
@@ -320,7 +322,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
             LogUtil.fineMF(logger,
                     "Installed PK {0} with number of columns: {1}",
                     primaryKey.getPrimaryKeyName(),
-                    primaryKey.getPrimaryKeyColumns().size());
+                    primaryKey.size());
         } finally {
             DbUtil.closeResultSetAndStatement(rs);
         }

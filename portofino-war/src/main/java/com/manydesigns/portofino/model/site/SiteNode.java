@@ -32,7 +32,8 @@ package com.manydesigns.portofino.model.site;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
-import com.manydesigns.portofino.system.model.users.Group;
+import com.manydesigns.portofino.xml.XmlCollection;
+import com.manydesigns.portofino.xml.XmlElement;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -53,8 +54,9 @@ public abstract class  SiteNode implements ModelObject {
     //**************************************************************************
 
     protected final SiteNode parent;
-
     protected final ArrayList<SiteNode> childNodes;
+
+    protected Permissions permissions;
     protected String id;
     protected String actualId;
     protected String actualUrl;
@@ -64,29 +66,12 @@ public abstract class  SiteNode implements ModelObject {
 
 
     //**************************************************************************
-    // Permissions
-    //**************************************************************************
-    protected List<String> allowGroups;
-    protected List<String> denyGroups;
-
-
-    public List<String> getAllowGroups() {
-        return this.allowGroups;
-    }
-
-    public List<String> getDenyGroups() {
-        return this.denyGroups;
-    }
-
-    //**************************************************************************
     // Constructors
     //**************************************************************************
 
     public SiteNode(SiteNode parent) {
         this.childNodes = new ArrayList<SiteNode>();
         this.parent= parent;
-        this.allowGroups = new ArrayList<String>();
-        this.denyGroups = new ArrayList<String>();
     }
 
     public SiteNode( SiteNode parent, String id, String title, String description) {
@@ -164,6 +149,17 @@ public abstract class  SiteNode implements ModelObject {
         this.description = description;
     }
 
+    @XmlElement
+    public Permissions getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Permissions permissions) {
+        this.permissions = permissions;
+    }
+
+    @XmlCollection(itemClass = {DocumentNode.class, FolderNode.class, CustomNode.class, CustomFolderNode.class, UseCaseNode.class, PortletNode.class},
+            itemName = {"documentNode", "folderNode", "customNode", "customFolderNode", "useCaseNode", "portletNode"})
     public List<SiteNode> getChildNodes() {
         return childNodes;
     }
@@ -193,30 +189,17 @@ public abstract class  SiteNode implements ModelObject {
         this.url = url;
     }
 
-    public boolean checkPermission(String group) {
-        if (denyGroups.contains(group)) {
-                return false;
-        }
-        if (allowGroups.contains(Group.REGISTERED)
-                && !Group.ANONYMOUS.equals(group)){
-            return true;
-        }
-        if (allowGroups.size()>0){
-            return allowGroups.contains(group);
-        } else {
-            return true;
-        }
-    }
-
     public boolean isAllowed(List<String> groups) {
-        boolean result = false;
         boolean parentAllowed= true;
         if (parent != null){
-            parentAllowed= parent.isAllowed(groups);
+            parentAllowed = parent.isAllowed(groups);
         }
-        for (String group : groups){
-            result = result || (parentAllowed && checkPermission(group));
+
+        boolean ownAllowed = true;
+        if (permissions != null){
+            ownAllowed = permissions.isAllowed(groups);
         }
-        return result;
+
+        return parentAllowed && ownAllowed;
     }
 }

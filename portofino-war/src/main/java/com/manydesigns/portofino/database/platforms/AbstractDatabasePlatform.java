@@ -30,11 +30,11 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.datamodel.*;
+import org.apache.commons.dbutils.DbUtils;
 import org.hibernate.dialect.Dialect;
 
 import java.sql.Connection;
@@ -106,12 +106,11 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     //**************************************************************************
 
     public void test() {
-        Class driverClass =
-                ReflectionUtil.loadClass(getStandardDriverClassName());
-        if (driverClass == null) {
-            status = STATUS_DRIVER_NOT_FOUND;
-        } else {
+        boolean success = DbUtils.loadDriver(getStandardDriverClassName());
+        if (success) {
             status = STATUS_OK;
+        } else {
+            status = STATUS_DRIVER_NOT_FOUND;
         }
     }
 
@@ -416,10 +415,10 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 if (current == null) {
                     continue;
                 }
-                primaryKey.getPrimaryKeyColumns().add(current);
+                primaryKey.add(current);
             }
             // sanity check
-            if (primaryKey.getPrimaryKeyColumns().size() == 0) {
+            if (primaryKey.size() == 0) {
                 LogUtil.warningMF(logger,
                         "Primary key {0} is empty. Discarding.",
                         primaryKey.getPrimaryKeyName());
@@ -429,7 +428,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
             LogUtil.fineMF(logger,
                     "Installed PK {0} with number of columns: {1}",
                     primaryKey.getPrimaryKeyName(),
-                    primaryKey.getPrimaryKeyColumns().size());
+                    primaryKey.size());
         } finally {
             DbUtil.closeResultSetAndStatement(rs);
         }

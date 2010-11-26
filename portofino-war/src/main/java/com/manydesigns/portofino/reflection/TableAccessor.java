@@ -67,7 +67,7 @@ public class TableAccessor
     //**************************************************************************
 
     public TableAccessor(Table table) {
-        super(table.getModelAnnotations());
+        super(table.getAnnotations());
         Class clazz = table.getActualJavaClass();
         if (clazz != null) {
             javaClassAccessor = JavaClassAccessor.getClassAccessor(clazz);
