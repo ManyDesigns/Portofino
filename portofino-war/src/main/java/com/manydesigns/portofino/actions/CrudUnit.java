@@ -802,7 +802,7 @@ public class CrudUnit {
 
 
     //**************************************************************************
-    // ExportReadPdf
+    // exportSearchPdf
     //**************************************************************************
 
     public void exportSearchPdf(File tempPdfFile) throws FOPException,
@@ -823,7 +823,7 @@ public class CrudUnit {
 
             ClassLoader cl = getClass().getClassLoader();
             InputStream xsltStream = cl.getResourceAsStream(
-                   "templateFOP.xsl");
+                   "templateFOP-Land.xsl");
 
             // Setup XSLT
             TransformerFactory Factory = TransformerFactory.newInstance();
@@ -835,7 +835,7 @@ public class CrudUnit {
 
             // Setup input for XSLT transformation
             Source src = new StreamSource(new StringReader(
-                    composeXml().toString()));
+                    composeXmlLand().toString()));
 
             // Resulting SAX events (the generated FO) must be piped through to
             // FOP
@@ -860,7 +860,7 @@ public class CrudUnit {
         }
     }
 
-    public XmlBuffer composeXml() {
+    public XmlBuffer composeXmlLand() {
         XmlBuffer xb = new XmlBuffer();
         xb.writeXmlHeader("UTF-8");
         xb.openElement("class");
@@ -895,9 +895,207 @@ public class CrudUnit {
 
         }
         xb.closeElement("class");
-        System.out.println(xb);
         return xb;
     }
+
+
+    //**************************************************************************
+    // ExportRead
+    //**************************************************************************
+
+    private XmlBuffer composeXmlPort()
+            throws IOException, WriteException {
+
+        setupSearchForm();
+
+        loadObjects();
+        loadObject();
+
+        setupTableForm(Mode.VIEW);
+        setupForm(Mode.VIEW);
+        form.readFromObject(object);
+
+
+
+
+        XmlBuffer xb = new XmlBuffer();
+        xb.writeXmlHeader("UTF-8");
+        xb.openElement("class");
+        xb.openElement("table");
+        xb.write(classAccessor.getName());
+        xb.closeElement("table");
+
+        boolean firstRun = true;
+
+        for (FieldSet fieldset : form) {
+                    xb.openElement("tableData");
+            for (Field field : fieldset) {
+                xb.openElement("nameColumn");
+                xb.write(field.getLabel());
+                xb.closeElement("nameColumn");
+                xb.openElement("valueColumn");
+                xb.write(field.getStringValue());
+                xb.closeElement("valueColumn");
+            }
+            xb.closeElement("tableData");
+        }
+
+
+        ValueStack valueStack = Struts2Util.getValueStack();
+        valueStack.push(object);
+
+        //Aggiungo le relazioni/sheet
+        //WritableCellFormat formatCell = headerExcel();*/
+        for (CrudUnit subCrudUnit: subCrudUnits) {
+            xb.openElement("table_rel");
+            subCrudUnit.setupSearchForm();
+            subCrudUnit.loadObjects();
+            subCrudUnit.setupTableForm(Mode.VIEW);
+
+            //stampo header
+            for (TableForm.Column col : subCrudUnit.tableForm.getColumns()) {
+                xb.openElement("header");
+                xb.openElement("nameColumn");
+                xb.write(col.getLabel());
+                xb.closeElement("nameColumn");
+                xb.closeElement("header");
+            }
+
+            /*sheet = workbook.createSheet(subCrudUnit.searchTitle ,
+                    workbook.getNumberOfSheets());*/
+
+
+            /*
+               xb.openElement("rows");
+            for (Field field : row.getFields()) {
+                xb.openElement("row");
+                xb.openElement("value");
+                xb.write(field.getStringValue());
+                xb.closeElement("value");
+                xb.closeElement("row");
+            }
+            xb.closeElement("rows");
+            */
+            xb.openElement("rows");
+            for (TableForm.Row row : subCrudUnit.tableForm.getRows()) {
+                for (Field field : Arrays.asList(row.getFields())) {
+                    xb.openElement("row");
+                    xb.openElement("value");
+                    xb.write(field.getStringValue());
+                    xb.closeElement("value");
+                    xb.closeElement("row");
+                }
+            }
+            xb.closeElement("rows");
+            xb.closeElement("table_rel");
+        }
+
+        valueStack.pop();
+
+        //workbook.write();*/
+
+         xb.closeElement("class");
+
+
+
+        System.out.println("XB vale : " + xb);
+        return xb;
+    }
+
+     public void exportReadPdf(File tempPdfFile) throws FOPException,
+            IOException, TransformerException {
+        setupSearchForm();
+
+        loadObjects();
+
+        setupTableForm(Mode.VIEW);
+
+        FopFactory fopFactory = FopFactory.newInstance();
+
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(tempPdfFile);
+
+            Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
+
+            ClassLoader cl = getClass().getClassLoader();
+            InputStream xsltStream = cl.getResourceAsStream(
+                   "templateFOP-Land.xsl");
+
+            // Setup XSLT
+            TransformerFactory Factory = TransformerFactory.newInstance();
+            Transformer transformer = Factory.newTransformer(new StreamSource(
+                    xsltStream));
+
+            // Set the value of a <param> in the stylesheet
+            transformer.setParameter("versionParam", "2.0");
+
+            // Setup input for XSLT transformation
+            Source src = new StreamSource(new StringReader(
+                    composeXmlPort().toString()));
+
+            // Resulting SAX events (the generated FO) must be piped through to
+            // FOP
+            Result res = new SAXResult(fop.getDefaultHandler());
+
+            // Start XSLT transformation and FOP processing
+            transformer.transform(src, res);
+
+            out.flush();
+        } catch (Exception e) {
+            LogUtil.warning(logger, "IOException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } finally {
+            try {
+                if (out != null)
+                    out.close();
+            }
+            catch (Exception e) {
+                LogUtil.warning(logger, "IOException", e);
+                SessionMessages.addErrorMessage(e.getMessage());
+            }
+        }
+    }
+
+    /*public XmlBuffer composeXmlPort() {
+        XmlBuffer xb = new XmlBuffer();
+        xb.writeXmlHeader("UTF-8");
+        xb.openElement("class");
+        xb.openElement("table");
+        xb.write(classAccessor.getName());
+        xb.closeElement("table");
+
+        boolean firstRun = true;
+
+        for (TableForm.Row row : tableForm.getRows()) {
+            if ( firstRun) {
+
+                for (Field field : row.getFields()) {
+                    xb.openElement("header");
+                    xb.openElement("nameColumn");
+                    xb.write(field.getLabel());
+                    xb.closeElement("nameColumn");
+                    xb.closeElement("header");
+                }
+
+                firstRun = false;
+            }
+            xb.openElement("rows");
+            for (Field field : row.getFields()) {
+                xb.openElement("row");
+                xb.openElement("value");
+                xb.write(field.getStringValue());
+                xb.closeElement("value");
+                xb.closeElement("row");
+            }
+            xb.closeElement("rows");
+
+        }
+        xb.closeElement("class");
+        return xb;
+    }
+     */
+
 
 
 }

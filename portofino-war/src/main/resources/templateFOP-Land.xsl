@@ -6,7 +6,7 @@
   <xsl:template match="class">
     <fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
       <fo:layout-master-set>
-        <fo:simple-page-master master-name="simpleA4" page-height="29.7cm" page-width="21cm" margin-top="2cm" margin-bottom="2cm" margin-left="2cm" margin-right="2cm">
+        <fo:simple-page-master master-name="simpleA4" page-height="21cm" page-width="29.7cm" margin-top="2cm" margin-bottom="2cm" margin-left="2cm" margin-right="2cm">
           <fo:region-body/>
         </fo:simple-page-master>
       </fo:layout-master-set>
