@@ -29,62 +29,21 @@
 
 package com.manydesigns.portofino.navigation;
 
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.model.site.SiteNode;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class FolderNavigationNode implements NavigationNode {
+public class FolderNavigationNode extends SimpleNavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    protected final SiteNode siteNode;
-    protected final List<NavigationNode> childNodes;
-    protected final String url;
-
-    //**************************************************************************
-    // Constructors
-    //**************************************************************************
-
-    public FolderNavigationNode(SiteNode siteNode) {
-        this.siteNode = siteNode;
-        childNodes = new ArrayList<NavigationNode>();
-        url = Util.getAbsoluteUrl(siteNode.getActualUrl());
+    public FolderNavigationNode(SiteNode siteNode, boolean allowed) {
+        super(siteNode, allowed);
     }
 
-    //**************************************************************************
-    // NavigationNode implementation
-    //**************************************************************************
-
-    public String getUrl() {
-        return url;
-    }
-
-    public String getTitle() {
-        return siteNode.getTitle();
-    }
-
-    public String getDescription() {
-        return siteNode.getDescription();
-    }
-
-    public List<NavigationNode> getChildNodes() {
-        return childNodes;
-    }
-
-    public SiteNode getSiteNode() {
-        return this.siteNode;
-    }
 
     public SiteNode getActualSiteNode() {
         if (siteNode.getChildNodes().size()==0){

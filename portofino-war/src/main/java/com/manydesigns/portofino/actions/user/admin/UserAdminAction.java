@@ -38,6 +38,7 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
+import com.manydesigns.portofino.system.model.users.UserUtils;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -137,6 +138,7 @@ public class UserAdminAction extends UseCaseAction {
     //**************************************************************************
 
     public String resetPassword() {
+
         String pk = rootCrudUnit.pk;
         Serializable pkObject = rootCrudUnit.pkHelper.parsePkString(pk);
         User user =  (User)context.getObjectByPk(userTable, pkObject);
@@ -149,9 +151,12 @@ public class UserAdminAction extends UseCaseAction {
                 properties.getProperty(PortofinoProperties.MAIL_ENABLED, "false"));
 
         if (mailEnabled) {
-        String msg = "La tua nuova password è " + generatedPwd;
-        EmailHandler.addEmail(context, "new password", msg,
-                user.getEmail(), context.getCurrentUser().getEmail());
+            String msg = "La tua nuova password è " + generatedPwd;
+            Long userId = (Long) getSession().get(UserUtils.USERID);
+            User thisUser =
+            (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
+            EmailHandler.addEmail(context, "new password", msg,
+                    user.getEmail(), thisUser.getEmail());
 
         } else {
            SessionMessages.addInfoMessage("La nuova password per l'utente è "+generatedPwd);

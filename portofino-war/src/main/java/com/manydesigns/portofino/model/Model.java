@@ -223,7 +223,7 @@ public class Model {
         return databases;
     }
 
-    @XmlElement(required = true)
+    @XmlElement(required = false)
     public RootNode getRootNode() {
         return rootNode;
     }

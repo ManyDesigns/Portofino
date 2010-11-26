@@ -29,62 +29,21 @@
 
 package com.manydesigns.portofino.navigation;
 
-import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.site.UseCaseNode;
-
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCaseNavigationNode implements NavigationNode {
+public class UseCaseNavigationNode extends SimpleNavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    protected final UseCaseNode siteNode;
-    protected final String url;
-
-    //**************************************************************************
     // Constructors
     //**************************************************************************
-
-    public UseCaseNavigationNode(UseCaseNode siteNode) {
-        this.siteNode = siteNode;
-        this.url = Util.getAbsoluteUrl(siteNode.getId());
-    }
-
-
-    //**************************************************************************
-    // NavigationNode implementation
-    //**************************************************************************
-
-    public String getUrl() {
-        return url;
-    }
-
-    public String getTitle() {
-        return siteNode.getTitle();
-    }
-
-    public String getDescription() {
-        return siteNode.getDescription();
-    }
-
-    public List<NavigationNode> getChildNodes() {
-        return null;
-    }
-
-    public SiteNode getSiteNode() {
-        return this.siteNode;
-    }
-    public SiteNode getActualSiteNode() {
-        return siteNode;
+    public UseCaseNavigationNode(UseCaseNode siteNode, boolean allowed) {
+       super(siteNode, allowed);
     }
 }

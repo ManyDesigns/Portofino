@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.database;
 
+import com.manydesigns.portofino.xml.XmlAttribute;
 import org.apache.commons.dbutils.DbUtils;
 
 import javax.naming.InitialContext;
@@ -41,7 +42,7 @@ import java.text.MessageFormat;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class JndiConnectionProvider extends AbstractConnectionProvider {
+public class JndiConnectionProvider extends ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -56,12 +57,8 @@ public class JndiConnectionProvider extends AbstractConnectionProvider {
     // Constructors
     //**************************************************************************
 
-    public JndiConnectionProvider(String databaseName,
-                                  String jndiResource,
-                                  String includeSchemas,
-                                  String excludeSchemas) {
-        super(databaseName, includeSchemas, excludeSchemas);
-        this.jndiResource = jndiResource;
+    public JndiConnectionProvider() {
+        super();
     }
 
     //**************************************************************************
@@ -86,6 +83,7 @@ public class JndiConnectionProvider extends AbstractConnectionProvider {
     // Getters/setters
     //**************************************************************************
 
+    @XmlAttribute(required = true)
     public String getJndiResource() {
         return jndiResource;
     }

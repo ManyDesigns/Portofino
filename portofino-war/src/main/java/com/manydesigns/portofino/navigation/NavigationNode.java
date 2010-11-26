@@ -45,6 +45,8 @@ public interface NavigationNode {
     String getUrl();
     String getTitle();
     String getDescription();
+
+    boolean isAllowed();
     List<NavigationNode> getChildNodes();
     SiteNode getSiteNode();
     SiteNode getActualSiteNode();

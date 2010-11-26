@@ -36,8 +36,8 @@ import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;
 import com.manydesigns.portofino.model.diff.MessageDiffer;
-import com.manydesigns.portofino.model.io.ModelParser;
 import com.manydesigns.portofino.model.io.ModelWriter;
+import com.manydesigns.portofino.xml.XmlParser;
 
 import java.io.File;
 import java.util.List;
@@ -316,8 +316,8 @@ public class RoundtripTest extends AbstractPortofinoTest {
         modelWriter.write(model, file);
 
         // Parse the model from the file into model2
-        ModelParser modelParser = new ModelParser();
-        Model model2 = modelParser.parse(file);
+        XmlParser modelParser = new XmlParser();
+        Model model2 = (Model) modelParser.parse(file, Model.class, "model");
         assertNotNull(model2);
 
         // compare model and model2

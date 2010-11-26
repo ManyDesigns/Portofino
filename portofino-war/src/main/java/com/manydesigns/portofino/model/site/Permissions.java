@@ -31,7 +31,6 @@ package com.manydesigns.portofino.model.site;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.xml.XmlCollection;
 
 import java.util.ArrayList;
@@ -78,14 +77,16 @@ public class Permissions implements ModelObject {
     // Permission verification
     //**************************************************************************
 
-    public boolean isAllowed (String group) {
+    public boolean checkPermission(String group) {
         if (deny.contains(group)) {
                 return false;
         }
+        /*
         if (allow.contains(Group.REGISTERED)
                 && !Group.ANONYMOUS.equals(group)){
             return true;
         }
+        */
         if (allow.size()>0){
             return allow.contains(group);
         } else {
@@ -93,18 +94,13 @@ public class Permissions implements ModelObject {
         }
     }
 
-    public boolean isAllowed (List<String> groups) {
+    public boolean isAllowed(List<String> groups) {
         boolean result = false;
         for (String group : groups){
-            boolean parentAllowed= true;
-            if (parent != null){
-                parentAllowed= parent.isAllowed(groups);
-            }
-            result = result || (parentAllowed && isAllowed(group));
+            result = result || checkPermission(group);
         }
         return result;
     }
-
 
     //**************************************************************************
     // Getters/setters

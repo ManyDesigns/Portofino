@@ -29,7 +29,11 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.model.site.*;
+import com.manydesigns.portofino.system.model.users.Group;
 import junit.framework.TestCase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -37,6 +41,20 @@ import junit.framework.TestCase;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class SiteNodeTest extends TestCase{
+
+    Permissions permissions;
+    List<String> groups;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        permissions = new Permissions();
+        permissions.getAllow().add("buoni");
+        permissions.getDeny().add("cattivi");
+        groups = new ArrayList<String>();
+    }
+
     public void testSiteNodes (){
         Model model = new Model();
         //1. Radice
@@ -128,5 +146,35 @@ public class SiteNodeTest extends TestCase{
         assertEquals("/Profile", n1_3.getActualId());
         assertEquals("/userAdmin/Index.action", n1_4.getActualUrl());
         assertEquals("/userAdmin", n1_4.getActualId());
+    }
+
+    public void testPermissions1() {
+        assertTrue(permissions.isAllowed(groups));
+    }
+
+    public void testPermissions2() {
+        groups.add("buoni");
+        assertTrue(permissions.isAllowed(groups));
+    }
+
+    public void testPermissions3() {
+        groups.add("cattivi");
+        assertFalse(permissions.isAllowed(groups));
+    }
+
+    public void testPermissions4() {
+        groups.add("buoni");
+        groups.add("cattivi");
+        assertFalse(permissions.isAllowed(groups));
+    }
+
+    public void testPermissions5() {
+        groups.add(Group.ANONYMOUS);
+        assertFalse(permissions.isAllowed(groups));
+    }
+
+    public void testPermissions6() {
+        groups.add(Group.REGISTERED);
+        assertFalse(permissions.isAllowed(groups));
     }
 }

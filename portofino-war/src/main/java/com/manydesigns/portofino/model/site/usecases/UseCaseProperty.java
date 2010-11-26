@@ -29,10 +29,11 @@
 
 package com.manydesigns.portofino.model.site.usecases;
 
-import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.xml.XmlAttribute;
+import com.manydesigns.portofino.xml.XmlCollection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +105,7 @@ public class UseCaseProperty implements ModelObject {
         this.name = name;
     }
 
+    @XmlCollection (itemClass = Annotation.class, itemName = "annotation")
     public List<Annotation> getAnnotations() {
         return annotations;
     }

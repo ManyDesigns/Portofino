@@ -31,6 +31,7 @@ package com.manydesigns.portofino.database;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Password;
+import com.manydesigns.portofino.xml.XmlAttribute;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -43,7 +44,7 @@ import java.text.MessageFormat;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class JdbcConnectionProvider extends AbstractConnectionProvider {
+public class JdbcConnectionProvider extends ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -51,8 +52,8 @@ public class JdbcConnectionProvider extends AbstractConnectionProvider {
     // Fields (configured values)
     //**************************************************************************
 
-    protected String driverClass;
-    protected String connectionURL;
+    protected String driver;
+    protected String url;
     protected String username;
     protected String password;
 
@@ -61,18 +62,8 @@ public class JdbcConnectionProvider extends AbstractConnectionProvider {
     // Constructors
     //**************************************************************************
 
-    public JdbcConnectionProvider(String databaseName,
-                                  String driverClass,
-                                  String connectionURL,
-                                  String username,
-                                  String password,
-                                  String includeSchemas,
-                                  String excludeSchemas) {
-        super(databaseName, includeSchemas, excludeSchemas);
-        this.driverClass = driverClass;
-        this.connectionURL = connectionURL;
-        this.username = username;
-        this.password = password;
+    public JdbcConnectionProvider() {
+        super();
     }
 
     //**************************************************************************
@@ -81,12 +72,12 @@ public class JdbcConnectionProvider extends AbstractConnectionProvider {
 
     public String getDescription() {
         return MessageFormat.format(
-                "JDBC connection to URL: {0}", connectionURL);
+                "JDBC connection to URL: {0}", url);
     }
 
     public Connection acquireConnection() throws Exception {
-        Class.forName(driverClass);
-        return DriverManager.getConnection(connectionURL,
+        Class.forName(driver);
+        return DriverManager.getConnection(url,
                 username, password);
     }
 
@@ -99,23 +90,26 @@ public class JdbcConnectionProvider extends AbstractConnectionProvider {
     // Getters
     //**************************************************************************
 
-    public String getDriverClass() {
-        return driverClass;
+    @XmlAttribute(required = true)
+    public String getDriver() {
+        return driver;
     }
 
-    public void setDriverClass(String driverClass) {
-        this.driverClass = driverClass;
+    public void setDriver(String driver) {
+        this.driver = driver;
     }
 
     @Label("connection URL")
-    public String getConnectionURL() {
-        return connectionURL;
+    @XmlAttribute(required = true)
+    public String getUrl() {
+        return url;
     }
 
-    public void setConnectionURL(String connectionURL) {
-        this.connectionURL = connectionURL;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
+    @XmlAttribute(required = true)
     public String getUsername() {
         return username;
     }
@@ -125,6 +119,7 @@ public class JdbcConnectionProvider extends AbstractConnectionProvider {
     }
 
     @Password
+    @XmlAttribute(required = true)
     public String getPassword() {
         return password;
     }
@@ -141,11 +136,11 @@ public class JdbcConnectionProvider extends AbstractConnectionProvider {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("databaseName", connectionURL)
-                .append("driverClass", driverClass)
-                .append("connectionURL", connectionURL)
+                .append("databaseName", databaseName)
+                .append("driver", driver)
+                .append("url", url)
                 .append("username", username)
-                .append("password", "********")
+                .append("password", password)
                 .toString();
     }
 }

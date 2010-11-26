@@ -56,7 +56,7 @@ public class JdbcMetadataReaderTest extends AbstractPortofinoTest {
         super.setUp();
 
         connectionProvider=context.getConnectionProvider("jpetstore");
-        connectionProvider.test();
+        connectionProvider.init();
         database = connectionProvider.readModel();
 
     }

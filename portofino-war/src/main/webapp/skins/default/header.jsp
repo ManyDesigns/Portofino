@@ -51,18 +51,18 @@
         <div id="globalLinks">
 
             <s:if test="#application.portofinoProperties['user.enabled'].equals('true') 
-            && #application.context.getCurrentUser() != null">
+            && #session.get('userId') != null">
                 Welcome, <s:a href="%{#profileUrl}">
-                <s:property value="#application.context.getCurrentUser().getEmail()"/></s:a> -
+                <s:property value="#session.get('userName')"/></s:a> -
             </s:if>
             <s:a href="%{#settingsUrl}">Settings</s:a> -
             <s:a href="%{#helpUrl}">Help</s:a>
             <s:if test="#application.portofinoProperties['user.enabled'].equals('true')
-            && #application.context.getCurrentUser() == null">
+            && #session.get('userId') == null">
               - <s:a href="%{#loginUrl}">Log in</s:a>
             </s:if>
             <s:if test="#application.portofinoProperties['user.enabled'].equals('true')
-            && #application.context.getCurrentUser() != null">
+            && #session.get('userId') != null">
                 - <s:a href="%{#logoutUrl}">Log out</s:a>    
             </s:if>
 

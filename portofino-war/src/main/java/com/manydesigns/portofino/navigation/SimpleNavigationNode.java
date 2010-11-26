@@ -51,15 +51,17 @@ public class SimpleNavigationNode implements NavigationNode {
     protected final SiteNode siteNode;
     protected final List<NavigationNode> childNodes;
     protected final String url;
+    protected final boolean allowed;
     
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public SimpleNavigationNode(SiteNode siteNode) {
+    public SimpleNavigationNode(SiteNode siteNode, boolean allowed) {
         this.siteNode = siteNode;
         childNodes = new ArrayList<NavigationNode>();
         url = Util.getAbsoluteUrl(siteNode.getActualUrl());
+        this.allowed= allowed;
     }
 
     //**************************************************************************
@@ -88,5 +90,9 @@ public class SimpleNavigationNode implements NavigationNode {
 
     public SiteNode getActualSiteNode() {
         return siteNode;
+    }
+
+    public boolean isAllowed() {
+        return allowed;
     }
 }

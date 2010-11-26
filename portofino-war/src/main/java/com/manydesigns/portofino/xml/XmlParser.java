@@ -227,6 +227,12 @@ public class XmlParser {
         }
     }
 
+    public void expectElement(List<Callback> callbacks) throws Exception {
+        Callback[] callbackArray = new Callback[callbacks.size()];
+        callbacks.toArray(callbackArray);
+        expectElement(callbackArray);
+    }
+
     public void expectElement(Callback... callbackArray) throws Exception {
         int length = callbackArray.length;
         String[] elementNameArray = new String[length];
@@ -468,18 +474,14 @@ public class XmlParser {
 
                     Collection collection =
                             (Collection) propertyAccessor.get(obj);
-                    for (int i = 0; i < itemClass.length; i++) {
-                        CollectionCallback collectionCallBack =
-                                new CollectionCallback(obj,
-                                        collection, collectionName, required,
-                                        itemClass[i], itemName[i], itemMin, itemMax);
-                        childCallbacks.add(collectionCallBack);
-                    }
+                    CollectionCallback collectionCallBack =
+                            new CollectionCallback(obj,
+                                    collection, collectionName, required,
+                                    itemClass, itemName, itemMin, itemMax);
+                    childCallbacks.add(collectionCallBack);
                 }
             }
-            Callback[] callbackArray = new Callback[childCallbacks.size()];
-            childCallbacks.toArray(callbackArray);
-            expectElement(callbackArray);
+            expectElement(childCallbacks);
         }
     }
 
@@ -487,14 +489,14 @@ public class XmlParser {
         protected final Object parent;
         protected final Collection parentCollection;
         protected final boolean required;
-        protected final Class itemClass;
-        protected final String itemName;
+        protected final Class[] itemClass;
+        protected final String[] itemName;
         protected final int itemMin;
         protected final int itemMax;
 
         protected CollectionCallback(Object parent, Collection parentCollection,
                                      String elementName, boolean required,
-                                     Class itemClass, String itemName,
+                                     Class[] itemClass, String[] itemName,
                                      int itemMin, int itemMax) {
             super(elementName, (required ? 1 : 0), 1);
             this.parent = parent;
@@ -508,37 +510,53 @@ public class XmlParser {
 
         public void doElement(Map<String, String> attributes)
                 throws Exception {
-            expectElement(new ElementCallback(parent, parentCollection, null,
-                    itemClass, itemName, itemMin, itemMax));
+            List<Callback> callbacks = new ArrayList<Callback>();
+            for (int i = 0; i < itemClass.length; i++) {
+                ElementCallback callback = new ElementCallback(parent, parentCollection, null,
+                        itemClass[i], itemName[i], itemMin, itemMax);
+                callbacks.add(callback);
+            }
+            expectElement(callbacks);
         }
     }
 
 
-    public Object parse(String resourceName, Class rootClass) throws Exception {
+    public Object parse(String resourceName, Class rootClass,
+                        String rootName) throws Exception {
         InputStream inputStream = ReflectionUtil.getResourceAsStream(resourceName);
-        return parse(inputStream, rootClass);
+        return parse(inputStream, rootClass, rootName);
     }
 
-    public Object parse(File file, Class rootClass) throws Exception {
+    public Object parse(File file, Class rootClass,
+                        String rootName) throws Exception {
         LogUtil.infoMF(logger, "Parsing file: {0}", file.getAbsolutePath());
         InputStream input = new FileInputStream(file);
-        return parse(input, rootClass);
+        return parse(input, rootClass, rootName);
     }
 
-    private Object parse(InputStream inputStream, Class rootClass) throws Exception {
+    private Object parse(InputStream inputStream, Class rootClass,
+                         String rootName) throws Exception {
         initParser(inputStream);
-        this.rootClass = rootClass;
-        expectDocument(new ModelDocumentCallback());
-        return model;
+        ModelDocumentCallback modelDocumentCallback =
+                new ModelDocumentCallback(rootClass, rootName);
+        expectDocument(modelDocumentCallback);
+        return modelDocumentCallback.model;
     }
-
-    private Class rootClass;
-    private Object model;
 
     private class ModelDocumentCallback implements DocumentCallback {
+
+        private Class rootClass;
+        private String rootName;
+        private Object model;
+
+        private ModelDocumentCallback(Class rootClass, String rootName) {
+            this.rootClass = rootClass;
+            this.rootName = rootName;
+        }
+
         public void doDocument() throws Exception {
             ElementCallback elementCallback =
-                    new ElementCallback(rootClass, "model", 1, 1);
+                    new ElementCallback(rootClass, rootName, 1, 1);
             expectElement(elementCallback);
             model = elementCallback.obj;
         }

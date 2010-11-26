@@ -29,12 +29,10 @@
 
 package com.manydesigns.portofino.navigation;
 
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.site.SiteNode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -42,27 +40,18 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableDataNavigationNode implements NavigationNode {
+public class TableDataNavigationNode extends SimpleNavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-
-
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    protected final SiteNode siteNode;
-    protected final List<NavigationNode> childNodes;
-    protected final String url;
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public TableDataNavigationNode(Context context, SiteNode siteNode) {
-        this.siteNode = siteNode;
-        childNodes = new ArrayList<NavigationNode>();
+    public TableDataNavigationNode(Context context, SiteNode siteNode,
+                                    boolean allowed) {
+        super(siteNode, allowed);
 
         List<Table> tables = context.getModel().getAllTables();
         for (Table table : tables) {
@@ -72,38 +61,8 @@ public class TableDataNavigationNode implements NavigationNode {
                     new TableNavigationNode(siteNode,table,
                             urlFormat,
                             "%{tableName}",
-                            "Table data: %{qualifiedName}");
+                            "Table data: %{qualifiedName}", allowed);
             childNodes.add(node);
         }
-        url = Util.getAbsoluteUrl(siteNode.getActualUrl());
-    }
-
-
-    //**************************************************************************
-    // NavigationNode implementation
-    //**************************************************************************
-
-    public String getUrl() {
-        return url;
-    }
-
-    public String getTitle() {
-        return siteNode.getTitle();
-    }
-
-    public String getDescription() {
-        return siteNode.getDescription();
-    }
-
-    public List<NavigationNode> getChildNodes() {
-        return childNodes;
-    }
-
-    public SiteNode getSiteNode() {
-        return this.siteNode;
-    }
-
-    public SiteNode getActualSiteNode() {
-        return siteNode;
     }
 }

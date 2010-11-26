@@ -1,7 +1,6 @@
 <connections>
-    <connection
+    <jdbcConnection
             databaseName="jpetstore"
-            type="jdbc"
             driver="org.postgresql.Driver"
             url="jdbc:postgresql://127.0.0.1:5432/jpetstore"
             username="manydesigns"
@@ -9,9 +8,8 @@
             includeSchemas="public"
             excludeSchemas=""
             />
-    <connection
+    <jdbcConnection
             databaseName="hibernatetest"
-            type="jdbc"
             driver="org.postgresql.Driver"
             url="jdbc:postgresql://127.0.0.1:5432/hibernatetest"
             username="manydesigns"
@@ -19,9 +17,8 @@
             includeSchemas="public"
             excludeSchemas=""
             />
-    <connection
+    <jdbcConnection
             databaseName="portofino"
-            type="jdbc"
             driver="org.postgresql.Driver"
             url="jdbc:postgresql://127.0.0.1:5432/portofino4"
             username="manydesigns"
@@ -30,9 +27,8 @@
             excludeSchemas=""
             />
     <!--
-    <connection
+    <jdbcConnection
             databaseName="mysql"
-            type="jdbc"
             driver="com.mysql.jdbc.Driver"
             url="jdbc:mysql://192.168.1.2/meta"
             username="manydesigns"

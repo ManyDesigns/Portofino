@@ -44,7 +44,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public abstract class SiteNode implements ModelObject {
+public abstract class  SiteNode implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -63,6 +63,7 @@ public abstract class SiteNode implements ModelObject {
     protected String title;
     protected String description;
     protected String url;
+
 
     //**************************************************************************
     // Constructors
@@ -157,7 +158,8 @@ public abstract class SiteNode implements ModelObject {
         this.permissions = permissions;
     }
 
-    @XmlCollection(itemClass = DocumentNode.class, itemName = "documentNode")
+    @XmlCollection(itemClass = {DocumentNode.class, FolderNode.class, CustomNode.class, CustomFolderNode.class, UseCaseNode.class, PortletNode.class},
+            itemName = {"documentNode", "folderNode", "customNode", "customFolderNode", "useCaseNode", "portletNode"})
     public List<SiteNode> getChildNodes() {
         return childNodes;
     }
@@ -187,4 +189,17 @@ public abstract class SiteNode implements ModelObject {
         this.url = url;
     }
 
+    public boolean isAllowed(List<String> groups) {
+        boolean parentAllowed= true;
+        if (parent != null){
+            parentAllowed = parent.isAllowed(groups);
+        }
+
+        boolean ownAllowed = true;
+        if (permissions != null){
+            ownAllowed = permissions.isAllowed(groups);
+        }
+
+        return parentAllowed && ownAllowed;
+    }
 }
