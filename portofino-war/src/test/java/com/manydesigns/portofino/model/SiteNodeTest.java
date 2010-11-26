@@ -32,8 +32,8 @@ import com.manydesigns.portofino.model.site.*;
 import com.manydesigns.portofino.system.model.users.Group;
 import junit.framework.TestCase;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,40 +42,65 @@ import java.util.List;
 */
 public class SiteNodeTest extends TestCase{
 
+    Model model;
+    RootNode root;
+    SiteNode n1_1;
+    SiteNode n1_2;
+    SiteNode n1_3;
+    SiteNode n1_4;
+    CustomFolderNode n1_2_1;
+    CustomFolderNode n1_2_2;
+    SiteNode n1_2_3;
+
+    Permissions n1_1_perm;
+    Permissions n1_2_perm;
+    Permissions n1_3_perm;
+    Permissions n1_4_perm;
+    Permissions n1_2_1_perm;
+    Permissions n1_2_2_perm;
+    Permissions n1_2_3_perm;
+
     Permissions permissions;
+    Permissions permissions2;
+    Permissions permissions3;
     List<String> groups;
+
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-
-        permissions = new Permissions();
-        permissions.getAllow().add("buoni");
-        permissions.getDeny().add("cattivi");
-        groups = new ArrayList<String>();
-    }
-
-    public void testSiteNodes (){
-        Model model = new Model();
+        model = new Model();
         //1. Radice
-        RootNode root = new RootNode();
+        root = new RootNode();
         root.setId("/");
         root.setTitle("portofino4");
         root.setDescription("portofino application");
 
+        //Nessun permesso
+
         //1.1
-        DocumentNode n1_1 = new DocumentNode(root);
+        n1_1 = new DocumentNode(root);
+        n1_1_perm = new Permissions();
+        n1_1.setPermissions(n1_1_perm);
         n1_1.setDescription("homepage description");
         n1_1.setTitle("homepage title");
         n1_1.setId("homepage");
 
+        n1_1_perm.getAllow().add(Group.ANONYMOUS);
+
         //1.2
-        FolderNode n1_2 = new FolderNode(root);
+        n1_2 = new FolderNode(root);
+        n1_2_perm = new Permissions();
+        n1_2.setPermissions(n1_2_perm);
         n1_2.setDescription("Model description");
         n1_2.setTitle("Model title");
         n1_2.setId("model");
 
-        CustomFolderNode n1_2_1 = new CustomFolderNode(n1_2);
+        n1_2_perm.getAllow().add(Group.REGISTERED);
+
+        n1_2_1 = new CustomFolderNode(n1_2);
+        n1_2_1_perm = new Permissions();
+        n1_2_1.setPermissions(n1_2_1_perm);
         n1_2_1.setType("table-data");
         n1_2_1.setDescription("TableData description");
         n1_2_1.setTitle("TableData title");
@@ -83,7 +108,11 @@ public class SiteNodeTest extends TestCase{
         n1_2_1.setUrl("/model/TableData.action");
         n1_2.getChildNodes().add(n1_2_1);
 
-        CustomFolderNode n1_2_2 = new CustomFolderNode(n1_2);
+        n1_2_1_perm.getAllow().add("admins");
+
+        n1_2_2 = new CustomFolderNode(n1_2);
+        n1_2_2_perm = new Permissions();
+        n1_2_2.setPermissions(n1_2_2_perm);
         n1_2_2.setType("table-design");
         n1_2_2.setDescription("TableData design description");
         n1_2_2.setTitle("TableData design title");
@@ -91,23 +120,35 @@ public class SiteNodeTest extends TestCase{
         n1_2_2.setUrl("/model/TableDesign.action");
         n1_2.getChildNodes().add(n1_2_2);
 
-        CustomNode n1_2_3 = new CustomNode(n1_2);
+
+
+        n1_2_3 = new CustomNode(n1_2);
+        n1_2_3_perm = new Permissions();
+        n1_2_3.setPermissions(n1_2_3_perm);
         n1_2_3.setDescription("Somewhere description");
         n1_2_3.setTitle("Somewhere");
         n1_2_3.setId("somewhere");
         n1_2_3.setUrl("http://www.manydesigns.com/");
         n1_2.getChildNodes().add(n1_2_3);
 
+        n1_2_3_perm.getDeny().add("cattivi");
 
         //1.3
-        CustomNode n1_3 = new CustomNode(root);
+        n1_3 = new CustomNode(root);
+        n1_3_perm = new Permissions();
+        n1_3.setPermissions(n1_3_perm);
         n1_3.setDescription("Profile");
         n1_3.setTitle("Profile");
         n1_3.setId("Profile");
         n1_3.setUrl("/Profile.action");
 
+        n1_3_perm.getDeny().add("cattivi");
+        n1_3_perm.getAllow().add("buoni");
+
         //1.4
-        FolderNode n1_4 = new FolderNode(root);
+        n1_4 = new FolderNode(root);
+        n1_4_perm = new Permissions();
+        n1_4.setPermissions(n1_4_perm);
         n1_4.setDescription("user administration");
         n1_4.setTitle("user admin");
         n1_4.setId("userAdmin");
@@ -124,6 +165,21 @@ public class SiteNodeTest extends TestCase{
         root.init(model);
 
 
+        permissions = new Permissions();
+        permissions.getAllow().add("buoni");
+        permissions.getDeny().add("cattivi");
+
+        permissions2 = new Permissions();
+        permissions2.getDeny().add("cattivi");
+
+        permissions3 = new Permissions();
+        permissions3.getAllow().add("buoni");
+
+        groups = new ArrayList<String>();
+
+    }
+
+    public void testSiteNodes (){
         assertEquals("/", root.getActualUrl());
         assertEquals("/", root.getActualId());
 
@@ -148,33 +204,178 @@ public class SiteNodeTest extends TestCase{
         assertEquals("/userAdmin", n1_4.getActualId());
     }
 
-    public void testPermissions1() {
-        assertTrue(permissions.isAllowed(groups));
-    }
 
-    public void testPermissions2() {
-        groups.add("buoni");
-        assertTrue(permissions.isAllowed(groups));
-    }
 
-    public void testPermissions3() {
-        groups.add("cattivi");
-        assertFalse(permissions.isAllowed(groups));
-    }
 
-    public void testPermissions4() {
-        groups.add("buoni");
-        groups.add("cattivi");
-        assertFalse(permissions.isAllowed(groups));
-    }
 
-    public void testPermissions5() {
+    public void testAnonymous() {
         groups.add(Group.ANONYMOUS);
+
+        assertTrue(root.isAllowed(groups));
+        assertTrue(n1_1.isAllowed(groups));
+        assertFalse(n1_2.isAllowed(groups));
+
+        assertFalse(n1_2_1.isAllowed(groups));
+        assertFalse(n1_2_2.isAllowed(groups));
+        assertFalse(n1_2_3.isAllowed(groups));
+
+        assertFalse(n1_3.isAllowed(groups));
+        assertTrue(n1_4.isAllowed(groups));
+    }
+
+    public void testRegistered() {
+        groups.add(Group.ANONYMOUS);
+        groups.add(Group.REGISTERED);
+
+        assertTrue(root.isAllowed(groups));
+        assertTrue(n1_1.isAllowed(groups));
+        assertTrue(n1_2.isAllowed(groups));
+
+        assertFalse(n1_2_1.isAllowed(groups));
+        assertTrue(n1_2_2.isAllowed(groups));
+        assertTrue(n1_2_3.isAllowed(groups));
+
+        assertFalse(n1_3.isAllowed(groups));
+        assertTrue(n1_4.isAllowed(groups));
+    }
+
+    public void testAdmins() {
+        groups.add(Group.ANONYMOUS);
+        groups.add(Group.REGISTERED);
+        groups.add("admins");
+
+        assertTrue(root.isAllowed(groups));
+        assertTrue(n1_1.isAllowed(groups));
+        assertTrue(n1_2.isAllowed(groups));
+
+        //allow solo admins
+        assertTrue(n1_2_1.isAllowed(groups));
+
+        assertTrue(n1_2_2.isAllowed(groups));
+        assertTrue(n1_2_3.isAllowed(groups));
+
+        assertFalse(n1_3.isAllowed(groups));
+        assertTrue(n1_4.isAllowed(groups));
+    }
+
+    public void testCattivi() {
+        groups.add(Group.ANONYMOUS);
+        groups.add(Group.REGISTERED);
+        groups.add("cattivi");
+
+        assertTrue(root.isAllowed(groups));
+        assertTrue(n1_1.isAllowed(groups));
+        assertTrue(n1_2.isAllowed(groups));
+
+        assertFalse(n1_2_1.isAllowed(groups));
+        assertTrue(n1_2_2.isAllowed(groups));
+
+        //deny
+        assertFalse(n1_2_3.isAllowed(groups));
+
+        assertFalse(n1_3.isAllowed(groups));
+        assertTrue(n1_4.isAllowed(groups));
+    }
+
+    public void testBuoni() {
+        groups.add(Group.ANONYMOUS);
+        groups.add(Group.REGISTERED);
+        groups.add("buoni");
+
+        assertTrue(root.isAllowed(groups));
+        assertTrue(n1_1.isAllowed(groups));
+        assertTrue(n1_2.isAllowed(groups));
+
+        assertFalse(n1_2_1.isAllowed(groups));
+        assertTrue(n1_2_2.isAllowed(groups));
+        assertTrue(n1_2_3.isAllowed(groups));
+
+        //Vede questo in più di un registered
+        assertTrue(n1_3.isAllowed(groups));
+        assertTrue(n1_4.isAllowed(groups));
+    }
+
+    public void testBuoniCattivi() {
+        groups.add(Group.ANONYMOUS);
+        groups.add(Group.REGISTERED);
+        groups.add("buoni");
+        groups.add("cattivi");
+
+        assertTrue(root.isAllowed(groups));
+        assertTrue(n1_1.isAllowed(groups));
+        assertTrue(n1_2.isAllowed(groups));
+
+        assertFalse(n1_2_1.isAllowed(groups));
+        assertTrue(n1_2_2.isAllowed(groups));
+        
+        //deny su cattivi
+        assertFalse(n1_2_3.isAllowed(groups));
+
+        //Pue essendo buono, essendo anche cattivo non vede il nodo 1.3
+        assertFalse(n1_3.isAllowed(groups));
+        assertTrue(n1_4.isAllowed(groups));
+    }
+
+    // test su permissions (con liste allow e deny entrambe riempite)
+    public void testPermissions1_1() {
         assertFalse(permissions.isAllowed(groups));
     }
 
-    public void testPermissions6() {
-        groups.add(Group.REGISTERED);
+    public void testPermissions1_2() {
+        groups.add("buoni");
+        assertTrue(permissions.isAllowed(groups));
+    }
+
+    public void testPermissions1_3() {
+        groups.add("cattivi");
         assertFalse(permissions.isAllowed(groups));
     }
+
+    public void testPermissions1_4() {
+        groups.add("buoni");
+        groups.add("cattivi");
+        assertFalse(permissions.isAllowed(groups));
+    }
+
+    public void testPermissions1_5() {
+        groups.add("altro");
+        assertFalse(permissions.isAllowed(groups));
+    }
+
+
+
+    // test su permissions (con solo lista deny riempita)
+    public void testPermissions2_1() {
+        assertTrue(permissions2.isAllowed(groups));
+    }
+
+    public void testPermissions2_3() {
+        groups.add("cattivi");
+        assertFalse(permissions2.isAllowed(groups));
+    }
+
+    public void testPermissions2_5() {
+        groups.add("altro");
+        assertTrue(permissions2.isAllowed(groups));
+    }
+
+
+    
+    // test su permissions (con solo lista allow riempita)
+    public void testPermissions3_1() {
+        assertFalse(permissions3.isAllowed(groups));
+    }
+
+    public void testPermissions3_2() {
+        groups.add("buoni");
+        assertTrue(permissions3.isAllowed(groups));
+    }
+
+    public void testPermissions3_5() {
+        groups.add("altro");
+        assertFalse(permissions3.isAllowed(groups));
+    }
+
+
+
 }

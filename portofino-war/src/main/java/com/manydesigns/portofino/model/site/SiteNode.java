@@ -192,14 +192,16 @@ public abstract class  SiteNode implements ModelObject {
     public boolean isAllowed(List<String> groups) {
         boolean parentAllowed= true;
         if (parent != null){
-            parentAllowed = parent.isAllowed(groups);
+            parentAllowed= parent.isAllowed(groups);
+        }
+        if (!parentAllowed) {
+            return false;
         }
 
-        boolean ownAllowed = true;
-        if (permissions != null){
-            ownAllowed = permissions.isAllowed(groups);
+        boolean result = true;
+        if (permissions != null) {
+            result = permissions.isAllowed(groups);
         }
-
-        return parentAllowed && ownAllowed;
+        return result;
     }
 }
