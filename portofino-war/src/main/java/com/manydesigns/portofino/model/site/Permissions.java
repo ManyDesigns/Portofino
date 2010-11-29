@@ -95,12 +95,12 @@ public class Permissions implements ModelObject {
     // Getters/setters
     //**************************************************************************
 
-    @XmlCollection(itemClasses = String.class, itemNames = "group")
+    @XmlCollection(itemClasses = String.class, itemNames = "group", order = 1)
     public List<String> getAllow() {
         return allow;
     }
 
-    @XmlCollection(itemClasses = String.class, itemNames = "group")
+    @XmlCollection(itemClasses = String.class, itemNames = "group", order = 2)
     public List<String> getDeny() {
         return deny;
     }

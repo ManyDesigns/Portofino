@@ -176,27 +176,27 @@ public class UseCase {
         return parentUseCase;
     }
 
-    @XmlCollection(itemClasses = UseCaseProperty.class, itemNames = "property")
+    @XmlCollection(itemClasses = UseCaseProperty.class, itemNames = "property", order = 1)
     public List<UseCaseProperty> getProperties() {
         return properties;
     }
 
-    @XmlCollection(itemClasses = ModelSelectionProvider.class, itemNames = "selectionProvider")
+    @XmlCollection(itemClasses = ModelSelectionProvider.class, itemNames = "selectionProvider", order = 2)
     public List<ModelSelectionProvider> getSelectionProviders() {
         return selectionProviders;
     }
 
-    @XmlCollection(itemClasses = Button.class, itemNames = "button")
-    public List<Button> getButtons() {
-        return buttons;
-    }
-
-    @XmlCollection(itemClasses = Annotation.class, itemNames = "annotation")
+    @XmlCollection(itemClasses = Annotation.class, itemNames = "annotation", order = 3)
     public List<Annotation> getModelAnnotations() {
         return annotations;
     }
 
-    @XmlCollection(itemClasses = UseCase.class, itemNames = "useCase")
+    @XmlCollection(itemClasses = Button.class, itemNames = "button", order = 4)
+    public List<Button> getButtons() {
+        return buttons;
+    }
+
+    @XmlCollection(itemClasses = UseCase.class, itemNames = "useCase", order = 5)
     public List<UseCase> getSubUseCases() {
         return subUseCases;
     }

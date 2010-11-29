@@ -97,7 +97,8 @@ public class XmlWriter {
             //Inizio il documento XML
             w.writeStartDocument();
 
-            ElementWriter elementWriter = new ElementWriter(object, rootName);
+            ElementWriter elementWriter =
+                    new ElementWriter(object, rootName, 0);
             elementWriter.write();
 
             // Chiudo il documento
@@ -146,7 +147,7 @@ public class XmlWriter {
                 writers.add(writer);
             }
         }
-        Collections.sort(writers, new AttributeWriterComparator());
+        Collections.sort(writers, new WriterComparator());
         for (Writer current : writers) {
             current.write();
         }
@@ -170,6 +171,7 @@ public class XmlWriter {
 
     interface Writer {
         void write() throws XMLStreamException;
+        int getOrder();
     }
 
     //--------------------------------------------------------------------------
@@ -190,14 +192,17 @@ public class XmlWriter {
         public void write() throws XMLStreamException {
             w.writeAttribute(name, value);
         }
+
+        public int getOrder() {
+            return order;
+        }
     }
 
-    static class AttributeWriterComparator
-            implements Comparator<AttributeWriter> {
-        public int compare(AttributeWriter o1,
-                           AttributeWriter o2) {
-            int order1 = o1.order;
-            int order2 = o2.order;
+    static class WriterComparator
+            implements Comparator<Writer> {
+        public int compare(Writer o1, Writer o2) {
+            int order1 = o1.getOrder();
+            int order2 = o2.getOrder();
             if(order1 > order2) {
                 return 1;
             } else if(order1 < order2) {
@@ -215,10 +220,12 @@ public class XmlWriter {
     class ElementWriter implements Writer {
         final Object object;
         final String elementName;
+        final int order;
 
-        ElementWriter(Object object, String elementName) {
+        ElementWriter(Object object, String elementName, int order) {
             this.object = object;
             this.elementName = elementName;
+            this.order = order;
         }
 
         public void write()
@@ -245,7 +252,9 @@ public class XmlWriter {
             if (ownCollectionAnnotation != null) {
                 CollectionContentWriter collectionContentWriter = 
                         new CollectionContentWriter(
-                                (Collection)object, ownCollectionAnnotation);
+                                (Collection)object,
+                                ownCollectionAnnotation,
+                                ownCollectionAnnotation.order());
                 writers.add(collectionContentWriter);
             }
 
@@ -264,7 +273,8 @@ public class XmlWriter {
                         }
                     } else {
                         ElementWriter elementWriter =
-                                new ElementWriter(item, propertyName);
+                                new ElementWriter(item, propertyName,
+                                        xmlElementAnnotation.order());
                         writers.add(elementWriter);
                     }
                 }
@@ -277,7 +287,9 @@ public class XmlWriter {
                     if (!collection.isEmpty() || collectionAnnotation.required()) {
                         CollectionWriter collectionWriter =
                                 new CollectionWriter(collection,
-                                        collectionAnnotation, propertyName);
+                                        collectionAnnotation,
+                                        propertyName,
+                                        collectionAnnotation.order());
                         writers.add(collectionWriter);
                     }
                 }
@@ -290,6 +302,7 @@ public class XmlWriter {
             } else {
                 w.writeStartElement(elementName);
                 writeAttributes(object);
+                Collections.sort(writers, new WriterComparator());
                 for (Writer current : writers) {
                     current.write();
                 }
@@ -302,6 +315,10 @@ public class XmlWriter {
             w.writeCharacters((String) object);
             w.writeEndElement();
         }
+
+        public int getOrder() {
+            return order;
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -311,11 +328,14 @@ public class XmlWriter {
     class CollectionContentWriter implements Writer {
         final Collection collection;
         final XmlCollection annotation;
+        final int order;
 
         CollectionContentWriter(Collection collection,
-                                XmlCollection annotation) {
+                                XmlCollection annotation,
+                                int order) {
             this.collection = collection;
             this.annotation = annotation;
+            this.order = order;
         }
 
         public void write() throws XMLStreamException {
@@ -327,7 +347,7 @@ public class XmlWriter {
                 if (index >= 0) {
                     String itemName = itemNames[index];
                     ElementWriter elementWriter =
-                            new ElementWriter(item, itemName);
+                            new ElementWriter(item, itemName, 0);
                     elementWriter.write();
                 } else {
                     String message = MessageFormat.format(
@@ -337,6 +357,10 @@ public class XmlWriter {
                     throw new Error(message);
                 }
             }
+        }
+
+        public int getOrder() {
+            return order;
         }
     }
 
@@ -349,8 +373,10 @@ public class XmlWriter {
 
         CollectionWriter(Collection collection,
                          XmlCollection annotation,
-                         String elementName) {
-            super(collection, annotation);
+                         String elementName,
+                         int order
+        ) {
+            super(collection, annotation, order);
             this.elementName = elementName;
         }
 

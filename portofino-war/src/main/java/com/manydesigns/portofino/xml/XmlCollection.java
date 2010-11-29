@@ -50,4 +50,5 @@ public @interface XmlCollection {
     boolean required() default false;
     int itemMin() default 0;
     int itemMax() default -1;
+    int order();
 }

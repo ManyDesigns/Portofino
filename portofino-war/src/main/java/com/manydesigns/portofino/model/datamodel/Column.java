@@ -263,7 +263,7 @@ public class Column implements ModelObject {
         this.searchable = searchable;
     }
 
-    @XmlCollection(itemClasses = Annotation.class, itemNames = "annotation")
+    @XmlCollection(itemClasses = Annotation.class, itemNames = "annotation", order = 1)
     public List<Annotation> getAnnotations() {
         return annotations;
     }

@@ -46,4 +46,5 @@ public @interface XmlElement {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     boolean required() default false;
+    int order();
 }

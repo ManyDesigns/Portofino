@@ -54,7 +54,7 @@ public class UseCaseNode extends SiteNode{
         super(parent);
     }
 
-    @XmlElement
+    @XmlElement(order = 1)
     public UseCase getUseCase() {
         return useCase;
     }

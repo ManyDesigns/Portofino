@@ -47,7 +47,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-@XmlCollection(itemClasses = String.class, itemNames = "value")
+@XmlCollection(itemClasses = String.class, itemNames = "value", order = 1)
 public class Annotation extends ArrayList<String> implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";

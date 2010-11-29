@@ -149,7 +149,7 @@ public abstract class  SiteNode implements ModelObject {
         this.description = description;
     }
 
-    @XmlElement
+    @XmlElement(order = 2)
     public Permissions getPermissions() {
         return permissions;
     }
@@ -159,7 +159,7 @@ public abstract class  SiteNode implements ModelObject {
     }
 
     @XmlCollection(itemClasses = {DocumentNode.class, FolderNode.class, CustomNode.class, CustomFolderNode.class, UseCaseNode.class, PortletNode.class},
-            itemNames = {"documentNode", "folderNode", "customNode", "customFolderNode", "useCaseNode", "portletNode"})
+            itemNames = {"documentNode", "folderNode", "customNode", "customFolderNode", "useCaseNode", "portletNode"}, order = 1)
     public List<SiteNode> getChildNodes() {
         return childNodes;
     }

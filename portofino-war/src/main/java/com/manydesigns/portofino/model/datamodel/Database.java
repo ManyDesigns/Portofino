@@ -110,7 +110,7 @@ public class Database implements ModelObject {
         this.databaseName = databaseName;
     }
 
-    @XmlCollection(itemClasses = Schema.class, itemNames = "schema")
+    @XmlCollection(itemClasses = Schema.class, itemNames = "schema", order = 1)
     public List<Schema> getSchemas() {
         return schemas;
     }

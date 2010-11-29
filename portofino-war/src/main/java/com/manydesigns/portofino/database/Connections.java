@@ -39,7 +39,7 @@ import java.util.ArrayList;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 @XmlCollection(itemClasses = {JdbcConnectionProvider.class, JndiConnectionProvider.class},
-        itemNames = {"jdbcConnection", "jndiConnection"})
+        itemNames = {"jdbcConnection", "jndiConnection"}, order = 1)
 public class Connections extends ArrayList<ConnectionProvider> {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
