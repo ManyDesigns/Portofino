@@ -30,10 +30,11 @@
 package com.manydesigns.portofino.model.site.usecases;
 
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.xml.XmlAttribute;
+import com.manydesigns.portofino.xml.XmlCollection;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -55,8 +56,8 @@ public class UseCase {
 
     protected final UseCase parentUseCase;
     protected final List<UseCaseProperty> properties;
-    protected final List<ModelSelectionProvider> modelSelectionProviders;
-    protected final List<ModelAnnotation> modelAnnotations;
+    protected final List<ModelSelectionProvider> selectionProviders;
+    protected final List<Annotation> annotations;
     protected final List<Button> buttons;
     protected final List<UseCase> subUseCases;
 
@@ -78,11 +79,15 @@ public class UseCase {
     // Constructors
     //**************************************************************************
 
+    public UseCase() {
+        this(null);
+    }
+
     public UseCase(UseCase parentUseCase) {
         this.parentUseCase = parentUseCase;
         properties = new ArrayList<UseCaseProperty>();
-        modelSelectionProviders = new ArrayList<ModelSelectionProvider>();
-        modelAnnotations = new ArrayList<ModelAnnotation>();
+        selectionProviders = new ArrayList<ModelSelectionProvider>();
+        annotations = new ArrayList<Annotation>();
         buttons = new ArrayList<Button>();
         subUseCases = new ArrayList<UseCase>();
     }
@@ -112,12 +117,12 @@ public class UseCase {
             property.reset();
         }
 
-        for (ModelSelectionProvider modelSelectionProvider : modelSelectionProviders) {
+        for (ModelSelectionProvider modelSelectionProvider : selectionProviders) {
             modelSelectionProvider.reset();
         }
 
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.reset();
+        for (Annotation annotation : annotations) {
+            annotation.reset();
         }
 
         for (Button button : buttons) {
@@ -136,12 +141,12 @@ public class UseCase {
             property.init(model);
         }
 
-        for (ModelSelectionProvider modelSelectionProvider : modelSelectionProviders) {
+        for (ModelSelectionProvider modelSelectionProvider : selectionProviders) {
             modelSelectionProvider.init(model);
         }
 
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.init(model);
+        for (Annotation annotation : annotations) {
+            annotation.init(model);
         }
 
         for (Button button : buttons) {
@@ -171,22 +176,27 @@ public class UseCase {
         return parentUseCase;
     }
 
+    @XmlCollection(itemClass = UseCaseProperty.class, itemName = "property")
     public List<UseCaseProperty> getProperties() {
         return properties;
     }
 
-    public List<ModelSelectionProvider> getModelSelectionProviders() {
-        return modelSelectionProviders;
+    @XmlCollection(itemClass = ModelSelectionProvider.class, itemName = "selectionProvider")
+    public List<ModelSelectionProvider> getSelectionProviders() {
+        return selectionProviders;
     }
 
+    @XmlCollection(itemClass = Button.class, itemName = "button")
     public List<Button> getButtons() {
         return buttons;
     }
 
-    public List<ModelAnnotation> getModelAnnotations() {
-        return modelAnnotations;
+    @XmlCollection(itemClass = Annotation.class, itemName = "annotation")
+    public List<Annotation> getModelAnnotations() {
+        return annotations;
     }
 
+    @XmlCollection(itemClass = UseCase.class, itemName = "useCase")
     public List<UseCase> getSubUseCases() {
         return subUseCases;
     }

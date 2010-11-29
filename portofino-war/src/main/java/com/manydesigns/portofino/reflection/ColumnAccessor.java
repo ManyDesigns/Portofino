@@ -69,7 +69,7 @@ public class ColumnAccessor
 
     public ColumnAccessor(Column column, boolean inPk,
                           PropertyAccessor nestedPropertyAccessor) {
-        super(column.getModelAnnotations());
+        super(column.getAnnotations());
         this.column = column;
         this.nestedPropertyAccessor = nestedPropertyAccessor;
 

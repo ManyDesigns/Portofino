@@ -32,10 +32,7 @@ package com.manydesigns.portofino.context.hibernate;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.database.DbUtil;
-import com.manydesigns.portofino.database.JdbcConnectionProvider;
-import com.manydesigns.portofino.database.Type;
+import com.manydesigns.portofino.database.*;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.Reference;
@@ -80,9 +77,9 @@ public class HibernateConfig {
             JdbcConnectionProvider jdbcConnectionProvider =
                     (JdbcConnectionProvider) connectionProvider;
             configuration.setProperty("hibernate.connection.url",
-                    jdbcConnectionProvider.getConnectionURL())
+                    jdbcConnectionProvider.getUrl())
                     .setProperty("hibernate.connection.driver_class",
-                            jdbcConnectionProvider.getDriverClass())
+                            jdbcConnectionProvider.getDriver())
                     .setProperty("hibernate.connection.username",
                             jdbcConnectionProvider.getUsername())
                     .setProperty("hibernate.connection.password",

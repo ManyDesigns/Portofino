@@ -40,13 +40,14 @@ import java.lang.annotation.Target;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
 public @interface XmlCollection {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    Class itemType();
+    Class[] itemClass();
+    String[] itemName();
     boolean required() default false;
-    int min() default 0;
-    int max() default -1;
+    int itemMin() default 0;
+    int itemMax() default -1;
 }

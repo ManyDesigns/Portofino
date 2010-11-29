@@ -155,7 +155,7 @@ public class MessageDiffer extends AbstractDiffer {
         String difference = MessageFormat.format(
                 "Source table {0} does not contain annotation of type: {1}",
                 sourceTable.getQualifiedName(),
-                targetModelAnnotation.getType());
+                targetAnnotation.getType());
         messages.add(difference);
     }
 
@@ -163,17 +163,17 @@ public class MessageDiffer extends AbstractDiffer {
         String difference = MessageFormat.format(
                 "Target table {0} does not contain annotation of type: {1}",
                 targetTable.getQualifiedName(),
-                sourceModelAnnotation.getType());
+                sourceAnnotation.getType());
         messages.add(difference);
     }
 
     public void diffTableAnnotationSourceTarget(ModelAnnotationDiff modelAnnotationDiff) {
-        if (!ObjectUtils.equals(sourceModelAnnotation.getType(),
-                targetModelAnnotation.getType())) {
+        if (!ObjectUtils.equals(sourceAnnotation.getType(),
+                targetAnnotation.getType())) {
             String difference = MessageFormat.format(
                     "Annotation types {0} / {1} are different",
-                    sourceModelAnnotation.getType(),
-                    targetModelAnnotation.getType());
+                    sourceAnnotation.getType(),
+                    targetAnnotation.getType());
             messages.add(difference);
         }
         diffTableAnnotationChildren(modelAnnotationDiff);
@@ -220,7 +220,7 @@ public class MessageDiffer extends AbstractDiffer {
         String difference = MessageFormat.format(
                 "Source column {0} does not contain annotation of type: {1}",
                 sourceColumn.getQualifiedName(),
-                targetModelAnnotation.getType());
+                targetAnnotation.getType());
         messages.add(difference);
     }
 
@@ -228,17 +228,17 @@ public class MessageDiffer extends AbstractDiffer {
         String difference = MessageFormat.format(
                 "Target column {0} does not contain annotation of type: {1}",
                 targetColumn.getQualifiedName(),
-                sourceModelAnnotation.getType());
+                sourceAnnotation.getType());
         messages.add(difference);
     }
 
     public void diffColumnAnnotationSourceTarget(ModelAnnotationDiff modelAnnotationDiff) {
-        if (!ObjectUtils.equals(sourceModelAnnotation.getType(),
-                targetModelAnnotation.getType())) {
+        if (!ObjectUtils.equals(sourceAnnotation.getType(),
+                targetAnnotation.getType())) {
             String difference = MessageFormat.format(
                     "Annotation types {0} / {1} are different",
-                    sourceModelAnnotation.getType(),
-                    targetModelAnnotation.getType());
+                    sourceAnnotation.getType(),
+                    targetAnnotation.getType());
             messages.add(difference);
         }
         diffColumnAnnotationChildren(modelAnnotationDiff);
@@ -398,7 +398,7 @@ public class MessageDiffer extends AbstractDiffer {
         String difference = MessageFormat.format(
                 "Source foreign key {0} does not contain annotation of type: {1}",
                 sourceForeignKey.getForeignKeyName(),
-                targetModelAnnotation.getType());
+                targetAnnotation.getType());
         messages.add(difference);
     }
 
@@ -406,17 +406,17 @@ public class MessageDiffer extends AbstractDiffer {
         String difference = MessageFormat.format(
                 "Target foreign key {0} does not contain annotation of type: {1}",
                 targetForeignKey.getForeignKeyName(),
-                sourceModelAnnotation.getType());
+                sourceAnnotation.getType());
         messages.add(difference);
     }
 
     public void diffForeignKeyAnnotationSourceTarget(ModelAnnotationDiff modelAnnotationDiff) {
-        if (!ObjectUtils.equals(sourceModelAnnotation.getType(),
-                targetModelAnnotation.getType())) {
+        if (!ObjectUtils.equals(sourceAnnotation.getType(),
+                targetAnnotation.getType())) {
             String difference = MessageFormat.format(
                     "Annotation types {0} / {1} are different",
-                    sourceModelAnnotation.getType(),
-                    targetModelAnnotation.getType());
+                    sourceAnnotation.getType(),
+                    targetAnnotation.getType());
             messages.add(difference);
         }
         diffForeignKeyAnnotationChildren(modelAnnotationDiff);

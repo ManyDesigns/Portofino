@@ -30,9 +30,9 @@
 package com.manydesigns.portofino.database;
 
 import com.manydesigns.elements.logging.LogUtil;
+import org.apache.commons.dbutils.DbUtils;
 import org.hibernate.Hibernate;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Types;
@@ -49,52 +49,13 @@ public class DbUtil {
 
     public final static Logger logger = LogUtil.getLogger(DbUtil.class);
 
-    public static void closeResultSetStatementAndConnection(ResultSet rs,
-                                                            Statement st,
-                                                            Connection conn) {
-        closeResultSet(rs);
-        closeStatement(st);
-        closeConnection(conn);
-    }
-
-    public static void closeResultSetAndStatement(ResultSet rs, Statement st) {
-        closeResultSet(rs);
-        closeStatement(st);
-    }
-
-    public static void closeResultSet(ResultSet rs) {
-        if (rs != null) try {
-            rs.close();
-        } catch (Exception e) {
-            LogUtil.finer(logger, "Could not close result set", e);
-        }
-    }
-
     public static void closeResultSetAndStatement(ResultSet rs) {
-        closeResultSet(rs);
         try {
+            DbUtils.closeQuietly(rs);
             Statement st = rs.getStatement();
-            if (st != null) {
-                st.close();
-            }
-        } catch (Exception e) {
+            DbUtils.closeQuietly(st);
+        } catch (Throwable e) {
             LogUtil.finer(logger, "Could not close statement", e);
-        }
-    }
-
-    public static void closeStatement(Statement st) {
-        if (st != null) try {
-            st.close();
-        } catch (Exception e) {
-            LogUtil.finer(logger, "Could not close statement", e);
-        }
-    }
-
-    public static void closeConnection(Connection conn) {
-        if (conn != null) try {
-            conn.close();
-        } catch (Exception e) {
-            LogUtil.finer(logger, "Could not close connection", e);
         }
     }
 

@@ -1,7 +1,6 @@
 <connections>
-    <connection
+    <jdbcConnection
             databaseName="jpetstore"
-            type="jdbc"
             driver="org.h2.Driver"
             url="jdbc:h2:mem:jpetstore"
             username="manydesigns"
@@ -9,9 +8,8 @@
             includeSchemas=".*"
             excludeSchemas=""
             />
-    <connection
+    <jdbcConnection
             databaseName="hibernatetest"
-            type="jdbc"
             driver="org.h2.Driver"
             url="jdbc:h2:mem:hibernatetest"
             username="manydesigns"
@@ -19,9 +17,8 @@
             includeSchemas=".*"
             excludeSchemas=""
             />
-    <connection
+    <jdbcConnection
             databaseName="portofino"
-            type="jdbc"
             driver="org.h2.Driver"
             url="jdbc:h2:mem:portofino4"
             username="manydesigns"

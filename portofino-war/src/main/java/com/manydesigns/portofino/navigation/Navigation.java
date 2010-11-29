@@ -82,7 +82,7 @@ public class Navigation implements XhtmlFragment {
         Stack<NavigationNode> stack = new Stack<NavigationNode>();
         foundPath = new ArrayList<NavigationNode>();
         rootNodes = new ArrayList<NavigationNode>();
-        final List<SiteNode> rootChildNodes = context.getModel().getRoot().getChildNodes();
+        final List<SiteNode> rootChildNodes = context.getModel().getRootNode().getChildNodes();
         generateNavigationNodes(rootChildNodes, rootNodes);
         searchPath(rootNodes, stack);
     }

@@ -40,7 +40,6 @@ import com.manydesigns.portofino.xml.XmlCollection;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 /*
@@ -48,15 +47,14 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ModelAnnotation implements ModelObject {
+@XmlCollection(itemClass = String.class, itemName = "value")
+public class Annotation extends ArrayList<String> implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
     // Fields
     //**************************************************************************
-
-    protected final List<String> values;
 
     protected String type;
 
@@ -72,17 +70,15 @@ public class ModelAnnotation implements ModelObject {
     //**************************************************************************
 
     public static final Logger logger =
-            LogUtil.getLogger(ModelAnnotation.class);
+            LogUtil.getLogger(Annotation.class);
 
     //**************************************************************************
     // Contruction
     //**************************************************************************
 
-    public ModelAnnotation() {
-        values = new ArrayList<String>();
-    }
+    public Annotation() {}
 
-    public ModelAnnotation(String type) {
+    public Annotation(String type) {
         this();
         this.type = type;
     }
@@ -122,7 +118,7 @@ public class ModelAnnotation implements ModelObject {
         for (Constructor candidateConstructor : constructors) {
             Class[] parameterTypes =
                     candidateConstructor.getParameterTypes();
-            if (parameterTypes.length != values.size()) {
+            if (parameterTypes.length != this.size()) {
                 continue;
             }
 
@@ -130,7 +126,7 @@ public class ModelAnnotation implements ModelObject {
                 Object castValues[] = new Object[parameterTypes.length];
                 for (int i = 0; i < parameterTypes.length; i++) {
                     Class parameterType = parameterTypes[i];
-                    String stringValue = values.get(i);
+                    String stringValue = this.get(i);
                     Object value;
                     if (parameterType.isArray()) {
                         value = Util.matchStringArray(stringValue);
@@ -171,11 +167,6 @@ public class ModelAnnotation implements ModelObject {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    @XmlCollection(itemType = String.class)
-    public List<String> getValues() {
-        return values;
     }
 
     public Class getJavaAnnotationClass() {

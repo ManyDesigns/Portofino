@@ -31,10 +31,8 @@ package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.io.ModelParser;
 
 import java.util.List;
-import java.util.logging.Level;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,24 +43,11 @@ public class DBParserTest extends AbstractPortofinoTest {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    ModelParser parser;
-    Model model;
-
-
     public void setUp() throws Exception {
         super.setUp();
-        ModelParser.logger.setLevel(Level.ALL);
-        parser = new ModelParser();
     }
 
     public void testParseJpetStorePostgresql() {
-        try {
-            model = parser.parse("database/portofino-model.xml");
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-
         assertNotNull(model);
 
         List<Database> databases = model.getDatabases();

@@ -33,7 +33,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.xml.XmlAttribute;
 import com.manydesigns.portofino.xml.XmlCollection;
 
@@ -70,7 +70,7 @@ public class Column implements ModelObject {
 
     protected String javaType;
     protected String propertyName;
-    protected final List<ModelAnnotation> modelAnnotations;
+    protected final List<Annotation> annotations;
 
     //**************************************************************************
     // Fields for wire-up
@@ -86,7 +86,7 @@ public class Column implements ModelObject {
     //**************************************************************************
     public Column(Table table) {
         this.table = table;
-        modelAnnotations = new ArrayList<ModelAnnotation>();
+        annotations = new ArrayList<Annotation>();
     }
 
     public Column(Table table, String columnName, String columnType,
@@ -131,8 +131,8 @@ public class Column implements ModelObject {
         actualPropertyName = null;
         actualJavaType = null;
 
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.reset();
+        for (Annotation annotation : annotations) {
+            annotation.reset();
         }
     }
 
@@ -149,8 +149,8 @@ public class Column implements ModelObject {
                     "Cannot load column java type: {0}", javaType);
         }
 
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.init(model);
+        for (Annotation annotation : annotations) {
+            annotation.init(model);
         }
     }
 
@@ -263,9 +263,9 @@ public class Column implements ModelObject {
         this.searchable = searchable;
     }
 
-    @XmlCollection(itemType = ModelAnnotation.class)
-    public List<ModelAnnotation> getModelAnnotations() {
-        return modelAnnotations;
+    @XmlCollection(itemClass = Annotation.class, itemName = "annotation")
+    public List<Annotation> getAnnotations() {
+        return annotations;
     }
     
     @Override
@@ -293,10 +293,10 @@ public class Column implements ModelObject {
                 columnName);
     }
 
-    public ModelAnnotation findModelAnnotationByType(String annotationType) {
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            if (modelAnnotation.getType().equals(annotationType)) {
-                return modelAnnotation;
+    public Annotation findModelAnnotationByType(String annotationType) {
+        for (Annotation annotation : annotations) {
+            if (annotation.getType().equals(annotationType)) {
+                return annotation;
             }
         }
         return null;

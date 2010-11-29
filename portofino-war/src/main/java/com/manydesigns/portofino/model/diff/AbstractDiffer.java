@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.model.diff;
 
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 
 import java.util.List;
@@ -73,8 +73,8 @@ public abstract class AbstractDiffer {
     protected Reference sourceReference;
     protected Reference targetReference;
 
-    protected ModelAnnotation sourceModelAnnotation;
-    protected ModelAnnotation targetModelAnnotation;
+    protected Annotation sourceAnnotation;
+    protected Annotation targetAnnotation;
 
     //--------------------------------------------------------------------------
     // Logging
@@ -208,16 +208,16 @@ public abstract class AbstractDiffer {
     }
 
     public void diffTableAnnotation(ModelAnnotationDiff modelAnnotationDiff) {
-        sourceModelAnnotation =
+        sourceAnnotation =
                 modelAnnotationDiff.getSourceModelAnnotation();
-        targetModelAnnotation =
+        targetAnnotation =
                 modelAnnotationDiff.getTargetModelAnnotation();
 
-        if (sourceModelAnnotation == null && targetModelAnnotation == null) {
+        if (sourceAnnotation == null && targetAnnotation == null) {
             diffTableAnnotationSourceTargetNull(modelAnnotationDiff);
-        } else if (sourceModelAnnotation == null) {
+        } else if (sourceAnnotation == null) {
             diffTableAnnotationSourceNull(modelAnnotationDiff);
-        } else if (targetModelAnnotation == null) {
+        } else if (targetAnnotation == null) {
             diffTableAnnotationTargetNull(modelAnnotationDiff);
         } else {
             diffTableAnnotationSourceTarget(modelAnnotationDiff);
@@ -283,16 +283,16 @@ public abstract class AbstractDiffer {
     }
 
     public void diffColumnAnnotation(ModelAnnotationDiff modelAnnotationDiff) {
-        sourceModelAnnotation =
+        sourceAnnotation =
                 modelAnnotationDiff.getSourceModelAnnotation();
-        targetModelAnnotation =
+        targetAnnotation =
                 modelAnnotationDiff.getTargetModelAnnotation();
 
-        if (sourceModelAnnotation == null && targetModelAnnotation == null) {
+        if (sourceAnnotation == null && targetAnnotation == null) {
             diffColumnAnnotationSourceTargetNull(modelAnnotationDiff);
-        } else if (sourceModelAnnotation == null) {
+        } else if (sourceAnnotation == null) {
             diffColumnAnnotationSourceNull(modelAnnotationDiff);
-        } else if (targetModelAnnotation == null) {
+        } else if (targetAnnotation == null) {
             diffColumnAnnotationTargetNull(modelAnnotationDiff);
         } else {
             diffColumnAnnotationSourceTarget(modelAnnotationDiff);
@@ -463,16 +463,16 @@ public abstract class AbstractDiffer {
     }
 
     public void diffForeignKeyAnnotation(ModelAnnotationDiff modelAnnotationDiff) {
-        sourceModelAnnotation =
+        sourceAnnotation =
                 modelAnnotationDiff.getSourceModelAnnotation();
-        targetModelAnnotation =
+        targetAnnotation =
                 modelAnnotationDiff.getTargetModelAnnotation();
 
-        if (sourceModelAnnotation == null && targetModelAnnotation == null) {
+        if (sourceAnnotation == null && targetAnnotation == null) {
             diffForeignKeyAnnotationSourceTargetNull(modelAnnotationDiff);
-        } else if (sourceModelAnnotation == null) {
+        } else if (sourceAnnotation == null) {
             diffForeignKeyAnnotationSourceNull(modelAnnotationDiff);
-        } else if (targetModelAnnotation == null) {
+        } else if (targetAnnotation == null) {
             diffForeignKeyAnnotationTargetNull(modelAnnotationDiff);
         } else {
             diffForeignKeyAnnotationSourceTarget(modelAnnotationDiff);

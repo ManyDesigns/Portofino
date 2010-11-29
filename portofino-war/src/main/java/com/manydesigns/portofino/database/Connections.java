@@ -27,32 +27,44 @@
  *
  */
 
-package com.manydesigns.portofino.model.io;
+package com.manydesigns.portofino.database;
 
-import com.manydesigns.portofino.model.Model;
-import junit.framework.TestCase;
+import com.manydesigns.portofino.xml.XmlCollection;
 
-import java.util.logging.Level;
+import java.util.ArrayList;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ConnectionsParserTest extends TestCase {
+@XmlCollection(itemClass = {JdbcConnectionProvider.class, JndiConnectionProvider.class},
+        itemName = {"jdbcConnection", "jndiConnection"})
+public class Connections extends ArrayList<ConnectionProvider> {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-    ConnectionsParser parser;
-    Model model;
 
-    public void setUp() throws Exception {
-        super.setUp();
-        ConnectionsParser.logger.setLevel(Level.ALL);
+    //**************************************************************************
+    // Constructors
+    //**************************************************************************
 
-        parser = new ConnectionsParser();
+    public Connections() {
+        super();
     }
 
-    public void testParse() throws Exception {
-        parser.parse("database/portofino-connections.xml");
+    //**************************************************************************
+    // Initialization
+    //**************************************************************************
+
+    public void init() {
+        for (ConnectionProvider connection : this) {
+            connection.reset();
+        }
+
+        for (ConnectionProvider connection : this) {
+            connection.init();
+        }
     }
+
+
 }

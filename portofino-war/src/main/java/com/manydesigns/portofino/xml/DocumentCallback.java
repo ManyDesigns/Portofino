@@ -29,8 +29,6 @@
 
 package com.manydesigns.portofino.xml;
 
-import javax.xml.stream.XMLStreamException;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -40,5 +38,5 @@ public interface DocumentCallback {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public void doDocument() throws XMLStreamException;
+    public void doDocument() throws Exception;
 }
