@@ -36,7 +36,7 @@ import com.manydesigns.portofino.system.model.email.EmailBean;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class EmailHandler {
+public class EmailUtils {
 
     //STATI POSSIBILI DELLA MAIL
     public static final long SENDING  = 0;
@@ -46,7 +46,6 @@ public class EmailHandler {
     public static final long BOUNCED  = 4;
 
 
-    public static final String EMAILQUEUE_TABLE = "portofino.public.emailqueue";
     public static final String SUBJECT = "subject";
     public static final String BODY = "body";
     public static final String TO = "to";
@@ -57,6 +56,8 @@ public class EmailHandler {
     public static final String ATTACHMENT_PATH = "attachmentPath";
     public static final String ATTACHMENT_DESCRIPTION = "attachmentDescription";
     public static final String ATTACHMENT_NAME = "attachmentName";
+    public static final String EMAILQUEUE_TABLE = "portofino.public.emailqueue";
+    public static final String PORTOFINO = "portofino";
 
     public static synchronized void addEmail(Context context, EmailBean email) {
         context.saveObject(EMAILQUEUE_TABLE, email);
@@ -68,6 +69,26 @@ public class EmailHandler {
                 from);
         context.saveObject(EMAILQUEUE_TABLE, email);
     }
-    
-    
+
+    public static synchronized void deleteEmail(Context context, EmailBean email) {
+        context.deleteObject(EMAILQUEUE_TABLE, email);
+    }
+
+    public static synchronized void deleteEmail(Context context, String subject, String body,
+    String to, String from) {
+        EmailBean email = new EmailBean(subject, body, to,
+                from);
+        context.deleteObject(EMAILQUEUE_TABLE, email);
+    }
+
+    public static synchronized void updateEmail(Context context, EmailBean email) {
+        context.updateObject(EMAILQUEUE_TABLE, email);
+    }
+
+    public static synchronized void updateEmail(Context context, String subject, String body,
+    String to, String from) {
+        EmailBean email = new EmailBean(subject, body, to,
+                from);
+        context.updateObject(EMAILQUEUE_TABLE, email);
+    }
 }
