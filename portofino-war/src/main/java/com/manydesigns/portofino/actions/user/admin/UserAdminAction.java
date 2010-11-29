@@ -33,7 +33,7 @@ import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.UseCaseAction;
-import com.manydesigns.portofino.email.EmailHandler;
+import com.manydesigns.portofino.email.EmailUtils;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
@@ -155,7 +155,7 @@ public class UserAdminAction extends UseCaseAction {
             Long userId = (Long) getSession().get(UserUtils.USERID);
             User thisUser =
             (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
-            EmailHandler.addEmail(context, "new password", msg,
+            EmailUtils.addEmail(context, "new password", msg,
                     user.getEmail(), thisUser.getEmail());
 
         } else {
