@@ -34,7 +34,6 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.model.site.usecases.UseCaseProperty;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Logger;
 
 /*
@@ -96,13 +95,11 @@ public class UseCasePropertyAccessor
         return nestedAccessor.getAnnotation(annotationClass);
     }
 
-    public Object get(Object obj)
-            throws IllegalAccessException, InvocationTargetException {
+    public Object get(Object obj) {
         return nestedAccessor.get(obj);
     }
 
-    public void set(Object obj, Object value)
-            throws IllegalAccessException, InvocationTargetException {
+    public void set(Object obj, Object value) {
         nestedAccessor.set(obj, value);
     }
 }

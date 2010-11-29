@@ -99,13 +99,7 @@ public class PkHelper {
         for(PropertyAccessor property : classAccessor.getKeyProperties()) {
             String stringValue = pkList[i];
             Object value = Util.convertValue(stringValue, property.getType());
-            try {
-                property.set(result, value);
-            } catch (Throwable e) {
-                LogUtil.warningMF(logger,
-                        "Could not set property: {0}", e, property);
-                return null;
-            }
+            property.set(result, value);
             i++;
         }
 
@@ -122,16 +116,10 @@ public class PkHelper {
             } else {
                 sb.append(",");
             }
-            try {
-                Object value = property.get(object);
-                String stringValue =
-                        (String) Util.convertValue(value, String.class);
-                sb.append(stringValue);
-            } catch (Throwable e) {
-                LogUtil.warningMF(logger,
-                        "Could not get property: {0}", e, property);
-                return null;
-            }
+            Object value = property.get(object);
+            String stringValue =
+                    (String) Util.convertValue(value, String.class);
+            sb.append(stringValue);
         }
         return sb.toString();
     }

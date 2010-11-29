@@ -91,7 +91,7 @@ public class ModelSelectionProvider implements ModelObject {
     // Getters/setters
     //**************************************************************************
 
-    @XmlCollection(itemClass = SelectionProperty.class, itemName = "selectionProperty")
+    @XmlCollection(itemClasses = SelectionProperty.class, itemNames = "selectionProperty")
     public List<SelectionProperty> getSelectionProperties() {
         return selectionProperties;
     }

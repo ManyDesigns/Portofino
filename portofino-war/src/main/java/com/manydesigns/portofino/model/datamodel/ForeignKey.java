@@ -289,7 +289,7 @@ public class ForeignKey implements ModelObject {
         this.onDelete = onDelete;
     }
 
-    @XmlCollection(itemMin = 1, itemClass = Reference.class, itemName = "reference")
+    @XmlCollection(itemMin = 1, itemClasses = Reference.class, itemNames = "reference")
     public List<Reference> getReferences() {
         return references;
     }
@@ -321,7 +321,7 @@ public class ForeignKey implements ModelObject {
         this.onePropertyName = onePropertyName;
     }
 
-    @XmlCollection(itemClass = Annotation.class, itemName = "annotation")
+    @XmlCollection(itemClasses = Annotation.class, itemNames = "annotation")
     public List<Annotation> getAnnotations() {
         return annotations;
     }

@@ -203,7 +203,7 @@ public class Table implements ModelObject {
         this.javaClass = javaClass;
     }
 
-    @XmlCollection(itemClass = Column.class, itemName = "column")
+    @XmlCollection(itemClasses = Column.class, itemNames = "column")
     public List<Column> getColumns() {
         return columns;
     }
@@ -221,7 +221,7 @@ public class Table implements ModelObject {
         return actualJavaClass;
     }
 
-    @XmlCollection(itemClass = ForeignKey.class, itemName = "foreignKey")
+    @XmlCollection(itemClasses = ForeignKey.class, itemNames = "foreignKey")
     public List<ForeignKey> getForeignKeys() {
         return foreignKeys;
     }
@@ -230,7 +230,7 @@ public class Table implements ModelObject {
         return oneToManyRelationships;
     }
 
-    @XmlCollection(itemClass = Annotation.class, itemName = "annotation")
+    @XmlCollection(itemClasses = Annotation.class, itemNames = "annotation")
     public List<Annotation> getAnnotations() {
         return annotations;
     }

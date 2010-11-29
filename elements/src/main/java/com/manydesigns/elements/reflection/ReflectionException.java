@@ -27,44 +27,29 @@
  *
  */
 
-package com.manydesigns.portofino.database;
-
-import com.manydesigns.portofino.xml.XmlCollection;
-
-import java.util.ArrayList;
+package com.manydesigns.elements.reflection;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-@XmlCollection(itemClasses = {JdbcConnectionProvider.class, JndiConnectionProvider.class},
-        itemNames = {"jdbcConnection", "jndiConnection"})
-public class Connections extends ArrayList<ConnectionProvider> {
+public class ReflectionException extends RuntimeException {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    //**************************************************************************
-    // Constructors
-    //**************************************************************************
-
-    public Connections() {
-        super();
+    public ReflectionException() {
     }
 
-    //**************************************************************************
-    // Initialization
-    //**************************************************************************
-
-    public void init() {
-        for (ConnectionProvider connection : this) {
-            connection.reset();
-        }
-
-        for (ConnectionProvider connection : this) {
-            connection.init();
-        }
+    public ReflectionException(String s) {
+        super(s);
     }
 
+    public ReflectionException(String s, Throwable throwable) {
+        super(s, throwable);
+    }
 
+    public ReflectionException(Throwable throwable) {
+        super(throwable);
+    }
 }

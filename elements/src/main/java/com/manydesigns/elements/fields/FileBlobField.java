@@ -246,14 +246,8 @@ public class FileBlobField extends AbstractField
         if (obj == null) {
             blob = null;
         } else {
-            try {
-                String code = (String) accessor.get(obj);
-                safeLoadBlob(code);
-            } catch (Throwable e) {
-                blob = null;
-                LogUtil.severe(logger, "Cannot access blob", e);
-                throw new Error(e);
-            }
+            String code = (String) accessor.get(obj);
+            safeLoadBlob(code);
         }
     }
 

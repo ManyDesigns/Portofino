@@ -105,7 +105,7 @@ public class UseCaseProperty implements ModelObject {
         this.name = name;
     }
 
-    @XmlCollection (itemClass = Annotation.class, itemName = "annotation")
+    @XmlCollection (itemClasses = Annotation.class, itemNames = "annotation")
     public List<Annotation> getAnnotations() {
         return annotations;
     }

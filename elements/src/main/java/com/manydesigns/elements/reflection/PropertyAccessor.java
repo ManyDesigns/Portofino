@@ -30,7 +30,6 @@
 package com.manydesigns.elements.reflection;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.InvocationTargetException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -54,8 +53,6 @@ public interface PropertyAccessor extends AnnotatedElement {
     // Accessors
     //**************************************************************************
 
-    public Object get(Object obj)
-            throws IllegalAccessException, InvocationTargetException;
-    public void set(Object obj, Object value)
-            throws IllegalAccessException, InvocationTargetException;
+    public Object get(Object obj);
+    public void set(Object obj, Object value);
 }

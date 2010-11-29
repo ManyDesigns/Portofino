@@ -204,13 +204,9 @@ public class NumericField extends AbstractTextField {
         if (obj == null) {
             decimalValue = null;
         } else {
-            try {
             Object value = accessor.get(obj);
-            decimalValue =
-                    (BigDecimal) Util.convertValue(value, BigDecimal.class);
-            } catch (Throwable e) {
-                throw new Error(e);
-            }
+            decimalValue = (BigDecimal)
+                    Util.convertValue(value, BigDecimal.class);
         }
 
         if (decimalValue == null) {

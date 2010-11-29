@@ -36,7 +36,6 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.model.datamodel.Column;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -101,8 +100,7 @@ public class ColumnAccessor
         return Modifier.PUBLIC;
     }
 
-    public Object get(Object obj)
-            throws IllegalAccessException, InvocationTargetException {
+    public Object get(Object obj) {
         if (nestedPropertyAccessor == null) {
             return ((Map)obj).get(column.getActualPropertyName());
         } else {
@@ -110,10 +108,9 @@ public class ColumnAccessor
         }
     }
 
-    @SuppressWarnings({"unchecked"})
-    public void set(Object obj, Object value)
-            throws IllegalAccessException, InvocationTargetException {
+    public void set(Object obj, Object value) {
         if (nestedPropertyAccessor == null) {
+            //noinspection unchecked
             ((Map)obj).put(column.getActualPropertyName(), value);
         } else {
             nestedPropertyAccessor.set(obj, value);

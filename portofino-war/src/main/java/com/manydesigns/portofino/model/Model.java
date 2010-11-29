@@ -218,7 +218,7 @@ public class Model {
     // Getters/setter
     //**************************************************************************
 
-    @XmlCollection(itemClass = Database.class, itemName = "database")
+    @XmlCollection(itemClasses = Database.class, itemNames = "database")
     public List<Database> getDatabases() {
         return databases;
     }

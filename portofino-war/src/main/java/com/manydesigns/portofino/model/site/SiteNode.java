@@ -158,8 +158,8 @@ public abstract class  SiteNode implements ModelObject {
         this.permissions = permissions;
     }
 
-    @XmlCollection(itemClass = {DocumentNode.class, FolderNode.class, CustomNode.class, CustomFolderNode.class, UseCaseNode.class, PortletNode.class},
-            itemName = {"documentNode", "folderNode", "customNode", "customFolderNode", "useCaseNode", "portletNode"})
+    @XmlCollection(itemClasses = {DocumentNode.class, FolderNode.class, CustomNode.class, CustomFolderNode.class, UseCaseNode.class, PortletNode.class},
+            itemNames = {"documentNode", "folderNode", "customNode", "customFolderNode", "useCaseNode", "portletNode"})
     public List<SiteNode> getChildNodes() {
         return childNodes;
     }

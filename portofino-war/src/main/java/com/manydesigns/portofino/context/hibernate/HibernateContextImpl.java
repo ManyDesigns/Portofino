@@ -254,15 +254,8 @@ public class HibernateContextImpl implements Context {
         }
         startTimer();
         PropertyAccessor propertyAccessor = keyProperties[0];
-        try {
-            Serializable key = (Serializable) propertyAccessor.get(pk);
-            result = session.load(qualifiedTableName, key);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            LogUtil.warningMF(logger,
-                    "Cannot invoke property accessor for {0} on class {1}",
-                    e, propertyAccessor.getName(), table.getName());
-        }
+        Serializable key = (Serializable) propertyAccessor.get(pk);
+        result = session.load(qualifiedTableName, key);
         stopTimer();
         return result;
     }

@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.model.diff;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -292,13 +291,7 @@ public class MergeDiffer extends AbstractDiffer {
 
             String name = propertyAccessor.getName();
 
-            Object value = null;
-            try {
-                value = propertyAccessor.get(source);
-            } catch (Throwable e) {
-                LogUtil.warningMF(logger,
-                        "Cannot get source attribute/property ''{0}''", e, name);
-            }
+            Object value = propertyAccessor.get(source);
 
             if (value == null) {
                 if (xmlAttribute.required()) {
@@ -306,12 +299,7 @@ public class MergeDiffer extends AbstractDiffer {
                             "Attribute ''{0}'' required. {1}", name));
                 }
             } else {
-                try {
-                    propertyAccessor.set(target, value);
-                } catch (Throwable e) {
-                    LogUtil.warningMF(logger,
-                            "Cannot set target attribute/property ''{0}''", e, name);
-                }
+                propertyAccessor.set(target, value);
             }
         }
     }

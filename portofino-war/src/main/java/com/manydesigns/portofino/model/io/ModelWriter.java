@@ -119,7 +119,7 @@ public class ModelWriter {
             LogUtil.getLogger(ModelWriter.class);
 
 
-    public String write(Model model, File file) throws IOException {
+    public void write(Model model, File file) throws IOException {
         XMLOutputFactory f = XMLOutputFactory.newInstance();
 
         try {
@@ -149,8 +149,6 @@ public class ModelWriter {
                 }
             }
         }
-
-        return file.getAbsolutePath();
     }
 
     public void writeAttributes(Object object) throws XMLStreamException {
@@ -167,13 +165,7 @@ public class ModelWriter {
 
             String name = propertyAccessor.getName();
 
-            Object value = null;
-            try {
-                value = propertyAccessor.get(object);
-            } catch (Throwable e) {
-                LogUtil.warningMF(logger,
-                        "Cannot get attribute/property ''{0}''", name);
-            }
+            Object value = propertyAccessor.get(object);
 
             String stringValue = Util.convertValueToString(value);
 
