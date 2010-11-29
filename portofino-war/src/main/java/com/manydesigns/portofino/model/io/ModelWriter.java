@@ -35,7 +35,7 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
@@ -62,6 +62,57 @@ import java.util.logging.Logger;
 */
 
 public class ModelWriter {
+
+    //--------------------------------------------------------------------------
+    // Constants
+    //--------------------------------------------------------------------------
+
+    public static final String MODEL = "model";
+
+    public static final String DATABASES = "databases";
+    public static final String DATABASE = "database";
+    public static final String SCHEMAS = "schemas";
+    public static final String SCHEMA = "schema";
+    public static final String TABLES = "tables";
+    public static final String TABLE = "table";
+    public static final String COLUMNS = "columns";
+    public static final String COLUMN = "column";
+    public static final String PRIMARYKEY = "primaryKey";
+    public static final String PRIMARYKEYCOLUMN = COLUMN;
+    public static final String FOREIGNKEYS = "foreignKeys";
+    public static final String FOREIGNKEY = "foreignKey";
+    public static final String REFERENCES = "references";
+    public static final String REFERENCE = "reference";
+    public static final String CHILDNODES = "childNodes";
+    public static final String PORTLETS = "portlets";
+    public static final String PORTLET = "portlet";
+    public static final String USECASES = "useCases";
+    public static final String USECASE = "useCase";
+    public static final String BUTTONS = "buttons";
+    public static final String BUTTON = "button";
+    public static final String SUBUSECASES = "subUseCases";
+    public static final String PROPERTIES = "properties";
+    public static final String PROPERTY = "property";
+    public static final String ANNOTATIONS = "annotations";
+    public static final String ANNOTATION = "annotation";
+    public static final String VALUE = "value";
+    public static final String ROOTNODE = "rootNode";
+    public static final String DOCUMENTNODE = "documentNode";
+    public static final String FOLDERNODE = "folderNode";
+    public static final String CUSTOMNODE = "customNode";
+    public static final String CUSTOMFOLDERNODE = "customFolderNode";
+    public static final String USECASENODE = "useCaseNode";
+    public static final String PORTLETNODE = "portletNode";
+    public static final String PERMISSIONS = "permissions";
+    public static final String ALLOW = "allow";
+    public static final String DENY = "deny";
+    public static final String GROUP = "group";
+    public static final String NAME = "name";
+    public static final String SELECTIONPROVIDERS = "selectionProviders";
+    public static final String SELECTIONPROVIDER = "selectionProvider";
+    public static final String SELECTIONPROPERTIES = "selectionProperties";
+    public static final String SELECTIONPROPERTY = "selectionProperty";
+    
     protected XMLStreamWriter w = null;
 
     public static final Logger logger =
@@ -143,16 +194,16 @@ public class ModelWriter {
     //--------------------------------------------------------------------------
 
     private void writeModel(Model model) throws XMLStreamException {
-        w.writeStartElement(ModelParser.MODEL);
+        w.writeStartElement(MODEL);
 
         // databases
-        w.writeStartElement(ModelParser.DATABASES);
+        w.writeStartElement(DATABASES);
         for (Database database : model.getDatabases()){
             writeDatabase(database);
         }
         w.writeEndElement(); // databases
 
-        SiteNode rootNode = model.getRoot();
+        SiteNode rootNode = model.getRootNode();
         if (rootNode != null) {
             writeSiteNode(rootNode);
         }
@@ -165,9 +216,9 @@ public class ModelWriter {
     //--------------------------------------------------------------------------
 
     private void writeDatabase(Database database) throws XMLStreamException {
-        w.writeStartElement(ModelParser.DATABASE);
+        w.writeStartElement(DATABASE);
         writeAttributes(database);
-        w.writeStartElement(ModelParser.SCHEMAS);
+        w.writeStartElement(SCHEMAS);
         for (Schema schema : database.getSchemas()){
             writeSchema(schema);
         }
@@ -176,9 +227,9 @@ public class ModelWriter {
     }
 
     private void writeSchema(Schema schema) throws XMLStreamException {
-        w.writeStartElement(ModelParser.SCHEMA);
+        w.writeStartElement(SCHEMA);
         writeAttributes(schema);
-        w.writeStartElement(ModelParser.TABLES);
+        w.writeStartElement(TABLES);
         for (Table table : schema.getTables()){
             writeTable(table);
         }
@@ -187,9 +238,9 @@ public class ModelWriter {
     }
 
     private void writeTable(Table table) throws XMLStreamException {
-        w.writeStartElement(ModelParser.TABLE);
+        w.writeStartElement(TABLE);
         writeAttributes(table);
-        w.writeStartElement(ModelParser.COLUMNS);
+        w.writeStartElement(COLUMNS);
         for (Column column : table.getColumns()){
             writeColumn(column);
         }
@@ -200,7 +251,7 @@ public class ModelWriter {
 
         // Foreign keys
         if (!table.getForeignKeys().isEmpty()) {
-            w.writeStartElement(ModelParser.FOREIGNKEYS);
+            w.writeStartElement(FOREIGNKEYS);
 
             for(ForeignKey rel : table.getForeignKeys()) {
                 writeForeignKey(rel);
@@ -210,49 +261,48 @@ public class ModelWriter {
         }
 
         // Annotations
-        writeModelAnnotations(table.getModelAnnotations());
+        writeModelAnnotations(table.getAnnotations());
 
         w.writeEndElement(); //table
     }
 
     private void writeColumn(Column column) throws XMLStreamException {
-        List<ModelAnnotation> modelAnnotations = column.getModelAnnotations();
-        if (modelAnnotations.isEmpty()) {
-            w.writeEmptyElement(ModelParser.COLUMN);
+        List<Annotation> annotations = column.getAnnotations();
+        if (annotations.isEmpty()) {
+            w.writeEmptyElement(COLUMN);
             writeAttributes(column);
         } else {
-            w.writeStartElement(ModelParser.COLUMN);
+            w.writeStartElement(COLUMN);
             writeAttributes(column);
-            writeModelAnnotations(modelAnnotations);
+            writeModelAnnotations(annotations);
             w.writeEndElement(); //column
         }
     }
 
-    private void writeModelAnnotations(List<ModelAnnotation> modelAnnotations)
+    private void writeModelAnnotations(List<Annotation> annotations)
             throws XMLStreamException {
-        if (!modelAnnotations.isEmpty()) {
-            w.writeStartElement(ModelParser.ANNOTATIONS);
-            for (ModelAnnotation modelAnnotation : modelAnnotations){
-                writeModelAnnotation(modelAnnotation);
+        if (!annotations.isEmpty()) {
+            w.writeStartElement(ANNOTATIONS);
+            for (Annotation annotation : annotations){
+                writeModelAnnotation(annotation);
             }
             w.writeEndElement(); // annotations
         }
     }
 
-    private void writeModelAnnotation(ModelAnnotation modelAnnotation)
+    private void writeModelAnnotation(Annotation annotation)
             throws XMLStreamException {
-        List<String> values= modelAnnotation.getValues();
-        if (values.isEmpty()) {
-            w.writeEmptyElement(ModelParser.ANNOTATION);
-            writeAttributes(modelAnnotation);
+        if (annotation.isEmpty()) {
+            w.writeEmptyElement(ANNOTATION);
+            writeAttributes(annotation);
         } else {
-            w.writeStartElement(ModelParser.ANNOTATION);
-            writeAttributes(modelAnnotation);
-            for (String value : values) {
+            w.writeStartElement(ANNOTATION);
+            writeAttributes(annotation);
+            for (String value : (List<String>) annotation) {
                 if (value == null) {
-                    w.writeEmptyElement(ModelParser.VALUE);                    
+                    w.writeEmptyElement(VALUE);                    
                 } else {
-                    w.writeStartElement(ModelParser.VALUE);
+                    w.writeStartElement(VALUE);
                     w.writeCharacters(value);
                     w.writeEndElement(); // value
                 }
@@ -267,11 +317,10 @@ public class ModelWriter {
         if (primaryKey == null) {
             return;
         }
-        w.writeStartElement(ModelParser.PRIMARYKEY);
+        w.writeStartElement(PRIMARYKEY);
         writeAttributes(primaryKey);
 
-        for (PrimaryKeyColumn primaryKeyColumn
-                : primaryKey.getPrimaryKeyColumns()) {
+        for (PrimaryKeyColumn primaryKeyColumn : primaryKey) {
             writePrimaryKeyColumn(primaryKeyColumn);
         }
         w.writeEndElement();//primaryKey
@@ -279,29 +328,29 @@ public class ModelWriter {
 
     private void writePrimaryKeyColumn(PrimaryKeyColumn primaryKeyColumn)
             throws XMLStreamException {
-        w.writeEmptyElement(ModelParser.COLUMN);
+        w.writeEmptyElement(COLUMN);
         writeAttributes(primaryKeyColumn);
     }
 
 
     private void writeForeignKey(ForeignKey foreignKey)
             throws XMLStreamException {
-        w.writeStartElement(ModelParser.FOREIGNKEY);
+        w.writeStartElement(FOREIGNKEY);
         writeAttributes(foreignKey);
-        w.writeStartElement(ModelParser.REFERENCES);
+        w.writeStartElement(REFERENCES);
         for (Reference reference : foreignKey.getReferences()) {
             writeReference(reference);
         }
         w.writeEndElement(); // references
 
         // Annotations
-        writeModelAnnotations(foreignKey.getModelAnnotations());
+        writeModelAnnotations(foreignKey.getAnnotations());
         w.writeEndElement(); // foreign key
     }
 
     private void writeReference(Reference reference)
             throws XMLStreamException {
-        w.writeEmptyElement(ModelParser.REFERENCE);
+        w.writeEmptyElement(REFERENCE);
         writeAttributes(reference);
     }
 
@@ -330,27 +379,27 @@ public class ModelWriter {
     }
 
     private void writeRootNode(RootNode node) throws XMLStreamException {
-        simpleWriteNode(node, ModelParser.ROOTNODE);
+        simpleWriteNode(node, ROOTNODE);
     }
 
     private void writeFolderNode(FolderNode node) throws XMLStreamException {
-        simpleWriteNode(node, ModelParser.FOLDERNODE);
+        simpleWriteNode(node, FOLDERNODE);
     }
 
     private void writeDocumentNode(DocumentNode node) throws XMLStreamException {
-        simpleWriteNode(node, ModelParser.DOCUMENTNODE);
+        simpleWriteNode(node, DOCUMENTNODE);
     }
 
     private void writeCustomNode(CustomNode node) throws XMLStreamException {
-        simpleWriteNode(node, ModelParser.CUSTOMNODE);
+        simpleWriteNode(node, CUSTOMNODE);
     }
 
     private void writeCustomFolderNode(CustomFolderNode node) throws XMLStreamException {
-        simpleWriteNode(node, ModelParser.CUSTOMFOLDERNODE);
+        simpleWriteNode(node, CUSTOMFOLDERNODE);
     }
 
     private void writeUseCaseNode(UseCaseNode node) throws XMLStreamException {
-        w.writeStartElement(ModelParser.USECASENODE);
+        w.writeStartElement(USECASENODE);
         writeAttributes(node);
         writeUseCase(node.getUseCase());
         writeChildNodes(node);
@@ -359,21 +408,21 @@ public class ModelWriter {
     }
 
     private void writeUseCase(UseCase useCase) throws XMLStreamException {
-        w.writeStartElement(ModelParser.USECASE);
+        w.writeStartElement(USECASE);
         writeAttributes(useCase);
 
         if (!useCase.getProperties().isEmpty()) {
-            w.writeStartElement(ModelParser.PROPERTIES);
+            w.writeStartElement(PROPERTIES);
             for (UseCaseProperty property : useCase.getProperties()) {
                 writeUseCaseProperty(property);
             }
             w.writeEndElement(); // properties
         }
 
-        if (!useCase.getModelSelectionProviders().isEmpty()) {
-            w.writeStartElement(ModelParser.SELECTIONPROVIDERS);
+        if (!useCase.getSelectionProviders().isEmpty()) {
+            w.writeStartElement(SELECTIONPROVIDERS);
             for (ModelSelectionProvider modelSelectionProvider
-                    : useCase.getModelSelectionProviders()) {
+                    : useCase.getSelectionProviders()) {
                 writeModelSelectionProvider(modelSelectionProvider);
             }
             w.writeEndElement(); // selectionProviders
@@ -382,7 +431,7 @@ public class ModelWriter {
         writeModelAnnotations(useCase.getModelAnnotations());
 
         if (!useCase.getButtons().isEmpty()) {
-            w.writeStartElement(ModelParser.BUTTONS);
+            w.writeStartElement(BUTTONS);
             for (Button button : useCase.getButtons()) {
                 writeButton(button);
             }
@@ -390,7 +439,7 @@ public class ModelWriter {
         }
 
         if (!useCase.getSubUseCases().isEmpty()) {
-            w.writeStartElement(ModelParser.SUBUSECASES);
+            w.writeStartElement(SUBUSECASES);
             for (UseCase subUseCase : useCase.getSubUseCases()) {
                 writeUseCase(subUseCase);
             }
@@ -401,16 +450,16 @@ public class ModelWriter {
     }
 
     private void writeButton(Button button) throws XMLStreamException {
-        w.writeEmptyElement(ModelParser.BUTTON);
+        w.writeEmptyElement(BUTTON);
         writeAttributes(button);
     }
 
     private void writeModelSelectionProvider(ModelSelectionProvider modelSelectionProvider)
             throws XMLStreamException {
-        w.writeStartElement(ModelParser.SELECTIONPROVIDER);
+        w.writeStartElement(SELECTIONPROVIDER);
         writeAttributes(modelSelectionProvider);
         if (!modelSelectionProvider.getSelectionProperties().isEmpty()) {
-            w.writeStartElement(ModelParser.SELECTIONPROPERTIES);
+            w.writeStartElement(SELECTIONPROPERTIES);
             for (SelectionProperty selectionProperty
                     : modelSelectionProvider.getSelectionProperties()) {
                 writeSelectionProperty(selectionProperty);
@@ -422,17 +471,17 @@ public class ModelWriter {
 
     private void writeSelectionProperty(SelectionProperty selectionProperty)
             throws XMLStreamException {
-        w.writeEmptyElement(ModelParser.SELECTIONPROPERTY);
+        w.writeEmptyElement(SELECTIONPROPERTY);
         writeAttributes(selectionProperty);
     }
 
     private void writeUseCaseProperty(UseCaseProperty property)
             throws XMLStreamException {
         if (property.getAnnotations().isEmpty()) {
-            w.writeEmptyElement(ModelParser.PROPERTY);
+            w.writeEmptyElement(PROPERTY);
             writeAttributes(property);
         } else {
-            w.writeStartElement(ModelParser.PROPERTY);
+            w.writeStartElement(PROPERTY);
             writeAttributes(property);
 
             writeModelAnnotations(property.getAnnotations());
@@ -442,14 +491,14 @@ public class ModelWriter {
     }
 
     private void writePortletNode(PortletNode node) throws XMLStreamException {
-        simpleWriteNode(node, ModelParser.PORTLETNODE);
+        simpleWriteNode(node, PORTLETNODE);
     }
 
     private void simpleWriteNode(SiteNode node, String elementType)
             throws XMLStreamException {
-        if (node.getChildNodes().isEmpty()
-                && node.getAllowGroups().isEmpty()
-                && node.getDenyGroups().isEmpty()) {
+        if (node.getChildNodes().isEmpty() && (node.getPermissions() == null || (
+                node.getPermissions().getAllow().isEmpty()
+                && node.getPermissions().getDeny().isEmpty()))) {
             w.writeEmptyElement(elementType);
             writeAttributes(node);
         } else {
@@ -463,7 +512,7 @@ public class ModelWriter {
 
     private void writeChildNodes(SiteNode node) throws XMLStreamException {
         if (!node.getChildNodes().isEmpty()) {
-            w.writeStartElement(ModelParser.CHILDNODES);
+            w.writeStartElement(CHILDNODES);
             for (SiteNode childNode : node.getChildNodes()) {
                 writeSiteNode(childNode);
             }
@@ -472,22 +521,26 @@ public class ModelWriter {
     }
 
     private void writePermissions(SiteNode node) throws XMLStreamException {
-        if (!node.getAllowGroups().isEmpty()
-                || !node.getDenyGroups().isEmpty()) {
-            w.writeStartElement(ModelParser.PERMISSIONS);
-            if (!node.getAllowGroups().isEmpty()) {
-                w.writeStartElement(ModelParser.ALLOW);
-                for (String group : node.getAllowGroups()) {
-                    w.writeEmptyElement(ModelParser.GROUP);
-                    w.writeAttribute(ModelParser.NAME, group);
+        Permissions permissions = node.getPermissions();
+        if (permissions == null) {
+            return;
+        }
+        if (!permissions.getAllow().isEmpty()
+                || !permissions.getDeny().isEmpty()) {
+            w.writeStartElement(PERMISSIONS);
+            if (!permissions.getAllow().isEmpty()) {
+                w.writeStartElement(ALLOW);
+                for (String group : permissions.getAllow()) {
+                    w.writeEmptyElement(GROUP);
+                    w.writeAttribute(NAME, group);
                 }
                 w.writeEndElement(); // allow
             }
-            if (!node.getDenyGroups().isEmpty()) {
-                w.writeStartElement(ModelParser.DENY);
-                for (String group : node.getDenyGroups()) {
-                    w.writeEmptyElement(ModelParser.GROUP);
-                    w.writeAttribute(ModelParser.NAME, group);
+            if (!permissions.getDeny().isEmpty()) {
+                w.writeStartElement(DENY);
+                for (String group : permissions.getDeny()) {
+                    w.writeEmptyElement(GROUP);
+                    w.writeAttribute(NAME, group);
                 }
                 w.writeEndElement(); // DENY
             }

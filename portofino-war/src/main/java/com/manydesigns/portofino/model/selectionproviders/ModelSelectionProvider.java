@@ -32,6 +32,7 @@ package com.manydesigns.portofino.model.selectionproviders;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
+import com.manydesigns.portofino.xml.XmlCollection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,6 +91,7 @@ public class ModelSelectionProvider implements ModelObject {
     // Getters/setters
     //**************************************************************************
 
+    @XmlCollection(itemClass = SelectionProperty.class, itemName = "selectionProperty")
     public List<SelectionProperty> getSelectionProperties() {
         return selectionProperties;
     }

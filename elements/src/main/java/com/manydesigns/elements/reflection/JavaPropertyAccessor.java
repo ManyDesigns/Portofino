@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.reflection;
 
+import com.manydesigns.elements.logging.LogUtil;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.beans.PropertyDescriptor;
@@ -36,8 +37,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
-
-import com.manydesigns.elements.logging.LogUtil;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

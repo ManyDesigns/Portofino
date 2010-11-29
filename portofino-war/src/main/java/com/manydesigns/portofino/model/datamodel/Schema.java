@@ -120,7 +120,7 @@ public class Schema implements ModelObject {
         this.schemaName = schemaName;
     }
 
-    @XmlCollection(itemType = Table.class)
+    @XmlCollection(itemClass = Table.class, itemName = "table")
     public List<Table> getTables() {
         return tables;
     }

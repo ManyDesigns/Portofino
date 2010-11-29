@@ -30,9 +30,8 @@
 package com.manydesigns.portofino.reflection;
 
 import com.manydesigns.elements.logging.LogUtil;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,7 +52,7 @@ public abstract class AbstractAnnotatedAccessor
     // Fields
     //**************************************************************************
 
-    protected final Map<Class, Annotation> annotations;
+    protected final Map<Class, java.lang.annotation.Annotation> annotations;
 
     public static final Logger logger =
             LogUtil.getLogger(AbstractAnnotatedAccessor.class);
@@ -64,14 +63,14 @@ public abstract class AbstractAnnotatedAccessor
     //**************************************************************************
 
     public AbstractAnnotatedAccessor(
-            Collection<ModelAnnotation>
-                    modelAnnotations) {
-        annotations = new HashMap<Class, Annotation>();
+            Collection<Annotation>
+                    annotations) {
+        this.annotations = new HashMap<Class, java.lang.annotation.Annotation>();
 
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            Class annotationClass = modelAnnotation.getJavaAnnotationClass();
-            Annotation annotation = modelAnnotation.getJavaAnnotation();
-            annotations.put(annotationClass, annotation);
+        for (Annotation annotation : annotations) {
+            Class annotationClass = annotation.getJavaAnnotationClass();
+            java.lang.annotation.Annotation javaAnnotation = annotation.getJavaAnnotation();
+            this.annotations.put(annotationClass, javaAnnotation);
         }
     }
 
@@ -79,23 +78,23 @@ public abstract class AbstractAnnotatedAccessor
     // AnnotatedElement implementation
     //**************************************************************************
 
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+    public boolean isAnnotationPresent(Class<? extends java.lang.annotation.Annotation> annotationClass) {
         return getAnnotation(annotationClass) != null;
     }
 
     @SuppressWarnings({"unchecked"})
-    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+    public <T extends java.lang.annotation.Annotation> T getAnnotation(Class<T> annotationClass) {
         return (T) annotations.get(annotationClass);
     }
 
-    public Annotation[] getAnnotations() {
-        Collection<Annotation> annotationCollection = annotations.values();
-        Annotation[] result = new Annotation[annotationCollection.size()];
+    public java.lang.annotation.Annotation[] getAnnotations() {
+        Collection<java.lang.annotation.Annotation> annotationCollection = annotations.values();
+        java.lang.annotation.Annotation[] result = new java.lang.annotation.Annotation[annotationCollection.size()];
         annotationCollection.toArray(result);
         return result;
     }
 
-    public Annotation[] getDeclaredAnnotations() {
+    public java.lang.annotation.Annotation[] getDeclaredAnnotations() {
         return getAnnotations();
     }
 }

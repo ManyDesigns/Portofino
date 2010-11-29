@@ -27,120 +27,81 @@
  *
  */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.model.site;
 
-import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.Password;
-import com.manydesigns.portofino.xml.XmlAttribute;
-import org.apache.commons.dbutils.DbUtils;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.xml.XmlCollection;
+import org.apache.commons.collections.CollectionUtils;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class JdbcConnectionProvider extends ConnectionProvider {
+public class Permissions implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // Fields (configured values)
+    // Fields
     //**************************************************************************
 
-    protected String driver;
-    protected String url;
-    protected String username;
-    protected String password;
-
+    protected final List<String> allow;
+    protected final List<String> deny;
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public JdbcConnectionProvider() {
-        super();
+    public Permissions() {
+        allow = new ArrayList<String>();
+        deny = new ArrayList<String>();
     }
 
     //**************************************************************************
-    // Implementation of ConnectionProvider
+    // ModelObject implementation
     //**************************************************************************
 
-    public String getDescription() {
-        return MessageFormat.format(
-                "JDBC connection to URL: {0}", url);
-    }
+    public void reset() {}
 
-    public Connection acquireConnection() throws Exception {
-        Class.forName(driver);
-        return DriverManager.getConnection(url,
-                username, password);
-    }
+    public void init(Model model) {}
 
-    public void releaseConnection(Connection conn) {
-        DbUtils.closeQuietly(conn);
+    public String getQualifiedName() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
-
 
     //**************************************************************************
-    // Getters
+    // Permission verification
     //**************************************************************************
 
-    @XmlAttribute(required = true)
-    public String getDriver() {
-        return driver;
-    }
+    public boolean isAllowed(List<String> groups) {
+        if (CollectionUtils.containsAny(deny, groups)) {
+            return false;
+        }
 
-    public void setDriver(String driver) {
-        this.driver = driver;
-    }
+        //noinspection SimplifiableIfStatement
+        if (allow.isEmpty()) {
+            return true;
+        }
 
-    @Label("connection URL")
-    @XmlAttribute(required = true)
-    public String getUrl() {
-        return url;
+        return CollectionUtils.containsAny(allow, groups);
     }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    @XmlAttribute(required = true)
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    @Password
-    @XmlAttribute(required = true)
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
 
     //**************************************************************************
-    // Other methods
+    // Getters/setters
     //**************************************************************************
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("databaseName", databaseName)
-                .append("driver", driver)
-                .append("url", url)
-                .append("username", username)
-                .append("password", password)
-                .toString();
+    @XmlCollection(itemClass = String.class, itemName = "group")
+    public List<String> getAllow() {
+        return allow;
+    }
+
+    @XmlCollection(itemClass = String.class, itemName = "group")
+    public List<String> getDeny() {
+        return deny;
     }
 }

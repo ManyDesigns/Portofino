@@ -40,14 +40,13 @@ import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.database.ConnectionProvider;
+import com.manydesigns.portofino.database.Connections;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;
 import com.manydesigns.portofino.model.diff.MergeDiffer;
-import com.manydesigns.portofino.model.io.ConnectionsParser;
-import com.manydesigns.portofino.model.io.ModelParser;
 import com.manydesigns.portofino.model.io.ModelWriter;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
@@ -55,6 +54,7 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.UseCaseAccessor;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
+import com.manydesigns.portofino.xml.XmlParser;
 import org.apache.commons.lang.time.StopWatch;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
@@ -121,11 +121,12 @@ public class HibernateContextImpl implements Context {
         LogUtil.infoMF(logger, "Loading connections from file: {0}",
                 file.getAbsolutePath());
 
-        ConnectionsParser parser = new ConnectionsParser();
+        XmlParser parser = new XmlParser();
         try {
-            connectionProviders = parser.parse(file);
+            connectionProviders = (Connections)
+                    parser.parse(file, Connections.class, "connections");
             for (ConnectionProvider current : connectionProviders) {
-                current.test();
+                current.init();
             }
         } catch (Exception e) {
             LogUtil.severeMF(logger, "Cannot load/parse file: {0}", e, file);
@@ -138,9 +139,10 @@ public class HibernateContextImpl implements Context {
         LogUtil.infoMF(logger, "Loading xml model from file: {0}",
                 file.getAbsolutePath());
 
-        ModelParser parser = new ModelParser();
+        XmlParser parser = new XmlParser();
         try {
-            Model loadedModel = parser.parse(file);
+            Model loadedModel = (Model) parser.parse(file, Model.class, "model");
+            loadedModel.init();
             installDataModel(loadedModel);
             xmlModelFile = file;
         } catch (Exception e) {
@@ -877,7 +879,6 @@ public class HibernateContextImpl implements Context {
     //**************************************************************************
     // Timers
     //**************************************************************************
-
     public void resetDbTimer() {
         stopWatches.set(null);
     }

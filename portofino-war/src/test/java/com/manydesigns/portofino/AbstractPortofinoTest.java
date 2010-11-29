@@ -32,6 +32,7 @@ import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
+import com.manydesigns.portofino.model.Model;
 import org.apache.commons.io.IOUtils;
 import org.h2.tools.RunScript;
 
@@ -50,6 +51,7 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     public Connection connPortofino;
     public Connection connDBTest;
     public Context context = null;
+    public Model model;
 
     public static final String PORTOFINO_CONNECTIONS_RESOURCE =
             "database/portofino-connections.xml";
@@ -79,6 +81,8 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         // copy portofino-model from classpath resource to temp file
         File xmlModelFile = copyResourceToTempFile(PORTOFINO_MODEL_RESOURCE);
         context.loadXmlModel(xmlModelFile);
+
+        model = context.getModel();
 
         connPortofino = context.getConnectionProvider("portofino").acquireConnection();
         connPetStore = context.getConnectionProvider("jpetstore").acquireConnection();

@@ -31,13 +31,13 @@ package com.manydesigns.portofino.database;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;
 import com.manydesigns.portofino.model.diff.MessageDiffer;
-import com.manydesigns.portofino.model.io.ModelParser;
 import com.manydesigns.portofino.model.io.ModelWriter;
+import com.manydesigns.portofino.xml.XmlParser;
 
 import java.io.File;
 import java.util.List;
@@ -115,19 +115,19 @@ public class RoundtripTest extends AbstractPortofinoTest {
         Table productTable = model.findTableByQualifiedName("mydb.PUBLIC.PRODUCT");
         productTable.setJavaClass("com.example.Product");
 
-        ModelAnnotation productAnnotation =
-                new ModelAnnotation("com.example.TableAnnotation");
-        productTable.getModelAnnotations().add(productAnnotation);
+        Annotation productAnnotation =
+                new Annotation("com.example.TableAnnotation");
+        productTable.getAnnotations().add(productAnnotation);
 
         Column descnColumn = productTable.findColumnByName("DESCN");
         descnColumn.setPropertyName("description");
         descnColumn.setJavaType("java.lang.String");
 
-        ModelAnnotation descnAnnotation =
-                new ModelAnnotation("com.example.ColumnAnnotation");
-        descnAnnotation.getValues().add("value1");
-        descnAnnotation.getValues().add("value2");
-        descnColumn.getModelAnnotations().add(descnAnnotation);
+        Annotation descnAnnotation =
+                new Annotation("com.example.ColumnAnnotation");
+        descnAnnotation.add("value1");
+        descnAnnotation.add("value2");
+        descnColumn.getAnnotations().add(descnAnnotation);
 
         Column productCatidColumn =
                 productTable.findColumnByName("PRODUCT_CATID");
@@ -137,9 +137,9 @@ public class RoundtripTest extends AbstractPortofinoTest {
         ForeignKey catidForeignKey =
                 productTable.findForeignKeyByName("catid_fk");
 
-        ModelAnnotation catidFkAnnotation =
-                new ModelAnnotation("com.example.ForeignKeyAnnotation");
-        catidForeignKey.getModelAnnotations().add(catidFkAnnotation);
+        Annotation catidFkAnnotation =
+                new Annotation("com.example.ForeignKeyAnnotation");
+        catidForeignKey.getAnnotations().add(catidFkAnnotation);
 
         return model;
     }
@@ -175,7 +175,7 @@ public class RoundtripTest extends AbstractPortofinoTest {
 
         PrimaryKey categoryPrimaryKey =
                 new PrimaryKey(categoryTable, "category_pk");
-        categoryPrimaryKey.getPrimaryKeyColumns().add(
+        categoryPrimaryKey.add(
                 new PrimaryKeyColumn(categoryPrimaryKey, "CATID")
         );
         categoryTable.setPrimaryKey(categoryPrimaryKey);
@@ -208,7 +208,7 @@ public class RoundtripTest extends AbstractPortofinoTest {
         assertEquals("CATEGORY", categoryTable2.getTableName());
         assertEquals("com.example.Category", categoryTable2.getJavaClass());
         assertNull(categoryTable2.getManyToMany());
-        assertEquals(0, categoryTable2.getModelAnnotations().size());
+        assertEquals(0, categoryTable2.getAnnotations().size());
 
         // check the column
         assertEquals(1, categoryTable2.getColumns().size());
@@ -227,10 +227,8 @@ public class RoundtripTest extends AbstractPortofinoTest {
         PrimaryKey categoryPrimaryKey2 = categoryTable2.getPrimaryKey();
         assertNotNull(categoryPrimaryKey2);
         assertEquals("category_pk", categoryPrimaryKey2.getPrimaryKeyName());
-        List<PrimaryKeyColumn> categoryPrimaryKeyColumns =
-                categoryPrimaryKey2.getPrimaryKeyColumns();
-        assertEquals(1, categoryPrimaryKeyColumns.size());
-        assertEquals("CATID", categoryPrimaryKeyColumns.get(0).getColumnName());
+        assertEquals(1, categoryPrimaryKey2.size());
+        assertEquals("CATID", categoryPrimaryKey2.get(0).getColumnName());
 
         // check foreign key
         assertTrue(categoryTable2.getForeignKeys().isEmpty());
@@ -242,11 +240,11 @@ public class RoundtripTest extends AbstractPortofinoTest {
         assertNull(productTable2.getManyToMany());
 
         // check the table annotations
-        assertEquals(1, productTable2.getModelAnnotations().size());
-        ModelAnnotation productAnnotation2 = productTable2.getModelAnnotations().get(0);
+        assertEquals(1, productTable2.getAnnotations().size());
+        Annotation productAnnotation2 = productTable2.getAnnotations().get(0);
         assertNotNull(productAnnotation2);
         assertEquals("com.example.TableAnnotation", productAnnotation2.getType());
-        assertEquals(0, productAnnotation2.getValues().size());
+        assertEquals(0, productAnnotation2.size());
 
         // check the columns
         assertEquals(2, productTable2.getColumns().size());
@@ -265,13 +263,13 @@ public class RoundtripTest extends AbstractPortofinoTest {
         assertEquals("java.lang.String", descnColumn2.getJavaType());
 
         // check the column annotations
-        assertEquals(1, descnColumn2.getModelAnnotations().size());
-        ModelAnnotation columnAnnotation2 = descnColumn2.getModelAnnotations().get(0);
+        assertEquals(1, descnColumn2.getAnnotations().size());
+        Annotation columnAnnotation2 = descnColumn2.getAnnotations().get(0);
         assertNotNull(columnAnnotation2);
         assertEquals("com.example.ColumnAnnotation", columnAnnotation2.getType());
-        assertEquals(2, columnAnnotation2.getValues().size());
-        assertEquals("value1", columnAnnotation2.getValues().get(0));
-        assertEquals("value2", columnAnnotation2.getValues().get(1));
+        assertEquals(2, columnAnnotation2.size());
+        assertEquals("value1", columnAnnotation2.get(0));
+        assertEquals("value2", columnAnnotation2.get(1));
 
         // check product catid column
         Column productCatidColumn2 = productTable2.getColumns().get(1);
@@ -318,8 +316,8 @@ public class RoundtripTest extends AbstractPortofinoTest {
         modelWriter.write(model, file);
 
         // Parse the model from the file into model2
-        ModelParser modelParser = new ModelParser();
-        Model model2 = modelParser.parse(file);
+        XmlParser modelParser = new XmlParser();
+        Model model2 = (Model) modelParser.parse(file, Model.class, "model");
         assertNotNull(model2);
 
         // compare model and model2

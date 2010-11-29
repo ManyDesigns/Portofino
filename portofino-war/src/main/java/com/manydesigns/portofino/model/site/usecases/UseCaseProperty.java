@@ -29,10 +29,11 @@
 
 package com.manydesigns.portofino.model.site.usecases;
 
-import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.xml.XmlAttribute;
+import com.manydesigns.portofino.xml.XmlCollection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,7 @@ public class UseCaseProperty implements ModelObject {
     protected final UseCase useCase;
 
     protected String name;
-    protected final List<ModelAnnotation> modelAnnotations;
+    protected final List<Annotation> annotations;
 
 
     //**************************************************************************
@@ -63,7 +64,7 @@ public class UseCaseProperty implements ModelObject {
 
     public UseCaseProperty(UseCase useCase) {
         this.useCase = useCase;
-        modelAnnotations = new ArrayList<ModelAnnotation>();
+        annotations = new ArrayList<Annotation>();
     }
 
     public UseCaseProperty(UseCase useCase, String name) {
@@ -76,14 +77,14 @@ public class UseCaseProperty implements ModelObject {
     //**************************************************************************
 
     public void reset() {
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.reset();
+        for (Annotation annotation : annotations) {
+            annotation.reset();
         }
     }
 
     public void init(Model model) {
-        for (ModelAnnotation modelAnnotation : modelAnnotations) {
-            modelAnnotation.init(model);
+        for (Annotation annotation : annotations) {
+            annotation.init(model);
         }
     }
 
@@ -104,7 +105,8 @@ public class UseCaseProperty implements ModelObject {
         this.name = name;
     }
 
-    public List<ModelAnnotation> getAnnotations() {
-        return modelAnnotations;
+    @XmlCollection (itemClass = Annotation.class, itemName = "annotation")
+    public List<Annotation> getAnnotations() {
+        return annotations;
     }
 }

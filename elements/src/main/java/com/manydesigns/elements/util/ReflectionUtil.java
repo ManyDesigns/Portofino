@@ -95,6 +95,28 @@ public class ReflectionUtil {
         }
     }
 
+    public static Constructor getBestMatchConstructor(Class aClass,
+                                                      Class... argClasses) {
+        for (Constructor current : aClass.getConstructors()) {
+            Class[] parameterTypes = current.getParameterTypes();
+            if (parameterTypes.length != argClasses.length) {
+                continue;
+            }
+            boolean matches = true;
+            for (int i = 0; i < argClasses.length; i++) {
+                Class paramaterType = parameterTypes[i];
+                Class argClass = argClasses[i];
+                matches = matches && paramaterType.isAssignableFrom(argClass);
+            }
+            if (matches) {
+                return current;
+            }
+        }
+        LogUtil.fineMF(logger,
+                "Could not find best match construtor for class: {0}", aClass);
+        return null;
+    }
+
     public static Object newInstance(String className) {
         return newInstance(loadClass(className));
     }
@@ -108,7 +130,7 @@ public class ReflectionUtil {
         try {
             return constructor.newInstance(args);
         } catch (Throwable e) {
-            LogUtil.fineMF(logger,
+            LogUtil.warningMF(logger,
                     "Could not instanciate class constructor: {0}",
                     e, constructor);
             return null;

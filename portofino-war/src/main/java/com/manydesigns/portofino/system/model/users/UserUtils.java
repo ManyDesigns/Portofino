@@ -48,6 +48,7 @@ public class UserUtils {
     public static final String USERID = "userId";
     public static final String USERNAME = "userName";
     public static final String PASSWORD = "pwd";
+    public static final String GROUPS = "groups";
 
     public static final Long ACTIVE = 1L;
     public static final Long SUSPENDED = 2L;

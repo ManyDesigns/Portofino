@@ -33,7 +33,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.model.annotations.ModelAnnotation;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
@@ -122,13 +122,13 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffTableAnnotationTargetNull(ModelAnnotationDiff modelAnnotationDiff) {
-        targetModelAnnotation = new ModelAnnotation();
-        targetTable.getModelAnnotations().add(targetModelAnnotation);
+        targetAnnotation = new Annotation();
+        targetTable.getAnnotations().add(targetAnnotation);
         diffTableAnnotationSourceTarget(modelAnnotationDiff);
     }
 
     public void diffTableAnnotationSourceTarget(ModelAnnotationDiff modelAnnotationDiff) {
-        mergeProperties(sourceModelAnnotation, targetModelAnnotation);
+        mergeProperties(sourceAnnotation, targetAnnotation);
         diffTableAnnotationChildren(modelAnnotationDiff);
     }
 
@@ -160,13 +160,13 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffColumnAnnotationTargetNull(ModelAnnotationDiff modelAnnotationDiff) {
-        targetModelAnnotation = new ModelAnnotation();
-        targetColumn.getModelAnnotations().add(targetModelAnnotation);
+        targetAnnotation = new Annotation();
+        targetColumn.getAnnotations().add(targetAnnotation);
         diffColumnAnnotationSourceTarget(modelAnnotationDiff);
     }
 
     public void diffColumnAnnotationSourceTarget(ModelAnnotationDiff modelAnnotationDiff) {
-        mergeProperties(sourceModelAnnotation, targetModelAnnotation);
+        mergeProperties(sourceAnnotation, targetAnnotation);
         diffColumnAnnotationChildren(modelAnnotationDiff);
     }
 
@@ -198,13 +198,13 @@ public class MergeDiffer extends AbstractDiffer {
     //--------------------------------------------------------------------------
 
     public void diffPrimaryKeyColumnSourceNull(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
-        targetPrimaryKey.getPrimaryKeyColumns().remove(targetPrimaryKeyColumn);
+        targetPrimaryKey.remove(targetPrimaryKeyColumn);
         diffPrimaryKeyColumnChildren(primaryKeyColumnDiff);
     }
 
     public void diffPrimaryKeyColumnTargetNull(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
         targetPrimaryKeyColumn = new PrimaryKeyColumn(targetPrimaryKey);
-        targetPrimaryKey.getPrimaryKeyColumns().add(targetPrimaryKeyColumn);
+        targetPrimaryKey.add(targetPrimaryKeyColumn);
         diffPrimaryKeyColumnSourceTarget(primaryKeyColumnDiff);
     }
 

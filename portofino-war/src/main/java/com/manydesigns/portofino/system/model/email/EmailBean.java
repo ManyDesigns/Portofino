@@ -152,11 +152,8 @@ public class EmailBean implements Serializable{
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         EmailBean emailBean = (EmailBean) o;
-
         if (!id.equals(emailBean.id)) return false;
-
         return true;
     }
 

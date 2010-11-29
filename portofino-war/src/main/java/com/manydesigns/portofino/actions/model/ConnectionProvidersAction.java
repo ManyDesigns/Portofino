@@ -178,7 +178,7 @@ public class ConnectionProvidersAction extends PortofinoAction {
 
     public String test() {
         connectionProvider = context.getConnectionProvider(databaseName);
-        connectionProvider.test();
+        connectionProvider.init();
         String status = connectionProvider.getStatus();
         if (ConnectionProvider.STATUS_CONNECTED.equals(status)) {
             SessionMessages.addInfoMessage("Connection tested successfully");
