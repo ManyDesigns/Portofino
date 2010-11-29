@@ -32,17 +32,17 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
-import com.manydesigns.portofino.PortofinoProperties;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
+import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.logging.Logger;
-import java.sql.Timestamp;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

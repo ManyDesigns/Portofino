@@ -117,6 +117,8 @@ INSERT INTO users_groups(
             groupid, userid, deletiondate, creationdate)
     VALUES (1, 1, null, current_timestamp);
 
+
+
 ALTER TABLE ONLY emailqueue
     ADD CONSTRAINT "EmailQueue_pkey" PRIMARY KEY (id);
 
@@ -129,6 +131,7 @@ ALTER TABLE ONLY emailstate
 ALTER TABLE ONLY groups
     ADD CONSTRAINT group_pkey PRIMARY KEY (groupid);
 
+ALTER TABLE groups ADD UNIQUE (name);
 
 ALTER TABLE ONLY msg
     ADD CONSTRAINT msg_pkey PRIMARY KEY (id);
@@ -138,6 +141,8 @@ ALTER TABLE ONLY msgstate
 
 ALTER TABLE ONLY users
     ADD CONSTRAINT user_pkey PRIMARY KEY (userid);
+
+ALTER TABLE users ADD UNIQUE (username);
 
 ALTER TABLE  public.users_groups
     ADD CONSTRAINT users_groups_pkey PRIMARY KEY (groupid, userid, creationdate);

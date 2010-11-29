@@ -42,6 +42,7 @@ import org.hibernate.FetchMode;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Mappings;
 import org.hibernate.id.PersistentIdentifierGenerator;
+import org.hibernate.id.enhanced.SequenceStyleGenerator;
 import org.hibernate.mapping.*;
 
 import java.text.MessageFormat;
@@ -361,7 +362,7 @@ public class HibernateConfig {
 
 
         if (column.isAutoincrement()) {
-            manageAutoIncrementTypes(mappings, tab, id);
+            manageIdentityTypes(mappings, tab, id);
         }
 
         tab.setIdentifierValue(id);
@@ -371,7 +372,7 @@ public class HibernateConfig {
 
     }
 
-    private void manageAutoIncrementTypes(Mappings mappings, Table tab,
+    private void manageIdentityTypes(Mappings mappings, Table tab,
                                           SimpleValue id) {
         id.setIdentifierGeneratorStrategy("identity");
         Properties params = new Properties();
@@ -384,6 +385,34 @@ public class HibernateConfig {
         id.setIdentifierGeneratorProperties(params);
         id.setNullValue(null);
     }
+
+    private void manageSequenceTypes(Mappings mappings, Table tab,
+                                          SimpleValue id, String seqName) {
+        id.setIdentifierGeneratorStrategy("sequence");
+        Properties params = new Properties();
+        params.put(SequenceStyleGenerator.SEQUENCE_PARAM,
+                    seqName);
+
+        params.setProperty(
+                    SequenceStyleGenerator.SCHEMA,
+                    tab.getSchema());
+        id.setIdentifierGeneratorProperties(params);
+        id.setNullValue(null);
+    }
+
+    /*private void manageHiLoTypes(Mappings mappings, Table tab,
+                                          SimpleValue id, String tableName, String columnName) {
+        id.setIdentifierGeneratorStrategy("sequence");
+        Properties params = new Properties();
+        params.put(SequenceHiLoGenerator.SEQUENCE,
+                    seqName);
+
+        params.setProperty(
+                    SequenceHiLoGenerator.SCHEMA,
+                    tab.getSchema());
+        id.setIdentifierGeneratorProperties(params);
+        id.setNullValue(null);
+    }*/
 
 
     protected void createO2M(

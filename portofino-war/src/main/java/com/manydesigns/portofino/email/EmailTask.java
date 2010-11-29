@@ -35,6 +35,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.system.model.users.UserUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -67,7 +68,7 @@ public class EmailTask extends TimerTask {
     protected static final Logger logger =
             LogUtil.getLogger(TimerTask.class);
     protected final Context context;
-    private static final String PORTOFINO_PUBLIC_USER = "portofino.public.users";
+    private static final String USERTABLE = UserUtils.USERTABLE;
 
 
     public EmailTask(Context context) {
@@ -122,19 +123,18 @@ public class EmailTask extends TimerTask {
     public synchronized void createQueue() {
         try {
             ClassAccessor accessor = context.getTableAccessor(
-                    EmailHandler.EMAILQUEUE_TABLE);
+                    EmailUtils.EMAILQUEUE_TABLE);
             Criteria criteria = new Criteria(accessor);
             List<Object> emails = context.getObjects(
                     criteria.eq(accessor.getProperty("state"),
-                            EmailHandler.TOBESENT));
+                            EmailUtils.TOBESENT));
             for (Object obj : emails) {
-
                 EmailSender emailSender = new EmailSender((EmailBean) obj);
                 EmailBean email = emailSender.getEmailBean();
                 try{
-                    email.setState(EmailHandler.SENDING);
-                    context.saveObject("portofino.public.emailqueue", email);
-                    context.commit("portofino");
+                    email.setState(EmailUtils.SENDING);
+                    context.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
+                    context.commit(EmailUtils.PORTOFINO);
                 } catch (Throwable e) {
                     LogUtil.warning(logger, "cannot store email state", e);
                 }
@@ -147,7 +147,6 @@ public class EmailTask extends TimerTask {
 
 
     private synchronized void manageSuccessAndRejected() {
-
             while (!successQueue.isEmpty()) {
                 EmailSender email = successQueue.poll();
                 if ("true".equals(PortofinoProperties.getProperties()
@@ -155,9 +154,8 @@ public class EmailTask extends TimerTask {
                     continue;
                 }
                 try {
-                    context.deleteObject(EmailHandler.EMAILQUEUE_TABLE,
-                        email.getEmailBean());
-                    context.commit("portofino");
+                    EmailUtils.deleteEmail(context,email.getEmailBean());
+                    context.commit(EmailUtils.PORTOFINO);
                 } catch (Throwable e) {
                     LogUtil.warning(logger, "Cannot delete email", e);
                 }
@@ -166,7 +164,9 @@ public class EmailTask extends TimerTask {
             EmailSender email = rejectedQueue.poll();
             LogUtil.finestMF(logger, "Adding reject mail with id:"
                     + email.getEmailBean().getId());
-            outbox.submit(email);
+            email.getEmailBean().setState(EmailUtils.TOBESENT);
+            EmailUtils.updateEmail(context, email.getEmailBean());
+            context.commit();
         }
     }
 
@@ -181,7 +181,7 @@ public class EmailTask extends TimerTask {
 
     private void incrementBounce(String email) {
         try {
-            ClassAccessor accessor = context.getTableAccessor(PORTOFINO_PUBLIC_USER);
+            ClassAccessor accessor = context.getTableAccessor(USERTABLE);
             Criteria criteria = new Criteria(accessor);
             List<Object> users = context.getObjects(
                     criteria.gt(accessor.getProperty("email"), email));
@@ -197,7 +197,7 @@ public class EmailTask extends TimerTask {
                 value++;
             }
             user.setBounced(value);
-            context.saveObject(PORTOFINO_PUBLIC_USER, user);
+            context.saveObject(USERTABLE, user);
         } catch (NoSuchFieldException e) {
             LogUtil.warning(logger,"cannot increment bounce for user", e);
         }

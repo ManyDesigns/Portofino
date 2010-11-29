@@ -32,7 +32,7 @@ import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.email.EmailHandler;
+import com.manydesigns.portofino.email.EmailUtils;
 import com.manydesigns.portofino.system.model.users.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
@@ -108,7 +108,7 @@ public class PwdRecoveryAction extends PortofinoAction
                 .append(url)
                 .append(" to insert a new one. \n\n")
                 .append("Thank you.").toString();
-        EmailHandler.addEmail(context, subject, body, email, from);
+        EmailUtils.addEmail(context, subject, body, email, from);
         SessionMessages.addInfoMessage("An email was sent to your address. " +
                 "Please check your email.");
         context.commit();

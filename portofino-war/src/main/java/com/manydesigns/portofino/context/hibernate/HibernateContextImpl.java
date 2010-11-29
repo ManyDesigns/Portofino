@@ -872,7 +872,6 @@ public class HibernateContextImpl implements Context {
     //**************************************************************************
     // Timers
     //**************************************************************************
-
     public void resetDbTimer() {
         stopWatches.set(null);
     }
