@@ -36,12 +36,11 @@ import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;
-import com.manydesigns.portofino.model.io.ModelWriter;
+import com.manydesigns.portofino.xml.XmlWriter;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.MessageFormat;
@@ -106,13 +105,13 @@ public class SelfTestAction extends PortofinoAction {
     }
 
 
-    public String export() throws IOException {
+    public String export() throws Exception {
         contentType= "text/xml";
         contentDisposition= MessageFormat.format("inline; filename={0}.xml",
                     "datamodel");
-        ModelWriter writer = new ModelWriter();
+        XmlWriter writer = new XmlWriter();
         File tempFile = File.createTempFile("portofino", ".xml");
-        writer.write(model, tempFile);
+        writer.write(tempFile, model, "model");
         inputStream = new FileInputStream(tempFile);
 
         return "export";

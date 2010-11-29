@@ -43,7 +43,9 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Logger;
 
 /*
@@ -65,7 +67,7 @@ public class XmlWriter {
     //--------------------------------------------------------------------------
 
     protected final XMLOutputFactory f;
-    protected XMLStreamWriter w = null;
+    protected XMLStreamWriter w;
     protected boolean indentationEnabled = true;
 
     //--------------------------------------------------------------------------
@@ -87,7 +89,7 @@ public class XmlWriter {
     // Methods
     //--------------------------------------------------------------------------
 
-    public void write(File file, Object object, String rootName) {
+    public void write(File file, Object object, String rootName) throws Exception {
         try {
             //Istanzio il Writer a partire da un FileWiter
             w = f.createXMLStreamWriter(new FileWriter(file));
@@ -97,7 +99,8 @@ public class XmlWriter {
             //Inizio il documento XML
             w.writeStartDocument();
 
-            writeElement(object, rootName);
+            ElementWriter elementWriter = new ElementWriter(object, rootName);
+            elementWriter.write();
 
             // Chiudo il documento
             w.writeEndDocument();
@@ -106,65 +109,13 @@ public class XmlWriter {
             LogUtil.warningMF(logger,
                     "Exception caught while writing file: {0}",
                     e, file.getAbsolutePath());
+            throw e;
         } finally {
             closeQuietly();
         }
     }
 
-    public void writeElement(Object object, String elementName)
-            throws XMLStreamException {
-        // opening tag
-        w.writeStartElement(elementName);
 
-        // element's attributes
-        writeAttributes(object);
-
-        Class javaClass = object.getClass();
-        ClassAccessor classAccessor =
-                JavaClassAccessor.getClassAccessor(javaClass);
-
-        doOwnCollection(object, classAccessor);
-
-        for (PropertyAccessor propertyAccessor
-                : classAccessor.getProperties()) {
-            String propertyName = propertyAccessor.getName();
-            XmlElement xmlElementAnnotation =
-                    propertyAccessor.getAnnotation(XmlElement.class);
-
-            if (xmlElementAnnotation != null) {
-                Object item = propertyAccessor.get(object);
-            }
-        }
-
-        // closing tag
-        w.writeEndElement();
-
-    }
-
-    private void doOwnCollection(Object object, ClassAccessor classAccessor)
-            throws XMLStreamException {
-        XmlCollection xmlCollectionAnnotation =
-                classAccessor.getAnnotation(XmlCollection.class);
-        if (xmlCollectionAnnotation != null) {
-            Class[] itemClasses = xmlCollectionAnnotation.itemClasses();
-            String[] itemNames = xmlCollectionAnnotation.itemNames();
-            Collection collection = (Collection)object;
-            for (Object item : collection) {
-                Class itemClass = item.getClass();
-                int index = ArrayUtils.indexOf(itemClasses, itemClass);
-                if (index >= 0) {
-                    String itemName = itemNames[index];
-                    writeElement(item, itemName);
-                } else {
-                    String message = MessageFormat.format(
-                            "Item class ''{0}'' not in expected set ''{1}''",
-                            itemClass.getName(),
-                            ArrayUtils.toString(itemClasses));
-                    throw new Error(message);
-                }
-            }
-        }
-    }
 
     public void writeAttributes(Object object) throws XMLStreamException {
         Class javaClass = object.getClass();
@@ -207,4 +158,164 @@ public class XmlWriter {
         }
     }
 
+    //--------------------------------------------------------------------------
+    // Writer interface
+    //--------------------------------------------------------------------------
+
+    interface Writer {
+        void write() throws XMLStreamException;
+    }
+
+    //--------------------------------------------------------------------------
+    // ElementWriter
+    //--------------------------------------------------------------------------
+
+    class ElementWriter implements Writer {
+        final Object object;
+        final String elementName;
+
+        ElementWriter(Object object, String elementName) {
+            this.object = object;
+            this.elementName = elementName;
+        }
+
+        public void write()
+                throws XMLStreamException {
+            Class javaClass = object.getClass();
+
+            if (javaClass == String.class) {
+                writeStringElement();
+            } else {
+                writeObjectElement();
+            }
+
+        }
+
+        private void writeObjectElement() throws XMLStreamException {
+            Class javaClass = object.getClass();
+            ClassAccessor classAccessor =
+                    JavaClassAccessor.getClassAccessor(javaClass);
+
+            List<Writer> writers = new ArrayList<Writer>();
+
+            XmlCollection ownCollectionAnnotation =
+                    classAccessor.getAnnotation(XmlCollection.class);
+            if (ownCollectionAnnotation != null) {
+                CollectionContentWriter collectionContentWriter = 
+                        new CollectionContentWriter(
+                                (Collection)object, ownCollectionAnnotation);
+                writers.add(collectionContentWriter);
+            }
+
+            for (PropertyAccessor propertyAccessor
+                    : classAccessor.getProperties()) {
+                String propertyName = propertyAccessor.getName();
+
+                XmlElement xmlElementAnnotation =
+                        propertyAccessor.getAnnotation(XmlElement.class);
+                if (xmlElementAnnotation != null) {
+                    Object item = propertyAccessor.get(object);
+                    if (item != null) {
+                        ElementWriter elementWriter =
+                                new ElementWriter(item, propertyName);
+                        writers.add(elementWriter);
+                    }
+                }
+
+                XmlCollection collectionAnnotation =
+                        propertyAccessor.getAnnotation(XmlCollection.class);
+                if (collectionAnnotation != null) {
+                    Collection collection =
+                            (Collection) propertyAccessor.get(object);
+                    if (!collection.isEmpty() || collectionAnnotation.required()) {
+                        CollectionWriter collectionWriter =
+                                new CollectionWriter(collection,
+                                        collectionAnnotation, propertyName);
+                        writers.add(collectionWriter);
+                    }
+                }
+            }
+
+            // do all the writing
+            if (writers.isEmpty()) {
+                w.writeEmptyElement(elementName);
+                writeAttributes(object);
+            } else {
+                w.writeStartElement(elementName);
+                writeAttributes(object);
+                for (Writer current : writers) {
+                    current.write();
+                }
+                w.writeEndElement();
+            }
+        }
+
+        protected void writeStringElement() throws XMLStreamException {
+            w.writeStartElement(elementName);
+            w.writeCharacters((String) object);
+            w.writeEndElement();
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    // CollectionContentWriter
+    //--------------------------------------------------------------------------
+
+    class CollectionContentWriter implements Writer {
+        final Collection collection;
+        final XmlCollection annotation;
+
+        CollectionContentWriter(Collection collection,
+                                XmlCollection annotation) {
+            this.collection = collection;
+            this.annotation = annotation;
+        }
+
+        public void write() throws XMLStreamException {
+            Class[] itemClasses = annotation.itemClasses();
+            String[] itemNames = annotation.itemNames();
+            for (Object item : collection) {
+                Class itemClass = item.getClass();
+                int index = ArrayUtils.indexOf(itemClasses, itemClass);
+                if (index >= 0) {
+                    String itemName = itemNames[index];
+                    ElementWriter elementWriter =
+                            new ElementWriter(item, itemName);
+                    elementWriter.write();
+                } else {
+                    String message = MessageFormat.format(
+                            "Item class ''{0}'' not in expected set ''{1}''",
+                            itemClass.getName(),
+                            ArrayUtils.toString(itemClasses));
+                    throw new Error(message);
+                }
+            }
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    // CollectionWriter
+    //--------------------------------------------------------------------------
+
+    class CollectionWriter extends CollectionContentWriter {
+        final String elementName;
+
+        CollectionWriter(Collection collection,
+                         XmlCollection annotation,
+                         String elementName) {
+            super(collection, annotation);
+            this.elementName = elementName;
+        }
+
+        @Override
+        public void write() throws XMLStreamException {
+            if (collection.isEmpty()) {
+                w.writeEmptyElement(elementName);
+            } else {
+                w.writeStartElement(elementName);
+                super.write();
+                w.writeEndElement();
+            }
+        }
+    }
 }
