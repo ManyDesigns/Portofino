@@ -18,7 +18,7 @@
 
                         <xsl:apply-templates select="tableData"/>
 
-                        <xsl:apply-templates select="table_rel"/>
+                        <xsl:apply-templates select="tablerel"/>
 
                     </fo:block>
                 </fo:flow>
@@ -28,28 +28,85 @@
 
     <xsl:template match="tableData">
         <fo:table table-layout="fixed" width="100%" border-collapse="separate">
-            <fo:table-cell>
-                <fo:block font-weight="bold">
-                    <xsl:value-of select="nameColumn"/>
-                    <xsl:value-of select="valueColumn"/>
-                </fo:block>
-            </fo:table-cell>
-        </fo:table>
-    </xsl:template>
-
-    <xsl:template match="table_rel">
-        <fo:table table-layout="fixed" width="100%" border-collapse="separate">
             <fo:table-header>
-                <xsl:apply-templates select="header"/>
+                <fo:table-cell>
+                    <fo:block font-weight="bold">
+                    </fo:block>
+                </fo:table-cell>
             </fo:table-header>
-
             <fo:table-body>
-                <xsl:apply-templates select="rows"/>
+                <xsl:choose>
+                    <xsl:when test="string(rows)">
+                        <xsl:apply-templates select="rows"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <fo:table-cell>
+                            <fo:block>
+                            </fo:block>
+                        </fo:table-cell>
+                    </xsl:otherwise>
+                </xsl:choose>
             </fo:table-body>
         </fo:table>
     </xsl:template>
 
-    <xsl:template match="header">
+    <xsl:template match="rows">
+             <xsl:choose>
+                 <xsl:when test="string(row)">
+                    <xsl:apply-templates select="row"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <fo:table-row>
+                    <fo:table-cell>
+                        <fo:block>
+                        </fo:block>
+                    </fo:table-cell>
+                    </fo:table-row>
+                </xsl:otherwise>
+            </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="row">
+    <fo:table-row>
+        <fo:table-cell>
+            <fo:block>
+                <xsl:value-of select="nameColumn"/>
+            </fo:block>
+        </fo:table-cell>
+        <fo:table-cell>
+            <fo:block>
+                <xsl:value-of select="value"/>
+            </fo:block>
+        </fo:table-cell>
+        </fo:table-row>
+    </xsl:template>
+
+
+    <xsl:template match="tablerel">
+        <fo:table table-layout="fixed" width="100%" border-collapse="separate">
+            <fo:table-header>
+                <xsl:apply-templates select="headerrel"/>
+            </fo:table-header>
+
+            <fo:table-body>
+                <xsl:choose>
+                    <xsl:when test="string(rowsrel)">
+                        <xsl:apply-templates select="rowsrel"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <fo:table-row>
+                            <fo:table-cell>
+                                <fo:block>
+                                </fo:block>
+                            </fo:table-cell>
+                        </fo:table-row>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </fo:table-body>
+        </fo:table>
+    </xsl:template>
+
+       <xsl:template match="headerrel">
         <fo:table-cell>
             <fo:block font-weight="bold">
                 <xsl:value-of select="nameColumn"/>
@@ -57,13 +114,23 @@
         </fo:table-cell>
     </xsl:template>
 
-    <xsl:template match="rows">
+        <xsl:template match="rowsrel">
         <fo:table-row>
-            <xsl:apply-templates select="row"/>
+             <xsl:choose>
+                 <xsl:when test="string(rowrel)">
+                    <xsl:apply-templates select="rowrel"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <fo:table-cell>
+                        <fo:block>
+                        </fo:block>
+                    </fo:table-cell>
+                </xsl:otherwise>
+            </xsl:choose>
         </fo:table-row>
     </xsl:template>
 
-    <xsl:template match="row">
+    <xsl:template match="rowrel">
         <fo:table-cell>
             <fo:block>
                 <xsl:value-of select="value"/>

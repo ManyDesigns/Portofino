@@ -868,21 +868,16 @@ public class CrudUnit {
         xb.write(classAccessor.getName());
         xb.closeElement("table");
 
-        boolean firstRun = true;
-        
+        for (TableForm.Column col : tableForm.getColumns()) {
+            xb.openElement("header");
+            xb.openElement("nameColumn");
+            xb.write(col.getLabel());
+            xb.closeElement("nameColumn");
+            xb.closeElement("header");
+        }
+
+
         for (TableForm.Row row : tableForm.getRows()) {
-            if ( firstRun) {
-
-                for (Field field : row.getFields()) {
-                    xb.openElement("header");
-                    xb.openElement("nameColumn");
-                    xb.write(field.getLabel());
-                    xb.closeElement("nameColumn");
-                    xb.closeElement("header");
-                }
-
-                firstRun = false;
-            }
             xb.openElement("rows");
             for (Field field : row.getFields()) {
                 xb.openElement("row");
@@ -892,9 +887,10 @@ public class CrudUnit {
                 xb.closeElement("row");
             }
             xb.closeElement("rows");
-
         }
+
         xb.closeElement("class");
+
         return xb;
     }
 
@@ -916,8 +912,6 @@ public class CrudUnit {
         form.readFromObject(object);
 
 
-
-
         XmlBuffer xb = new XmlBuffer();
         xb.writeXmlHeader("UTF-8");
         xb.openElement("class");
@@ -927,72 +921,72 @@ public class CrudUnit {
 
         boolean firstRun = true;
 
+
+
         for (FieldSet fieldset : form) {
-                    xb.openElement("tableData");
+            xb.openElement("tableData");
+            /*for (Field field : fieldset) {
+                if ( firstRun) {
+                    xb.openElement("header");
+                    xb.openElement("nameColumn");
+                    xb.write(field.getLabel());
+                    xb.closeElement("nameColumn");
+                    xb.closeElement("header");
+                }
+            }      */
+            firstRun = false;
+            xb.openElement("rows");
             for (Field field : fieldset) {
+                xb.openElement("row");
                 xb.openElement("nameColumn");
                 xb.write(field.getLabel());
                 xb.closeElement("nameColumn");
-                xb.openElement("valueColumn");
+                
+                xb.openElement("value");
                 xb.write(field.getStringValue());
-                xb.closeElement("valueColumn");
+                xb.closeElement("value");
+                xb.closeElement("row");
+
             }
+            xb.closeElement("rows");
             xb.closeElement("tableData");
         }
-
 
         ValueStack valueStack = Struts2Util.getValueStack();
         valueStack.push(object);
 
-        //Aggiungo le relazioni/sheet
-        //WritableCellFormat formatCell = headerExcel();*/
+        //Aggiungo le relazioni
         for (CrudUnit subCrudUnit: subCrudUnits) {
-            xb.openElement("table_rel");
+            xb.openElement("tablerel");
             subCrudUnit.setupSearchForm();
             subCrudUnit.loadObjects();
             subCrudUnit.setupTableForm(Mode.VIEW);
 
             //stampo header
             for (TableForm.Column col : subCrudUnit.tableForm.getColumns()) {
-                xb.openElement("header");
+                xb.openElement("headerrel");
                 xb.openElement("nameColumn");
                 xb.write(col.getLabel());
                 xb.closeElement("nameColumn");
-                xb.closeElement("header");
+                xb.closeElement("headerrel");
             }
 
-            /*sheet = workbook.createSheet(subCrudUnit.searchTitle ,
-                    workbook.getNumberOfSheets());*/
-
-
-            /*
-               xb.openElement("rows");
-            for (Field field : row.getFields()) {
-                xb.openElement("row");
-                xb.openElement("value");
-                xb.write(field.getStringValue());
-                xb.closeElement("value");
-                xb.closeElement("row");
-            }
-            xb.closeElement("rows");
-            */
-            xb.openElement("rows");
             for (TableForm.Row row : subCrudUnit.tableForm.getRows()) {
+                xb.openElement("rowsrel");
                 for (Field field : Arrays.asList(row.getFields())) {
-                    xb.openElement("row");
+                    xb.openElement("rowrel");
                     xb.openElement("value");
                     xb.write(field.getStringValue());
                     xb.closeElement("value");
-                    xb.closeElement("row");
+                    xb.closeElement("rowrel");
                 }
+                xb.closeElement("rowsrel");
             }
-            xb.closeElement("rows");
-            xb.closeElement("table_rel");
+            xb.closeElement("tablerel");
         }
 
         valueStack.pop();
 
-        //workbook.write();*/
 
          xb.closeElement("class");
 
@@ -1020,7 +1014,7 @@ public class CrudUnit {
 
             ClassLoader cl = getClass().getClassLoader();
             InputStream xsltStream = cl.getResourceAsStream(
-                   "templateFOP-Land.xsl");
+                   "templateFOP-Port.xsl");
 
             // Setup XSLT
             TransformerFactory Factory = TransformerFactory.newInstance();
