@@ -90,7 +90,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     // Getters
     //**************************************************************************
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 10)
     public String getDriver() {
         return driver;
     }
@@ -100,7 +100,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     }
 
     @Label("connection URL")
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 11)
     public String getUrl() {
         return url;
     }
@@ -109,7 +109,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
         this.url = url;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 12)
     public String getUsername() {
         return username;
     }
@@ -119,7 +119,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     }
 
     @Password
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 13)
     public String getPassword() {
         return password;
     }

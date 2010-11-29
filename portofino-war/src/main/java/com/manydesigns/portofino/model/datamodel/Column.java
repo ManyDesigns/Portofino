@@ -174,7 +174,7 @@ public class Column implements ModelObject {
         return table.getTableName();
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getColumnName() {
         return columnName;
     }
@@ -183,7 +183,7 @@ public class Column implements ModelObject {
         this.columnName = columnName;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 2)
     public String getColumnType() {
         return columnType;
     }
@@ -192,7 +192,7 @@ public class Column implements ModelObject {
         this.columnType = columnType;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 3)
     public boolean isNullable() {
         return nullable;
     }
@@ -201,7 +201,7 @@ public class Column implements ModelObject {
         this.nullable = nullable;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 4)
     public int getLength() {
         return length;
     }
@@ -210,7 +210,7 @@ public class Column implements ModelObject {
         this.length = length;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 5)
     public int getScale() {
         return scale;
     }
@@ -219,20 +219,7 @@ public class Column implements ModelObject {
         this.scale = scale;
     }
 
-    public Class getActualJavaType() {
-        return actualJavaType;
-    }
-
-    @XmlAttribute(required = false)
-    public String getJavaType() {
-        return javaType;
-    }
-
-    public void setJavaType(String javaType) {
-        this.javaType = javaType;
-    }
-
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 6)
     public boolean isAutoincrement() {
         return autoincrement;
     }
@@ -241,22 +228,35 @@ public class Column implements ModelObject {
         this.autoincrement = autoincrement;
     }
 
+    @XmlAttribute(required = true, order = 7)
+    public boolean isSearchable() {
+        return searchable;
+    }
+
+    public Class getActualJavaType() {
+        return actualJavaType;
+    }
+
+    @XmlAttribute(required = false, order = 8)
+    public String getJavaType() {
+        return javaType;
+    }
+
+    public void setJavaType(String javaType) {
+        this.javaType = javaType;
+    }
+
     public String getActualPropertyName() {
         return actualPropertyName;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 9)
     public String getPropertyName() {
         return propertyName;
     }
 
     public void setPropertyName(String propertyName) {
         this.propertyName = propertyName;
-    }
-
-    @XmlAttribute(required = true)
-    public boolean isSearchable() {
-        return searchable;
     }
 
     public void setSearchable(boolean searchable) {

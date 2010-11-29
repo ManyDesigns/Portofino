@@ -176,7 +176,7 @@ public class Table implements ModelObject {
         return schema.getSchemaName();
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getTableName() {
         return tableName;
     }
@@ -185,7 +185,7 @@ public class Table implements ModelObject {
         this.tableName = tableName;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 2)
     public Boolean getManyToMany() {
         return manyToMany;
     }
@@ -194,7 +194,7 @@ public class Table implements ModelObject {
         this.manyToMany = manyToMany;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 3)
     public String getJavaClass() {
         return javaClass;
     }

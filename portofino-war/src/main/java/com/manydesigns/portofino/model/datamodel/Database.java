@@ -101,7 +101,7 @@ public class Database implements ModelObject {
     // Getters/setter
     //**************************************************************************
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getDatabaseName() {
         return databaseName;
     }

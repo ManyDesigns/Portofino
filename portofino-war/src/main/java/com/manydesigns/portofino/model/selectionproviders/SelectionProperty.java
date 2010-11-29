@@ -84,7 +84,7 @@ public class SelectionProperty implements ModelObject {
     // Getters/setters
     //**************************************************************************
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getName() {
         return name;
     }

@@ -160,7 +160,7 @@ public class Annotation extends ArrayList<String> implements ModelObject {
     // Getters and setters
     //**************************************************************************
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getType() {
         return type;
     }

@@ -122,7 +122,7 @@ public abstract class  SiteNode implements ModelObject {
     // Getters/Setters
     //**************************************************************************
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getId() {
         return id;
     }
@@ -131,7 +131,7 @@ public abstract class  SiteNode implements ModelObject {
         this.id = id;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 2)
     public String getTitle() {
         return title;
     }
@@ -140,7 +140,7 @@ public abstract class  SiteNode implements ModelObject {
         this.title = title;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 3)
     public String getDescription() {
         return description;
     }
@@ -180,7 +180,7 @@ public abstract class  SiteNode implements ModelObject {
         this.actualId = actualId;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 4)
     public String getUrl() {
         return url;
     }

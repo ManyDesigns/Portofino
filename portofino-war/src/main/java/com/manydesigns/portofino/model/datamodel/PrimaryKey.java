@@ -153,7 +153,7 @@ public class PrimaryKey extends ArrayList<PrimaryKeyColumn> implements ModelObje
         return table.getTableName();
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getPrimaryKeyName() {
         return primaryKeyName;
     }

@@ -43,9 +43,7 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 /*
@@ -121,6 +119,8 @@ public class XmlWriter {
         Class javaClass = object.getClass();
         ClassAccessor classAccessor =
                 JavaClassAccessor.getClassAccessor(javaClass);
+
+        List<AttributeWriter> writers = new ArrayList<AttributeWriter>();
         for (PropertyAccessor propertyAccessor
                 : classAccessor.getProperties()) {
             XmlAttribute xmlAttribute =
@@ -136,14 +136,20 @@ public class XmlWriter {
 
             if (value == null) {
                 if (xmlAttribute.required()) {
-                    throw new Error(MessageFormat.format(
-                            "Attribute ''{0}'' required", name));
+                    LogUtil.warningMF(logger,
+                            "Attribute ''{0}'' required", name);
                 }
             } else {
-                w.writeAttribute(name, stringValue);
+                int order = xmlAttribute.order();
+                AttributeWriter writer =
+                        new AttributeWriter(name, stringValue, order);
+                writers.add(writer);
             }
         }
-
+        Collections.sort(writers, new AttributeWriterComparator());
+        for (Writer current : writers) {
+            current.write();
+        }
     }
 
     public void closeQuietly() {
@@ -164,6 +170,42 @@ public class XmlWriter {
 
     interface Writer {
         void write() throws XMLStreamException;
+    }
+
+    //--------------------------------------------------------------------------
+    // AttributeWriter
+    //--------------------------------------------------------------------------
+
+    class AttributeWriter implements Writer {
+        final String name;
+        final String value;
+        final int order;
+
+        AttributeWriter(String name, String value, int order) {
+            this.name = name;
+            this.value = value;
+            this.order = order;
+        }
+
+        public void write() throws XMLStreamException {
+            w.writeAttribute(name, value);
+        }
+    }
+
+    static class AttributeWriterComparator
+            implements Comparator<AttributeWriter> {
+        public int compare(AttributeWriter o1,
+                           AttributeWriter o2) {
+            int order1 = o1.order;
+            int order2 = o2.order;
+            if(order1 > order2) {
+                return 1;
+            } else if(order1 < order2) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -215,7 +257,12 @@ public class XmlWriter {
                         propertyAccessor.getAnnotation(XmlElement.class);
                 if (xmlElementAnnotation != null) {
                     Object item = propertyAccessor.get(object);
-                    if (item != null) {
+                    if (item == null) {
+                        if (xmlElementAnnotation.required()) {
+                            LogUtil.warningMF(logger,
+                                    "Element ''{0}'' required", propertyName);
+                        }
+                    } else {
                         ElementWriter elementWriter =
                                 new ElementWriter(item, propertyName);
                         writers.add(elementWriter);

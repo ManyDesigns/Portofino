@@ -47,7 +47,7 @@ public class CustomFolderNode extends SiteNode{
         super(parent);
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 10)
     public String getType() {
         return type;
     }

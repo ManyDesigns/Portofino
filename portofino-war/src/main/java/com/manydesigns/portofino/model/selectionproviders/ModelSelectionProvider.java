@@ -96,7 +96,7 @@ public class ModelSelectionProvider implements ModelObject {
         return selectionProperties;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getName() {
         return name;
     }
@@ -105,7 +105,7 @@ public class ModelSelectionProvider implements ModelObject {
         this.name = name;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 2)
     public String getDatabase() {
         return database;
     }
@@ -114,7 +114,7 @@ public class ModelSelectionProvider implements ModelObject {
         this.database = database;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 3)
     public String getSql() {
         return sql;
     }
@@ -123,7 +123,7 @@ public class ModelSelectionProvider implements ModelObject {
         this.sql = sql;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 4)
     public String getHql() {
         return hql;
     }

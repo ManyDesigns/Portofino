@@ -101,7 +101,7 @@ public class PortletNode extends SiteNode {
     // Getters/setters
     //**************************************************************************
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 10)
     public String getName() {
         return name;
     }
@@ -110,7 +110,7 @@ public class PortletNode extends SiteNode {
         this.name = name;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 11)
     public String getType() {
         return type;
     }
@@ -119,7 +119,7 @@ public class PortletNode extends SiteNode {
         this.type = type;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 12)
     public String getTitle() {
         return title;
     }
@@ -128,7 +128,7 @@ public class PortletNode extends SiteNode {
         this.title = title;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 13)
     public String getLegend() {
         return legend;
     }
@@ -137,7 +137,7 @@ public class PortletNode extends SiteNode {
         this.legend = legend;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 14)
     public String getDatabase() {
         return database;
     }
@@ -147,7 +147,7 @@ public class PortletNode extends SiteNode {
     }
 
     @Label("SQL")
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 15)
     public String getQuery() {
         return query;
     }
@@ -157,7 +157,7 @@ public class PortletNode extends SiteNode {
     }
 
     @Label("URL expression")
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 16)
     public String getUrlExpression() {
         return urlExpression;
     }

@@ -111,7 +111,7 @@ public class Schema implements ModelObject {
         return database.getDatabaseName();
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getSchemaName() {
         return schemaName;
     }

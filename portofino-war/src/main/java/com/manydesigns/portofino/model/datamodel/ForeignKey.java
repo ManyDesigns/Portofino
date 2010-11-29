@@ -235,7 +235,7 @@ public class ForeignKey implements ModelObject {
         return fromTable.getTableName();
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getForeignKeyName() {
         return foreignKeyName;
     }
@@ -244,7 +244,7 @@ public class ForeignKey implements ModelObject {
         this.foreignKeyName = foreignKeyName;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 2)
     public String getToDatabase() {
         return toDatabase;
     }
@@ -253,7 +253,7 @@ public class ForeignKey implements ModelObject {
         this.toDatabase = toDatabase;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 3)
     public String getToSchema() {
         return toSchema;
     }
@@ -262,7 +262,7 @@ public class ForeignKey implements ModelObject {
         this.toSchema = toSchema;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 4)
     public String getToTable() {
         return toTable;
     }
@@ -271,7 +271,7 @@ public class ForeignKey implements ModelObject {
         this.toTable = toTable;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 5)
     public String getOnUpdate() {
         return onUpdate;
     }
@@ -280,7 +280,7 @@ public class ForeignKey implements ModelObject {
         this.onUpdate = onUpdate;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 6)
     public String getOnDelete() {
         return onDelete;
     }
@@ -294,7 +294,7 @@ public class ForeignKey implements ModelObject {
         return references;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 7)
     public String getManyPropertyName() {
         return manyPropertyName;
     }
@@ -303,12 +303,12 @@ public class ForeignKey implements ModelObject {
         this.manyPropertyName = manyPropertyName;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 8)
     public String getOnePropertyName() {
         return onePropertyName;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 9)
     public boolean isVirtual() {
         return virtual;
     }

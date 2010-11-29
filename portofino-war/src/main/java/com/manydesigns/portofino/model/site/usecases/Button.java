@@ -122,7 +122,7 @@ public class Button implements ModelObject {
         return useCase;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getName() {
         return name;
     }
@@ -131,7 +131,7 @@ public class Button implements ModelObject {
         this.name = name;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 2)
     public String getLabel() {
         return label;
     }
@@ -140,7 +140,7 @@ public class Button implements ModelObject {
         this.label = label;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 3)
     public String getMethod() {
         return method;
     }
@@ -149,7 +149,7 @@ public class Button implements ModelObject {
         this.method = method;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 4)
     public String getGuard() {
         return guard;
     }
@@ -158,7 +158,7 @@ public class Button implements ModelObject {
         this.guard = guard;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 5)
     public String getScript() {
         return script;
     }
@@ -167,7 +167,7 @@ public class Button implements ModelObject {
         this.script = script;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 6)
     public String getScriptLanguage() {
         return scriptLanguage;
     }

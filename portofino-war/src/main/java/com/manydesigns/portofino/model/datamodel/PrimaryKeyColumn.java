@@ -108,7 +108,7 @@ public class PrimaryKeyColumn implements ModelObject {
         return primaryKey;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getColumnName() {
         return columnName;
     }
