@@ -67,41 +67,37 @@ public class PortofinoInterceptor implements Interceptor {
     public void init() {}
 
     public String intercept(ActionInvocation invocation) throws Exception {
-        Context context = null;
-        try {
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
 
-            Object action = invocation.getAction();
-            ActionContext actionContext = invocation.getInvocationContext();
-            Map<String, Object> session = actionContext.getSession();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
 
-            HttpServletRequest req =
-                    (HttpServletRequest)actionContext.get(StrutsStatics.HTTP_REQUEST);
 
-            ServletContext servletContext =
-                    (ServletContext)actionContext.get(StrutsStatics.SERVLET_CONTEXT);
+        Object action = invocation.getAction();
+        ActionContext actionContext = invocation.getInvocationContext();
+        Map<String, Object> session = actionContext.getSession();
+        HttpServletRequest req =
+                (HttpServletRequest)actionContext.get(StrutsStatics.HTTP_REQUEST);
+        ServletContext servletContext =
+                (ServletContext)actionContext.get(StrutsStatics.SERVLET_CONTEXT);
+        Context context =
+                (Context)servletContext.getAttribute(
+                        PortofinoListener.CONTEXT_ATTRIBUTE);
+        req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
+        Long userId = (Long) session.get(UserUtils.USERID);
+        List<String> groups = (List<String>) session.get(UserUtils.GROUPS);
 
-            context =
-                    (Context)servletContext.getAttribute(
-                            PortofinoListener.CONTEXT_ATTRIBUTE);
-
+        try{
             if (context == null || context.getModel() == null) {
                 return "modelNotFound";
             }
+            context.resetDbTimer();
             context.openSession();
-            req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
-
             String requestUrl = Util.getAbsoluteUrl(req.getServletPath());
-
-
-            if (action instanceof ContextAware) {
+             if (action instanceof ContextAware) {
                 ((ContextAware)action).setContext(context);
             }
 
-            Long userId = (Long) session.get(UserUtils.USERID);
-            List<String> groups;
-            groups = UserUtils.manageGroups(context, userId);
+            groups=UserUtils.manageGroups(context, userId);
 
             Navigation navigation = new Navigation(context, requestUrl, groups);
             req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
@@ -109,26 +105,25 @@ public class PortofinoInterceptor implements Interceptor {
                 ((NavigationAware)action).setNavigation(navigation);
             }
             NavigationNode selectedNode = navigation.getSelectedNavigationNode();
+
             if (!(invocation.getAction() instanceof PortofinoAction)
                     || selectedNode==null ) {
                 stopWatch.stop();
                 return invocation.invoke();
             }
-
-            stopWatch.stop();
             SiteNode node = selectedNode.getActualSiteNode();
             if(node.isAllowed(groups)){
+                stopWatch.stop();
                 return invocation.invoke();
             } else {
-                //se non sono loggato mi porta alla pagina di login altrimenti
-                // mi manda alla pagina non autorizzato
                 if (userId==null){
+                    stopWatch.stop();
                     return LOGIN_ACTION;
                 } else {
+                    stopWatch.stop();
                     return UNAUTHORIZED;
                 }
             }
-
         } finally {
             if (context!=null)
                 context.closeSession();
