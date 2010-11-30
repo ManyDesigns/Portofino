@@ -26,7 +26,7 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.model;
+package com.manydesigns.portofino.context;
 
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.portofino.AbstractPortofinoTest;
@@ -47,7 +47,7 @@ import java.util.Map;
  * @author Paolo     Predonzani - paolo.predonzani@manydesigns.com
  */
 public class HibernateTest extends AbstractPortofinoTest {
-    private static final String PORTOFINO_PUBLIC_USER = "portofino.PUBLIC.users";
+    private static final String PORTOFINO_PUBLIC_USER = "portofino.public.users";
 
     @Override
     public void setUp() throws Exception {
@@ -68,11 +68,11 @@ public class HibernateTest extends AbstractPortofinoTest {
 
     public void testUsers() {
         List<Object> groupList =
-                context.getAllObjects("portofino.PUBLIC.groups");
+                context.getAllObjects("portofino.public.groups");
         assertEquals( 2, groupList.size());
 
         List<Object> usergroups =
-                context.getAllObjects("portofino.PUBLIC.users_groups");
+                context.getAllObjects("portofino.public.users_groups");
         assertEquals( 3, usergroups.size());
 
         List<Object> users =
@@ -344,9 +344,9 @@ public class HibernateTest extends AbstractPortofinoTest {
         List<Object> listu =
                 context.getAllObjects(PORTOFINO_PUBLIC_USER);
         List<Object> listg =
-                context.getAllObjects("portofino.PUBLIC.groups");
+                context.getAllObjects("portofino.public.groups");
         List<Object> listug =
-                context.getAllObjects("portofino.PUBLIC.users_groups");
+                context.getAllObjects("portofino.public.users_groups");
     }
 }
 

@@ -65,7 +65,7 @@ public class DBParserTest extends AbstractPortofinoTest {
         assertEquals("jpetstore.PUBLIC", schema.getQualifiedName());
 
         List<Table> tables = schema.getTables();
-        assertEquals(3, tables.size());
+        assertEquals(6, tables.size());
 
         // tabella 0
         Table table0 = tables.get(1);

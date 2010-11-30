@@ -140,8 +140,8 @@ public class EmailTask extends TimerTask {
                 }
                 outbox.submit(emailSender);                
             }
-        } catch (NoSuchFieldException e) {
-            LogUtil.warning(logger,"No state field in emailQueue",e);
+        } catch (Throwable e) {
+            LogUtil.warning(logger,"cannot create emailQueue",e);
         }
     }
 

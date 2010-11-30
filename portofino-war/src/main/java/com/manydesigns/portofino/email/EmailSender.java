@@ -54,8 +54,8 @@ public class EmailSender implements Runnable{
 
 
     //Costruttore con proprietà da inserire
-    public EmailSender(String server, EmailBean emailBean, int port, boolean ssl,
-                 String login, String password) {
+    public EmailSender(EmailBean emailBean, String server, int port, boolean ssl,
+                       String login, String password) {
         this.emailBean = emailBean;
         this.server = server;
         this.port = port;
@@ -82,7 +82,6 @@ public class EmailSender implements Runnable{
     public void run() {
 
         try {
-
             Email email;
             if(null == emailBean.getAttachmentPath()) {
                 email = new SimpleEmail();                

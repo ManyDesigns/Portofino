@@ -72,6 +72,7 @@ public class Column implements ModelObject {
     protected String propertyName;
     protected final List<Annotation> annotations;
 
+
     //**************************************************************************
     // Fields for wire-up
     //**************************************************************************
@@ -267,7 +268,8 @@ public class Column implements ModelObject {
     public List<Annotation> getAnnotations() {
         return annotations;
     }
-    
+
+        
     @Override
     public String toString() {
         return MessageFormat.format("column {0} {1}({2},{3}){4}",
