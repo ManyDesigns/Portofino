@@ -41,6 +41,8 @@ import java.util.logging.Logger;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class EmailSender implements Runnable{
+    public static final String copyright =
+            "Copyright (c) 2005-2010, ManyDesigns srl";
 
     protected final boolean ssl;
     protected final String login;
@@ -67,15 +69,15 @@ public class EmailSender implements Runnable{
     //Costruttore che prende le proprietà dal portofino.properties
     public EmailSender(EmailBean emailBean) {
         this.emailBean = emailBean;
-        this.server = (String) PortofinoProperties.getProperties()
+        this.server = PortofinoProperties.getProperties()
                     .getProperty(PortofinoProperties.MAIL_SMTP_HOST);
-        this.port = Integer.parseInt((String)PortofinoProperties.getProperties()
+        this.port = Integer.parseInt(PortofinoProperties.getProperties()
                     .getProperty(PortofinoProperties.MAIL_SMTP_PORT, "25"));
-        this.ssl = Boolean.parseBoolean((String) PortofinoProperties.getProperties()
+        this.ssl = Boolean.parseBoolean(PortofinoProperties.getProperties()
                     .getProperty(PortofinoProperties.MAIL_SMTP_SSL_ENABLED));
-        this.login = (String) PortofinoProperties.getProperties()
+        this.login = PortofinoProperties.getProperties()
                     .getProperty(PortofinoProperties.MAIL_SMTP_LOGIN);
-        this.password = (String) PortofinoProperties.getProperties()
+        this.password = PortofinoProperties.getProperties()
                     .getProperty(PortofinoProperties.MAIL_SMTP_PASSWORD);
     }
 
