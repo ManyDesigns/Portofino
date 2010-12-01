@@ -124,8 +124,6 @@ public class HibernateConfig {
                 RootClass clazz = createTableMapping(
                         mappings, aTable);
                 mappings.addClass(clazz);
-                //mappings.addImport(clazz.getEntityName(),
-                //        aTable.getTableName()); // TODO: prima era aTable.getTableName() - Verificare!!!!
                 mappings.addImport(clazz.getEntityName(),
                         clazz.getEntityName());
             }
@@ -174,7 +172,7 @@ public class HibernateConfig {
                 aTable.getTableName(), aTable.getTableName(), null);
 
         RootClass clazz = new RootClass();
-        clazz.setEntityName(aTable.getQualifiedName());
+        clazz.setEntityName(aTable.getActualEntityName());
         if (aTable.getJavaClass() != null) {
             clazz.setClassName(aTable.getJavaClass());
             clazz.setProxyInterfaceName(aTable.getJavaClass());
@@ -504,8 +502,8 @@ public class HibernateConfig {
             return;
         }
 
-        String manyMDQualifiedTableName = manyMDTable.getQualifiedName();
-        String oneMDQualifiedTableName = oneMDTable.getQualifiedName();
+        String manyMDQualifiedTableName = manyMDTable.getActualEntityName();
+        String oneMDQualifiedTableName = oneMDTable.getActualEntityName();
 
         PersistentClass clazzOne =
                 config.getClassMapping(oneMDQualifiedTableName);
@@ -650,8 +648,8 @@ public class HibernateConfig {
                 relationship.getFromTable();
         com.manydesigns.portofino.model.datamodel.Table oneMDTable =
                 relationship.getActualToTable();
-        String manyMDQualifiedTableName = manyMDTable.getQualifiedName();
-        String oneMDQualifiedTableName = oneMDTable.getQualifiedName();
+        String manyMDQualifiedTableName = manyMDTable.getActualEntityName();
+        String oneMDQualifiedTableName = oneMDTable.getActualEntityName();
 
         RootClass clazz =
                 (RootClass) mappings.getClass(manyMDQualifiedTableName);

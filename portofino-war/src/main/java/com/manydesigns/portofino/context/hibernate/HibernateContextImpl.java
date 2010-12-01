@@ -37,7 +37,6 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
-import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.Connections;
@@ -243,12 +242,14 @@ public class HibernateContextImpl implements Context {
                                 Serializable pk) {
         Session session = getSession(qualifiedTableName);
         TableAccessor table = getTableAccessor(qualifiedTableName);
+        String actualEntityName = table.getTable().getActualEntityName();
         Object result = null;
         PropertyAccessor[] keyProperties = table.getKeyProperties();
         int size = keyProperties.length;
         if (size > 1) {
             startTimer();
-            result = session.load(qualifiedTableName, pk);
+
+            result = session.load(actualEntityName, pk);
             stopTimer();
             return result;
         }
@@ -256,7 +257,7 @@ public class HibernateContextImpl implements Context {
         PropertyAccessor propertyAccessor = keyProperties[0];
         try {
             Serializable key = (Serializable) propertyAccessor.get(pk);
-            result = session.load(qualifiedTableName, key);
+            result = session.load(actualEntityName, key);
         } catch (Throwable e) {
             e.printStackTrace();
             LogUtil.warningMF(logger,
@@ -273,14 +274,9 @@ public class HibernateContextImpl implements Context {
 
         org.hibernate.Criteria hibernateCriteria;
         Table table = model.findTableByQualifiedName(qualifiedTableName);
+        String actualEntityName = table.getActualEntityName();
 
-        if (table.getJavaClass() == null) {
-            hibernateCriteria = session.createCriteria(qualifiedTableName);
-        } else {
-            hibernateCriteria = session.createCriteria
-                    (ReflectionUtil.loadClass(table.getJavaClass()));
-        }
-
+        hibernateCriteria = session.createCriteria(actualEntityName);
         startTimer();
         //noinspection unchecked
         List<Object> result = hibernateCriteria.list();
@@ -301,6 +297,8 @@ public class HibernateContextImpl implements Context {
         }
         ClassAccessor classAccessor = criteria.getClassAccessor();
         String qualifiedTableName = classAccessor.getName();
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        String actualEntityName = table.getActualEntityName();
 
         ArrayList<Object> parametersList = new ArrayList<Object>();
         StringBuilder whereBuilder = new StringBuilder();
@@ -389,12 +387,12 @@ public class HibernateContextImpl implements Context {
         if (whereClause.length() > 0) {
             queryString = MessageFormat.format(
                     "FROM {0}" + WHERE_STRING + "{1}",
-                    qualifiedTableName,
+                    actualEntityName,
                     whereClause);
         } else {
             queryString = MessageFormat.format(
                     "FROM {0}",
-                    qualifiedTableName);
+                    actualEntityName);
         }
 
         Object[] parameters = new Object[parametersList.size()];
@@ -451,8 +449,10 @@ public class HibernateContextImpl implements Context {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
         String formatString = sqlFormat.getFormatString();
         Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        String actualEntityName = table.getActualEntityName();
 
-        return runHqlQuery(qualifiedTableName, formatString, parameters);
+        return runHqlQuery(actualEntityName, formatString, parameters);
     }
 
     public List<Object> getObjects(String queryString) {
@@ -560,9 +560,12 @@ public class HibernateContextImpl implements Context {
         Session session = getSession(qualifiedTableName);
         session.beginTransaction();
 
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        String actualEntityName = table.getActualEntityName();
+
         try {
             startTimer();
-            session.save(qualifiedTableName, obj);
+            session.save(actualEntityName, obj);
             //session.getTransaction().commit();
         } catch (HibernateException e) {
             session.getTransaction().rollback();
@@ -576,9 +579,12 @@ public class HibernateContextImpl implements Context {
     public void updateObject(String qualifiedTableName, Object obj) {
         Session session = getSession(qualifiedTableName);
         session.beginTransaction();
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        String actualEntityName = table.getActualEntityName();
+
         try {
             startTimer();
-            session.update(qualifiedTableName, obj);
+            session.update(actualEntityName, obj);
             //session.getTransaction().commit();
         } catch (HibernateException e) {
             session.getTransaction().rollback();
@@ -591,10 +597,12 @@ public class HibernateContextImpl implements Context {
     public void deleteObject(String qualifiedTableName, Object obj) {
         Session session = getSession(qualifiedTableName);
         session.beginTransaction();
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        String actualEntityName = table.getActualEntityName();
         try {
             Object obj2 = getObjectByPk(qualifiedTableName, (Serializable) obj);
             startTimer();
-            session.delete(qualifiedTableName, obj2);
+            session.delete(actualEntityName, obj2);
             //session.getTransaction().commit();
         } catch (HibernateException e) {
             session.getTransaction().rollback();
@@ -708,7 +716,7 @@ public class HibernateContextImpl implements Context {
         boolean sameDB = toTable.getDatabaseName().equals(fromTable.getDatabaseName());
         try {
             org.hibernate.Criteria criteria =
-                    session.createCriteria(fromTable.getQualifiedName());
+                    session.createCriteria(fromTable.getActualEntityName());
             for (Reference reference : relationship.getReferences()) {
                 Column fromColumn = reference.getActualFromColumn();
                 Column toColumn = reference.getActualToColumn();
