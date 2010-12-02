@@ -78,7 +78,7 @@ public class TableDataAction extends AbstractCrudAction {
         ClassAccessor classAccessor =
                     context.getTableAccessor(qualifiedTableName);
         String query = MessageFormat.format(
-                "FROM {0}", qualifiedTableName);
+                "FROM {0}", table.getActualEntityName());
         String searchTitle = MessageFormat.format(
                 "Search: {0}", qualifiedTableName);
         String createTitle = MessageFormat.format(
@@ -169,7 +169,7 @@ public class TableDataAction extends AbstractCrudAction {
                 context.getTableAccessor(subTable.getQualifiedName());
         StringBuilder sb = new StringBuilder();
         sb.append("FROM ");
-        sb.append(subTable.getQualifiedName());
+        sb.append(subTable.getActualEntityName());
         boolean first = true;
         for (Reference reference : foreignKey.getReferences()) {
             if (first) {
