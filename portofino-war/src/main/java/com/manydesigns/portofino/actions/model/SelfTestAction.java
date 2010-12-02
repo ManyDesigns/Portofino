@@ -33,8 +33,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.diff.DatabaseDiff;
-import com.manydesigns.portofino.model.diff.DiffUtil;
+import com.manydesigns.portofino.xml.XmlDiffer;
 import com.manydesigns.portofino.xml.XmlWriter;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -59,6 +58,7 @@ public class SelfTestAction extends PortofinoAction {
     // Fields
     //--------------------------------------------------------------------------
 
+    public XmlDiffer xmlDiffer;
     public TreeTableDiffer treeTableDiffer;
     // result parameters
     public InputStream inputStream;
@@ -77,18 +77,15 @@ public class SelfTestAction extends PortofinoAction {
     //--------------------------------------------------------------------------
 
     public String execute() throws SQLException {
+        xmlDiffer = new XmlDiffer();
         treeTableDiffer = new TreeTableDiffer();
-        model = context.getModel();
         for (ConnectionProvider current : context.getConnectionProviders()) {
             Database sourceDatabase = current.readModel();
-
             Database targetDatabase =
                     model.findDatabaseByName(current.getDatabaseName());
-
-            DatabaseDiff diff =
-                    DiffUtil.diff(sourceDatabase, targetDatabase);
-
-//            treeTableDiffer.diffDatabase(diff);
+            XmlDiffer.ElementDiffer rootDiffer =
+                    xmlDiffer.diff("database", sourceDatabase, targetDatabase);
+            treeTableDiffer.run(rootDiffer);
         }
         return SUCCESS;
     }
@@ -96,7 +93,8 @@ public class SelfTestAction extends PortofinoAction {
     public String sync() throws SQLException {
         try {
             context.syncDataModel();
-            SessionMessages.addInfoMessage("In-memory model synchronized to database model");
+            SessionMessages.addInfoMessage(
+                    "In-memory model synchronized to database model");
         } catch (Throwable e) {
             String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
             logger.error(rootCauseMessage, e);

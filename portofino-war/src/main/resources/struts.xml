@@ -17,7 +17,11 @@
                          class="com.manydesigns.portofino.interceptors.PortofinoInterceptor" />
             <interceptor-stack name="mdstack">
 <!-- customized interceptor stack based on struts-default.xml in Struts 2.2.1 -->
-                <interceptor-ref name="exception"/>
+                <interceptor-ref name="exception">
+                    <param name="logEnabled">true</param>
+                    <param name="logCategory">unhandled</param>
+                    <param name="logLevel">WARN</param>
+                </interceptor-ref>
                 <interceptor-ref name="i18n"/>
                 <interceptor-ref name="servletConfig"/>
                 <interceptor-ref name="elements-struts2" />

@@ -51,36 +51,45 @@ public class TreeTableDiffer implements XhtmlFragment {
     protected final XhtmlBuffer xb;
     protected int nodeCounter;
 
-    protected String databaseId;
-    protected String schemaId;
-    protected String tableId;
-    protected String columnId;
-    protected String primaryKeyId;
-    protected String foreignKeyId;
-
     public TreeTableDiffer() {
         super();
         xb = new XhtmlBuffer();
         nodeCounter = 1;
     }
 
-    public void run(XmlDiffer.ElementDiffer elementDiffer) {
-        databaseId = generateId();
+    public void run(XmlDiffer.Differ rootDiffer) {
+        run(rootDiffer, null);
+    }
+
+    public void run(XmlDiffer.Differ differ, String htmlClass) {
+        String id = generateId();
         xb.openElement("tr");
-        xb.addAttribute("id", databaseId);
+        xb.addAttribute("id", id);
+        if (htmlClass != null) {
+            xb.addAttribute("class", htmlClass);
+        }
 
         xb.openElement("td");
-        xb.write(elementDiffer.getName());
+        xb.write(differ.getName());
         xb.closeElement("td");
 
-        writeTypeAndStatus("database", elementDiffer.getStatus());
+        writeTypeAndStatus(differ.getType(), differ.getStatus());
 
         xb.closeElement("tr");
 
+        String childOfId = generateChildOfId(id);
+        // scan child differs
+        for (XmlDiffer.Differ childDiffer : differ.getChildDiffers()) {
+            run(childDiffer, childOfId);
+        }
     }
 
     private String generateId() {
         return MessageFormat.format("id-{0}", nodeCounter++);
+    }
+
+    private String generateChildOfId(String parentId) {
+        return MessageFormat.format("child-of-{0}", parentId);
     }
 
     private void writeTypeAndStatus(String type, XmlDiffer.Status status) {
@@ -92,11 +101,27 @@ public class TreeTableDiffer implements XhtmlFragment {
         switch(status) {
             case EQUAL:
                 xb.addAttribute("class", "status_green");
+                xb.write("Ok");
+                break;
+            case BOTH_NULL:
+                xb.addAttribute("class", "status_red");
+                xb.write("Ok");
+                break;
+            case SOURCE_NULL:
+                xb.addAttribute("class", "status_red");
+                xb.write("Not on db");
+                break;
+            case TARGET_NULL:
+                xb.addAttribute("class", "status_red");
+                xb.write("Only on db");
+                break;
+            case DIFFERENT:
+                xb.addAttribute("class", "status_red");
+                xb.write("Differences");
                 break;
             default:
-                xb.addAttribute("class", "status_red");
+                throw new Error("Unknown case");
         }
-        xb.write("status");
         xb.closeElement("td");
     }
 
@@ -201,10 +226,6 @@ public class TreeTableDiffer implements XhtmlFragment {
         writeTypeAndStatus("schema", status);
 
         xb.closeElement("tr");
-    }
-
-    private String generateChildOfId(String parentId) {
-        return MessageFormat.format("child-of-{0}", parentId);
     }
 
     //--------------------------------------------------------------------------

@@ -124,6 +124,7 @@ public class HibernateContextImpl implements Context {
             connectionProviders = (Connections)
                     parser.parse(file, Connections.class, "connections");
             for (ConnectionProvider current : connectionProviders) {
+                current.reset();
                 current.init();
             }
         } catch (Exception e) {

@@ -114,22 +114,6 @@ public abstract class ConnectionProvider {
 
     public ConnectionProvider() {
         types = new ArrayList<Type>();
-
-        if (includeSchemas == null) {
-            includeSchemasPattern = null;
-        } else {
-            includeSchemasPattern = Pattern.compile(includeSchemas);
-        }
-
-        if (excludeSchemas == null) {
-            excludeSchemasPattern = null;
-        } else {
-            excludeSchemasPattern = Pattern.compile(excludeSchemas);
-        }
-
-        status = STATUS_DISCONNECTED;
-        errorMessage = null;
-        lastTested = null;
     }
 
 
@@ -163,6 +147,18 @@ public abstract class ConnectionProvider {
     }
 
     public void init() {
+        if (includeSchemas == null) {
+            includeSchemasPattern = null;
+        } else {
+            includeSchemasPattern = Pattern.compile(includeSchemas);
+        }
+
+        if (excludeSchemas == null) {
+            excludeSchemasPattern = null;
+        } else {
+            excludeSchemasPattern = Pattern.compile(excludeSchemas);
+        }
+
         Connection conn = null;
         ResultSet typeRs = null;
         try {
