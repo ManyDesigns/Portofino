@@ -41,6 +41,8 @@ import org.slf4j.LoggerFactory;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class EmailSender implements Runnable{
+    public static final String copyright =
+            "Copyright (c) 2005-2010, ManyDesigns srl";
 
     protected final boolean ssl;
     protected final String login;
@@ -54,8 +56,8 @@ public class EmailSender implements Runnable{
 
 
     //Costruttore con proprietà da inserire
-    public EmailSender(String server, EmailBean emailBean, int port, boolean ssl,
-                 String login, String password) {
+    public EmailSender(EmailBean emailBean, String server, int port, boolean ssl,
+                       String login, String password) {
         this.emailBean = emailBean;
         this.server = server;
         this.port = port;
@@ -67,22 +69,21 @@ public class EmailSender implements Runnable{
     //Costruttore che prende le proprietà dal portofino.properties
     public EmailSender(EmailBean emailBean) {
         this.emailBean = emailBean;
-        this.server = (String) PortofinoProperties.getProperties()
+        this.server = PortofinoProperties.getProperties()
                     .getProperty(PortofinoProperties.MAIL_SMTP_HOST);
-        this.port = Integer.parseInt((String)PortofinoProperties.getProperties()
+        this.port = Integer.parseInt(PortofinoProperties.getProperties()
                     .getProperty(PortofinoProperties.MAIL_SMTP_PORT, "25"));
-        this.ssl = Boolean.parseBoolean((String) PortofinoProperties.getProperties()
+        this.ssl = Boolean.parseBoolean(PortofinoProperties.getProperties()
                     .getProperty(PortofinoProperties.MAIL_SMTP_SSL_ENABLED));
-        this.login = (String) PortofinoProperties.getProperties()
+        this.login = PortofinoProperties.getProperties()
                     .getProperty(PortofinoProperties.MAIL_SMTP_LOGIN);
-        this.password = (String) PortofinoProperties.getProperties()
+        this.password = PortofinoProperties.getProperties()
                     .getProperty(PortofinoProperties.MAIL_SMTP_PASSWORD);
     }
 
     public void run() {
 
         try {
-
             Email email;
             if(null == emailBean.getAttachmentPath()) {
                 email = new SimpleEmail();                

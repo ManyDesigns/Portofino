@@ -199,4 +199,11 @@ ALTER TABLE  public."table3"
 --
 -- PostgreSQL database dump complete
 --
+DROP SEQUENCE IF EXISTS public."test_seq";
+CREATE SEQUENCE "test_seq";
 
+DROP TABLE IF EXISTS public."test";
+CREATE TABLE "test"
+(
+  "id" bigint NOT NULL PRIMARY KEY
+);

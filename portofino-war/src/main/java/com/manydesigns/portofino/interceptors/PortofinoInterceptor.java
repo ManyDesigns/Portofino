@@ -84,7 +84,6 @@ public class PortofinoInterceptor implements Interceptor {
                         PortofinoListener.CONTEXT_ATTRIBUTE);
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
         Long userId = (Long) session.get(UserUtils.USERID);
-        List<String> groups = (List<String>) session.get(UserUtils.GROUPS);
 
         try{
             if (context == null || context.getModel() == null) {
@@ -97,7 +96,7 @@ public class PortofinoInterceptor implements Interceptor {
                 ((ContextAware)action).setContext(context);
             }
 
-            groups=UserUtils.manageGroups(context, userId);
+            List<String> groups=UserUtils.manageGroups(context, userId);
 
             Navigation navigation = new Navigation(context, requestUrl, groups);
             req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);

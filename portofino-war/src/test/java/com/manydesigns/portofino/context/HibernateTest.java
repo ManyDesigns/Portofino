@@ -26,7 +26,7 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.model;
+package com.manydesigns.portofino.context;
 
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.portofino.AbstractPortofinoTest;
@@ -47,7 +47,7 @@ import java.util.Map;
  * @author Paolo     Predonzani - paolo.predonzani@manydesigns.com
  */
 public class HibernateTest extends AbstractPortofinoTest {
-    private static final String PORTOFINO_PUBLIC_USER = "portofino.PUBLIC.users";
+    private static final String PORTOFINO_PUBLIC_USER = "portofino.public.users";
 
     @Override
     public void setUp() throws Exception {
@@ -68,11 +68,11 @@ public class HibernateTest extends AbstractPortofinoTest {
 
     public void testUsers() {
         List<Object> groupList =
-                context.getAllObjects("portofino.PUBLIC.groups");
+                context.getAllObjects("portofino.public.groups");
         assertEquals( 2, groupList.size());
 
         List<Object> usergroups =
-                context.getAllObjects("portofino.PUBLIC.users_groups");
+                context.getAllObjects("portofino.public.users_groups");
         assertEquals( 3, usergroups.size());
 
         List<Object> users =
@@ -93,7 +93,7 @@ public class HibernateTest extends AbstractPortofinoTest {
 
 
         Map categoria0 = (Map<String, Object>) resultCat.get(0);
-        assertEquals("jpetstore.PUBLIC.category", categoria0.get("$type$"));
+        assertEquals("jpetstore_public_category", categoria0.get("$type$"));
         assertNotNull(categoria0.get("name"));
         Map categoria1 = (Map<String, Object>)resultCat.get(1);
         assertNotNull(categoria0.get("name"));
@@ -148,7 +148,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         int sizeCat = resultCat.size();
         assertEquals("categorie", 5, sizeCat);
         Map<String, String> categoria0 =  findCategory(tableAccessor, criteria);
-        assertEquals("jpetstore.PUBLIC.category", categoria0.get("$type$"));
+        assertEquals("jpetstore_public_category", categoria0.get("$type$"));
         assertEquals("Fish", categoria0.get("name"));
         categoria0.put("name", "Pesciu");
         context.updateObject("jpetstore.PUBLIC.category", categoria0);
@@ -159,7 +159,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         context.openSession();
         criteria = new Criteria(tableAccessor);
         categoria0 =  findCategory(tableAccessor, criteria);
-        assertEquals("jpetstore.PUBLIC.category", categoria0.get("$type$"));
+        assertEquals("jpetstore_public_category", categoria0.get("$type$"));
         assertEquals("Pesciu", categoria0.get("name"));
         categoria0.put("name", "Fish");
         context.updateObject("jpetstore.PUBLIC.category", categoria0);
@@ -344,9 +344,9 @@ public class HibernateTest extends AbstractPortofinoTest {
         List<Object> listu =
                 context.getAllObjects(PORTOFINO_PUBLIC_USER);
         List<Object> listg =
-                context.getAllObjects("portofino.PUBLIC.groups");
+                context.getAllObjects("portofino.public.groups");
         List<Object> listug =
-                context.getAllObjects("portofino.PUBLIC.users_groups");
+                context.getAllObjects("portofino.public.users_groups");
     }
 }
 

@@ -57,7 +57,7 @@ public class EmailTask extends TimerTask {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    protected static final int N_THREADS=5;
+    protected static final int N_THREADS = 5;
     protected static ExecutorService outbox = Executors.newFixedThreadPool
             (N_THREADS);
     protected static final ConcurrentLinkedQueue<EmailSender> successQueue
@@ -73,7 +73,6 @@ public class EmailTask extends TimerTask {
 
     public EmailTask(Context context) {
         this.context = context;
-
         //Setto il client smtp per il bouncing
         String popHost = PortofinoProperties.getProperties()
                 .getProperty(PortofinoProperties.MAIL_POP3_HOST, "127.0.0.1");
@@ -85,10 +84,14 @@ public class EmailTask extends TimerTask {
                 .getProperty(PortofinoProperties.MAIL_POP3_LOGIN);
         String popPassword = PortofinoProperties.getProperties()
                 .getProperty(PortofinoProperties.MAIL_POP3_PASSWORD);
-        boolean bounceEnabled = Boolean.parseBoolean(PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_BOUNCE_ENABLED, "false"));
-        boolean sslEnabled = Boolean.parseBoolean(PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_POP3_SSL_ENABLED, "false"));
+        boolean bounceEnabled = Boolean.parseBoolean(
+                PortofinoProperties.getProperties()
+                .getProperty(PortofinoProperties.MAIL_BOUNCE_ENABLED,
+                "false"));
+        boolean sslEnabled = Boolean.parseBoolean(
+                PortofinoProperties.getProperties()
+                .getProperty(PortofinoProperties.MAIL_POP3_SSL_ENABLED,
+                "false"));
         if (bounceEnabled &&
                 popHost != null && protocol != null && popLogin != null
                 && popPassword != null) {
@@ -110,7 +113,7 @@ public class EmailTask extends TimerTask {
 
 
     public void run() {
-        try{
+        try {
             context.openSession();
             createQueue();
             checkBounce();
@@ -124,42 +127,43 @@ public class EmailTask extends TimerTask {
         try {
             ClassAccessor accessor = context.getTableAccessor(
                     EmailUtils.EMAILQUEUE_TABLE);
-            Criteria criteria = new Criteria(accessor);
+            Criteria criteria;
+            criteria = new Criteria(accessor);
             List<Object> emails = context.getObjects(
                     criteria.eq(accessor.getProperty("state"),
                             EmailUtils.TOBESENT));
             for (Object obj : emails) {
                 EmailSender emailSender = new EmailSender((EmailBean) obj);
                 EmailBean email = emailSender.getEmailBean();
-                try{
+                try {
                     email.setState(EmailUtils.SENDING);
                     context.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
                     context.commit(EmailUtils.PORTOFINO);
                 } catch (Throwable e) {
                     logger.warn("cannot store email state", e);
                 }
-                outbox.submit(emailSender);                
+                outbox.submit(emailSender);
             }
-        } catch (NoSuchFieldException e) {
-            logger.warn("No state field in emailQueue",e);
+        } catch (Throwable e) {
+            logger.warn("cannot create emailQueue", e);
         }
     }
 
 
     private synchronized void manageSuccessAndRejected() {
-            while (!successQueue.isEmpty()) {
-                EmailSender email = successQueue.poll();
-                if ("true".equals(PortofinoProperties.getProperties()
-                        .getProperty(PortofinoProperties.KEEP_SENT))){
-                    continue;
-                }
-                try {
-                    EmailUtils.deleteEmail(context,email.getEmailBean());
-                    context.commit(EmailUtils.PORTOFINO);
-                } catch (Throwable e) {
-                    logger.warn("Cannot delete email", e);
-                }
+        while (!successQueue.isEmpty()) {
+            EmailSender email = successQueue.poll();
+            if ("true".equals(PortofinoProperties.getProperties()
+                    .getProperty(PortofinoProperties.KEEP_SENT))) {
+                continue;
             }
+            try {
+                EmailUtils.deleteEmail(context, email.getEmailBean());
+                context.commit(EmailUtils.PORTOFINO);
+            } catch (Throwable e) {
+                logger.warn("Cannot delete email", e);
+            }
+        }
         while (!rejectedQueue.isEmpty()) {
             EmailSender email = rejectedQueue.poll();
             logger.debug("Adding reject mail with id:"
@@ -182,16 +186,17 @@ public class EmailTask extends TimerTask {
     private void incrementBounce(String email) {
         try {
             ClassAccessor accessor = context.getTableAccessor(USERTABLE);
-            Criteria criteria = new Criteria(accessor);
+            Criteria criteria;
+            criteria = new Criteria(accessor);
             List<Object> users = context.getObjects(
                     criteria.gt(accessor.getProperty("email"), email));
-            if (users.size()==0){
+            if (users.size() == 0) {
                 logger.warn("no user found for email {}", email);
                 return;
             }
             User user = (User) users.get(0);
             Integer value = user.getBounced();
-            if (null==value){
+            if (null == value) {
                 value = 1;
             } else {
                 value++;

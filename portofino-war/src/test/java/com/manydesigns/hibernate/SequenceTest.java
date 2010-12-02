@@ -26,32 +26,36 @@
  * Boston, MA  02111-1307  USA
  *
  */
+package com.manydesigns.hibernate;
 
-package com.manydesigns.elements.text;
+import junit.framework.TestCase;
+import org.hibernate.Session;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class QueryStringWithParameters {
-    public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+public class SequenceTest extends TestCase {
+    public void setUp(){
 
-    protected final String queryString;
-    protected final Object[] paramaters;
-
-    public QueryStringWithParameters(String queryString, Object[] paramaters) {
-        this.queryString = queryString;
-        this.paramaters = paramaters;
     }
 
-    public String getQueryString() {
-        return queryString;
+    public void tearDown(){
+
     }
 
-    public Object[] getParamaters() {
-        return paramaters;
+    public void testPersona(){
+        Session session = HibernateUtil.getSessionFactory("1").getCurrentSession();
+        session.beginTransaction();
+       
+
+
+        session.getTransaction().commit();
+
     }
+
+
+
 
 }

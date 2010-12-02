@@ -158,12 +158,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-            <version>10.4.2.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>ojdbc</groupId>
             <artifactId>ojdbc</artifactId>
             <version>14</version>
@@ -236,7 +230,7 @@
         <dependency>
             <groupId>dumbster</groupId>
             <artifactId>dumbster</artifactId>
-            <version>1.6</version>
+            <version>1.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>

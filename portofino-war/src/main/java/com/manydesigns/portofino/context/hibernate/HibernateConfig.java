@@ -32,20 +32,23 @@ package com.manydesigns.portofino.context.hibernate;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.database.DbUtil;
+import static com.manydesigns.portofino.database.DbUtil.getHibernateType;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.Type;
-import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
-import com.manydesigns.portofino.model.datamodel.Reference;
-import com.manydesigns.portofino.model.datamodel.Schema;
 import org.apache.commons.lang.BooleanUtils;
 import org.hibernate.FetchMode;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Mappings;
+import org.hibernate.id.IncrementGenerator;
 import org.hibernate.id.PersistentIdentifierGenerator;
 import org.hibernate.id.enhanced.SequenceStyleGenerator;
+import org.hibernate.id.enhanced.TableGenerator;
 import org.hibernate.mapping.*;
+import org.hibernate.mapping.Column;
+import org.hibernate.mapping.PrimaryKey;
+import org.hibernate.mapping.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,8 +124,6 @@ public class HibernateConfig {
                 RootClass clazz = createTableMapping(
                         mappings, aTable);
                 mappings.addClass(clazz);
-                //mappings.addImport(clazz.getEntityName(),
-                //        aTable.getTableName()); // TODO: prima era aTable.getTableName() - Verificare!!!!
                 mappings.addImport(clazz.getEntityName(),
                         clazz.getEntityName());
             }
@@ -151,7 +152,7 @@ public class HibernateConfig {
                 for (ForeignKey rel : aTable.getOneToManyRelationships()) {
                      logger.debug(MessageFormat.format("One to many - {0} {1}",
                                 aTable.getQualifiedName(), rel.getForeignKeyName()));
-                    createO2M(database, configuration, mappings, rel);
+                    createO2M(configuration, mappings, rel);
                 }
             }
         }
@@ -171,7 +172,7 @@ public class HibernateConfig {
                 aTable.getTableName(), aTable.getTableName(), null);
 
         RootClass clazz = new RootClass();
-        clazz.setEntityName(aTable.getQualifiedName());
+        clazz.setEntityName(aTable.getActualEntityName());
         if (aTable.getJavaClass() != null) {
             clazz.setClassName(aTable.getJavaClass());
             clazz.setProxyInterfaceName(aTable.getJavaClass());
@@ -226,7 +227,9 @@ public class HibernateConfig {
                     new String[] {tab.getName(), column.getColumnName(), columnType});
         }
 
-        col.setSqlTypeCode(type.getJdbcType());
+        if (type != null) {
+            col.setSqlTypeCode(type.getJdbcType());
+        }
         col.setSqlType(columnType);
         tab.addColumn(col);
 
@@ -237,8 +240,13 @@ public class HibernateConfig {
         SimpleValue value = new SimpleValue();
         value.setTable(tab);
         org.hibernate.type.Type hibernateType =
-                DbUtil.getHibernateType(type.getJdbcType());
-        value.setTypeName(hibernateType.getName());
+                null;
+        if (type != null) {
+            hibernateType = getHibernateType(type.getJdbcType());
+        }
+        if (hibernateType != null) {
+            value.setTypeName(hibernateType.getName());
+        }
         value.addColumn(col);
         clazz.addProperty(prop);
         prop.setValue(value);
@@ -254,7 +262,7 @@ public class HibernateConfig {
                                      List<com.manydesigns.portofino.model.datamodel.Column> columnPKList) {
 
 
-        final PrimaryKey primaryKey = new PrimaryKey();
+        PrimaryKey primaryKey = new PrimaryKey();
         primaryKey.setName(pkName);
         primaryKey.setTable(tab);
         tab.setPrimaryKey(primaryKey);
@@ -288,13 +296,17 @@ public class HibernateConfig {
                     " column {}, type {}",
                     new String[] {tab.getName(), column.getColumnName(), columnType});
             }
-            col.setSqlTypeCode(type.getJdbcType());
+            if (type != null) {
+                col.setSqlTypeCode(type.getJdbcType());
+            }
             col.setSqlType(columnType);
             primaryKey.addColumn(col);
             SimpleValue value = new SimpleValue();
             value.setTable(tab);
-            value.setTypeName(DbUtil.getHibernateType(type.getJdbcType())
+            if (type != null) {
+                value.setTypeName(getHibernateType(type.getJdbcType())
                     .getName());
+            }
             value.addColumn(col);
             tab.getPrimaryKey().addColumn(col);
             tab.addColumn(col);
@@ -318,6 +330,7 @@ public class HibernateConfig {
                                   String pkName, RootClass clazz,
                                   Table tab,
                                   List<com.manydesigns.portofino.model.datamodel.Column> columnPKList) {
+        PrimaryKeyColumn pkcol =mdTable.getPrimaryKey().get(0);
         com.manydesigns.portofino.model.datamodel.Column
                 column = columnPKList.get(0);
         SimpleValue id = new SimpleValue(tab);
@@ -341,17 +354,22 @@ public class HibernateConfig {
                     " column {}, type {}",
                     new String[] {tab.getName(), column.getColumnName(), columnType});
         }
-        col.setSqlTypeCode(type.getJdbcType());
+        if (type != null) {
+            col.setSqlTypeCode(type.getJdbcType());
+        }
         col.setSqlType(columnType);
-        org.hibernate.type.Type hibernateType =
-                DbUtil.getHibernateType(type.getJdbcType());
-        id.setTypeName(hibernateType.getName());
+        if (type != null) {
+            org.hibernate.type.Type hibernateType = getHibernateType(type.getJdbcType());
+            id.setTypeName(hibernateType.getName());
+        }
+
 
         mappings.addColumnBinding(column.getColumnName(),
                 col, tab);
         tab.addColumn(col);
         tab.getPrimaryKey().addColumn(col);
         id.addColumn(col);
+        
 
         Property prop = new Property();
         prop.setName(column.getActualPropertyName());
@@ -367,8 +385,17 @@ public class HibernateConfig {
         clazz.addProperty(prop);
 
 
-        if (column.isAutoincrement()) {
-            manageIdentityTypes(mappings, tab, id);
+        if (null!=pkcol.getSequenceName()) {
+            manageSequenceGenerator(mappings, tab, id, pkcol.getSequenceName());
+        } else if (null!=pkcol.getSequenceTable()){
+            manageTableGenerator(mappings, tab, id, pkcol.getSequenceTable(),
+                    pkcol.getKeyColumn(), pkcol.getKeyValue(),
+                    pkcol.getValueColumn());
+
+        } else if (column.isAutoincrement()) {
+            manageIdentityGenerator(mappings, tab, id);
+        } else if (null!=pkcol.getIncrement()&&pkcol.getIncrement()){
+            manageAutoIncrementType(mappings, id, clazz.getEntityName());
         }
 
         tab.setIdentifierValue(id);
@@ -378,7 +405,7 @@ public class HibernateConfig {
 
     }
 
-    private void manageIdentityTypes(Mappings mappings, Table tab,
+    private void manageIdentityGenerator(Mappings mappings, Table tab,
                                           SimpleValue id) {
         id.setIdentifierGeneratorStrategy("identity");
         Properties params = new Properties();
@@ -387,42 +414,60 @@ public class HibernateConfig {
 
         params.setProperty(
                     PersistentIdentifierGenerator.SCHEMA,
-                    tab.getSchema());
+                    escapeName(tab.getSchema()));
         id.setIdentifierGeneratorProperties(params);
         id.setNullValue(null);
     }
 
-    private void manageSequenceTypes(Mappings mappings, Table tab,
+    private void manageSequenceGenerator(Mappings mappings, Table tab,
                                           SimpleValue id, String seqName) {
-        id.setIdentifierGeneratorStrategy("sequence");
+        id.setIdentifierGeneratorStrategy
+                ("enhanced-sequence");
         Properties params = new Properties();
+        params.put(PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER,
+                    mappings.getObjectNameNormalizer());
         params.put(SequenceStyleGenerator.SEQUENCE_PARAM,
-                    seqName);
-
+                    escapeName(seqName));
         params.setProperty(
                     SequenceStyleGenerator.SCHEMA,
-                    tab.getSchema());
+                    escapeName(tab.getSchema()));
         id.setIdentifierGeneratorProperties(params);
         id.setNullValue(null);
     }
 
-    /*private void manageHiLoTypes(Mappings mappings, Table tab,
-                                          SimpleValue id, String tableName, String columnName) {
-        id.setIdentifierGeneratorStrategy("sequence");
+    private void manageTableGenerator(Mappings mappings, Table tab, SimpleValue id,
+                                          String seqTableName,
+                                          String keyColumn, String keyValue,
+                                          String valueColumn) {
+        id.setIdentifierGeneratorStrategy("enhanced-table");
         Properties params = new Properties();
-        params.put(SequenceHiLoGenerator.SEQUENCE,
-                    seqName);
-
+        params.put(TableGenerator.TABLE,
+                    tab);
+        params.put(TableGenerator.TABLE_PARAM,
+                    escapeName(seqTableName));
+        params.put(PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER,
+                    mappings.getObjectNameNormalizer());
+        params.put(TableGenerator.SEGMENT_COLUMN_PARAM, escapeName(keyColumn));
+        params.put(TableGenerator.SEGMENT_VALUE_PARAM, keyValue);
+        params.put(TableGenerator.VALUE_COLUMN_PARAM,escapeName(valueColumn));
         params.setProperty(
-                    SequenceHiLoGenerator.SCHEMA,
-                    tab.getSchema());
+                    TableGenerator.SCHEMA,escapeName(tab.getSchema()));
         id.setIdentifierGeneratorProperties(params);
         id.setNullValue(null);
-    }*/
+    }
 
+    private void manageAutoIncrementType(Mappings mappings, SimpleValue id, String entityName) {
+        id.setIdentifierGeneratorStrategy("increment");
+        Properties params = new Properties();
+        params.put(PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER,
+                    mappings.getObjectNameNormalizer());
+        params.put(IncrementGenerator.ENTITY_NAME,
+                    entityName);
+        id.setIdentifierGeneratorProperties(params);
+        id.setNullValue(null);
+    }
 
     protected void createO2M(
-            Database database,
             Configuration config,
             Mappings mappings,
             ForeignKey relationship) {
@@ -460,8 +505,8 @@ public class HibernateConfig {
             return;
         }
 
-        String manyMDQualifiedTableName = manyMDTable.getQualifiedName();
-        String oneMDQualifiedTableName = oneMDTable.getQualifiedName();
+        String manyMDQualifiedTableName = manyMDTable.getActualEntityName();
+        String oneMDQualifiedTableName = oneMDTable.getActualEntityName();
 
         PersistentClass clazzOne =
                 config.getClassMapping(oneMDQualifiedTableName);
@@ -606,8 +651,8 @@ public class HibernateConfig {
                 relationship.getFromTable();
         com.manydesigns.portofino.model.datamodel.Table oneMDTable =
                 relationship.getActualToTable();
-        String manyMDQualifiedTableName = manyMDTable.getQualifiedName();
-        String oneMDQualifiedTableName = oneMDTable.getQualifiedName();
+        String manyMDQualifiedTableName = manyMDTable.getActualEntityName();
+        String oneMDQualifiedTableName = oneMDTable.getActualEntityName();
 
         RootClass clazz =
                 (RootClass) mappings.getClass(manyMDQualifiedTableName);

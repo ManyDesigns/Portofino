@@ -38,6 +38,7 @@ import com.manydesigns.portofino.xml.XmlCollection;
 import com.manydesigns.portofino.xml.XmlElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -62,6 +63,9 @@ public class Table implements ModelObject {
     protected final List<Annotation> annotations;
 
     protected String tableName;
+
+    protected String entityName;
+    protected String actualEntityName;
 
     protected Boolean manyToMany;
     protected String javaClass;
@@ -138,6 +142,12 @@ public class Table implements ModelObject {
     public void init(Model model) {
         // wire up javaClass
         actualJavaClass = ReflectionUtil.loadClass(javaClass);
+
+        if (entityName == null) {
+            actualEntityName = defineEntityName(this.getQualifiedName());
+        } else {
+            actualEntityName = defineEntityName(entityName);
+        }
 
         for (Column column : columns) {
             column.init(model);
@@ -225,6 +235,23 @@ public class Table implements ModelObject {
         return foreignKeys;
     }
 
+    @XmlAttribute(required = false, order = 4)
+    public String getEntityName() {
+        return entityName;
+    }
+
+    public void setEntityName(String entityName) {
+        this.entityName = entityName;
+    }
+
+    public String getActualEntityName() {
+        return actualEntityName;
+    }
+
+    public void setActualEntityName(String actualEntityName) {
+        this.actualEntityName = actualEntityName;
+    }
+
     public List<ForeignKey> getOneToManyRelationships() {
         return oneToManyRelationships;
     }
@@ -300,4 +327,59 @@ public class Table implements ModelObject {
     }
 
 
+    //**************************************************************************
+    // Rende un nome secondo le regole che specificano gli identificatori in HQL
+    // protected
+    //ID_START_LETTER
+    //    :    '_'
+    //    |    '$'
+    //|    'a'..'z'
+    //|    '\u0080'..'\ufffe'       // HHH-558 : Allow unicode chars in identifiers
+    //;
+    //
+    //protected
+    //ID_LETTER
+    //:    ID_START_LETTER
+    //|    '0'..'9'
+    //;
+    //**************************************************************************
+    public static String defineEntityName (String name) {
+        name = StringUtils.replaceChars(name, ".", "_");
+        String firstLetter = name.substring(0,1);
+        String others = name.substring(1);
+
+        StringBuffer result = new StringBuffer();
+        result.append(checkFirstLetter(firstLetter));
+
+        for(int i=0; i< others.length();i++){
+            String letter = String.valueOf(others.charAt(i));
+            result.append(checkOtherLetters(letter));
+        }
+        return result.toString();
+    }
+
+    private static String checkFirstLetter(String letter) {
+        letter = StringUtils.replaceChars(letter, "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                                                  "abcdefghijklmnopqrstuvwxyz");
+
+        if (letter.equals("_") || letter.equals("$")
+                || StringUtils.isAlpha(letter)){
+            return letter;
+        } else if (StringUtils.isNumeric(letter)) {
+            return "_"+letter;
+        } else {
+            return "_";
+        }
+    }
+
+    private  static String checkOtherLetters(String letter) {
+        letter = StringUtils.replaceChars(letter, "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                                                  "abcdefghijklmnopqrstuvwxyz");
+        if (letter.equals("_") || letter.equals("$")
+                || StringUtils.isAlphanumeric(letter)){
+            return letter;
+        } else {
+            return "_";
+        }
+    }
 }

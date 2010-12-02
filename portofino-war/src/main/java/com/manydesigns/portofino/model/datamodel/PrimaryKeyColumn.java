@@ -52,6 +52,14 @@ public class PrimaryKeyColumn implements ModelObject {
 
     protected String columnName;
 
+    protected String sequenceName;
+
+    protected String sequenceTable;
+    protected String keyColumn;
+    protected String keyValue;
+    protected String valueColumn;
+
+    protected Boolean increment;
     //**************************************************************************
     // Fields for wire-up
     //**************************************************************************
@@ -118,5 +126,59 @@ public class PrimaryKeyColumn implements ModelObject {
 
     public Column getActualColumn() {
         return actualColumn;
+    }
+
+    @XmlAttribute(required = false, order = 2)
+    public String getSequenceTable() {
+        return sequenceTable;
+    }
+
+    public void setSequenceTable(String sequenceTable) {
+        this.sequenceTable = sequenceTable;
+    }
+
+    @XmlAttribute(required = false, order = 3)
+    public String getKeyColumn() {
+        return keyColumn;
+    }
+
+    public void setKeyColumn(String keyColumn) {
+        this.keyColumn = keyColumn;
+    }
+
+    @XmlAttribute(required = false, order = 4)
+    public String getKeyValue() {
+        return keyValue;
+    }
+
+    public void setKeyValue(String keyValue) {
+        this.keyValue = keyValue;
+    }
+
+    @XmlAttribute(required = false, order = 5)
+    public String getValueColumn() {
+        return valueColumn;
+    }
+
+    public void setValueColumn(String valueColumn) {
+        this.valueColumn = valueColumn;
+    }
+
+    @XmlAttribute(required = false, order = 6)
+    public String getSequenceName() {
+        return sequenceName;
+    }
+
+    public void setSequenceName(String sequenceName) {
+        this.sequenceName = sequenceName;
+    }
+
+    @XmlAttribute(required = false, order = 2)
+    public Boolean getIncrement() {
+        return increment;
+    }
+
+    public void setIncrement(Boolean increment) {
+        this.increment = increment;
     }
 }
