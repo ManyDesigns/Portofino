@@ -12,8 +12,8 @@
     <s:submit id="Table_bulkDelete" method="bulkDelete" value="Delete"
               onclick="return confirm ('Are you sure?');"/>
     <s:submit id="Table_print" method="print" value="Print" disabled="true"/>
-    <s:submit id="Table_exportExcel" method="exportSearchExcel" value="exportSearchExcel" disabled="false"/>
-    <s:submit id="Table_exportPdf" method="exportSearchPdf" value="ExportSearchPdf" disabled="false"/>
+    <s:submit id="Table_exportExcel" method="exportSearchExcel" value="Excel" disabled="false"/>
+    <s:submit id="Table_exportPdf" method="exportSearchPdf" value="Pdf" disabled="false"/>
     <s:iterator var="button" value="buttons">
         <s:submit id="%{#button.name}" method="%{#button.actualMethod}" value="%{#button.label}"/>
     </s:iterator>

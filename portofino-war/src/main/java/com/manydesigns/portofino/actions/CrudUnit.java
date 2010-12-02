@@ -712,19 +712,17 @@ public class CrudUnit {
                 sheet.addCell(new Label(m, 0, col.getLabel(), formatCell));
                 m++;
             }
-            i = 1;
+            int k = 1;
             for (TableForm.Row row : subCrudUnit.tableForm.getRows()) {
                 int j = 0;
                 for (Field field : Arrays.asList(row.getFields())) {
-                    addFieldToCell(sheet, i, j, field);
+                    addFieldToCell(sheet, k, j, field);
                     j++;
                 }
-                i++;
+                k++;
             }
         }
-        
         valueStack.pop();
-
         workbook.write();
     }
 
@@ -740,7 +738,6 @@ public class CrudUnit {
         int j = 0;
         for (Field field : row.getFields()) {
             addFieldToCell(sheet, i, j, field);
-
             j++;
         }
     }
@@ -827,7 +824,7 @@ public class CrudUnit {
 
             ClassLoader cl = getClass().getClassLoader();
             InputStream xsltStream = cl.getResourceAsStream(
-                   "templateFOP-Land.xsl");
+                    "templateFOP-Search.xsl");
 
             // Setup XSLT
             TransformerFactory Factory = TransformerFactory.newInstance();
@@ -839,7 +836,7 @@ public class CrudUnit {
 
             // Setup input for XSLT transformation
             Source src = new StreamSource(new StringReader(
-                    composeXmlLand().toString()));
+                    composeXmlSearch().toString()));
 
             // Resulting SAX events (the generated FO) must be piped through to
             // FOP
@@ -864,7 +861,7 @@ public class CrudUnit {
         }
     }
 
-    public XmlBuffer composeXmlLand() {
+    public XmlBuffer composeXmlSearch() {
         XmlBuffer xb = new XmlBuffer();
         xb.writeXmlHeader("UTF-8");
         xb.openElement("class");
@@ -923,23 +920,10 @@ public class CrudUnit {
         xb.write(classAccessor.getName());
         xb.closeElement("table");
 
-        boolean firstRun = true;
-
-
-
         for (FieldSet fieldset : form) {
             xb.openElement("tableData");
-            /*for (Field field : fieldset) {
-                if ( firstRun) {
-                    xb.openElement("header");
-                    xb.openElement("nameColumn");
-                    xb.write(field.getLabel());
-                    xb.closeElement("nameColumn");
-                    xb.closeElement("header");
-                }
-            }      */
-            firstRun = false;
             xb.openElement("rows");
+
             for (Field field : fieldset) {
                 xb.openElement("row");
                 xb.openElement("nameColumn");
@@ -966,6 +950,10 @@ public class CrudUnit {
             subCrudUnit.loadObjects();
             subCrudUnit.setupTableForm(Mode.VIEW);
 
+            xb.openElement("nametablerel");
+            xb.write(subCrudUnit.classAccessor.getName());
+            xb.closeElement("nametablerel");
+
             //stampo header
             for (TableForm.Column col : subCrudUnit.tableForm.getColumns()) {
                 xb.openElement("headerrel");
@@ -988,15 +976,9 @@ public class CrudUnit {
             }
             xb.closeElement("tablerel");
         }
-
         valueStack.pop();
 
-
-         xb.closeElement("class");
-
-
-
-        System.out.println("XB vale : " + xb);
+        xb.closeElement("class");
         return xb;
     }
 
@@ -1018,7 +1000,7 @@ public class CrudUnit {
 
             ClassLoader cl = getClass().getClassLoader();
             InputStream xsltStream = cl.getResourceAsStream(
-                   "templateFOP-Port.xsl");
+                    "templateFOP-Read.xsl");
 
             // Setup XSLT
             TransformerFactory Factory = TransformerFactory.newInstance();
@@ -1054,46 +1036,4 @@ public class CrudUnit {
             }
         }
     }
-
-    /*public XmlBuffer composeXmlPort() {
-        XmlBuffer xb = new XmlBuffer();
-        xb.writeXmlHeader("UTF-8");
-        xb.openElement("class");
-        xb.openElement("table");
-        xb.write(classAccessor.getName());
-        xb.closeElement("table");
-
-        boolean firstRun = true;
-
-        for (TableForm.Row row : tableForm.getRows()) {
-            if ( firstRun) {
-
-                for (Field field : row.getFields()) {
-                    xb.openElement("header");
-                    xb.openElement("nameColumn");
-                    xb.write(field.getLabel());
-                    xb.closeElement("nameColumn");
-                    xb.closeElement("header");
-                }
-
-                firstRun = false;
-            }
-            xb.openElement("rows");
-            for (Field field : row.getFields()) {
-                xb.openElement("row");
-                xb.openElement("value");
-                xb.write(field.getStringValue());
-                xb.closeElement("value");
-                xb.closeElement("row");
-            }
-            xb.closeElement("rows");
-
-        }
-        xb.closeElement("class");
-        return xb;
-    }
-     */
-
-
-
 }
