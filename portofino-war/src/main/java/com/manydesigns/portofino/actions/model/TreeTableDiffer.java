@@ -31,7 +31,7 @@ package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
-import com.manydesigns.portofino.model.diff.*;
+import com.manydesigns.portofino.xml.XmlDiffer;
 
 import java.text.MessageFormat;
 
@@ -40,7 +40,7 @@ import java.text.MessageFormat;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TreeTableDiffer extends AbstractDiffer implements XhtmlFragment {
+public class TreeTableDiffer implements XhtmlFragment {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -64,6 +64,42 @@ public class TreeTableDiffer extends AbstractDiffer implements XhtmlFragment {
         nodeCounter = 1;
     }
 
+    public void run(XmlDiffer.ElementDiffer elementDiffer) {
+        databaseId = generateId();
+        xb.openElement("tr");
+        xb.addAttribute("id", databaseId);
+
+        xb.openElement("td");
+        xb.write(elementDiffer.getName());
+        xb.closeElement("td");
+
+        writeTypeAndStatus("database", elementDiffer.getStatus());
+
+        xb.closeElement("tr");
+
+    }
+
+    private String generateId() {
+        return MessageFormat.format("id-{0}", nodeCounter++);
+    }
+
+    private void writeTypeAndStatus(String type, XmlDiffer.Status status) {
+        xb.openElement("td");
+        xb.write(type);
+        xb.closeElement("td");
+
+        xb.openElement("td");
+        switch(status) {
+            case EQUAL:
+                xb.addAttribute("class", "status_green");
+                break;
+            default:
+                xb.addAttribute("class", "status_red");
+        }
+        xb.write("status");
+        xb.closeElement("td");
+    }
+
     //--------------------------------------------------------------------------
     // XhtmlFragment implementation
     //--------------------------------------------------------------------------
@@ -71,6 +107,7 @@ public class TreeTableDiffer extends AbstractDiffer implements XhtmlFragment {
         xb.toXhtml(toBuffer);
     }
 
+    /*
     //--------------------------------------------------------------------------
     // Databases
     //--------------------------------------------------------------------------
@@ -390,5 +427,5 @@ public class TreeTableDiffer extends AbstractDiffer implements XhtmlFragment {
     //--------------------------------------------------------------------------
     // Getter/setter
     //--------------------------------------------------------------------------
-
+*/
 }

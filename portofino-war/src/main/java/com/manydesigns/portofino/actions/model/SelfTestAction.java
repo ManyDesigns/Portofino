@@ -88,7 +88,7 @@ public class SelfTestAction extends PortofinoAction {
             DatabaseDiff diff =
                     DiffUtil.diff(sourceDatabase, targetDatabase);
 
-            treeTableDiffer.diffDatabase(diff);
+//            treeTableDiffer.diffDatabase(diff);
         }
         return SUCCESS;
     }

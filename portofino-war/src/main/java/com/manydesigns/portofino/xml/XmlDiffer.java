@@ -55,7 +55,7 @@ public class XmlDiffer {
     // Constants
     //--------------------------------------------------------------------------
 
-    enum Status {
+    public enum Status {
         BOTH_NULL,
         SOURCE_NULL,
         TARGET_NULL,
@@ -94,7 +94,8 @@ public class XmlDiffer {
     //--------------------------------------------------------------------------
 
     public static interface Differ {
-
+        String getName();
+        Status getStatus();
     }
 
     //--------------------------------------------------------------------------
@@ -193,6 +194,17 @@ public class XmlDiffer {
                         new AttributeDiffer(propertyAccessor,
                                 sourceValue, targetValue);
                 attributeDiffers.add(attributeDiffer);
+            }
+        }
+
+        public String getName() {
+            switch(status) {
+                case BOTH_NULL:
+                    return null;
+                case SOURCE_NULL:
+                    return targetElement.toString();
+                default:
+                    return sourceElement.toString();
             }
         }
 
@@ -328,6 +340,14 @@ public class XmlDiffer {
             PropertyAccessor[] result = new PropertyAccessor[properties.size()];
             properties.toArray(result);
             return result;
+        }
+
+        public String getName() {
+            return "collection";
+        }
+
+        public Status getStatus() {
+            return Status.EQUAL;
         }
     }
 
