@@ -122,7 +122,7 @@ public abstract class  SiteNode implements ModelObject {
     // Getters/Setters
     //**************************************************************************
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getId() {
         return id;
     }
@@ -131,7 +131,7 @@ public abstract class  SiteNode implements ModelObject {
         this.id = id;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 2)
     public String getTitle() {
         return title;
     }
@@ -140,7 +140,7 @@ public abstract class  SiteNode implements ModelObject {
         this.title = title;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 3)
     public String getDescription() {
         return description;
     }
@@ -149,7 +149,7 @@ public abstract class  SiteNode implements ModelObject {
         this.description = description;
     }
 
-    @XmlElement
+    @XmlElement(order = 2)
     public Permissions getPermissions() {
         return permissions;
     }
@@ -158,8 +158,8 @@ public abstract class  SiteNode implements ModelObject {
         this.permissions = permissions;
     }
 
-    @XmlCollection(itemClass = {DocumentNode.class, FolderNode.class, CustomNode.class, CustomFolderNode.class, UseCaseNode.class, PortletNode.class},
-            itemName = {"documentNode", "folderNode", "customNode", "customFolderNode", "useCaseNode", "portletNode"})
+    @XmlCollection(itemClasses = {DocumentNode.class, FolderNode.class, CustomNode.class, CustomFolderNode.class, UseCaseNode.class, PortletNode.class},
+            itemNames = {"documentNode", "folderNode", "customNode", "customFolderNode", "useCaseNode", "portletNode"}, order = 1)
     public List<SiteNode> getChildNodes() {
         return childNodes;
     }
@@ -180,7 +180,7 @@ public abstract class  SiteNode implements ModelObject {
         this.actualId = actualId;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 4)
     public String getUrl() {
         return url;
     }

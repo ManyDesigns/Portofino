@@ -111,7 +111,7 @@ public class Schema implements ModelObject {
         return database.getDatabaseName();
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getSchemaName() {
         return schemaName;
     }
@@ -120,7 +120,7 @@ public class Schema implements ModelObject {
         this.schemaName = schemaName;
     }
 
-    @XmlCollection(itemClass = Table.class, itemName = "table")
+    @XmlCollection(itemClasses = Table.class, itemNames = "table", order = 1)
     public List<Table> getTables() {
         return tables;
     }

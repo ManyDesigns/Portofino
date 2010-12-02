@@ -265,7 +265,7 @@ public abstract class ConnectionProvider {
     // Getters/setters
     //**************************************************************************
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getDatabaseName() {
         return databaseName;
     }
@@ -274,7 +274,7 @@ public abstract class ConnectionProvider {
         this.databaseName = databaseName;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 2)
     public String getIncludeSchemas() {
         return includeSchemas;
     }
@@ -283,7 +283,7 @@ public abstract class ConnectionProvider {
         this.includeSchemas = includeSchemas;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 3)
     public String getExcludeSchemas() {
         return excludeSchemas;
     }

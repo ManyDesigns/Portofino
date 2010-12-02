@@ -222,12 +222,12 @@ public class Model {
     // Getters/setter
     //**************************************************************************
 
-    @XmlCollection(itemClass = Database.class, itemName = "database")
+    @XmlCollection(itemClasses = Database.class, itemNames = "database", order = 1)
     public List<Database> getDatabases() {
         return databases;
     }
 
-    @XmlElement(required = false)
+    @XmlElement(required = false, order = 2)
     public RootNode getRootNode() {
         return rootNode;
     }

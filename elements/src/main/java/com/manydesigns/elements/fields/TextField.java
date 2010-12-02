@@ -29,18 +29,17 @@
 
 package com.manydesigns.elements.fields;
 
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.HighlightLinks;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import com.manydesigns.elements.Mode;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -125,16 +124,10 @@ public class TextField extends AbstractTextField {
 
     public void readFromObject(Object obj) {
         super.readFromObject(obj);
-        try {
-            if (obj == null) {
-                stringValue = null;
-            } else {
-                stringValue = (String)accessor.get(obj);
-            }
-        } catch (IllegalAccessException e) {
-            throw new Error(e);
-        } catch (InvocationTargetException e) {
-            throw new Error(e);
+        if (obj == null) {
+            stringValue = null;
+        } else {
+            stringValue = (String)accessor.get(obj);
         }
     }
 

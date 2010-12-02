@@ -101,7 +101,7 @@ public class Database implements ModelObject {
     // Getters/setter
     //**************************************************************************
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getDatabaseName() {
         return databaseName;
     }
@@ -110,7 +110,7 @@ public class Database implements ModelObject {
         this.databaseName = databaseName;
     }
 
-    @XmlCollection(itemClass = Schema.class, itemName = "schema")
+    @XmlCollection(itemClasses = Schema.class, itemNames = "schema", order = 1)
     public List<Schema> getSchemas() {
         return schemas;
     }

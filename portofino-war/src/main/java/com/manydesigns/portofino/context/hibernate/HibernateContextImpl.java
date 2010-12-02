@@ -46,7 +46,6 @@ import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;
 import com.manydesigns.portofino.model.diff.MergeDiffer;
-import com.manydesigns.portofino.model.io.ModelWriter;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -54,6 +53,7 @@ import com.manydesigns.portofino.reflection.UseCaseAccessor;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.xml.XmlParser;
+import com.manydesigns.portofino.xml.XmlWriter;
 import org.apache.commons.lang.time.StopWatch;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
@@ -148,9 +148,9 @@ public class HibernateContextImpl implements Context {
     }
 
     public void saveXmlModel() {
-        ModelWriter modelWriter = new ModelWriter();
+        XmlWriter modelWriter = new XmlWriter();
         try {
-            modelWriter.write(model, xmlModelFile);
+            modelWriter.write(xmlModelFile, model, "model");
             LogUtil.infoMF(logger,
                     "Saved xml model to file: {0}", xmlModelFile);
         } catch (Throwable e) {
@@ -241,7 +241,7 @@ public class HibernateContextImpl implements Context {
         Session session = getSession(qualifiedTableName);
         TableAccessor table = getTableAccessor(qualifiedTableName);
         String actualEntityName = table.getTable().getActualEntityName();
-        Object result = null;
+        Object result;
         PropertyAccessor[] keyProperties = table.getKeyProperties();
         int size = keyProperties.length;
         if (size > 1) {
@@ -253,15 +253,8 @@ public class HibernateContextImpl implements Context {
         }
         startTimer();
         PropertyAccessor propertyAccessor = keyProperties[0];
-        try {
-            Serializable key = (Serializable) propertyAccessor.get(pk);
-            result = session.load(actualEntityName, key);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            LogUtil.warningMF(logger,
-                    "Cannot invoke property accessor for {0} on class {1}",
-                    e, propertyAccessor.getName(), table.getName());
-        }
+        Serializable key = (Serializable) propertyAccessor.get(pk);
+        result = session.load(actualEntityName, key);
         stopTimer();
         return result;
     }

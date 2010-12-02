@@ -107,13 +107,7 @@ public class XmlParser {
                 castValue = Util.convertValue(value, type);
             }
 
-            try {
-                propertyAccessor.set(object, castValue);
-            } catch (Throwable e) {
-                LogUtil.warningMF(logger,
-                        "Cannot set attribute/property ''{0}''. {1}",
-                        e, name, getLocationString());
-            }
+            propertyAccessor.set(object, castValue);
         }
 
         // look for any unused attributes
@@ -434,8 +428,8 @@ public class XmlParser {
             XmlCollection xmlClassCollectionAnnotation =
                     classAccessor.getAnnotation(XmlCollection.class);
             if (xmlClassCollectionAnnotation != null) {
-                Class[] itemClass = xmlClassCollectionAnnotation.itemClass();
-                String[] itemName = xmlClassCollectionAnnotation.itemName();
+                Class[] itemClass = xmlClassCollectionAnnotation.itemClasses();
+                String[] itemName = xmlClassCollectionAnnotation.itemNames();
                 int itemMin = xmlClassCollectionAnnotation.itemMin();
                 int itemMax = xmlClassCollectionAnnotation.itemMax();
 
@@ -467,8 +461,8 @@ public class XmlParser {
                     boolean required = xmlCollectionAnnotation.required();
                     String collectionName = propertyAccessor.getName();
 
-                    Class[] itemClass = xmlCollectionAnnotation.itemClass();
-                    String[] itemName = xmlCollectionAnnotation.itemName();
+                    Class[] itemClass = xmlCollectionAnnotation.itemClasses();
+                    String[] itemName = xmlCollectionAnnotation.itemNames();
                     int itemMin = xmlCollectionAnnotation.itemMin();
                     int itemMax = xmlCollectionAnnotation.itemMax();
 

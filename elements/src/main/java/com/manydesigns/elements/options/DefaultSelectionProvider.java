@@ -203,22 +203,14 @@ public class DefaultSelectionProvider implements SelectionProvider {
             String[] labels = new String[fieldsCount];
             int j = 0;
             for (PropertyAccessor property : propertyAccessors) {
-                try {
-                    Object value = property.get(current);
-                    values[j] = value;
-                    if (textFormats == null || textFormats[j] == null) {
-                        String label = Util.convertValueToString(value);
-                        labels[j] = label;
-                    } else {
-                        TextFormat textFormat = textFormats[j];
-                        labels[j] = textFormat.format(current);
-                    }
-                } catch (Throwable e) {
-                    String msg = MessageFormat.format(
-                            "Could not access property: {0}",
-                            property.getName());
-                    LogUtil.warning(logger, msg, e);
-                    throw new IllegalArgumentException(msg, e);
+                Object value = property.get(current);
+                values[j] = value;
+                if (textFormats == null || textFormats[j] == null) {
+                    String label = Util.convertValueToString(value);
+                    labels[j] = label;
+                } else {
+                    TextFormat textFormat = textFormats[j];
+                    labels[j] = textFormat.format(current);
                 }
                 j++;
             }

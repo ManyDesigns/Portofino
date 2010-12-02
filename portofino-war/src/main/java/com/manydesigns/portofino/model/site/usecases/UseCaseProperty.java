@@ -96,7 +96,7 @@ public class UseCaseProperty implements ModelObject {
     // Getters/setters
     //**************************************************************************
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getName() {
         return name;
     }
@@ -105,7 +105,7 @@ public class UseCaseProperty implements ModelObject {
         this.name = name;
     }
 
-    @XmlCollection (itemClass = Annotation.class, itemName = "annotation")
+    @XmlCollection (itemClasses = Annotation.class, itemNames = "annotation", order = 1)
     public List<Annotation> getAnnotations() {
         return annotations;
     }

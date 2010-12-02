@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-@XmlCollection(itemClass = PrimaryKeyColumn.class, itemName = "column")
+@XmlCollection(itemClasses = PrimaryKeyColumn.class, itemNames = "column", order = 1)
 public class PrimaryKey extends ArrayList<PrimaryKeyColumn> implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -153,7 +153,7 @@ public class PrimaryKey extends ArrayList<PrimaryKeyColumn> implements ModelObje
         return table.getTableName();
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getPrimaryKeyName() {
         return primaryKeyName;
     }

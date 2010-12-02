@@ -29,8 +29,8 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
 
 /*
@@ -112,7 +112,7 @@ public class Reference implements ModelObject {
         return foreignKey.getFromTableName();
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getFromColumn() {
         return fromColumn;
     }
@@ -133,7 +133,7 @@ public class Reference implements ModelObject {
         return foreignKey.getToTable();
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 2)
     public String getToColumn() {
         return toColumn;
     }

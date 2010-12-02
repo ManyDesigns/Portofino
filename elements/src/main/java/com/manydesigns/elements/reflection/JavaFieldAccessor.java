@@ -76,12 +76,22 @@ public class JavaFieldAccessor implements PropertyAccessor {
         return field.getModifiers();
     }
 
-    public Object get(Object obj) throws IllegalAccessException {
-        return field.get(obj);
+    public Object get(Object obj) {
+        try {
+            return field.get(obj);
+        } catch (IllegalAccessException e) {
+            throw new ReflectionException(
+                    String.format("Cannot get property: %s", getName()), e);
+        }
     }
 
-    public void set(Object obj, Object value) throws IllegalAccessException {
-        field.set(obj, value);
+    public void set(Object obj, Object value) {
+        try {
+            field.set(obj, value);
+        } catch (IllegalAccessException e) {
+            throw new ReflectionException(
+                    String.format("Cannot set property: %s", getName()), e);
+        }
     }
 
     

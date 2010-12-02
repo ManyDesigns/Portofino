@@ -46,4 +46,5 @@ public @interface XmlAttribute {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     boolean required();
+    int order();
 }

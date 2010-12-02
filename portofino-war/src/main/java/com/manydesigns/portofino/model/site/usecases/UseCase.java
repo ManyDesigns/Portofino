@@ -176,33 +176,33 @@ public class UseCase {
         return parentUseCase;
     }
 
-    @XmlCollection(itemClass = UseCaseProperty.class, itemName = "property")
+    @XmlCollection(itemClasses = UseCaseProperty.class, itemNames = "property", order = 1)
     public List<UseCaseProperty> getProperties() {
         return properties;
     }
 
-    @XmlCollection(itemClass = ModelSelectionProvider.class, itemName = "selectionProvider")
+    @XmlCollection(itemClasses = ModelSelectionProvider.class, itemNames = "selectionProvider", order = 2)
     public List<ModelSelectionProvider> getSelectionProviders() {
         return selectionProviders;
     }
 
-    @XmlCollection(itemClass = Button.class, itemName = "button")
-    public List<Button> getButtons() {
-        return buttons;
-    }
-
-    @XmlCollection(itemClass = Annotation.class, itemName = "annotation")
+    @XmlCollection(itemClasses = Annotation.class, itemNames = "annotation", order = 3)
     public List<Annotation> getModelAnnotations() {
         return annotations;
     }
 
-    @XmlCollection(itemClass = UseCase.class, itemName = "useCase")
+    @XmlCollection(itemClasses = Button.class, itemNames = "button", order = 4)
+    public List<Button> getButtons() {
+        return buttons;
+    }
+
+    @XmlCollection(itemClasses = UseCase.class, itemNames = "useCase", order = 5)
     public List<UseCase> getSubUseCases() {
         return subUseCases;
     }
 
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 1)
     public String getName() {
         return name;
     }
@@ -211,7 +211,7 @@ public class UseCase {
         this.name = name;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 2)
     public String getTable() {
         return table;
     }
@@ -228,7 +228,7 @@ public class UseCase {
         this.actualTable = actualTable;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 3)
     public String getQuery() {
         return query;
     }
@@ -237,7 +237,7 @@ public class UseCase {
         this.query = query;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 4)
     public String getSearchTitle() {
         return searchTitle;
     }
@@ -246,7 +246,7 @@ public class UseCase {
         this.searchTitle = searchTitle;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 5)
     public String getCreateTitle() {
         return createTitle;
     }
@@ -255,7 +255,7 @@ public class UseCase {
         this.createTitle = createTitle;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 6)
     public String getReadTitle() {
         return readTitle;
     }
@@ -264,7 +264,7 @@ public class UseCase {
         this.readTitle = readTitle;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute(required = false, order = 7)
     public String getEditTitle() {
         return editTitle;
     }

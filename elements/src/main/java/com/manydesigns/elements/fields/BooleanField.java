@@ -36,7 +36,6 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -121,16 +120,10 @@ public class BooleanField extends AbstractField {
 
     public void readFromObject(Object obj) {
         super.readFromObject(obj);
-        try {
-            if (obj == null) {
-                booleanValue = null;
-            } else {
-                booleanValue = (Boolean)accessor.get(obj);
-            }
-        } catch (IllegalAccessException e) {
-            throw new Error(e);
-        } catch (InvocationTargetException e) {
-            throw new Error(e);
+        if (obj == null) {
+            booleanValue = null;
+        } else {
+            booleanValue = (Boolean)accessor.get(obj);
         }
     }
 

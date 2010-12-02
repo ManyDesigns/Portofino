@@ -38,8 +38,8 @@ import java.util.ArrayList;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-@XmlCollection(itemClass = {JdbcConnectionProvider.class, JndiConnectionProvider.class},
-        itemName = {"jdbcConnection", "jndiConnection"})
+@XmlCollection(itemClasses = {JdbcConnectionProvider.class, JndiConnectionProvider.class},
+        itemNames = {"jdbcConnection", "jndiConnection"}, order = 1)
 public class Connections extends ArrayList<ConnectionProvider> {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";

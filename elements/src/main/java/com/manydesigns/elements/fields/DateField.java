@@ -151,25 +151,21 @@ public class DateField extends AbstractTextField {
 
     public void readFromObject(Object obj) {
         super.readFromObject(obj);
-        try {
-            if (obj == null) {
+        if (obj == null) {
+            dateValue = null;
+        } else {
+            Object value = accessor.get(obj);
+            if (value == null) {
                 dateValue = null;
             } else {
-                Object value = accessor.get(obj);
-                if (value == null) {
-                    dateValue = null;
-                } else {
-                    dateValue = (Date)value;
-                }
+                dateValue = (Date)value;
             }
-            if (dateValue == null) {
-                stringValue = null;
-            } else {
-                DateTime dateTime = new DateTime(dateValue);
-                stringValue = dateTimeFormatter.print(dateTime);
-            }
-        } catch (Throwable e) {
-            LogUtil.severe(logger, "Exception caught", e);
+        }
+        if (dateValue == null) {
+            stringValue = null;
+        } else {
+            DateTime dateTime = new DateTime(dateValue);
+            stringValue = dateTimeFormatter.print(dateTime);
         }
     }
 

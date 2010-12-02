@@ -91,19 +91,33 @@ public class JavaPropertyAccessor implements PropertyAccessor {
         return getter.getModifiers();
     }
 
-    public Object get(Object obj)
-            throws IllegalAccessException, InvocationTargetException {
-        return getter.invoke(obj);
+    public Object get(Object obj) {
+        try {
+            return getter.invoke(obj);
+        } catch (IllegalAccessException e) {
+            throw new ReflectionException(
+                    String.format("Cannot get property: %s", getName()), e);
+        } catch (InvocationTargetException e) {
+            throw new ReflectionException(
+                    String.format("Cannot get property: %s", getName()), e);
+        }
     }
 
-    public void set(Object obj, Object value)
-            throws IllegalAccessException, InvocationTargetException {
+    public void set(Object obj, Object value) {
         if (setter == null) {
-            LogUtil.warningMF(logger,
-                    "Setter not available for: {0}",
-                    propertyDescriptor.getName());
+            throw new ReflectionException(String.format(
+                    "Setter not available for property: %s", getName()));
         } else {
-            setter.invoke(obj, value);
+            try {
+                setter.invoke(obj, value);
+            } catch (IllegalAccessException e) {
+                throw new ReflectionException(
+                        String.format("Cannot set property: %s", getName()), e);
+
+            } catch (InvocationTargetException e) {
+                throw new ReflectionException(
+                        String.format("Cannot set property: %s", getName()), e);
+            }
         }
     }
 

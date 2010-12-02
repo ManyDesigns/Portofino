@@ -83,7 +83,7 @@ public class JndiConnectionProvider extends ConnectionProvider {
     // Getters/setters
     //**************************************************************************
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, order = 10)
     public String getJndiResource() {
         return jndiResource;
     }

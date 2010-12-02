@@ -331,13 +331,33 @@ public abstract class  AbstractCrudAction extends PortofinoAction
     }
 
     //**************************************************************************
-    // ExportReadPdf
+    // ExportSearchPdf
     //**************************************************************************
 
     public String exportSearchPdf() throws FOPException,
             IOException, TransformerException {
         File tempPdfFile = createExportTempFile();
         rootCrudUnit.exportSearchPdf(tempPdfFile);
+
+        inputStream = new FileInputStream(tempPdfFile);
+
+        contentType = "application/pdf";
+
+        fileName = tempPdfFile.getName() + ".pdf";
+
+        contentLength = tempPdfFile.length();
+
+        return EXPORT;
+    }
+
+     //**************************************************************************
+    // ExportSearchPdf
+    //**************************************************************************
+
+    public String exportReadPdf() throws FOPException,
+            IOException, TransformerException {
+        File tempPdfFile = createExportTempFile();
+        rootCrudUnit.exportReadPdf(tempPdfFile);
 
         inputStream = new FileInputStream(tempPdfFile);
 
