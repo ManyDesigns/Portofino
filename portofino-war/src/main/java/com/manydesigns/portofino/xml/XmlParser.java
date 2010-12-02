@@ -29,13 +29,14 @@
 
 package com.manydesigns.portofino.xml;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.stream.*;
 import java.io.File;
@@ -44,7 +45,6 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -63,7 +63,7 @@ public class XmlParser {
     protected Stack<String> elementStack = new Stack<String>();
 
     public static final Logger logger =
-            LogUtil.getLogger(XmlParser.class);
+            LoggerFactory.getLogger(XmlParser.class);
 
     public void initParser(InputStream inputStream) throws XMLStreamException {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -113,8 +113,7 @@ public class XmlParser {
         // look for any unused attributes
         for (String attribute : attributes.keySet()) {
             if (!usedAttributeSet.contains(attribute)) {
-                LogUtil.warningMF(logger,
-                        "Unknown attribute ''{0}''. {1}",
+                logger.warn("Unknown attribute '{}'. {}",
                         attribute, getLocationString());
             }
         }
@@ -152,13 +151,13 @@ public class XmlParser {
         switch (event) {
             case XMLStreamConstants.START_ELEMENT:
                 loadLocalName();
-                LogUtil.fineMF(logger, "START_ELEMENT: {0}", localName);
+                logger.debug("START_ELEMENT: {}", localName);
                 loadAttributes();
                 elementStack.push(localName);
                 break;
             case XMLStreamConstants.END_ELEMENT:
                 loadLocalName();
-                LogUtil.fineMF(logger, "END_ELEMENT: {0}", localName);
+                logger.debug("END_ELEMENT: {}", localName);
                 String matchingElementName = elementStack.pop();
                 if (!matchingElementName.equals(localName)) {
                     throw new Error(MessageFormat.format(
@@ -169,51 +168,50 @@ public class XmlParser {
                 }
                 break;
             case XMLStreamConstants.PROCESSING_INSTRUCTION:
-                LogUtil.fineMF(logger, "PROCESSING_INSTRUCTION");
+                logger.debug("PROCESSING_INSTRUCTION");
                 break;
             case XMLStreamConstants.CHARACTERS:
                 loadText();
-                LogUtil.fineMF(logger, "CHARACTERS: {0}", text);
+                logger.debug("CHARACTERS: {}", text);
                 break;
             case XMLStreamConstants.COMMENT:
-                LogUtil.fineMF(logger, "COMMENT");
+                logger.debug("COMMENT");
                 break;
             case XMLStreamConstants.SPACE:
-                LogUtil.fineMF(logger, "SPACE");
+                logger.debug("SPACE");
                 break;
             case XMLStreamConstants.START_DOCUMENT:
-                LogUtil.fineMF(logger, "START_DOCUMENT");
+                logger.debug("START_DOCUMENT");
                 break;
             case XMLStreamConstants.END_DOCUMENT:
-                LogUtil.fineMF(logger, "END_DOCUMENT");
+                logger.debug("END_DOCUMENT");
                 break;
             case XMLStreamConstants.ENTITY_REFERENCE:
-                LogUtil.fineMF(logger, "ENTITY_REFERENCE");
+                logger.debug("ENTITY_REFERENCE");
                 break;
             case XMLStreamConstants.ATTRIBUTE:
-                LogUtil.fineMF(logger, "ATTRIBUTE");
+                logger.debug("ATTRIBUTE");
                 break;
             case XMLStreamConstants.DTD:
-                LogUtil.fineMF(logger, "DTD");
+                logger.debug("DTD");
                 break;
             case XMLStreamConstants.CDATA:
                 loadText();
-                LogUtil.fineMF(logger, "CDATA: {0}", text);
+                logger.debug("CDATA: {}", text);
                 break;
             case XMLStreamConstants.NAMESPACE:
-                LogUtil.fineMF(logger, "NAMESPACE");
+                logger.debug("NAMESPACE");
                 break;
             case XMLStreamConstants.NOTATION_DECLARATION:
-                LogUtil.fineMF(logger, "NOTATION_DECLARATION");
+                logger.debug("NOTATION_DECLARATION");
                 break;
             case XMLStreamConstants.ENTITY_DECLARATION:
-                LogUtil.fineMF(logger, "ENTITY_DECLARATION");
+                logger.debug("ENTITY_DECLARATION");
                 break;
         }
     }
 
-    public void expectDocument(DocumentCallback callback) throws Exception {
-        callback.doDocument();
+    public void expectDocumentEnd() throws Exception {
         if (event != XMLStreamConstants.END_DOCUMENT) {
             throw new Error(MessageFormat.format(
                     "Document end expected but not found. {0}",
@@ -324,7 +322,7 @@ public class XmlParser {
             String attrName = xmlStreamReader.getAttributeLocalName(i);
             String attrvalue = xmlStreamReader.getAttributeValue(i);
             attributes.put(attrName, attrvalue);
-            LogUtil.fineMF(logger, "Attribute {0} = {1}", attrName, attrvalue);
+            logger.debug("Attribute {} = {}", attrName, attrvalue);
         }
     }
 
@@ -523,7 +521,7 @@ public class XmlParser {
 
     public Object parse(File file, Class rootClass,
                         String rootName) throws Exception {
-        LogUtil.infoMF(logger, "Parsing file: {0}", file.getAbsolutePath());
+        logger.info("Parsing file: {}", file.getAbsolutePath());
         InputStream input = new FileInputStream(file);
         return parse(input, rootClass, rootName);
     }
@@ -531,29 +529,10 @@ public class XmlParser {
     private Object parse(InputStream inputStream, Class rootClass,
                          String rootName) throws Exception {
         initParser(inputStream);
-        ModelDocumentCallback modelDocumentCallback =
-                new ModelDocumentCallback(rootClass, rootName);
-        expectDocument(modelDocumentCallback);
-        return modelDocumentCallback.model;
+        ElementCallback elementCallback =
+                new ElementCallback(rootClass, rootName, 1, 1);
+        expectElement(elementCallback);
+        expectDocumentEnd();
+        return elementCallback.obj;
     }
-
-    private class ModelDocumentCallback implements DocumentCallback {
-
-        private Class rootClass;
-        private String rootName;
-        private Object model;
-
-        private ModelDocumentCallback(Class rootClass, String rootName) {
-            this.rootClass = rootClass;
-            this.rootName = rootName;
-        }
-
-        public void doDocument() throws Exception {
-            ElementCallback elementCallback =
-                    new ElementCallback(rootClass, rootName, 1, 1);
-            expectElement(elementCallback);
-            model = elementCallback.obj;
-        }
-    }
-
 }

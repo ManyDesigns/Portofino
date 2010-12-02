@@ -29,15 +29,15 @@
 
 package com.manydesigns.portofino.database.platforms;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.database.ConnectionProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -56,7 +56,7 @@ public class DatabasePlatformsManager {
     protected static final DatabasePlatformsManager manager;
 
     public static final Logger logger =
-            LogUtil.getLogger(DatabasePlatformsManager.class);
+            LoggerFactory.getLogger(DatabasePlatformsManager.class);
 
     protected ArrayList<DatabasePlatform> databasePlatformList;
 
@@ -90,7 +90,7 @@ public class DatabasePlatformsManager {
         String listString = portofinoProperties.getProperty(
                 PortofinoProperties.DATABASE_PLATFORMS_LIST_PROPERTY);
         if (listString == null) {
-            logger.finer("Empty list");
+            logger.debug("Empty list");
             return;
         }
 
@@ -102,13 +102,12 @@ public class DatabasePlatformsManager {
 
     protected void addDatabasePlatform(String databasePlatformClassName) {
         databasePlatformClassName = databasePlatformClassName.trim();
-        LogUtil.finerMF(logger,
-                    "Adding database platform: {0}", databasePlatformClassName);
+        logger.debug("Adding database platform: {}", databasePlatformClassName);
         DatabasePlatform databasePlatform =
                 (DatabasePlatform)ReflectionUtil
                         .newInstance(databasePlatformClassName);
         if (databasePlatform == null) {
-            LogUtil.warningMF(logger, "Cannot load or instanciate: {0}",
+            logger.warn("Cannot load or instanciate: {}",
                     databasePlatformClassName);
         } else {
             databasePlatform.test();

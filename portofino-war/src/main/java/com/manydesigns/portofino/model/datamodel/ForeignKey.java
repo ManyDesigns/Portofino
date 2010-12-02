@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
@@ -37,11 +36,12 @@ import com.manydesigns.portofino.util.Pair;
 import com.manydesigns.portofino.xml.XmlAttribute;
 import com.manydesigns.portofino.xml.XmlCollection;
 import org.apache.commons.lang.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -102,7 +102,8 @@ public class ForeignKey implements ModelObject {
     // Logging
     //**************************************************************************
 
-    public static final Logger logger = LogUtil.getLogger(ForeignKey.class);
+    public static final Logger logger =
+            LoggerFactory.getLogger(ForeignKey.class);
 
     //**************************************************************************
     // Constructors and init
@@ -162,8 +163,7 @@ public class ForeignKey implements ModelObject {
                 Table.composeQualifiedName(toDatabase, toSchema, toTable);
         actualToTable = model.findTableByQualifiedName(qualifiedToTableName);
         if (actualToTable == null) {
-            LogUtil.warningMF(logger,
-                    "Cannor wire ''{0}'' to table ''{1}''",
+            logger.warn("Cannor wire '{}' to table '{}'",
                     this, qualifiedToTableName);
         } else {
             // wire up Table.oneToManyRelationships
@@ -210,8 +210,7 @@ public class ForeignKey implements ModelObject {
                 return annotation;
             }
         }
-        LogUtil.fineMF(logger,
-                "Model annotation not found: {0}", annotationType);
+        logger.debug("Model annotation not found: {}", annotationType);
         return null;
     }
 
@@ -235,7 +234,7 @@ public class ForeignKey implements ModelObject {
         return fromTable.getTableName();
     }
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true, order = 1, identifier = true)
     public String getForeignKeyName() {
         return foreignKeyName;
     }

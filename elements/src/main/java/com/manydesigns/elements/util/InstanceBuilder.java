@@ -30,9 +30,8 @@
 package com.manydesigns.elements.util;
 
 import com.manydesigns.elements.fields.helpers.FieldsManager;
-import com.manydesigns.elements.logging.LogUtil;
+import org.slf4j.Logger;
 
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -60,37 +59,30 @@ public class InstanceBuilder<T> {
     public T createInstance(String managerClassName) {
         Class managerClass = ReflectionUtil.loadClass(managerClassName);
         if (managerClass == null) {
-            LogUtil.warningMF(logger,
-                    "Cannot load class: {0}", managerClassName);
+            logger.warn("Cannot load class: {}", managerClassName);
             managerClass = defaultImplClass;
         }
 
         if (!clazz.isAssignableFrom(managerClass)) {
-            LogUtil.warningMF(logger,
-                    "Cannot use as {0}: {1}",
-                    clazz.getName(),
-                    managerClassName);
+            logger.warn("Cannot use as {}: {}",
+                    clazz.getName(), managerClassName);
             managerClass = defaultImplClass;
         }
-        LogUtil.finerMF(logger,
-                "Using class: {0}", managerClass.getName());
+        logger.debug("Using class: {}", managerClass.getName());
 
         T instance = (T)ReflectionUtil.newInstance(managerClass);
         if (instance == null) {
-            LogUtil.warningMF(logger,
-                    "Cannot instanciate: {0}. Fall back to default: {1}.",
+            logger.warn("Cannot instanciate: {}. Fall back to default: {}.",
                     managerClass.getName(),
                     FieldsManager.class.getName());
             instance = (T)ReflectionUtil.newInstance(defaultImplClass);
             if (instance == null) {
-                LogUtil.severeMF(logger,
-                        "Cannot instanciate: {0}",
+                logger.error("Cannot instanciate: {}",
                         defaultImplClass.getName());
             }
         }
 
-        LogUtil.finerMF(logger, "Installed {0}: {1}",
-                clazz.getName(), instance);
+        logger.debug("Installed {0}: {1}", clazz.getName(), instance);
         return instance;
     }
 

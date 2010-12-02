@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.database;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
-import com.manydesigns.portofino.database.platforms.AbstractDatabasePlatform;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
@@ -38,7 +37,6 @@ import com.manydesigns.portofino.model.diff.DiffUtil;
 import com.manydesigns.portofino.model.diff.MessageDiffer;
 
 import java.util.List;
-import java.util.logging.Level;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -62,7 +60,7 @@ public class JdbcMetadataReaderTest extends AbstractPortofinoTest {
     }
 
     public void testReadModelFromConnection() {
-        AbstractDatabasePlatform.logger.setLevel(Level.FINE);
+        //AbstractDatabasePlatform.logger.setLevel(Level.FINE);
 
         assertEquals(2, database.getSchemas().size());
         assertEquals(13, database.getAllTables().size());
@@ -70,7 +68,7 @@ public class JdbcMetadataReaderTest extends AbstractPortofinoTest {
     }
 
     public void testDiff() {
-        DiffUtil.logger.setLevel(Level.FINE);
+        //DiffUtil.logger.setLevel(Level.FINE);
         Database pippoDatabase = new Database("pippo");
         Schema publicSchema = new Schema(pippoDatabase, "PUBLIC");
         pippoDatabase.getSchemas().add(publicSchema);

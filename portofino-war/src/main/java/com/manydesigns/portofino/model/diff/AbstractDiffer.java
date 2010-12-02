@@ -29,12 +29,12 @@
 
 package com.manydesigns.portofino.model.diff;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -80,7 +80,8 @@ public abstract class AbstractDiffer {
     // Logging
     //--------------------------------------------------------------------------
 
-    public final static Logger logger = LogUtil.getLogger(AbstractDiffer.class);
+    public final static Logger logger =
+            LoggerFactory.getLogger(AbstractDiffer.class);
 
     //--------------------------------------------------------------------------
     // Constructor
@@ -108,7 +109,7 @@ public abstract class AbstractDiffer {
     }
 
     public void diffDatabaseSourceTargetNull(DatabaseDiff databaseDiff) {
-        logger.warning("Both souce and target databases are null");
+        logger.warn("Both souce and target databases are null");
     }
     public abstract void diffDatabaseSourceNull(DatabaseDiff databaseDiff);
     public abstract void diffDatabaseTargetNull(DatabaseDiff databaseDiff);
@@ -144,7 +145,7 @@ public abstract class AbstractDiffer {
     }
 
     public void diffSchemaSourceTargetNull(SchemaDiff schemaDiff) {
-        logger.warning("Both source and target schemas are null");
+        logger.warn("Both source and target schemas are null");
     }
     public abstract void diffSchemaSourceNull(SchemaDiff schemaDiff);
     public abstract void diffSchemaTargetNull(SchemaDiff schemaDiff);
@@ -180,7 +181,7 @@ public abstract class AbstractDiffer {
     }
 
     public void diffTableSourceTargetNull(TableDiff tableDiff) {
-        logger.warning("Both source and target tables are null");
+        logger.warn("Both source and target tables are null");
     }
     public abstract void diffTableSourceNull(TableDiff tableDiff);
     public abstract void diffTableTargetNull(TableDiff tableDiff);
@@ -225,8 +226,8 @@ public abstract class AbstractDiffer {
     }
 
     public void diffTableAnnotationSourceTargetNull(ModelAnnotationDiff modelAnnotationDiff) {
-        LogUtil.warningMF(logger, "Both source and target table " +
-                "annotations are null. Tables: {0}/{1}",
+        logger.warn("Both source and target table " +
+                "annotations are null. Tables: {}/{}",
                 sourceTable, targetTable);
     }
     public abstract void diffTableAnnotationSourceNull(ModelAnnotationDiff modelAnnotationDiff);
@@ -261,7 +262,7 @@ public abstract class AbstractDiffer {
     }
 
     public void diffColumnSourceTargetNull(ColumnDiff columnDiff) {
-        logger.warning("Both source and target columns are null");
+        logger.warn("Both source and target columns are null");
     }
     public abstract void diffColumnSourceNull(ColumnDiff columnDiff);
     public abstract void diffColumnTargetNull(ColumnDiff columnDiff);
@@ -300,7 +301,7 @@ public abstract class AbstractDiffer {
     }
 
     public void diffColumnAnnotationSourceTargetNull(ModelAnnotationDiff modelAnnotationDiff) {
-        logger.warning("Both source and target column annotations are null");
+        logger.warn("Both source and target column annotations are null");
     }
     public abstract void diffColumnAnnotationSourceNull(ModelAnnotationDiff modelAnnotationDiff);
     public abstract void diffColumnAnnotationTargetNull(ModelAnnotationDiff modelAnnotationDiff);
@@ -328,7 +329,7 @@ public abstract class AbstractDiffer {
     }
 
     public void diffPrimaryKeySourceTargetNull(PrimaryKeyDiff primaryKeyDiff) {
-        logger.warning("Both source and target primary keys are null");
+        logger.warn("Both source and target primary keys are null");
     }
     public abstract void diffPrimaryKeySourceNull(PrimaryKeyDiff primaryKeyDiff);
     public abstract void diffPrimaryKeyTargetNull(PrimaryKeyDiff primaryKeyDiff);
@@ -367,7 +368,7 @@ public abstract class AbstractDiffer {
     }
 
     public void diffPrimaryKeyColumnSourceTargetNull(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
-        logger.warning("Both source and target primary key columns are null");
+        logger.warn("Both source and target primary key columns are null");
     }
     public abstract void diffPrimaryKeyColumnSourceNull(PrimaryKeyColumnDiff primaryKeyColumnDiff);
     public abstract void diffPrimaryKeyColumnTargetNull(PrimaryKeyColumnDiff primaryKeyColumnDiff);
@@ -403,7 +404,7 @@ public abstract class AbstractDiffer {
     }
 
     public void diffForeignKeySourceTargetNull(ForeignKeyDiff foreignKeyDiff) {
-        logger.warning("Both source and target foreign keys are null");
+        logger.warn("Both source and target foreign keys are null");
     }
     public abstract void diffForeignKeySourceNull(ForeignKeyDiff foreignKeyDiff);
     public abstract void diffForeignKeyTargetNull(ForeignKeyDiff foreignKeyDiff);
@@ -442,7 +443,7 @@ public abstract class AbstractDiffer {
     }
 
     public void diffReferenceSourceTargetNull(ReferenceDiff referenceDiff) {
-        logger.warning("Both source and target references are null");
+        logger.warn("Both source and target references are null");
     }
     public abstract void diffReferenceSourceNull(ReferenceDiff referenceDiff);
     public abstract void diffReferenceTargetNull(ReferenceDiff referenceDiff);
@@ -480,7 +481,7 @@ public abstract class AbstractDiffer {
     }
 
     public void diffForeignKeyAnnotationSourceTargetNull(ModelAnnotationDiff modelAnnotationDiff) {
-        logger.warning("Both source and target foreign key annotations are null");
+        logger.warn("Both source and target foreign key annotations are null");
     }
     public abstract void diffForeignKeyAnnotationSourceNull(ModelAnnotationDiff modelAnnotationDiff);
     public abstract void diffForeignKeyAnnotationTargetNull(ModelAnnotationDiff modelAnnotationDiff);

@@ -29,13 +29,14 @@
 package com.manydesigns.portofino.email;
 
 import com.manydesigns.elements.fields.search.Criteria;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Set;
@@ -43,7 +44,6 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
 
 
 /*
@@ -66,7 +66,7 @@ public class EmailTask extends TimerTask {
             = new ConcurrentLinkedQueue<EmailSender>();
     protected final POP3Client client;
     protected static final Logger logger =
-            LogUtil.getLogger(TimerTask.class);
+            LoggerFactory.getLogger(TimerTask.class);
     protected final Context context;
     private static final String USERTABLE = UserUtils.USERTABLE;
 
@@ -136,12 +136,12 @@ public class EmailTask extends TimerTask {
                     context.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
                     context.commit(EmailUtils.PORTOFINO);
                 } catch (Throwable e) {
-                    LogUtil.warning(logger, "cannot store email state", e);
+                    logger.warn("cannot store email state", e);
                 }
                 outbox.submit(emailSender);                
             }
         } catch (NoSuchFieldException e) {
-            LogUtil.warning(logger,"No state field in emailQueue",e);
+            logger.warn("No state field in emailQueue",e);
         }
     }
 
@@ -157,12 +157,12 @@ public class EmailTask extends TimerTask {
                     EmailUtils.deleteEmail(context,email.getEmailBean());
                     context.commit(EmailUtils.PORTOFINO);
                 } catch (Throwable e) {
-                    LogUtil.warning(logger, "Cannot delete email", e);
+                    logger.warn("Cannot delete email", e);
                 }
             }
         while (!rejectedQueue.isEmpty()) {
             EmailSender email = rejectedQueue.poll();
-            LogUtil.finestMF(logger, "Adding reject mail with id:"
+            logger.debug("Adding reject mail with id:"
                     + email.getEmailBean().getId());
             email.getEmailBean().setState(EmailUtils.TOBESENT);
             EmailUtils.updateEmail(context, email.getEmailBean());
@@ -186,7 +186,7 @@ public class EmailTask extends TimerTask {
             List<Object> users = context.getObjects(
                     criteria.gt(accessor.getProperty("email"), email));
             if (users.size()==0){
-                LogUtil.warningMF(logger,"no user found for email {0}", email);
+                logger.warn("no user found for email {}", email);
                 return;
             }
             User user = (User) users.get(0);
@@ -199,7 +199,7 @@ public class EmailTask extends TimerTask {
             user.setBounced(value);
             context.saveObject(USERTABLE, user);
         } catch (NoSuchFieldException e) {
-            LogUtil.warning(logger,"cannot increment bounce for user", e);
+            logger.warn("cannot increment bounce for user", e);
         }
     }
 }

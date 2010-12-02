@@ -33,7 +33,6 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.InSummary;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -42,12 +41,13 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -72,7 +72,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
     protected Mode mode = Mode.EDIT;
 
     public static final Logger logger =
-            LogUtil.getLogger(TableFormBuilder.class);
+            LoggerFactory.getLogger(TableFormBuilder.class);
 
 
     //**************************************************************************
@@ -103,8 +103,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
                         classAccessor.getProperty(currentField);
                 propertyAccessors.add(accessor);
             } catch (NoSuchFieldException e) {
-                LogUtil.warningMF(logger, "Field not found: {0}", e,
-                        currentField);
+                logger.warn("Field not found: {}", currentField);
             }
         }
         return this;
@@ -142,7 +141,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
             InSummary inSummaryAnnotation =
                     current.getAnnotation(InSummary.class);
             if (inSummaryAnnotation != null && !inSummaryAnnotation.value()) {
-                LogUtil.finerMF(logger, "Skipping non-in-summary field: {0}",
+                logger.debug("Skipping non-in-summary field: {}",
                         current.getName());
                 continue;
             }
@@ -210,8 +209,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
                 PropertyAccessor propertyAccessor = propertyAccessors.get(j);
                 Field field = buildField(propertyAccessor, rowPrefix);
                 if (field == null) {
-                    LogUtil.warningMF(logger,
-                            "Cannot instanciate field for property {0}",
+                    logger.warn("Cannot instanciate field for property {}",
                             propertyAccessor);
                     break;
                 }

@@ -112,7 +112,7 @@ public class Reference implements ModelObject {
         return foreignKey.getFromTableName();
     }
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true, order = 1, identifier = true)
     public String getFromColumn() {
         return fromColumn;
     }
@@ -133,7 +133,7 @@ public class Reference implements ModelObject {
         return foreignKey.getToTable();
     }
 
-    @XmlAttribute(required = true, order = 2)
+    @XmlAttribute(required = true, order = 2, identifier = true)
     public String getToColumn() {
         return toColumn;
     }

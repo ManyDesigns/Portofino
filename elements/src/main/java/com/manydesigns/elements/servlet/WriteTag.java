@@ -30,17 +30,17 @@
 package com.manydesigns.elements.servlet;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.TagSupport;
-import java.util.logging.Logger;
 
 
 /*
@@ -73,7 +73,7 @@ public class WriteTag extends TagSupport {
     // Logging
     //--------------------------------------------------------------------------
 
-    public final static Logger logger = LogUtil.getLogger(WriteTag.class);
+    public final static Logger logger = LoggerFactory.getLogger(WriteTag.class);
 
     //--------------------------------------------------------------------------
     // TabSupport override
@@ -103,7 +103,7 @@ public class WriteTag extends TagSupport {
         } else if (PAGE_SCOPE.equals(scope)){
             scopeCode = PageContext.PAGE_SCOPE;
         } else {
-            LogUtil.warningMF(logger, "Unknown scope: {0}", scope);
+            logger.warn("Unknown scope: {}", scope);
             return;
         }
 
@@ -115,9 +115,7 @@ public class WriteTag extends TagSupport {
         }
 
         if (bean == null) {
-            LogUtil.warningMF(logger,
-                    "Bean {0} not found in scope {1}",
-                    name, scope);
+            logger.warn("Bean {} not found in scope {}", name, scope);
             return;
         }
 
@@ -136,9 +134,8 @@ public class WriteTag extends TagSupport {
             XhtmlBuffer xb = new XhtmlBuffer(out);
             xhtmlFragment.toXhtml(xb);
         } else {
-            LogUtil.warningMF(logger,
-                    "Bean {0} scope {1} property {2} not of type XhtmlFragment",
-                    name, scope, property);
+            logger.warn("Bean {} scope {} property {} not of type XhtmlFragment",
+                    new String[] {name, scope, property});
         }
     }
 

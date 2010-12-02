@@ -31,11 +31,12 @@ package com.manydesigns.portofino.database;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Status;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.xml.XmlAttribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -43,7 +44,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /*
@@ -105,7 +105,7 @@ public abstract class ConnectionProvider {
     //**************************************************************************
 
     public static final Logger logger =
-            LogUtil.getLogger(JdbcConnectionProvider.class);
+            LoggerFactory.getLogger(JdbcConnectionProvider.class);
 
 
     //**************************************************************************
@@ -215,7 +215,7 @@ public abstract class ConnectionProvider {
                 errorMessage = MessageFormat.format(
                         "Database abstraction not found for {0}",
                         databaseProductName);
-                logger.warning(errorMessage);
+                logger.warn(errorMessage);
             } else {
                 status = STATUS_CONNECTED;
                 errorMessage = null;
@@ -223,9 +223,8 @@ public abstract class ConnectionProvider {
         } catch (Throwable e) {
             status = STATUS_ERROR;
             errorMessage = e.getMessage();
-            LogUtil.warningMF(logger,
-                    "Could not create database abstraction for {0}",
-                    e, databaseName);
+            logger.warn("Could not create database abstraction for " +
+                    databaseName, e);
         } finally {
             DbUtil.closeResultSetAndStatement(typeRs);
             releaseConnection(conn);
@@ -383,7 +382,7 @@ public abstract class ConnectionProvider {
                 return current;
             }
         }
-        LogUtil.severeMF(logger, "Could not find type: {0}", typeName);
+        logger.error("Could not find type: {}", typeName);
         return null;
     }
 

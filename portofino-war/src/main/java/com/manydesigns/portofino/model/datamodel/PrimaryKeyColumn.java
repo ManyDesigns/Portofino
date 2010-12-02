@@ -29,12 +29,12 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -63,7 +63,7 @@ public class PrimaryKeyColumn implements ModelObject {
     //**************************************************************************
 
     public static final Logger logger =
-            LogUtil.getLogger(PrimaryKeyColumn.class);
+            LoggerFactory.getLogger(PrimaryKeyColumn.class);
 
     //**************************************************************************
     // Constructors
@@ -93,8 +93,7 @@ public class PrimaryKeyColumn implements ModelObject {
     public void init(Model model) {
         actualColumn = primaryKey.getTable().findColumnByName(columnName);
         if (actualColumn == null) {
-            LogUtil.warningMF(logger,
-                    "Cannor wire primary key column ''{0}'' to primary key ''{1}''",
+            logger.warn("Cannor wire primary key column '{}' to primary key '{}'",
                     columnName, primaryKey);
 
         }
@@ -108,7 +107,7 @@ public class PrimaryKeyColumn implements ModelObject {
         return primaryKey;
     }
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true, order = 1, identifier = true)
     public String getColumnName() {
         return columnName;
     }

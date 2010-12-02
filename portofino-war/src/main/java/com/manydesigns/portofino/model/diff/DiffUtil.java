@@ -29,13 +29,13 @@
 
 package com.manydesigns.portofino.model.diff;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -46,7 +46,7 @@ public class DiffUtil {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public static final Logger logger = LogUtil.getLogger(DiffUtil.class);
+    public static final Logger logger = LoggerFactory.getLogger(DiffUtil.class);
 
     //--------------------------------------------------------------------------
     // Compare

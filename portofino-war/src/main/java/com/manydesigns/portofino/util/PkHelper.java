@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.util;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.struts2.Struts2Util;
@@ -37,11 +36,12 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -56,7 +56,7 @@ public class PkHelper {
     // Fields
     //**************************************************************************
 
-    public final static Logger logger = LogUtil.getLogger(PkHelper.class);
+    public final static Logger logger = LoggerFactory.getLogger(PkHelper.class);
 
     protected final ClassAccessor classAccessor;
 

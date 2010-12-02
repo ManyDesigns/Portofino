@@ -29,10 +29,12 @@
 package com.manydesigns.portofino.context.hibernate;
 
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.database.*;
+import com.manydesigns.portofino.database.ConnectionProvider;
+import com.manydesigns.portofino.database.DbUtil;
+import com.manydesigns.portofino.database.JdbcConnectionProvider;
+import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.Reference;
@@ -44,11 +46,12 @@ import org.hibernate.cfg.Mappings;
 import org.hibernate.id.PersistentIdentifierGenerator;
 import org.hibernate.id.enhanced.SequenceStyleGenerator;
 import org.hibernate.mapping.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.List;
-import java.util.logging.Logger;
 
 
 /**
@@ -62,7 +65,7 @@ public class HibernateConfig {
     private static final String SHOW_SQL = "true";
     private static final boolean LAZY = true;
     public static final Logger logger =
-            LogUtil.getLogger(HibernateConfig.class);
+            LoggerFactory.getLogger(HibernateConfig.class);
 
 
     public HibernateConfig(ConnectionProvider connectionProvider) {
@@ -113,7 +116,7 @@ public class HibernateConfig {
         for (Schema schema : database.getSchemas()) {
             for (com.manydesigns.portofino.model.datamodel.Table aTable :
                     schema.getTables()) {
-                LogUtil.finestMF(logger, MessageFormat.format("Class - {0} ",
+                logger.debug(MessageFormat.format("Class - {0} ",
                                 aTable.getQualifiedName()));
                 RootClass clazz = createTableMapping(
                         mappings, aTable);
@@ -132,7 +135,7 @@ public class HibernateConfig {
                     schema.getTables()) {
                 for (ForeignKey rel : aTable.getForeignKeys()) {
                     if (BooleanUtils.isTrue(aTable.getManyToMany())) {
-                        LogUtil.finestMF(logger, MessageFormat.format("Many to one - {0} {1}",
+                        logger.debug(MessageFormat.format("Many to one - {0} {1}",
                                 aTable.getQualifiedName(), rel.getForeignKeyName()));
                         createM2O(configuration, mappings, rel);
                     }
@@ -146,7 +149,7 @@ public class HibernateConfig {
             for (com.manydesigns.portofino.model.datamodel.Table aTable :
                     schema.getTables()) {
                 for (ForeignKey rel : aTable.getOneToManyRelationships()) {
-                     LogUtil.finestMF(logger, MessageFormat.format("One to many - {0} {1}",
+                     logger.debug(MessageFormat.format("One to many - {0} {1}",
                                 aTable.getQualifiedName(), rel.getForeignKeyName()));
                     createO2M(database, configuration, mappings, rel);
                 }
@@ -218,8 +221,9 @@ public class HibernateConfig {
         String columnType = column.getColumnType();
         Type type = connectionProvider.getTypeByName(columnType);
         if (type==null) {
-            LogUtil.severeMF(logger, "Cannot find JDBC type for table {0}," +
-                    " column {1}, type {2}", tab.getName(), column.getColumnName(), columnType);
+            logger.error("Cannot find JDBC type for table {}," +
+                    " column {}, type {}",
+                    new String[] {tab.getName(), column.getColumnName(), columnType});
         }
 
         col.setSqlTypeCode(type.getJdbcType());
@@ -280,8 +284,9 @@ public class HibernateConfig {
 
             Type type = connectionProvider.getTypeByName(columnType);
             if (type==null) {
-            LogUtil.severeMF(logger, "Cannot find JDBC type for table {0}," +
-                    " column {1}, type {2}", tab.getName(), column.getColumnName(), columnType);
+            logger.error("Cannot find JDBC type for table {}," +
+                    " column {}, type {}",
+                    new String[] {tab.getName(), column.getColumnName(), columnType});
             }
             col.setSqlTypeCode(type.getJdbcType());
             col.setSqlType(columnType);
@@ -332,8 +337,9 @@ public class HibernateConfig {
         col.setNullable(column.isNullable());
         Type type = connectionProvider.getTypeByName(columnType);
         if (type==null) {
-            LogUtil.severeMF(logger, "Cannot find JDBC type for table {0}," +
-                    " column {1}, type {2}", tab.getName(), column.getColumnName(), columnType);
+            logger.error("Cannot find JDBC type for table {}," +
+                    " column {}, type {}",
+                    new String[] {tab.getName(), column.getColumnName(), columnType});
         }
         col.setSqlTypeCode(type.getJdbcType());
         col.setSqlType(columnType);

@@ -28,7 +28,8 @@
  */
 package com.manydesigns.portofino.email;
 
-import com.manydesigns.elements.logging.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.mail.BodyPart;
 import javax.mail.Multipart;
@@ -37,7 +38,6 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,7 +58,7 @@ public abstract class POP3Client {
     protected final String password;
     protected final Properties pop3Props;
       public static final Logger logger =
-            LogUtil.getLogger(POP3Client.class);
+              LoggerFactory.getLogger(POP3Client.class);
 
     protected Set<String> emails;
 

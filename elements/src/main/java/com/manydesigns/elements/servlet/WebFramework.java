@@ -30,16 +30,16 @@
 package com.manydesigns.elements.servlet;
 
 import com.manydesigns.elements.ElementsProperties;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.InstanceBuilder;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -67,7 +67,8 @@ public class WebFramework {
     // Logging
     //**************************************************************************
 
-    public static final Logger logger = LogUtil.getLogger(WebFramework.class);
+    public static final Logger logger =
+            LoggerFactory.getLogger(WebFramework.class);
 
     //**************************************************************************
     // Static initialization
@@ -104,8 +105,7 @@ public class WebFramework {
 
     public Upload getUpload(HttpServletRequest req, String parameter) {
         if (!(req instanceof MultipartRequest)) {
-            LogUtil.warningMF(logger,
-                    "Request is not an instance of {0}. Actual type: {1}",
+            logger.warn("Request is not an instance of {}. Actual type: {}",
                     MultipartRequest.class.getName(),
                     req.getClass().getName());
             return null;
@@ -123,7 +123,7 @@ public class WebFramework {
                 String contentType = fileItem.getContentType();
                 return new Upload(fis, fileName, contentType);
             } catch (IOException e) {
-                logger.warning("Cannot read upload file.");
+                logger.warn("Cannot read upload file.");
                 return null;
             }
         }

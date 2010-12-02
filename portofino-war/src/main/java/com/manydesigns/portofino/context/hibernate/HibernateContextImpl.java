@@ -32,7 +32,6 @@ package com.manydesigns.portofino.context.hibernate;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.fields.search.Criterion;
 import com.manydesigns.elements.fields.search.TextMatchMode;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlSqlFormat;
@@ -55,6 +54,7 @@ import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.xml.XmlParser;
 import com.manydesigns.portofino.xml.XmlWriter;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
@@ -62,13 +62,14 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -101,7 +102,7 @@ public class HibernateContextImpl implements Context {
     protected File xmlModelFile;
 
     public static final Logger logger =
-            LogUtil.getLogger(HibernateContextImpl.class);
+            LoggerFactory.getLogger(HibernateContextImpl.class);
     private static final String PORTOFINO_PUBLIC_USERS = "portofino.public.users";
 
     //**************************************************************************
@@ -118,7 +119,7 @@ public class HibernateContextImpl implements Context {
     //**************************************************************************
 
     public void loadConnections(File file) {
-        LogUtil.infoMF(logger, "Loading connections from file: {0}",
+        logger.info("Loading connections from file: {}",
                 file.getAbsolutePath());
 
         XmlParser parser = new XmlParser();
@@ -129,14 +130,12 @@ public class HibernateContextImpl implements Context {
                 current.init();
             }
         } catch (Exception e) {
-            LogUtil.severeMF(logger, "Cannot load/parse file: {0}", e, file);
+            logger.error("Cannot load/parse file: " + file, e);
         }
-
-        LogUtil.exiting(logger, "loadConnectionsAsResource");
     }
 
     public void loadXmlModel(File file) {
-        LogUtil.infoMF(logger, "Loading xml model from file: {0}",
+        logger.info("Loading xml model from file: {}",
                 file.getAbsolutePath());
 
         XmlParser parser = new XmlParser();
@@ -146,7 +145,7 @@ public class HibernateContextImpl implements Context {
             installDataModel(loadedModel);
             xmlModelFile = file;
         } catch (Exception e) {
-            LogUtil.severeMF(logger, "Cannot load/parse model: {0}", e, file);
+            logger.error("Cannot load/parse model: " + file, e);
         }
     }
 
@@ -154,11 +153,9 @@ public class HibernateContextImpl implements Context {
         XmlWriter modelWriter = new XmlWriter();
         try {
             modelWriter.write(xmlModelFile, model, "model");
-            LogUtil.infoMF(logger,
-                    "Saved xml model to file: {0}", xmlModelFile);
+            logger.info("Saved xml model to file: {}", xmlModelFile);
         } catch (Throwable e) {
-            LogUtil.severeMF(logger,
-                    "Cannot save xml model to file: {0}", e, xmlModelFile);
+            logger.error("Cannot save xml model to file: " + xmlModelFile, e);
         }
     }
 
@@ -365,7 +362,7 @@ public class HibernateContextImpl implements Context {
             } else if (criterion instanceof Criteria.IsNotNullCriterion) {
                 hqlFormat = "{0} is not null";
             } else {
-                LogUtil.severeMF(logger, "Unrecognized criterion: ", criterion);
+                logger.error("Unrecognized criterion: {}", criterion);
                 throw new InternalError("Unrecognied criterion");
             }
 
@@ -416,7 +413,7 @@ public class HibernateContextImpl implements Context {
                 String msg = MessageFormat.format(
                         "Unrecognized text match mode: {0}",
                         textMatchMode);
-                logger.severe(msg);
+                logger.error(msg);
                 throw new InternalError(msg);
         }
         return pattern;
@@ -632,8 +629,7 @@ public class HibernateContextImpl implements Context {
                 try {
                     session.close();
                 } catch (Throwable e) {
-                    LogUtil.warning(logger,
-                            "Exception while closing Hibernate session", e);
+                    logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
                 }
             }
             current.setThreadSession(null);
@@ -717,9 +713,10 @@ public class HibernateContextImpl implements Context {
             stopTimer();
             return result;
         } catch (Throwable e) {
-            LogUtil.warningMF(logger,
-                    "Cannot access relationship {0} on table {1}",
-                    e, oneToManyRelationshipName, qualifiedTableName);
+            String msg = String.format(
+                    "Cannot access relationship %s on table %s",
+                    oneToManyRelationshipName, qualifiedTableName);
+            logger.warn(msg, e);
         }
         return null;
     }
@@ -769,9 +766,8 @@ public class HibernateContextImpl implements Context {
                 result.addAll(Arrays.asList(ddls));
 
             } catch (Throwable e) {
-                LogUtil.warningMF(logger,
-                        "Cannot retrieve DDLs for update DB for DB: {0}",
-                        e, db.getDatabaseName());
+                logger.warn("Cannot retrieve DDLs for update DB for DB: " +
+                        db.getDatabaseName(), e);
             } finally {
                 provider.releaseConnection(conn);
             }

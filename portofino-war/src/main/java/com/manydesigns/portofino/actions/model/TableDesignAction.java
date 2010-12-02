@@ -34,13 +34,12 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.Table;
-
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -85,7 +84,7 @@ public class TableDesignAction extends PortofinoAction {
     //**************************************************************************
 
     public static final Logger logger =
-            LogUtil.getLogger(TableDesignAction.class);
+            LoggerFactory.getLogger(TableDesignAction.class);
 
     //**************************************************************************
     // Action default execute method

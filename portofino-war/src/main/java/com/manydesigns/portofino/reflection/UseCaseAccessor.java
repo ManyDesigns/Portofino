@@ -29,14 +29,14 @@
 
 package com.manydesigns.portofino.reflection;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.model.site.usecases.UseCaseProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -60,7 +60,7 @@ public class UseCaseAccessor
     protected final UseCasePropertyAccessor[] keyPropertyAccessors;
 
     public final static Logger logger =
-            LogUtil.getLogger(UseCaseAccessor.class);
+            LoggerFactory.getLogger(UseCaseAccessor.class);
 
     //**************************************************************************
     // Constructors
@@ -87,9 +87,8 @@ public class UseCaseAccessor
                         new UseCasePropertyAccessor(property, columnAccessor);
                 propertyAccessors[i] = propertyAccessor;
             } catch (NoSuchFieldException e) {
-                LogUtil.severeMF(logger,
-                        "Could not access table property: {0}",
-                        e, propertyName);
+                logger.error("Could not access table property: " +
+                        propertyName, e);
             }
             i++;
         }
@@ -102,9 +101,7 @@ public class UseCaseAccessor
                         getProperty(keyColumnAccessor.getName());
                 keyPropertyAccessors[i] = keyPropertyAccessor;
             } catch (NoSuchFieldException e) {
-                LogUtil.severeMF(logger,
-                        "Could not find key property: {0}",
-                        e, propertyName);
+                logger.error("Could not find key property: " + propertyName, e);
             }
             i++;
         }

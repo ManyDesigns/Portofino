@@ -30,7 +30,6 @@
 package com.manydesigns.elements.fields.search;
 
 import com.manydesigns.elements.fields.BooleanSearchValue;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
@@ -92,8 +91,7 @@ public class BooleanSearchField extends AbstractSearchField {
                 criteria.eq(accessor, Boolean.TRUE);
                 break;
             default:
-                LogUtil.severeMF(logger,
-                        "Unknown BooleanSearchValue: {0}", value.name());
+                logger.error("Unknown BooleanSearchValue: {}", value.name());
         }
     }
 

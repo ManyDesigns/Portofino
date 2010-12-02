@@ -28,12 +28,12 @@
  */
 package com.manydesigns.portofino.email;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import org.apache.commons.mail.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,7 +49,7 @@ public class EmailSender implements Runnable{
     protected final int port;
     protected final EmailBean emailBean;
     protected static final Logger logger =
-            LogUtil.getLogger(EmailSender.class);
+            LoggerFactory.getLogger(EmailSender.class);
 
 
 
@@ -111,8 +111,7 @@ public class EmailSender implements Runnable{
             EmailTask.successQueue.add(this);          
 
         } catch (Throwable e) {
-            LogUtil.warningMF(logger, "Cannot send email with id {0}", e,
-                    emailBean.getId());
+            logger.warn("Cannot send email with id " + emailBean.getId(), e);
             emailBean.setState(EmailUtils.REJECTED);
             EmailTask.rejectedQueue.add(this);
         }

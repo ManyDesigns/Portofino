@@ -32,7 +32,6 @@ package com.manydesigns.portofino.actions.user;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
@@ -42,6 +41,8 @@ import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
@@ -49,7 +50,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -90,7 +90,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     public Form form;
 
     public static final Logger logger =
-            LogUtil.getLogger(ProfileAction.class);
+            LoggerFactory.getLogger(ProfileAction.class);
 
     public String execute() {
         Map session = getSession();
@@ -155,7 +155,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
             form.writeToObject(thisUser);
             context.updateObject(UserUtils.USERTABLE, thisUser);
             context.commit("portofino");
-            LogUtil.finestMF(logger, "User {0} updated", thisUser.getEmail());
+            logger.debug("User {} updated", thisUser.getEmail());
             SessionMessages.addInfoMessage("Utente aggiornato correttamente");
             return UPDATE;
         } else {
@@ -196,8 +196,8 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
                 context.updateObject(UserUtils.USERTABLE, thisUser);
                 context.commit("portofino");
 
-                LogUtil.finestMF(logger, "User {0} updated", thisUser.getEmail());
-                SessionMessages.addInfoMessage("Password coorectely updated");
+                logger.debug("User {} updated", thisUser.getEmail());
+                SessionMessages.addInfoMessage("Password correctely updated");
 
                 return UPDATE_PWD;
             } else {

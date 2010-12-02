@@ -29,15 +29,15 @@
 
 package com.manydesigns.portofino.model;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.site.RootNode;
 import com.manydesigns.portofino.xml.XmlCollection;
 import com.manydesigns.portofino.xml.XmlElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -56,7 +56,7 @@ public class Model {
     protected RootNode rootNode;
 
 
-    public static final Logger logger = LogUtil.getLogger(Model.class);
+    public static final Logger logger = LoggerFactory.getLogger(Model.class);
 
     //**************************************************************************
     // Constructors and init
@@ -160,7 +160,7 @@ public class Model {
                 return database;
             }
         }
-        LogUtil.fineMF(logger, "Database not found: {0}", databaseName);
+        logger.debug("Database not found: {}", databaseName);
         return null;
     }
 
@@ -171,7 +171,7 @@ public class Model {
         if (database != null) {
             return database.findSchemaByQualifiedName(qualifiedSchemaName);
         }
-        LogUtil.fineMF(logger, "Schema not found: {0}", qualifiedSchemaName);
+        logger.debug("Schema not found: {}", qualifiedSchemaName);
         return null;
     }
 
@@ -187,7 +187,7 @@ public class Model {
                 }
             }
         }
-        LogUtil.fineMF(logger, "Table not found: {0}", qualifiedTableName);
+        logger.debug("Table not found: {}", qualifiedTableName);
         return null;
     }
 
@@ -203,7 +203,7 @@ public class Model {
                 }
             }
         }
-        LogUtil.fineMF(logger, "Column not found: {0}", qualifiedColumnName);
+        logger.debug("Column not found: {}", qualifiedColumnName);
         return null;
     }
 

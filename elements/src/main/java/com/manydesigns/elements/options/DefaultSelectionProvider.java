@@ -29,19 +29,19 @@
 
 package com.manydesigns.elements.options;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -64,7 +64,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
     protected boolean autocomplete;
 
     public final static Logger logger =
-            LogUtil.getLogger(DefaultSelectionProvider.class);
+            LoggerFactory.getLogger(DefaultSelectionProvider.class);
     public static final String NON_WORD_CHARACTERS =
             " \t\n\f\r\\||!\"£$%&/()='?^[]+*@#<>,;.:-_";
 
@@ -170,7 +170,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
             } catch (Throwable e) {
                 String msg = MessageFormat.format(
                         "Could not access property: {0}", currentName);
-                LogUtil.warning(logger, msg, e);
+                logger.warn(msg, e);
                 throw new IllegalArgumentException(msg, e);
             }
         }

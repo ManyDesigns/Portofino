@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.annotations.ShortName;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -162,7 +161,7 @@ public class UseCaseAction extends AbstractCrudAction {
                 selectionProvider = DefaultSelectionProvider.create(
                         name, objects, tableAccessor, textFormats);
             } else {
-                LogUtil.warningMF(logger, "ModelSelection provider '{0}':" +
+                logger.warn("ModelSelection provider '{}':" +
                         " both 'hql' and 'sql' are null", name);
                 break;
             }

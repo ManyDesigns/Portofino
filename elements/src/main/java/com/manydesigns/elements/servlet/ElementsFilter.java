@@ -30,14 +30,14 @@
 package com.manydesigns.elements.servlet;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.logging.LogUtil;
 import org.apache.commons.fileupload.FileUploadException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -56,7 +56,8 @@ public class ElementsFilter implements Filter {
     // Logging
     //--------------------------------------------------------------------------
 
-    public final static Logger logger = LogUtil.getLogger(ElementsFilter.class);
+    public final static Logger logger =
+            LoggerFactory.getLogger(ElementsFilter.class);
 
     public void init(FilterConfig filterConfig) throws ServletException {
         this.config = filterConfig;
@@ -95,7 +96,7 @@ public class ElementsFilter implements Filter {
 
             filterChain.doFilter(req, res);
         } catch (FileUploadException e) {
-            LogUtil.severe(logger, "FileUploadException caught", e);
+            logger.error("FileUploadException caught", e);
             throw new ServletException(e);
         } finally {
             ElementsThreadLocals.removeElementsContext();

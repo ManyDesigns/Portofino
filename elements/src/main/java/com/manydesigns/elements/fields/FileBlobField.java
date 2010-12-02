@@ -32,7 +32,6 @@ package com.manydesigns.elements.fields;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobsManager;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.Upload;
 import com.manydesigns.elements.servlet.WebFramework;
@@ -223,7 +222,7 @@ public class FileBlobField extends AbstractField
                         upload.getContentType());
             }
         } catch (Throwable e) {
-            LogUtil.warning(logger, "Cannot save upload", e);
+            logger.warn("Cannot save upload", e);
             throw new Error(e);
         }
     }
@@ -260,8 +259,7 @@ public class FileBlobField extends AbstractField
             } catch (IOException e) {
                 blob = null;
                 blobError = "Cannot load blob";
-                LogUtil.warningMF(logger,
-                        "Cannot load blob with code {0}. Cause: {1}",
+                logger.warn("Cannot load blob with code {}. Cause: {}",
                         code, e.getMessage());
             }
         }

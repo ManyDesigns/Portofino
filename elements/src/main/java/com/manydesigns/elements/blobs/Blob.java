@@ -29,16 +29,16 @@
 
 package com.manydesigns.elements.blobs;
 
-import com.manydesigns.elements.logging.LogUtil;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -82,7 +82,7 @@ public class Blob {
     // Logging
     //**************************************************************************
 
-    public final static Logger logger = LogUtil.getLogger(Blob.class);
+    public final static Logger logger = LoggerFactory.getLogger(Blob.class);
 
     //**************************************************************************
     // Constructor
@@ -99,12 +99,12 @@ public class Blob {
 
     public boolean createFiles() throws IOException {
         if (dataFile.createNewFile()) {
-            LogUtil.warningMF(logger, "Blob data file already exists: {0}",
+            logger.warn("Blob data file already exists: {}",
                     metaFile.getAbsolutePath());
             return false;
         }
         if (metaFile.createNewFile()) {
-            LogUtil.warningMF(logger, "Blob meta file already exists: {0}",
+            logger.warn("Blob meta file already exists: {}",
                     metaFile.getAbsolutePath());
             return false;
         }

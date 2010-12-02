@@ -32,7 +32,6 @@ package com.manydesigns.elements.fields;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.DateFormat;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -44,7 +43,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -62,8 +60,6 @@ public class DateField extends AbstractTextField {
 
     protected Date dateValue;
     protected boolean dateFormatError;
-
-    public static final Logger logger = LogUtil.getLogger(DateField.class);
 
     public DateField(PropertyAccessor accessor, Mode mode) {
         this(accessor, mode, null);
@@ -127,7 +123,7 @@ public class DateField extends AbstractTextField {
             dateValue = new Date(dateTime.getMillis());
         } catch (Throwable e) {
             dateFormatError = true;
-            LogUtil.fineMF(logger, "Cannot parse date: {0}", stringValue);
+            logger.debug("Cannot parse date: {}", stringValue);
         }
     }
 

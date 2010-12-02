@@ -29,12 +29,12 @@
 
 package com.manydesigns.portofino;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -104,7 +104,7 @@ public class PortofinoProperties {
 
     private static final Properties properties;
     public static final Logger logger =
-            LogUtil.getLogger(PortofinoProperties.class);
+            LoggerFactory.getLogger(PortofinoProperties.class);
 
 
 
@@ -123,17 +123,15 @@ public class PortofinoProperties {
     public static void loadProperties(String resource) {
         InputStream stream = ReflectionUtil.getResourceAsStream(resource);
         if (stream == null) {
-            LogUtil.infoMF(logger, "Properties resource not found: {0}",
-                    resource);
+            logger.info("Properties resource not found: {}", resource);
             return;
         }
         try {
             properties.load(stream);
-            LogUtil.infoMF(logger, "Properties loaded from: {0}",
-                    resource);
+            logger.info("Properties loaded from: {}", resource);
         } catch (Throwable e) {
-            LogUtil.warningMF(logger, "Error loading properties from: {0}", e,
-                    resource);
+            logger.warn(String.format(
+                    "Error loading properties from: %s", resource), e);
         }
     }
 

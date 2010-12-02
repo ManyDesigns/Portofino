@@ -29,9 +29,10 @@
 
 package com.manydesigns.elements.reflection;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -43,7 +44,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -67,7 +67,7 @@ public class JavaClassAccessor implements ClassAccessor {
 
     protected static final Map<Class, JavaClassAccessor> classAccessorCache;
     public static final Logger logger =
-                LogUtil.getLogger(JavaClassAccessor.class);
+                LoggerFactory.getLogger(JavaClassAccessor.class);
 
     static {
         classAccessorCache = new HashMap<Class, JavaClassAccessor>();
@@ -76,13 +76,13 @@ public class JavaClassAccessor implements ClassAccessor {
     public static JavaClassAccessor getClassAccessor(Class javaClass) {
         JavaClassAccessor cachedResult = classAccessorCache.get(javaClass);
         if (cachedResult == null) {
-            LogUtil.finerMF(logger, "Cache miss for: {0}", javaClass);
+            logger.debug("Cache miss for: {}", javaClass);
             cachedResult = new JavaClassAccessor(javaClass);
-            LogUtil.finerMF(logger, "Caching key: {0} - Value: {1}",
+            logger.debug("Caching key: {} - Value: {}",
                     javaClass, cachedResult);
             classAccessorCache.put(javaClass, cachedResult);
         } else {
-            LogUtil.finerMF(logger, "Cache hit for: {0} - Value: {1}",
+            logger.debug("Cache hit for: {} - Value: {}",
                     javaClass, cachedResult);
         }
         return cachedResult;

@@ -122,7 +122,7 @@ public abstract class  SiteNode implements ModelObject {
     // Getters/Setters
     //**************************************************************************
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true, order = 1, identifier = true)
     public String getId() {
         return id;
     }

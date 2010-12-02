@@ -30,19 +30,19 @@ package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -72,7 +72,7 @@ public class LoginAction extends PortofinoAction
     public boolean recoverPwd;
 
     public static final Logger logger =
-            LogUtil.getLogger(LoginAction.class);
+            LoggerFactory.getLogger(LoginAction.class);
 
     public LoginAction(){
         FormBuilder builder =
@@ -109,7 +109,7 @@ public class LoginAction extends PortofinoAction
             String errMsg = MessageFormat.format("FAILED AUTH for user {0}",
                     username);
             SessionMessages.addInfoMessage(errMsg);
-            LogUtil.warningMF(logger, errMsg);
+            logger.warn(errMsg);
             updateFailedUser(username);
             return INPUT;
         }
@@ -118,12 +118,12 @@ public class LoginAction extends PortofinoAction
             String errMsg = MessageFormat.format("User {0} is not active. " +
                     "Please contact the administrator", username);
             SessionMessages.addInfoMessage(errMsg);
-            LogUtil.warningMF(logger, errMsg);
+            logger.warn(errMsg);
             return INPUT;
         }
 
 
-        LogUtil.fineMF(logger, "User {0} login", user.getEmail());
+        logger.debug("User {} login", user.getEmail());
         getSession().put(UserUtils.USERID, user.getUserId());
         getSession().put(UserUtils.USERNAME, user.getUserName());
         updateUser(user);

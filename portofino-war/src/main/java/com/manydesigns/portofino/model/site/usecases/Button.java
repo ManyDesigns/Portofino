@@ -122,7 +122,7 @@ public class Button implements ModelObject {
         return useCase;
     }
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true, order = 1, identifier = true)
     public String getName() {
         return name;
     }

@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.database.platforms;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
@@ -88,7 +87,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                                ConnectionProvider connectionProvider,
                                DatabaseMetaData metadata, Database database)
             throws SQLException {
-        logger.fine("Searching for schemas...");
+        logger.debug("Searching for schemas...");
         ResultSet rs = null;
         Pattern includePattern = connectionProvider.getIncludeSchemasPattern();
         Pattern excludePattern = connectionProvider.getExcludeSchemasPattern();
@@ -99,8 +98,8 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                 if (includePattern != null) {
                     Matcher includeMatcher = includePattern.matcher(schemaName);
                     if (!includeMatcher.matches()) {
-                        LogUtil.infoMF(logger,
-                                "Schema ''{0}'' does not match include pattern ''{1}''. Skipping this schema.",
+                        logger.info("Schema '{}' does not match include " +
+                                "pattern '{}'. Skipping this schema.",
                                 schemaName,
                                 connectionProvider.getIncludeSchemas());
                         continue;
@@ -109,16 +108,15 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                 if (excludePattern != null) {
                     Matcher excludeMatcher = excludePattern.matcher(schemaName);
                     if (excludeMatcher.matches()) {
-                        LogUtil.infoMF(logger,
-                                "Schema ''{0}'' matches exclude pattern ''{1}''. Skipping this schema.",
+                        logger.info("Schema '{}' matches exclude pattern " +
+                                "'{}'. Skipping this schema.",
                                 schemaName,
                                 connectionProvider.getExcludeSchemas());
                         continue;
                     }
                 }
                 Schema schema = new Schema(database, schemaName);
-                LogUtil.infoMF(logger, "Found schema: {0}",
-                        schema.getQualifiedName());
+                logger.info("Found schema: {0}", schema.getQualifiedName());
                 database.getSchemas().add(schema);
             }
         } finally {
@@ -137,7 +135,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
             throws SQLException {
         String expectedDatabaseName = schema.getDatabaseName();
         String expectedSchemaName = schema.getSchemaName();
-        LogUtil.fineMF(logger, "Searching for tables in schema {0}",
+        logger.debug("Searching for tables in schema {}",
                 schema.getQualifiedName());
         ResultSet rs = null;
         try {
@@ -148,19 +146,19 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
 
                 // sanity check
                 if (!expectedSchemaName.equals(schemaName)) {
-                    LogUtil.fineMF(logger,
+                    String msg = MessageFormat.format(
                             "Skipping table {0}.{1}.{2} because schema " +
                                     "does not match expected: {0}.{3}",
                             expectedDatabaseName,
                             schemaName,
                             tableName,
                             expectedSchemaName);
+                    logger.debug(msg);
                     continue;
                 }
 
                 Table table = new Table(schema, tableName);
-                LogUtil.fineMF(logger, "Found table: {0}",
-                        table.getQualifiedName());
+                logger.debug("Found table: {}", table.getQualifiedName());
                 schema.getTables().add(table);
             }
         } finally {
@@ -179,7 +177,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
             throws SQLException {
         String expectedSchemaName = table.getSchemaName();
         String expectedTableName = table.getTableName();
-        LogUtil.fineMF(logger, "Searching for columns in table {0}",
+        logger.debug("Searching for columns in table {}",
                 table.getQualifiedName());
         String sql = MessageFormat.format("SELECT * FROM `{0}`.`{1}`",
                 expectedSchemaName, expectedTableName);
@@ -203,7 +201,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                         columnName, columnType,
                         nullable, autoincrement,
                         length, scale, searchable);
-                LogUtil.fineMF(logger, "Found column: {0} of type {1}",
+                logger.debug("Found column: {} of type {}",
                         column.getQualifiedName(),
                         column.getColumnType());
                 Type type = connectionProvider.getTypeByName(columnType);
@@ -231,7 +229,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
         String expectedDatabaseName = table.getDatabaseName();
         String expectedSchemaName = table.getSchemaName();
         String expectedTableName = table.getTableName();
-        LogUtil.fineMF(logger, "Searching for primary key in table {0}",
+        logger.debug("Searching for primary key in table {}",
                 table.getQualifiedName());
         ResultSet rs = null;
         try {
@@ -250,7 +248,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                 // sanity check
                 if (!expectedSchemaName.equals(schemaName) ||
                         !expectedTableName.equals(tableName)) {
-                    LogUtil.fineMF(logger,
+                    String msg = MessageFormat.format(
                             "Skipping column {0}.{1}.{2}.{3} because table " +
                                     "does not match expected: {0}.{4}.{5}",
                             expectedDatabaseName,
@@ -259,17 +257,17 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                             columnName,
                             expectedSchemaName,
                             expectedTableName);
+                    logger.debug(msg);
                     continue;
                 }
 
                 if (primaryKey == null) {
                     primaryKey = new PrimaryKey(table, pkName);
-                    LogUtil.fineMF(logger, "Found primary key: {0}", pkName);
+                    logger.debug("Found primary key: {}", pkName);
                 } else if (!primaryKey.getPrimaryKeyName().equals(pkName)) {
                     //sanity check
-                    LogUtil.warningMF(logger,
-                            "Found new PK name {0} different " +
-                            "from previous name {1}",
+                    logger.debug("Found new PK name {} different " +
+                            "from previous name {}",
                             pkName, primaryKey.getPrimaryKeyName());
                     return;
                 }
@@ -280,17 +278,15 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
 
                 // sanity check
                 if (column == null) {
-                    LogUtil.warningMF(logger, "PK column {0} not found in " +
-                            "columns of table {1}. " +
+                    logger.warn("PK column {} not found in " +
+                            "columns of table {}. " +
                             "Aborting PK search for this table.",
                             columnName, table.getQualifiedName());
                     return;
                 }
 
-                LogUtil.fineMF(logger,
-                        "Found PK column {0} with key sequence {1}",
-                        column.getQualifiedName(),
-                        keySeq);
+                logger.debug("Found PK column {} with key sequence {}",
+                        column.getQualifiedName(), keySeq);
 
                 pkColumnArray =
                         ensureMinimumArrayLength(pkColumnArray, keySeq + 1);
@@ -298,9 +294,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
             }
 
             if (primaryKey == null) {
-                LogUtil.fineMF(logger,
-                        "No PK found for: {0}",
-                        table.getQualifiedName());
+                logger.debug("No PK found for: {}", table.getQualifiedName());
                 return;
             }
 
@@ -313,14 +307,12 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
             }
             // sanity check
             if (primaryKey.size() == 0) {
-                LogUtil.warningMF(logger,
-                        "Primary key {0} is empty. Discarding.",
+                logger.warn("Primary key {} is empty. Discarding.",
                         primaryKey.getPrimaryKeyName());
                 return;
             }
             table.setPrimaryKey(primaryKey);
-            LogUtil.fineMF(logger,
-                    "Installed PK {0} with number of columns: {1}",
+            logger.debug("Installed PK {} with number of columns: {}",
                     primaryKey.getPrimaryKeyName(),
                     primaryKey.size());
         } finally {
@@ -341,7 +333,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
         String expectedDatabaseName = table.getDatabaseName();
         String expectedSchemaName = table.getSchemaName();
         String expectedTableName = table.getTableName();
-        LogUtil.fineMF(logger, "Searching for foreign keys in table {0}",
+        logger.debug("Searching for foreign keys in table {}",
                 table.getQualifiedName());
         ResultSet rs = null;
         ForeignKey relationship = null;
@@ -368,7 +360,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                 // sanity check
                 if (!expectedSchemaName.equals(schemaName) ||
                         !expectedTableName.equals(tableName)) {
-                    LogUtil.fineMF(logger,
+                    String msg = MessageFormat.format(
                             "Skipping column {0}.{1}.{2}.{3} because table " +
                                     "does not match expected: {4}.{5}.{6}",
                             referencedDatabaseName,
@@ -378,6 +370,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                             expectedDatabaseName,
                             expectedSchemaName,
                             expectedTableName);
+                    logger.debug(msg);
                     continue;
                 }
 
@@ -410,7 +403,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
 
                     // reset the refernceArray
                     referenceArray = new Reference[0];
-                    LogUtil.fineMF(logger, "Found foreign key: {0}", fkName);
+                    logger.debug("Found foreign key: {}", fkName);
                 }
 
                 Reference reference = new Reference(
@@ -432,11 +425,11 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                         referencedTableName,
                         referencedColumnName);
 
-                LogUtil.fineMF(logger,
-                        "Found FK reference {0} -> {1} with key sequence {2}",
-                        qualifiedFromColumnName,
-                        qualifiedToColumnName,
-                        keySeq);
+                logger.debug("Found FK reference {} -> {} with key sequence {}",
+                        new Object[] {
+                                qualifiedFromColumnName,
+                                qualifiedToColumnName,
+                                keySeq});
 
                 referenceArray =
                         ensureMinimumArrayLength(referenceArray, keySeq + 1);

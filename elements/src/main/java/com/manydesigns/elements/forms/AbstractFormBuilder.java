@@ -30,15 +30,15 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.fields.helpers.FieldsManager;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -70,20 +70,20 @@ public class AbstractFormBuilder {
     //**************************************************************************
 
     public static final Logger logger =
-            LogUtil.getLogger(AbstractFormBuilder.class);
+            LoggerFactory.getLogger(AbstractFormBuilder.class);
     
     //**************************************************************************
     // Fields
     //**************************************************************************
 
     public AbstractFormBuilder(ClassAccessor classAccessor) {
-        logger.fine("Entering AbstractBuilder constructor");
+        logger.debug("Entering AbstractBuilder constructor");
 
         manager = FieldsManager.getManager();
         this.classAccessor = classAccessor;
         selectionProviders = new HashMap<String[], SelectionProvider>();
 
-        logger.fine("Exiting AbstractBuilder constructor");
+        logger.debug("Exiting AbstractBuilder constructor");
     }
 
     //**************************************************************************

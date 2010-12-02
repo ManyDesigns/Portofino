@@ -30,17 +30,17 @@
 package com.manydesigns.portofino.model.annotations;
 
 import com.manydesigns.elements.annotations.AnnotationsManager;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
 import com.manydesigns.portofino.xml.XmlCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -70,7 +70,7 @@ public class Annotation extends ArrayList<String> implements ModelObject {
     //**************************************************************************
 
     public static final Logger logger =
-            LogUtil.getLogger(Annotation.class);
+            LoggerFactory.getLogger(Annotation.class);
 
     //**************************************************************************
     // Contruction
@@ -95,8 +95,7 @@ public class Annotation extends ArrayList<String> implements ModelObject {
     public void init(Model model) {
         javaAnnotationClass = ReflectionUtil.loadClass(type);
         if (javaAnnotationClass == null) {
-            LogUtil.warningMF(logger,
-                    "Cannot load annotation class: {0}", type);
+            logger.warn("Cannot load annotation class: {}", type);
             return;
         }
 
@@ -107,8 +106,7 @@ public class Annotation extends ArrayList<String> implements ModelObject {
                 annotationsManager.getAnnotationImplementationClass(
                         javaAnnotationClass);
         if (annotationImplClass == null) {
-            LogUtil.warningMF(logger,
-                    "Cannot find implementation for annotation class: {0}",
+            logger.warn("Cannot find implementation for annotation class: {}",
                     javaAnnotationClass);
             return;
         }
@@ -140,14 +138,13 @@ public class Annotation extends ArrayList<String> implements ModelObject {
                         ReflectionUtil.newInstance(
                                 candidateConstructor, castValues);
             } catch (Throwable e) {
-                LogUtil.finerMF(logger, "Failed to use constructor: {0}", e,
-                        candidateConstructor);
+                logger.debug("Failed to use constructor: " +
+                        candidateConstructor, e);
             }
         }
 
         if (javaAnnotation == null) {
-            LogUtil.warningMF(logger,
-                    "Cannot instanciate annotation: {0}", javaAnnotationClass);
+            logger.debug("Cannot instanciate annotation: {}", javaAnnotationClass);
         }
     }
 
@@ -160,7 +157,7 @@ public class Annotation extends ArrayList<String> implements ModelObject {
     // Getters and setters
     //**************************************************************************
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true, order = 1, identifier = true)
     public String getType() {
         return type;
     }

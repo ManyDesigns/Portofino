@@ -30,17 +30,17 @@
 package com.manydesigns.elements.text;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.logging.LogUtil;
 import ognl.ClassResolver;
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,7 +63,8 @@ public abstract class AbstractOgnlFormat {
     protected final String[] ognlExpressions;
     protected final Object[] parsedOgnlExpressions;
 
-    public static final Logger logger = LogUtil.getLogger(AbstractOgnlFormat.class);
+    public static final Logger logger =
+            LoggerFactory.getLogger(AbstractOgnlFormat.class);
 
     //**************************************************************************
     // Constructors
@@ -91,7 +92,7 @@ public abstract class AbstractOgnlFormat {
             } catch (OgnlException e) {
                 String msg = MessageFormat.format(
                         "Could not parse: {0}", ognlExpression);
-                LogUtil.warning(logger,msg, e);
+                logger.warn(msg, e);
                 throw new IllegalArgumentException(msg);
             }
             previousEnd = end;
@@ -138,10 +139,8 @@ public abstract class AbstractOgnlFormat {
                         Ognl.getValue(parsedOgnlExpression, ognlContext, root);
             }
         } catch (Throwable e) {
-            LogUtil.warningMF(logger,
-                    "Error during evaluation of ognl expression: {0}",
-                    e,
-                    ognlExpression);
+            logger.warn("Error during evaluation of ognl expression: " +
+                    ognlExpression, e);
         }
     }
 

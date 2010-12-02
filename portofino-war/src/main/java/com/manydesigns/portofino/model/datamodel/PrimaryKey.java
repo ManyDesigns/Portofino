@@ -29,16 +29,16 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
 import com.manydesigns.portofino.xml.XmlCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -64,7 +64,7 @@ public class PrimaryKey extends ArrayList<PrimaryKeyColumn> implements ModelObje
 
     protected final List<Column> columns;
 
-    public static final Logger logger = LogUtil.getLogger(Table.class);
+    public static final Logger logger = LoggerFactory.getLogger(Table.class);
 
     //**************************************************************************
     // Constructors and wire up
@@ -111,8 +111,7 @@ public class PrimaryKey extends ArrayList<PrimaryKeyColumn> implements ModelObje
         }
 
         if (columns.isEmpty()) {
-            LogUtil.warningMF(logger,
-                    "Primary key ''{0}'' has no columns", this);
+            logger.warn("Primary key '{}' has no columns", this);
         }
     }
 
@@ -153,7 +152,7 @@ public class PrimaryKey extends ArrayList<PrimaryKeyColumn> implements ModelObje
         return table.getTableName();
     }
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true, order = 1, identifier = true)
     public String getPrimaryKeyName() {
         return primaryKeyName;
     }

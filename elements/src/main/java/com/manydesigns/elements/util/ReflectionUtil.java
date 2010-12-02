@@ -29,11 +29,11 @@
 
 package com.manydesigns.elements.util;
 
-import com.manydesigns.elements.logging.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -51,7 +51,8 @@ public class ReflectionUtil {
 
     protected final static ClassLoader classLoader;
 
-    public final static Logger logger = LogUtil.getLogger(ReflectionUtil.class);
+    public final static Logger logger =
+            LoggerFactory.getLogger(ReflectionUtil.class);
 
     static {
         classLoader = ReflectionUtil.class.getClassLoader();
@@ -65,12 +66,10 @@ public class ReflectionUtil {
     public static Class loadClass(String className) {
         try {
             Class<?> aClass = classLoader.loadClass(className);
-            LogUtil.finerMF(logger,
-                    "Loaded class: {0}", aClass);
+            logger.debug("Loaded class: {}", aClass);
             return aClass;
         } catch (Throwable e) {
-            LogUtil.fineMF(logger,
-                    "Could not load class: {0}", e, className);
+            logger.debug("Could not load class: {}", className);
             return null;
         }
     }
@@ -84,13 +83,10 @@ public class ReflectionUtil {
                                              Class... argClasses) {
         try {
             Constructor constructor = aClass.getConstructor(argClasses);
-            LogUtil.finerMF(logger,
-                    "Found constructor: {0}", constructor);
+            logger.debug("Found constructor: {}", constructor);
             return constructor;
         } catch (Throwable e) {
-            LogUtil.fineMF(logger,
-                    "Could not find construtor for class: {0}",
-                    e, aClass);
+            logger.debug("Could not find construtor for class: {}", aClass);
             return null;
         }
     }
@@ -112,8 +108,7 @@ public class ReflectionUtil {
                 return current;
             }
         }
-        LogUtil.fineMF(logger,
-                "Could not find best match construtor for class: {0}", aClass);
+        logger.debug("Could not find best match construtor for class: {}", aClass);
         return null;
     }
 
@@ -130,9 +125,8 @@ public class ReflectionUtil {
         try {
             return constructor.newInstance(args);
         } catch (Throwable e) {
-            LogUtil.warningMF(logger,
-                    "Could not instanciate class constructor: {0}",
-                    e, constructor);
+            logger.debug("Could not instanciate class constructor: {}",
+                    constructor);
             return null;
         }
     }

@@ -29,14 +29,14 @@
 
 package com.manydesigns.portofino.reflection;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.annotations.Annotation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -55,7 +55,7 @@ public abstract class AbstractAnnotatedAccessor
     protected final Map<Class, java.lang.annotation.Annotation> annotations;
 
     public static final Logger logger =
-            LogUtil.getLogger(AbstractAnnotatedAccessor.class);
+            LoggerFactory.getLogger(AbstractAnnotatedAccessor.class);
 
 
     //**************************************************************************

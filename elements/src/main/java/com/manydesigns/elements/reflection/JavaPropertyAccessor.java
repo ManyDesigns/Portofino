@@ -29,14 +29,14 @@
 
 package com.manydesigns.elements.reflection;
 
-import com.manydesigns.elements.logging.LogUtil;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -57,7 +57,7 @@ public class JavaPropertyAccessor implements PropertyAccessor {
     private final Method setter;
 
     public final static Logger logger =
-            LogUtil.getLogger(JavaPropertyAccessor.class);
+            LoggerFactory.getLogger(JavaPropertyAccessor.class);
 
     //**************************************************************************
     // Constructors
@@ -68,8 +68,7 @@ public class JavaPropertyAccessor implements PropertyAccessor {
         getter = propertyDescriptor.getReadMethod();
         setter = propertyDescriptor.getWriteMethod();
         if (setter == null) {
-            LogUtil.fineMF(logger,
-                    "Setter not available for: {0}",
+            logger.debug("Setter not available for: {}",
                     propertyDescriptor.getName());
         }
     }

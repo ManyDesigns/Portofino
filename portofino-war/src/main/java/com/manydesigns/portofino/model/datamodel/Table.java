@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
@@ -37,11 +36,12 @@ import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.xml.XmlAttribute;
 import com.manydesigns.portofino.xml.XmlCollection;
 import com.manydesigns.portofino.xml.XmlElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -79,7 +79,7 @@ public class Table implements ModelObject {
     // Logging
     //**************************************************************************
 
-    public static final Logger logger = LogUtil.getLogger(Table.class);
+    public static final Logger logger = LoggerFactory.getLogger(Table.class);
 
     //**************************************************************************
     // Constructors and init
@@ -144,8 +144,7 @@ public class Table implements ModelObject {
         }
 
         if (primaryKey == null) {
-            LogUtil.warningMF(logger,
-                    "Table {0} has no primary key", toString());
+            logger.warn("Table {} has no primary key", toString());
         } else {
             primaryKey.init(model);
         }
@@ -176,7 +175,7 @@ public class Table implements ModelObject {
         return schema.getSchemaName();
     }
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true, order = 1, identifier = true)
     public String getTableName() {
         return tableName;
     }
@@ -245,7 +244,7 @@ public class Table implements ModelObject {
                 return column;
             }
         }
-        LogUtil.fineMF(logger, "Column not found: {0}", columnName);
+        logger.debug("Column not found: {}", columnName);
         return null;
     }
 
@@ -255,8 +254,7 @@ public class Table implements ModelObject {
                 return current;
             }
         }
-        LogUtil.fineMF(logger,
-                "Foreign key not found: {0}", fkName);
+        logger.debug("Foreign key not found: {}", fkName);
         return null;
     }
 
@@ -266,8 +264,7 @@ public class Table implements ModelObject {
                 return current;
             }
         }
-        LogUtil.fineMF(logger,
-                "One to many relationship not found: {0}", relationshipName);
+        logger.debug("One to many relationship not found: {}", relationshipName);
         return null;
     }
 
@@ -277,8 +274,7 @@ public class Table implements ModelObject {
                 return annotation;
             }
         }
-        LogUtil.fineMF(logger,
-                "Model annotation not found: {0}", annotationType);
+        logger.debug("Model annotation not found: {}", annotationType);
         return null;
     }
 

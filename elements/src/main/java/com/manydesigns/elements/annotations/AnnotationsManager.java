@@ -30,12 +30,12 @@
 package com.manydesigns.elements.annotations;
 
 import com.manydesigns.elements.ElementsProperties;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -54,7 +54,7 @@ public class AnnotationsManager {
     protected static final AnnotationsManager manager;
 
     public static final Logger logger =
-            LogUtil.getLogger(AnnotationsManager.class);
+            LoggerFactory.getLogger(AnnotationsManager.class);
 
     //**************************************************************************
     // Fields
@@ -94,7 +94,7 @@ public class AnnotationsManager {
         String listString = elementsProperties.getProperty(
                 ElementsProperties.ANNOTATIONS_IMPLEMENTATION_LIST_PROPERTY);
         if (listString == null) {
-            logger.finer("Empty list");
+            logger.debug("Empty list");
             return;
         }
 
@@ -107,45 +107,38 @@ public class AnnotationsManager {
     public void addAnnotationMapping(String mapping) {
         String[] split = mapping.split(":");
         if (split.length != 2) {
-            LogUtil.warningMF(logger,
-                        "Incorrect annotation mapping syntax: {0}", mapping);
+            logger.warn("Incorrect annotation mapping syntax: {}", mapping);
             return;
         }
         String annotationName = split[0].trim();
         String annotationImplName = split[1].trim();
 
-        LogUtil.finerMF(logger,
-                "Mapping annotation {0} to implemetation {1}",
+        logger.debug("Mapping annotation {} to implemetation {}",
                 annotationName, annotationImplName);
         Class annotationClass = ReflectionUtil.loadClass(annotationName);
         if (annotationClass == null) {
-            LogUtil.warningMF(logger,
-                    "Failed to load annotation class: {0}", annotationName);
+            logger.warn("Failed to load annotation class: {}", annotationName);
             return;
         }
         if (!annotationClass.isAnnotation()) {
-            LogUtil.warningMF(logger,
-                    "Not an annotation: {0}", annotationName);
+            logger.warn("Not an annotation: {}", annotationName);
             return;
         }
         Class annotationImplClass =
                 ReflectionUtil.loadClass(annotationImplName);
         if (annotationImplClass == null) {
-            LogUtil.warningMF(logger,
-                    "Failed to load annotation implementation class: {0}",
+            logger.warn("Failed to load annotation implementation class: {}",
                     annotationImplName);
             return;
         }
         if (!Arrays.asList(annotationImplClass.getInterfaces()).contains(annotationClass)) {
-            LogUtil.warningMF(logger,
-                    "Class {0} not an implementation of {1}",
+            logger.warn("Class {} not an implementation of {}",
                     annotationImplName, annotationName);
             return;
         }
 
         annotationClassMap.put(annotationClass, annotationImplClass);
-        LogUtil.finerMF(logger,
-                "Mapped annotation {0} to implementation {1}",
+        logger.debug("Mapped annotation {} to implementation {}",
                 annotationName, annotationImplName);
 
     }

@@ -29,16 +29,16 @@
 
 package com.manydesigns.portofino.navigation;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.site.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -60,7 +60,8 @@ public class Navigation implements XhtmlFragment {
     protected final List<NavigationNode> rootNodes;
     protected final List<String> groups;
 
-    public static final Logger logger = LogUtil.getLogger(Navigation.class);
+    public static final Logger logger =
+            LoggerFactory.getLogger(Navigation.class);
 
     //**************************************************************************
     // Constructors
@@ -116,14 +117,12 @@ public class Navigation implements XhtmlFragment {
                         new TableDesignNavigationNode(context, siteNode,
                                  allowed);
                 } else {
-                LogUtil.warningMF(logger,
-                        "Unrecognized site node type: {0}",
+                logger.warn("Unrecognized site node type: {}",
                         siteNode.getClass().getName());
                 continue;
                 }
             } else {
-                LogUtil.warningMF(logger,
-                        "Unrecognized site node type: {0}",
+                logger.warn("Unrecognized site node type: {}",
                         siteNode.getClass().getName());
                 continue;
             }

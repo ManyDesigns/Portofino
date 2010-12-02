@@ -33,15 +33,15 @@ import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.search.SearchField;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -64,7 +64,7 @@ public class FieldsManager implements FieldHelper {
     //**************************************************************************
 
     public static final Logger logger =
-            LogUtil.getLogger(FieldsManager.class);
+            LoggerFactory.getLogger(FieldsManager.class);
 
     //**************************************************************************
     // Fields
@@ -104,7 +104,7 @@ public class FieldsManager implements FieldHelper {
         String listString = elementsProperties.getProperty(
                 ElementsProperties.FIELDS_LIST_PROPERTY);
         if (listString == null) {
-            logger.finer("Empty list");
+            logger.debug("Empty list");
             return;
         }
 
@@ -116,17 +116,14 @@ public class FieldsManager implements FieldHelper {
 
     public void addFieldHelper(String fieldHelperClassName) {
         String helperClassName = fieldHelperClassName.trim();
-        LogUtil.finerMF(logger,
-                    "Adding field helper: {0}", helperClassName);
+        logger.debug("Adding field helper: {}", helperClassName);
         FieldHelper helper =
                 (FieldHelper) ReflectionUtil.newInstance(helperClassName);
         if (helper == null) {
-            LogUtil.warningMF(logger,
-                        "Failed to add field helper: {0}", helperClassName);
+            logger.debug("Failed to add field helper: {}", helperClassName);
         } else {
             helperList.add(helper);
-            LogUtil.finerMF(logger,
-                        "Added field helper: {0}", helper);
+            logger.debug("Added field helper: {}", helper);
         }
     }
 

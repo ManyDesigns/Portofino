@@ -29,14 +29,14 @@
 
 package com.manydesigns.portofino.database;
 
-import com.manydesigns.elements.logging.LogUtil;
 import org.apache.commons.dbutils.DbUtils;
 import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Types;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -47,7 +47,7 @@ public class DbUtil {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public final static Logger logger = LogUtil.getLogger(DbUtil.class);
+    public final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
 
     public static void closeResultSetAndStatement(ResultSet rs) {
         try {
@@ -55,7 +55,7 @@ public class DbUtil {
             Statement st = rs.getStatement();
             DbUtils.closeQuietly(st);
         } catch (Throwable e) {
-            LogUtil.finer(logger, "Could not close statement", e);
+            logger.debug("Could not close statement", e);
         }
     }
 

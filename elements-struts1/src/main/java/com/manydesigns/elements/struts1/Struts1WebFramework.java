@@ -29,21 +29,20 @@
 
 package com.manydesigns.elements.struts1;
 
-import com.manydesigns.elements.servlet.WebFramework;
 import com.manydesigns.elements.servlet.Upload;
-import com.manydesigns.elements.logging.LogUtil;
+import com.manydesigns.elements.servlet.WebFramework;
+import org.apache.struts.Globals;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.config.ActionConfig;
+import org.apache.struts.upload.FormFile;
+import org.apache.struts.upload.MultipartRequestHandler;
+import org.apache.struts.upload.MultipartRequestWrapper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Hashtable;
-
-import org.apache.struts.upload.MultipartRequestWrapper;
-import org.apache.struts.upload.MultipartRequestHandler;
-import org.apache.struts.upload.FormFile;
-import org.apache.struts.config.ActionConfig;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.Globals;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -74,8 +73,7 @@ public class Struts1WebFramework extends WebFramework {
     public Upload getUpload(HttpServletRequest req, String parameter) {
         Class reqClass = req.getClass();
         if (!(req instanceof MultipartRequestWrapper)) {
-            LogUtil.warningMF(logger,
-                    "Request is not an instance of {0}. Actual type: {1}",
+            logger.warn("Request is not an instance of {}. Actual type: {}",
                     MultipartRequestWrapper.class.getName(),
                     reqClass.getName());
             return null;
@@ -112,8 +110,7 @@ public class Struts1WebFramework extends WebFramework {
             InputStream is = formFile.getInputStream();
             return new Upload(is, fileName, contentType);
         } catch (IOException e) {
-            LogUtil.warningMF(logger, "Cannot read upload file: {0}",
-                    fileName);
+            logger.warn("Cannot read upload file: {}", fileName);
             return null;
         }
     }

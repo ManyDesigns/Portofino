@@ -29,18 +29,18 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.xml.XmlAttribute;
 import com.manydesigns.portofino.xml.XmlCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -79,7 +79,7 @@ public class Column implements ModelObject {
     protected String actualPropertyName;
     protected Class actualJavaType;
 
-    public static final Logger logger = LogUtil.getLogger(Column.class);
+    public static final Logger logger = LoggerFactory.getLogger(Column.class);
 
     //**************************************************************************
     // Constructors and init
@@ -145,8 +145,7 @@ public class Column implements ModelObject {
 
         actualJavaType = ReflectionUtil.loadClass(javaType);
         if (actualJavaType == null) {
-            LogUtil.warningMF(logger,
-                    "Cannot load column java type: {0}", javaType);
+            logger.warn("Cannot load column java type: {}", javaType);
         }
 
         for (Annotation annotation : annotations) {
@@ -174,7 +173,7 @@ public class Column implements ModelObject {
         return table.getTableName();
     }
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true, order = 1, identifier = true)
     public String getColumnName() {
         return columnName;
     }

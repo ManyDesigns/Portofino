@@ -29,16 +29,16 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
 import com.manydesigns.portofino.xml.XmlCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -63,7 +63,7 @@ public class Schema implements ModelObject {
     // Logging
     //**************************************************************************
 
-    public static final Logger logger = LogUtil.getLogger(Schema.class);
+    public static final Logger logger = LoggerFactory.getLogger(Schema.class);
 
 
     //**************************************************************************
@@ -111,7 +111,7 @@ public class Schema implements ModelObject {
         return database.getDatabaseName();
     }
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true, order = 1, identifier = true)
     public String getSchemaName() {
         return schemaName;
     }
@@ -152,7 +152,7 @@ public class Schema implements ModelObject {
                 return table;
             }
         }
-        LogUtil.fineMF(logger, "Table not found: {0}", qualifiedTableName);
+        logger.debug("Table not found: {}", qualifiedTableName);
         return null;
     }
 
@@ -168,7 +168,7 @@ public class Schema implements ModelObject {
                 }
             }
         }
-        LogUtil.fineMF(logger, "Column not found: {0}", qualifiedColumnName);
+        logger.debug("Column not found: {}", qualifiedColumnName);
         return null;
     }
 

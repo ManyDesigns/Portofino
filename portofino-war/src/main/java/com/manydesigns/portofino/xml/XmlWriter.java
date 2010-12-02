@@ -29,13 +29,14 @@
 
 package com.manydesigns.portofino.xml;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.model.io.IndentingXMLStreamWriter;
 import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -44,7 +45,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -73,7 +73,7 @@ public class XmlWriter {
     //--------------------------------------------------------------------------
 
     public static final Logger logger =
-            LogUtil.getLogger(XmlWriter.class);
+            LoggerFactory.getLogger(XmlWriter.class);
 
     //--------------------------------------------------------------------------
     // Constructor
@@ -105,9 +105,8 @@ public class XmlWriter {
             w.writeEndDocument();
             w.flush();
         } catch (Exception e) {
-            LogUtil.warningMF(logger,
-                    "Exception caught while writing file: {0}",
-                    e, file.getAbsolutePath());
+            logger.warn("Exception caught while writing file: " +
+                    file.getAbsolutePath(), e);
             throw e;
         } finally {
             closeQuietly();
@@ -137,8 +136,7 @@ public class XmlWriter {
 
             if (value == null) {
                 if (xmlAttribute.required()) {
-                    LogUtil.warningMF(logger,
-                            "Attribute ''{0}'' required", name);
+                    logger.warn("Attribute '{}' required", name);
                 }
             } else {
                 int order = xmlAttribute.order();
@@ -159,8 +157,7 @@ public class XmlWriter {
             try {
                 w.close();
             } catch (Throwable e) {
-                LogUtil.warning(logger,
-                        "Exception caught while closing stream", e);
+                logger.warn("Exception caught while closing stream", e);
             }
         }
     }
@@ -268,8 +265,7 @@ public class XmlWriter {
                     Object item = propertyAccessor.get(object);
                     if (item == null) {
                         if (xmlElementAnnotation.required()) {
-                            LogUtil.warningMF(logger,
-                                    "Element ''{0}'' required", propertyName);
+                            logger.warn("Element ''{}'' required", propertyName);
                         }
                     } else {
                         ElementWriter elementWriter =

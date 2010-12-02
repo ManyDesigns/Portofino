@@ -29,16 +29,16 @@
 
 package com.manydesigns.portofino.reflection;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.Table;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -60,7 +60,8 @@ public class TableAccessor
     protected final ColumnAccessor[] keyColumnAccessors;
     protected ClassAccessor javaClassAccessor = null;
 
-    public final static Logger logger = LogUtil.getLogger(TableAccessor.class);
+    public final static Logger logger =
+            LoggerFactory.getLogger(TableAccessor.class);
 
     //**************************************************************************
     // Constructors and initialization
@@ -98,9 +99,8 @@ public class TableAccessor
                             javaClassAccessor.getProperty(propertyName);
                 } catch (NoSuchFieldException e) {
                     nestedPropertyAccessor = null;
-                    LogUtil.severeMF(logger,
-                            "Could not access nested property: {0}",
-                            e, propertyName);
+                    logger.error("Could not access nested property: " +
+                            propertyName, e);
                 }
             }
             ColumnAccessor columnAccessor =

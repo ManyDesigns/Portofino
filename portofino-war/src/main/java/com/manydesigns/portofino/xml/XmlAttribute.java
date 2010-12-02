@@ -45,6 +45,7 @@ public @interface XmlAttribute {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    boolean identifier() default false;
     boolean required();
     int order();
 }

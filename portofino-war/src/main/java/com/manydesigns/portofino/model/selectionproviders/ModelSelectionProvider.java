@@ -96,7 +96,7 @@ public class ModelSelectionProvider implements ModelObject {
         return selectionProperties;
     }
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true, order = 1, identifier = true)
     public String getName() {
         return name;
     }

@@ -30,13 +30,13 @@
 package com.manydesigns.elements.util;
 
 import com.manydesigns.elements.ElementsProperties;
-import com.manydesigns.elements.logging.LogUtil;
 import org.apache.commons.lang.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,7 +49,8 @@ public class RandomUtil {
 
     public final static int DEFAULT_RANDOM_CODE_LENGTH = 20;
 
-    public final static Logger logger = LogUtil.getLogger(RandomUtil.class);
+    public final static Logger logger =
+            LoggerFactory.getLogger(RandomUtil.class);
 
     protected static final int codeLength;
     protected static final File tempDir;
@@ -64,8 +65,7 @@ public class RandomUtil {
             tmp = Integer.parseInt(stringValue);
         } catch (Throwable e) {
             tmp = DEFAULT_RANDOM_CODE_LENGTH;
-            LogUtil.finerMF(logger,
-                    "Cannot use value ''{0}''. Using default: {2}",
+            logger.debug("Cannot use value '{}'. Using default: {}",
                     stringValue, tmp);
         }
         codeLength = tmp;

@@ -31,13 +31,13 @@ package com.manydesigns.elements.fields.search;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.annotations.*;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -56,7 +56,7 @@ public abstract class AbstractSearchField implements SearchField {
     protected boolean required;
 
     public static final Logger logger =
-            LogUtil.getLogger(AbstractSearchField.class);
+            LoggerFactory.getLogger(AbstractSearchField.class);
     public static final String ATTR_NAME_HTML_CLASS = "attr_name";
 
     //**************************************************************************
@@ -67,8 +67,6 @@ public abstract class AbstractSearchField implements SearchField {
     }
 
     public AbstractSearchField(PropertyAccessor accessor, String prefix) {
-        LogUtil.entering(logger, "AbstractSearchField", accessor, prefix);
-
         this.accessor = accessor;
 
         String localId;
@@ -91,7 +89,7 @@ public abstract class AbstractSearchField implements SearchField {
 
         if (accessor.isAnnotationPresent(LabelI18N.class)) {
             String text = accessor.getAnnotation(LabelI18N.class).value();
-            logger.finer("LabelI18N annotation present with value: " + text);
+            logger.debug("LabelI18N annotation present with value: {}", text);
 
             String args = null;
             String textCompare = MessageFormat.format(text, args);
@@ -102,21 +100,17 @@ public abstract class AbstractSearchField implements SearchField {
             }
         } else if (accessor.isAnnotationPresent(Label.class)) {
             label = accessor.getAnnotation(Label.class).value();
-            logger.finer("Label annotation present with value: " + label);
+            logger.debug("Label annotation present with value: ", label);
         } else {
             label = Util.camelCaseToWords(accessor.getName());
-            logger.finer("Setting label from property name: " + label);
+            logger.debug("Setting label from property name: ", label);
         }
 
         Required requiredAnnotation = accessor.getAnnotation(Required.class);
         if (requiredAnnotation != null) {
             required = requiredAnnotation.value();
-            LogUtil.finerMF(logger,
-                    "Required annotation present with value: {0}",
-                    required);
+            logger.debug("Required annotation present with value: {}", required);
         }
-
-        LogUtil.exiting(logger, "AbstractSearchField");
     }
 
     //**************************************************************************

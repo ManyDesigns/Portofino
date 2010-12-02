@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.actions.model;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.database.ConnectionProvider;
@@ -38,13 +37,14 @@ import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;
 import com.manydesigns.portofino.xml.XmlWriter;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.MessageFormat;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -69,7 +69,8 @@ public class SelfTestAction extends PortofinoAction {
     // Logging
     //--------------------------------------------------------------------------
 
-    public final static Logger logger = LogUtil.getLogger(SelfTestAction.class);
+    public final static Logger logger =
+            LoggerFactory.getLogger(SelfTestAction.class);
 
     //--------------------------------------------------------------------------
     // Action methods
@@ -97,8 +98,8 @@ public class SelfTestAction extends PortofinoAction {
             context.syncDataModel();
             SessionMessages.addInfoMessage("In-memory model synchronized to database model");
         } catch (Throwable e) {
-            LogUtil.severe(logger, "Exception caught", e);
             String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+            logger.error(rootCauseMessage, e);
             SessionMessages.addErrorMessage(rootCauseMessage);
         }
         return "sync";

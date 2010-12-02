@@ -1,12 +1,14 @@
 package com.manydesigns.elements;
 
-import com.manydesigns.elements.logging.LogUtil;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.util.StatusPrinter;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.elements.servlet.WebFramework;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
 import junit.framework.TestCase;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
@@ -24,12 +26,21 @@ public abstract class AbstractElementsTest extends TestCase {
 
     public MutableHttpServletRequest req;
 
+    public final static boolean PRINT_LOGBACK_STATUS = false;
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
 
+        if (PRINT_LOGBACK_STATUS) {
+            // assume SLF4J is bound to logback in the current environment
+            LoggerContext lc =
+                    (LoggerContext) LoggerFactory.getILoggerFactory();
+            // print logback's internal status
+            StatusPrinter.print(lc);
+        }
+        
         XmlBuffer.checkWellFormed = true;
-        LogUtil.initializeLoggingSystem();
 
         setUpProperties();
         setUpSingletons();

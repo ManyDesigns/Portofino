@@ -30,14 +30,14 @@
 package com.manydesigns.elements.blobs;
 
 import com.manydesigns.elements.ElementsProperties;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.RandomUtil;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -60,7 +60,7 @@ public class BlobsManager {
     //**************************************************************************
 
     public static final Logger logger =
-            LogUtil.getLogger(BlobsManager.class);
+            LoggerFactory.getLogger(BlobsManager.class);
 
     //**************************************************************************
     // Static initialization and methods
@@ -103,9 +103,8 @@ public class BlobsManager {
                         ElementsProperties.BLOBS_DIR_PROPERTY);
         if (blobsDirPath == null) {
             blobsDirPath = System.getProperty("java.io.tmpdir");
-            LogUtil.warningMF(logger,
-                    "Blobs dir property ''{0}'' not set. " +
-                            "Falling back to ''java.io.tmpdir'': {1}",
+            logger.warn("Blobs dir property '{}' not set. " +
+                    "Falling back to ''java.io.tmpdir'': {}",
                     ElementsProperties.BLOBS_DIR_PROPERTY,
                     blobsDirPath);
         }

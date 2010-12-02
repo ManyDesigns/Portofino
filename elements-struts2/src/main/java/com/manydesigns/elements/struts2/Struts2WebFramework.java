@@ -29,7 +29,6 @@
 
 package com.manydesigns.elements.struts2;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.servlet.Upload;
 import com.manydesigns.elements.servlet.WebFramework;
 import org.apache.struts2.dispatcher.StrutsRequestWrapper;
@@ -69,15 +68,13 @@ public class Struts2WebFramework extends WebFramework {
     public Upload getUpload(HttpServletRequest req, String parameter) {
         Class reqClass = req.getClass();
         if (StrutsRequestWrapper.class.equals(reqClass)) {
-            LogUtil.warningMF(logger,
-                    "Request of type {0} does not support uploads. " +
-                            "Make sure the form uses enctype=\"multipart/form-data\".",
+            logger.warn("Request of type {} does not support uploads. " +
+                    "Make sure the form uses enctype=\"multipart/form-data\".",
                     reqClass.getName());
             return null;
         }
         if (!(req instanceof MultiPartRequestWrapper)) {
-            LogUtil.warningMF(logger,
-                    "Request is not an instance of {0}. Actual type: {1}",
+            logger.warn("Request is not an instance of {}. Actual type: {}",
                     MultiPartRequestWrapper.class.getName(),
                     reqClass.getName());
             return null;
@@ -98,8 +95,7 @@ public class Struts2WebFramework extends WebFramework {
             InputStream is = new FileInputStream(file);
             return new Upload(is, fileName, contentType);
         } catch (FileNotFoundException e) {
-            LogUtil.warningMF(logger, "Cannot read upload file: {0}",
-                    file.getAbsolutePath());
+            logger.warn("Cannot read upload file: {}", file.getAbsolutePath());
             return null;
         }
     }

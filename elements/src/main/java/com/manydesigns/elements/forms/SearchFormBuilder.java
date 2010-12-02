@@ -32,7 +32,6 @@ package com.manydesigns.elements.forms;
 import com.manydesigns.elements.annotations.Searchable;
 import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.fields.search.SearchField;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
@@ -73,8 +72,6 @@ public class SearchFormBuilder extends AbstractFormBuilder {
     //**************************************************************************
 
     public SearchFormBuilder configFields(String... fieldNames) {
-        LogUtil.entering(logger, "configFields", fieldNames);
-
         propertyAccessors = new ArrayList<PropertyAccessor>();
         for (String current : fieldNames) {
             try {
@@ -82,20 +79,17 @@ public class SearchFormBuilder extends AbstractFormBuilder {
                         classAccessor.getProperty(current);
                 propertyAccessors.add(accessor);
             } catch (NoSuchFieldException e) {
-                LogUtil.warningMF(logger, "Field not found: {0}", e, current);
+                logger.warn("Field not found: " + current, e);
             }
         }
 
-        LogUtil.exiting(logger, "configFields");
         return this;
     }
 
     public SearchFormBuilder configPrefix(String prefix) {
-        LogUtil.entering(logger, "configPrefix", prefix);
+        logger.debug("prefix = {}", prefix);
 
         this.prefix = prefix;
-
-        LogUtil.exiting(logger, "configPrefix");
         return this;
     }
 
@@ -107,7 +101,7 @@ public class SearchFormBuilder extends AbstractFormBuilder {
 
 
     public SearchFormBuilder configReflectiveFields() {
-        LogUtil.entering(logger, "configReflectiveFields");
+        logger.debug("configReflectiveFields");
 
         propertyAccessors = new ArrayList<PropertyAccessor>();
 
@@ -119,7 +113,7 @@ public class SearchFormBuilder extends AbstractFormBuilder {
             // check if field is searchable
             Searchable searchableAnnotation = current.getAnnotation(Searchable.class);
             if (searchableAnnotation != null && !searchableAnnotation.value()) {
-                LogUtil.finerMF(logger, "Skipping non-searchable field: {0}",
+                logger.debug("Skipping non-searchable field: {}",
                         current.getName());
                 continue;
             }
@@ -127,7 +121,6 @@ public class SearchFormBuilder extends AbstractFormBuilder {
             propertyAccessors.add(current);
         }
 
-        LogUtil.exiting(logger, "configReflectiveFields");
         return this;
     }
 
@@ -136,7 +129,7 @@ public class SearchFormBuilder extends AbstractFormBuilder {
     //**************************************************************************
 
     public SearchForm build() {
-        LogUtil.entering(logger, "build");
+        logger.debug("build");
 
         SearchForm searchForm = new SearchForm();
         FieldsManager manager = FieldsManager.getManager();
@@ -155,7 +148,6 @@ public class SearchFormBuilder extends AbstractFormBuilder {
             searchForm.add(field);
         }
 
-        LogUtil.exiting(logger, "build");
         return searchForm;
     }
 }

@@ -33,7 +33,6 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.FieldSet;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -85,7 +84,7 @@ public class FormBuilder extends AbstractFormBuilder {
     //**************************************************************************
 
     public FormBuilder configFields(String... fieldNames) {
-        LogUtil.fineMF(logger, "Configuring fields to: {0}", fieldNames);
+        logger.debug("Configuring fields to: {}", fieldNames);
 
         String[][] groupedFieldNames = new String[1][];
         groupedFieldNames[0] = fieldNames;
@@ -93,7 +92,7 @@ public class FormBuilder extends AbstractFormBuilder {
     }
 
     public FormBuilder configFields(String[]... groupedFieldNames) {
-        LogUtil.entering(logger, "configFields", groupedFieldNames);
+        logger.debug("configFields", groupedFieldNames);
 
         groupedPropertyAccessors = new ArrayList<ArrayList<PropertyAccessor>>();
         for (String[] currentNameGroup : groupedFieldNames) {
@@ -106,33 +105,30 @@ public class FormBuilder extends AbstractFormBuilder {
                             classAccessor.getProperty(currentField);
                     currentPropertyGroup.add(accessor);
                 } catch (NoSuchFieldException e) {
-                    LogUtil.warningMF(logger, "Field not found: {0}", e,
-                            currentField);
+                    logger.warn("Field not found: {}" + currentField, e);
                 }
             }
         }
 
-        LogUtil.exiting(logger, "configFields");
         return this;
     }
 
     public FormBuilder configPrefix(String prefix) {
-        LogUtil.fineMF(logger, "Configuring prefix to: {0}", prefix);
+        logger.debug("Configuring prefix to: ", prefix);
 
         this.prefix = prefix;
         return this;
     }
 
     public FormBuilder configNColumns(int nColumns) {
-        LogUtil.fineMF(logger, "Configuring nColumns to: {0}", nColumns);
+        logger.debug("Configuring nColumns to: {}", nColumns);
 
         this.nColumns = nColumns;
         return this;
     }
 
     public FormBuilder configFieldSetNames(String... fieldSetNames) {
-        LogUtil.fineMF(logger,
-                "Configuring configFieldSetNames to: {0}", fieldSetNames);
+        logger.debug("Configuring configFieldSetNames to: {}", fieldSetNames);
 
         this.fieldSetNames = Arrays.asList(fieldSetNames);
         return this;
@@ -150,7 +146,7 @@ public class FormBuilder extends AbstractFormBuilder {
     }
 
     public FormBuilder configReflectiveFields() {
-        LogUtil.entering(logger, "configReflectiveFields");
+        logger.debug("configReflectiveFields");
 
         groupedPropertyAccessors = new ArrayList<ArrayList<PropertyAccessor>>();
         fieldSetNames = new ArrayList<String>();
@@ -178,7 +174,7 @@ public class FormBuilder extends AbstractFormBuilder {
             currentGroup.add(current);
         }
 
-        LogUtil.exiting(logger, "configReflectiveFields");
+        logger.debug("configReflectiveFields");
         return this;
     }
 
@@ -187,7 +183,7 @@ public class FormBuilder extends AbstractFormBuilder {
     //**************************************************************************
 
     public Form build() {
-        LogUtil.entering(logger, "build");
+        logger.debug("build");
 
         Form form = new Form(mode);
 
@@ -232,7 +228,6 @@ public class FormBuilder extends AbstractFormBuilder {
             }
         }
 
-        LogUtil.exiting(logger, "build");
         return form;
     }
 
@@ -275,8 +270,7 @@ public class FormBuilder extends AbstractFormBuilder {
         }
 
         if (field == null) {
-            LogUtil.warningMF(logger,
-                    "Cannot instanciate field for property {0}",
+            logger.warn("Cannot instanciate field for property {}",
                     propertyAccessor);
             return;
         }

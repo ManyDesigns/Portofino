@@ -29,12 +29,12 @@
 
 package com.manydesigns.portofino.reflection;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.model.site.usecases.UseCaseProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -55,7 +55,7 @@ public class UseCasePropertyAccessor
     protected final PropertyAccessor nestedAccessor;
 
     public static final Logger logger =
-            LogUtil.getLogger(UseCasePropertyAccessor.class);
+            LoggerFactory.getLogger(UseCasePropertyAccessor.class);
 
     
     //**************************************************************************

@@ -29,15 +29,15 @@
 
 package com.manydesigns.elements.json;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.text.MessageFormat;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -54,7 +54,7 @@ public class JsonBuffer {
 
     public static boolean checkWellFormed = false;
 
-    public Logger logger = LogUtil.getLogger(JsonBuffer.class);
+    public Logger logger = LoggerFactory.getLogger(JsonBuffer.class);
 
     //**************************************************************************
     // Fields
@@ -93,7 +93,7 @@ public class JsonBuffer {
             writeCommaIfNeeded();
             writer.write("[");
         } catch (IOException e) {
-            LogUtil.severe(logger, "Json writer exception", e);
+            logger.error("Json writer exception", e);
         }
         first = true;
     }
@@ -102,7 +102,7 @@ public class JsonBuffer {
         try {
             writer.write("]");
         } catch (IOException e) {
-            LogUtil.severe(logger, "Json writer exception", e);
+            logger.error("Json writer exception", e);
         }
         first = false;
     }
@@ -112,7 +112,7 @@ public class JsonBuffer {
             writeCommaIfNeeded();
             writer.write("{");
         } catch (IOException e) {
-            LogUtil.severe(logger, "Json writer exception", e);
+            logger.error("Json writer exception", e);
         }
         first = true;
     }
@@ -121,7 +121,7 @@ public class JsonBuffer {
         try {
             writer.write("}");
         } catch (IOException e) {
-            LogUtil.severe(logger, "Json writer exception", e);
+            logger.error("Json writer exception", e);
         }
         first = false;
     }
@@ -164,7 +164,7 @@ public class JsonBuffer {
                     rawValue);
             writer.write(text);
         } catch (IOException e) {
-            LogUtil.severe(logger, "Json writer exception", e);
+            logger.error("Json writer exception", e);
         }
     }
 

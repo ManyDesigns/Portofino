@@ -33,7 +33,6 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.jfreechart.JBla;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.struts2.Struts2Util;
 import com.manydesigns.elements.util.RandomUtil;
@@ -55,6 +54,8 @@ import org.jfree.ui.HorizontalAlignment;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.VerticalAlignment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.File;
@@ -62,7 +63,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -126,7 +126,7 @@ public class PortletDesignAction extends PortofinoAction {
     private final Color transparentColor = new Color(0, true);
 
     public static final Logger logger =
-            LogUtil.getLogger(PortletDesignAction.class);
+            LoggerFactory.getLogger(PortletDesignAction.class);
 
     //**************************************************************************
     // Action default execute method
@@ -168,7 +168,7 @@ public class PortletDesignAction extends PortofinoAction {
 
             bla = new JBla(chart, file, width, height, portletUrl);
         } catch (java.io.IOException e) {
-            LogUtil.warning(logger, "Could not save portlet", e);
+            logger.warn("Could not save portlet", e);
             SessionMessages.addErrorMessage(e.getMessage());
         }
 
@@ -184,7 +184,7 @@ public class PortletDesignAction extends PortofinoAction {
                 dataset.setValue((Comparable)current[0], (Number)current[1]);
             }
         } catch (Throwable e) {
-            LogUtil.warning(logger, "Could not run portlet sql", e);
+            logger.warn("Could not run portlet sql", e);
             while (e != null) {
                 SessionMessages.addErrorMessage(e.getMessage());
                 e = e.getCause();
@@ -264,7 +264,7 @@ public class PortletDesignAction extends PortofinoAction {
         try {
             inputStream = new FileInputStream(file);
         } catch (FileNotFoundException e) {
-            LogUtil.warning(logger, "Could not create chart input stream", e);
+            logger.warn("Could not create chart input stream", e);
         }
 
         return "chart";

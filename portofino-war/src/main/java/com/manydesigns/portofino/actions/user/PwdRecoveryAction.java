@@ -28,18 +28,18 @@
  */
 package com.manydesigns.portofino.actions.user;
 
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.email.EmailUtils;
 import com.manydesigns.portofino.system.model.users.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -58,7 +58,7 @@ public class PwdRecoveryAction extends PortofinoAction
 
 
     public static final Logger logger =
-        LogUtil.getLogger(PwdRecoveryAction.class);
+        LoggerFactory.getLogger(PwdRecoveryAction.class);
 
     public String email;
 
@@ -83,7 +83,7 @@ public class PwdRecoveryAction extends PortofinoAction
                     "L'email non è stata inviata";
             SessionMessages.addErrorMessage(
                     errore);
-            LogUtil.warning(logger, errore, e);
+            logger.warn(errore, e);
             return INPUT;
         }
 

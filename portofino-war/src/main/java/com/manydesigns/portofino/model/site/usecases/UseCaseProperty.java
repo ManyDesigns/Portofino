@@ -96,7 +96,7 @@ public class UseCaseProperty implements ModelObject {
     // Getters/setters
     //**************************************************************************
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true, order = 1, identifier = true)
     public String getName() {
         return name;
     }

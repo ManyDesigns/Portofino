@@ -31,14 +31,14 @@ package com.manydesigns.portofino.reflection;
 
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.annotations.impl.*;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.model.datamodel.Column;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Modifier;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -59,7 +59,7 @@ public class ColumnAccessor
     protected final PropertyAccessor nestedPropertyAccessor;
 
     public static final Logger logger =
-            LogUtil.getLogger(ColumnAccessor.class);
+            LoggerFactory.getLogger(ColumnAccessor.class);
 
 
     //**************************************************************************

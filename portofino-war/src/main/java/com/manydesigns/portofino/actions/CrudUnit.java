@@ -34,7 +34,6 @@ import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -61,6 +60,8 @@ import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.*;
@@ -73,7 +74,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -138,7 +138,7 @@ public class CrudUnit {
     //**************************************************************************
 
     public static final Logger logger =
-            LogUtil.getLogger(AbstractCrudAction.class);
+            LoggerFactory.getLogger(AbstractCrudAction.class);
     private static final String CONSTRAINT_VIOLATION = "Constraint violation";
 
 
@@ -267,8 +267,9 @@ public class CrudUnit {
             try {
                 context.commit(baseTable.getDatabaseName());
             } catch (Throwable e) {
-                LogUtil.fine(logger, ExceptionUtils.getRootCauseMessage(e), e);
-                SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
+                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                logger.warn(rootCauseMessage, e);
+                SessionMessages.addErrorMessage(rootCauseMessage);
                 return PortofinoAction.CREATE;
             }
             pk = pkHelper.generatePkString(object);
@@ -301,8 +302,9 @@ public class CrudUnit {
             try {
                 context.commit(baseTable.getDatabaseName());
             } catch (Throwable e) {
-                LogUtil.fine(logger, ExceptionUtils.getRootCauseMessage(e), e);
-                SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
+                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                logger.warn(rootCauseMessage, e);
+                SessionMessages.addErrorMessage(rootCauseMessage);
                 return PortofinoAction.EDIT;
             }
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
@@ -346,8 +348,9 @@ public class CrudUnit {
             try {
                 context.commit(baseTable.getDatabaseName());
             } catch (Throwable e) {
-                LogUtil.fine(logger, ExceptionUtils.getRootCauseMessage(e), e);
-                SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
+                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                logger.warn(rootCauseMessage, e);
+                SessionMessages.addErrorMessage(rootCauseMessage);
                 return PortofinoAction.BULK_EDIT;
             }
             SessionMessages.addInfoMessage(MessageFormat.format(
@@ -370,8 +373,9 @@ public class CrudUnit {
             context.commit(baseTable.getDatabaseName());
             SessionMessages.addInfoMessage("DELETE avvenuto con successo");
         } catch (Exception e) {
-            LogUtil.fine(logger, ExceptionUtils.getRootCauseMessage(e), e);
-            SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
+            String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+            logger.debug(rootCauseMessage, e);
+            SessionMessages.addErrorMessage(rootCauseMessage);
         }
         return PortofinoAction.DELETE;
     }
@@ -389,7 +393,7 @@ public class CrudUnit {
         try {
                 context.commit(baseTable.getDatabaseName());
             } catch (Exception e) {
-                LogUtil.fine(logger, ExceptionUtils.getRootCauseMessage(e), e);
+                logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
                 SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
         }
         SessionMessages.addInfoMessage(MessageFormat.format(
@@ -452,7 +456,7 @@ public class CrudUnit {
         targetField.setLabelSearch(labelSearch);
 
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
-        LogUtil.infoMF(logger, "jsonSelectFieldOptions: {0}", text);
+        logger.debug("jsonSelectFieldOptions: {}", text);
         return text;
     }
 
@@ -486,10 +490,10 @@ public class CrudUnit {
             if (matcher.matches()) {
                 String key = matcher.group(1);
                 String value = matcher.group(2);
-                LogUtil.fineMF(logger, "Matched part: {0}={1}", key, value);
+                logger.debug("Matched part: {}={}", key, value);
                 dummyRequest.setParameter(key, value);
             } else {
-                LogUtil.fineMF(logger, "Could not match part: {0}", part);
+                logger.debug("Could not match part: {}", part);
             }
         }
         searchForm.readFromRequest(dummyRequest);
@@ -633,13 +637,13 @@ public class CrudUnit {
 
             workbook.write();
         } catch (IOException e) {
-            LogUtil.warning(logger, "IOException", e);
+            logger.warn("IOException", e);
             SessionMessages.addErrorMessage(e.getMessage());
         } catch (RowsExceededException e) {
-            LogUtil.warning(logger, "RowsExceededException", e);
+            logger.warn("RowsExceededException", e);
             SessionMessages.addErrorMessage(e.getMessage());
         } catch (WriteException e) {
-            LogUtil.warning(logger, "WriteException", e);
+            logger.warn("WriteException", e);
             SessionMessages.addErrorMessage(e.getMessage());
         } finally {
             try {
@@ -647,7 +651,7 @@ public class CrudUnit {
                     workbook.close();
             }
             catch (Exception e) {
-                LogUtil.warning(logger, "IOException", e);
+                logger.warn("IOException", e);
                 SessionMessages.addErrorMessage(e.getMessage());
             }
         }
@@ -846,7 +850,7 @@ public class CrudUnit {
 
             out.flush();
         } catch (Exception e) {
-            LogUtil.warning(logger, "IOException", e);
+            logger.warn("IOException", e);
             SessionMessages.addErrorMessage(e.getMessage());
         } finally {
             try {
@@ -854,7 +858,7 @@ public class CrudUnit {
                     out.close();
             }
             catch (Exception e) {
-                LogUtil.warning(logger, "IOException", e);
+                logger.warn("IOException", e);
                 SessionMessages.addErrorMessage(e.getMessage());
             }
         }
@@ -1037,7 +1041,7 @@ public class CrudUnit {
 
             out.flush();
         } catch (Exception e) {
-            LogUtil.warning(logger, "IOException", e);
+            logger.warn("IOException", e);
             SessionMessages.addErrorMessage(e.getMessage());
         } finally {
             try {
@@ -1045,7 +1049,7 @@ public class CrudUnit {
                     out.close();
             }
             catch (Exception e) {
-                LogUtil.warning(logger, "IOException", e);
+                logger.warn("IOException", e);
                 SessionMessages.addErrorMessage(e.getMessage());
             }
         }

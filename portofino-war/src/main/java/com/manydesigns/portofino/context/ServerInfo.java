@@ -31,12 +31,12 @@ package com.manydesigns.portofino.context;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Memory;
-import com.manydesigns.elements.logging.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,7 +52,7 @@ public class ServerInfo {
     //**************************************************************************
 
     public static final Logger logger =
-            LogUtil.getLogger(ServerInfo.class);
+            LoggerFactory.getLogger(ServerInfo.class);
 
     protected final ServletContext servletContext;
 
@@ -70,19 +70,19 @@ public class ServerInfo {
         this.servletContext = servletContext;
 
         realPath = servletContext.getRealPath("/");
-        LogUtil.finerMF(logger, "Real path: {0}", realPath);
+        logger.debug("Real path: {}", realPath);
 
         servletContextName = servletContext.getServletContextName();
-        LogUtil.finerMF(logger, "Servlet context name: {0}", servletContextName);
+        logger.debug("Servlet context name: {}", servletContextName);
 
         serverInfo = servletContext.getServerInfo();
-        LogUtil.finerMF(logger, "Server info: {0}", serverInfo);
+        logger.debug("Server info: {}", serverInfo);
 
         servletApiMajor = servletContext.getMajorVersion();
         servletApiMinor = servletContext.getMinorVersion();
         servletApiVersion = MessageFormat.format("{0}.{1}",
                         servletApiMajor, servletApiMinor);
-        LogUtil.finerMF(logger, "Servlet API version: {0}", servletApiVersion);
+        logger.debug("Servlet API version: {}", servletApiVersion);
 
         String tmp = null;
         if (servletApiMajor >= 2 && servletApiMinor >= 5) {
@@ -91,11 +91,11 @@ public class ServerInfo {
                         servletContext.getClass().getMethod("getContextPath");
                 tmp = (String)method.invoke(servletContext);
             } catch (Throwable e) {
-                LogUtil.severe(logger, "Uncaught exception", e);
+                logger.debug("Uncaught exception", e);
             }
         }
         contextPath = tmp;
-        LogUtil.finerMF(logger, "Context path: {0}", contextPath);
+        logger.debug("Context path: {}", contextPath);
 
         runTime = Runtime.getRuntime();
     }

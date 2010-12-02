@@ -31,7 +31,6 @@ package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobsManager;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
 import com.opensymphony.xwork2.ModelDriven;
@@ -42,11 +41,12 @@ import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 import org.apache.fop.apps.FOPException;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.TransformerException;
 import java.io.*;
-import java.util.logging.Logger;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -129,7 +129,7 @@ public abstract class  AbstractCrudAction extends PortofinoAction
     //**************************************************************************
 
     public static final Logger logger =
-            LogUtil.getLogger(AbstractCrudAction.class);
+            LoggerFactory.getLogger(AbstractCrudAction.class);
 
     //**************************************************************************
     // Action default execute method
@@ -290,7 +290,7 @@ public abstract class  AbstractCrudAction extends PortofinoAction
         try {
             inputStream = new FileInputStream(fileTemp);
         } catch (IOException e) {
-            LogUtil.warning(logger, "IOException", e);
+            logger.warn("IOException", e);
             SessionMessages.addErrorMessage(e.getMessage());
         }
     }
@@ -308,13 +308,13 @@ public abstract class  AbstractCrudAction extends PortofinoAction
             workbook = Workbook.createWorkbook(fileTemp);
             rootCrudUnit.exportReadExcel(workbook);
         } catch (IOException e) {
-            LogUtil.warning(logger, "IOException", e);
+            logger.warn("IOException", e);
             SessionMessages.addErrorMessage(e.getMessage());
         } catch (RowsExceededException e) {
-            LogUtil.warning(logger, "RowsExceededException", e);
+            logger.warn("RowsExceededException", e);
             SessionMessages.addErrorMessage(e.getMessage());
         } catch (WriteException e) {
-            LogUtil.warning(logger, "WriteException", e);
+            logger.warn("WriteException", e);
             SessionMessages.addErrorMessage(e.getMessage());
         } finally {
             try {
@@ -322,7 +322,7 @@ public abstract class  AbstractCrudAction extends PortofinoAction
                     workbook.close();
             }
             catch (Exception e) {
-                LogUtil.warning(logger, "IOException", e);
+                logger.warn("IOException", e);
                 SessionMessages.addErrorMessage(e.getMessage());
             }
         }        

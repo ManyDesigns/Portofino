@@ -31,14 +31,16 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.logging.LogUtil;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
 import com.manydesigns.portofino.email.EmailTask;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -50,7 +52,6 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Properties;
 import java.util.Timer;
-import java.util.logging.Logger;
 
 
 /*
@@ -92,7 +93,7 @@ public class PortofinoListener
     protected Timer scheduler;
 
     public static final Logger logger =
-            LogUtil.getLogger(PortofinoListener.class);
+            LoggerFactory.getLogger(PortofinoListener.class);
     private static final int PERIOD = 10000;
     private static final int DELAY = 5000;
     private static final int DELAY2 = 5300;
@@ -102,8 +103,6 @@ public class PortofinoListener
     //**************************************************************************
 
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        LogUtil.initializeLoggingSystem();
-
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
@@ -113,15 +112,17 @@ public class PortofinoListener
         servletContext = servletContextEvent.getServletContext();
         serverInfo = new ServerInfo(servletContext);
 
-        LogUtil.infoMF(logger, "\n" + SEPARATOR +
-                "\n--- ManyDesigns Portofino {0} starting..." +
-                "\n--- Context path: {1}" +
-                "\n--- Real path: {2}" +
+        logger.info("\n" + SEPARATOR +
+                "\n--- ManyDesigns Portofino {} starting..." +
+                "\n--- Context path: {}" +
+                "\n--- Real path: {}" +
                 "\n" + SEPARATOR,
-                portofinoProperties.getProperty(
-                        PortofinoProperties.PORTOFINO_VERSION_PROPERTY),
-                serverInfo.getContextPath(),
-                serverInfo.getRealPath()
+                new String[] {
+                        portofinoProperties.getProperty(
+                                PortofinoProperties.PORTOFINO_VERSION_PROPERTY),
+                        serverInfo.getContextPath(),
+                        serverInfo.getRealPath()
+                }
         );
 
         servletContext.setAttribute(SERVER_INFO_ATTRIBUTE,
@@ -138,8 +139,7 @@ public class PortofinoListener
         if (serverInfo.getServletApiMajor() < 2 ||
                 (serverInfo.getServletApiMajor() == 2 &&
                         serverInfo.getServletApiMinor() < 3)) {
-            LogUtil.severeMF(logger,
-                    "Servlet API version must be >= 2.3. Found: {0}.",
+            logger.error("Servlet API version must be >= 2.3. Found: {}.",
                     serverInfo.getServletApiVersion());
             success = false;
         }
@@ -159,7 +159,7 @@ public class PortofinoListener
             {
                 if (null==mailSender
                         || null == mailHost ) {
-                    LogUtil.infoMF(logger, "User admin email or smtp server not set in" +
+                    logger.info("User admin email or smtp server not set in" +
                             " portofino-custom.properties");
                 } else {
                     scheduler = new java.util.Timer(true);
@@ -170,18 +170,17 @@ public class PortofinoListener
                                 DELAY2, PERIOD);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        LogUtil.severe(logger, "Problems in starting schedulers", e);
+                        logger.error("Problems in starting schedulers", e);
                     }
                 }
             }
         }
         stopWatch.stop();
         if (success) {
-            LogUtil.infoMF(logger,
-                    "ManyDesigns Portofino successfully started in {0} ms.",
+            logger.info("ManyDesigns Portofino successfully started in {} ms.",
                     stopWatch.getTime());
         } else {
-            logger.severe("Failed to start ManyDesigns Portofino.");
+            logger.error("Failed to start ManyDesigns Portofino.");
         }
     }
 
@@ -245,13 +244,12 @@ public class PortofinoListener
 
     public void sessionCreated(HttpSessionEvent httpSessionEvent) {
         HttpSession session = httpSessionEvent.getSession();
-        LogUtil.infoMF(logger, "Session created: id={0}",
-                session.getId());
+        logger.info("Session created: id={}", session.getId());
     }
 
     public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
         HttpSession session = httpSessionEvent.getSession();
-        LogUtil.infoMF(logger, "Session destroyed: id={0}", session.getId());
+        logger.info("Session destroyed: id={}", session.getId());
     }
 
     protected void createContext() {
@@ -295,7 +293,7 @@ public class PortofinoListener
             context.loadConnections(connectionsFile);
             context.loadXmlModel(modelFile);
         } catch (Throwable e) {
-            LogUtil.severe(logger, "Exception caught", e);
+            logger.error(ExceptionUtils.getRootCauseMessage(e), e);
         } finally {
             ElementsThreadLocals.removeElementsContext();
         }
