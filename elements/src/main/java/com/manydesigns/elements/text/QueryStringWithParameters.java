@@ -53,4 +53,5 @@ public class QueryStringWithParameters {
     public Object[] getParamaters() {
         return paramaters;
     }
+
 }

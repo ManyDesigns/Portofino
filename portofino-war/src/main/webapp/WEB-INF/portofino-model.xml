@@ -756,7 +756,7 @@ Struttura dell'XML:
                              description="user administration" url="/usersAdmin/Users.action">
                     <useCase name = "users"
                              table="portofino.public.users"
-                             query="FROM portofino.public.users"
+                             query="FROM portofino_public_users"
                              searchTitle="Users"
                              createTitle="Create new user"
                              readTitle="User"
@@ -773,7 +773,7 @@ Struttura dell'XML:
                         </properties>
                         <selectionProviders>
                             <selectionProvider name="mysel" database="portofino"
-                                               hql="FROM portofino.public.userstate">
+                                               hql="FROM portofino_public_userstate">
                                 <selectionProperties>
                                     <selectionProperty name="state"/>
                                 </selectionProperties>
@@ -796,7 +796,7 @@ Struttura dell'XML:
                         <subUseCases>
                             <useCase name="active"
                                      table="portofino.public.groups"
-                                     query="FROM portofino.public.groups groups WHERE groups.groupId NOT IN (SELECT groups2.groupId FROM portofino.public.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
+                                     query="FROM portofino_public_groups groups WHERE groups.groupId NOT IN (SELECT groups2.groupId FROM portofino_public_users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
                                      searchTitle="Active groups">
                                 <properties>
                                     <property name="groupId"/>
@@ -806,7 +806,7 @@ Struttura dell'XML:
                             </useCase>
                             <useCase name="current"
                                      table="portofino.public.groups"
-                                     query="FROM portofino.public.groups groups WHERE groups.groupId in (SELECT groups2.groupId FROM portofino.public.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
+                                     query="FROM portofino_public_groups groups WHERE groups.groupId in (SELECT groups2.groupId FROM portofino_public_users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
                                      searchTitle="Current groups">
                                 <properties>
                                     <property name="groupId"/>
@@ -817,7 +817,7 @@ Struttura dell'XML:
 
                             <useCase name="past"
                                      table="portofino.public.users_groups"
-                                     query="FROM portofino.public.users_groups ug WHERE ug.userid=%{userId} AND ug.deletionDate IS NOT null"
+                                     query="FROM portofino_public_users_groups ug WHERE ug.userid=%{userId} AND ug.deletionDate IS NOT null"
                                      searchTitle="Past groups">
                                 <properties>
                                     <property name="userid"/>
@@ -834,7 +834,7 @@ Struttura dell'XML:
                              description="groups administration" url="/usersAdmin/Groups.action">
                     <useCase name="groupAdmin"
                              table="portofino.public.groups"
-                             query="from portofino.public.groups"
+                             query="from portofino_public_groups"
                              searchTitle="Groups"
                              createTitle="Create new group"
                              readTitle="Group"
@@ -849,7 +849,7 @@ Struttura dell'XML:
                         </properties>
                         <selectionProviders>
                             <selectionProvider name="mysel" database="portofino"
-                                               hql="FROM portofino.public.users">
+                                               hql="FROM portofino_public_users">
                             <!--sql="SELECT userid, firstname ||' '|| lastname || '('|| emailaddress || ')' FROM users ORDER BY lastname, firstname"-->
                                 <selectionProperties>
                                     <selectionProperty name="creatorId"/>
@@ -872,7 +872,7 @@ Struttura dell'XML:
                 <useCaseNode description="uc1" id="uc1" title="uc1">
                     <useCase name="usecase1"
                      table="jpetstore.public.product"
-                     query="FROM jpetstore.public.product product where product.category = %{'FISH'}"
+                     query="FROM jpetstore_public_product product where product.category = %{'FISH'}"
                      searchTitle="Products in category FISH"
                      createTitle="Create product in category FISH"
                      readTitle="Product in category FISH"
@@ -952,7 +952,7 @@ Struttura dell'XML:
                 <useCaseNode description="uc2" id="uc2" title="uc2">
                     <useCase name="usecase2"
                              table="jpetstore.public.category"
-                             query="FROM jpetstore.public.category"
+                             query="FROM jpetstore_public_category"
                              searchTitle="Categories"
                              createTitle="Create new category"
                              readTitle="Category"
@@ -973,7 +973,7 @@ Struttura dell'XML:
                         <subUseCases>
                             <useCase name="usecase3"
                                      table="jpetstore.public.product"
-                                     query="FROM jpetstore.public.product product WHERE product.category = %{catid}"
+                                     query="FROM jpetstore_public_product product WHERE product.category = %{catid}"
                                      searchTitle="Products in category">
                                 <properties>
                                     <property name="productid"/>
@@ -988,7 +988,7 @@ Struttura dell'XML:
                 <useCaseNode description="rimborsi" title="rimborsi" id="rimborsi">
                     <useCase name="rimborsi"
                      table="hibernatetest.public.rimborso"
-                     query="FROM hibernatetest.public.rimborso rimborso"
+                     query="FROM hibernatetest_public_rimborso rimborso"
                      searchTitle="Rimborsi"
                      createTitle="Crea rimborso"
                      readTitle="Rimborso"

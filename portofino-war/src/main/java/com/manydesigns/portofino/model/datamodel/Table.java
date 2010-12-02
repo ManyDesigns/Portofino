@@ -347,7 +347,7 @@ public class Table implements ModelObject {
     //|    '0'..'9'
     //;
     //**************************************************************************
-    private String defineEntityName (String name) {
+    public static String defineEntityName (String name) {
         name = StringUtils.replaceChars(name, ".", "_");
         String firstLetter = name.substring(0,1);
         String others = name.substring(1);
@@ -362,7 +362,7 @@ public class Table implements ModelObject {
         return result.toString();
     }
 
-    private String checkFirstLetter(String letter) {
+    private static String checkFirstLetter(String letter) {
         letter = StringUtils.replaceChars(letter, "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
                                                   "abcdefghijklmnopqrstuvwxyz");
 
@@ -376,7 +376,7 @@ public class Table implements ModelObject {
         }
     }
 
-    private String checkOtherLetters(String letter) {
+    private  static String checkOtherLetters(String letter) {
         letter = StringUtils.replaceChars(letter, "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
                                                   "abcdefghijklmnopqrstuvwxyz");
         if (letter.equals("_") || letter.equals("$")

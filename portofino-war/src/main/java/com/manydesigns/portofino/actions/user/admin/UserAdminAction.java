@@ -148,7 +148,8 @@ public class UserAdminAction extends UseCaseAction {
         final Properties properties = PortofinoProperties.getProperties();
 
         boolean mailEnabled = Boolean.parseBoolean(
-                properties.getProperty(PortofinoProperties.MAIL_ENABLED, "false"));
+                properties.getProperty(PortofinoProperties.MAIL_ENABLED,
+                        "false"));
 
         if (mailEnabled) {
             String msg = "La tua nuova password è " + generatedPwd;
@@ -159,7 +160,8 @@ public class UserAdminAction extends UseCaseAction {
                     user.getEmail(), thisUser.getEmail());
 
         } else {
-           SessionMessages.addInfoMessage("La nuova password per l'utente è "+generatedPwd);
+           SessionMessages.addInfoMessage("La nuova password per l'utente è "
+                   +generatedPwd);
         }
         if (enc){
             user.encryptPwd();

@@ -60,8 +60,9 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
 
     public void testAutoIncrementGenerator(){
         Map<String, Object> supplier = new HashMap<String, Object>();
-        final String supplierTable = "jpetstore.PUBLIC.supplier";
-        supplier.put("$type$", supplierTable);
+        String supplierTable = "jpetstore.PUBLIC.supplier";
+        String supplierEntity = "jpetstore_public_supplier";
+        supplier.put("$type$", supplierEntity);
         supplier.put("status", "99");
         supplier.put("name", "Giampiero");
         context.saveObject(supplierTable,supplier);
@@ -87,7 +88,8 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
     public void testSequenceGenerator(){
         Map<String, Object> supplier = new HashMap<String, Object>();
         final String testTable = "hibernatetest.PUBLIC.test";
-        supplier.put("$type$", testTable);
+        final String testEntity = "hibernatetest_public_test";
+        supplier.put("$type$", testEntity);
         context.saveObject(testTable,supplier);
         context.commit("hibernatetest");
         Table table = context.getModel()
@@ -109,7 +111,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         Map<String, Object> order = new HashMap<String, Object>();
         final int expectedId = 1000;
         final String ordersTable = "jpetstore.PUBLIC.orders";
-        order.put("$type$", ordersTable);
+        order.put("$type$", "jpetstore_public_orders");
         order.put("userid", "99");
         order.put("orderdate", new Date());
         order.put("shipaddr1", "99");

@@ -177,6 +177,10 @@ public class Model {
 
     public Table findTableByQualifiedName(String qualifiedTableName) {
         int lastDot = qualifiedTableName.lastIndexOf(".");
+        if(lastDot==-1) {
+            return null;
+        }
+
         String qualifiedSchemaName = qualifiedTableName.substring(0, lastDot);
         String tableName = qualifiedTableName.substring(lastDot + 1);
         Schema schema = findSchemaByQualifiedName(qualifiedSchemaName);
@@ -230,5 +234,19 @@ public class Model {
 
     public void setRootNode(RootNode rootNode) {
         this.rootNode = rootNode;
+    }
+
+    public Table findTableByEntityName(String entityName) {
+        for(Database db : this.getDatabases()) {
+            for(Schema schema : db.getSchemas()){
+                for (Table tb : schema.getTables()){
+                    if(entityName.equals(tb.getActualEntityName())){
+                        return tb;
+                    }
+                }
+            }
+
+        }
+        return null;
     }
 }
