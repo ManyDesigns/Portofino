@@ -7,6 +7,7 @@
     <s:set var="buttonsBarBottom" value="true"/>
     <div class="buttons-bar-top">
 </s:else>
+    <s:submit id="refresh" method="execute" value="Refresh view"/>
     <s:submit id="SelfTest_sync" method="sync" value="Synchronize model"/>
     <s:submit id="SelfTest_export" method="export" value="Export xml"/>
 </div>

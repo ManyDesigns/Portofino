@@ -65,6 +65,15 @@ public class SelfTestAction extends PortofinoAction {
     public String contentType;
     public String contentDisposition;
 
+    public boolean showBothNull = false;
+    public boolean showSourceNull = true;
+    public boolean showTargetNull = true;
+    public boolean showEqual = false;
+    public boolean showDifferent = true;
+
+    public boolean expandTree = true;
+
+
     //--------------------------------------------------------------------------
     // Logging
     //--------------------------------------------------------------------------
@@ -78,7 +87,14 @@ public class SelfTestAction extends PortofinoAction {
 
     public String execute() throws SQLException {
         xmlDiffer = new XmlDiffer();
+
         treeTableDiffer = new TreeTableDiffer();
+        treeTableDiffer.setShowBothNull(showBothNull);
+        treeTableDiffer.setShowSourceNull(showSourceNull);
+        treeTableDiffer.setShowTargetNull(showTargetNull);
+        treeTableDiffer.setShowEqual(showEqual);
+        treeTableDiffer.setShowDifferent(showDifferent);
+
         for (ConnectionProvider current : context.getConnectionProviders()) {
             Database sourceDatabase = current.readModel();
             Database targetDatabase =
@@ -115,5 +131,6 @@ public class SelfTestAction extends PortofinoAction {
 
         return "export";
     }
+
 
 }

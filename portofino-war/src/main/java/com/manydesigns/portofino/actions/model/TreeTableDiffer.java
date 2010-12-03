@@ -51,6 +51,12 @@ public class TreeTableDiffer implements XhtmlFragment {
     protected final XhtmlBuffer xb;
     protected int nodeCounter;
 
+    boolean showBothNull;
+    boolean showSourceNull;
+    boolean showTargetNull;
+    boolean showEqual;
+    boolean showDifferent;
+
     public TreeTableDiffer() {
         super();
         xb = new XhtmlBuffer();
@@ -62,6 +68,9 @@ public class TreeTableDiffer implements XhtmlFragment {
     }
 
     public void run(XmlDiffer.Differ differ, String htmlClass) {
+        if (!recursivelyShow(differ)) {
+            return;
+        }
         String id = generateId();
         xb.openElement("tr");
         xb.addAttribute("id", id);
@@ -78,14 +87,55 @@ public class TreeTableDiffer implements XhtmlFragment {
         xb.closeElement("tr");
 
         String childOfId = generateChildOfId(id);
+        // scan attribute differs
+        for (XmlDiffer.Differ attributeDiffer : differ.getAttributeDiffers()) {
+            run(attributeDiffer, childOfId);
+        }
         // scan child differs
         for (XmlDiffer.Differ childDiffer : differ.getChildDiffers()) {
             run(childDiffer, childOfId);
         }
     }
 
+    boolean recursivelyShow(XmlDiffer.Differ differ) {
+        XmlDiffer.Status status = differ.getStatus();
+        switch (status) {
+            case EQUAL:
+                if (showEqual) return true;
+                break;
+            case DIFFERENT:
+                if (showDifferent) return true;
+                break;
+            case BOTH_NULL:
+                if (showBothNull) return true;
+                break;
+            case SOURCE_NULL:
+                if (showSourceNull) return true;
+                break;
+            case TARGET_NULL:
+                if (showTargetNull) return true;
+                break;
+            default:
+                throw new Error("Unknown case");
+        }
+
+        for (XmlDiffer.Differ current : differ.getAttributeDiffers()) {
+            if (recursivelyShow(current)) {
+                return true;
+            }
+        }
+
+        for (XmlDiffer.Differ current : differ.getChildDiffers()) {
+            if (recursivelyShow(current)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private String generateId() {
-        return MessageFormat.format("id-{0}", nodeCounter++);
+        return MessageFormat.format("id-{0}", Integer.toString(nodeCounter++));
     }
 
     private String generateChildOfId(String parentId) {
@@ -101,27 +151,23 @@ public class TreeTableDiffer implements XhtmlFragment {
         switch(status) {
             case EQUAL:
                 xb.addAttribute("class", "status_green");
-                xb.write("Ok");
                 break;
             case BOTH_NULL:
-                xb.addAttribute("class", "status_red");
-                xb.write("Ok");
+                xb.addAttribute("class", "status_green");
                 break;
             case SOURCE_NULL:
                 xb.addAttribute("class", "status_red");
-                xb.write("Not on db");
                 break;
             case TARGET_NULL:
                 xb.addAttribute("class", "status_red");
-                xb.write("Only on db");
                 break;
             case DIFFERENT:
                 xb.addAttribute("class", "status_red");
-                xb.write("Differences");
                 break;
             default:
                 throw new Error("Unknown case");
         }
+        xb.write(status.getLabel());
         xb.closeElement("td");
     }
 
@@ -132,321 +178,47 @@ public class TreeTableDiffer implements XhtmlFragment {
         xb.toXhtml(toBuffer);
     }
 
-    /*
-    //--------------------------------------------------------------------------
-    // Databases
-    //--------------------------------------------------------------------------
-
-    public void diffDatabaseSourceNull(DatabaseDiff databaseDiff) {
-        String databaseDisplayName = targetDatabase.getDatabaseName();
-        writeDatabase(databaseDisplayName, STATUS_NOT_ON_DB);
-        diffDatabaseChildren(databaseDiff);
-    }
-
-    public void diffDatabaseTargetNull(DatabaseDiff databaseDiff) {
-        String databaseDisplayName = sourceDatabase.getDatabaseName();
-        writeDatabase(databaseDisplayName, STATUS_ONLY_ON_DB);
-        diffDatabaseChildren(databaseDiff);
-    }
-
-    public void diffDatabaseSourceTarget(DatabaseDiff databaseDiff) {
-        String databaseDisplayName = sourceDatabase.getDatabaseName();
-        writeDatabase(databaseDisplayName, STATUS_OK);
-        diffDatabaseChildren(databaseDiff);
-    }
-
-
-    public void writeDatabase(String databaseDisplayName, String status) {
-        databaseId = generateId();
-        xb.openElement("tr");
-        xb.addAttribute("id", databaseId);
-
-        xb.openElement("td");
-        xb.write(databaseDisplayName);
-        xb.closeElement("td");
-
-        writeTypeAndStatus("database", status);
-
-        xb.closeElement("tr");
-    }
-
-    private void writeTypeAndStatus(String type, String status) {
-        xb.openElement("td");
-        xb.write(type);
-        xb.closeElement("td");
-
-        xb.openElement("td");
-        if (STATUS_OK.equals(status)) {
-            xb.addAttribute("class", "status_green");
-        } else if (STATUS_ONLY_ON_DB.equals(status)) {
-            xb.addAttribute("class", "status_red");
-        } else if (STATUS_NOT_ON_DB.equals(status)) {
-            xb.addAttribute("class", "status_red");
-        }
-        xb.write(status);
-        xb.closeElement("td");
-    }
-
-    private String generateId() {
-        return MessageFormat.format("id-{0}", nodeCounter++);
-    }
-
-    //--------------------------------------------------------------------------
-    // Schemas
-    //--------------------------------------------------------------------------
-
-    public void diffSchemaSourceNull(SchemaDiff schemaDiff) {
-        String schemaDisplayName = targetSchema.getSchemaName();
-        writeSchema(schemaDisplayName, STATUS_NOT_ON_DB);
-        diffSchemaChildren(schemaDiff);
-    }
-
-    public void diffSchemaTargetNull(SchemaDiff schemaDiff) {
-        String schemaDisplayName = sourceSchema.getSchemaName();
-        writeSchema(schemaDisplayName, STATUS_ONLY_ON_DB);
-        diffSchemaChildren(schemaDiff);
-    }
-
-    public void diffSchemaSourceTarget(SchemaDiff schemaDiff) {
-        String schemaDisplayName = sourceSchema.getSchemaName();
-        writeSchema(schemaDisplayName, STATUS_OK);
-        diffSchemaChildren(schemaDiff);
-    }
-
-    public void writeSchema(String schemaDisplayName, String status) {
-        schemaId = generateId();
-        xb.openElement("tr");
-        xb.addAttribute("id", schemaId);
-        xb.addAttribute("class", generateChildOfId(databaseId));
-
-        xb.openElement("td");
-        xb.write(schemaDisplayName);
-        xb.closeElement("td");
-
-        writeTypeAndStatus("schema", status);
-
-        xb.closeElement("tr");
-    }
-
-    //--------------------------------------------------------------------------
-    // Tables
-    //--------------------------------------------------------------------------
-
-    public void diffTableSourceNull(TableDiff tableDiff) {
-        String tableDisplayName = targetTable.getTableName();
-        writeTable(tableDisplayName, STATUS_NOT_ON_DB);
-        diffTableChildren(tableDiff);
-    }
-
-    public void diffTableTargetNull(TableDiff tableDiff) {
-        String tableDisplayName = sourceTable.getTableName();
-        writeTable(tableDisplayName, STATUS_ONLY_ON_DB);
-        diffTableChildren(tableDiff);
-    }
-
-    public void diffTableSourceTarget(TableDiff tableDiff) {
-        String tableDisplayName = sourceTable.getTableName();
-        writeTable(tableDisplayName, STATUS_OK);
-        diffTableChildren(tableDiff);
-    }
-
-    public void writeTable(String tableDisplayName, String status) {
-        tableId = generateId();
-        xb.openElement("tr");
-        xb.addAttribute("id", tableId);
-        xb.addAttribute("class", generateChildOfId(schemaId));
-
-        xb.openElement("td");
-        xb.write(tableDisplayName);
-        xb.closeElement("td");
-
-        writeTypeAndStatus("table", status);
-
-        xb.closeElement("tr");
-    }
-
-    //--------------------------------------------------------------------------
-    // Table annotations
-    //--------------------------------------------------------------------------
-
-    public void diffTableAnnotationSourceNull(ModelAnnotationDiff modelAnnotationDiff) {
-    }
-
-    public void diffTableAnnotationTargetNull(ModelAnnotationDiff modelAnnotationDiff) {
-    }
-
-    public void diffTableAnnotationSourceTarget(ModelAnnotationDiff modelAnnotationDiff) {
-    }
-
-    //--------------------------------------------------------------------------
-    // Columns
-    //--------------------------------------------------------------------------
-
-    public void diffColumnSourceNull(ColumnDiff columnDiff) {
-        String columnDisplayName = targetColumn.getColumnName();
-        writeColumn(columnDisplayName, STATUS_NOT_ON_DB);
-        diffColumnChildren(columnDiff);
-    }
-
-    public void diffColumnTargetNull(ColumnDiff columnDiff) {
-        String columnDisplayName = sourceColumn.getColumnName();
-        writeColumn(columnDisplayName, STATUS_ONLY_ON_DB);
-        diffColumnChildren(columnDiff);
-    }
-
-    public void diffColumnSourceTarget(ColumnDiff columnDiff) {
-        String columnDisplayName = sourceColumn.getColumnName();
-        writeColumn(columnDisplayName, STATUS_OK);
-        diffColumnChildren(columnDiff);
-    }
-
-    public void writeColumn(String columnDisplayName, String status) {
-        columnId = generateId();
-        xb.openElement("tr");
-        xb.addAttribute("id", columnId);
-        xb.addAttribute("class", generateChildOfId(tableId));
-
-        xb.openElement("td");
-        xb.write(columnDisplayName);
-        xb.closeElement("td");
-
-        writeTypeAndStatus("column", status);
-
-        xb.closeElement("tr");
-    }
-
-
-    //--------------------------------------------------------------------------
-    // Column annotations
-    //--------------------------------------------------------------------------
-
-    public void diffColumnAnnotationSourceNull(ModelAnnotationDiff modelAnnotationDiff) {
-    }
-
-    public void diffColumnAnnotationTargetNull(ModelAnnotationDiff modelAnnotationDiff) {
-    }
-
-    public void diffColumnAnnotationSourceTarget(ModelAnnotationDiff modelAnnotationDiff) {
-    }
-
-    //--------------------------------------------------------------------------
-    // Primary keys
-    //--------------------------------------------------------------------------
-
-    public void diffPrimaryKeySourceNull(PrimaryKeyDiff primaryKeyDiff) {
-        String primaryKeyDisplayName = targetPrimaryKey.getPrimaryKeyName();
-        writePrimaryKey(primaryKeyDisplayName, STATUS_NOT_ON_DB);
-        diffPrimaryKeyChildren(primaryKeyDiff);
-    }
-
-    public void diffPrimaryKeyTargetNull(PrimaryKeyDiff primaryKeyDiff) {
-        String primaryKeyDisplayName = sourcePrimaryKey.getPrimaryKeyName();
-        writePrimaryKey(primaryKeyDisplayName, STATUS_ONLY_ON_DB);
-        diffPrimaryKeyChildren(primaryKeyDiff);
-    }
-
-    public void diffPrimaryKeySourceTarget(PrimaryKeyDiff primaryKeyDiff) {
-        String primaryKeyDisplayName = sourcePrimaryKey.getPrimaryKeyName();
-        writePrimaryKey(primaryKeyDisplayName, STATUS_OK);
-        diffPrimaryKeyChildren(primaryKeyDiff);
-    }
-
-    public void writePrimaryKey(String primaryKeyDisplayName, String status) {
-        primaryKeyId = generateId();
-        xb.openElement("tr");
-        xb.addAttribute("id", primaryKeyId);
-        xb.addAttribute("class", generateChildOfId(tableId));
-
-        xb.openElement("td");
-        xb.write(primaryKeyDisplayName);
-        xb.closeElement("td");
-
-        writeTypeAndStatus("primary key", status);
-
-        xb.closeElement("tr");
-    }
-
-    //--------------------------------------------------------------------------
-    // Primary key columns
-    //--------------------------------------------------------------------------
-
-    public void diffPrimaryKeyColumnSourceNull(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
-    }
-
-    public void diffPrimaryKeyColumnTargetNull(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
-    }
-
-    public void diffPrimaryKeyColumnSourceTarget(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
-    }
-
-
-    //--------------------------------------------------------------------------
-    // Foreign keys
-    //--------------------------------------------------------------------------
-
-    public void diffForeignKeySourceNull(ForeignKeyDiff foreignKeyDiff) {
-        String foreignKeyDisplayName = targetForeignKey.getForeignKeyName();
-        writeForeignKey(foreignKeyDisplayName, STATUS_NOT_ON_DB);
-        diffForeignKeyChildren(foreignKeyDiff);
-    }
-
-    public void diffForeignKeyTargetNull(ForeignKeyDiff foreignKeyDiff) {
-        String foreignKeyDisplayName = sourceForeignKey.getForeignKeyName();
-        writeForeignKey(foreignKeyDisplayName, STATUS_ONLY_ON_DB);
-        diffForeignKeyChildren(foreignKeyDiff);
-    }
-
-    public void diffForeignKeySourceTarget(ForeignKeyDiff foreignKeyDiff) {
-        String foreignKeyDisplayName = sourceForeignKey.getForeignKeyName();
-        writeForeignKey(foreignKeyDisplayName, STATUS_OK);
-        diffForeignKeyChildren(foreignKeyDiff);
-    }
-
-    public void writeForeignKey(String foreignKeyDisplayName, String status) {
-        foreignKeyId = generateId();
-        xb.openElement("tr");
-        xb.addAttribute("id", foreignKeyId);
-        xb.addAttribute("class", generateChildOfId(tableId));
-
-        xb.openElement("td");
-        xb.write(foreignKeyDisplayName);
-        xb.closeElement("td");
-
-        writeTypeAndStatus("foreign key", status);
-
-        xb.closeElement("tr");
-    }
-
-
-    //--------------------------------------------------------------------------
-    // References
-    //--------------------------------------------------------------------------
-
-    public void diffReferenceSourceNull(ReferenceDiff referenceDiff) {
-    }
-
-    public void diffReferenceTargetNull(ReferenceDiff referenceDiff) {
-    }
-
-    public void diffReferenceSourceTarget(ReferenceDiff referenceDiff) {
-    }
-
-
-    //--------------------------------------------------------------------------
-    // Foreign key annotations
-    //--------------------------------------------------------------------------
-
-    public void diffForeignKeyAnnotationSourceNull(ModelAnnotationDiff modelAnnotationDiff) {
-    }
-
-    public void diffForeignKeyAnnotationTargetNull(ModelAnnotationDiff modelAnnotationDiff) {
-    }
-
-    public void diffForeignKeyAnnotationSourceTarget(ModelAnnotationDiff modelAnnotationDiff) {
-    }
-
     //--------------------------------------------------------------------------
     // Getter/setter
     //--------------------------------------------------------------------------
-*/
+
+    public boolean isShowBothNull() {
+        return showBothNull;
+    }
+
+    public void setShowBothNull(boolean showBothNull) {
+        this.showBothNull = showBothNull;
+    }
+
+    public boolean isShowSourceNull() {
+        return showSourceNull;
+    }
+
+    public void setShowSourceNull(boolean showSourceNull) {
+        this.showSourceNull = showSourceNull;
+    }
+
+    public boolean isShowTargetNull() {
+        return showTargetNull;
+    }
+
+    public void setShowTargetNull(boolean showTargetNull) {
+        this.showTargetNull = showTargetNull;
+    }
+
+    public boolean isShowEqual() {
+        return showEqual;
+    }
+
+    public void setShowEqual(boolean showEqual) {
+        this.showEqual = showEqual;
+    }
+
+    public boolean isShowDifferent() {
+        return showDifferent;
+    }
+
+    public void setShowDifferent(boolean showDifferent) {
+        this.showDifferent = showDifferent;
+    }
 }

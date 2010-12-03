@@ -29,8 +29,8 @@
                 <interceptor-ref name="staticParams"/>
                 <interceptor-ref name="prepare"/>
                 <interceptor-ref name="modelDriven"/>
-                <interceptor-ref name="params"/>
                 <interceptor-ref name="checkbox"/>
+                <interceptor-ref name="params"/>
             </interceptor-stack>
         </interceptors>
         <default-interceptor-ref name="mdstack"/>
