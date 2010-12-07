@@ -83,6 +83,9 @@
 
 
     <xsl:template match="tablerel">
+         <fo:block font-size="16pt" font-weight="bold" space-after="5mm"> <xsl:value-of select="nametablerel"/>
+         </fo:block>
+
         <fo:table table-layout="fixed" width="100%" border-collapse="separate">
             <fo:table-header>
                 <xsl:apply-templates select="headerrel"/>
