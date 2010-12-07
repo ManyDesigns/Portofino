@@ -777,7 +777,9 @@
                                 <column autoincrement="false" columnName="phone" columnType="varchar" javaType="java.lang.String" length="80" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="pk_supplier" >
-                                <column columnName="suppid" increment="true"/>
+                                <column columnName="suppid">
+                                    <incrementGenerator/>
+                                </column>
                             </primaryKey>
                         </table>
                         <table tableName="orders">
@@ -809,7 +811,9 @@
                                 <column autoincrement="false" columnName="locale" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="pk_orders">
-                                <column columnName="orderid" sequenceTable="sequence" keyColumn="name" keyValue="ordernum" valueColumn="nextid"/>
+                                <column columnName="orderid">
+                                    <tableGenerator table="sequence" keyColumn="name" keyValue="ordernum" valueColumn="nextid"/>
+                                </column>
                             </primaryKey>
                         </table>
                         <table tableName="sequence">
@@ -837,7 +841,9 @@
                                         nullable="false" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="test_pkey">
-                                <column columnName="id" sequenceName = "test_seq"/>
+                                <column columnName="id">
+                                    <sequenceGenerator name = "test_seq"/>
+                                </column>
                             </primaryKey>
                         </table>
                         <table tableName="table1">

@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Set;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -60,10 +59,10 @@ public class EmailTask extends TimerTask {
     protected static final int N_THREADS = 5;
     protected static ExecutorService outbox = Executors.newFixedThreadPool
             (N_THREADS);
-    protected static final ConcurrentLinkedQueue<EmailSender> successQueue
+    /*protected static final ConcurrentLinkedQueue<EmailSender> successQueue
             = new ConcurrentLinkedQueue<EmailSender>();
     protected static final ConcurrentLinkedQueue<EmailSender> rejectedQueue
-            = new ConcurrentLinkedQueue<EmailSender>();
+            = new ConcurrentLinkedQueue<EmailSender>();*/
     protected final POP3Client client;
     protected static final Logger logger =
             LoggerFactory.getLogger(TimerTask.class);
@@ -117,7 +116,6 @@ public class EmailTask extends TimerTask {
             context.openSession();
             createQueue();
             checkBounce();
-            manageSuccessAndRejected();
         } finally {
             context.closeSession();
         }
@@ -133,7 +131,8 @@ public class EmailTask extends TimerTask {
                     criteria.eq(accessor.getProperty("state"),
                             EmailUtils.TOBESENT));
             for (Object obj : emails) {
-                EmailSender emailSender = new EmailSender((EmailBean) obj);
+                EmailSender emailSender = new EmailSender(context,
+                        (EmailBean) obj);
                 EmailBean email = emailSender.getEmailBean();
                 try {
                     email.setState(EmailUtils.SENDING);
@@ -149,30 +148,6 @@ public class EmailTask extends TimerTask {
         }
     }
 
-
-    private synchronized void manageSuccessAndRejected() {
-        while (!successQueue.isEmpty()) {
-            EmailSender email = successQueue.poll();
-            if ("true".equals(PortofinoProperties.getProperties()
-                    .getProperty(PortofinoProperties.KEEP_SENT))) {
-                continue;
-            }
-            try {
-                EmailUtils.deleteEmail(context, email.getEmailBean());
-                context.commit(EmailUtils.PORTOFINO);
-            } catch (Throwable e) {
-                logger.warn("Cannot delete email", e);
-            }
-        }
-        while (!rejectedQueue.isEmpty()) {
-            EmailSender email = rejectedQueue.poll();
-            logger.debug("Adding reject mail with id:"
-                    + email.getEmailBean().getId());
-            email.getEmailBean().setState(EmailUtils.TOBESENT);
-            EmailUtils.updateEmail(context, email.getEmailBean());
-            context.commit();
-        }
-    }
 
     private synchronized void checkBounce() {
         if (client != null) {

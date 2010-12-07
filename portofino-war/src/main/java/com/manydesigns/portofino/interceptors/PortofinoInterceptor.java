@@ -117,6 +117,7 @@ public class PortofinoInterceptor implements Interceptor {
             } else {
                 if (userId==null){
                     stopWatch.stop();
+                    actionContext.getParameters().put("url", "/Profile.action");
                     return LOGIN_ACTION;
                 } else {
                     stopWatch.stop();

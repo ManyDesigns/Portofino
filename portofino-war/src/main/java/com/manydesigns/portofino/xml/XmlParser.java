@@ -449,12 +449,25 @@ public class XmlParser {
 
                 if (xmlElementAnnotation != null) {
                     boolean required = xmlElementAnnotation.required();
-                    Class itemClass = propertyAccessor.getType();
-                    String itemName = propertyAccessor.getName();
-                    ElementCallback callback =
-                            new ElementCallback(obj, null, propertyAccessor,
-                                    itemClass, itemName, (required ? 1 : 0), 1);
-                    childCallbacks.add(callback);
+
+                    Class[] itemClasses = xmlElementAnnotation.itemClasses();
+                    if (itemClasses.length == 0) {
+                        itemClasses = new Class[] {propertyAccessor.getType()};
+                    }
+
+                    String[] itemNames = xmlElementAnnotation.itemNames();
+                    if (itemNames.length == 0) {
+                        itemNames = new String[] {propertyAccessor.getName()};
+                    }
+
+                    for (int index = 0; index < itemClasses.length; index++) {
+                        Class itemClass = itemClasses[index];
+                        String itemName = itemNames[index];
+                        ElementCallback callback =
+                                new ElementCallback(obj, null, propertyAccessor,
+                                        itemClass, itemName, 0, 1);
+                        childCallbacks.add(callback);
+                    }
                 } else if (xmlCollectionAnnotation != null) {
                     boolean required = xmlCollectionAnnotation.required();
                     String collectionName = propertyAccessor.getName();

@@ -120,11 +120,11 @@ public abstract class POP3Client {
                     //attachment do nothing
                 } else {
                     if (bodyPart.getContent() instanceof String)
-                        ct = ct + " " + (String) bodyPart.getContent();
+                        ct = ct + " " + bodyPart.getContent();
                 }
             }
         } else {
-            ct = ct + (String) p.getContent();
+            ct = ct + p.getContent();
         }
         StringTokenizer st = new StringTokenizer(ct, "\n,; ");
         while (st.hasMoreTokens()) {

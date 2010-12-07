@@ -35,10 +35,11 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.UseCaseAction;
 import com.manydesigns.portofino.email.EmailUtils;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
-import com.manydesigns.portofino.system.model.users.UsersGroups;
 import com.manydesigns.portofino.system.model.users.UserUtils;
+import com.manydesigns.portofino.system.model.users.UsersGroups;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -156,9 +157,9 @@ public class UserAdminAction extends UseCaseAction {
             Long userId = (Long) getSession().get(UserUtils.USERID);
             User thisUser =
             (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
-            EmailUtils.addEmail(context, "new password", msg,
+            EmailBean email = new EmailBean("new password", msg,
                     user.getEmail(), thisUser.getEmail());
-
+            context.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
         } else {
            SessionMessages.addInfoMessage("La nuova password per l'utente è "
                    +generatedPwd);

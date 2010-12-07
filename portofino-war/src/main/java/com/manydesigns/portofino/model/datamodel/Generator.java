@@ -26,27 +26,31 @@
  * Boston, MA  02111-1307  USA
  *
  */
+package com.manydesigns.portofino.model.datamodel;
 
-package com.manydesigns.portofino.xml;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.manydesigns.portofino.model.ModelObject;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
-public @interface XmlElement {
+public abstract class Generator implements ModelObject{
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+    protected final PrimaryKeyColumn primaryKeyColumn;
 
-    Class[] itemClasses() default {};
-    String[] itemNames() default {};
-    boolean required() default false;
-    int order();
+    //**************************************************************************
+    // Constructor
+    //**************************************************************************
+    public Generator(PrimaryKeyColumn primaryKeyColumn) {
+        this.primaryKeyColumn = primaryKeyColumn;
+    }
+
+    public PrimaryKeyColumn getPrimaryKeyColumn() {
+        return primaryKeyColumn;
+    }
 }

@@ -84,7 +84,6 @@ public class HibernateContextImpl implements Context {
     protected static final String WHERE_STRING = " WHERE ";
     protected static final Pattern FROM_PATTERN =
             Pattern.compile("[fF][rR][oO][mM]\\s+([a-z_$\\u0080-\\ufffe]{1}[a-z_$1-9\\u0080-\\ufffe]*).*");
-    // (a-z$_\u0080-\ufffe){1}(a-z$_\u0080-\ufffe)*
 
 
     //**************************************************************************
@@ -828,7 +827,7 @@ public class HibernateContextImpl implements Context {
     public User findUserByUserName(String username) {
         String qualifiedTableName = PORTOFINO_PUBLIC_USERS;
         Session session = getSession(qualifiedTableName);
-        org.hibernate.Criteria criteria = session.createCriteria(qualifiedTableName);
+        org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
         criteria.add(Restrictions.eq(UserUtils.USERNAME, username));
         startTimer();
         @SuppressWarnings({"unchecked"})
@@ -845,7 +844,7 @@ public class HibernateContextImpl implements Context {
     public User findUserByToken(String token) {
         String qualifiedTableName = PORTOFINO_PUBLIC_USERS;
         Session session = getSession(qualifiedTableName);
-        org.hibernate.Criteria criteria = session.createCriteria(qualifiedTableName);
+        org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
         criteria.add(Restrictions.eq("token", token));
         startTimer();
         @SuppressWarnings({"unchecked"})

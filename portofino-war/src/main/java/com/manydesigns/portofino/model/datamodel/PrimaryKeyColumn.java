@@ -32,6 +32,7 @@ package com.manydesigns.portofino.model.datamodel;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.XmlAttribute;
+import com.manydesigns.portofino.xml.XmlElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,17 +50,9 @@ public class PrimaryKeyColumn implements ModelObject {
     // Fields
     //**************************************************************************
     protected final PrimaryKey primaryKey;
-
     protected String columnName;
+    protected Generator generator;
 
-    protected String sequenceName;
-
-    protected String sequenceTable;
-    protected String keyColumn;
-    protected String keyValue;
-    protected String valueColumn;
-
-    protected Boolean increment;
     //**************************************************************************
     // Fields for wire-up
     //**************************************************************************
@@ -128,57 +121,14 @@ public class PrimaryKeyColumn implements ModelObject {
         return actualColumn;
     }
 
-    @XmlAttribute(required = false, order = 2)
-    public String getSequenceTable() {
-        return sequenceTable;
+    @XmlElement(required = false, order = 1,
+            itemClasses = {SequenceGenerator.class, IncrementGenerator.class, TableGenerator.class},
+            itemNames = {"sequenceGenerator", "incrementGenerator", "tableGenerator"})
+    public Generator getGenerator() {
+        return generator;
     }
 
-    public void setSequenceTable(String sequenceTable) {
-        this.sequenceTable = sequenceTable;
-    }
-
-    @XmlAttribute(required = false, order = 3)
-    public String getKeyColumn() {
-        return keyColumn;
-    }
-
-    public void setKeyColumn(String keyColumn) {
-        this.keyColumn = keyColumn;
-    }
-
-    @XmlAttribute(required = false, order = 4)
-    public String getKeyValue() {
-        return keyValue;
-    }
-
-    public void setKeyValue(String keyValue) {
-        this.keyValue = keyValue;
-    }
-
-    @XmlAttribute(required = false, order = 5)
-    public String getValueColumn() {
-        return valueColumn;
-    }
-
-    public void setValueColumn(String valueColumn) {
-        this.valueColumn = valueColumn;
-    }
-
-    @XmlAttribute(required = false, order = 6)
-    public String getSequenceName() {
-        return sequenceName;
-    }
-
-    public void setSequenceName(String sequenceName) {
-        this.sequenceName = sequenceName;
-    }
-
-    @XmlAttribute(required = false, order = 2)
-    public Boolean getIncrement() {
-        return increment;
-    }
-
-    public void setIncrement(Boolean increment) {
-        this.increment = increment;
+    public void setGenerator(Generator generator) {
+        this.generator = generator;
     }
 }

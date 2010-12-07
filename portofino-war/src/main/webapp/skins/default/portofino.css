@@ -288,13 +288,17 @@ div#content-login {
     width: 400px;
 
 }
-div#login {
-    width: 395px;
-    height: 175px;
-    margin-left:20px;
+
+div#content-login table {
+    margin-left: auto;
+    margin-right: auto;
     
 }
-div#login table tr td, div#login table tr th {
+
+div#content-login h1 {
+    text-align: center;
+}
+div#content-login table tr td, div#login table tr th {
     border: 0pt;
     background-color: #65a7db;
 }

@@ -57,8 +57,9 @@
             </result>
             <result name="login" type="redirectAction">
                 <param name="actionName">Login</param>
-                <param name="namespace">/user</param>  
-            </result>
+                <param name="namespace">/user</param>
+                <param name="url">${url}</param>
+             </result>
             <result name="modelNotFound">/errors/model-not-found.jsp</result>
         </global-results>
     </package>
@@ -396,9 +397,9 @@
 
         <action name="Login" class="com.manydesigns.portofino.actions.user.LoginAction">
             <result name="input">/skins/default/user/login.jsp</result>
-            <result name="success" type="redirectAction">
-                <param name="actionName">Homepage</param>
-                <param name="namespace">/</param>
+            <result name="success" type="redirect">
+                <param name="location">${url}</param>
+                <param name="prependServletContext">true</param>
             </result>
         </action>
     </package>

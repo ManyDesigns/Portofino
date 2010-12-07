@@ -468,7 +468,9 @@ Struttura dell'XML:
                                 <column autoincrement="false" columnName="locale" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="pk_orders">
-                                <column columnName="orderid" sequenceTable="sequence" keyColumn="name" keyValue="ordernum" valueColumn="nextid"/>
+                                <column columnName="orderid">
+                                    <tableGenerator table="sequence" keyColumn="name" keyValue="ordernum" valueColumn="nextid"/>
+                                </column>                                
                             </primaryKey>
                         </table>
                         <table tableName="orderstatus">

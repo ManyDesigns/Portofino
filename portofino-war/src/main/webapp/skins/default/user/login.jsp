@@ -36,6 +36,7 @@
     <script type="text/javascript"
             src="<s:url value="/skins/default/portofino.js"/>"></script>
     <title><s:property value="#request.navigation.selectedNavigationNode.description"/></title>
+
 </head>
 <body>
 <div id="doc3" class="yui-t2">
@@ -57,21 +58,36 @@
     <div id="bd">
         <div id="yui-main">
             <div id="content-login">
-                <s:form method="post" namespace="/user" action="Login.action">
+                <s:form method="post" namespace="/user" action="Login">
 
 
 
                         <div id="login">
                             <h1>Login</h1>
                             <p/>
-                            <mdes:write value="form"/>
+                            <table class="details">
+                                <tbody>
+                                    <tr>
+                                        <th><label class="field" for="userName">User name:</label></th>
+                                        <td><input type="text" name="userName" id="userName" class="text" ></td>
+                                    </tr>
+                                    <tr>
+                                        <th><label class="field" for="pwd">Password:</label></th>
+                                        <td><input type="password" name="pwd" id="pwd" class="text"></td>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <td><s:submit id="loginButton" method="login" value="Login" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2"><s:if test="recoverPwd">
+                            Hai dimenticato la password? <a href="PwdRecovery.action">recupera password</a></s:if>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                             <p/>
-                            <s:submit id="loginButton" method="login" value="Login" />
-                            <p>
-                            <s:if test="recoverPwd">
-                            Hai dimenticato la password? <a href="PwdRecovery.action">recupera password</a>
-                            </p>
-                            </s:if>
+
                         </div>
                         <s:hidden name="successReturnUrl" value="%{successReturnUrl}"/>
                     
@@ -90,7 +106,7 @@
     </div>
 </div>
 <script type="text/javascript">
-/*YAHOO.example.fixSideBar();*/
+        $('#userName').focus();
 </script>
 </body>
 </html>

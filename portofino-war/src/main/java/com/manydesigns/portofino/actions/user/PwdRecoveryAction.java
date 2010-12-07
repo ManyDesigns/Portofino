@@ -33,6 +33,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.email.EmailUtils;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.system.model.email.EmailBean;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,7 +109,8 @@ public class PwdRecoveryAction extends PortofinoAction
                 .append(url)
                 .append(" to insert a new one. \n\n")
                 .append("Thank you.").toString();
-        EmailUtils.addEmail(context, subject, body, email, from);
+        EmailBean emailBean = new EmailBean(subject, body, email , from);
+        context.saveObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
         SessionMessages.addInfoMessage("An email was sent to your address. " +
                 "Please check your email.");
         context.commit();

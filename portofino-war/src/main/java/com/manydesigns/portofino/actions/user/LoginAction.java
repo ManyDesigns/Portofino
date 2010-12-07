@@ -71,6 +71,8 @@ public class LoginAction extends PortofinoAction
     public Form form;
     public boolean recoverPwd;
 
+    public String url;
+
     public static final Logger logger =
             LoggerFactory.getLogger(LoginAction.class);
 
@@ -127,6 +129,9 @@ public class LoginAction extends PortofinoAction
         getSession().put(UserUtils.USERID, user.getUserId());
         getSession().put(UserUtils.USERNAME, user.getUserName());
         updateUser(user);
+        if(null==url) {
+            url="/Homepage.action";
+        }
         return SUCCESS;
 
     }
@@ -155,6 +160,9 @@ public class LoginAction extends PortofinoAction
     public String logout(){
         getSession().remove(UserUtils.USERID);
         SessionMessages.addInfoMessage("User disconnetected");
+        if(null==url) {
+            url="/Homepage.action";
+        }
         return SUCCESS;
     }
 }

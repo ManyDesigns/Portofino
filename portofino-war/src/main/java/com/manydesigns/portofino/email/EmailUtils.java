@@ -59,36 +59,13 @@ public class EmailUtils {
     public static final String EMAILQUEUE_TABLE = "portofino.public.emailqueue";
     public static final String PORTOFINO = "portofino";
 
-    public static synchronized void addEmail(Context context, EmailBean email) {
-        context.saveObject(EMAILQUEUE_TABLE, email);
-    }
+
 
     public static synchronized void addEmail(Context context, String subject, String body,
     String to, String from) {
         EmailBean email = new EmailBean(subject, body, to,
                 from);
-        context.saveObject(EMAILQUEUE_TABLE, email);
+        context.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
     }
 
-    public static synchronized void deleteEmail(Context context, EmailBean email) {
-        context.deleteObject(EMAILQUEUE_TABLE, email);
-    }
-
-    public static synchronized void deleteEmail(Context context, String subject, String body,
-    String to, String from) {
-        EmailBean email = new EmailBean(subject, body, to,
-                from);
-        context.deleteObject(EMAILQUEUE_TABLE, email);
-    }
-
-    public static synchronized void updateEmail(Context context, EmailBean email) {
-        context.updateObject(EMAILQUEUE_TABLE, email);
-    }
-
-    public static synchronized void updateEmail(Context context, String subject, String body,
-    String to, String from) {
-        EmailBean email = new EmailBean(subject, body, to,
-                from);
-        context.updateObject(EMAILQUEUE_TABLE, email);
-    }
 }

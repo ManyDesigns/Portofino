@@ -384,17 +384,24 @@ public class HibernateConfig {
         prop.setUpdateable(false);
         clazz.addProperty(prop);
 
+        Generator generator = pkcol.getGenerator();
 
-        if (null!=pkcol.getSequenceName()) {
-            manageSequenceGenerator(mappings, tab, id, pkcol.getSequenceName());
-        } else if (null!=pkcol.getSequenceTable()){
-            manageTableGenerator(mappings, tab, id, pkcol.getSequenceTable(),
-                    pkcol.getKeyColumn(), pkcol.getKeyValue(),
-                    pkcol.getValueColumn());
+        if (null!=generator && generator instanceof SequenceGenerator) {
+            manageSequenceGenerator(mappings, tab, id, (SequenceGenerator) generator);
+        }
 
-        } else if (column.isAutoincrement()) {
+        if (null!=generator && generator instanceof
+                com.manydesigns.portofino.model.datamodel.TableGenerator) {
+            manageTableGenerator(mappings, tab, id,
+                    (com.manydesigns.portofino.model.datamodel.TableGenerator) generator);
+        }
+
+        if (column.isAutoincrement()) {
             manageIdentityGenerator(mappings, tab, id);
-        } else if (null!=pkcol.getIncrement()&&pkcol.getIncrement()){
+        }
+
+        if (null!=generator && generator instanceof
+                com.manydesigns.portofino.model.datamodel.IncrementGenerator){
             manageAutoIncrementType(mappings, id, clazz.getEntityName());
         }
 
@@ -420,14 +427,14 @@ public class HibernateConfig {
     }
 
     private void manageSequenceGenerator(Mappings mappings, Table tab,
-                                          SimpleValue id, String seqName) {
+                                          SimpleValue id, SequenceGenerator generator) {
         id.setIdentifierGeneratorStrategy
                 ("enhanced-sequence");
         Properties params = new Properties();
         params.put(PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER,
                     mappings.getObjectNameNormalizer());
         params.put(SequenceStyleGenerator.SEQUENCE_PARAM,
-                    escapeName(seqName));
+                    escapeName(generator.getName()));
         params.setProperty(
                     SequenceStyleGenerator.SCHEMA,
                     escapeName(tab.getSchema()));
@@ -436,20 +443,18 @@ public class HibernateConfig {
     }
 
     private void manageTableGenerator(Mappings mappings, Table tab, SimpleValue id,
-                                          String seqTableName,
-                                          String keyColumn, String keyValue,
-                                          String valueColumn) {
+                                          com.manydesigns.portofino.model.datamodel.TableGenerator generator) {
         id.setIdentifierGeneratorStrategy("enhanced-table");
         Properties params = new Properties();
         params.put(TableGenerator.TABLE,
                     tab);
         params.put(TableGenerator.TABLE_PARAM,
-                    escapeName(seqTableName));
+                    escapeName(generator.getTable()));
         params.put(PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER,
                     mappings.getObjectNameNormalizer());
-        params.put(TableGenerator.SEGMENT_COLUMN_PARAM, escapeName(keyColumn));
-        params.put(TableGenerator.SEGMENT_VALUE_PARAM, keyValue);
-        params.put(TableGenerator.VALUE_COLUMN_PARAM,escapeName(valueColumn));
+        params.put(TableGenerator.SEGMENT_COLUMN_PARAM, escapeName(generator.getKeyColumn()));
+        params.put(TableGenerator.SEGMENT_VALUE_PARAM, generator.getKeyValue());
+        params.put(TableGenerator.VALUE_COLUMN_PARAM,escapeName(generator.getValueColumn()));
         params.setProperty(
                     TableGenerator.SCHEMA,escapeName(tab.getSchema()));
         id.setIdentifierGeneratorProperties(params);

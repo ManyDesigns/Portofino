@@ -262,14 +262,37 @@ public class XmlWriter {
                 XmlElement xmlElementAnnotation =
                         propertyAccessor.getAnnotation(XmlElement.class);
                 if (xmlElementAnnotation != null) {
+                    Class[] itemClasses = xmlElementAnnotation.itemClasses();
+                    if (itemClasses.length == 0) {
+                        itemClasses = new Class[] {propertyAccessor.getType()};
+                    }
+
+                    String[] itemNames = xmlElementAnnotation.itemNames();
+                    if (itemNames.length == 0) {
+                        itemNames = new String[] {propertyAccessor.getName()};
+                    }
+
                     Object item = propertyAccessor.get(object);
                     if (item == null) {
                         if (xmlElementAnnotation.required()) {
                             logger.warn("Element ''{}'' required", propertyName);
                         }
                     } else {
-                        ElementWriter elementWriter =
-                                new ElementWriter(item, propertyName,
+                        Class itemClass = item.getClass();
+                        String itemName;
+
+                        itemName = itemNames[0];
+                        final Class[] classes = xmlElementAnnotation.itemClasses();
+                        for (int i=0; i < classes.length; i++) {
+                            if (itemClass.equals(classes[i])){
+                                itemName = xmlElementAnnotation.itemNames()[i];
+                                break;
+                            }
+                            // trova itemClass in itemClasses
+                            // dall'indice trovato, recupera itemName da itemNames
+                        }
+
+                        ElementWriter elementWriter =new ElementWriter(item, itemName,
                                         xmlElementAnnotation.order());
                         writers.add(elementWriter);
                     }

@@ -65,7 +65,7 @@ public class EmailTest extends AbstractPortofinoTest {
         myEmail.setSubject("subj");
         myEmail.setBody("body");
         myEmail.setCreateDate(new Date());
-        EmailSender sender = new EmailSender(myEmail, "127.0.0.1", SMTP_PORT,
+        EmailSender sender = new EmailSender(null, myEmail, "127.0.0.1", SMTP_PORT,
                 false, null, null);
         //lancio il run del sender
         sender.run();
@@ -75,7 +75,7 @@ public class EmailTest extends AbstractPortofinoTest {
             SmtpMessage msg = (SmtpMessage) it.next();
             assertEquals("body", msg.getBody());
         }
-        assertTrue(EmailTask.successQueue.contains(sender));
+
     }
 
     public void testServerDown() {
@@ -86,14 +86,13 @@ public class EmailTest extends AbstractPortofinoTest {
         myEmail.setSubject("subj");
         myEmail.setBody("body");
         myEmail.setCreateDate(new Date());
-        EmailSender sender = new EmailSender(myEmail, "127.0.0.1", SMTP_PORT - 1,
+        EmailSender sender = new EmailSender(null, myEmail, "127.0.0.1", SMTP_PORT - 1,
                 false, null, null);
 
         //lancio il run del sender
         sender.run();
 
         assertEquals(0, server.getReceivedEmailSize());
-        assertTrue(EmailTask.rejectedQueue.contains(sender));
     }
 
     public void testEmailAttachment() {
@@ -109,7 +108,8 @@ public class EmailTest extends AbstractPortofinoTest {
         myEmail.setAttachmentPath(attachment.getAbsolutePath());
         myEmail.setAttachmentName("piuma");
         myEmail.setAttachmentDescription("piuma dell'apache");
-        EmailSender sender = new EmailSender(myEmail, "127.0.0.1", SMTP_PORT,
+
+        EmailSender sender = new EmailSender(null, myEmail, "127.0.0.1", SMTP_PORT,
                 false, null, null);
         //lancio il run del sender
         sender.run();
@@ -123,15 +123,16 @@ public class EmailTest extends AbstractPortofinoTest {
                             " base64Content-Disposition: attachment; " +
                             "filename=piumaContent-Description: piuma dell'apache"));
         }
-        assertTrue(EmailTask.successQueue.contains(sender));
     }
 
     public void testEmailTask() {
         Timer scheduler = new Timer(true);
+        
         for (int i = 1; i <= 10; i++) {
-            EmailUtils.addEmail(context, "subj:" + i,
+            EmailBean bean = new EmailBean ("subj:" + i,
                     "body:" + i, "granatella@gmail.com",
                     "spammer@spam.it");
+            context.saveObject(EmailUtils.EMAILQUEUE_TABLE, bean);
             context.commit("portofino");
         }
         try {
@@ -150,14 +151,12 @@ public class EmailTest extends AbstractPortofinoTest {
         EmailTask.stop();
         
         try {
-            Thread.sleep(3000);
+            Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
             fail();
         }
         assertEquals(10, server.getReceivedEmailSize());
-        assertTrue(EmailTask.successQueue.size() == 0);
-        assertTrue(EmailTask.rejectedQueue.size() == 0);
         List<Object> emailList =
                 context.getAllObjects("portofino.public.emailqueue");
         assertEquals(0, emailList.size());
@@ -197,8 +196,6 @@ public class EmailTest extends AbstractPortofinoTest {
             fail();
         }
         assertEquals(0, server.getReceivedEmailSize());
-        assertTrue(EmailTask.successQueue.size() == 0);
-        assertTrue(EmailTask.rejectedQueue.size() == 0);
         List<Object> emailList =
                 context.getAllObjects("portofino.public.emailqueue");
         assertEquals(10, emailList.size());

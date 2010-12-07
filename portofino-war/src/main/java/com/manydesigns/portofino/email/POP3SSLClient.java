@@ -68,10 +68,10 @@ public class POP3SSLClient extends POP3Client {
             inbox.open(Folder.READ_ONLY);
 
             Message[] messages = inbox.getMessages();
-            for (int i = 0; i < messages.length; i++) {
-                if (messages[i].getSubject().toLowerCase().contains(DELIVERY_STATUS_NOTIFICATION));
+            for (Message message : messages) {
+                if (message.getSubject().toLowerCase().contains(DELIVERY_STATUS_NOTIFICATION))
                 {
-                    extractEmail(messages[i]);
+                    extractEmail(message);
                 }
             }
         } catch (Exception e) {
@@ -94,18 +94,4 @@ public class POP3SSLClient extends POP3Client {
         }
         return emails;
     }
-
-
-    public static void main (String[] args)
-    {
-        String host = "pop.gmail.com";
-        String protocol = "pop3";
-        int port = 995;
-        String username = "test@manydesigns.com";
-        String password = "MDtestMD";
-
-        POP3SSLClient client = new POP3SSLClient(host, protocol, port, username, password);
-        client.read();
-    }
-
 }
