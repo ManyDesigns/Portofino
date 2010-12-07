@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.fields.search;
 
+import com.manydesigns.elements.annotations.MaxLength;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
@@ -45,12 +46,14 @@ public class TextSearchField extends AbstractSearchField {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public final static String MODE_SUFFIX = "_mode";
+    public final static String MATCH_MODE_LABEL = "Match mode";
 
     protected String value;
     protected TextMatchMode matchMode = TextMatchMode.CONTAINS;
     protected String matchModeId;
     protected String matchModeParam;
-
+    protected boolean showMatchMode = true;
+    protected Integer maxLength = null;
 
     //**************************************************************************
     // Costruttori
@@ -62,6 +65,11 @@ public class TextSearchField extends AbstractSearchField {
 
     public TextSearchField(PropertyAccessor accessor, String prefix) {
         super(accessor, prefix);
+
+        if (accessor.isAnnotationPresent(MaxLength.class)) {
+            maxLength = accessor.getAnnotation(MaxLength.class).value();
+        }
+
         matchModeId = id + MODE_SUFFIX;
         matchModeParam = this.inputName + MODE_SUFFIX;
     }
@@ -74,28 +82,31 @@ public class TextSearchField extends AbstractSearchField {
     public void toXhtml(XhtmlBuffer xb) {
         xb.writeLabel(StringUtils.capitalize(label),
                 id, ATTR_NAME_HTML_CLASS);
-        String matchModeLabel = "Match mode";
-        xb.writeLabel(matchModeLabel, matchModeId, "match_mode");
-        xb.openElement("select");
-        xb.addAttribute("id", matchModeId);
-        xb.addAttribute("name", matchModeParam);
-        for (TextMatchMode m : TextMatchMode.values()) {
-            boolean checked = matchMode == m;
-            String option = m.getStringValue();
-            xb.writeOption(option, checked, getText(m.getLabel()));
+        if (showMatchMode) {
+            xb.writeLabel(MATCH_MODE_LABEL, matchModeId, "match_mode");
+            xb.openElement("select");
+            xb.addAttribute("id", matchModeId);
+            xb.addAttribute("name", matchModeParam);
+            for (TextMatchMode m : TextMatchMode.values()) {
+                boolean checked = matchMode == m;
+                String option = m.getStringValue();
+                xb.writeOption(option, checked, getText(m.getLabel()));
+            }
+            xb.closeElement("select");
         }
-        xb.closeElement("select");
-        xb.writeInputText(id, inputName, value, "text", "18");
+        xb.writeInputText(id, inputName, value, "text", 18, maxLength);
     }
 
 
     public void readFromRequest(HttpServletRequest req) {
         value = StringUtils.trimToNull(req.getParameter(inputName));
-        String matchModeStr = req.getParameter(matchModeParam);
-        matchMode = TextMatchMode.CONTAINS; // default
-        for (TextMatchMode m : TextMatchMode.values()) {
-            if (m.getStringValue().equals(matchModeStr)) {
-                matchMode = m;
+        if (showMatchMode) {
+            String matchModeStr = req.getParameter(matchModeParam);
+            matchMode = TextMatchMode.CONTAINS; // default
+            for (TextMatchMode m : TextMatchMode.values()) {
+                if (m.getStringValue().equals(matchModeStr)) {
+                    matchMode = m;
+                }
             }
         }
     }
@@ -114,5 +125,57 @@ public class TextSearchField extends AbstractSearchField {
         if (value != null) {
             criteria.ilike(accessor, value, matchMode);
         }
+    }
+
+    //**************************************************************************
+    // Getters/setters
+    //**************************************************************************
+
+    public TextMatchMode getMatchMode() {
+        return matchMode;
+    }
+
+    public void setMatchMode(TextMatchMode matchMode) {
+        this.matchMode = matchMode;
+    }
+
+    public boolean isShowMatchMode() {
+        return showMatchMode;
+    }
+
+    public void setShowMatchMode(boolean showMatchMode) {
+        this.showMatchMode = showMatchMode;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getMatchModeId() {
+        return matchModeId;
+    }
+
+    public void setMatchModeId(String matchModeId) {
+        this.matchModeId = matchModeId;
+    }
+
+    public String getMatchModeParam() {
+        return matchModeParam;
+    }
+
+    public void setMatchModeParam(String matchModeParam) {
+        this.matchModeParam = matchModeParam;
+    }
+
+    public Integer getMaxLength() {
+        return maxLength;
+    }
+
+    public void setMaxLength(Integer maxLength) {
+        this.maxLength = maxLength;
     }
 }

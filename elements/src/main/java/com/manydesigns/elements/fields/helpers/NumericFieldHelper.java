@@ -29,14 +29,14 @@
 
 package com.manydesigns.elements.fields.helpers;
 
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.NumericField;
-import com.manydesigns.elements.fields.search.NumericSearchField;
+import com.manydesigns.elements.fields.search.RangeSearchField;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.elements.Mode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -64,7 +64,7 @@ public class NumericFieldHelper implements FieldHelper {
                                                    String prefix) {
         Class type = propertyAccessor.getType();
         if (Util.isNumericType(type)) {
-            return new NumericSearchField(propertyAccessor, prefix);
+            return new RangeSearchField(propertyAccessor, prefix);
         }
 
         return null;

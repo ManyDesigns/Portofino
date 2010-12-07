@@ -593,6 +593,7 @@ public class CrudUnit {
             objects = context.getObjects(query, criteria, root);
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
+            logger.warn("Incorrect Field Type", e);
             SessionMessages.addWarningMessage("Incorrect Field Type");
         }
     }

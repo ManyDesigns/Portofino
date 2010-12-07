@@ -252,6 +252,7 @@ public abstract class ConnectionProvider {
         types.add(type);
     }
 
+    public abstract String getDescription();
     public abstract Connection acquireConnection() throws Exception;
     public abstract void releaseConnection(Connection conn);
 

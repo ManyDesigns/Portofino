@@ -29,13 +29,13 @@
 
 package com.manydesigns.elements.fields.helpers;
 
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Password;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.PasswordField;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.Mode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

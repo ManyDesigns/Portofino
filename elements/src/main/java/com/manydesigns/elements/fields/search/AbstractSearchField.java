@@ -37,8 +37,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.MessageFormat;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -91,13 +89,7 @@ public abstract class AbstractSearchField implements SearchField {
             String text = accessor.getAnnotation(LabelI18N.class).value();
             logger.debug("LabelI18N annotation present with value: {}", text);
 
-            String args = null;
-            String textCompare = MessageFormat.format(text, args);
-            String i18NText = getText(text);
-            label = i18NText;
-            if (textCompare.equals(i18NText) && accessor.isAnnotationPresent(Label.class)) {
-                label = accessor.getAnnotation(Label.class).value();
-            }
+            label = getText(text);
         } else if (accessor.isAnnotationPresent(Label.class)) {
             label = accessor.getAnnotation(Label.class).value();
             logger.debug("Label annotation present with value: ", label);

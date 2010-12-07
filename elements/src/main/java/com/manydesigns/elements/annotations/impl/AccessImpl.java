@@ -27,44 +27,33 @@
  *
  */
 
-package com.manydesigns.elements.fields.helpers;
+package com.manydesigns.elements.annotations.impl;
 
-import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.Password;
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.TextField;
-import com.manydesigns.elements.fields.search.SearchField;
-import com.manydesigns.elements.fields.search.TextSearchField;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.annotations.Access;
+
+import java.lang.annotation.Annotation;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TextFieldHelper implements FieldHelper {
+@SuppressWarnings({"ClassExplicitlyAnnotation"})
+public class AccessImpl implements Access {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Field tryToInstantiateField(ClassAccessor classAccessor,
-                                       PropertyAccessor propertyAccessor,
-                                       Mode mode,
-                                       String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())) {
-            return new TextField(propertyAccessor, mode, prefix);
-        }
-        return null;
+    private String value;
+
+    public AccessImpl(String value) {
+        this.value = value;
     }
 
-    public SearchField tryToInstantiateSearchField(
-            ClassAccessor classAccessor,
-            PropertyAccessor propertyAccessor,
-            String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())
-                && !propertyAccessor.isAnnotationPresent(Password.class)) {
-            return new TextSearchField(propertyAccessor, prefix);
-        }
-        return null;
+    public String value() {
+        return value;
+    }
+
+    public Class<? extends Annotation> annotationType() {
+        return Access.class;
     }
 }
