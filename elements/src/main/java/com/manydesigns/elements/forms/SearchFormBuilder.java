@@ -143,6 +143,8 @@ public class SearchFormBuilder extends AbstractFormBuilder {
                     classAccessor, propertyAccessor, prefix);
 
             if (field == null) {
+                logger.warn("Cannot instanciate field for property {}",
+                        propertyAccessor);
                 continue;
             }
             searchForm.add(field);

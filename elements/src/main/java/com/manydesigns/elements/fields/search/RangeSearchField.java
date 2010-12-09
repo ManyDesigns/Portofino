@@ -29,7 +29,6 @@
 
 package com.manydesigns.elements.fields.search;
 
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -42,7 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class NumericSearchField extends AbstractSearchField {
+public class RangeSearchField extends AbstractSearchField {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -67,11 +66,11 @@ public class NumericSearchField extends AbstractSearchField {
     // Costruttori
     //**************************************************************************
 
-    public NumericSearchField(PropertyAccessor accessor) {
+    public RangeSearchField(PropertyAccessor accessor) {
         this(accessor, null);
     }
 
-    public NumericSearchField(PropertyAccessor accessor, String prefix) {
+    public RangeSearchField(PropertyAccessor accessor, String prefix) {
         super(accessor, prefix);
 
         minId = id + MIN_SUFFIX;
@@ -93,33 +92,28 @@ public class NumericSearchField extends AbstractSearchField {
         xb.openElement("table");
         xb.addAttribute("class", "range");
 
-        xb.openElement("tr");
-        xb.openElement("th");
-        xb.openElement("label");
-        xb.addAttribute("for", minId);
-        xb.write(getText("From"));
-        xb.closeElement("label");
-        xb.closeElement("th");
-        xb.openElement("td");
-        xb.writeInputText(minId, minInputName, minStringValue, "text", null);
-        xb.closeElement("td");
-        xb.closeElement("tr");
-
-        xb.openElement("tr");
-        xb.openElement("th");
-        xb.openElement("label");
-        xb.addAttribute("for", maxId);
-        xb.write(getText("To"));
-        xb.closeElement("label");
-        xb.closeElement("th");
-        xb.openElement("td");
-        xb.writeInputText(maxId, maxInputName, maxStringValue, "text", null);
-        xb.closeElement("td");
-        xb.closeElement("tr");
+        rangeEndToXhtml(xb, minId, minInputName, minStringValue, getText("From"));
+        rangeEndToXhtml(xb, maxId, maxInputName, maxStringValue, getText("To"));
 
         xb.closeElement("table");
 
         xb.closeElement("fieldset");
+    }
+
+    public void rangeEndToXhtml(XhtmlBuffer xb, String id,
+                                String inputName, String stringValue,
+                                String label) {
+        xb.openElement("tr");
+        xb.openElement("th");
+        xb.openElement("label");
+        xb.addAttribute("for", id);
+        xb.write(label);
+        xb.closeElement("label");
+        xb.closeElement("th");
+        xb.openElement("td");
+        xb.writeInputText(id, inputName, stringValue, "text", null, null);
+        xb.closeElement("td");
+        xb.closeElement("tr");
     }
 
 
@@ -147,13 +141,6 @@ public class NumericSearchField extends AbstractSearchField {
     public boolean validate() {
         return true;
     }
-
-    public Mode getMode() {
-        return Mode.VIEW;
-    }
-
-    public void setMode(Mode mode) {}
-
 
     public void toSearchString(StringBuilder sb) {
         if (minStringValue != null) {

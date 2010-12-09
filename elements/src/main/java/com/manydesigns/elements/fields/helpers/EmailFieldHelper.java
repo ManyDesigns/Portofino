@@ -29,13 +29,15 @@
 
 package com.manydesigns.elements.fields.helpers;
 
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Email;
 import com.manydesigns.elements.fields.EmailField;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.search.SearchField;
+import com.manydesigns.elements.fields.search.TextMatchMode;
+import com.manydesigns.elements.fields.search.TextSearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.Mode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -60,6 +62,14 @@ public class EmailFieldHelper implements FieldHelper {
     public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
                                                    PropertyAccessor propertyAccessor,
                                                    String prefix) {
+        if (String.class.isAssignableFrom(propertyAccessor.getType())
+                && propertyAccessor.isAnnotationPresent(Email.class)) {
+            TextSearchField textSearchField =
+                    new TextSearchField(propertyAccessor, prefix);
+            textSearchField.setShowMatchMode(false);
+            textSearchField.setMatchMode(TextMatchMode.EQUALS);
+            return textSearchField;
+        }
         return null;
     }
 }

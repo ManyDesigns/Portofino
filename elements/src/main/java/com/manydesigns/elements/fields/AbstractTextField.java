@@ -29,10 +29,10 @@
 
 package com.manydesigns.elements.fields;
 
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.MaxLength;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import com.manydesigns.elements.Mode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -102,22 +102,14 @@ public abstract class AbstractTextField extends AbstractField {
     }
 
     protected void valueToXhtmlEdit(XhtmlBuffer xb) {
-        xb.openElement("input");
-        xb.addAttribute("type", "text");
-        xb.addAttribute("class", "text");
-        xb.addAttribute("id", id);
-        xb.addAttribute("name", inputName);
-        xb.addAttribute("value", stringValue);
+        Integer textInputSize = null;
         if (maxLength != null) {
-            int textInputSize = (maxLength > size)
+            textInputSize = (maxLength > size)
                     ? size
                     : maxLength;
-            xb.addAttribute("maxlength",
-                    Integer.toString(maxLength));
-            xb.addAttribute("size",
-                    Integer.toString(textInputSize));
         }
-        xb.closeElement("input");
+        xb.writeInputText(id, inputName, stringValue,
+                "text", textInputSize, maxLength);
     }
 
     protected void valueToXhtmlPreview(XhtmlBuffer xb) {
