@@ -87,7 +87,7 @@ public class PortofinoAction extends ActionSupport
     public final static String REDIRECT_TO_FIRST = "redirectToFirst";
     public final static String NO_CLASSES = "noClasses";
     public final static String JSON_SELECT_FIELD_OPTIONS = "jsonSelectFieldOptions";
-
+    public final static String INDEX = "index";
     
     //**************************************************************************
     // ContextAware implementation

@@ -26,16 +26,28 @@
  * Boston, MA  02111-1307  USA
  *
  */
-
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.interceptors;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class HomepageAction extends DocumentAction {
+public class UrlBean {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    String returnUrl;
+
+    public String getReturnUrl() {
+        return returnUrl;
+    }
+
+    public void setReturnUrl(String returnUrl) {
+        this.returnUrl = returnUrl;
+    }
+
+    public UrlBean(String returnUrl) {
+        this.returnUrl = returnUrl;
+    }
 }

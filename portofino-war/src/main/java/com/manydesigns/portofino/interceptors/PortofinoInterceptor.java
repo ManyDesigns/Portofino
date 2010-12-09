@@ -108,6 +108,9 @@ public class PortofinoInterceptor implements Interceptor {
             if (!(invocation.getAction() instanceof PortofinoAction)
                     || selectedNode==null ) {
                 stopWatch.stop();
+
+                
+
                 return invocation.invoke();
             }
             SiteNode node = selectedNode.getActualSiteNode();
@@ -117,7 +120,10 @@ public class PortofinoInterceptor implements Interceptor {
             } else {
                 if (userId==null){
                     stopWatch.stop();
-                    actionContext.getParameters().put("url", "/Profile.action");
+                    String returnUrl=req.getServletPath();
+                    UrlBean bean = new UrlBean(returnUrl);
+                    actionContext.getValueStack().getRoot().push(bean);
+                    invocation.getStack().push(bean);
                     return LOGIN_ACTION;
                 } else {
                     stopWatch.stop();

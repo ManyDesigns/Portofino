@@ -35,7 +35,10 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
+import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.util.ValueStack;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,8 +74,9 @@ public class LoginAction extends PortofinoAction
     public Form form;
     public boolean recoverPwd;
 
-    public String url;
-
+    public String returnUrl;
+    
+    private static final String home = "/Homepage.action";
     public static final Logger logger =
             LoggerFactory.getLogger(LoginAction.class);
 
@@ -124,14 +128,16 @@ public class LoginAction extends PortofinoAction
             return INPUT;
         }
 
+        ValueStack vs = ActionContext.getContext().getValueStack();
 
         logger.debug("User {} login", user.getEmail());
         getSession().put(UserUtils.USERID, user.getUserId());
         getSession().put(UserUtils.USERNAME, user.getUserName());
         updateUser(user);
-        if(null==url) {
-            url="/Homepage.action";
-        }
+        //TODO: da correggere, ma non capisco - Giampiero
+        returnUrl = StringUtils.trimToNull(returnUrl);
+        returnUrl=(returnUrl!=null)?returnUrl:home;
+
         return SUCCESS;
 
     }
@@ -160,9 +166,7 @@ public class LoginAction extends PortofinoAction
     public String logout(){
         getSession().remove(UserUtils.USERID);
         SessionMessages.addInfoMessage("User disconnetected");
-        if(null==url) {
-            url="/Homepage.action";
-        }
-        return SUCCESS;
+
+        return "logout";
     }
 }

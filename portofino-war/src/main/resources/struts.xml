@@ -58,9 +58,14 @@
             <result name="login" type="redirectAction">
                 <param name="actionName">Login</param>
                 <param name="namespace">/user</param>
-                <param name="url">${url}</param>
+                <param name="returnUrl">%{returnUrl}</param>
+             </result>
+            <result name="index" type="redirectAction">
+                <param name="actionName">Index</param>
+                <param name="namespace">/</param>                
              </result>
             <result name="modelNotFound">/errors/model-not-found.jsp</result>
+
         </global-results>
     </package>
 
@@ -88,7 +93,11 @@
         </action>
         <action name="Homepage"
                 class="com.manydesigns.portofino.actions.HomepageAction">
-            <result name="success">/skins/default/homepage.jsp</result>
+            <result name="success">/skins/default/document.jsp</result>
+        </action>
+        <action name="**/Document"
+                class="com.manydesigns.portofino.actions.DocumentAction">
+            <result name="success">/skins/default/document.jsp</result>
         </action>
 
         <action name="UseCase"
@@ -398,8 +407,12 @@
         <action name="Login" class="com.manydesigns.portofino.actions.user.LoginAction">
             <result name="input">/skins/default/user/login.jsp</result>
             <result name="success" type="redirect">
-                <param name="location">${url}</param>
+                <param name="location">%{returnUrl}</param>
                 <param name="prependServletContext">true</param>
+            </result>
+            <result name="logout" type="redirectAction">
+                <param name="actionName">Homepage</param>
+                <param name="namespace">/</param>
             </result>
         </action>
     </package>

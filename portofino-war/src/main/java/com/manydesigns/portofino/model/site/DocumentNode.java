@@ -28,6 +28,8 @@
  */
 package com.manydesigns.portofino.model.site;
 
+import com.manydesigns.portofino.xml.XmlAttribute;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -36,6 +38,7 @@ package com.manydesigns.portofino.model.site;
 public class DocumentNode extends SiteNode{
 
     private final String urlFormat = "{0}/Document.action";
+    private String fileName;
 
     public DocumentNode(SiteNode parent) {
         super(parent);
@@ -43,5 +46,14 @@ public class DocumentNode extends SiteNode{
 
     protected String getUrlFormat() {
         return urlFormat;
+    }
+
+    @XmlAttribute(required = false, order = 4)
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }

@@ -87,11 +87,8 @@
                                 </tbody>
                             </table>
                             <p/>
-
                         </div>
-                        <s:hidden name="successReturnUrl" value="%{successReturnUrl}"/>
-                    
-
+                       <s:hidden name="returnUrl" value="%{returnUrl}"/>
                 </s:form>
             </div>
         </div>
