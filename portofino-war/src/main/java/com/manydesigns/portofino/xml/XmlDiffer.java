@@ -93,7 +93,7 @@ public class XmlDiffer {
 
     public ElementDiffer diff(String elementName, Object sourceRoot, Object targetRoot) {
         ElementDiffer rootDiffer =
-                new ElementDiffer(elementName, sourceRoot, targetRoot, 0);
+                new ElementDiffer(sourceRoot, targetRoot, elementName, 0);
         rootDiffer.diff();
         return rootDiffer;
     }
@@ -154,14 +154,15 @@ public class XmlDiffer {
         int getOrder();
     }
 
-    //--------------------------------------------------------------------------
-    // ElementDiffer
-    //--------------------------------------------------------------------------
-
-    public class ElementDiffer implements Differ {
-        final String elementName;
+    public abstract class AbstractDiffer implements Differ {
         final Object sourceElement;
         final Object targetElement;
+
+        final List<Differ> attributeDiffers;
+        final List<Differ> childDiffers;
+
+        final String elementName;
+        final int order;
 
         final Class sourceClass;
         final Class targetClass;
@@ -169,22 +170,18 @@ public class XmlDiffer {
         ClassAccessor commonClassAccessor;
         PropertyAccessor[] identifierProperties;
 
-        final List<Differ> attributeDiffers;
-        final List<Differ> childDiffers;
-
-        final int order;
 
         Status status;
 
-        ElementDiffer(String elementName,
-                      Object sourceElement,
-                      Object targetElement,
-                      int order
-        ) {
-            this.elementName = elementName;
+        protected AbstractDiffer(Object sourceElement, Object targetElement,
+                                 String elementName, int order) {
             this.sourceElement = sourceElement;
             this.targetElement = targetElement;
+            this.elementName = elementName;
             this.order = order;
+
+            attributeDiffers = new ArrayList<Differ>();
+            childDiffers = new ArrayList<Differ>();
 
             if (sourceElement == null) {
                 sourceClass = null;
@@ -203,88 +200,9 @@ public class XmlDiffer {
             }
 
             identifierProperties = getIdentifierProperties(commonClassAccessor);
-
-            if (sourceElement == null) {
-                if (targetElement == null) {
-                    status = Status.BOTH_NULL;
-                } else {
-                    status = Status.SOURCE_NULL;
-                }
-            } else {
-                if (targetElement == null) {
-                    status = Status.TARGET_NULL;
-                } else {
-                    status = Status.EQUAL;
-                }
-            }
-
-            attributeDiffers = new ArrayList<Differ>();
-            childDiffers = new ArrayList<Differ>();
         }
 
-        public void diff() {
-            if (sourceElement != null && targetElement != null) {
-                if (sourceClass != targetClass) {
-                    String msg = String.format(
-                            "Source/target of different java types: %s/%s",
-                            sourceClass.getName(), targetClass.getName());
-                    throw new Error(msg);
-                }
-
-                diffAttributes();
-
-                XmlCollection ownCollectionAnnotation =
-                        commonClassAccessor.getAnnotation(XmlCollection.class);
-                if (ownCollectionAnnotation != null) {
-                    CollectionDiffer collectionDiffer =
-                            new CollectionDiffer(elementName,
-                                    childDiffers,
-                                    ownCollectionAnnotation,
-                                    (List)sourceElement,
-                                    (List)targetElement);
-                    collectionDiffer.diff();
-                }
-
-                for (PropertyAccessor propertyAccessor
-                        : commonClassAccessor.getProperties()) {
-                    XmlElement elementAnnotation =
-                            propertyAccessor.getAnnotation(XmlElement.class);
-                    XmlCollection collectionAnnotation =
-                            propertyAccessor.getAnnotation(XmlCollection.class);
-
-                    if (elementAnnotation != null) {
-                        Object sourceChildElement = propertyAccessor.get(sourceElement);
-                        Object targetChildElement = propertyAccessor.get(targetElement);
-                        ElementDiffer elementDiffer =
-                                new ElementDiffer(
-                                        propertyAccessor.getName(),
-                                        sourceChildElement,
-                                        targetChildElement,
-                                        elementAnnotation.order()
-                                );
-                        elementDiffer.diff();
-                        childDiffers.add(elementDiffer);
-                    }
-
-                    if (collectionAnnotation != null) {
-                        List sourceCollection =
-                                (List)propertyAccessor.get(sourceElement);
-                        List targetCollection =
-                                (List)propertyAccessor.get(targetElement);
-                        CollectionDiffer collectionDiffer =
-                            new CollectionDiffer(
-                                    propertyAccessor.getName(),
-                                    collectionAnnotation,
-                                    sourceCollection, targetCollection);
-                        collectionDiffer.diff();
-                        childDiffers.add(collectionDiffer);
-                    }
-                }
-                Collections.sort(childDiffers, new DifferComparator());
-            }
-        }
-
-        private void diffAttributes() {
+        protected void diffAttributes() {
             for (PropertyAccessor propertyAccessor :
                     commonClassAccessor.getProperties()) {
                 XmlAttribute attributeAnnotation =
@@ -303,6 +221,105 @@ public class XmlDiffer {
                 attributeDiffers.add(attributeDiffer);
             }
             Collections.sort(attributeDiffers, new DifferComparator());
+        }
+
+        public List<Differ> getAttributeDiffers() {
+            return attributeDiffers;
+        }
+
+        public List<Differ> getChildDiffers() {
+            return childDiffers;
+        }
+
+        public int getOrder() {
+            return order;
+        }
+    }
+    //--------------------------------------------------------------------------
+    // ElementDiffer
+    //--------------------------------------------------------------------------
+
+    public class ElementDiffer extends AbstractDiffer {
+
+        ElementDiffer(Object sourceElement, Object targetElement,
+                      String elementName, int order
+        ) {
+            super(sourceElement, targetElement, elementName, order);
+
+            if (sourceElement == null) {
+                if (targetElement == null) {
+                    status = Status.BOTH_NULL;
+                } else {
+                    status = Status.SOURCE_NULL;
+                }
+            } else {
+                if (targetElement == null) {
+                    status = Status.TARGET_NULL;
+                } else {
+                    status = Status.EQUAL;
+                }
+            }
+        }
+
+        public void diff() {
+            if (sourceElement != null && targetElement != null) {
+                if (sourceClass != targetClass) {
+                    String msg = String.format(
+                            "Source/target of different java types: %s/%s",
+                            sourceClass.getName(), targetClass.getName());
+                    throw new Error(msg);
+                }
+
+                diffAttributes();
+
+                XmlCollection ownCollectionAnnotation =
+                        commonClassAccessor.getAnnotation(XmlCollection.class);
+                if (ownCollectionAnnotation != null) {
+                    CollectionDiffer collectionDiffer =
+                            new CollectionDiffer(elementName,
+                                    ownCollectionAnnotation,
+                                    (List)sourceElement,
+                                    (List)targetElement,
+                                    ownCollectionAnnotation.order());
+                    collectionDiffer.diff();
+                }
+
+                for (PropertyAccessor propertyAccessor
+                        : commonClassAccessor.getProperties()) {
+                    XmlElement elementAnnotation =
+                            propertyAccessor.getAnnotation(XmlElement.class);
+                    XmlCollection collectionAnnotation =
+                            propertyAccessor.getAnnotation(XmlCollection.class);
+
+                    if (elementAnnotation != null) {
+                        Object sourceChildElement = propertyAccessor.get(sourceElement);
+                        Object targetChildElement = propertyAccessor.get(targetElement);
+                        ElementDiffer elementDiffer =
+                                new ElementDiffer(
+                                        sourceChildElement, targetChildElement, propertyAccessor.getName(),
+                                        elementAnnotation.order()
+                                );
+                        elementDiffer.diff();
+                        childDiffers.add(elementDiffer);
+                    }
+
+                    if (collectionAnnotation != null) {
+                        List sourceCollection =
+                                (List)propertyAccessor.get(sourceElement);
+                        List targetCollection =
+                                (List)propertyAccessor.get(targetElement);
+                        CollectionDiffer collectionDiffer =
+                            new CollectionDiffer(
+                                    propertyAccessor.getName(),
+                                    collectionAnnotation,
+                                    sourceCollection, targetCollection,
+                                    collectionAnnotation.order());
+                        collectionDiffer.diff();
+                        childDiffers.add(collectionDiffer);
+                    }
+                }
+                Collections.sort(childDiffers, new DifferComparator());
+            }
         }
 
         public String getName() {
@@ -356,18 +373,6 @@ public class XmlDiffer {
         public Status getStatus() {
             return status;
         }
-
-        public List<Differ> getAttributeDiffers() {
-            return attributeDiffers;
-        }
-
-        public List<Differ> getChildDiffers() {
-            return childDiffers;
-        }
-
-        public int getOrder() {
-            return order;
-        }
     }
 
 
@@ -375,90 +380,76 @@ public class XmlDiffer {
     // CollectionDiffer
     //--------------------------------------------------------------------------
 
-    class CollectionDiffer implements Differ {
-        final String elementName;
-        final List<Differ> childDiffers;
+    class CollectionDiffer extends AbstractDiffer {
         final XmlCollection collectionAnnotation;
-        final List sourceCollection;
-        final List targetCollection;
-        final Class type;
-        final ClassAccessor classAccessor;
-        final PropertyAccessor[] identifierProperties;
+        final Class itemClass;
+        final ClassAccessor itemClassAccessor;
+        final PropertyAccessor[] itemIdProperties;
 
-        Collection<Object[]> sourceIdentifiers;
-        Collection<Object[]> targetIdentifiers;
-        List<Object[]> allIdentifiers;
+        Collection<Object[]> sourceItemIdentifiers;
+        Collection<Object[]> targetItemIdentifiers;
+        List<Object[]> allItemIdentifiers;
 
-        CollectionDiffer(String elementName, XmlCollection collectionAnnotation,
-                         List sourceCollection,
-                         List targetCollection) {
-            this(elementName, new ArrayList<Differ>(), collectionAnnotation,
-                    sourceCollection, targetCollection);
-        }
-        
         CollectionDiffer(String elementName,
-                         List<Differ> childDiffers,
                          XmlCollection collectionAnnotation,
-                         List sourceCollection,
-                         List targetCollection) {
-            this.elementName = elementName;
+                         List sourceElement,
+                         List targetElement,
+                         int order) {
+            super(sourceElement, targetElement, elementName, order);
             this.collectionAnnotation = collectionAnnotation;
-            this.childDiffers = childDiffers;
-            this.sourceCollection = sourceCollection;
-            this.targetCollection = targetCollection;
 
-            type = collectionAnnotation.itemClasses()[0];
-            classAccessor = JavaClassAccessor.getClassAccessor(type);
-            identifierProperties = getIdentifierProperties(classAccessor);
+            itemClass = collectionAnnotation.itemClasses()[0];
+            itemClassAccessor = JavaClassAccessor.getClassAccessor(itemClass);
+            itemIdProperties = getIdentifierProperties(itemClassAccessor);
         }
 
         void diff() {
             String itemName = collectionAnnotation.itemNames()[0];
 
-            if (sourceCollection == null || sourceCollection.isEmpty()) {
+            if (sourceElement == null || ((List)sourceElement).isEmpty()) {
                 int index = 0;
-                for (Object current : targetCollection) {
+                for (Object current : (List)targetElement) {
                     ElementDiffer currentDiffer =
-                            new ElementDiffer(itemName, null, current, index++);
+                            new ElementDiffer(null, current, itemName, index++);
                     childDiffers.add(currentDiffer);
                 }
-            } else if (targetCollection == null || targetCollection.isEmpty()) {
+            } else if (targetElement == null || ((List)targetElement).isEmpty()) {
                 int index = 0;
-                for (Object current : sourceCollection) {
+                for (Object current : (List)sourceElement) {
                     ElementDiffer currentDiffer =
-                            new ElementDiffer(itemName, current, null, index++);
+                            new ElementDiffer(current, null, itemName, index++);
                     childDiffers.add(currentDiffer);
                 }
             } else {
                 // collect identifiers from source/target collections
-                sourceIdentifiers = collectIdentifiers(sourceCollection);
-                targetIdentifiers = collectIdentifiers(targetCollection);
+                sourceItemIdentifiers = collectIdentifiers((List)sourceElement);
+                targetItemIdentifiers = collectIdentifiers((List)targetElement);
 
                 // merge source/target identifiers into allIdentifiers
-                allIdentifiers = new ArrayList<Object[]>(sourceIdentifiers);
-                for (Object[] identifier : targetIdentifiers) {
-                    if (!contains(allIdentifiers, identifier)) {
-                        allIdentifiers.add(identifier);
+                allItemIdentifiers = new ArrayList<Object[]>(sourceItemIdentifiers);
+                for (Object[] identifier : targetItemIdentifiers) {
+                    if (!contains(allItemIdentifiers, identifier)) {
+                        allItemIdentifiers.add(identifier);
                     }
                 }
 
                 int index = 0;
-                for (Object[] identifier : allIdentifiers) {
-                    int sourceIndex = indexOf(sourceIdentifiers, identifier);
+                for (Object[] identifier : allItemIdentifiers) {
+                    int sourceIndex = indexOf(sourceItemIdentifiers, identifier);
                     Object sourceChildElement = null;
                     if (sourceIndex >= 0) {
-                        sourceChildElement = sourceCollection.get(sourceIndex);
+                        sourceChildElement = ((List)sourceElement).get(sourceIndex);
                     }
 
-                    int targetIndex = indexOf(targetIdentifiers, identifier);
+                    int targetIndex = indexOf(targetItemIdentifiers, identifier);
                     Object targetChildElement = null;
                     if (targetIndex >= 0) {
-                        targetChildElement = targetCollection.get(targetIndex);
+                        targetChildElement = ((List)targetElement).get(targetIndex);
                     }
 
                     ElementDiffer childElementDiffer =
-                            new ElementDiffer(itemName, sourceChildElement,
-                                    targetChildElement, index++);
+                            new ElementDiffer(sourceChildElement, targetChildElement, itemName,
+                                    index++);
                     childElementDiffer.diff();
                     childDiffers.add(childElementDiffer);
                 }
@@ -469,7 +460,7 @@ public class XmlDiffer {
             return (Collection<Object[]>)CollectionUtils.collect(
                     collection, new Transformer() {
                 public Object transform(Object input) {
-                    return extractIdentifier(identifierProperties, input);
+                    return extractIdentifier(itemIdProperties, input);
                 }
             });
         }
@@ -503,18 +494,6 @@ public class XmlDiffer {
 
         public Status getStatus() {
             return Status.EQUAL;
-        }
-
-        public List<Differ> getAttributeDiffers() {
-            return Collections.EMPTY_LIST;
-        }
-
-        public List<Differ> getChildDiffers() {
-            return childDiffers;
-        }
-
-        public int getOrder() {
-            return collectionAnnotation.order();
         }
     }
 
