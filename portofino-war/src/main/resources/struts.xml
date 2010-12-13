@@ -248,7 +248,7 @@
 
             <result name="save" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>
-                <param name="pk">%{rootCrudUnit.pk}</param>
+                <param name="pk">%{pk}</param>
             </result>
 
             <result name="edit">/skins/default/crud/edit.jsp</result>
@@ -263,16 +263,19 @@
 
             <result name="bulkUpdate" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>
+                <param name="pk">%{pk}</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="returnToSearch" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>
+                <param name="pk">%{pk}</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="delete" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>
+                <param name="pk">%{pk}</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 

@@ -55,6 +55,7 @@ import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
@@ -177,7 +178,7 @@ public class CrudUnit {
     //--------------------------------------------------------------------------
 
     public String execute() {
-        if (pk == null) {
+        if (StringUtils.isBlank(pk)) {
             return search();
         } else {
             return read();
@@ -210,7 +211,6 @@ public class CrudUnit {
         setupForm(Mode.VIEW);
         form.readFromObject(object);
         refreshBlobDownloadHref();
-
 
         ValueStack valueStack = Struts2Util.getValueStack();
 
