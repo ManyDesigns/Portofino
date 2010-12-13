@@ -141,6 +141,12 @@ public class CrudUnit {
             LoggerFactory.getLogger(AbstractCrudAction.class);
     private static final String CONSTRAINT_VIOLATION = "Constraint violation";
 
+    //**************************************************************************
+    // Export
+    //**************************************************************************
+    private static final String TEMPLATE_FOP_SEARCH = "templateFOP-Search.xsl";
+    private static final String TEMPLATE_FOP_READ = "templateFOP-Read.xsl";
+
 
     //--------------------------------------------------------------------------
     // Constructors
@@ -626,7 +632,7 @@ public class CrudUnit {
         try {
             workbook = Workbook.createWorkbook(fileTemp);
             WritableSheet sheet =
-                    workbook.createSheet(classAccessor.getName(), 0);
+                    workbook.createSheet(searchTitle, 0);
 
             addHeaderToSheet(sheet);
 
@@ -680,7 +686,7 @@ public class CrudUnit {
     private void writeFileReadExcel(WritableWorkbook workbook)
             throws IOException, WriteException {
         WritableSheet sheet =
-                workbook.createSheet(classAccessor.getName(),
+                workbook.createSheet(readTitle,
                         workbook.getNumberOfSheets());
 
         addHeaderToSheet(sheet);
@@ -809,6 +815,7 @@ public class CrudUnit {
 
     public void exportSearchPdf(File tempPdfFile) throws FOPException,
             IOException, TransformerException {
+        
         setupSearchForm();
 
         loadObjects();
@@ -825,7 +832,7 @@ public class CrudUnit {
 
             ClassLoader cl = getClass().getClassLoader();
             InputStream xsltStream = cl.getResourceAsStream(
-                    "templateFOP-Search.xsl");
+                    TEMPLATE_FOP_SEARCH);
 
             // Setup XSLT
             TransformerFactory Factory = TransformerFactory.newInstance();
@@ -867,7 +874,7 @@ public class CrudUnit {
         xb.writeXmlHeader("UTF-8");
         xb.openElement("class");
         xb.openElement("table");
-        xb.write(classAccessor.getName());
+        xb.write(searchTitle);
         xb.closeElement("table");
 
         for (TableForm.Column col : tableForm.getColumns()) {
@@ -903,7 +910,6 @@ public class CrudUnit {
 
     private XmlBuffer composeXmlPort()
             throws IOException, WriteException {
-
         setupSearchForm();
 
         loadObjects();
@@ -918,7 +924,7 @@ public class CrudUnit {
         xb.writeXmlHeader("UTF-8");
         xb.openElement("class");
         xb.openElement("table");
-        xb.write(classAccessor.getName());
+        xb.write(readTitle);
         xb.closeElement("table");
 
         for (FieldSet fieldset : form) {
@@ -952,7 +958,7 @@ public class CrudUnit {
             subCrudUnit.setupTableForm(Mode.VIEW);
 
             xb.openElement("nametablerel");
-            xb.write(subCrudUnit.classAccessor.getName());
+            xb.write(subCrudUnit.searchTitle);
             xb.closeElement("nametablerel");
 
             //stampo header
@@ -1001,7 +1007,7 @@ public class CrudUnit {
 
             ClassLoader cl = getClass().getClassLoader();
             InputStream xsltStream = cl.getResourceAsStream(
-                    "templateFOP-Read.xsl");
+                    TEMPLATE_FOP_READ);
 
             // Setup XSLT
             TransformerFactory Factory = TransformerFactory.newInstance();
