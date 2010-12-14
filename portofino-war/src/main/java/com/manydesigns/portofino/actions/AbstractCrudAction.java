@@ -235,7 +235,8 @@ public abstract class  AbstractCrudAction extends PortofinoAction
     public String exportSearchExcel() {
         File fileTemp = createExportTempFile();
         rootCrudUnit.exportSearchExcel(fileTemp);
-        paramExport(fileTemp);
+        paramExportXls(fileTemp);
+        fileName = rootCrudUnit.searchTitle + ".xls";
         return EXPORT;
     }
 
@@ -244,10 +245,9 @@ public abstract class  AbstractCrudAction extends PortofinoAction
          return RandomUtil.getTempCodeFile(exportFilenameFormat, exportId);
      }
 
-    private void paramExport(File fileTemp) {
+    private void paramExportXls(File fileTemp) {
         contentType = "application/ms-excel; charset=UTF-8";
-        fileName = fileTemp.getName() + ".xls";
-
+        
         contentLength = fileTemp.length();
 
         try {
@@ -288,8 +288,9 @@ public abstract class  AbstractCrudAction extends PortofinoAction
                 logger.warn("IOException", e);
                 SessionMessages.addErrorMessage(e.getMessage());
             }
-        }        
-        paramExport(fileTemp);
+        }
+        paramExportXls(fileTemp);
+        fileName = rootCrudUnit.readTitle + ".xls";
         return PortofinoAction.EXPORT;
     }
 
@@ -302,19 +303,16 @@ public abstract class  AbstractCrudAction extends PortofinoAction
         File tempPdfFile = createExportTempFile();
         rootCrudUnit.exportSearchPdf(tempPdfFile);
 
-        inputStream = new FileInputStream(tempPdfFile);
+        paramExportPdf(tempPdfFile);
 
-        contentType = "application/pdf";
-
-        fileName = tempPdfFile.getName() + ".pdf";
-
-        contentLength = tempPdfFile.length();
+        fileName = rootCrudUnit.searchTitle + ".pdf";
 
         return EXPORT;
     }
 
-     //**************************************************************************
-    // ExportSearchPdf
+
+    //**************************************************************************
+    // ExportReadPdf
     //**************************************************************************
 
     public String exportReadPdf() throws FOPException,
@@ -322,15 +320,19 @@ public abstract class  AbstractCrudAction extends PortofinoAction
         File tempPdfFile = createExportTempFile();
         rootCrudUnit.exportReadPdf(tempPdfFile);
 
+        paramExportPdf(tempPdfFile);
+
+        fileName = rootCrudUnit.readTitle + ".pdf";
+
+        return EXPORT;
+    }
+
+    private void paramExportPdf(File tempPdfFile) throws FileNotFoundException {
         inputStream = new FileInputStream(tempPdfFile);
 
         contentType = "application/pdf";
 
-        fileName = tempPdfFile.getName() + ".pdf";
-
         contentLength = tempPdfFile.length();
-
-        return EXPORT;
     }
 
 }
