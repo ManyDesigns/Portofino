@@ -322,7 +322,7 @@
                                         propertyName="creatorId"/>
                                 <column columnName="deletiondate"
                                         columnType="timestamp"
-                                        javaType="java.util.Timestamp"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         nullable="true"
@@ -331,7 +331,7 @@
                                         propertyName="deletionDate"/>
                                 <column columnName="creationdate"
                                         columnType="timestamp"
-                                        javaType="java.util.Timestamp"
+                                        javaType="java.sql.Timestamp"
                                         length="29"
                                         scale="6"
                                         nullable="true"
@@ -756,7 +756,7 @@
                                             toSchema="PUBLIC"
                                             toTable="category"
                                             onUpdate="NO ACTION"
-                                            onDelete="NO ACTION">
+                                            onDelete="CASCADE">
                                     <references>
                                         <reference fromColumn="category"
                                                    toColumn="catid"/>
@@ -1210,7 +1210,7 @@
     </databases>
     <rootNode title="Portofino4" description="portofino 4" id="/">
         <childNodes>
-        <documentNode id="homepage" title="Homepage" description="Homepage" url="Homepage.action">
+        <documentNode id="homepage" title="Homepage" description="Homepage" url="Homepage.action" fileName="skins/default/homepage.html">
             <permissions>
                 <allow>
                     <group>anonymous</group>

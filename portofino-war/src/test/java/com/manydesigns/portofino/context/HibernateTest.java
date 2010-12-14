@@ -246,6 +246,29 @@ public class HibernateTest extends AbstractPortofinoTest {
 
     }
 
+    public void testDeleteCategoriaAndCascadedProducys() {
+        try {
+            context.openSession();
+            HashMap birdsPk = new HashMap();
+            birdsPk.put("catid", "BIRDS");
+            Map<String, Object> birdCat = (Map<String, Object>) context.getObjectByPk("jpetstore.PUBLIC.category", birdsPk);
+            assertEquals(16,context.getAllObjects("jpetstore.PUBLIC.product").size());
+
+            context.deleteObject("jpetstore.PUBLIC.category", birdCat);
+
+            //Perdo i due prodotti associati alla categoria Birds
+            assertEquals(14,context.getAllObjects("jpetstore.PUBLIC.product").size());
+
+
+            //test commit globale
+            context.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+
+    }
+
         public void testSpaccaSession(){
         context.openSession();
 

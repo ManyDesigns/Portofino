@@ -26,33 +26,33 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.model.datamodel;
+package com.manydesigns.hibernate;
 
-import com.manydesigns.portofino.model.ModelObject;
+import junit.framework.TestCase;
+
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public abstract class Generator implements ModelObject{
-    public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-    protected final PrimaryKeyColumn primaryKeyColumn;
-
-
-    //**************************************************************************
-    // Constructor
-    //**************************************************************************
-    public Generator(PrimaryKeyColumn primaryKeyColumn) {
-        this.primaryKeyColumn = primaryKeyColumn;
+public class HibernateTest extends TestCase {
+    public void setUp(){
     }
 
-    public PrimaryKeyColumn getPrimaryKeyColumn() {
-        return primaryKeyColumn;
+    public void tearDown(){
     }
 
+    public void testHbm(){
+        // Test che non servono a nulla mi servono solo per verificare come configurare
+        // programmaticamente hibernate poi sono portati sotto la directory classica dei test
+        /*Session session = HibernateUtil.getSessionFactory("1").getCurrentSession();
+        session.beginTransaction();
+        int i = 17;
+        Map persona = (Map) session.load("persona", new Integer(i));
+
+        session.delete("persona", persona);
+        session.getTransaction().commit();
+        */
+    }
 }

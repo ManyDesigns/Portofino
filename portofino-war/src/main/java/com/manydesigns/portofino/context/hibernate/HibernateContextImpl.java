@@ -585,7 +585,6 @@ public class HibernateContextImpl implements Context {
             Object obj2 = getObjectByPk(qualifiedTableName, (Serializable) obj);
             startTimer();
             session.delete(actualEntityName, obj2);
-            //session.getTransaction().commit();
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;

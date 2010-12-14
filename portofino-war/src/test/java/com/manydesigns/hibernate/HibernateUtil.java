@@ -47,7 +47,7 @@ public class HibernateUtil {
         try {
             Configuration result = new Configuration().setProperty("default_entity_mode", "dynamic-map");
             result = result
-                    .addResource("com/manydesigns/hibernate/test.hbm.xml");
+                    .addResource("com/manydesigns/hibernate/persona.hbm.xml");
             result = result
                     .setProperty("hibernate.connection.url", "jdbc:postgresql://localhost:5432/hibernatetest")
                     .setProperty("hibernate.connection.driver_class", "org.postgresql.Driver")

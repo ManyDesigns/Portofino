@@ -26,33 +26,48 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.model.datamodel;
+package com.manydesigns.portofino.web;
 
-import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.CommonTestUtil;
+import com.meterware.httpunit.WebResponse;
+import com.meterware.servletunit.ServletUnitClient;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import javax.servlet.http.HttpServletResponse;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public abstract class Generator implements ModelObject{
-    public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-    protected final PrimaryKeyColumn primaryKeyColumn;
+public class HomepageTest extends CommonTestUtil {
 
-
-    //**************************************************************************
-    // Constructor
-    //**************************************************************************
-    public Generator(PrimaryKeyColumn primaryKeyColumn) {
-        this.primaryKeyColumn = primaryKeyColumn;
+    public HomepageTest() {
+        super();
     }
 
-    public PrimaryKeyColumn getPrimaryKeyColumn() {
-        return primaryKeyColumn;
+    protected boolean requiresUsers() {
+        return true;
     }
 
+    public static Test suite() {
+        return new TestSuite(HomepageTest.class);
+    }
+
+    //Bug: query x Oracle errata in RunJasperReports.
+    //Test che va in RunJasperReports
+    public void testLinkHomePage() throws Exception {
+      System.out.println("testLinkHomePage:");
+
+        ServletUnitClient client = servletRunner.newClient();
+
+        // pagina dei report
+        String url = "http://127.0.0.1/Homepage.action";
+        System.out.println(url);
+        WebResponse resp = client.getResponse(url);
+        assertEquals("Codice risposta.",
+               HttpServletResponse.SC_OK, resp.getResponseCode());
+
+    }
 }

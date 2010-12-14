@@ -53,7 +53,7 @@ public class EmailTest extends AbstractPortofinoTest {
     public void setUp() throws Exception {
         super.setUp();
         server = SimpleSmtpServer.start(SMTP_PORT);
-        PortofinoProperties.loadProperties("database/portofino_test.properties");
+        PortofinoProperties.loadProperties("portofino_test.properties");
         context.openSession();
     }
 
@@ -103,8 +103,10 @@ public class EmailTest extends AbstractPortofinoTest {
         myEmail.setSubject("subj");
         myEmail.setBody("body");
         myEmail.setCreateDate(new Date());
-        File attachment = new File("portofino-war/src/test/java/com/manydesigns/" +
-                "portofino/email/feather.gif");
+        //final String url = "../../test/java/com/manydesigns/portofino/email/";
+        final String url = "portofino-war/src/test/java/com/manydesigns/portofino/email/";
+        File attachment = new File(url +
+                "feather.gif");
         myEmail.setAttachmentPath(attachment.getAbsolutePath());
         myEmail.setAttachmentName("piuma");
         myEmail.setAttachmentDescription("piuma dell'apache");
@@ -164,7 +166,7 @@ public class EmailTest extends AbstractPortofinoTest {
 
     public void testEmailTaskErrSmtp() {
         PortofinoProperties.loadProperties
-                ("database/portofino_smtpsbagliato.properties");
+                ("portofino_smtpsbagliato.properties");
         Timer scheduler = new Timer(true);
         for (int i = 1; i <= 10; i++) {
             EmailUtils.addEmail(context, "subj:" + i,

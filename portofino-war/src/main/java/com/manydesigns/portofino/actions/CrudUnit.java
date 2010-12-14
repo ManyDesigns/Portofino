@@ -389,16 +389,18 @@ public class CrudUnit {
         for (String current : selection) {
             Object pkObject = pkHelper.parsePkString(current);
             context.deleteObject(baseTable.getQualifiedName(), pkObject);
+
         }
         try {
                 context.commit(baseTable.getDatabaseName());
+                SessionMessages.addInfoMessage(MessageFormat.format(
+                "DELETE di {0} oggetti avvenuto con successo",
+                selection.length));
             } catch (Exception e) {
                 logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
                 SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
         }
-        SessionMessages.addInfoMessage(MessageFormat.format(
-                "DELETE di {0} oggetti avvenuto con successo",
-                selection.length));
+
         return PortofinoAction.DELETE;
     }
 

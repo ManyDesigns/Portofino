@@ -54,9 +54,9 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     public Model model;
 
     public static final String PORTOFINO_CONNECTIONS_RESOURCE =
-            "database/portofino-connections.xml";
+            "portofino-connections.xml";
     public static final String PORTOFINO_MODEL_RESOURCE =
-            "database/portofino-model.xml";
+            "portofino-model.xml";
 
     //Script per h2 3 file di configurazione
     public static final String PETSTORE_DB_SCHEMA =

@@ -134,12 +134,10 @@ public class LoginAction extends PortofinoAction
         getSession().put(UserUtils.USERID, user.getUserId());
         getSession().put(UserUtils.USERNAME, user.getUserName());
         updateUser(user);
-        //TODO: da correggere, ma non capisco - Giampiero
         returnUrl = StringUtils.trimToNull(returnUrl);
         returnUrl=(returnUrl!=null)?returnUrl:home;
 
         return SUCCESS;
-
     }
 
     private void updateFailedUser(String username) {

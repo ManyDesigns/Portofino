@@ -20,7 +20,7 @@
     <jdbcConnection
             databaseName="portofino"
             driver="org.postgresql.Driver"
-            url="jdbc:postgresql://127.0.0.1:5432/portofino4"
+            url="jdbc:postgresql://127.0.0.1:5432/p42"
             username="manydesigns"
             password="manydesigns"
             includeSchemas="public"
