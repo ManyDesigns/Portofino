@@ -7,6 +7,6 @@
     <s:set var="buttonsBarBottom" value="true"/>
     <div class="buttons-bar-top">
 </s:else>
-    <s:submit id="TableData_update" method="update" value="Update"/>
+    <s:submit id="TableData_update" name="crud:%{targetCrudPath}:update" value="Update"/>
     <s:submit id="TableData_cancel" method="cancel" value="Cancel"/>
 </div>

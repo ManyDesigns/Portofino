@@ -35,10 +35,10 @@
         </div>
     </s:if>
     <s:submit id="Table_returnToSearch" method="returnToSearch" value="<< Return to search"/>
-    <s:submit id="Table_edit" method="edit" value="Edit"/>
-    <s:submit id="Table_delete" method="delete" value="Delete"
+    <s:submit id="Table_edit" name="crud::edit" value="Edit"/>
+    <s:submit id="Table_delete" name="crud::delete" value="Delete"
               onclick="return confirm ('Are you sure?');"/>
-    <s:submit id="Table_duplicate" method="duplicate" value="Duplicate" disabled="true"/>
+    <s:submit id="Table_duplicate" name="crud::duplicate" value="Duplicate" disabled="true"/>
     <s:submit id="Table_print" method="print" value="Print" disabled="true"/>
     <s:submit id="Table_exportExcel" method="exportReadExcel" value="Excel" disabled="false"/>
     <s:submit id="Table_exportPdf" method="exportReadPdf" value="Pdf" disabled="false"/>

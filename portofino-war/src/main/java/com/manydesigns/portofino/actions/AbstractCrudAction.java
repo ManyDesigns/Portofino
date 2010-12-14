@@ -47,6 +47,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.TransformerException;
 import java.io.*;
+import java.lang.reflect.Method;
+import java.util.Enumeration;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -101,11 +103,20 @@ public abstract class  AbstractCrudAction extends PortofinoAction
     // Web parameters
     //**************************************************************************
 
+    public String successReturnUrl;
     public String cancelReturnUrl;
     public String relName;
     public int selectionProviderIndex;
     public String labelSearch;
     public String code;
+
+    //**************************************************************************
+    // target identification
+    //**************************************************************************
+
+    public String targetCrudPath;
+    public String targetCrudMethodName;
+    public CrudUnit targetCrudUnit;
 
     //**************************************************************************
     // Use case instance root (tree)
@@ -135,38 +146,54 @@ public abstract class  AbstractCrudAction extends PortofinoAction
     // Action default execute method
     //**************************************************************************
 
-    public String execute() {
+    public String execute() throws Exception {
         if (qualifiedName == null) {
             return redirectToFirst();
-        } else {
-            return rootCrudUnit.execute();
         }
+
+        Enumeration enumeration = req.getParameterNames();
+        while (enumeration.hasMoreElements()) {
+            String current = (String) enumeration.nextElement();
+
+            if (current.startsWith("crud:")) {
+                String[] parts = current.split(":");
+                if (parts.length != 3) {
+                    continue;
+                }
+                targetCrudPath = parts[1];
+                targetCrudMethodName = parts[2];
+                if (targetCrudPath.length() == 0) {
+                    targetCrudUnit = rootCrudUnit;
+                } else {
+                    int index = Integer.parseInt(targetCrudPath);
+                    targetCrudUnit = rootCrudUnit.subCrudUnits.get(index);
+                }
+                Class clazz = targetCrudUnit.getClass();
+                Method method = clazz.getMethod(targetCrudMethodName);
+                return (String) method.invoke(targetCrudUnit);
+            }
+        }
+
+        return rootCrudUnit.execute();
     }
 
     public abstract String redirectToFirst();
-
-    //**************************************************************************
-    // Search
-    //**************************************************************************
-
-    public String search() {
-        return rootCrudUnit.search();
-    }
 
     //**************************************************************************
     // Return to search
     //**************************************************************************
 
     public String returnToSearch() {
+        rootCrudUnit.pk = null;
         return RETURN_TO_SEARCH;
     }
 
     //**************************************************************************
-    // Read
+    // Cancel
     //**************************************************************************
 
-    public String read() {
-        return rootCrudUnit.read();
+    public String cancel() {
+        return CANCEL;
     }
 
     //**************************************************************************
@@ -180,70 +207,6 @@ public abstract class  AbstractCrudAction extends PortofinoAction
         inputStream = new FileInputStream(blob.getDataFile());
         fileName = blob.getFilename();
         return EXPORT;
-    }
-
-    //**************************************************************************
-    // Create/Save
-    //**************************************************************************
-
-    public String create() {
-        return rootCrudUnit.create();
-    }
-
-    public String save() {
-        return rootCrudUnit.save();
-    }
-
-    //**************************************************************************
-    // Edit/Update
-    //**************************************************************************
-
-    public String edit() {
-        return rootCrudUnit.edit();
-    }
-
-    public String update() {
-        return rootCrudUnit.update();
-    }
-
-    //**************************************************************************
-    // Bulk Edit/Update
-    //**************************************************************************
-
-    public String bulkEdit() {
-        return rootCrudUnit.bulkEdit();
-    }
-
-    public String bulkUpdate() {
-        return rootCrudUnit.bulkUpdate();
-    }
-
-    //**************************************************************************
-    // Delete
-    //**************************************************************************
-
-    public String delete() {
-        return rootCrudUnit.delete();
-    }
-
-    public String bulkDelete() {
-        return rootCrudUnit.bulkDelete();
-    }
-
-    //**************************************************************************
-    // Cancel
-    //**************************************************************************
-
-    public String cancel() {
-        return CANCEL;
-    }
-
-    //**************************************************************************
-    // Button
-    //**************************************************************************
-
-    public String button() throws Exception {
-        return rootCrudUnit.button();
     }
 
     //**************************************************************************
@@ -272,7 +235,8 @@ public abstract class  AbstractCrudAction extends PortofinoAction
     public String exportSearchExcel() {
         File fileTemp = createExportTempFile();
         rootCrudUnit.exportSearchExcel(fileTemp);
-        paramExport(fileTemp);
+        paramExportXls(fileTemp);
+        fileName = rootCrudUnit.searchTitle + ".xls";
         return EXPORT;
     }
 
@@ -281,10 +245,9 @@ public abstract class  AbstractCrudAction extends PortofinoAction
          return RandomUtil.getTempCodeFile(exportFilenameFormat, exportId);
      }
 
-    private void paramExport(File fileTemp) {
+    private void paramExportXls(File fileTemp) {
         contentType = "application/ms-excel; charset=UTF-8";
-        fileName = fileTemp.getName() + ".xls";
-
+        
         contentLength = fileTemp.length();
 
         try {
@@ -325,8 +288,9 @@ public abstract class  AbstractCrudAction extends PortofinoAction
                 logger.warn("IOException", e);
                 SessionMessages.addErrorMessage(e.getMessage());
             }
-        }        
-        paramExport(fileTemp);
+        }
+        paramExportXls(fileTemp);
+        fileName = rootCrudUnit.readTitle + ".xls";
         return PortofinoAction.EXPORT;
     }
 
@@ -339,19 +303,16 @@ public abstract class  AbstractCrudAction extends PortofinoAction
         File tempPdfFile = createExportTempFile();
         rootCrudUnit.exportSearchPdf(tempPdfFile);
 
-        inputStream = new FileInputStream(tempPdfFile);
+        paramExportPdf(tempPdfFile);
 
-        contentType = "application/pdf";
-
-        fileName = tempPdfFile.getName() + ".pdf";
-
-        contentLength = tempPdfFile.length();
+        fileName = rootCrudUnit.searchTitle + ".pdf";
 
         return EXPORT;
     }
 
-     //**************************************************************************
-    // ExportSearchPdf
+
+    //**************************************************************************
+    // ExportReadPdf
     //**************************************************************************
 
     public String exportReadPdf() throws FOPException,
@@ -359,15 +320,19 @@ public abstract class  AbstractCrudAction extends PortofinoAction
         File tempPdfFile = createExportTempFile();
         rootCrudUnit.exportReadPdf(tempPdfFile);
 
+        paramExportPdf(tempPdfFile);
+
+        fileName = rootCrudUnit.readTitle + ".pdf";
+
+        return EXPORT;
+    }
+
+    private void paramExportPdf(File tempPdfFile) throws FileNotFoundException {
         inputStream = new FileInputStream(tempPdfFile);
 
         contentType = "application/pdf";
 
-        fileName = tempPdfFile.getName() + ".pdf";
-
         contentLength = tempPdfFile.length();
-
-        return EXPORT;
     }
 
 }

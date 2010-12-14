@@ -157,6 +157,14 @@
                 <param name="inputName">inputStream</param>
                 <param name="bufferSize">1024</param>
             </result>
+
+            <result name="export" type="stream">
+                <param name="contentType">%{contentType}</param>
+                <param name="contentLength">%{contentLength}</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename="%{fileName}"</param>
+                <param name="bufferSize">1024</param>
+            </result>
         </action>
         <action name="Profile" class="com.manydesigns.portofino.actions.user.ProfileAction">
             <result name="read">
@@ -174,6 +182,7 @@
             <result name="updatePwd" type="redirectAction">
                 <param name="actionName">Profile</param>
             </result>
+
         </action>
         <action name="Portlet"
                 class="com.manydesigns.portofino.actions.model.PortletDesignAction">
@@ -248,7 +257,7 @@
 
             <result name="save" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>
-                <param name="pk">%{rootCrudUnit.pk}</param>
+                <param name="pk">%{pk}</param>
             </result>
 
             <result name="edit">/skins/default/crud/edit.jsp</result>
@@ -263,16 +272,19 @@
 
             <result name="bulkUpdate" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>
+                <param name="pk">%{pk}</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="returnToSearch" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>
+                <param name="pk">%{pk}</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
             <result name="delete" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>
+                <param name="pk">%{pk}</param>
                 <param name="searchString">%{searchString}</param>
             </result>
 
@@ -473,6 +485,14 @@
                 <param name="location">${cancelReturnUrl}</param>
                 <param name="prependServletContext">false</param>
             </result>
+
+            <result name="export" type="stream">
+                <param name="contentType">%{contentType}</param>
+                <param name="contentLength">%{contentLength}</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename="%{fileName}"</param>
+                <param name="bufferSize">1024</param>
+            </result>
         </action>
 
         <action name="Groups"
@@ -524,6 +544,14 @@
             <result name="cancel" type="redirect">
                 <param name="location">${cancelReturnUrl}</param>
                 <param name="prependServletContext">false</param>
+            </result>
+
+            <result name="export" type="stream">
+                <param name="contentType">%{contentType}</param>
+                <param name="contentLength">%{contentLength}</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename="%{fileName}"</param>
+                <param name="bufferSize">1024</param>
             </result>
         </action>
     </package>
