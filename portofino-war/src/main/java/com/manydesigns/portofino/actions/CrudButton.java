@@ -36,6 +36,7 @@ import com.manydesigns.portofino.model.site.usecases.Button;
 import com.opensymphony.xwork2.util.CompoundRoot;
 import com.opensymphony.xwork2.util.ValueStack;
 import ognl.OgnlContext;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,8 +79,9 @@ public class CrudButton {
 
     public void runGuard() {
         String guard = button.getGuard();
-        if (guard == null) {
+        if (StringUtils.isBlank(guard)) {
             enabled = true;
+            return;
         }
 
         // Ognl context

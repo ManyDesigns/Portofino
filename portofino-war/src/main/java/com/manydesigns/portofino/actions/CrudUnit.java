@@ -218,6 +218,11 @@ public class CrudUnit {
         form.readFromObject(object);
         refreshBlobDownloadHref();
 
+        // refresh crud buttons (enabled/disabled)
+        for (CrudButton crudButton : crudButtons) {
+            crudButton.runGuard();
+        }
+
         ValueStack valueStack = Struts2Utils.getValueStack();
 
         valueStack.push(object);
