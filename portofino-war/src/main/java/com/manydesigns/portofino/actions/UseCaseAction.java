@@ -41,6 +41,7 @@ import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
 import com.manydesigns.portofino.model.site.UseCaseNode;
+import com.manydesigns.portofino.model.site.usecases.Button;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
 
@@ -65,8 +66,8 @@ public class UseCaseAction extends AbstractCrudAction {
         if (qualifiedName == null) {
             return;
         }
-        UseCase rootUseCase = ((UseCaseNode) navigation.getSelectedNavigationNode().getActualSiteNode())
-                .getUseCase();
+        UseCase rootUseCase = ((UseCaseNode) navigation
+                .getSelectedNavigationNode().getActualSiteNode()).getUseCase();
         if (rootUseCase == null) {
             throw new ModelObjectNotFoundError(qualifiedName);
         }
@@ -83,7 +84,10 @@ public class UseCaseAction extends AbstractCrudAction {
                 useCase.getSearchTitle(), useCase.getCreateTitle(),
                 useCase.getReadTitle(), useCase.getEditTitle(),
                 useCase.getName(), prefix, first);
-        result.buttons.addAll(useCase.getButtons());
+        for (Button button : useCase.getButtons()) {
+            CrudButton crudButton = new CrudButton(button);
+            result.crudButtons.add(crudButton);
+        }
 
         // inject values
         result.context = context;

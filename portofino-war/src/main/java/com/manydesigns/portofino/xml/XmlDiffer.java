@@ -29,10 +29,10 @@
 
 package com.manydesigns.portofino.xml;
 
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.util.Util;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.slf4j.Logger;
@@ -363,7 +363,7 @@ public class XmlDiffer {
                 } else {
                     sb.append(separator);
                 }
-                String stringValue = Util.convertValueToString(current);
+                String stringValue = OgnlUtils.convertValueToString(current);
                 sb.append(stringValue);
             }
             return sb.toString();

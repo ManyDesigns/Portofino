@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.text;
 
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +85,7 @@ public class OgnlTextFormat
         String[] argStrings = new String[args.length];
         for (int i = 0; i < args.length; i++) {
             Object arg = args[i];
-            String argString = (String)Util.convertValue(arg, String.class);
+            String argString = (String) OgnlUtils.convertValue(arg, String.class);
             argStrings[i] = url ? Util.urlencode(argString) : argString;
         }
 

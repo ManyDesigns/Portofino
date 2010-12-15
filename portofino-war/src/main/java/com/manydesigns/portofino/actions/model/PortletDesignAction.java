@@ -34,7 +34,7 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.jfreechart.JBla;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.struts2.Struts2Util;
+import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
@@ -160,7 +160,7 @@ public class PortletDesignAction extends PortofinoAction {
 
         HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("chartId", chartId);
-        String portletUrl = Util.getAbsoluteUrl(Struts2Util.buildActionUrl("chart", parameters));
+        String portletUrl = Util.getAbsoluteUrl(Struts2Utils.buildActionUrl("chart", parameters));
 
         try {
             File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);

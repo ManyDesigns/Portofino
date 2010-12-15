@@ -38,7 +38,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.struts2.Struts2Util;
+import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
@@ -102,7 +102,7 @@ public class CrudUnit {
     public final String editTitle;
     public final PkHelper pkHelper;
     public final List<CrudUnit> subCrudUnits;
-    public final List<Button> buttons;
+    public final List<CrudButton> crudButtons;
     public final List<CrudSelectionProvider> crudSelectionProviders;
     private final boolean first;
 
@@ -163,7 +163,7 @@ public class CrudUnit {
                     String name,
                     String prefix,
                     boolean first) {
-        this.buttons = new ArrayList<Button>();
+        this.crudButtons = new ArrayList<CrudButton>();
         this.classAccessor = classAccessor;
         this.baseTable = baseTable;
         this.query = query;
@@ -218,7 +218,7 @@ public class CrudUnit {
         form.readFromObject(object);
         refreshBlobDownloadHref();
 
-        ValueStack valueStack = Struts2Util.getValueStack();
+        ValueStack valueStack = Struts2Utils.getValueStack();
 
         valueStack.push(object);
         for (CrudUnit subCrudUnit : subCrudUnits) {
@@ -246,7 +246,7 @@ public class CrudUnit {
 
     public String getBlobDownloadUrl(String code) {
         StringBuilder sb = new StringBuilder();
-        sb.append(Struts2Util.buildActionUrl("downloadBlob"));
+        sb.append(Struts2Utils.buildActionUrl("downloadBlob"));
         sb.append("?code=");
         sb.append(Util.urlencode(code));
         return Util.getAbsoluteUrl(sb.toString());
@@ -416,7 +416,8 @@ public class CrudUnit {
 
     public String button() throws Exception {
         String value = req.getParameter("method:button");
-        for (Button button : buttons) {
+        for (CrudButton crudButton : crudButtons) {
+            Button button = crudButton.getButton();
             if (button.getLabel().equals(value)) {
                 String script = button.getScript();
                 String scriptLanguage = button.getActualScriptLanguage();
@@ -563,7 +564,7 @@ public class CrudUnit {
 
     protected String getReadLinkExpression() {
         StringBuilder sb = new StringBuilder();
-        sb.append(Struts2Util.buildActionUrl(null));
+        sb.append(Struts2Utils.buildActionUrl(null));
         sb.append("?pk=");
         boolean first = true;
 
@@ -590,7 +591,7 @@ public class CrudUnit {
     //**************************************************************************
 
     public void loadObjects() {
-        ValueStack valueStack = Struts2Util.getValueStack();
+        ValueStack valueStack = Struts2Utils.getValueStack();
         CompoundRoot root = valueStack.getRoot();
 
         //Se si passano dati sbagliati al criterio restituisco messaggio d'errore
@@ -703,7 +704,7 @@ public class CrudUnit {
             i++;
         }
 
-        ValueStack valueStack = Struts2Util.getValueStack();
+        ValueStack valueStack = Struts2Utils.getValueStack();
         valueStack.push(object);
 
         //Aggiungo le relazioni/sheet
@@ -949,7 +950,7 @@ public class CrudUnit {
             xb.closeElement("tableData");
         }
 
-        ValueStack valueStack = Struts2Util.getValueStack();
+        ValueStack valueStack = Struts2Utils.getValueStack();
         valueStack.push(object);
 
         //Aggiungo le relazioni

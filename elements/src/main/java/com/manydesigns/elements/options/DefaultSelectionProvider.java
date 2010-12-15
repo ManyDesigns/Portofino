@@ -29,11 +29,11 @@
 
 package com.manydesigns.elements.options;
 
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
-import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,8 +106,8 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
             for (int j = 0; j < fieldCount; j++) {
                 Class valueType = valueTypes[j];
-                values[j] = Util.convertValue(valueAndLabel[j*2], valueType);
-                labels[j] = Util.convertValueToString(valueAndLabel[j*2+1]);
+                values[j] = OgnlUtils.convertValue(valueAndLabel[j*2], valueType);
+                labels[j] = OgnlUtils.convertValueToString(valueAndLabel[j*2+1]);
             }
 
             i++;
@@ -206,7 +206,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
                 Object value = property.get(current);
                 values[j] = value;
                 if (textFormats == null || textFormats[j] == null) {
-                    String label = Util.convertValueToString(value);
+                    String label = OgnlUtils.convertValueToString(value);
                     labels[j] = label;
                 } else {
                     TextFormat textFormat = textFormats[j];

@@ -29,11 +29,11 @@
 
 package com.manydesigns.portofino.xml;
 
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +104,7 @@ public class XmlParser {
             } else if (type == Boolean.class || type == Boolean.TYPE) {
                 castValue = Boolean.valueOf(value);
             } else {
-                castValue = Util.convertValue(value, type);
+                castValue = OgnlUtils.convertValue(value, type);
             }
 
             propertyAccessor.set(object, castValue);

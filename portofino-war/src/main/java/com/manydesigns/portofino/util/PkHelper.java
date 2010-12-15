@@ -29,9 +29,10 @@
 
 package com.manydesigns.portofino.util;
 
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.struts2.Struts2Util;
+import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
@@ -98,7 +99,7 @@ public class PkHelper {
 
         for(PropertyAccessor property : classAccessor.getKeyProperties()) {
             String stringValue = pkList[i];
-            Object value = Util.convertValue(stringValue, property.getType());
+            Object value = OgnlUtils.convertValue(stringValue, property.getType());
             property.set(result, value);
             i++;
         }
@@ -118,7 +119,7 @@ public class PkHelper {
             }
             Object value = property.get(object);
             String stringValue =
-                    (String) Util.convertValue(value, String.class);
+                    (String) OgnlUtils.convertValue(value, String.class);
             sb.append(stringValue);
         }
         return sb.toString();
@@ -129,14 +130,14 @@ public class PkHelper {
         Map<String,Object> params = new HashMap<String,Object>();
         params.put("pk", pkString);
         params.put("searchString", searchString);
-        String url = Struts2Util.buildActionUrl(null, params);
+        String url = Struts2Utils.buildActionUrl(null, params);
         return Util.getAbsoluteUrl(url);
     }
 
     public String generateSearchUrl(String searchString) {
         Map<String,Object> params = new HashMap<String,Object>();
         params.put("searchString", searchString);
-        String url = Struts2Util.buildActionUrl(null, params);
+        String url = Struts2Utils.buildActionUrl(null, params);
         return Util.getAbsoluteUrl(url);
     }
 

@@ -29,10 +29,10 @@
 
 package com.manydesigns.portofino.xml;
 
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.model.io.IndentingXMLStreamWriter;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
@@ -132,7 +132,7 @@ public class XmlWriter {
             String name = propertyAccessor.getName();
 
             Object value = propertyAccessor.get(object);
-            String stringValue = Util.convertValueToString(value);
+            String stringValue = OgnlUtils.convertValueToString(value);
 
             if (value == null) {
                 if (xmlAttribute.required()) {

@@ -33,6 +33,7 @@ import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -408,7 +409,7 @@ public abstract class AbstractField implements Field {
             return;
         }
         Object convertedValue =
-                Util.convertValue(value, accessor.getType());
+                OgnlUtils.convertValue(value, accessor.getType());
         accessor.set(obj, convertedValue);
     }
 }

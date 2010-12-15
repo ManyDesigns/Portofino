@@ -30,6 +30,7 @@
 package com.manydesigns.elements.util;
 
 import com.manydesigns.elements.AbstractElementsTest;
+import com.manydesigns.elements.ognl.OgnlUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -127,50 +128,50 @@ public class UtilTest extends AbstractElementsTest {
     public void testConvertFromInteger() {
         int intValue = 3;
 
-        byte byteValue = (Byte) Util.convertValue(intValue, Byte.class);
+        byte byteValue = (Byte) OgnlUtils.convertValue(intValue, Byte.class);
         assertEquals((byte)3, byteValue);
 
-        short shortValue = (Short) Util.convertValue(intValue, Short.class);
+        short shortValue = (Short) OgnlUtils.convertValue(intValue, Short.class);
         assertEquals((short)3, shortValue);
 
-        long longValue = (Long) Util.convertValue(intValue, Long.class);
+        long longValue = (Long) OgnlUtils.convertValue(intValue, Long.class);
         assertEquals((long)3, longValue);
 
-        BigDecimal bigDecimalValue = (BigDecimal) Util.convertValue(intValue, BigDecimal.class);
+        BigDecimal bigDecimalValue = (BigDecimal) OgnlUtils.convertValue(intValue, BigDecimal.class);
         assertEquals(new BigDecimal(3), bigDecimalValue);
 
-        BigInteger bigIntegerValue = (BigInteger) Util.convertValue(intValue, BigInteger.class);
+        BigInteger bigIntegerValue = (BigInteger) OgnlUtils.convertValue(intValue, BigInteger.class);
         assertEquals(new BigInteger("3"), bigIntegerValue);
 
-        float floatValue = (Float) Util.convertValue(intValue, Float.class);
+        float floatValue = (Float) OgnlUtils.convertValue(intValue, Float.class);
         assertEquals(3f, floatValue);
 
-        double doubleValue = (Double) Util.convertValue(intValue, Double.class);
+        double doubleValue = (Double) OgnlUtils.convertValue(intValue, Double.class);
         assertEquals(3.0, doubleValue);
     }
 
     public void testConvertFromBigDecimal() {
         BigDecimal bigDecimalValue = new BigDecimal(3);
 
-        byte byteValue = (Byte) Util.convertValue(bigDecimalValue, Byte.class);
+        byte byteValue = (Byte) OgnlUtils.convertValue(bigDecimalValue, Byte.class);
         assertEquals((byte)3, byteValue);
 
-        short shortValue = (Short) Util.convertValue(bigDecimalValue, Short.class);
+        short shortValue = (Short) OgnlUtils.convertValue(bigDecimalValue, Short.class);
         assertEquals((short)3, shortValue);
 
-        long longValue = (Long) Util.convertValue(bigDecimalValue, Long.class);
+        long longValue = (Long) OgnlUtils.convertValue(bigDecimalValue, Long.class);
         assertEquals((long)3, longValue);
 
-        int intValue = (Integer) Util.convertValue(bigDecimalValue, Integer.class);
+        int intValue = (Integer) OgnlUtils.convertValue(bigDecimalValue, Integer.class);
         assertEquals(3, intValue);
 
-        float floatValue = (Float) Util.convertValue(bigDecimalValue, Float.class);
+        float floatValue = (Float) OgnlUtils.convertValue(bigDecimalValue, Float.class);
         assertEquals(3f, floatValue);
 
-        double doubleValue = (Double) Util.convertValue(bigDecimalValue, Double.class);
+        double doubleValue = (Double) OgnlUtils.convertValue(bigDecimalValue, Double.class);
         assertEquals(3.0, doubleValue);
 
-        BigInteger bigIntegerValue = (BigInteger) Util.convertValue(bigDecimalValue, BigInteger.class);
+        BigInteger bigIntegerValue = (BigInteger) OgnlUtils.convertValue(bigDecimalValue, BigInteger.class);
         assertEquals(new BigInteger("3"), bigIntegerValue);
     }
 
@@ -194,17 +195,17 @@ public class UtilTest extends AbstractElementsTest {
     }
 
     public void testConvert() {
-        assertEquals((Integer)3, Util.convertValue("3", Integer.class));
+        assertEquals((Integer)3, OgnlUtils.convertValue("3", Integer.class));
 
         try {
-            Util.convertValue("bla", Integer.class);
+            OgnlUtils.convertValue("bla", Integer.class);
             fail();
         } catch (NumberFormatException e) {
             assertEquals("For input string: \"bla\"", e.getMessage());
         }
 
         try {
-            Util.convertValue("1.0bla", BigDecimal.class);
+            OgnlUtils.convertValue("1.0bla", BigDecimal.class);
             fail();
         } catch (NumberFormatException e) {
             assertNull(e.getMessage());
@@ -214,7 +215,7 @@ public class UtilTest extends AbstractElementsTest {
         Date date = new Date();
         Timestamp target = new Timestamp(date.getTime());
 
-        assertEquals(target, Util.convertValue(date, Timestamp.class));
+        assertEquals(target, OgnlUtils.convertValue(date, Timestamp.class));
     }
 
 }

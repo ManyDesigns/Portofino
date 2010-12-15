@@ -30,9 +30,9 @@
 package com.manydesigns.elements.servlet;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
-import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
 import org.slf4j.Logger;
@@ -122,11 +122,7 @@ public class WriteTag extends TagSupport {
         if (property != null) {
             // use property as Ognl expression
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-            if (ognlContext == null) {
-                bean = Ognl.getValue(property, ognlContext, bean);
-            } else {
-                bean = Ognl.getValue(property, bean);
-            }
+            bean = OgnlUtils.getValueQuietly(property, ognlContext, bean);
         }
 
         if (bean instanceof XhtmlFragment) {

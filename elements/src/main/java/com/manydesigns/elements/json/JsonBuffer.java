@@ -29,7 +29,7 @@
 
 package com.manydesigns.elements.json;
 
-import com.manydesigns.elements.util.Util;
+import com.manydesigns.elements.ognl.OgnlUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,7 +133,7 @@ public class JsonBuffer {
     }
 
     public void writeKeyValue(String key, Integer intValue) {
-        String rawValue = Util.convertValueToString(intValue);
+        String rawValue = OgnlUtils.convertValueToString(intValue);
         writeKeyRawValue(key, rawValue);
     }
 
