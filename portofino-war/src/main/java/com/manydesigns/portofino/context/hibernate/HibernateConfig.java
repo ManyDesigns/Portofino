@@ -530,11 +530,12 @@ public class HibernateConfig {
         OneToMany oneToMany = new OneToMany(set.getOwner());
         set.setElement(oneToMany);
 
+
         oneToMany.setReferencedEntityName(manyMDQualifiedTableName);
 
         oneToMany.setAssociatedClass(clazzMany);
         oneToMany.setEmbedded(true);
-
+        
         set.setSorted(false);
         set.setFetchMode(FetchMode.DEFAULT);
         //Riferimenti alle colonne
@@ -558,6 +559,8 @@ public class HibernateConfig {
                 manyColumns,
                 oneMDQualifiedTableName,
                 oneColumns);
+
+        dv.setNullable(false);
         set.setKey(dv);
         mappings.addCollection(set);
 
@@ -565,6 +568,11 @@ public class HibernateConfig {
         prop.setName(relationship.getActualManyPropertyName());
         prop.setNodeName(relationship.getActualManyPropertyName());
         prop.setValue(set);
+        if ("cascade".equalsIgnoreCase(relationship.getOnDelete())){
+            prop.setCascade("delete");
+        } else {
+            prop.setCascade("none");
+        }
         clazzOne.addProperty(prop);
     }
 
@@ -682,10 +690,12 @@ public class HibernateConfig {
             m2o.addColumn(col);
         }
 
+        
         Property prop = new Property();
         prop.setName(relationship.getActualOnePropertyName());
         prop.setNodeName(relationship.getActualOnePropertyName());
         prop.setValue(m2o);
+        prop.setCascade("all");
         prop.setInsertable(false);
         prop.setUpdateable(false);
         clazz.addProperty(prop);

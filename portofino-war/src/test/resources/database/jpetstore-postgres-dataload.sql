@@ -59,8 +59,6 @@ INSERT INTO  "item" ("itemid", "productid", "listprice", "unitcost", "supplier",
  INSERT INTO  "item" ("itemid", "productid", "listprice", "unitcost", "supplier", "status", "attr1") VALUES('EST-15','FL-DSH-01',23.50,12.00,1,'P','With tail');
  INSERT INTO  "item" ("itemid", "productid", "listprice", "unitcost", "supplier", "status", "attr1") VALUES('EST-16','FL-DLH-02',93.50,12.00,1,'P','Adult Female');
  INSERT INTO  "item" ("itemid", "productid", "listprice", "unitcost", "supplier", "status", "attr1") VALUES('EST-17','FL-DLH-02',93.50,12.00,1,'P','Adult Male');
- INSERT INTO  "item" ("itemid", "productid", "listprice", "unitcost", "supplier", "status", "attr1") VALUES('EST-18','AV-CB-01',193.50,92.00,1,'P','Adult Male');
- INSERT INTO  "item" ("itemid", "productid", "listprice", "unitcost", "supplier", "status", "attr1") VALUES('EST-19','AV-SB-02',15.50, 2.00,1,'P','Adult Male');
  INSERT INTO  "item" ("itemid", "productid", "listprice", "unitcost", "supplier", "status", "attr1") VALUES('EST-20','FI-FW-02',5.50, 2.00,1,'P','Adult Male');
  INSERT INTO  "item" ("itemid", "productid", "listprice", "unitcost", "supplier", "status", "attr1") VALUES('EST-21','FI-FW-02',5.29, 1.00,1,'P','Adult Female');
  INSERT INTO  "item" ("itemid", "productid", "listprice", "unitcost", "supplier", "status", "attr1") VALUES('EST-22','K9-RT-02',135.50, 100.00,1,'P','Adult Male');

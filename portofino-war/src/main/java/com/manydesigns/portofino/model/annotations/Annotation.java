@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model.annotations;
 
 import com.manydesigns.elements.annotations.AnnotationsManager;
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.model.Model;
@@ -131,7 +132,7 @@ public class Annotation extends ArrayList<String> implements ModelObject {
                     } else {
                         value = stringValue;
                     }
-                    castValues[i] = Util.convertValue(value, parameterType);
+                    castValues[i] = OgnlUtils.convertValue(value, parameterType);
                 }
 
                 javaAnnotation = (java.lang.annotation.Annotation)

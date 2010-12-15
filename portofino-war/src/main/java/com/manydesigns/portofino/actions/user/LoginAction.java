@@ -37,8 +37,8 @@ import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.util.ValueStack;
-import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.commons.lang.StringUtils;
+import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,16 +130,14 @@ public class LoginAction extends PortofinoAction
 
         ValueStack vs = ActionContext.getContext().getValueStack();
 
-        logger.debug("User {} login", user.getEmail());
+        logger.info("User {} login", user.getUserName());
         getSession().put(UserUtils.USERID, user.getUserId());
         getSession().put(UserUtils.USERNAME, user.getUserName());
         updateUser(user);
-        //TODO: da correggere, ma non capisco - Giampiero
         returnUrl = StringUtils.trimToNull(returnUrl);
         returnUrl=(returnUrl!=null)?returnUrl:home;
 
         return SUCCESS;
-
     }
 
     private void updateFailedUser(String username) {

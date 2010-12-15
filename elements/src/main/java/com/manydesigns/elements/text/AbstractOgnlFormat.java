@@ -30,14 +30,11 @@
 package com.manydesigns.elements.text;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import ognl.ClassResolver;
-import ognl.Ognl;
+import com.manydesigns.elements.ognl.OgnlUtils;
 import ognl.OgnlContext;
-import ognl.OgnlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -84,17 +81,10 @@ public abstract class AbstractOgnlFormat {
             String ognlExpression = group.substring(2, group.length()-1);
             replaceOgnlExpression(sb, index, ognlExpression);
             int end = m.end();
-            try {
-                Object parsedOgnlExpression =
-                        Ognl.parseExpression(ognlExpression);
-                ognlExpressionList.add(ognlExpression);
-                parsedOgnlExpressionList.add(parsedOgnlExpression);
-            } catch (OgnlException e) {
-                String msg = MessageFormat.format(
-                        "Could not parse: {0}", ognlExpression);
-                logger.warn(msg, e);
-                throw new IllegalArgumentException(msg);
-            }
+            Object parsedOgnlExpression =
+                    OgnlUtils.parseExpressionQuietly(ognlExpression);
+            ognlExpressionList.add(ognlExpression);
+            parsedOgnlExpressionList.add(parsedOgnlExpression);
             previousEnd = end;
             index++;
         }
@@ -116,7 +106,6 @@ public abstract class AbstractOgnlFormat {
 
     public Object[] evaluateOgnlExpressions(Object root) {
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        ClassResolver cr = ognlContext.getClassResolver();
         Object[] result = new Object[parsedOgnlExpressions.length];
         for (int i = 0; i < result.length; i++) {
             evaluateOneOgnlExpression(root, ognlContext, result, i);
@@ -128,21 +117,12 @@ public abstract class AbstractOgnlFormat {
                                            Map ognlContext,
                                            Object[] result,
                                            int i) {
-        String ognlExpression = ognlExpressions[i];
         Object parsedOgnlExpression = parsedOgnlExpressions[i];
-        try {
-            if (ognlContext == null) {
-                result[i] =
-                        Ognl.getValue(parsedOgnlExpression, root);
-            } else {
-                result[i] =
-                        Ognl.getValue(parsedOgnlExpression, ognlContext, root);
-            }
-        } catch (Throwable e) {
-            logger.warn("Error during evaluation of ognl expression: " +
-                    ognlExpression, e);
-        }
+        Object ognlResult = OgnlUtils.getValueQuietly(
+                parsedOgnlExpression, ognlContext, root);
+        result[i] = ognlResult;
     }
+
 
     //**************************************************************************
     // Getters and setters

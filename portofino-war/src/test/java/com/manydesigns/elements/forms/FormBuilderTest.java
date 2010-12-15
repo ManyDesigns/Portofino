@@ -310,19 +310,19 @@ public class FormBuilderTest extends AbstractElementsTest {
                 "<script type=\"text/javascript\">setupDatePicker('#date', 'yy-mm-dd');</script>" +
                 "</td></tr><tr><th>" +
                 "<label for=\"decimal\" class=\"field\">Decimal:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"decimal\" " +
-                "name=\"decimal\"></input></td></tr>" +
+                "<td><input id=\"decimal\" type=\"text\" name=\"decimal\" " +
+                "class=\"text\"></input></td></tr>" +
                 "<tr><th><label for=\"anInt\" class=\"field\">" +
                 "<span class=\"required\">*</span>&nbsp;An int:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"anInt\" " +
-                "name=\"anInt\"></input></td></tr></table></fieldset>" +
+                "<td><input id=\"anInt\" type=\"text\" name=\"anInt\" " +
+                "class=\"text\"></input></td></tr></table></fieldset>" +
                 "<fieldset><legend>bar</legend>" +
                 "<table class=\"details\"><tr><th><label for=\"anInteger\" " +
                 "class=\"field\">An integer:</label></th><td>" +
-                "<input type=\"text\" class=\"text\" id=\"anInteger\" " +
-                "name=\"anInteger\"></input></td></tr><tr><th>" +
+                "<input id=\"anInteger\" type=\"text\" name=\"anInteger\" " +
+                "class=\"text\"></input></td></tr><tr><th>" +
                 "<label for=\"text\" class=\"field\">Text:</label></th><td>" +
-                "<input type=\"text\" class=\"text\" id=\"text\" name=\"text\">" +
+                "<input id=\"text\" type=\"text\" name=\"text\" class=\"text\">" +
                 "</input></td></tr></table></fieldset>", text);
     }
 

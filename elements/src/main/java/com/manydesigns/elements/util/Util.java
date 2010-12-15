@@ -30,8 +30,6 @@
 package com.manydesigns.elements.util;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import ognl.OgnlContext;
-import ognl.TypeConverter;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,18 +137,6 @@ public class Util {
     public static String[] matchStringArray(String text) {
         StrTokenizer strTokenizer = StrTokenizer.getCSVInstance(text);
         return strTokenizer.getTokenArray();
-    }
-
-    public static String convertValueToString(Object value) {
-        return (String) convertValue(value, String.class);
-    }
-
-    public static Object convertValue(Object value, Class toType) {
-        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        TypeConverter typeConverter = ognlContext.getTypeConverter();
-
-        return typeConverter.convertValue(
-                ognlContext, null, null, null, value, toType);
     }
 
 

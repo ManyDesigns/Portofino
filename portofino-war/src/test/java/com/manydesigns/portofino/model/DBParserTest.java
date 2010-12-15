@@ -92,7 +92,7 @@ public class DBParserTest extends AbstractPortofinoTest {
         assertEquals(2, table0.getOneToManyRelationships().size());
         checkRelationships(table0.getOneToManyRelationships()
                 , 0, "fk_product_1", "PUBLIC" ,
-                "category", "NO ACTION", "NO ACTION");
+                "category", "NO ACTION", "CASCADE");
         List<Reference> references =
                 table0.getOneToManyRelationships().get(0).getReferences();
         checkReference(references, 0, "category", "catid");
@@ -105,7 +105,7 @@ public class DBParserTest extends AbstractPortofinoTest {
         int idxRel = 0;
         checkRelationships(table1.getForeignKeys()
                 , idxRel, "fk_product_1", "PUBLIC" ,
-                "category", "NO ACTION", "NO ACTION");
+                "category", "NO ACTION", "CASCADE");
         assertEquals(1, table1.getForeignKeys().size());
         List<Reference> references2 =
                 table1.getForeignKeys().get(idxRel).getReferences();

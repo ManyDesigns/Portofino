@@ -111,7 +111,7 @@ Struttura dell'XML:
                                 <column autoincrement="false" columnName="token" columnType="varchar" javaType="java.lang.String" length="100" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="remquestion" columnType="varchar" javaType="java.lang.String" length="255" nullable="true" propertyName="remQuestion" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="remans" columnType="varchar" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="username" columnType="varchar" javaType="java.lang.String" length="50" nullable="true" propertyName="userName" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="username" columnType="varchar" javaType="java.lang.String" length="50" nullable="false" propertyName="userName" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="firstname" columnType="varchar" javaType="java.lang.String" length="50" nullable="true" propertyName="firstName" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="middlename" columnType="varchar" javaType="java.lang.String" length="50" nullable="true" propertyName="middleName" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="lastname" columnType="varchar" javaType="java.lang.String" length="50" nullable="true" propertyName="lastName" scale="0" searchable="true"/>
@@ -119,12 +119,12 @@ Struttura dell'XML:
                                 <column autoincrement="false" columnName="defaultuser" columnType="bool" javaType="java.lang.Boolean" length="1" nullable="true" propertyName="defaultUser" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="extauth" columnType="bool" javaType="java.lang.Boolean" length="1" nullable="true" propertyName="extAuth" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="agreedtoterms" columnType="bool" javaType="java.lang.Boolean" length="1" nullable="true" propertyName="agreedToTerms" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="creationdate" columnType="timestamp" javaType="java.util.Date" length="29" nullable="true" propertyName="creationDate" scale="6" searchable="true"/>
-                                <column autoincrement="false" columnName="deletiondate" columnType="timestamp" javaType="java.util.Date" length="29" nullable="true" propertyName="deletionDate" scale="6" searchable="true"/>
-                                <column autoincrement="false" columnName="modifieddate" columnType="timestamp" javaType="java.util.Date" length="29" nullable="true" propertyName="modifiedDate" scale="6" searchable="true"/>
-                                <column autoincrement="false" columnName="lastpwdmoddate" columnType="timestamp" javaType="java.util.Date" length="29" nullable="true" propertyName="pwdModDate" scale="6" searchable="true"/>
-                                <column autoincrement="false" columnName="lastlogindate" columnType="timestamp" javaType="java.util.Date" length="29" nullable="true" propertyName="lastLoginDate" scale="6" searchable="true"/>
-                                <column autoincrement="false" columnName="lastfailedlogindate" columnType="timestamp" javaType="java.util.Date" length="29" nullable="true" propertyName="lastFailedLoginDate" scale="6" searchable="true"/>
+                                <column autoincrement="false" columnName="creationdate" columnType="timestamp" javaType="java.sql.Timestamp" length="29" nullable="true" propertyName="creationDate" scale="6" searchable="true"/>
+                                <column autoincrement="false" columnName="deletiondate" columnType="timestamp" javaType="java.sql.Timestamp" length="29" nullable="true" propertyName="deletionDate" scale="6" searchable="true"/>
+                                <column autoincrement="false" columnName="modifieddate" columnType="timestamp" javaType="java.sql.Timestamp" length="29" nullable="true" propertyName="modifiedDate" scale="6" searchable="true"/>
+                                <column autoincrement="false" columnName="lastpwdmoddate" columnType="timestamp" javaType="java.sql.Timestamp" length="29" nullable="true" propertyName="pwdModDate" scale="6" searchable="true"/>
+                                <column autoincrement="false" columnName="lastlogindate" columnType="timestamp" javaType="java.sql.Timestamp" length="29" nullable="true" propertyName="lastLoginDate" scale="6" searchable="true"/>
+                                <column autoincrement="false" columnName="lastfailedlogindate" columnType="timestamp" javaType="java.sql.Timestamp" length="29" nullable="true" propertyName="lastFailedLoginDate" scale="6" searchable="true"/>
                                 <column autoincrement="false" columnName="failedloginattempts" columnType="int4" javaType="java.lang.Integer" length="10" nullable="true" propertyName="failedLoginAttempts" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="gracelogincount" columnType="int4" javaType="java.lang.Integer" length="10" nullable="true" propertyName="graceLoginCount" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="bounced" columnType="int4" javaType="java.lang.Integer" length="10" nullable="true" propertyName="bounced" scale="0" searchable="true"/>
@@ -159,8 +159,8 @@ Struttura dell'XML:
                                     </annotations>
                                 </column>
                                 <column autoincrement="false" columnName="creatorid" columnType="int8" javaType="java.lang.Long" length="19" nullable="true" propertyName="creatorId" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="deletiondate" columnType="timestamp" javaType="java.util.Date" length="29" nullable="true" propertyName="deletionDate" scale="6" searchable="true"/>
-                                <column autoincrement="false" columnName="creationdate" columnType="timestamp" javaType="java.util.Date" length="29" nullable="true" propertyName="creationDate" scale="6" searchable="true"/>
+                                <column autoincrement="false" columnName="deletiondate" columnType="timestamp" javaType="java.sql.Timestamp" length="29" nullable="true" propertyName="deletionDate" scale="6" searchable="true"/>
+                                <column autoincrement="false" columnName="creationdate" columnType="timestamp" javaType="java.sql.Timestamp" length="29" nullable="true" propertyName="creationDate" scale="6" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="group_pkey">
                                 <column columnName="groupid"/>
@@ -182,8 +182,8 @@ Struttura dell'XML:
                             <columns>
                                 <column autoincrement="false" columnName="userid" columnType="int8" javaType="java.lang.Long" length="19" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="groupid" columnType="int8" javaType="java.lang.Long" length="19" nullable="false" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="deletiondate" columnType="timestamp" javaType="java.util.Date" length="29" nullable="true" propertyName="deletionDate" scale="6" searchable="true"/>
-                                <column autoincrement="false" columnName="creationdate" columnType="timestamp" javaType="java.util.Date" length="29" nullable="false" propertyName="creationDate" scale="6" searchable="true"/>
+                                <column autoincrement="false" columnName="deletiondate" columnType="timestamp" javaType="java.sql.Timestamp" length="29" nullable="true" propertyName="deletionDate" scale="6" searchable="true"/>
+                                <column autoincrement="false" columnName="creationdate" columnType="timestamp" javaType="java.sql.Timestamp" length="29" nullable="false" propertyName="creationDate" scale="6" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="users_groups_pkey">
                                 <column columnName="userid"/>
@@ -229,7 +229,7 @@ Struttura dell'XML:
                                 <column autoincrement="false" columnName="attachmentname" columnType="varchar" javaType="java.lang.String" length="255" nullable="true" propertyName="attachmentName" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="from_" columnType="varchar" javaType="java.lang.String" length="100" nullable="true" propertyName="from" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="createdate" columnType="date" javaType="java.util.Date" length="13" nullable="true" propertyName="createDate" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="state" columnType="int4" javaType="java.lang.Integer" length="10" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="state" columnType="int8" javaType="java.lang.Long" length="10" nullable="true" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="EmailQueue_pkey">
                                 <column columnName="id"/>
@@ -263,7 +263,7 @@ Struttura dell'XML:
                                 <column autoincrement="false" columnName="creationdate" columnType="timestamp" javaType="java.util.Date" length="29" nullable="true" propertyName="creationDate" scale="6" searchable="true"/>
                                 <column autoincrement="false" columnName="from_" columnType="int8" javaType="java.lang.Long" length="19" nullable="true" propertyName="fromId" scale="0" searchable="true"/>
                                 <column autoincrement="true" columnName="id" columnType="bigserial" javaType="java.lang.Long" length="19" nullable="false" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="state" columnType="int4" javaType="java.lang.Integer" length="10" nullable="true" propertyName="stateId" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="state" columnType="int8" javaType="java.lang.Long" length="10" nullable="true" propertyName="stateId" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="subject" columnType="varchar" javaType="java.lang.String" length="255" nullable="true" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="to_" columnType="int8" javaType="java.lang.Long" length="19" nullable="true" propertyName="toId" scale="0" searchable="true"/>
                             </columns>
@@ -303,7 +303,7 @@ Struttura dell'XML:
                                 <column autoincrement="false" columnName="createdate" columnType="timestamp" javaType="java.util.Date" length="29" nullable="true" propertyName="createDate" scale="6" searchable="true"/>
                                 <column autoincrement="true" columnName="id" columnType="bigserial" javaType="java.lang.Long" length="19" nullable="false" scale="0" searchable="true"/>
                                 <column autoincrement="false" columnName="password" columnType="varchar" javaType="java.lang.String" length="30" nullable="true" scale="0" searchable="true"/>
-                                <column autoincrement="false" columnName="userid" columnType="int4" javaType="java.lang.Integer" length="10" nullable="true" propertyName="userId" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="userid" columnType="int8" javaType="java.lang.Long" length="10" nullable="true" propertyName="userId" scale="0" searchable="true"/>
                             </columns>
                             <primaryKey primaryKeyName="OldPwd_pkey">
                                 <column columnName="id"/>
@@ -365,7 +365,7 @@ Struttura dell'XML:
                                 <column columnName="productid"/>
                             </primaryKey>
                             <foreignKeys>
-                                <foreignKey foreignKeyName="fk_product_1" onDelete="NO ACTION" onUpdate="NO ACTION" toDatabase="jpetstore" toSchema="public" toTable="category" virtual="false">
+                                <foreignKey foreignKeyName="fk_product_1" onDelete="CASCADE" onUpdate="NO ACTION" toDatabase="jpetstore" toSchema="public" toTable="category" virtual="false">
                                     <references>
                                         <reference fromColumn="category" toColumn="catid"/>
                                     </references>
@@ -751,14 +751,7 @@ Struttura dell'XML:
                     </allow>
                 </permissions>
             </folderNode>
-            <customNode id="Profile" url="/Profile.action" title="Profile" description="Profile">
-                <permissions>
-                    <allow>
-                        <group>registered</group>
-                    </allow>
-                </permissions>
-            </customNode>
-            <folderNode id="usersAdmin" description="User admin" title="admin user">
+            <folderNode id="usersAdmin" description="User administration" title="User administration">
                 <childNodes>
                 <useCaseNode title="userAdmin"
                              id="userAdmin"
@@ -875,6 +868,13 @@ Struttura dell'XML:
                 </permissions>
 
             </folderNode>
+            <customNode id="Profile" url="/Profile.action" title="Profile" description="Profile">
+                <permissions>
+                    <allow>
+                        <group>registered</group>
+                    </allow>
+                </permissions>
+            </customNode>
             <folderNode id="usecases" title="Use cases"
                       description="Use cases">
                 <childNodes>

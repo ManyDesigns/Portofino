@@ -104,6 +104,11 @@ public class Struts1WebFramework extends WebFramework {
             return null;
         }
 
+        int fileSize= formFile.getFileSize();
+        if (fileSize <= 0) {
+            return null;
+        }
+
         String fileName = formFile.getFileName();
         String contentType = formFile.getContentType();
         try {

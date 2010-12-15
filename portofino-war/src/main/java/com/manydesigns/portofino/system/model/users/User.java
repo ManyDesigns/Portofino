@@ -38,7 +38,6 @@ import java.io.Serializable;
 import java.security.MessageDigest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /*
@@ -51,7 +50,6 @@ public class User implements Serializable{
             = "Copyright (c) 2005-2010, ManyDesigns srl";
     //Dati
     Long userId;
-
     Long state;
 
 
@@ -140,7 +138,7 @@ public class User implements Serializable{
         this.state = state;
     }
 
-    public Date getDeletionDate() {
+    public Timestamp getDeletionDate() {
         return deletionDate;
     }
 
@@ -148,7 +146,7 @@ public class User implements Serializable{
         this.deletionDate = deletionDate;
     }
 
-    public Date getModifiedDate() {
+    public Timestamp getModifiedDate() {
         return modifiedDate;
     }
 
@@ -172,7 +170,7 @@ public class User implements Serializable{
         this.extAuth = extAuth;
     }
 
-        public Date getPwdModDate() {
+    public Timestamp getPwdModDate() {
         return pwdModDate;
     }
 
@@ -244,7 +242,7 @@ public class User implements Serializable{
         this.jobTitle = jobTitle;
     }
 
-    public Date getLastLoginDate() {
+    public Timestamp getLastLoginDate() {
         return lastLoginDate;
     }
 
@@ -252,7 +250,7 @@ public class User implements Serializable{
         this.lastLoginDate = lastLoginDate;
     }
 
-    public Date getLastFailedLoginDate() {
+    public Timestamp getLastFailedLoginDate() {
         return lastFailedLoginDate;
     }
 
@@ -276,7 +274,7 @@ public class User implements Serializable{
         this.agreedToTerms = agreedToTerms;
     }
 
-    public Date getCreationDate() {
+    public Timestamp getCreationDate() {
         return creationDate;
     }
 
@@ -358,16 +356,13 @@ public class User implements Serializable{
 
         User user = (User) o;
 
-        if (userId != null ? !userId.equals(user.userId) : user.userId != null)
-            return false;
+        return !(userId != null ? !userId.equals(user.userId) : user.userId != null);
 
-        return true;
     }
 
     @Override
     public int hashCode() {
-        int result = userId.hashCode();
-        return result;
+        return userId.hashCode();
     }
 
     

@@ -29,8 +29,8 @@
 
 package com.manydesigns.elements.fields.search;
 
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
 
@@ -122,14 +122,14 @@ public class RangeSearchField extends AbstractSearchField {
 
         minStringValue = StringUtils.trimToNull(req.getParameter(minInputName));
         try {
-            minValue = Util.convertValue(minStringValue, type);
+            minValue = OgnlUtils.convertValue(minStringValue, type);
         } catch (Throwable e) {
             minValue = null;
         }
 
         maxStringValue = StringUtils.trimToNull(req.getParameter(maxInputName));
         try {
-            maxValue = Util.convertValue(maxStringValue, type);
+            maxValue = OgnlUtils.convertValue(maxStringValue, type);
         } catch (Throwable e) {
             maxValue = null;
         }

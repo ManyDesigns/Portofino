@@ -41,6 +41,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -103,6 +104,9 @@ public class PortofinoListener
     //**************************************************************************
 
     public void contextInitialized(ServletContextEvent servletContextEvent) {
+        // clear the Mapping Diagnostic Context for logging
+        MDC.clear();
+        
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
@@ -185,6 +189,9 @@ public class PortofinoListener
     }
 
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
+        // clear the Mapping Diagnostic Context for logging
+        MDC.clear();
+
         logger.info("ManyDesigns Portofino stopping...");
 
         if (scheduler!=null) {

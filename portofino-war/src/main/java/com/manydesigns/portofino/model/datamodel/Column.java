@@ -146,7 +146,7 @@ public class Column implements ModelObject {
 
         actualJavaType = ReflectionUtil.loadClass(javaType);
         if (actualJavaType == null) {
-            logger.warn("Cannot load column java type: {}", javaType);
+            logger.warn("Cannot load column {} of java type: {}", getQualifiedName(), javaType);
         }
 
         for (Annotation annotation : annotations) {

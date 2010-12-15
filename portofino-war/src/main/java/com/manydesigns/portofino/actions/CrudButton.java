@@ -27,43 +27,84 @@
  *
  */
 
-package com.manydesigns.portofino.scripting;
+package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.struts2.Struts2Utils;
+import com.manydesigns.portofino.model.site.usecases.Button;
 import com.opensymphony.xwork2.util.CompoundRoot;
 import com.opensymphony.xwork2.util.ValueStack;
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
 import ognl.OgnlContext;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ScriptingUtil {
+public class CrudButton {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public static Object runScript(String script, String scriptLanguage)
-            throws Exception {
-        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        ValueStack valueStack = Struts2Utils.getValueStack();
-        CompoundRoot root = valueStack.getRoot();
-        if ("ognl".equals(scriptLanguage)) {
-            return OgnlUtils.getValueQuietly(script, ognlContext, root);
-        } else if ("groovy".equals(scriptLanguage)) {
-            ognlContext.put("root", root);
-            Binding binding = new Binding(ognlContext);
-            GroovyShell shell = new GroovyShell(binding);
-            return shell.evaluate(script);
-        } else {
-            String msg = String.format(
-                    "Unrecognised script language: %s", scriptLanguage);
-            throw new IllegalArgumentException(msg);
-        }
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
+
+    protected final Button button;
+    protected boolean enabled;
+
+
+    //--------------------------------------------------------------------------
+    // Logging
+    //--------------------------------------------------------------------------
+
+    public final static Logger logger =
+            LoggerFactory.getLogger(CrudButton.class);
+
+    //--------------------------------------------------------------------------
+    // Guard management
+    //--------------------------------------------------------------------------
+
+    public CrudButton(Button button) {
+        this.button = button;
     }
 
+    
+    //--------------------------------------------------------------------------
+    // Guard management
+    //--------------------------------------------------------------------------
+
+    public void runGuard() {
+        String guard = button.getGuard();
+        if (StringUtils.isBlank(guard)) {
+            enabled = true;
+            return;
+        }
+
+        // Ognl context
+        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+
+        // Ognl root
+        ValueStack valueStack = Struts2Utils.getValueStack();
+        CompoundRoot root = valueStack.getRoot();
+
+        Object result = OgnlUtils.getValueQuietly(guard, ognlContext, root);
+
+        enabled = Boolean.TRUE.equals(result);
+    }
+
+    //--------------------------------------------------------------------------
+    // Getters/setters
+    //--------------------------------------------------------------------------
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public Button getButton() {
+        return button;
+    }
 }

@@ -26,36 +26,31 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.hibernate;
+package com.manydesigns.portofino;
 
-import junit.framework.TestCase;
-import org.hibernate.Session;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletException;
+import java.io.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SequenceTest extends TestCase {
-    public void setUp(){
+public class FileServlet extends HttpServlet {
+    private static final String ROOT_DIR = "./";
 
+    public void doGet(HttpServletRequest req, HttpServletResponse res)
+    throws ServletException, IOException {
+        File f = new File(ROOT_DIR, req.getRequestURI());
+        InputStream is = new FileInputStream(f);
+        res.setContentType("text/html; charset=ISO-8859-1");
+        OutputStream os = res.getOutputStream();
+        while (is.available() > 0) {
+            os.write(is.read());
+        }
+        is.close();
     }
-
-    public void tearDown(){
-
-    }
-
-    public void testPersona(){
-        Session session = HibernateUtil.getSessionFactory("1").getCurrentSession();
-        session.beginTransaction();
-       
-
-
-        session.getTransaction().commit();
-
-    }
-
-
-
-
 }

@@ -62,7 +62,7 @@ CREATE TABLE users (
     extauth boolean,
     pwd character varying(50),
     lastpwdmoddate timestamp,
-    username character varying(50),
+    username character varying(50) NOT NULL,
     emailaddress character varying(100) NOT NULL,
     firstname character varying(50),
     middlename character varying(50),

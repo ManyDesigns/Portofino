@@ -42,7 +42,5 @@
     <s:submit id="Table_print" method="print" value="Print" disabled="true"/>
     <s:submit id="Table_exportExcel" method="exportReadExcel" value="Excel" disabled="false"/>
     <s:submit id="Table_exportPdf" method="exportReadPdf" value="Pdf" disabled="false"/>
-    <s:iterator var="button" value="buttons">
-        <s:submit id="%{#button.name}" method="%{#button.actualMethod}" value="%{#button.label}"/>
-    </s:iterator>
+    <s:include value="crudButtons.jsp"/>
 </div>

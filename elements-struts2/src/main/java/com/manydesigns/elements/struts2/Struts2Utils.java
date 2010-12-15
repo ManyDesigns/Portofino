@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.struts2;
 
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.Util;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
@@ -43,7 +44,7 @@ import java.util.Map;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Struts2Util {
+public class Struts2Utils {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -78,7 +79,7 @@ public class Struts2Util {
         for (Map.Entry<String,Object> parameter : parameters.entrySet()) {
             String parameterName = parameter.getKey();
             Object parameterValue = parameter.getValue();
-            String StringValue = Util.convertValueToString(parameterValue);
+            String StringValue = OgnlUtils.convertValueToString(parameterValue);
 
             // parameters with null value are ignored
             if (parameterValue == null) {

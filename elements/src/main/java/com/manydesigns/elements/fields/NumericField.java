@@ -31,8 +31,8 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.util.Util;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -150,7 +150,7 @@ public class NumericField extends AbstractTextField {
         BigDecimal tmpValue;
         try {
             //Provo a parserizzare il numero come BigDecimal
-            tmpValue = (BigDecimal) Util.convertValue(
+            tmpValue = (BigDecimal) OgnlUtils.convertValue(
                     stringValue, BigDecimal.class);
         } catch (Throwable e) {
             //Se il testo non è un BigDecimal provo a parserizzarlo
@@ -206,13 +206,13 @@ public class NumericField extends AbstractTextField {
         } else {
             Object value = accessor.get(obj);
             decimalValue = (BigDecimal)
-                    Util.convertValue(value, BigDecimal.class);
+                    OgnlUtils.convertValue(value, BigDecimal.class);
         }
 
         if (decimalValue == null) {
             stringValue = null;
         } else if (decimalFormat == null) {
-            stringValue = Util.convertValueToString(decimalValue);
+            stringValue = OgnlUtils.convertValueToString(decimalValue);
         } else {
             stringValue = decimalFormat.format(decimalValue);
         }
@@ -220,7 +220,7 @@ public class NumericField extends AbstractTextField {
 
     public void writeToObject(Object obj) {
         Class type = accessor.getType();
-        Object value = Util.convertValue(decimalValue, type);
+        Object value = OgnlUtils.convertValue(decimalValue, type);
         writeToObject(obj, value);
     }
 

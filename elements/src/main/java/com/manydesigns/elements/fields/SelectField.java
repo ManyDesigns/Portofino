@@ -32,11 +32,11 @@ package com.manydesigns.elements.fields;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.json.JsonBuffer;
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -100,7 +100,7 @@ public class SelectField extends AbstractField {
         }
 
         String stringValue = req.getParameter(inputName);
-        Object value = Util.convertValue(stringValue, accessor.getType());
+        Object value = OgnlUtils.convertValue(stringValue, accessor.getType());
         selectionModel.setValue(selectionModelIndex, value);
     }
 
@@ -172,7 +172,7 @@ public class SelectField extends AbstractField {
                 options.entrySet()) {
             Object optionValue = option.getKey();
             String optionStringValue =
-                    (String) Util.convertValue(optionValue, String.class);
+                    (String) OgnlUtils.convertValue(optionValue, String.class);
             String optionLabel = option.getValue();
             checked =  optionValue.equals(value);
             xb.writeOption(optionStringValue, checked, optionLabel);
@@ -228,7 +228,7 @@ public class SelectField extends AbstractField {
 
     protected void valueToXhtmlEditAutocomplete(XhtmlBuffer xb) {
         Object value = selectionModel.getValue(selectionModelIndex);
-        String stringValue = Util.convertValueToString(value);
+        String stringValue = OgnlUtils.convertValueToString(value);
         xb.writeInputHidden(id, inputName, stringValue);
 
         xb.openElement("input");
@@ -252,7 +252,7 @@ public class SelectField extends AbstractField {
 
     private void valueToXhtmlHidden(XhtmlBuffer xb) {
         Object value = selectionModel.getValue(selectionModelIndex);
-        String stringValue = Util.convertValueToString(value);
+        String stringValue = OgnlUtils.convertValueToString(value);
         xb.writeInputHidden(id, inputName, stringValue);
     }
 
@@ -298,7 +298,7 @@ public class SelectField extends AbstractField {
         for (Map.Entry<Object,String> option : options.entrySet()) {
             jb.openObject();
             Object optionValue = option.getKey();
-            String optionStringValue = Util.convertValueToString(optionValue);
+            String optionStringValue = OgnlUtils.convertValueToString(optionValue);
             String optionLabel = option.getValue();
 
             jb.writeKeyValue("v", optionStringValue);

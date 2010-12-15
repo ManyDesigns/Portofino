@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class entity-name="persona" table="persona" >
+        <id name="id" type="int" column="id" unsaved-value="0" />
+        <property name="nome" type="java.lang.String" column="nome"  />
+        <set name="familiari"  cascade="delete" >
+            <key column="persona_id" not-null="true" />
+            <one-to-many class="familiare"/>
+        </set>
+   </class>
+
+    <class entity-name="familiare" table="familiare" >
+        <id name="id" type="int" column="id" />
+        <property name="nome" type="java.lang.String" column="nome" />
+        <many-to-one name="persona"  class="persona" column="persona_id" insert="false" update="false"/>
+   </class>
+</hibernate-mapping>
