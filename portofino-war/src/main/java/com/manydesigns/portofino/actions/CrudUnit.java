@@ -184,7 +184,7 @@ public class CrudUnit {
     //--------------------------------------------------------------------------
 
     public String execute() {
-        if (StringUtils.isBlank(pk)) {
+        if (StringUtils.isEmpty(pk)) {
             return search();
         } else {
             return read();

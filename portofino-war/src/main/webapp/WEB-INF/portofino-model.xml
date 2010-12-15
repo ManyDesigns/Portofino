@@ -751,14 +751,7 @@ Struttura dell'XML:
                     </allow>
                 </permissions>
             </folderNode>
-            <customNode id="Profile" url="/Profile.action" title="Profile" description="Profile">
-                <permissions>
-                    <allow>
-                        <group>registered</group>
-                    </allow>
-                </permissions>
-            </customNode>
-            <folderNode id="usersAdmin" description="User admin" title="admin user">
+            <folderNode id="usersAdmin" description="User administration" title="User administration">
                 <childNodes>
                 <useCaseNode title="userAdmin"
                              id="userAdmin"
@@ -875,6 +868,13 @@ Struttura dell'XML:
                 </permissions>
 
             </folderNode>
+            <customNode id="Profile" url="/Profile.action" title="Profile" description="Profile">
+                <permissions>
+                    <allow>
+                        <group>registered</group>
+                    </allow>
+                </permissions>
+            </customNode>
             <folderNode id="usecases" title="Use cases"
                       description="Use cases">
                 <childNodes>

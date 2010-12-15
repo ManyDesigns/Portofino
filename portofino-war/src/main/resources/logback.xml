@@ -1,7 +1,7 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %logger{40} [%F:%L]%n%level: %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} [userId=%X{userId},userName=%X{userName}] %logger{40} [%F:%L]%n%level: %msg%n</pattern>
         </encoder>
     </appender>
 

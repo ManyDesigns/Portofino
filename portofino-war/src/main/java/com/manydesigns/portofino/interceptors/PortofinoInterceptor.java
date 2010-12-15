@@ -42,6 +42,7 @@ import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.struts2.StrutsStatics;
+import org.slf4j.MDC;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -83,9 +84,17 @@ public class PortofinoInterceptor implements Interceptor {
                 (Context)servletContext.getAttribute(
                         PortofinoListener.CONTEXT_ATTRIBUTE);
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
+
         Long userId = (Long) session.get(UserUtils.USERID);
+        String userName = (String) session.get(UserUtils.USERNAME);
 
         try{
+            MDC.clear();
+            String userIdString =
+                    (userId == null) ? null : Long.toString(userId);
+            MDC.put(UserUtils.USERID, userIdString);
+            MDC.put(UserUtils.USERNAME, userName);
+
             if (context == null || context.getModel() == null) {
                 return "modelNotFound";
             }
@@ -131,6 +140,7 @@ public class PortofinoInterceptor implements Interceptor {
                 }
             }
         } finally {
+            MDC.clear();
             if (context!=null)
                 context.closeSession();
         }
