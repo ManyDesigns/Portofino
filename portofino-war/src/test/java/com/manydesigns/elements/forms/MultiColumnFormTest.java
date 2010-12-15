@@ -57,25 +57,25 @@ public class MultiColumnFormTest extends AbstractElementsTest {
                 "<table class=\"details\">" +
                 "<tr>" +
                 "<th><label for=\"s1\" class=\"field\">S1:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s1\" name=\"s1\"></input></td>" +
+                "<td><input id=\"s1\" type=\"text\" name=\"s1\" class=\"text\"></input></td>" +
                 "</tr><tr>" +
                 "<th><label for=\"s2\" class=\"field\">S2:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s2\" name=\"s2\"></input></td>" +
+                "<td><input id=\"s2\" type=\"text\" name=\"s2\" class=\"text\"></input></td>" +
                 "</tr><tr>" +
                 "<th><label for=\"s3\" class=\"field\">S3:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s3\" name=\"s3\"></input></td>" +
+                "<td><input id=\"s3\" type=\"text\" name=\"s3\" class=\"text\"></input></td>" +
                 "</tr><tr>" +
                 "<th><label for=\"s4\" class=\"field\">S4:</label></th>" +
-                "<td colspan=\"3\"><input type=\"text\" class=\"text\" id=\"s4\" name=\"s4\"></input></td>" +
+                "<td colspan=\"3\"><input id=\"s4\" type=\"text\" name=\"s4\" class=\"text\"></input></td>" +
                 "</tr><tr>" +
                 "<th><label for=\"s5\" class=\"field\">S5:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s5\" name=\"s5\"></input></td>" +
+                "<td><input id=\"s5\" type=\"text\" name=\"s5\" class=\"text\"></input></td>" +
                 "</tr><tr>" +
                 "<th><label for=\"s6\" class=\"field\">S6:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s6\" name=\"s6\"></input></td>" +
+                "<td><input id=\"s6\" type=\"text\" name=\"s6\" class=\"text\"></input></td>" +
                 "</tr><tr>" +
                 "<th><label for=\"s7\" class=\"field\">S7:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s7\" name=\"s7\"></input></td>" +
+                "<td><input id=\"s7\" type=\"text\" name=\"s7\" class=\"text\"></input></td>" +
                 "</tr>" +
                 "</table>" +
                 "</fieldset>", text);
@@ -89,24 +89,24 @@ public class MultiColumnFormTest extends AbstractElementsTest {
                 "<table class=\"details\">" +
                 "<tr>" +
                 "<th><label for=\"s1\" class=\"field\">S1:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s1\" name=\"s1\"></input></td>" +
+                "<td><input id=\"s1\" type=\"text\" name=\"s1\" class=\"text\"></input></td>" +
                 "<th><label for=\"s2\" class=\"field\">S2:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s2\" name=\"s2\"></input></td>" +
+                "<td><input id=\"s2\" type=\"text\" name=\"s2\" class=\"text\"></input></td>" +
                 "</tr><tr>" +
                 "<th><label for=\"s3\" class=\"field\">S3:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s3\" name=\"s3\"></input></td>" +
+                "<td><input id=\"s3\" type=\"text\" name=\"s3\" class=\"text\"></input></td>" +
                 "<td colspan=\"2\"></td>" +
                 "</tr><tr>" +
                 "<th><label for=\"s4\" class=\"field\">S4:</label></th>" +
-                "<td colspan=\"3\"><input type=\"text\" class=\"text\" id=\"s4\" name=\"s4\"></input></td>" +
+                "<td colspan=\"3\"><input id=\"s4\" type=\"text\" name=\"s4\" class=\"text\"></input></td>" +
                 "</tr><tr>" +
                 "<th><label for=\"s5\" class=\"field\">S5:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s5\" name=\"s5\"></input></td>" +
+                "<td><input id=\"s5\" type=\"text\" name=\"s5\" class=\"text\"></input></td>" +
                 "<th><label for=\"s6\" class=\"field\">S6:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s6\" name=\"s6\"></input></td>" +
+                "<td><input id=\"s6\" type=\"text\" name=\"s6\" class=\"text\"></input></td>" +
                 "</tr><tr>" +
                 "<th><label for=\"s7\" class=\"field\">S7:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s7\" name=\"s7\"></input></td>" +
+                "<td><input id=\"s7\" type=\"text\" name=\"s7\" class=\"text\"></input></td>" +
                 "<td colspan=\"2\"></td>" +
                 "</tr>" +
                 "</table>" +
@@ -121,22 +121,22 @@ public class MultiColumnFormTest extends AbstractElementsTest {
                 "<table class=\"details\">" +
                 "<tr>" +
                 "<th><label for=\"s1\" class=\"field\">S1:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s1\" name=\"s1\"></input></td>" +
+                "<td><input id=\"s1\" type=\"text\" name=\"s1\" class=\"text\"></input></td>" +
                 "<th><label for=\"s2\" class=\"field\">S2:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s2\" name=\"s2\"></input></td>" +
+                "<td><input id=\"s2\" type=\"text\" name=\"s2\" class=\"text\"></input></td>" +
                 "<th><label for=\"s3\" class=\"field\">S3:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s3\" name=\"s3\"></input></td>" +
+                "<td><input id=\"s3\" type=\"text\" name=\"s3\" class=\"text\"></input></td>" +
                 "</tr><tr>" +
                 "<th><label for=\"s4\" class=\"field\">S4:</label></th>" +
-                "<td colspan=\"3\"><input type=\"text\" class=\"text\" id=\"s4\" name=\"s4\"></input></td>" +
+                "<td colspan=\"3\"><input id=\"s4\" type=\"text\" name=\"s4\" class=\"text\"></input></td>" +
                 "<td colspan=\"2\"></td>" +
                 "</tr><tr>" +
                 "<th><label for=\"s5\" class=\"field\">S5:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s5\" name=\"s5\"></input></td>" +
+                "<td><input id=\"s5\" type=\"text\" name=\"s5\" class=\"text\"></input></td>" +
                 "<th><label for=\"s6\" class=\"field\">S6:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s6\" name=\"s6\"></input></td>" +
+                "<td><input id=\"s6\" type=\"text\" name=\"s6\" class=\"text\"></input></td>" +
                 "<th><label for=\"s7\" class=\"field\">S7:</label></th>" +
-                "<td><input type=\"text\" class=\"text\" id=\"s7\" name=\"s7\"></input></td>" +
+                "<td><input id=\"s7\" type=\"text\" name=\"s7\" class=\"text\"></input></td>" +
                 "</tr>" +
                 "</table>" +
                 "</fieldset>", text);

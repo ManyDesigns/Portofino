@@ -39,13 +39,13 @@ public class FormTest extends AbstractElementsTest {
         assertEquals("<fieldset class=\"nolegend\">" +
                 "<table class=\"details\"><tr><th>" +
                 "<label for=\"myValue\" class=\"field\">My value:</label>" +
-                "</th><td><input type=\"text\" class=\"text\" id=\"myValue\" name=\"myValue\">" +
+                "</th><td><input id=\"myValue\" type=\"text\" name=\"myValue\" class=\"text\">" +
                 "</input></td></tr><tr><th>" +
                 "<label for=\"myLabel\" class=\"field\">My label:</label>" +
-                "</th><td><input type=\"text\" class=\"text\" id=\"myLabel\" name=\"myLabel\">" +
+                "</th><td><input id=\"myLabel\" type=\"text\" name=\"myLabel\" class=\"text\">" +
                 "</input></td></tr><tr><th>" +
                 "<label for=\"myUrl\" class=\"field\">My url:</label></th><td>" +
-                "<input type=\"text\" class=\"text\" id=\"myUrl\" name=\"myUrl\">" +
+                "<input id=\"myUrl\" type=\"text\" name=\"myUrl\" class=\"text\">" +
                 "</input></td></tr></table></fieldset>", text);
     }
 
@@ -55,13 +55,13 @@ public class FormTest extends AbstractElementsTest {
         assertEquals("<fieldset class=\"nolegend\">" +
                 "<table class=\"details\"><tr><th>" +
                 "<label for=\"prova.myValue\" class=\"field\">My value:</label>" +
-                "</th><td><input type=\"text\" class=\"text\" id=\"prova.myValue\" name=\"prova.myValue\">" +
+                "</th><td><input id=\"prova.myValue\" type=\"text\" name=\"prova.myValue\" class=\"text\">" +
                 "</input></td></tr><tr><th>" +
                 "<label for=\"prova.myLabel\" class=\"field\">My label:</label>" +
-                "</th><td><input type=\"text\" class=\"text\" id=\"prova.myLabel\" name=\"prova.myLabel\">" +
+                "</th><td><input id=\"prova.myLabel\" type=\"text\" name=\"prova.myLabel\" class=\"text\">" +
                 "</input></td></tr><tr><th>" +
                 "<label for=\"prova.myUrl\" class=\"field\">My url:</label></th><td>" +
-                "<input type=\"text\" class=\"text\" id=\"prova.myUrl\" name=\"prova.myUrl\">" +
+                "<input id=\"prova.myUrl\" type=\"text\" name=\"prova.myUrl\" class=\"text\">" +
                 "</input></td></tr></table></fieldset>", text);
     }
 
@@ -72,11 +72,11 @@ public class FormTest extends AbstractElementsTest {
                 "<table class=\"details\">" +
                 "<tr><th>" +
                 "<label for=\"myUrl\" class=\"field\">My url:</label></th><td>" +
-                "<input type=\"text\" class=\"text\" id=\"myUrl\" name=\"myUrl\">" +
+                "<input id=\"myUrl\" type=\"text\" name=\"myUrl\" class=\"text\">" +
                 "</input></td></tr>" +
                 "<tr><th>" +
                 "<label for=\"myValue\" class=\"field\">My value:</label>" +
-                "</th><td><input type=\"text\" class=\"text\" id=\"myValue\" name=\"myValue\">" +
+                "</th><td><input id=\"myValue\" type=\"text\" name=\"myValue\" class=\"text\">" +
                 "</input></td></tr>" +
                 "</table></fieldset>", text);
     }
