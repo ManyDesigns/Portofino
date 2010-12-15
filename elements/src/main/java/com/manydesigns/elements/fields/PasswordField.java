@@ -105,12 +105,7 @@ public class PasswordField extends TextField {
             return true;
         }
 
-        if (stringValue == null && confirmationValue != null) {
-            errors.add(getText("elements.error.field.passwords.dont.match"));
-            return false;
-        }
-
-        if (stringValue != null && !stringValue.equals(confirmationValue)) {
+        if (StringUtils.equals(stringValue, confirmationValue)) {
             errors.add(getText("elements.error.field.passwords.dont.match"));
             return false;
         }

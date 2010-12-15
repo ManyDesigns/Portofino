@@ -33,6 +33,7 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.MaxLength;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.apache.commons.lang.StringUtils;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -72,12 +73,11 @@ public abstract class AbstractTextField extends AbstractField {
         }
 
         boolean result = true;
-        if (required && (stringValue == null || stringValue.length() == 0)) {
+        if (required && StringUtils.isBlank(stringValue)) {
             errors.add(getText("elements.error.field.required"));
             result = false;
         }
-        if (maxLength != null && stringValue != null
-                && stringValue.length() > maxLength) {
+        if (maxLength != null && StringUtils.length(stringValue) > maxLength) {
             errors.add(getText("elements.error.field.length.exceeded", maxLength));
             result = false;
         }
