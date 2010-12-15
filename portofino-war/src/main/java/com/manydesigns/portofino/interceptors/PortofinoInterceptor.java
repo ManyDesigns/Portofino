@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.navigation.Navigation;
@@ -41,11 +40,13 @@ import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.lang.xwork.StringUtils;
 import org.apache.struts2.StrutsStatics;
 import org.slf4j.MDC;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -95,13 +96,14 @@ public class PortofinoInterceptor implements Interceptor {
             MDC.put(UserUtils.USERID, userIdString);
             MDC.put(UserUtils.USERNAME, userName);
 
+            //1. Non ho modello
             if (context == null || context.getModel() == null) {
                 return "modelNotFound";
             }
             context.resetDbTimer();
             context.openSession();
             String requestUrl = Util.getAbsoluteUrl(req.getServletPath());
-             if (action instanceof ContextAware) {
+            if (action instanceof ContextAware) {
                 ((ContextAware)action).setContext(context);
             }
 
@@ -114,27 +116,36 @@ public class PortofinoInterceptor implements Interceptor {
             }
             NavigationNode selectedNode = navigation.getSelectedNavigationNode();
 
-            if (!(invocation.getAction() instanceof PortofinoAction)
-                    || selectedNode==null ) {
+            //2. Se è fuori dall'albero di navigazione non ho permessi
+            if (selectedNode==null ) {
                 stopWatch.stop();
-
-                
-
                 return invocation.invoke();
             }
+
             SiteNode node = selectedNode.getActualSiteNode();
+            //3. Ho i permessi necessari vado alla pagina
             if(node.isAllowed(groups)){
                 stopWatch.stop();
                 return invocation.invoke();
             } else {
+                //4. Non ho i permessi, ma non sono loggato, vado alla pagina di login
                 if (userId==null){
                     stopWatch.stop();
                     String returnUrl=req.getServletPath();
+                    Map parameters = req.getParameterMap();
+                    if (parameters.size()!=0){                        
+                        List<String> params = new ArrayList<String>();
+                        for (Object key : parameters.keySet()){
+                            params.add(key+"="+((String[]) parameters.get(key))[0]);
+                        }
+                        returnUrl += "?"+ StringUtils.join(params,  "&");
+                    }
                     UrlBean bean = new UrlBean(returnUrl);
                     actionContext.getValueStack().getRoot().push(bean);
                     invocation.getStack().push(bean);
                     return LOGIN_ACTION;
                 } else {
+                    //5. Non ho i permessi, ma sono loggato, errore 404
                     stopWatch.stop();
                     return UNAUTHORIZED;
                 }

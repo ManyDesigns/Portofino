@@ -29,7 +29,7 @@
 package com.manydesigns.portofino.actions.user.admin;
 
 
-import com.manydesigns.elements.fields.search.Criteria;
+import com.manydesigns.portofino.context.CriteriaImpl;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.UseCaseAction;
@@ -89,7 +89,7 @@ public class UserAdminAction extends UseCaseAction {
         for (String current : rootCrudUnit.subCrudUnits.get(1).selection) {
             TableAccessor ugAccessor = context.getTableAccessor(usersGroupsTable);
 
-            Criteria criteria = new Criteria(ugAccessor);
+            CriteriaImpl criteria = new CriteriaImpl(ugAccessor.getTable());
             criteria.eq(ugAccessor.getProperty("userid"), Long.parseLong(pk));
             criteria.eq(ugAccessor.getProperty("groupid"), Long.parseLong(current));
             criteria.isNull(ugAccessor.getProperty("deletionDate"));

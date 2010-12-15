@@ -10,7 +10,7 @@
         <s:if test="!searchForm.isEmpty()">
             <div class="search_form">
                 <mdes:write value="searchForm"/>
-                <s:submit method="search" value="Search"/>
+                <s:submit name="crud::search" value="Search"/>
                 <s:reset value="Reset form"/>
             </div>
         </s:if>

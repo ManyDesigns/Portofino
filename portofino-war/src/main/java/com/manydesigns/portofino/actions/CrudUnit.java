@@ -32,7 +32,7 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.fields.*;
-import com.manydesigns.elements.fields.search.Criteria;
+import com.manydesigns.portofino.context.CriteriaImpl;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.SelectionProvider;
@@ -602,7 +602,7 @@ public class CrudUnit {
         //Se si passano dati sbagliati al criterio restituisco messaggio d'errore
         // ma nessun risultato
         try {
-            Criteria criteria = new Criteria(classAccessor);
+            CriteriaImpl criteria = new CriteriaImpl(baseTable);
             searchForm.configureCriteria(criteria);
             objects = context.getObjects(query, criteria, root);
         } catch (ClassCastException e) {

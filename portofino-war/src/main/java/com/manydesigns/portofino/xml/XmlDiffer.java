@@ -108,9 +108,12 @@ public class XmlDiffer {
 
     private PropertyAccessor[] getIdentifierProperties(ClassAccessor classAccessor) {
         List<PropertyAccessor> properties = new ArrayList<PropertyAccessor>();
+
+        //todo rimuovere
         if (classAccessor == null){
             return new PropertyAccessor[0];
         }
+       
         for (PropertyAccessor current : classAccessor.getProperties()) {
             XmlAttribute xmlAttribute =
                     current.getAnnotation(XmlAttribute.class);

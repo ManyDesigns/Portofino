@@ -26,271 +26,37 @@
  * Boston, MA  02111-1307  USA
  *
  */
-
 package com.manydesigns.elements.fields.search;
 
-import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-
-import java.util.ArrayList;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class Criteria extends ArrayList<Criterion> {
-    public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+public interface Criteria {
+    Criteria eq(PropertyAccessor accessor, Object value);
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
+    Criteria ne(PropertyAccessor accessor, Object value);
 
-    protected final ClassAccessor classAccessor;
+    Criteria between(PropertyAccessor accessor, Object min, Object max);
 
+    Criteria gt(PropertyAccessor accessor, Object value);
 
-    //**************************************************************************
-    // Constructor
-    //**************************************************************************
+    Criteria ge(PropertyAccessor accessor, Object value);
 
-    public Criteria(ClassAccessor classAccessor) {
-        this.classAccessor = classAccessor;
-    }
+    Criteria lt(PropertyAccessor accessor, Object value);
 
+    Criteria le(PropertyAccessor accessor, Object value);
 
-    //**************************************************************************
-    // Criteria building
-    //**************************************************************************
+    Criteria like(PropertyAccessor accessor, String value,
+                     TextMatchMode textMatchMode);
 
-    public Criteria eq(PropertyAccessor accessor, Object value) {
-        add(new EqCriterion(accessor, value));
-        return this;
-    }
-    public Criteria ne(PropertyAccessor accessor, Object value) {
-        add(new NeCriterion(accessor, value));
-        return this;
-    }
+    Criteria ilike(PropertyAccessor accessor, String value,
+                                      TextMatchMode textMatchMode);
 
-    public Criteria between(PropertyAccessor accessor, Object min, Object max) {
-        add(new BetweenCriterion(accessor, min, max));
-        return this;
-    }
+    Criteria isNull(PropertyAccessor accessor);
 
-    public Criteria gt(PropertyAccessor accessor, Object value) {
-        add(new GtCriterion(accessor, value));
-        return this;
-    }
-    public Criteria ge(PropertyAccessor accessor, Object value) {
-        add(new GeCriterion(accessor, value));
-        return this;
-    }
-
-    public Criteria lt(PropertyAccessor accessor, Object value) {
-        add(new LtCriterion(accessor, value));
-        return this;
-    }
-    public Criteria le(PropertyAccessor accessor, Object value) {
-        add(new LeCriterion(accessor, value));
-        return this;
-    }
-
-    public Criteria like(PropertyAccessor accessor, String value,
-                     TextMatchMode textMatchMode) {
-        add(new LikeCriterion(accessor, value, textMatchMode));
-        return this;
-    }
-
-    public Criteria ilike(PropertyAccessor accessor, String value,
-                     TextMatchMode textMatchMode) {
-        add(new IlikeCriterion(accessor, value, textMatchMode));
-        return this;
-    }
-
-    public Criteria isNull(PropertyAccessor accessor) {
-        add(new IsNullCriterion(accessor));
-        return this;
-    }
-    public Criteria isNotNull(PropertyAccessor accessor) {
-        add(new IsNotNullCriterion(accessor));
-        return this;
-    }
-
-    //**************************************************************************
-    // Getter/setters
-    //**************************************************************************
-
-    public ClassAccessor getClassAccessor() {
-        return classAccessor;
-    }
-
-    //**************************************************************************
-    // Criterion implementation classes
-    //**************************************************************************
-
-    public static abstract class AbstractCriterion implements Criterion {
-        protected final PropertyAccessor accessor;
-
-        public AbstractCriterion(PropertyAccessor accessor) {
-            this.accessor = accessor;
-        }
-
-        public PropertyAccessor getPropertyAccessor() {
-            return accessor;
-        }
-    }
-
-    public static class EqCriterion extends AbstractCriterion {
-        protected final Object value;
-
-        public EqCriterion(PropertyAccessor accessor, Object value) {
-            super(accessor);
-            this.value = value;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-    }
-
-    public static class NeCriterion extends AbstractCriterion {
-        protected final Object value;
-
-        public NeCriterion(PropertyAccessor accessor, Object value) {
-            super(accessor);
-            this.value = value;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-    }
-
-    public static class BetweenCriterion extends AbstractCriterion {
-        protected final Object min;
-        protected final Object max;
-
-        public BetweenCriterion(PropertyAccessor accessor,
-                                Object min, Object max) {
-            super(accessor);
-            this.min = min;
-            this.max = max;
-        }
-
-        public Object getMin() {
-            return min;
-        }
-
-        public Object getMax() {
-            return max;
-        }
-    }
-
-    public static class GtCriterion extends AbstractCriterion {
-        protected final Object value;
-
-        public GtCriterion(PropertyAccessor accessor, Object value) {
-            super(accessor);
-            this.value = value;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-    }
-
-    public static class GeCriterion extends AbstractCriterion {
-        protected final Object value;
-
-        public GeCriterion(PropertyAccessor accessor, Object value) {
-            super(accessor);
-            this.value = value;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-    }
-
-    public static class LtCriterion extends AbstractCriterion {
-        protected final Object value;
-
-        public LtCriterion(PropertyAccessor accessor, Object value) {
-            super(accessor);
-            this.value = value;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-    }
-
-    public static class LeCriterion extends AbstractCriterion {
-        protected final Object value;
-
-        public LeCriterion(PropertyAccessor accessor, Object value) {
-            super(accessor);
-            this.value = value;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-    }
-
-    public static class LikeCriterion extends AbstractCriterion {
-        protected final Object value;
-        protected final TextMatchMode textMatchMode;
-
-        public LikeCriterion(PropertyAccessor accessor, Object value,
-                             TextMatchMode textMatchMode) {
-            super(accessor);
-            this.value = value;
-            this.textMatchMode = textMatchMode;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public TextMatchMode getTextMatchMode() {
-            return textMatchMode;
-        }
-    }
-
-    public static class IlikeCriterion extends AbstractCriterion {
-        protected final Object value;
-        protected final TextMatchMode textMatchMode;
-
-        public IlikeCriterion(PropertyAccessor accessor, Object value,
-                              TextMatchMode textMatchMode) {
-            super(accessor);
-            this.value = value;
-            this.textMatchMode = textMatchMode;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public TextMatchMode getTextMatchMode() {
-            return textMatchMode;
-        }
-    }
-
-    public static class IsNullCriterion extends AbstractCriterion {
-
-
-        public IsNullCriterion(PropertyAccessor accessor) {
-            super(accessor);
-        }
-    }
-
-    public static class IsNotNullCriterion extends AbstractCriterion {
-
-
-        public IsNotNullCriterion(PropertyAccessor accessor) {
-            super(accessor);
-        }
-    }
+    Criteria isNotNull(PropertyAccessor accessor);
 }

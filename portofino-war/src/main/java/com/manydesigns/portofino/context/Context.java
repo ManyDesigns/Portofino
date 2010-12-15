@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.context;
 
-import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
@@ -83,7 +82,7 @@ public interface Context {
 
     List<Object> getAllObjects(String qualifiedTableName);
 
-    List<Object> getObjects(Criteria criteria);
+    List<Object> getObjects(CriteriaImpl criteria);
 
     List<Object> getObjects(String queryString, Object rootObject);
 
@@ -91,9 +90,9 @@ public interface Context {
 
     List<Object> getObjects(String queryString);
 
-    List<Object> getObjects(String queryString, Criteria criteria, Object rootObject);
+    List<Object> getObjects(String queryString, CriteriaImpl criteria, Object rootObject);
 
-    List<Object> getObjects(String queryString, Criteria criteria);
+    List<Object> getObjects(String queryString, CriteriaImpl criteria);
 
     void saveObject(String qualifiedTableName, Object obj);
 

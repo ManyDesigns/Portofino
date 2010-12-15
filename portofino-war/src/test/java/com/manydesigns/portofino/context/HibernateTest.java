@@ -28,7 +28,6 @@
  */
 package com.manydesigns.portofino.context;
 
-import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -110,7 +109,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         Table table = context.getModel()
                 .findTableByQualifiedName("jpetstore.PUBLIC.category");
         TableAccessor tableAccessor = new TableAccessor(table);
-        Criteria criteria = new Criteria(tableAccessor);
+        CriteriaImpl criteria = new CriteriaImpl(table);
         HashMap<String, String> category= findCategory(tableAccessor, criteria);
 
         int sizePrd = resultProd.size();
@@ -120,7 +119,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         assertEquals("Angelfish", prd0.get("name"));
     }
 
-    private HashMap<String, String> findCategory(TableAccessor tableAccessor, Criteria criteria) {
+    private HashMap<String, String> findCategory(TableAccessor tableAccessor, CriteriaImpl criteria) {
         HashMap<String, String> category=null;
         try {
             criteria.eq(tableAccessor.getProperty("catid"), "FISH");
@@ -141,7 +140,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         Table table = context.getModel()
                 .findTableByQualifiedName("jpetstore.PUBLIC.category");
         TableAccessor tableAccessor = new TableAccessor(table);
-        Criteria criteria = new Criteria(tableAccessor);
+        CriteriaImpl criteria = new CriteriaImpl(table);
 
         List<Object> resultCat =
                 context.getAllObjects("jpetstore.PUBLIC.category");
@@ -157,7 +156,7 @@ public class HibernateTest extends AbstractPortofinoTest {
 
         //Controllo l'aggiornamento e riporto le cose come stavano
         context.openSession();
-        criteria = new Criteria(tableAccessor);
+        criteria = new CriteriaImpl(table);
         categoria0 =  findCategory(tableAccessor, criteria);
         assertEquals("jpetstore_public_category", categoria0.get("$type$"));
         assertEquals("Pesciu", categoria0.get("name"));

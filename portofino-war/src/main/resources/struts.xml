@@ -59,6 +59,7 @@
                 <param name="actionName">Login</param>
                 <param name="namespace">/user</param>
                 <param name="returnUrl">%{returnUrl}</param>
+                <param name="parameters">%{parameters}</param>
              </result>
             <result name="index" type="redirectAction">
                 <param name="actionName">Index</param>
@@ -91,15 +92,14 @@
                 <param name="prependServletContext">false</param>
             </result>
         </action>
-        <action name="Homepage"
-                class="com.manydesigns.portofino.actions.HomepageAction">
-            <result name="success">/skins/default/document.jsp</result>
-        </action>
         <action name="**/Document"
                 class="com.manydesigns.portofino.actions.DocumentAction">
             <result name="success">/skins/default/document.jsp</result>
         </action>
-
+        <action name="Document"
+                class="com.manydesigns.portofino.actions.DocumentAction">
+            <result name="success">/skins/default/document.jsp</result>
+        </action>
         <action name="UseCase"
                 class="com.manydesigns.portofino.actions.UseCaseAction">
             <result name="redirectToFirst" type="redirectAction">
@@ -403,7 +403,7 @@
         <action name="LostPasswordChange" class="com.manydesigns.portofino.actions.user.LostPwdChangeAction">
             <result name="input">/skins/default/user/lostPwdChange.jsp</result>
             <result name="success" type="redirectAction">
-                <param name="actionName">Homepage</param>
+                <param name="actionName">Document</param>
                 <param name="namespace">/</param>
             </result>
         </action>
@@ -423,7 +423,7 @@
                 <param name="prependServletContext">true</param>
             </result>
             <result name="logout" type="redirectAction">
-                <param name="actionName">Homepage</param>
+                <param name="actionName">Document</param>
                 <param name="namespace">/</param>
             </result>
         </action>

@@ -37,14 +37,10 @@ public class UrlBean {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    String returnUrl;
+    final String returnUrl;
 
     public String getReturnUrl() {
         return returnUrl;
-    }
-
-    public void setReturnUrl(String returnUrl) {
-        this.returnUrl = returnUrl;
     }
 
     public UrlBean(String returnUrl) {

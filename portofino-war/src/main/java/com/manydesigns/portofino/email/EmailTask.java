@@ -28,10 +28,11 @@
  */
 package com.manydesigns.portofino.email;
 
-import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.CriteriaImpl;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
@@ -125,8 +126,9 @@ public class EmailTask extends TimerTask {
         try {
             ClassAccessor accessor = context.getTableAccessor(
                     EmailUtils.EMAILQUEUE_TABLE);
-            Criteria criteria;
-            criteria = new Criteria(accessor);
+            Table table = context.getModel()
+                    .findTableByQualifiedName(EmailUtils.EMAILQUEUE_TABLE);
+            CriteriaImpl criteria = new CriteriaImpl(table);
             List<Object> emails = context.getObjects(
                     criteria.eq(accessor.getProperty("state"),
                             EmailUtils.TOBESENT));
@@ -160,9 +162,11 @@ public class EmailTask extends TimerTask {
 
     private void incrementBounce(String email) {
         try {
+            Table table = context.getModel()
+                    .findTableByQualifiedName(EmailUtils.EMAILQUEUE_TABLE);
+            CriteriaImpl criteria = new CriteriaImpl(table);
+
             ClassAccessor accessor = context.getTableAccessor(USERTABLE);
-            Criteria criteria;
-            criteria = new Criteria(accessor);
             List<Object> users = context.getObjects(
                     criteria.gt(accessor.getProperty("email"), email));
             if (users.size() == 0) {
