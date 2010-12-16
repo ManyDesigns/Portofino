@@ -55,15 +55,12 @@ public class HomepageTest extends CommonTestUtil {
         return new TestSuite(HomepageTest.class);
     }
 
-    //Bug: query x Oracle errata in RunJasperReports.
-    //Test che va in RunJasperReports
     public void testLinkHomePage() throws Exception {
       System.out.println("testLinkHomePage:");
 
         ServletUnitClient client = servletRunner.newClient();
 
-        // pagina dei report
-        String url = "http://127.0.0.1/Homepage.action";
+        String url = "http://127.0.0.1/Document.action";
         System.out.println(url);
         WebResponse resp = client.getResponse(url);
         assertEquals("Codice risposta.",

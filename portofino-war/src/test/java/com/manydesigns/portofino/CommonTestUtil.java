@@ -28,9 +28,6 @@
  */
 package com.manydesigns.portofino;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.text.BasicTextProvider;
-import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.meterware.httpunit.HttpUnitOptions;
 import com.meterware.httpunit.parsing.HTMLParserFactory;
 import com.meterware.servletunit.ServletRunner;
@@ -40,19 +37,19 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Hashtable;
-import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class CommonTestUtil extends AbstractPortofinoTest{
+public abstract class CommonTestUtil extends AbstractPortofinoTest{
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     protected ServletRunner servletRunner;
     private static final String FILECONFIGURATION = "portofino.properties";
+    private static final long MILLIS_SLEEP_CLEANUP = 500;
 
     @Override
     public void setUp() throws Exception {
@@ -60,16 +57,7 @@ public class CommonTestUtil extends AbstractPortofinoTest{
         //Creo e setto il file di properties di configurazione
         setupPortofinoProperties();
         setUpWorkingDirectory();
-        //setupContainer();
-        System.out.println("Creo un text provider");
-        ElementsThreadLocals.setTextProvider(
-                    new BasicTextProvider(new Locale("ENGLISH")));
-
-        DummyHttpServletRequest req = new DummyHttpServletRequest();
-        req.setContextPath("");
-        ElementsThreadLocals.setHttpServletRequest(req);
-
-
+        setupContainer();
         System.out.println("Context creati e legati correttamente");
     }
 
@@ -79,6 +67,8 @@ public class CommonTestUtil extends AbstractPortofinoTest{
     private void setUpWorkingDirectory() {
         try {
             FileUtils.copyDirectory(new File("portofino-war/src/main/webapp"), new File("/tmp/portofinoTest"));
+            FileUtils.copyDirectory(new File("portofino-war/src/test/resources"), new File("/tmp/portofinoTest/portofino-war/src/test/resources"));
+               
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -92,7 +82,9 @@ public class CommonTestUtil extends AbstractPortofinoTest{
 
 
         File f = new File("/tmp/portofinoTest/WEB-INF/web.xml");
-        servletRunner = new ServletRunner(f);
+        final String workingDirectory = "/tmp/portofinoTest";
+        servletRunner = new ServletRunner(f, workingDirectory, workingDirectory );
+
         servletRunner.registerServlet("/util.js",
                 "com.manydesigns.portofino.FileServlet");
         servletRunner.registerServlet("/jscalendar/calendar.js",
@@ -137,8 +129,6 @@ public class CommonTestUtil extends AbstractPortofinoTest{
             throws IllegalAccessException {
         Field fields[] = object.getClass().getDeclaredFields();
         for (Field field : fields) {
-            // System.out.println(field.getName() + "(" +
-            //        field.getType().getName() + ")");
             if (fieldName.equals(field.getName())) {
                 // forziamo accessibilità campi privati
                 field.setAccessible(true);
@@ -151,9 +141,26 @@ public class CommonTestUtil extends AbstractPortofinoTest{
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
+
         // shut down servlet runner
-        servletRunner.shutDown();
-        // pulisce i puntatori ai fini di GC. Tenere!!
+        //servletRunner.shutDown();
         servletRunner = null;
+        // Esegue garbage collection e finalizzazioni per chiudere
+        //tutte le connesioni eventualmente appese
+        System.gc();
+        // Thread.currentThread().yield();
+
+        // Dà un po' di tempo a gc() per completare
+        // Thread.sleep(MILLIS_SLEEP_CLEANUP);
+
+        System.runFinalization();
+
+        // Dà un po' di tempo a runFinalization() per completare
+        Thread.sleep(500);
+
+        // Lasciare che altri processi (db server)
+        // riescano a chiudere bene ogni risorsa aperta
+        Thread.yield();
+        FileUtils.deleteDirectory(new File("/tmp/portofinoTest"));
     }
 }

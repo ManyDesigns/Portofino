@@ -1210,7 +1210,7 @@
     </databases>
     <rootNode title="Portofino4" description="portofino 4" id="/">
         <childNodes>
-        <documentNode id="homepage" title="Homepage" description="Homepage" url="Homepage.action" fileName="skins/default/homepage.html">
+        <documentNode id="homepage" title="Homepage" description="Homepage" url="Document.action" fileName="skins/default/homepage.html">
             <permissions>
                 <allow>
                     <group>anonymous</group>

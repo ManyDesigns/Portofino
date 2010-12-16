@@ -148,7 +148,7 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>httpunit</artifactId>
-            <version>1.7</version>
+            <version>1.7.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>

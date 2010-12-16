@@ -40,7 +40,7 @@ import java.io.*;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class FileServlet extends HttpServlet {
-    private static final String ROOT_DIR = "./";
+    private static final String ROOT_DIR = "/tmp/portofinoTest";
 
     public void doGet(HttpServletRequest req, HttpServletResponse res)
     throws ServletException, IOException {
