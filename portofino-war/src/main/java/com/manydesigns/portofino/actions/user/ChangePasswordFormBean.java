@@ -49,7 +49,7 @@ public class ChangePasswordFormBean {
     public String oldPwd;
 
     @Required
-    @com.manydesigns.elements.annotations.Password(confirmationRequired = true)
+    @com.manydesigns.elements.annotations.Password(confirmationRequired = false)
     public String pwd;
 
     public String getEncOldPwd(){
