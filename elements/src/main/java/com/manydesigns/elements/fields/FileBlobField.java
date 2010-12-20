@@ -195,17 +195,15 @@ public class FileBlobField extends AbstractField
         }
 
         String updateTypeStr = req.getParameter(operationInputName);
-        if (updateTypeStr == null) {
-            // do nothing
-        } else if (updateTypeStr.equals(UPLOAD_KEEP)) {
-            if (mode.isCreate()) {
-                String code = req.getParameter(codeInputName);
-                safeLoadBlob(code);
-            }
-        } else if (updateTypeStr.equals(UPLOAD_MODIFY)) {
+        if (UPLOAD_MODIFY.equals(updateTypeStr)) {
             saveUpload(req);
-        } else if (updateTypeStr.equals(UPLOAD_DELETE)) {
+        } else if (UPLOAD_DELETE.equals(updateTypeStr)) {
             blob = null;
+        } else {
+            // in all other cases (updateTypeStr is UPLOAD_KEEP,
+            // null, or other values) keep the existing blob
+            String code = req.getParameter(codeInputName);
+            safeLoadBlob(code);
         }
     }
 
