@@ -38,8 +38,6 @@
     <modules>
         <module>portofino-war</module>
         <module>elements</module>
-        <module>elements-struts1</module>
-        <module>elements-struts2</module>
         <module>elements-extras</module>
     </modules>
     
