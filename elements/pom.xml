@@ -78,6 +78,18 @@
             <artifactId>struts-core</artifactId>
             <version>${struts1.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion><!-- Exclude incompatible version (2.7.2) and, below, include the right one -->
+                    <groupId>antlr</groupId>
+                    <artifactId>antlr</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>antlr</groupId>
+            <artifactId>antlr</artifactId>
+            <version>${antlr.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-chain</groupId>
