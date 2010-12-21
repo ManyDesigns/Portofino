@@ -165,7 +165,7 @@ INSERT INTO "public"."users"("userid", "creationdate", "pwd", "username", "email
 
 
 INSERT INTO "public"."groups" ("groupid", "creatorid",  "name", "description",  "creationdate") VALUES (2, 1,  '"users"', 'user',  current_timestamp);
-INSERT INTO "public"."groups" ("groupid", "creatorid",  "name", "description",  "creationdate") VALUES (1, 1,  'admin', 'admin', current_timestamp);
+INSERT INTO "public"."groups" ("groupid", "creatorid",  "name", "description",  "creationdate") VALUES (1, 1,  'admins', 'admins', current_timestamp);
 
 INSERT INTO "public"."users_groups" VALUES (1,1, null, current_timestamp);
 INSERT INTO "public"."users_groups" VALUES (2,1, null, current_timestamp);

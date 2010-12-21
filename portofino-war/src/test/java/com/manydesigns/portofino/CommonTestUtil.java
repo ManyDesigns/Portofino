@@ -66,8 +66,8 @@ public abstract class CommonTestUtil extends AbstractPortofinoTest{
 
     private void setUpWorkingDirectory() {
         try {
-            FileUtils.copyDirectory(new File("portofino-war/src/main/webapp"), new File("/tmp/portofinoTest"));
-            FileUtils.copyDirectory(new File("portofino-war/src/test/resources"), new File("/tmp/portofinoTest/portofino-war/src/test/resources"));
+            FileUtils.copyDirectory(new File("src/main/webapp"), new File("/tmp/portofinoTest"));
+            FileUtils.copyDirectory(new File("src/test/resources"), new File("/tmp/portofinoTest/portofino-war/src/test/resources"));
                
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,7 +83,8 @@ public abstract class CommonTestUtil extends AbstractPortofinoTest{
 
         File f = new File("/tmp/portofinoTest/WEB-INF/web.xml");
         final String workingDirectory = "/tmp/portofinoTest";
-        servletRunner = new ServletRunner(f, workingDirectory, workingDirectory );
+
+        servletRunner = new ServletRunner(f, workingDirectory, null );
 
         servletRunner.registerServlet("/util.js",
                 "com.manydesigns.portofino.FileServlet");

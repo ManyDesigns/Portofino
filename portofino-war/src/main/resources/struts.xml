@@ -36,7 +36,7 @@
         <default-interceptor-ref name="mdstack"/>
         <global-results>
             <result name="unauthorized" type="httpheader">
-                <param name="error">410</param>
+                <param name="error">401</param>
                 <param name="errorMessage">${errorMessage}</param>
             </result>
             <result name="400" type="httpheader">
