@@ -31,12 +31,6 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>elements-struts2/pom.xml</source>
-      <outputDirectory>elements-struts2</outputDirectory>
-      <destName>pom.xml</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
         <source>elements-extras/pom.xml</source>
       <outputDirectory>elements-extras</outputDirectory>
       <destName>pom.xml</destName>
@@ -53,13 +47,6 @@
     <fileSet>
       <directory>elements/src/main</directory>
       <outputDirectory>elements/src/main</outputDirectory>
-      <useDefaultExcludes>true</useDefaultExcludes>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>elements-struts2/src/main</directory>
-      <outputDirectory>elements-struts2/src/main</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
