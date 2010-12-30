@@ -383,6 +383,9 @@ public class CrudUnit {
         try {
             context.commit(baseTable.getDatabaseName());
             SessionMessages.addInfoMessage("DELETE avvenuto con successo");
+
+            // invalidate the pk on this crud unit
+            pk = null;
         } catch (Exception e) {
             String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
             logger.debug(rootCauseMessage, e);

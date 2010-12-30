@@ -7,7 +7,7 @@
     <s:set var="buttonsBarBottom" value="true"/>
     <div class="buttons-bar-top">
 </s:else>
-    <s:submit id="ConnectionProviders_create" method="create" value="Create new"/>
+    <s:submit id="ConnectionProviders_create" method="create" value="Create new" disabled="true"/>
     <s:submit id="ConnectionProviders_bulkDelete" method="bulkDelete" value="Delete"
-              onclick="return confirm ('Are you sure?');"/>
+              onclick="return confirm ('Are you sure?');" disabled="true"/>
 </div>
