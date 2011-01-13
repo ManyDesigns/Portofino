@@ -35,14 +35,19 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.JdbcConnectionProvider;
+import com.manydesigns.portofino.database.JndiConnectionProvider;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import org.apache.struts2.interceptor.ServletRequestAware;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /*
@@ -50,7 +55,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ConnectionProvidersAction extends PortofinoAction {
+public class ConnectionProvidersAction extends PortofinoAction implements ServletRequestAware{
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -62,11 +67,22 @@ public class ConnectionProvidersAction extends PortofinoAction {
 
     public TableForm tableForm;
     public Form form;
+    public Form jdbcForm;
+    public Form jndiForm;
     public Form detectedValuesForm;
     public TableForm typesTableForm;
     public TableForm databasePlatformsTableForm;
 
     public String databaseName;
+    public String connectionType;
+
+    //**************************************************************************
+    // Request aware
+    //**************************************************************************
+    private HttpServletRequest req;
+    public void setServletRequest(HttpServletRequest req) {
+        this.req = req;
+    }
 
     public String execute() {
         if (databaseName == null) {
@@ -91,6 +107,7 @@ public class ConnectionProvidersAction extends PortofinoAction {
                 .configHyperlinkGenerators("databaseName", hrefFormat, null)
                 .configMode(Mode.VIEW)
                 .build();
+        tableForm.setSelectable(true);
         tableForm.readFromObject(connectionProviders);
 
         // database platforms
@@ -116,8 +133,8 @@ public class ConnectionProvidersAction extends PortofinoAction {
 
         if (connectionProvider instanceof JdbcConnectionProvider) {
             form = new FormBuilder(JdbcConnectionProvider.class)
-                    .configFields("databaseName", "driverClass",
-                            "connectionURL", "username", "password",
+                    .configFields("databaseName", "driver",
+                            "url", "username", "password",
                             "includeSchemas", "excludeSchemas",
                             "status", "errorMessage", "lastTested")
                     .configMode(Mode.VIEW)
@@ -190,4 +207,72 @@ public class ConnectionProvidersAction extends PortofinoAction {
         return RETURN_TO_READ;
     }
 
+    public String create() {
+        setupForm(Mode.CREATE);
+        return CREATE;
+    }
+
+    public String save() {
+        ClassAccessor accessor;
+        FormBuilder formBuilder;
+        Form form;
+
+        if ("jdbc".equals(connectionType)){
+            accessor = JavaClassAccessor.getClassAccessor(JdbcConnectionProvider.class);
+            formBuilder = new FormBuilder(accessor);
+            formBuilder.configPrefix("jdbc_");
+            form = formBuilder
+                .configFields("databaseName", "driver", "url", "username", "password",
+                        "includeSchemas", "excludeSchemas")
+                .configPrefix("jdbc_")
+                .configMode(Mode.CREATE)
+                .build();
+        } else if ("jndi".equals(connectionType)) {
+            accessor = JavaClassAccessor.getClassAccessor(JndiConnectionProvider.class);
+            formBuilder = new FormBuilder(accessor);
+            formBuilder.configPrefix("jndi_");
+            form = formBuilder
+                .configFields("databaseName", "jndiResource",
+                        "includeSchemas", "excludeSchemas")
+                .configPrefix("jndi_")
+                .configMode(Mode.CREATE)
+                .build();
+        } else {
+            return PortofinoAction.CREATE;
+        }
+        
+        form.readFromRequest(req);
+        if (form.validate()) {
+            ConnectionProvider object = (ConnectionProvider) accessor.newInstance();
+            form.writeToObject(object);
+            context.addConnectionProvider(object);
+            SessionMessages.addInfoMessage("Connection provider created");
+            return PortofinoAction.SAVE;
+        } else {
+            return PortofinoAction.CREATE;
+        }
+    }
+
+    private void setupForm(Mode mode) {
+        ClassAccessor jdbcClassAccessor =
+                JavaClassAccessor.getClassAccessor(JdbcConnectionProvider.class);
+        ClassAccessor jndiClassAccessor =
+                JavaClassAccessor.getClassAccessor(JndiConnectionProvider.class);
+        FormBuilder formBuilder = new FormBuilder(jdbcClassAccessor);
+
+        jdbcForm = formBuilder
+                .configFields("databaseName", "driver", "url", "username", "password",
+                        "includeSchemas", "excludeSchemas")
+                .configPrefix("jdbc_")
+                .configMode(mode)
+                .build();
+
+        formBuilder = new FormBuilder(jndiClassAccessor);
+        jndiForm = formBuilder
+                .configFields("databaseName", "jndiResource",
+                        "includeSchemas", "excludeSchemas")
+                .configPrefix("jndi_")
+                .configMode(mode)
+                .build();
+    }
 }

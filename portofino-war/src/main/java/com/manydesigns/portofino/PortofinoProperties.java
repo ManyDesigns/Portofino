@@ -49,9 +49,9 @@ public class PortofinoProperties {
     // Default and custom properties location
     //**************************************************************************
 
-    public final static String PROPERIES_RESOURCE =
+    public final static String PROPERTIES_RESOURCE =
             "portofino.properties";
-    public final static String CUSTOM_PROPERIES_RESOURCE =
+    public final static String CUSTOM_PROPERTIES_RESOURCE =
             "portofino-custom.properties";
 
 
@@ -75,6 +75,12 @@ public class PortofinoProperties {
             "database.platforms.list";
     public static final String SECURITY_TYPE_PROPERTY =
             "security.type";
+    public static final String PORTOFINO_STOREDIR_PROPERTY =
+            "portofino.store.dir";
+    public static final String PORTOFINO_WORKDIR_PROPERTY =
+            "portofino.work.dir";
+    public static final String CONNECTION_FILE_PROPERTY =
+            "connection.file";
 
     //Email properties
     public static final String MAIL_ENABLED = "mail.enabled";
@@ -107,7 +113,6 @@ public class PortofinoProperties {
             LoggerFactory.getLogger(PortofinoProperties.class);
 
 
-
     static {
         properties = new Properties();
         reloadProperties();
@@ -116,8 +121,8 @@ public class PortofinoProperties {
     public static void reloadProperties() {
         properties.clear();
 
-        loadProperties(PROPERIES_RESOURCE);
-        loadProperties(CUSTOM_PROPERIES_RESOURCE);
+        loadProperties(PROPERTIES_RESOURCE);
+        loadProperties(CUSTOM_PROPERTIES_RESOURCE);
     }
 
     public static void loadProperties(String resource) {

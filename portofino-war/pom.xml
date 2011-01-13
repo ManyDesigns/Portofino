@@ -67,6 +67,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>commons-transaction</groupId>
+            <artifactId>commons-transaction</artifactId>
+            <version>${commons.transaction.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>${servlet.api.version}</version>

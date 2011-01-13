@@ -39,6 +39,7 @@ import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
 import com.manydesigns.portofino.email.EmailTask;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -150,6 +151,16 @@ public class PortofinoListener
         if (success) {
             createContext();
         }
+
+        if (success) {
+            try {
+                context.startFileManager();
+            } catch (Exception e) {
+                logger.error("Cannot start FileManager.", e);
+                success=false;
+            }
+        }
+
         if (success) {
             String securityType = (String) portofinoProperties
                     .getProperty(PortofinoProperties.SECURITY_TYPE_PROPERTY, "application");
@@ -210,6 +221,12 @@ public class PortofinoListener
         setFieldValue("com.opensymphony.xwork2.ActionContext", "actionContext", null, null);
         System.gc();
 
+        try {
+            context.stopFileManager();
+        } catch (Exception e) {
+            logger.warn("cannot stop FileManager");
+        }
+
         // remove attributes from application context
         servletContext.removeAttribute(CONTEXT_ATTRIBUTE);
         servletContext.removeAttribute(SERVER_INFO_ATTRIBUTE);
@@ -227,7 +244,7 @@ public class PortofinoListener
         try {
             field.set(null, fieldValue);
         } catch (Throwable e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
     }
 
@@ -239,7 +256,7 @@ public class PortofinoListener
             field.setAccessible(true);
             return field;
         } catch (Throwable e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
             return null;
         }
     }
@@ -299,6 +316,23 @@ public class PortofinoListener
 
             context.loadConnections(connectionsFile);
             context.loadXmlModel(modelFile);
+
+            String storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
+                PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));
+            String workDir = FilenameUtils.normalize(portofinoProperties.getProperty(
+                PortofinoProperties.PORTOFINO_WORKDIR_PROPERTY));
+
+            if(FilenameUtils.getPrefixLength(storeDir)==-1
+                    || FilenameUtils.getPrefixLength(storeDir)==0){
+                storeDir = FilenameUtils.concat(rootDirPath, storeDir);
+            }
+            if(FilenameUtils.getPrefixLength(workDir)==-1
+                    || FilenameUtils.getPrefixLength(storeDir)==0){
+                workDir = FilenameUtils.concat(rootDirPath, workDir);
+            }
+            logger.info("Storing directory:" + storeDir);
+            logger.info("Working directory:" + workDir);
+            context.createFileManager(storeDir, workDir);
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
         } finally {

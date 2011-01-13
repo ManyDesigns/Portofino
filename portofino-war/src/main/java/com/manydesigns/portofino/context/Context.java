@@ -66,7 +66,17 @@ public interface Context {
 
     List<ConnectionProvider> getConnectionProviders();
     ConnectionProvider getConnectionProvider(String databaseName);
+    void addConnectionProvider(ConnectionProvider connectionProvider);
+    void deleteConnectionProvider(ConnectionProvider connectionProvider);
+    void updateConnectionProvider(ConnectionProvider connectionProvider);
 
+    //**************************************************************************
+    // FileManager
+    //**************************************************************************
+    void createFileManager(String storeDir, String workDir) throws Exception;
+    public void startFileManager() throws Exception;
+    public void stopFileManager() throws Exception;
+    
     //**************************************************************************
     // Model access
     //**************************************************************************
@@ -145,4 +155,6 @@ public interface Context {
     public User findUserByUserName(String username);
 
     public User findUserByToken(String token);
+
+
 }

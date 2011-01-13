@@ -1,3 +1,4 @@
+<?xml version="1.0" ?>
 <connections>
     <jdbcConnection
             databaseName="jpetstore"
@@ -26,15 +27,4 @@
             includeSchemas="public"
             excludeSchemas=""
             />
-    <!--
-    <jdbcConnection
-            databaseName="mysql"
-            driver="com.mysql.jdbc.Driver"
-            url="jdbc:mysql://192.168.1.2/meta"
-            username="manydesigns"
-            password="manydesigns"
-            includeSchemas="frogpress_model"
-            excludeSchemas=""
-            />
-    -->
 </connections>

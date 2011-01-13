@@ -31,12 +31,14 @@ package com.manydesigns.portofino.context.hibernate;
 
 import com.manydesigns.elements.fields.search.Criterion;
 import com.manydesigns.elements.fields.search.TextMatchMode;
-import com.manydesigns.portofino.context.CriteriaImpl;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
+import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.io.FileManager;
 import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.CriteriaImpl;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.Connections;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
@@ -55,6 +57,7 @@ import com.manydesigns.portofino.xml.XmlParser;
 import com.manydesigns.portofino.xml.XmlWriter;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.transaction.file.FileResourceManager;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
@@ -66,6 +69,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Serializable;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
@@ -91,6 +95,7 @@ public class HibernateContextImpl implements Context {
     //**************************************************************************
 
     protected List<ConnectionProvider> connectionProviders;
+    protected FileManager fm;
     protected Model model;
     protected Map<String, HibernateDatabaseSetup> setups;
     protected final ThreadLocal<StopWatch> stopWatches;
@@ -195,6 +200,63 @@ public class HibernateContextImpl implements Context {
             }
         }
         return null;
+    }
+
+    public void addConnectionProvider(ConnectionProvider connectionProvider) {
+        logger.info("Adding a new connection Provider: {}",
+                        connectionProvider.toString());
+        connectionProviders.add(connectionProvider);
+        XmlWriter connectionWriter = new XmlWriter();
+        String connectionsLocation =
+                    PortofinoProperties.getProperties().getProperty(
+                            PortofinoProperties.CONNECTIONS_LOCATION_PROPERTY);
+        File file = new File(connectionsLocation);
+        try {
+            FileResourceManager frm = fm.getFrm();
+            String txId = frm.generatedUniqueTxId();
+            frm.startTransaction(txId);
+            OutputStream os = null;
+            try {
+                frm.createResource(txId, "portofino-connections2.xml");
+                os = frm.writeResource(txId, "portofino-connections2.xml");
+                connectionWriter.write(os, connectionProviders, "connections");
+            } finally {
+                if(os!=null){
+                    os.close();
+                }
+            }
+            frm.commitTransaction(txId);
+            logger.info("Saved connections to file: {}", file);
+        } catch (Throwable e) {
+            logger.error("Cannot save xml model to file: " + file, e);
+        }
+
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void deleteConnectionProvider(ConnectionProvider connectionProvider) {
+        logger.info("Deleting connection Provider: {}",
+                connectionProvider.toString());
+    }
+
+    public void updateConnectionProvider(ConnectionProvider connectionProvider) {
+        logger.info("Updating connection Provider: {}", 
+                connectionProvider.toString());
+    }
+    //**************************************************************************
+    // FileManager
+    //**************************************************************************
+
+    public void createFileManager(String storeDir, String workDir) throws Exception {
+        this.fm = new FileManager(storeDir, workDir);
+    }
+
+    public void startFileManager() throws Exception {
+        this.fm.start();
+    }
+
+    public void stopFileManager() throws Exception {
+        this.fm.stop();
     }
 
     //**************************************************************************
