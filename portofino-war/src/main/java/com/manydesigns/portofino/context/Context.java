@@ -67,7 +67,8 @@ public interface Context {
     List<ConnectionProvider> getConnectionProviders();
     ConnectionProvider getConnectionProvider(String databaseName);
     void addConnectionProvider(ConnectionProvider connectionProvider);
-    void deleteConnectionProvider(ConnectionProvider connectionProvider);
+    void deleteConnectionProvider(String[] connectionProvider);
+    void deleteConnectionProvider(String connectionProvider);
     void updateConnectionProvider(ConnectionProvider connectionProvider);
 
     //**************************************************************************

@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.forms.TableForm;
@@ -76,6 +77,8 @@ public class ConnectionProvidersAction extends PortofinoAction implements Servle
     public String databaseName;
     public String connectionType;
 
+    public String[] selection;
+
     //**************************************************************************
     // Request aware
     //**************************************************************************
@@ -108,6 +111,8 @@ public class ConnectionProvidersAction extends PortofinoAction implements Servle
                 .configMode(Mode.VIEW)
                 .build();
         tableForm.setSelectable(true);
+        tableForm.setKeyGenerator(OgnlTextFormat.create("%{databaseName}"));
+
         tableForm.readFromObject(connectionProviders);
 
         // database platforms
@@ -253,6 +258,98 @@ public class ConnectionProvidersAction extends PortofinoAction implements Servle
         }
     }
 
+    public String edit() {
+        ClassAccessor accessor;
+        FormBuilder formBuilder;
+        ConnectionProvider connectionProvider =
+                context.getConnectionProvider(databaseName);
+
+        if (connectionProvider instanceof JdbcConnectionProvider){
+            accessor = JavaClassAccessor.getClassAccessor(JdbcConnectionProvider.class);
+            formBuilder = new FormBuilder(accessor);
+            form = formBuilder
+                .configFields("databaseName", "driver", "url", "username", "password",
+                        "includeSchemas", "excludeSchemas")
+                .configMode(Mode.EDIT)
+                .build();
+        } else {
+            accessor = JavaClassAccessor.getClassAccessor(JndiConnectionProvider.class);
+            formBuilder = new FormBuilder(accessor);
+            form = formBuilder
+                .configFields("databaseName", "jndiResource",
+                        "includeSchemas", "excludeSchemas")
+                .configMode(Mode.EDIT)
+                .build();
+        }
+
+        form.readFromObject(connectionProvider);
+        return EDIT;
+    }
+
+    public String update() {
+        ClassAccessor accessor;
+        FormBuilder formBuilder;
+        Form form;
+        ConnectionProvider connectionProvider =
+                context.getConnectionProvider(databaseName);
+        ConnectionProvider object;
+
+
+        if (connectionProvider instanceof JdbcConnectionProvider){
+            accessor = JavaClassAccessor.getClassAccessor(JdbcConnectionProvider.class);
+            formBuilder = new FormBuilder(accessor);
+            form = formBuilder
+                .configFields("databaseName", "driver", "url", "username", "password",
+                        "includeSchemas", "excludeSchemas")
+                .configMode(Mode.CREATE)
+                .build();
+            object = (ConnectionProvider) accessor.newInstance();
+        } else {
+            accessor = JavaClassAccessor.getClassAccessor(JndiConnectionProvider.class);
+            formBuilder = new FormBuilder(accessor);
+
+            form = formBuilder
+                .configFields("databaseName", "jndiResource",
+                        "includeSchemas", "excludeSchemas")
+                 .configMode(Mode.CREATE)
+                .build();
+            object = (ConnectionProvider) accessor.newInstance();
+        }
+
+        form.readFromRequest(req);
+        if (form.validate()) {            
+            form.writeToObject(object);
+            context.updateConnectionProvider(object);
+            SessionMessages.addInfoMessage("Connection provider updated");
+            return PortofinoAction.RETURN_TO_LIST;
+        } else {
+            return PortofinoAction.EDIT;
+        }
+    }
+
+    public String delete(){
+        if(null!=databaseName){
+            context.deleteConnectionProvider(databaseName);
+            SessionMessages.addInfoMessage("Connection providers deleted");
+        } 
+        return RETURN_TO_LIST;
+    }
+
+    public String bulkDelete(){
+
+        if(null!=selection && 0!=selection.length){
+            context.deleteConnectionProvider(selection);
+            SessionMessages.addInfoMessage("Connection providers deleted");
+        } else {
+            SessionMessages.addInfoMessage("No Connection providers selected");
+        }
+        return RETURN_TO_LIST;
+    }
+
+    public String cancel() {
+        return RETURN_TO_LIST;        
+    }
+
     private void setupForm(Mode mode) {
         ClassAccessor jdbcClassAccessor =
                 JavaClassAccessor.getClassAccessor(JdbcConnectionProvider.class);
@@ -267,6 +364,11 @@ public class ConnectionProvidersAction extends PortofinoAction implements Servle
                 .configMode(mode)
                 .build();
 
+        for (Field field : jdbcForm.get(0))
+        {
+            field.setRequired(true);
+        }
+
         formBuilder = new FormBuilder(jndiClassAccessor);
         jndiForm = formBuilder
                 .configFields("databaseName", "jndiResource",
@@ -274,5 +376,10 @@ public class ConnectionProvidersAction extends PortofinoAction implements Servle
                 .configPrefix("jndi_")
                 .configMode(mode)
                 .build();
+
+        for (Field field : jndiForm.get(0))
+        {
+            field.setRequired(true);
+        }
     }
 }

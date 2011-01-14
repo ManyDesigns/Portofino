@@ -36,12 +36,12 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.io.FileManager;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.CriteriaImpl;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.Connections;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
+import com.manydesigns.portofino.io.FileManager;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
@@ -68,8 +68,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.Serializable;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
@@ -206,43 +206,50 @@ public class HibernateContextImpl implements Context {
         logger.info("Adding a new connection Provider: {}",
                         connectionProvider.toString());
         connectionProviders.add(connectionProvider);
-        XmlWriter connectionWriter = new XmlWriter();
-        String connectionsLocation =
-                    PortofinoProperties.getProperties().getProperty(
-                            PortofinoProperties.CONNECTIONS_LOCATION_PROPERTY);
-        File file = new File(connectionsLocation);
-        try {
-            FileResourceManager frm = fm.getFrm();
-            String txId = frm.generatedUniqueTxId();
-            frm.startTransaction(txId);
-            OutputStream os = null;
-            try {
-                frm.createResource(txId, "portofino-connections2.xml");
-                os = frm.writeResource(txId, "portofino-connections2.xml");
-                connectionWriter.write(os, connectionProviders, "connections");
-            } finally {
-                if(os!=null){
-                    os.close();
-                }
-            }
-            frm.commitTransaction(txId);
-            logger.info("Saved connections to file: {}", file);
-        } catch (Throwable e) {
-            logger.error("Cannot save xml model to file: " + file, e);
-        }
-
-        //To change body of implemented methods use File | Settings | File Templates.
+        writeToConnectionFile();
     }
 
-    public void deleteConnectionProvider(ConnectionProvider connectionProvider) {
+    public void deleteConnectionProvider(String[] connectionProvider) {
         logger.info("Deleting connection Provider: {}",
                 connectionProvider.toString());
+        List<ConnectionProvider> toBeRemoved = new ArrayList<ConnectionProvider>();
+        for(String databaseName : connectionProvider){
+            for(ConnectionProvider current : connectionProviders){
+                if(current.getDatabaseName().equals(databaseName)){
+                    toBeRemoved.add(current);
+                }
+            }
+        }
+        connectionProviders.removeAll(toBeRemoved);
+        writeToConnectionFile();
+    }
+
+     public void deleteConnectionProvider(String connectionProvider) {
+        logger.info("Deleting connection Provider: {}",
+                connectionProvider.toString());
+        for(ConnectionProvider current : connectionProviders){
+            if(current.getDatabaseName().equals(connectionProvider)){
+                connectionProviders.remove(current);
+                break;
+            }
+        }
+
+        writeToConnectionFile();
     }
 
     public void updateConnectionProvider(ConnectionProvider connectionProvider) {
         logger.info("Updating connection Provider: {}", 
                 connectionProvider.toString());
+        for (ConnectionProvider conn : connectionProviders){
+            if (conn.getDatabaseName().equals(connectionProvider.getDatabaseName())){
+                deleteConnectionProvider(connectionProvider.getDatabaseName());
+                addConnectionProvider(connectionProvider);
+                return;
+            }
+        }
+        writeToConnectionFile();
     }
+    
     //**************************************************************************
     // FileManager
     //**************************************************************************
@@ -945,6 +952,38 @@ public class HibernateContextImpl implements Context {
         StopWatch stopWatch = stopWatches.get();
         if (stopWatch != null) {
             stopWatch.suspend();
+        }
+    }
+
+    //**************************************************************************
+    // File Access
+    //**************************************************************************
+
+    private void writeToConnectionFile() {
+        XmlWriter connectionWriter = new XmlWriter();
+        final Properties portofinoProperties = PortofinoProperties.getProperties();
+        String fileName = portofinoProperties.getProperty(PortofinoProperties.CONNECTION_FILE_PROPERTY,
+                "portofino-connections.xml");
+        try {
+            FileResourceManager frm = fm.getFrm();
+            String txId = frm.generatedUniqueTxId();
+            frm.startTransaction(txId);
+            OutputStream os = null;
+            try {
+
+                frm.createResource(txId, fileName);
+                os = frm.writeResource(txId, fileName);
+                connectionWriter.write(os, connectionProviders, "connections");
+            } finally {
+                if(os!=null){
+                    os.flush();
+                    os.close();
+                }
+            }
+            frm.commitTransaction(txId);
+            logger.info("Saved connection to file: {}", fileName);
+        } catch (Throwable e) {
+            logger.error("Cannot save xml model to file: " + fileName, e);
         }
     }
 }

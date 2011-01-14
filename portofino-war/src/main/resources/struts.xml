@@ -246,6 +246,10 @@
             <result name="save" type="redirectAction">
                 <param name="actionName">ConnectionProviders</param>                
             </result>
+            <result name="edit">/skins/default/model/connectionProviders/edit.jsp</result>
+            <result name="update" type="redirectAction">
+                <param name="actionName">ConnectionProviders</param>
+            </result>
             <result name="returnToList" type="redirectAction">
                 <param name="actionName">ConnectionProviders</param>
             </result>

@@ -392,4 +392,22 @@ public abstract class ConnectionProvider {
             return o1.getTypeName().compareToIgnoreCase(o2.getTypeName());
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ConnectionProvider that = (ConnectionProvider) o;
+
+        if (databaseName != null ? !databaseName.equals(that.databaseName) : that.databaseName != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return databaseName != null ? databaseName.hashCode() : 0;
+    }
 }
