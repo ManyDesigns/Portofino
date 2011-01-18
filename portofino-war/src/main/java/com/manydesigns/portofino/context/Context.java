@@ -35,6 +35,7 @@ import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.UseCaseAccessor;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.io.FileManager;
 
 import java.io.File;
 import java.io.Serializable;
@@ -54,7 +55,7 @@ public interface Context {
     // Model loading
     //**************************************************************************
 
-    void loadConnections(File file);
+    void loadConnections(String fileName);
 
     void loadXmlModel(File file);
     void saveXmlModel();
@@ -77,6 +78,7 @@ public interface Context {
     void createFileManager(String storeDir, String workDir) throws Exception;
     public void startFileManager() throws Exception;
     public void stopFileManager() throws Exception;
+    public FileManager getFileManager ();
     
     //**************************************************************************
     // Model access

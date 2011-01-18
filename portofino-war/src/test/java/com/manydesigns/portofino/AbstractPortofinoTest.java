@@ -29,12 +29,18 @@
 package com.manydesigns.portofino;
 
 import com.manydesigns.elements.AbstractElementsTest;
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
 import com.manydesigns.portofino.model.Model;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.h2.tools.RunScript;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.sql.Connection;
@@ -67,28 +73,23 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
             "database/portofino4.sql";
     public static final String TEST_DB =
             "database/hibernatetest.sql";
+    private static final String PORTOFINO_TEST_PROPERTIES = "portofino_test.properties";
 
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        PortofinoProperties.loadProperties(PORTOFINO_TEST_PROPERTIES);
 
-        context = new HibernateContextImpl();
-        // copy portofino-model from classpath resource to temp file
-        File connectionsFile = copyResourceToTempFile(PORTOFINO_CONNECTIONS_RESOURCE);
-        context.loadConnections(connectionsFile);
+        copyResource(PORTOFINO_CONNECTIONS_RESOURCE);
+        copyResource(PORTOFINO_MODEL_RESOURCE);
 
-        // copy portofino-model from classpath resource to temp file
-        File xmlModelFile = copyResourceToTempFile(PORTOFINO_MODEL_RESOURCE);
-        context.loadXmlModel(xmlModelFile);
+        createContext();
 
-        model = context.getModel();
-
+        ClassLoader cl = AbstractPortofinoTest.class.getClassLoader();
         connPortofino = context.getConnectionProvider("portofino").acquireConnection();
         connPetStore = context.getConnectionProvider("jpetstore").acquireConnection();
         connDBTest = context.getConnectionProvider("hibernatetest").acquireConnection();
-
-        ClassLoader cl = AbstractPortofinoTest.class.getClassLoader();
 
         RunScript.execute(connPortofino,
                 new InputStreamReader(
@@ -102,16 +103,78 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         RunScript.execute(connDBTest,
                 new InputStreamReader(
                         cl.getResourceAsStream(TEST_DB)));
+        ElementsThreadLocals.setupDefaultElementsContext();        
     }
 
-    private File copyResourceToTempFile(String resource) throws IOException {
+    @Override
+    public void tearDown() throws Exception {
+        context.stopFileManager();
+        super.tearDown();
+    }
+
+    private void copyResource(String resourceName) throws IOException {
+        String storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
+                PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));
         InputStream is =
-                ReflectionUtil.getResourceAsStream(resource);
-        File tempFile = File.createTempFile("portofino-model-", ".xml");
+                ReflectionUtil.getResourceAsStream(resourceName);
+        File tempFile = new File(storeDir+"/"+resourceName);
         Writer writer = new FileWriter(tempFile);
         IOUtils.copy(is, writer);
         IOUtils.closeQuietly(writer);
-        return tempFile;
+    }
+
+
+
+    protected void createContext() {
+        Logger logger = LoggerFactory.getLogger(AbstractPortofinoTest.class);
+        logger.info("Creating Context and " +
+                "registering on servlet context...");
+        // create and register the container first, without exceptions
+
+        try {
+            
+            ElementsThreadLocals.setupDefaultElementsContext();
+
+            String managerClassName =
+                    portofinoProperties.getProperty(
+                            PortofinoProperties.CONTEXT_CLASS_PROPERTY);
+            InstanceBuilder<Context> builder =
+                    new InstanceBuilder<Context>(
+                            Context.class,
+                            HibernateContextImpl.class,
+                            logger);
+            context = builder.createInstance(managerClassName);
+
+            String storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
+                PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));
+            String workDir = FilenameUtils.normalize(portofinoProperties.getProperty(
+                PortofinoProperties.PORTOFINO_WORKDIR_PROPERTY));
+
+            String connectionsFileName =
+                    portofinoProperties.getProperty(
+                            PortofinoProperties.CONNECTION_FILE_PROPERTY);
+            String modelLocation =
+                    portofinoProperties.getProperty(
+                            PortofinoProperties.MODEL_LOCATION_PROPERTY);
+
+            //String rootDirPath = ServletContext.getRealPath("/");
+
+            File modelFile = new File(storeDir+"/"+modelLocation);
+
+            logger.info("Storing directory:" + storeDir);
+            logger.info("Working directory:" + workDir);
+            context.createFileManager(storeDir, workDir);
+            context.startFileManager();
+            context.loadConnections(connectionsFileName);
+            context.loadXmlModel(modelFile);
+            model = context.getModel();
+
+
+        } catch (Throwable e) {
+            logger.error(ExceptionUtils.getRootCauseMessage(e), e);
+        } finally {
+            ElementsThreadLocals.removeElementsContext();
+        }
     }
 
 }

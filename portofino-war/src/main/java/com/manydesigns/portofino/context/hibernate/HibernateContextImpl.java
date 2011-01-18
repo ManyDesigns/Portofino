@@ -70,6 +70,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
@@ -119,20 +120,26 @@ public class HibernateContextImpl implements Context {
     // Model loading
     //**************************************************************************
 
-    public void loadConnections(File file) {
-        logger.info("Loading connections from file: {}",
-                file.getAbsolutePath());
-
-        XmlParser parser = new XmlParser();
+    public void loadConnections(String fileName) {
         try {
+            FileResourceManager frm = fm.getFrm();
+            String txId = frm.generatedUniqueTxId();
+            frm.startTransaction(txId);
+
+            InputStream is = frm.readResource(txId, fileName);
+
+            XmlParser parser = new XmlParser();
+
             connectionProviders = (Connections)
-                    parser.parse(file, Connections.class, "connections");
+                    parser.parse(is, Connections.class, "connections");
             for (ConnectionProvider current : connectionProviders) {
                 current.reset();
                 current.init();
             }
-        } catch (Exception e) {
-            logger.error("Cannot load/parse file: " + file, e);
+
+            frm.commitTransaction(txId);
+            } catch (Exception e) {
+            logger.error("Cannot load/parse file: " + fileName, e);
         }
     }
 
@@ -264,6 +271,10 @@ public class HibernateContextImpl implements Context {
 
     public void stopFileManager() throws Exception {
         this.fm.stop();
+    }
+
+    public FileManager getFileManager () {
+        return fm;
     }
 
     //**************************************************************************
@@ -986,4 +997,5 @@ public class HibernateContextImpl implements Context {
             logger.error("Cannot save xml model to file: " + fileName, e);
         }
     }
+
 }

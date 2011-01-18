@@ -148,17 +148,9 @@ public class PortofinoListener
                     serverInfo.getServletApiVersion());
             success = false;
         }
-        if (success) {
-            createContext();
-        }
 
         if (success) {
-            try {
-                context.startFileManager();
-            } catch (Exception e) {
-                logger.error("Cannot start FileManager.", e);
-                success=false;
-            }
+            createContext();
         }
 
         if (success) {
@@ -296,31 +288,26 @@ public class PortofinoListener
 
             servletContext.setAttribute(CONTEXT_ATTRIBUTE, context);
 
-            String connectionsLocation =
+            String storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
+                PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));
+            String workDir = FilenameUtils.normalize(portofinoProperties.getProperty(
+                PortofinoProperties.PORTOFINO_WORKDIR_PROPERTY));
+
+            String connectionsFileName =
                     portofinoProperties.getProperty(
-                            PortofinoProperties.CONNECTIONS_LOCATION_PROPERTY);
+                            PortofinoProperties.CONNECTION_FILE_PROPERTY);
             String modelLocation =
                     portofinoProperties.getProperty(
                             PortofinoProperties.MODEL_LOCATION_PROPERTY);
 
             String rootDirPath = servletContext.getRealPath("/");
-            File connectionsFile;
             File modelFile;
             if (rootDirPath == null) {
-                connectionsFile = new File(connectionsLocation);
                 modelFile = new File(modelLocation);
             } else {
-                connectionsFile = new File(rootDirPath, connectionsLocation);
+
                 modelFile = new File (rootDirPath, modelLocation);
             }
-
-            context.loadConnections(connectionsFile);
-            context.loadXmlModel(modelFile);
-
-            String storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
-                PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));
-            String workDir = FilenameUtils.normalize(portofinoProperties.getProperty(
-                PortofinoProperties.PORTOFINO_WORKDIR_PROPERTY));
 
             if(FilenameUtils.getPrefixLength(storeDir)==-1
                     || FilenameUtils.getPrefixLength(storeDir)==0){
@@ -333,6 +320,15 @@ public class PortofinoListener
             logger.info("Storing directory:" + storeDir);
             logger.info("Working directory:" + workDir);
             context.createFileManager(storeDir, workDir);
+
+            context.startFileManager();
+
+
+
+            context.loadConnections(connectionsFileName);
+            context.loadXmlModel(modelFile);
+
+
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
         } finally {
