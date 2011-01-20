@@ -104,7 +104,7 @@ public class EmailTest extends AbstractPortofinoTest {
         myEmail.setBody("body");
         myEmail.setCreateDate(new Date());
         //final String url = "../../test/java/com/manydesigns/portofino/email/";
-        final String url = "portofino-war/src/test/java/com/manydesigns/portofino/email/";
+        final String url = "src/test/java/com/manydesigns/portofino/email/";
         File attachment = new File(url +
                 "feather.gif");
         myEmail.setAttachmentPath(attachment.getAbsolutePath());

@@ -43,6 +43,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -89,7 +90,7 @@ public class XmlWriter {
 
     public void write(File file, Object object, String rootName) throws Exception {
         try {
-            //Istanzio il Writer a partire da un FileWiter
+            //Istanzio il Writer a partire da un FileWriter
             w = f.createXMLStreamWriter(new FileWriter(file));
             if (indentationEnabled) {
                 w = new IndentingXMLStreamWriter(w);
@@ -113,6 +114,30 @@ public class XmlWriter {
         }
     }
 
+    public void write(OutputStream o, Object object, String rootName) throws Exception {
+        try {
+            //Istanzio il Writer a partire da un FileWriter
+            w = f.createXMLStreamWriter(o);
+            if (indentationEnabled) {
+                w = new IndentingXMLStreamWriter(w);
+            }
+            //Inizio il documento XML
+            w.writeStartDocument();
+
+            ElementWriter elementWriter =
+                    new ElementWriter(object, rootName, 0);
+            elementWriter.write();
+
+            // Chiudo il documento
+            w.writeEndDocument();
+            w.flush();
+        } catch (Exception e) {
+            logger.warn("Exception caught while writing to OutputStream", e);
+            throw e;
+        } finally {
+            closeQuietly();
+        }
+    }
 
 
     public void writeAttributes(Object object) throws XMLStreamException {

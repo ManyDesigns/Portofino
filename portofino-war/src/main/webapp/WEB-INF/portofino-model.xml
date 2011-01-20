@@ -737,6 +737,19 @@ Struttura dell'XML:
                               description="Configuration properties"/>
                     <customNode url="/system-admin/Logs.action" id="Logs" title="Logs"
                               description="Logs"/>
+                    <folderNode description="application" id="application" title="application">
+                        <childNodes>
+                            <documentNode id="connectionManager" title="Connection Manager"
+                                              description="Connection Manager"
+                                              fileName="skins/default/tbd.html"/>
+                            <documentNode id="databaseObjects" title="Data base Objects"
+                                              description="Data base Objects"
+                                              fileName="skins/default/tbd.html"/>
+                            <documentNode id="navigation Manager" title="Navigation Manager"
+                                              description="Navigation Manager" 
+                                              fileName="skins/default/tbd.html"/>
+                        </childNodes>
+                    </folderNode>
                 </childNodes>
                 <permissions>
                     <allow>

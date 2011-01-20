@@ -36,7 +36,7 @@
         <default-interceptor-ref name="mdstack"/>
         <global-results>
             <result name="unauthorized" type="httpheader">
-                <param name="error">410</param>
+                <param name="error">401</param>
                 <param name="errorMessage">${errorMessage}</param>
             </result>
             <result name="400" type="httpheader">
@@ -209,6 +209,20 @@
                <param name="contentDisposition">filename="%{fileName}"</param>
              </result>
         </action>
+        <action name="system-admin/ServerInfo"
+                class="com.manydesigns.portofino.actions.systemadmin.ServerInfoAction">
+            <result name="success">/skins/default/system-admin/serverInfo.jsp</result>
+        </action>
+        <action name="system-admin/ConfigurationProperties"
+                class="com.manydesigns.portofino.actions.systemadmin.ConfigurationPropertiesAction">
+            <result name="portofinoProperties">/skins/default/system-admin/portofinoProperties.jsp</result>
+            <result name="elementsProperties">/skins/default/system-admin/elementsProperties.jsp</result>
+            <result name="systemProperties">/skins/default/system-admin/systemProperties.jsp</result>
+        </action>
+        <action name="system-admin/Logs"
+                class="com.manydesigns.portofino.actions.systemadmin.LogsAction">
+            <result name="success">/skins/default/system-admin/logs.jsp</result>
+        </action>
     </package>
 
 
@@ -228,6 +242,14 @@
                 class="com.manydesigns.portofino.actions.model.ConnectionProvidersAction">
             <result name="list">/skins/default/model/connectionProviders/list.jsp</result>
             <result name="read">/skins/default/model/connectionProviders/read.jsp</result>
+            <result name="create">/skins/default/model/connectionProviders/create.jsp</result>
+            <result name="save" type="redirectAction">
+                <param name="actionName">ConnectionProviders</param>                
+            </result>
+            <result name="edit">/skins/default/model/connectionProviders/edit.jsp</result>
+            <result name="update" type="redirectAction">
+                <param name="actionName">ConnectionProviders</param>
+            </result>
             <result name="returnToList" type="redirectAction">
                 <param name="actionName">ConnectionProviders</param>
             </result>
@@ -361,10 +383,18 @@
     ****************************************************************************
     -->
 
+    <!--
     <package name="portofino-system-admin" extends="portofino-default" namespace="/system-admin">
         <action name="Index">
             <result name="success" type="redirectAction">
                 <param name="actionName">ServerInfo</param>
+            </result>
+        </action>
+        <action name="**/Index"
+                class="com.manydesigns.portofino.actions.FolderAction">
+            <result name="success" type="redirect">
+                <param name="location">${redirectUrl}</param>
+                <param name="prependServletContext">false</param>
             </result>
         </action>
         <action name="ServerInfo"
@@ -383,7 +413,7 @@
         </action>
     </package>
 
-    
+-->
     <!--
     ****************************************************************************
     User functions (namespace='/user')

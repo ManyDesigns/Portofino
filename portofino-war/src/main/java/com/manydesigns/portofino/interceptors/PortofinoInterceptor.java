@@ -116,7 +116,7 @@ public class PortofinoInterceptor implements Interceptor {
             }
             NavigationNode selectedNode = navigation.getSelectedNavigationNode();
 
-            //2. Se è fuori dall'albero di navigazione non ho permessi
+            //2. Se è fuori dall'albero di navigazione e non ho permessi
             if (selectedNode==null ) {
                 stopWatch.stop();
                 return invocation.invoke();

@@ -539,7 +539,7 @@ public class XmlParser {
         return parse(input, rootClass, rootName);
     }
 
-    private Object parse(InputStream inputStream, Class rootClass,
+    public Object parse(InputStream inputStream, Class rootClass,
                          String rootName) throws Exception {
         initParser(inputStream);
         ElementCallback elementCallback =

@@ -35,6 +35,7 @@ import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.UseCaseAccessor;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.io.FileManager;
 
 import java.io.File;
 import java.io.Serializable;
@@ -54,7 +55,7 @@ public interface Context {
     // Model loading
     //**************************************************************************
 
-    void loadConnections(File file);
+    void loadConnections(String fileName);
 
     void loadXmlModel(File file);
     void saveXmlModel();
@@ -66,7 +67,19 @@ public interface Context {
 
     List<ConnectionProvider> getConnectionProviders();
     ConnectionProvider getConnectionProvider(String databaseName);
+    void addConnectionProvider(ConnectionProvider connectionProvider);
+    void deleteConnectionProvider(String[] connectionProvider);
+    void deleteConnectionProvider(String connectionProvider);
+    void updateConnectionProvider(ConnectionProvider connectionProvider);
 
+    //**************************************************************************
+    // FileManager
+    //**************************************************************************
+    void createFileManager(String storeDir, String workDir) throws Exception;
+    public void startFileManager() throws Exception;
+    public void stopFileManager() throws Exception;
+    public FileManager getFileManager ();
+    
     //**************************************************************************
     // Model access
     //**************************************************************************
@@ -145,4 +158,6 @@ public interface Context {
     public User findUserByUserName(String username);
 
     public User findUserByToken(String token);
+
+
 }

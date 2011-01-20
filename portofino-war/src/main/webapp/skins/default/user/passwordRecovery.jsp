@@ -17,7 +17,7 @@
             <input type="submit" name="invia" value="invia"/>
             <input type="hidden" name="method:send" value="send"/> 
         </form>
-        
+        <p/>
     </div>
 
 </s:form>

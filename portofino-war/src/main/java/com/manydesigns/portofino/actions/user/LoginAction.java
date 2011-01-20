@@ -46,7 +46,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -76,7 +75,7 @@ public class LoginAction extends PortofinoAction
     public boolean recoverPwd;
 
     public String returnUrl;
-    public Map parameters;
+    //public Map parameters;
     
     private static final String home = "/Document.action";
     public static final Logger logger =

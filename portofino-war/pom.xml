@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.0.beta4</version>
+        <version>4.0.beta5</version>
     </parent>
     <artifactId>portofino-war</artifactId>
     <packaging>war</packaging> 
@@ -64,6 +64,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-email</artifactId>
             <version>${commons.email.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-transaction</groupId>
+            <artifactId>commons-transaction</artifactId>
+            <version>${commons.transaction.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
