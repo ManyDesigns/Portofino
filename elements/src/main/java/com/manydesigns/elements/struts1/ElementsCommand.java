@@ -29,20 +29,20 @@
 
 package com.manydesigns.elements.struts1;
 
+import com.manydesigns.elements.ElementsContext;
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.i18n.TextProvider;
+import com.manydesigns.elements.i18n.SimpleTextProvider;
+import ognl.Ognl;
+import ognl.OgnlContext;
 import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
 import org.apache.struts.chain.contexts.ServletActionContext;
 import org.apache.struts.util.MessageResources;
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.ElementsContext;
-import com.manydesigns.elements.i18n.TextProvider;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletContext;
-
-import ognl.OgnlContext;
-import ognl.Ognl;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -61,7 +61,12 @@ public class ElementsCommand implements Command {
         ServletContext servletContext = actionContext.getContext();
 
         MessageResources messageResources = actionContext.getMessageResources();
-        TextProvider textProvider = new Struts1TextProvider(messageResources);
+        TextProvider textProvider;
+        if (messageResources == null) {
+            textProvider = SimpleTextProvider.create();            
+        } else {
+            textProvider = new Struts1TextProvider(messageResources);
+        }
 
         OgnlContext ognlContext = (OgnlContext) Ognl.createDefaultContext(null);
 
