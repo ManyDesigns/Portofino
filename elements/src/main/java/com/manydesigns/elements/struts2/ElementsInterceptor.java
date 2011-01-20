@@ -43,7 +43,6 @@ import org.apache.struts2.StrutsStatics;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -89,7 +88,7 @@ public class ElementsInterceptor implements Interceptor {
                         new Struts2TextProvider(
                                 (com.opensymphony.xwork2.TextProvider)action);
             } else {
-                textProvider = new SimpleTextProvider(Locale.ENGLISH);
+                textProvider = SimpleTextProvider.create();
             }
             elementsContext.setTextProvider(textProvider);
 

@@ -39,7 +39,6 @@ import ognl.TypeConverter;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -131,7 +130,7 @@ public final class ElementsThreadLocals {
         OgnlContext ognlContext = (OgnlContext) Ognl.createDefaultContext(null);
         TypeConverter conv = ognlContext.getTypeConverter();
         ognlContext.setTypeConverter(new CustomTypeConverter(conv));
-        TextProvider textProvider = new SimpleTextProvider(Locale.ENGLISH);
+        TextProvider textProvider = SimpleTextProvider.create();
 
         ElementsContext elementsContext = getElementsContext();
 

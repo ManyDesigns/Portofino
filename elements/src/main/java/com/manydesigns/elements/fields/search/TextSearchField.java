@@ -90,7 +90,7 @@ public class TextSearchField extends AbstractSearchField {
             for (TextMatchMode m : TextMatchMode.values()) {
                 boolean checked = matchMode == m;
                 String option = m.getStringValue();
-                xb.writeOption(option, checked, getText(m.getLabel()));
+                xb.writeOption(option, checked, getText(m.getI18nKey()));
             }
             xb.closeElement("select");
         }

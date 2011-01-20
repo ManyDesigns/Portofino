@@ -34,18 +34,42 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class SimpleTextProvider implements TextProvider {
-    private static final String DEFAULT_MESSAGE_RESOURCE =
+    public static final String DEFAULT_MESSAGE_RESOURCE =
             "com.manydesigns.elements.messages";
+
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
 
     protected final Locale locale;
     protected final String messageResource;
     protected final ResourceBundle resourceBundle;
 
-    public SimpleTextProvider(Locale locale) {
-        this(locale, DEFAULT_MESSAGE_RESOURCE);
+    //--------------------------------------------------------------------------
+    // static builder methods
+    //--------------------------------------------------------------------------
+
+    public static SimpleTextProvider create() {
+        return create(Locale.getDefault(), DEFAULT_MESSAGE_RESOURCE);
     }
 
-    public SimpleTextProvider(Locale locale, String messageResource) {
+    public static SimpleTextProvider create(Locale locale) {
+        return create(locale, DEFAULT_MESSAGE_RESOURCE);
+    }
+
+    public static SimpleTextProvider create(String messageResource) {
+        return create(Locale.getDefault(), messageResource);
+    }
+
+    public static SimpleTextProvider create(Locale locale, String messageResource) {
+        return new SimpleTextProvider(locale, messageResource);
+    }
+
+    //--------------------------------------------------------------------------
+    // Constructor
+    //--------------------------------------------------------------------------
+
+    private SimpleTextProvider(Locale locale, String messageResource) {
         this.locale = locale;
         this.messageResource = messageResource;
 
@@ -62,10 +86,18 @@ public class SimpleTextProvider implements TextProvider {
         resourceBundle = tmpBundle;
     }
 
+    //--------------------------------------------------------------------------
+    // TextProvider implementation
+    //--------------------------------------------------------------------------
+
     public String getText(String key, Object... args) {
         String localizedString = getLocalizedString(key);
         return MessageFormat.format(localizedString, args);
     }
+
+    //--------------------------------------------------------------------------
+    // Utility methods
+    //--------------------------------------------------------------------------
 
     public String getLocalizedString(String key) {
         try{

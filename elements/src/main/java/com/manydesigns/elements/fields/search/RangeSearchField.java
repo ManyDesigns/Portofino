@@ -92,8 +92,10 @@ public class RangeSearchField extends AbstractSearchField {
         xb.openElement("table");
         xb.addAttribute("class", "range");
 
-        rangeEndToXhtml(xb, minId, minInputName, minStringValue, getText("From"));
-        rangeEndToXhtml(xb, maxId, maxInputName, maxStringValue, getText("To"));
+        rangeEndToXhtml(xb, minId, minInputName, minStringValue,
+                getText("elements.search.range.from"));
+        rangeEndToXhtml(xb, maxId, maxInputName, maxStringValue,
+                getText("elements.search.range.to"));
 
         xb.closeElement("table");
 
