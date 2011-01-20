@@ -27,44 +27,47 @@
  *
  */
 
-package com.manydesigns.elements.text;
+package com.manydesigns.elements.struts1;
 
 import com.manydesigns.elements.i18n.TextProvider;
-
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.text.MessageFormat;
+import org.apache.struts.util.MessageResources;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class BasicTextProvider implements TextProvider {
-    public final static String ELEMENTSI18N =
-            "com.manydesigns.elements.messages";
+public class Struts1TextProvider implements TextProvider {
+    public static final String copyright =
+            "Copyright (c) 2005-2010, ManyDesigns srl";
     
-    protected final Locale locale;
+    //**************************************************************************
+    // Properties
+    //**************************************************************************
 
-    public BasicTextProvider(Locale locale) {
-        this.locale = locale;
+    protected final MessageResources messageResources;
+
+    //**************************************************************************
+    // Constructor
+    //**************************************************************************
+
+    public Struts1TextProvider(MessageResources messageResources) {
+        this.messageResources = messageResources;
     }
+
+    //**************************************************************************
+    // TextProvider implementation
+    //**************************************************************************
 
     public String getText(String key, Object... args) {
-        return MessageFormat.format(
-                getLocalizedString(ELEMENTSI18N, locale, key), args);
-    }
-
-    private String getLocalizedString(
-            String propertyFile,
-            Locale locale,
-            String key) {
-        if (locale == null)
-            return ResourceBundle.getBundle(propertyFile).getString(key);
-        else {
-            return ResourceBundle.getBundle(propertyFile, locale).getString(key);
+        String[] strutsArgs = new String[args.length];
+        for (int i = 0; i < args.length; i++) {
+            Object arg = args[i];
+            if (arg != null) {
+                strutsArgs[i] = arg.toString();
+            }
         }
+
+        return messageResources.getMessage(key, strutsArgs);
     }
-
-
 }

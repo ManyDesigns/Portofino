@@ -29,40 +29,52 @@
 
 package com.manydesigns.elements.i18n;
 
-import com.manydesigns.elements.i18n.TextProvider;
-
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.text.MessageFormat;
 
 public class SimpleTextProvider implements TextProvider {
+    private static final String DEFAULT_MESSAGE_RESOURCE =
+            "com.manydesigns.elements.messages";
+
     protected final Locale locale;
-    private static final String MESSAGES = "com.manydesigns.elements.messages";
+    protected final String messageResource;
+    protected final ResourceBundle resourceBundle;
 
     public SimpleTextProvider(Locale locale) {
+        this(locale, DEFAULT_MESSAGE_RESOURCE);
+    }
+
+    public SimpleTextProvider(Locale locale, String messageResource) {
         this.locale = locale;
+        this.messageResource = messageResource;
+
+        ResourceBundle tmpBundle;
+        try{
+            if (locale == null)
+                tmpBundle = ResourceBundle.getBundle(messageResource);
+            else {
+                tmpBundle = ResourceBundle.getBundle(messageResource, locale);
+            }
+        } catch (Throwable e) {
+            tmpBundle  = null;
+        }
+        resourceBundle = tmpBundle;
     }
 
     public String getText(String key, Object... args) {
-        String result;
-        result= MessageFormat.format(
-                        getLocalizedString(MESSAGES,
-                                locale, key), args);
-        return result;
+        String localizedString = getLocalizedString(key);
+        return MessageFormat.format(localizedString, args);
     }
 
-    private String getLocalizedString(
-            String propertyFile,
-            Locale locale,
-            String key) {
+    public String getLocalizedString(String key) {
         try{
-            if (locale == null)
-                return ResourceBundle.getBundle(propertyFile).getString(key);
-            else {
-                return ResourceBundle.getBundle(propertyFile, locale).getString(key);
+            if (resourceBundle == null) {
+                return key;
+            } else {
+                return resourceBundle.getString(key);
             }
-        }catch (Throwable e)
-        {
+        } catch (Throwable e) {
             return key;
         }
     }
