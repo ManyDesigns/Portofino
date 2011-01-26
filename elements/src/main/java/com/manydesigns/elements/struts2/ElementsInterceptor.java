@@ -31,9 +31,9 @@ package com.manydesigns.elements.struts2;
 
 import com.manydesigns.elements.ElementsContext;
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.ognl.CustomTypeConverter;
+import com.manydesigns.elements.i18n.SimpleTextProvider;
 import com.manydesigns.elements.i18n.TextProvider;
-import com.manydesigns.elements.text.BasicTextProvider;
+import com.manydesigns.elements.ognl.CustomTypeConverter;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
@@ -43,7 +43,6 @@ import org.apache.struts2.StrutsStatics;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -86,10 +85,10 @@ public class ElementsInterceptor implements Interceptor {
             TextProvider textProvider;
             if (action instanceof com.opensymphony.xwork2.TextProvider) {
                 textProvider =
-                        new StrutsTextProvider(
+                        new Struts2TextProvider(
                                 (com.opensymphony.xwork2.TextProvider)action);
             } else {
-                textProvider = new BasicTextProvider(Locale.ENGLISH);
+                textProvider = SimpleTextProvider.create();
             }
             elementsContext.setTextProvider(textProvider);
 

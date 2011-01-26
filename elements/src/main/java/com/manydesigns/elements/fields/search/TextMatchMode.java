@@ -35,27 +35,27 @@ package com.manydesigns.elements.fields.search;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public enum TextMatchMode {
-    CONTAINS("", "contains"),
-    EQUALS("equals", "equals"),
-    STARTS_WITH("starts", "starts_with"),
-    ENDS_WITH("ends", "ends_with");
+    CONTAINS("", "elements.search.text.match.mode.contains"),
+    EQUALS("equals", "elements.search.text.match.mode.equals"),
+    STARTS_WITH("starts", "elements.search.text.match.mode.starts.with"),
+    ENDS_WITH("ends", "elements.search.text.match.mode.ends.with");
 
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     private final String stringValue;
-    private final String label;
+    private final String i18nKey;
 
-    TextMatchMode(String stringValue, String label) {
+    TextMatchMode(String stringValue, String i18nKey) {
         this.stringValue = stringValue;
-        this.label = label;
+        this.i18nKey = i18nKey;
     }
 
     public String getStringValue() {
         return stringValue;
     }
 
-    public String getLabel() {
-        return label;
+    public String getI18nKey() {
+        return i18nKey;
     }
 }

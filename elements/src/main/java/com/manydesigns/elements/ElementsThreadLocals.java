@@ -29,18 +29,16 @@
 
 package com.manydesigns.elements;
 
+import com.manydesigns.elements.i18n.SimpleTextProvider;
 import com.manydesigns.elements.i18n.TextProvider;
-import com.manydesigns.elements.text.BasicTextProvider;
 import com.manydesigns.elements.ognl.CustomTypeConverter;
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.TypeConverter;
-import ognl.ClassResolver;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -132,7 +130,7 @@ public final class ElementsThreadLocals {
         OgnlContext ognlContext = (OgnlContext) Ognl.createDefaultContext(null);
         TypeConverter conv = ognlContext.getTypeConverter();
         ognlContext.setTypeConverter(new CustomTypeConverter(conv));
-        TextProvider textProvider = new BasicTextProvider(Locale.ENGLISH);
+        TextProvider textProvider = SimpleTextProvider.create();
 
         ElementsContext elementsContext = getElementsContext();
 
