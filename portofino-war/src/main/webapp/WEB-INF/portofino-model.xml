@@ -872,7 +872,6 @@ Struttura dell'XML:
                         <group>admins</group>
                     </allow>
                 </permissions>
-
             </folderNode>
             <customNode id="Profile" url="/Profile.action" title="Profile" description="Profile">
                 <permissions>

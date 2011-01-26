@@ -52,7 +52,6 @@ public class TableDataNavigationNode extends SimpleNavigationNode {
     public TableDataNavigationNode(Context context, SiteNode siteNode,
                                     boolean allowed) {
         super(siteNode, allowed);
-
         List<Table> tables = context.getModel().getAllTables();
         for (Table table : tables) {
             String urlFormat = siteNode.getParent().getActualId() +

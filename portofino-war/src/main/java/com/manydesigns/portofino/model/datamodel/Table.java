@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
+import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
@@ -36,9 +37,9 @@ import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.xml.XmlAttribute;
 import com.manydesigns.portofino.xml.XmlCollection;
 import com.manydesigns.portofino.xml.XmlElement;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -177,18 +178,22 @@ public class Table implements ModelObject {
         return schema;
     }
 
+    @Required
     public String getDatabaseName() {
         return schema.getDatabaseName();
     }
 
+    @Required
     public String getSchemaName() {
         return schema.getSchemaName();
     }
 
+    @Required
     @XmlAttribute(required = true, order = 1, identifier = true)
     public String getTableName() {
         return tableName;
     }
+
 
     public void setTableName(String tableName) {
         this.tableName = tableName;

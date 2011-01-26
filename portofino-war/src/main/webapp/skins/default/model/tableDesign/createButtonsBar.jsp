@@ -7,8 +7,6 @@
     <s:set var="buttonsBarBottom" value="true"/>
     <div class="buttons-bar-top">
 </s:else>
-    <s:submit id="TableDesign_edit" method="edit" value="Edit" />
-    <s:submit id="TableDesign_rename" method="rename" value="Rename" />
-    <s:submit id="TableDesign_drop" method="drop" value="Drop" />
-    <s:submit id="TableDesign_create" method="createStep1" value="Create New" />
+    <s:submit id="TableDesign_cancel" method="cancel" value="Cancel" />
+    <s:submit id="TableDesign_save" method="save" value="Save" />
 </div>

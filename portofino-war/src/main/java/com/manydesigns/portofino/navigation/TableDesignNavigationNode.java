@@ -55,12 +55,14 @@ public class TableDesignNavigationNode extends SimpleNavigationNode {
         super(siteNode, allowed);
         List<Table> tables = context.getModel().getAllTables();
         for (Table table : tables) {
+            String urlFormat = siteNode.getParent().getActualId() +
+                    "/%{qualifiedName}/TableDesign.action";
             TableNavigationNode node =
                     new TableNavigationNode(siteNode,table,
-                            siteNode.getParent().getActualId()+"/{0}/TableDesign.action",
-                            "{0}",
-                            "Table design: {0}", allowed);
+                            urlFormat,
+                            "%{tableName}",
+                            "Table design: %{qualifiedName}", allowed);
             childNodes.add(node);
-        }
+        }        
     }
 }

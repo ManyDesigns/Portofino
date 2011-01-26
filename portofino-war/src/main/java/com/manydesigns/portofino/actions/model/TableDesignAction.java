@@ -30,16 +30,18 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.forms.TableForm;
-import com.manydesigns.elements.forms.TableFormBuilder;
+import com.manydesigns.elements.forms.*;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.datamodel.Column;
+import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -56,6 +58,8 @@ public class TableDesignAction extends PortofinoAction {
 
     public String qualifiedTableName;
     public String cancelReturnUrl;
+
+
 
     //**************************************************************************
     // Web parameters setters (for struts.xml inspections in IntelliJ)
@@ -77,6 +81,7 @@ public class TableDesignAction extends PortofinoAction {
     //**************************************************************************
 
     public Form form;
+    public SearchForm searchForm;
     public TableForm columnTableForm;
 
     //**************************************************************************
@@ -85,6 +90,7 @@ public class TableDesignAction extends PortofinoAction {
 
     public static final Logger logger =
             LoggerFactory.getLogger(TableDesignAction.class);
+
 
     //**************************************************************************
     // Action default execute method
@@ -110,7 +116,9 @@ public class TableDesignAction extends PortofinoAction {
                 .configMode(Mode.VIEW)
                 .build();
         columnTableForm.readFromObject(table.getColumns());
-        
+
+
+
         return SUMMARY;
     }
 
@@ -132,5 +140,62 @@ public class TableDesignAction extends PortofinoAction {
     public String cancel() {
         return CANCEL;
     }
+
+    //**************************************************************************
+    // Drop
+    //**************************************************************************
+
+    public String drop() {
+
+
+        return "drop";
+    }
+
+    //**************************************************************************
+    // Create new
+    //**************************************************************************
+
+    public String createStep1() {
+        /*CreateTableStatement cts = new CreateTableStatement("pubLic", "teZt");
+        cts.addColumn("a1", new VarcharType());
+        CreateTableGenerator generator = new CreateTableGenerator();
+        try {
+            Database database =
+                   CommandLineUtils.createDatabaseObject(getClass().getClassLoader(),
+                            "jdbc:postgresql://127.0.0.1:5432/portofino4", "manydesigns", "manydesigns", "org.postgresql.Driver",
+                            "public", "liquibase.database.core.PostgresDatabase");
+            SortedSet<SqlGenerator> sqlGenerators = new TreeSet<SqlGenerator>();
+            sqlGenerators.add(generator);
+            Sql[] sqls =  generator.generateSql(cts, database, new SqlGeneratorChain(sqlGenerators) );
+            for(Sql sql : sqls){
+                System.out.println(sql.toSql());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }*/
+
+
+
+        //Available databases
+        List<Database> databases = model.getDatabases();
+
+        String [] databaseNames = new String[databases.size()];
+        int i = 0;
+        for (Database db : databases){
+            databaseNames[i++] = db.getQualifiedName();
+        }
+        FormBuilder formBuilder = new FormBuilder(Table.class)
+                .configFields("databaseName", "schemaName", "tableName")
+                .configMode(Mode.CREATE);
+
+        SelectionProvider selectionProvider = DefaultSelectionProvider.create("databases",
+                databaseNames, databaseNames);
+        formBuilder.configSelectionProvider(selectionProvider, "databaseName");
+        formBuilder.configPrefix("table_");
+        form = formBuilder.build();
+
+        return CREATE;
+    }
+
 
 }
