@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
+import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
@@ -174,6 +175,7 @@ public class Column implements ModelObject {
         return table.getTableName();
     }
 
+    @Required
     @XmlAttribute(required = true, order = 1, identifier = true)
     public String getColumnName() {
         return columnName;
@@ -183,6 +185,7 @@ public class Column implements ModelObject {
         this.columnName = columnName;
     }
 
+    @Required
     @XmlAttribute(required = true, order = 2)
     public String getColumnType() {
         return columnType;
@@ -192,6 +195,7 @@ public class Column implements ModelObject {
         this.columnType = columnType;
     }
 
+    @Required
     @XmlAttribute(required = true, order = 3)
     public boolean isNullable() {
         return nullable;
@@ -201,6 +205,7 @@ public class Column implements ModelObject {
         this.nullable = nullable;
     }
 
+    @Required
     @XmlAttribute(required = true, order = 4)
     public int getLength() {
         return length;
@@ -210,6 +215,7 @@ public class Column implements ModelObject {
         this.length = length;
     }
 
+    @Required
     @XmlAttribute(required = true, order = 5)
     public int getScale() {
         return scale;
@@ -219,6 +225,7 @@ public class Column implements ModelObject {
         this.scale = scale;
     }
 
+    @Required
     @XmlAttribute(required = true, order = 6)
     public boolean isAutoincrement() {
         return autoincrement;
@@ -228,6 +235,7 @@ public class Column implements ModelObject {
         this.autoincrement = autoincrement;
     }
 
+    @Required
     @XmlAttribute(required = true, order = 7)
     public boolean isSearchable() {
         return searchable;
@@ -237,6 +245,7 @@ public class Column implements ModelObject {
         return actualJavaType;
     }
 
+    @Required
     @XmlAttribute(required = false, order = 8)
     public String getJavaType() {
         return javaType;

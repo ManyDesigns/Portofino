@@ -10,5 +10,5 @@
     <s:submit id="TableDesign_edit" method="edit" value="Edit" />
     <s:submit id="TableDesign_rename" method="rename" value="Rename" />
     <s:submit id="TableDesign_drop" method="drop" value="Drop" />
-    <s:submit id="TableDesign_create" method="createStep1" value="Create New" />
+    <s:submit id="TableDesign_create" method="create" value="Create New" />
 </div>

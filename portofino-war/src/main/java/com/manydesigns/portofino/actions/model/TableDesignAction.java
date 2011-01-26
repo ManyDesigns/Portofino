@@ -29,18 +29,19 @@
 
 package com.manydesigns.portofino.actions.model;
 
+import com.manydesigns.elements.Element;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
-import com.manydesigns.portofino.model.datamodel.Column;
-import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.datamodel.*;
+import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /*
@@ -48,39 +49,46 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableDesignAction extends PortofinoAction {
+public class TableDesignAction extends PortofinoAction implements ServletRequestAware{
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
+    // Implementazione ServletRequestAware
+    //**************************************************************************
+    private HttpServletRequest req;
+    public void setServletRequest(HttpServletRequest request) {
+        req = request;
+    }
+
+    //**************************************************************************
     // Web parameters
     //**************************************************************************
-
     public String qualifiedTableName;
     public String cancelReturnUrl;
+    public Table table;
 
+    public Integer ncol;
 
 
     //**************************************************************************
     // Web parameters setters (for struts.xml inspections in IntelliJ)
     //**************************************************************************
-
     public void setQualifiedTableName(String qualifiedTableName) {
         this.qualifiedTableName = qualifiedTableName;
     }
 
-    //**************************************************************************
-    // Model metadata
-    //**************************************************************************
 
-    public Table table;
 
 
     //**************************************************************************
     // Presentation elements
     //**************************************************************************
+    public Element wizard;
 
-    public Form form;
+    public Form tableForm;
+    public Form columnForm;
+    public Form pkForm;
     public SearchForm searchForm;
     public TableForm columnTableForm;
 
@@ -93,6 +101,14 @@ public class TableDesignAction extends PortofinoAction {
 
 
     //**************************************************************************
+    // WebParameters
+    //**************************************************************************
+
+    public String table_databaseName;
+    public String table_schemaName;
+    public String table_tableName;
+
+    //**************************************************************************
     // Action default execute method
     //**************************************************************************
 
@@ -102,13 +118,13 @@ public class TableDesignAction extends PortofinoAction {
             return REDIRECT_TO_FIRST;
         }
 
-        setupTable();
+        Table table = setupTable();
 
-        form = new FormBuilder(Table.class)
+        tableForm = new FormBuilder(Table.class)
                 .configFields("databaseName", "schemaName", "tableName")
                 .configMode(Mode.VIEW)
                 .build();
-        form.readFromObject(table);
+        tableForm.readFromObject(table);
 
         columnTableForm = new TableFormBuilder(Column.class)
                 .configFields("columnName", "columnType")
@@ -126,11 +142,12 @@ public class TableDesignAction extends PortofinoAction {
     // Common methods
     //**************************************************************************
 
-    public void setupTable() {
-        table = model.findTableByQualifiedName(qualifiedTableName);
+    public Table setupTable() {
+        Table table = model.findTableByQualifiedName(qualifiedTableName);
         if (table == null) {
             throw new ModelObjectNotFoundError(qualifiedTableName);
         }
+        return table;
     }
 
     //**************************************************************************
@@ -146,8 +163,6 @@ public class TableDesignAction extends PortofinoAction {
     //**************************************************************************
 
     public String drop() {
-
-
         return "drop";
     }
 
@@ -155,7 +170,7 @@ public class TableDesignAction extends PortofinoAction {
     // Create new
     //**************************************************************************
 
-    public String createStep1() {
+    public String create() {
         /*CreateTableStatement cts = new CreateTableStatement("pubLic", "teZt");
         cts.addColumn("a1", new VarcharType());
         CreateTableGenerator generator = new CreateTableGenerator();
@@ -173,17 +188,98 @@ public class TableDesignAction extends PortofinoAction {
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }*/
-
-
-
+        if (ncol == null){
+            ncol = 0;
+        }
         //Available databases
         List<Database> databases = model.getDatabases();
-
         String [] databaseNames = new String[databases.size()];
         int i = 0;
         for (Database db : databases){
             databaseNames[i++] = db.getQualifiedName();
         }
+        setupTableForm(databaseNames);
+        setupColumnForm();
+        setupPkForm();
+
+        if(table_tableName != null){
+            Database database  = model.findDatabaseByName(table_databaseName);
+            Schema schema = model.findSchemaByQualifiedName(
+                    database.getQualifiedName()+"."+table_schemaName);
+            if (schema == null) {
+                schema = new Schema(database,  table_schemaName);
+            }
+
+            if(table == null) {
+                table = new Table(schema, table_tableName);
+            } else {
+                table.setTableName(table_tableName);    
+            }
+
+            schema.getTables().add(table);
+            table.init(model);
+            tableForm.readFromObject(table);
+
+            Column col = new Column(table);
+            columnForm.readFromRequest(req);
+            columnForm.writeToObject(col);
+
+
+            columnTableForm = new TableFormBuilder(Column.class)
+                .configFields("columnName", "columnType", "nullable",
+                        "autoincrement", "length", "scale",
+                        "searchable", "javaType", "propertyName")
+                .configPrefix("cols_").configNRows(ncol)
+                .configMode(Mode.CREATE_PREVIEW)
+                .build();
+            columnTableForm.readFromRequest(req);
+            for(TableForm.Row row : columnTableForm.getRows()) {
+                try {
+                    Column currCol = new Column(table);
+                    row.writeToObject(currCol);
+                    table.getColumns().add(currCol);
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            }
+            table.getColumns().add(col);
+            columnTableForm = new TableFormBuilder(Column.class)
+                .configFields("columnName", "columnType", "nullable",
+                        "autoincrement", "length", "scale",
+                        "searchable", "javaType", "propertyName").configPrefix("cols_")
+                .configNRows(table.getColumns().size())
+                .configMode(Mode.CREATE_PREVIEW)
+                .build();
+            columnTableForm.readFromObject(table.getColumns());
+        }
+        ncol++;
+        return CREATE;
+    }
+
+    //**************************************************************************
+    // Save
+    //**************************************************************************
+    public String step1(){
+        FormBuilder formBuilder = new FormBuilder(Table.class)
+                .configFields("databaseName", "schemaName", "tableName")
+                .configMode(Mode.CREATE);
+        formBuilder.configPrefix("table_");
+        tableForm = formBuilder.build();
+        tableForm.readFromRequest(req);
+        if(!tableForm.validate()){
+            return CREATE;
+        }
+
+
+
+        return SUMMARY;
+    }
+
+
+    //**************************************************************************
+    // private methods
+    //**************************************************************************
+    private void setupTableForm(String[] databaseNames) {
         FormBuilder formBuilder = new FormBuilder(Table.class)
                 .configFields("databaseName", "schemaName", "tableName")
                 .configMode(Mode.CREATE);
@@ -192,10 +288,24 @@ public class TableDesignAction extends PortofinoAction {
                 databaseNames, databaseNames);
         formBuilder.configSelectionProvider(selectionProvider, "databaseName");
         formBuilder.configPrefix("table_");
-        form = formBuilder.build();
-
-        return CREATE;
+        tableForm = formBuilder.build();
     }
 
+    private void setupColumnForm() {
+        FormBuilder formBuilder = new FormBuilder(Column.class)
+                .configFields("columnName", "columnType", "nullable",
+                        "autoincrement", "length", "scale",
+                        "searchable", "javaType", "propertyName")
+                .configMode(Mode.CREATE);
+        formBuilder.configPrefix("column_");
+        columnForm = formBuilder.build();
+    }
 
+    private void setupPkForm() {
+        FormBuilder formBuilder = new FormBuilder(PrimaryKey.class)
+                .configFields("primaryKeyName")
+                .configMode(Mode.CREATE);
+        formBuilder.configPrefix("pk_");
+        pkForm = formBuilder.build();
+    }
 }

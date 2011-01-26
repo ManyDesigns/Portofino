@@ -333,7 +333,7 @@
 
         <action name="TableDesign"
                 class="com.manydesigns.portofino.actions.model.TableDesignAction">
-             <result name="search">/skins/default/model/tableDesign/create.jsp</result>
+            <result name="search">/skins/default/model/tableDesign/create.jsp</result>
             <result name="redirectToFirst" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableDesign</param>
             </result>
