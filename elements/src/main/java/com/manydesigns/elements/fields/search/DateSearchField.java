@@ -116,7 +116,7 @@ public class DateSearchField extends RangeSearchField {
         xb.openElement("th");
         xb.openElement("label");
         xb.addAttribute("for", id);
-        xb.write(getText(label));
+        xb.write(label);
         xb.closeElement("label");
         xb.closeElement("th");
         xb.openElement("td");

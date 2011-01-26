@@ -83,7 +83,7 @@ public class SelectField extends AbstractField {
             selectionModelIndex = 0;
         }
 
-        comboLabel = MessageFormat.format("-- Select {0} --", label);
+        comboLabel = getText("elements.field.select.select", label);
         autocompleteId = id + AUTOCOMPLETE_SUFFIX;
         autocompleteInputName = inputName + AUTOCOMPLETE_SUFFIX;
     }
