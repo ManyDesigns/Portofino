@@ -322,7 +322,6 @@
                 <param name="contentDisposition">attachment;filename="%{fileName}"</param>
                 <param name="bufferSize">1024</param>
             </result>
-    
             
             <result name="jsonSelectFieldOptions" type="stream">
                 <param name="contentType">text/plain</param>
@@ -347,6 +346,11 @@
             <result name="cancel" type="redirect">
                 <param name="location">${cancelReturnUrl}</param>
                 <param name="prependServletContext">false</param>
+            </result>
+            <result name="json" type="stream">
+                <param name="contentType">text/plain</param>
+                <param name="inputName">inputStream</param>
+                <param name="bufferSize">1024</param>
             </result>
         </action>
 

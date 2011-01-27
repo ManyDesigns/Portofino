@@ -42,6 +42,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.List;
 
 /*
@@ -64,6 +66,8 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     //**************************************************************************
     // Web parameters
     //**************************************************************************
+    public InputStream inputStream;
+
     public String qualifiedTableName;
     public String cancelReturnUrl;
     public Table table;
@@ -91,6 +95,8 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     public Form pkForm;
     public SearchForm searchForm;
     public TableForm columnTableForm;
+
+    public String term;
 
     //**************************************************************************
     // Other objects
@@ -269,10 +275,15 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         if(!tableForm.validate()){
             return CREATE;
         }
-
-
-
         return SUMMARY;
+    }
+
+    //**************************************************************************
+    // Json output per i corretti types per una piattaforma
+    //**************************************************************************
+    public String jsonTypes() throws Exception {
+        inputStream = new ByteArrayInputStream(("[\"int\", \"varchar\", \"text\"]").getBytes());
+        return "json";
     }
 
 

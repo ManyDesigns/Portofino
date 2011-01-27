@@ -3,6 +3,18 @@
 %><%@ taglib prefix="s" uri="/struts-tags"
 %><%@ taglib prefix="mdes" uri="/manydesigns-elements-struts2"
 %><s:include value="/skins/default/header.jsp"/>
+<script>
+  $(document).ready(function(){
+    //var colTypes = "int varchar decimal number text".split(" ");
+    var colTypes;
+    //$.getJSON('./TableDesign!jsonTypes.action', function(data){
+    //    colTypes = data.types.split(" ");
+    //});
+    //$("#column_columnType").autocomplete({source:colTypes});
+     $("#column_columnType").autocomplete({source: './TableDesign!jsonTypes.action'
+     });
+  });
+  </script>
 <s:form method="post">
     <s:include value="/skins/default/model/tableDesign/createButtonsBar.jsp"/>
     <div id="inner-content">
