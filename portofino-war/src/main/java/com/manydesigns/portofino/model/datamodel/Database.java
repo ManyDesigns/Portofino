@@ -211,5 +211,4 @@ public class Database implements ModelObject {
         return MessageFormat.format("database {0}", getQualifiedName());
     }
 
-    
 }

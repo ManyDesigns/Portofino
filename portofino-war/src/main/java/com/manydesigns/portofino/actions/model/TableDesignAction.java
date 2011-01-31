@@ -34,9 +34,13 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
+import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.datamodel.*;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -71,9 +76,17 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     public String qualifiedTableName;
     public String cancelReturnUrl;
     public Table table;
-
     public Integer ncol;
+    public Integer npkcol;
+    public String pk_primaryKeyName;
+    public String pk_column;
 
+    public List<String> columnNames = new ArrayList<String>();
+    //colonne da rimuovere
+    public String[] cols_selection;
+    public String[] pkCols_selection;
+    //testo parziale per autocomplite
+    public String term;
 
     //**************************************************************************
     // Web parameters setters (for struts.xml inspections in IntelliJ)
@@ -95,8 +108,9 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     public Form pkForm;
     public SearchForm searchForm;
     public TableForm columnTableForm;
+    public TableForm pkColumnTableForm;
 
-    public String term;
+
 
     //**************************************************************************
     // Other objects
@@ -173,10 +187,10 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     }
 
     //**************************************************************************
-    // Create new
+    // Add new Column
     //**************************************************************************
 
-    public String create() {
+    public String create() throws CloneNotSupportedException {
         /*CreateTableStatement cts = new CreateTableStatement("pubLic", "teZt");
         cts.addColumn("a1", new VarcharType());
         CreateTableGenerator generator = new CreateTableGenerator();
@@ -197,6 +211,10 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         if (ncol == null){
             ncol = 0;
         }
+
+        if (npkcol == null){
+            npkcol = 0;
+        }
         //Available databases
         List<Database> databases = model.getDatabases();
         String [] databaseNames = new String[databases.size()];
@@ -209,27 +227,14 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         setupPkForm();
 
         if(table_tableName != null){
-            Database database  = model.findDatabaseByName(table_databaseName);
-            Schema schema = model.findSchemaByQualifiedName(
-                    database.getQualifiedName()+"."+table_schemaName);
-            if (schema == null) {
-                schema = new Schema(database,  table_schemaName);
-            }
+            Database database  =
+                new Database(model.findDatabaseByName(table_databaseName)
+                        .getDatabaseName());
+            Schema schema = new Schema(database, table_schemaName);
 
-            if(table == null) {
-                table = new Table(schema, table_tableName);
-            } else {
-                table.setTableName(table_tableName);    
-            }
-
+            table = new Table(schema, table_tableName);
             schema.getTables().add(table);
-            table.init(model);
             tableForm.readFromObject(table);
-
-            Column col = new Column(table);
-            columnForm.readFromRequest(req);
-            columnForm.writeToObject(col);
-
 
             columnTableForm = new TableFormBuilder(Column.class)
                 .configFields("columnName", "columnType", "nullable",
@@ -238,29 +243,130 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
                 .configPrefix("cols_").configNRows(ncol)
                 .configMode(Mode.CREATE_PREVIEW)
                 .build();
+            columnTableForm.setSelectable(true);
+            columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
             columnTableForm.readFromRequest(req);
+
+            if (table.getPrimaryKey()!=null){
+                npkcol =table.getPrimaryKey().size();
+            }
+            pkColumnTableForm = new TableFormBuilder(PrimaryKeyColumn.class)
+                .configFields("columnName").configPrefix("pkCols_")
+            .configNRows(npkcol)
+            .configMode(Mode.CREATE_PREVIEW)
+            .build();
+            pkColumnTableForm.readFromObject(req);
+            pkColumnTableForm.setSelectable(true);
+            columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));           
+
             for(TableForm.Row row : columnTableForm.getRows()) {
                 try {
                     Column currCol = new Column(table);
                     row.writeToObject(currCol);
                     table.getColumns().add(currCol);
+                    columnNames.add(currCol.getColumnName());
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    //Do nothing
                 }
             }
-            table.getColumns().add(col);
-            columnTableForm = new TableFormBuilder(Column.class)
-                .configFields("columnName", "columnType", "nullable",
-                        "autoincrement", "length", "scale",
-                        "searchable", "javaType", "propertyName").configPrefix("cols_")
-                .configNRows(table.getColumns().size())
-                .configMode(Mode.CREATE_PREVIEW)
-                .build();
+            String operation = req.getParameter("method:create");
+            if ("Add column".equals(operation)) {
+                addCol();
+            } else if ("Remove column" .equals(operation)){
+                removeCol();
+            } else if ("Add primary key column".equals(operation)) {
+                addPkCol();
+            } else if ("Remove primary key column".equals(operation)) {
+
+            }
+            columnTableForm.setSelectable(true);
+            columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
             columnTableForm.readFromObject(table.getColumns());
         }
-        ncol++;
+
         return CREATE;
     }
+
+    private void removeCol() {
+        columnNames.clear();
+        for(TableForm.Row row : columnTableForm.getRows()) {
+            try {
+                Column currCol = new Column(table);
+                row.writeToObject(currCol);
+                if (ArrayUtils.contains(cols_selection, currCol.getColumnName())){
+                    table.getColumns().remove(
+                            table.findColumnByName(
+                                    currCol.getColumnName()));
+                } else {
+                    columnNames.add(currCol.getColumnName());
+                }
+            } catch (Throwable e) {
+                //do nothing: accetto errori quali assenza di pk sulla tabella
+            }
+        }
+
+        columnTableForm = new TableFormBuilder(Column.class)
+            .configFields("columnName", "columnType", "nullable",
+                    "autoincrement", "length", "scale",
+                    "searchable", "javaType", "propertyName").configPrefix("cols_")
+            .configNRows(table.getColumns().size())
+            .configMode(Mode.CREATE_PREVIEW)
+            .build();
+        columnTableForm.setSelectable(true);
+        columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
+        columnTableForm.readFromObject(table.getColumns());
+        ncol = table.getColumns().size();
+    }
+
+    private void addPkCol() {
+        PrimaryKey pk = new PrimaryKey(table);
+        table.setPrimaryKey(pk);
+        pk.setPrimaryKeyName(pk_primaryKeyName!=null?pk_primaryKeyName:"pk_"+table_tableName);
+
+        for(Column currentColumn : table.getColumns()){
+            if(currentColumn.getColumnName().equals(pk_column)){
+                pk.add(new PrimaryKeyColumn(pk, pk_column));
+            }
+        }
+        pkColumnTableForm = new TableFormBuilder(PrimaryKeyColumn.class)
+                .configFields("columnName").configPrefix("pkCols_")
+            .configNRows(table.getPrimaryKey().size())
+            .configMode(Mode.CREATE_PREVIEW)
+            .build();
+        pkColumnTableForm.readFromObject(pk);
+        pkColumnTableForm.setSelectable(true);
+        columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
+        npkcol++;
+    }
+
+    private void addCol() {
+        Column col = new Column(table);
+        columnForm.readFromRequest(req);
+        columnForm.writeToObject(col);
+        List<Column> columns = table.getColumns();
+        boolean found = false;
+        columnNames.clear();
+        for (Column currentColumn : columns){
+            String name = currentColumn.getColumnName();
+            if (name.equals(col.getColumnName())){
+                found = true;
+            }
+        }
+        if (!found){
+            columns.add(col);
+            columnNames.add(col.getColumnName());
+        }
+        columnTableForm = new TableFormBuilder(Column.class)
+            .configFields("columnName", "columnType", "nullable",
+                    "autoincrement", "length", "scale",
+                    "searchable", "javaType", "propertyName").configPrefix("cols_")
+            .configNRows(table.getColumns().size())
+            .configMode(Mode.CREATE_PREVIEW)
+            .build();
+        ncol++;
+    }
+
+
 
     //**************************************************************************
     // Save
@@ -282,7 +388,19 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     // Json output per i corretti types per una piattaforma
     //**************************************************************************
     public String jsonTypes() throws Exception {
-        inputStream = new ByteArrayInputStream(("[\"int\", \"varchar\", \"text\"]").getBytes());
+        Type[] types = context.getConnectionProvider(table_databaseName).getTypes();
+        List<String> typesString = new ArrayList<String>();
+
+        for(Type currentType : types){
+            if(null!=term && !"".equals(term)) {
+                if (StringUtils.startsWithIgnoreCase(currentType.getTypeName(),term))
+                   typesString.add("\""+currentType.getTypeName()+"\"");
+            } else {
+                typesString.add("\""+currentType.getTypeName()+"\"");
+            }
+        }
+        String result = "["+ StringUtils.join(typesString, ",")+"]";
+        inputStream = new ByteArrayInputStream(result.getBytes());
         return "json";
     }
 
