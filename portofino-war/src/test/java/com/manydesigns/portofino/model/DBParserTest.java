@@ -190,8 +190,8 @@ public class DBParserTest extends AbstractPortofinoTest {
         assertEquals(name, column.getActualPropertyName());
         assertEquals(columnType.toUpperCase(), column.getColumnType().toUpperCase());
         assertEquals(nullable, column.isNullable());
-        assertEquals(length, column.getLength());
-        assertEquals(scale, column.getScale());
+        assertEquals(length, column.getLength().intValue());
+        assertEquals(scale, column.getScale().intValue());
         assertEquals(databaseName + "." + schemaName + "." +
                 tableName + "." + columnName, column.getQualifiedName());
     }

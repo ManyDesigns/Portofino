@@ -57,6 +57,9 @@ public class Type {
     protected final boolean searchable;
     protected final short minimumScale;
     protected final short maximumScale;
+    protected final Boolean precisionRequired;
+    protected final Boolean scaleRequired;
+
 
     //**************************************************************************
     // Constructors
@@ -77,6 +80,32 @@ public class Type {
         this.autoincrement = autoincrement;
         this.minimumScale = minimumScale;
         this.maximumScale = maximumScale;
+
+        this.precisionRequired = null;
+        this.scaleRequired = null;
+
+    }
+
+    public Type(String typeName, int jdbcType, int maximumPrecision,
+                String literalPrefix, String literalSuffix,
+                boolean nullable, boolean caseSensitive, boolean searchable,
+                boolean autoincrement, short minimumScale, short maximumScale,
+                boolean precisionRequired, boolean scaleRequired) {
+        this.typeName = typeName;
+        this.jdbcType = jdbcType;
+        this.maximumPrecision = maximumPrecision;
+        this.literalPrefix = literalPrefix;
+        this.literalSuffix = literalSuffix;
+        this.nullable = nullable;
+        this.caseSensitive = caseSensitive;
+        this.searchable = searchable;
+        this.autoincrement = autoincrement;
+        this.minimumScale = minimumScale;
+        this.maximumScale = maximumScale;
+
+        this.precisionRequired = precisionRequired;
+        this.scaleRequired = scaleRequired;
+
     }
 
     //**************************************************************************
@@ -96,19 +125,25 @@ public class Type {
             case Types.BIGINT:
                 return Long.class;
             case Types.BIT:
+                return Boolean.class;
             case Types.BOOLEAN:
                 return Boolean.class;
             case Types.CHAR:
+                return String.class;
             case Types.VARCHAR:
                 return String.class;
             case Types.DATE:
+                return java.sql.Date.class;
             case Types.TIME:
+                return java.sql.Time.class;
             case Types.TIMESTAMP:
                 return Date.class;
             case Types.DECIMAL:
+                return BigDecimal.class;
             case Types.NUMERIC:
                 return BigDecimal.class;
             case Types.DOUBLE:
+                return Double.class;
             case Types.REAL:
                 return Double.class;
             case Types.FLOAT:
@@ -120,24 +155,35 @@ public class Type {
             case Types.TINYINT:
                 return Byte.class;
             case Types.BINARY:
+                return byte[].class;
             case Types.BLOB:
+                 return java.sql.Blob.class;
             case Types.CLOB:
+                return java.sql.Clob.class;
             case Types.LONGVARBINARY:
+                return byte[].class;
             case Types.LONGVARCHAR:
+                return java.lang.String.class;
             case Types.VARBINARY:
                 return byte[].class;
             case Types.ARRAY:
+                return java.sql.Array.class;
             case Types.DATALINK:
+                return java.net.URL.class;
             case Types.DISTINCT:
             case Types.JAVA_OBJECT:
+                return Object.class;
             case Types.NULL:
             case Types.OTHER:
             case Types.REF:
+                return java.sql.Ref.class;
             case Types.STRUCT:
+                return java.sql.Struct.class;
             default:
                 throw new Error("Unsupported type: " + jdbcType);
         }
     }
+
 
     public boolean isAutoincrement() {
         return autoincrement;
@@ -190,5 +236,140 @@ public class Type {
                 ", minimumScale=" + minimumScale +
                 ", maximumScale=" + maximumScale +
                 '}';
+    }
+
+    public boolean isPrecisionRequired() {
+        if (precisionRequired!= null){
+            return precisionRequired;
+        }
+        switch (jdbcType) {
+            case Types.BIGINT:
+                return false;
+            case Types.BIT:
+                return false;
+            case Types.BOOLEAN:
+                return false;
+            case Types.CHAR:
+                return true;
+            case Types.VARCHAR:
+                return true;
+            case Types.DATE:
+                return false;
+            case Types.TIME:
+                return false;
+            case Types.TIMESTAMP:
+                return false;
+            case Types.DECIMAL:
+                return true;
+            case Types.NUMERIC:
+                return true;
+            case Types.DOUBLE:
+                return false;
+            case Types.REAL:
+                return false;
+            case Types.FLOAT:
+                return false;
+            case Types.INTEGER:
+                return false;
+            case Types.SMALLINT:
+                return false;
+            case Types.TINYINT:
+                return false;
+            case Types.BINARY:
+                return false;
+            case Types.BLOB:
+                 return false;
+            case Types.CLOB:
+                return false;
+            case Types.LONGVARBINARY:
+                return false;
+            case Types.LONGVARCHAR:
+                return false;
+            case Types.VARBINARY:
+                return false;
+            case Types.ARRAY:
+                return false;
+            case Types.DATALINK:
+                return false;
+            case Types.DISTINCT:
+            case Types.JAVA_OBJECT:
+                return false;
+            case Types.NULL:
+            case Types.OTHER:
+            case Types.REF:
+                return false;
+            case Types.STRUCT:
+                return false;
+            default:
+                return false;
+        }
+
+    }
+
+    public boolean isScaleRequired() {
+        if (scaleRequired!= null){
+            return scaleRequired;
+        }
+        switch (jdbcType) {
+            case Types.BIGINT:
+                return false;
+            case Types.BIT:
+                return false;
+            case Types.BOOLEAN:
+                return false;
+            case Types.CHAR:
+                return false;
+            case Types.VARCHAR:
+                return false;
+            case Types.DATE:
+                return false;
+            case Types.TIME:
+                return false;
+            case Types.TIMESTAMP:
+                return false;
+            case Types.DECIMAL:
+                return true;
+            case Types.NUMERIC:
+                return true;
+            case Types.DOUBLE:
+                return false;
+            case Types.REAL:
+                return false;
+            case Types.FLOAT:
+                return false;
+            case Types.INTEGER:
+                return false;
+            case Types.SMALLINT:
+                return false;
+            case Types.TINYINT:
+                return false;
+            case Types.BINARY:
+                return false;
+            case Types.BLOB:
+                 return false;
+            case Types.CLOB:
+                return false;
+            case Types.LONGVARBINARY:
+                return false;
+            case Types.LONGVARCHAR:
+                return false;
+            case Types.VARBINARY:
+                return false;
+            case Types.ARRAY:
+                return false;
+            case Types.DATALINK:
+                return false;
+            case Types.DISTINCT:
+            case Types.JAVA_OBJECT:
+                return false;
+            case Types.NULL:
+            case Types.OTHER:
+            case Types.REF:
+                return false;
+            case Types.STRUCT:
+                return false;
+            default:
+                return false;
+        }
     }
 }

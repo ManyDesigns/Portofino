@@ -61,8 +61,8 @@ public class Column implements ModelObject {
     protected String columnType;
     protected boolean nullable;
     protected boolean autoincrement;
-    protected int length;
-    protected int scale;
+    protected Integer length;
+    protected Integer scale;
     protected boolean searchable;
     
     //**************************************************************************
@@ -93,7 +93,7 @@ public class Column implements ModelObject {
 
     public Column(Table table, String columnName, String columnType,
                   boolean nullable, boolean autoincrement,
-                  int length, int scale, boolean searchable) {
+                  Integer length, Integer scale, boolean searchable) {
         this(table);
         this.columnName = columnName;
         this.columnType = columnType;
@@ -109,8 +109,8 @@ public class Column implements ModelObject {
                   String columnType,
                   boolean nullable,
                   boolean autoincrement,
-                  int length,
-                  int scale,
+                  Integer length,
+                  Integer scale,
                   boolean searchable,
                   String javaType,
                   String propertyName) {
@@ -195,7 +195,6 @@ public class Column implements ModelObject {
         this.columnType = columnType;
     }
 
-    @Required
     @XmlAttribute(required = true, order = 3)
     public boolean isNullable() {
         return nullable;
@@ -205,27 +204,24 @@ public class Column implements ModelObject {
         this.nullable = nullable;
     }
 
-    @Required
     @XmlAttribute(required = true, order = 4)
-    public int getLength() {
+    public Integer getLength() {
         return length;
     }
 
-    public void setLength(int length) {
+    public void setLength(Integer length) {
         this.length = length;
     }
 
-    @Required
     @XmlAttribute(required = true, order = 5)
-    public int getScale() {
+    public Integer getScale() {
         return scale;
     }
 
-    public void setScale(int scale) {
+    public void setScale(Integer scale) {
         this.scale = scale;
     }
 
-    @Required
     @XmlAttribute(required = true, order = 6)
     public boolean isAutoincrement() {
         return autoincrement;
@@ -235,7 +231,6 @@ public class Column implements ModelObject {
         this.autoincrement = autoincrement;
     }
 
-    @Required
     @XmlAttribute(required = true, order = 7)
     public boolean isSearchable() {
         return searchable;
@@ -311,6 +306,4 @@ public class Column implements ModelObject {
         }
         return null;
     }
-
-
 }

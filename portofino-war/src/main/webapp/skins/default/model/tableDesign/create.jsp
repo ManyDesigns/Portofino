@@ -26,7 +26,7 @@
             </s:if>
             <p/>
             <mdes:write value="columnForm"/>
-            <s:submit id="add_col" method="create" value="Add column" />
+            <s:submit id="add_col" method="addCol" value="Add column" />
             <h2>Primary key</h2>
             <mdes:write value="pkForm"/>
             <s:if test="pkColumnTableForm != null">
@@ -100,13 +100,42 @@
 <script>
 
     $("#table_databaseName").change(function(){
-     $("#column_columnType").autocomplete({source: './TableDesign!jsonTypes.action?table_databaseName='+$("#table_databaseName").val()});
- } );
+        $("#column_columnType").autocomplete({source: './TableDesign!jsonTypes.action?table_databaseName='+$("#table_databaseName").val()});
+    } );
     $("#column_columnType").focusout(function(){
-    $("#column_javaType")
+        $("#column_javaType")
                 .autocomplete({source: './TableDesign!jsonJavaTypes.action?table_databaseName='
                 +$("#table_databaseName").val()+'&column_columnType='
                 +$("#column_columnType").val()}, {minLength: 0});
+        $.getJSON('./TableDesign!jsonTypeInfo.action?table_databaseName='
+                +$("#table_databaseName").val()+'&column_columnType='
+                +$("#column_columnType").val(), function(data) {
+                    if (data.precision=='false') {
+                        $("#column_length").attr('disabled', true);
+                    } else {
+                        $("#column_length").attr('disabled', false);
+                    }
+
+                    if (data.scale=='false') {
+                        $("#column_scale").attr('disabled', true);
+                    } else {
+                        $("#column_scale").attr('disabled', false);
+                    }
+
+                    if (data.searchable=='false') {
+                        $("#column_searchable").attr('disabled', true);
+                    } else {
+                        $("#column_searchable").attr('disabled', false);
+                    }
+
+                    if (data.autoincrement=='false') {
+                        $("#column_autoincrement").attr('disabled', true);
+                    } else {
+                        $("#column_autoincrement").attr('disabled', false);
+                    }
+
+                 }
+                );
     });
   </script>
 <s:include value="/skins/default/footer.jsp"/>

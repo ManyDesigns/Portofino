@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
@@ -50,6 +51,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -64,6 +66,9 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     // Implementazione ServletRequestAware
     //**************************************************************************
     private HttpServletRequest req;
+
+
+
     public void setServletRequest(HttpServletRequest request) {
         req = request;
     }
@@ -126,6 +131,26 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     public String table_databaseName;
     public String table_schemaName;
     public String table_tableName;
+
+    //**************************************************************************
+    // private fields
+    //**************************************************************************
+
+    private final List<String> annotations;
+
+    //**************************************************************************
+    // Constructor
+    //**************************************************************************
+    public TableDesignAction() {
+        annotations = new ArrayList<String>();
+        Set<Class> annotationsClasses
+                =  AnnotationsManager.getManager().getManagedAnnotationClasses();
+
+        for (Class aClass: annotationsClasses){
+            annotations.add(aClass.getName());
+        }
+
+    }
 
     //**************************************************************************
     // Action default execute method
@@ -207,47 +232,36 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }*/
-        if (ncol == null){
-            ncol = 0;
+
+        setupForms();
+        if(!readFromRequest()){
+            return CREATE;
         }
 
-        if (npkcol == null){
-            npkcol = 0;
+        String operation = req.getParameter("method:create");
+         if ("Remove column" .equals(operation)){
+            removeCol();
+        } else if ("Add primary key column".equals(operation)) {
+            addPkCol();
+        } else if ("Remove primary key column".equals(operation)) {
+            remPkCol();
         }
-        //Available databases
-        List<Database> databases = model.getDatabases();
-        String [] databaseNames = new String[databases.size()];
-        int i = 0;
-        for (Database db : databases){
-            databaseNames[i++] = db.getQualifiedName();
-        }
-        setupForms(databaseNames);
 
-        if(table_tableName != null){
-            readFromRequest();
-            String operation = req.getParameter("method:create");
-            if ("Add column".equals(operation)) {
-                addCol();
-            } else if ("Remove column" .equals(operation)){
-                removeCol();
-            } else if ("Add primary key column".equals(operation)) {
-                addPkCol();
-            } else if ("Remove primary key column".equals(operation)) {
-                remPkCol();
-            }
-            columnTableForm.setSelectable(true);
-            columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
-            columnTableForm.readFromObject(table.getColumns());
-        }
+
 
         return CREATE;
     }
 
 
 
-    private void addCol() {
+    public String addCol() {
+        setupForms();
+        readFromRequest();
         Column col = new Column(table);
         columnForm.readFromRequest(req);
+        if(!columnForm.validate()){
+            return CREATE;
+        }      
        
         columnForm.writeToObject(col);
         List<Column> columns = table.getColumns();
@@ -272,7 +286,12 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
             .configMode(Mode.CREATE_PREVIEW)
             .build();
         ncol++;
-    }
+        columnTableForm.setSelectable(true);
+        columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
+        columnTableForm.readFromObject(table.getColumns());
+
+        return CREATE;
+}
 
     private void removeCol() {
         columnNames.clear();
@@ -303,6 +322,9 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
         columnTableForm.readFromObject(table.getColumns());
         ncol = table.getColumns().size();
+        columnTableForm.setSelectable(true);
+        columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
+        columnTableForm.readFromObject(table.getColumns());
     }
 
     private void addPkCol() {
@@ -326,8 +348,6 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     }
 
     private void remPkCol() {
-
-
         for(TableForm.Row row : pkColumnTableForm.getRows()) {
             try {
                 PrimaryKeyColumnModel currCol = new PrimaryKeyColumnModel();
@@ -352,66 +372,34 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         pkColumnTableForm.readFromObject(pkModel);
     }
 
-
-
-
-
-    //**************************************************************************
-    // Json output per i corretti types per una piattaforma
-    //**************************************************************************
-    public String jsonTypes() throws Exception {
-        Type[] types = context.getConnectionProvider(table_databaseName).getTypes();
-        List<String> typesString = new ArrayList<String>();
-
-        for(Type currentType : types){
-            if(null!=term && !"".equals(term)) {
-                if (StringUtils.startsWithIgnoreCase(currentType.getTypeName(),term))
-                   typesString.add("\""+currentType.getTypeName()+"\"");
-            } else {
-                typesString.add("\""+currentType.getTypeName()+"\"");
-            }
-        }
-        String result = "["+ StringUtils.join(typesString, ",")+"]";
-        inputStream = new ByteArrayInputStream(result.getBytes());
-        return "json";
-    }
-
-    //**************************************************************************
-    // Json output per i corretti Java types per una piattaforma
-    //**************************************************************************
-    public String jsonJavaTypes() throws Exception {
-        Type[] types = context.getConnectionProvider(table_databaseName).getTypes();
-        List<String> javaTypesString = new ArrayList<String>();
-
-        for(Type currentType : types){
-            if(StringUtils.startsWithIgnoreCase(currentType.getTypeName(), req.getParameter("column_columnType"))){
-                String defJavaType;
-                try{
-                    defJavaType= currentType.getDefaultJavaType().getName();
-                } catch (Throwable e){
-                    defJavaType="UNSOPPORTED";
-                }
-                javaTypesString.add("\""+defJavaType+"\"");
-            }
-        }
-        String result = "["+ StringUtils.join(javaTypesString, ",")+"]";
-        inputStream = new ByteArrayInputStream(result.getBytes());
-        return "json";
-    }
     //**************************************************************************
     // private methods
     //**************************************************************************
-    private void readFromRequest() {
+    private boolean readFromRequest() {
+        if(null==table_databaseName){
+            return false;
+        }
+
+        tableForm.readFromRequest(req);
+
+        if(!tableForm.validate()){
+            return false;
+        }
+        //Gestione tabella
         Database database  =
             new Database(model.findDatabaseByName(table_databaseName)
                     .getDatabaseName());
-
-        //Gestione tabella
         Schema schema = new Schema(database, table_schemaName);
         table = new Table(schema, table_tableName);
 
         schema.getTables().add(table);
         tableForm.readFromObject(table);
+
+        if(!tableForm.validate()){
+            return false;
+        }
+
+
 
         //Gestione colonne
         columnTableForm = new TableFormBuilder(Column.class)
@@ -468,9 +456,25 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
                 //Do nothing
             }
         }
+
+        return true;
     }
 
-    private void setupForms(String[] databaseNames) {
+    private void setupForms() {
+        if (ncol == null){
+            ncol = 0;
+        }
+
+        if (npkcol == null){
+            npkcol = 0;
+        }
+        //Available databases
+        List<Database> databases = model.getDatabases();
+        String [] databaseNames = new String[databases.size()];
+        int i = 0;
+        for (Database db : databases){
+            databaseNames[i++] = db.getQualifiedName();
+        }
         FormBuilder formBuilder = new FormBuilder(Table.class)
                 .configFields("databaseName", "schemaName", "tableName")
                 .configMode(Mode.CREATE);
@@ -499,4 +503,73 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
                         "tabName", "colName", "colValue").configPrefix("pk_")
                 .configMode(Mode.CREATE).build();
     }
+
+    //**************************************************************************
+    // Json output per i corretti types per una piattaforma
+    //**************************************************************************
+    public String jsonTypes() throws Exception {
+        Type[] types = context.getConnectionProvider(table_databaseName).getTypes();
+        List<String> typesString = new ArrayList<String>();
+
+        for(Type currentType : types){
+            if(null!=term && !"".equals(term)) {
+                if (StringUtils.startsWithIgnoreCase(currentType.getTypeName(),term))
+                   typesString.add("\""+currentType.getTypeName()+"\"");
+            } else {
+                typesString.add("\""+currentType.getTypeName()+"\"");
+            }
+        }
+        String result = "["+ StringUtils.join(typesString, ",")+"]";
+        inputStream = new ByteArrayInputStream(result.getBytes());
+        return "json";
+    }
+
+    //**************************************************************************
+    // Json output per i corretti Java types per una piattaforma
+    //**************************************************************************
+    public String jsonJavaTypes() throws Exception {
+        Type[] types = context.getConnectionProvider(table_databaseName).getTypes();
+        List<String> javaTypesString = new ArrayList<String>();
+
+        for(Type currentType : types){
+            if(StringUtils.equalsIgnoreCase(currentType.getTypeName(), req.getParameter("column_columnType"))){
+                String defJavaType;
+                try{
+                    defJavaType= currentType.getDefaultJavaType().getName();
+                } catch (Throwable e){
+                    defJavaType="UNSOPPORTED";
+                }
+                javaTypesString.add("\""+defJavaType+"\"");
+            }
+        }
+        String result = "["+ StringUtils.join(javaTypesString, ",")+"]";
+        inputStream = new ByteArrayInputStream(result.getBytes());
+        return "json";
+    }
+    
+    //**************************************************************************
+    // Json output per vedere se richiesta Precision
+    //**************************************************************************
+    public String jsonTypeInfo() throws Exception {
+        Type[] types = context.getConnectionProvider(table_databaseName).getTypes();
+        List<String> info = new ArrayList<String>();
+
+        for(Type currentType : types){
+            if(StringUtils.equalsIgnoreCase(currentType.getTypeName(), req.getParameter("column_columnType"))){
+
+                info.add("\"precision\" : \""+
+                        (currentType.isPrecisionRequired()?"true":"false")+"\"");
+                info.add("\"scale\" : \""+
+                        (currentType.isScaleRequired()?"true":"false")+"\"");
+                info.add("\"searchable\" : \""+
+                        (currentType.isSearchable()?"true":"false")+"\"");
+                info.add("\"autoincrement\" : \""+
+                        (currentType.isAutoincrement()?"true":"false")+"\"");
+            }
+        }
+        String result = "{"+ StringUtils.join(info, ",")+"}";
+        inputStream = new ByteArrayInputStream(result.getBytes());
+        return "json";
+    }
 }
+

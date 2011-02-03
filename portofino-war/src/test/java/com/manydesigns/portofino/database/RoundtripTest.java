@@ -210,8 +210,8 @@ public class RoundtripTest extends AbstractPortofinoTest {
         assertNotNull(catidColumn2);
         assertEquals("CATID", catidColumn2.getColumnName());
         assertEquals("varchar", catidColumn2.getColumnType());
-        assertEquals(50, catidColumn2.getLength());
-        assertEquals(1, catidColumn2.getScale());
+        assertEquals(50, catidColumn2.getLength().intValue());
+        assertEquals(1, catidColumn2.getScale().intValue());
         assertEquals(true, catidColumn2.isNullable());
         assertEquals(true, catidColumn2.isSearchable());
         assertEquals(true, catidColumn2.isAutoincrement());
@@ -248,8 +248,8 @@ public class RoundtripTest extends AbstractPortofinoTest {
         assertNotNull(descnColumn2);
         assertEquals("DESCN", descnColumn2.getColumnName());
         assertEquals("varchar", descnColumn2.getColumnType());
-        assertEquals(255, descnColumn2.getLength());
-        assertEquals(0, descnColumn2.getScale());
+        assertEquals(255, descnColumn2.getLength().intValue());
+        assertEquals(0, descnColumn2.getScale().intValue());
         assertEquals(false, descnColumn2.isNullable());
         assertEquals(false, descnColumn2.isSearchable());
         assertEquals(false, descnColumn2.isAutoincrement());
@@ -270,8 +270,8 @@ public class RoundtripTest extends AbstractPortofinoTest {
         assertNotNull(productCatidColumn2);
         assertEquals("PRODUCT_CATID", productCatidColumn2.getColumnName());
         assertEquals("varchar", productCatidColumn2.getColumnType());
-        assertEquals(255, productCatidColumn2.getLength());
-        assertEquals(0, productCatidColumn2.getScale());
+        assertEquals(255, productCatidColumn2.getLength().intValue());
+        assertEquals(0, productCatidColumn2.getScale().intValue());
         assertEquals(false, productCatidColumn2.isNullable());
         assertEquals(false, productCatidColumn2.isSearchable());
         assertEquals(false, productCatidColumn2.isAutoincrement());
