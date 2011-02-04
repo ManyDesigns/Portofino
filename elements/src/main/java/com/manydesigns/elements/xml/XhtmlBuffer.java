@@ -33,6 +33,7 @@ package com.manydesigns.elements.xml;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.io.Writer;
+import java.io.StringWriter;
 
 /**
  * @author Paolo Predonzani - paolo.predonzani@manydesigns.com
@@ -43,15 +44,33 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
+    // Constants
+    //**************************************************************************
+
+    public static String[] XHTML_EMPTY_TAG_ALLOWED_LIST = {
+            "area",
+            "base",
+            "br",
+            "col",
+            "hr",
+            "img",
+            "input",
+            "link",
+            "meta",
+            "param"
+    };
+
+    //**************************************************************************
     // Constructors
     //**************************************************************************
 
     public XhtmlBuffer() {
-        super();
+        this(new StringWriter());
     }
 
     public XhtmlBuffer(Writer writer) {
         super(writer);
+        allowedEmptyTags = XHTML_EMPTY_TAG_ALLOWED_LIST;
     }
 
     //~--- methods ------------------------------------------------------------

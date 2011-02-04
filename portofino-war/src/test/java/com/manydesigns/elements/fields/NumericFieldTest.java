@@ -39,7 +39,7 @@ public class NumericFieldTest extends AbstractElementsTest {
         String text = elementToString(decimalField);
         assertEquals("<th><label for=\"myDecimal\" class=\"field\">" +
                 "My decimal:</label></th><td><input id=\"myDecimal\" type=\"text\"" +
-                " name=\"myDecimal\" class=\"text\"></input></td>", text);
+                " name=\"myDecimal\" class=\"text\" /></td>", text);
 
         assertEquals(Mode.EDIT, decimalField.getMode());
         assertNull(decimalField.getStringValue());
@@ -57,7 +57,7 @@ public class NumericFieldTest extends AbstractElementsTest {
         String text = elementToString(decimalField);
         assertEquals("<th><label for=\"myDecimal\" class=\"field\">" +
                 "My decimal:</label></th><td><input id=\"myDecimal\" type=\"text\"" +
-                " name=\"myDecimal\" value=\"10.02\" class=\"text\"></input></td>", text);
+                " name=\"myDecimal\" value=\"10.02\" class=\"text\" /></td>", text);
     }
 
 
@@ -66,7 +66,7 @@ public class NumericFieldTest extends AbstractElementsTest {
         String text = elementToString(decimalField);
         assertEquals("<th><label for=\"myDecimal\" class=\"field\">" +
                 "My decimal:</label></th><td><input id=\"myDecimal\" type=\"text\"" +
-                " name=\"myDecimal\" value=\"10g.0f2\" class=\"text\"></input></td>", text);
+                " name=\"myDecimal\" value=\"10g.0f2\" class=\"text\" /></td>", text);
     }
 
     public void testWriteToObject() {

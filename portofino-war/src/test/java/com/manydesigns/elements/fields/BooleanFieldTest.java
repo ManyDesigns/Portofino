@@ -78,8 +78,8 @@ public class BooleanFieldTest extends AbstractElementsTest {
         String text = elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
-                "<input id=\"myBoolean\" type=\"checkbox\" name=\"myBoolean\" value=\"true\" class=\"checkbox\"></input>" +
-                "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\"></input>" +
+                "<input id=\"myBoolean\" type=\"checkbox\" name=\"myBoolean\" value=\"true\" class=\"checkbox\" />" +
+                "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\" />" +
                 "</td>", text);
 
         booleanField.setBooleanValue(false);
@@ -87,8 +87,8 @@ public class BooleanFieldTest extends AbstractElementsTest {
         text = elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
-                "<input id=\"myBoolean\" type=\"checkbox\" name=\"myBoolean\" value=\"true\" class=\"checkbox\"></input>" +
-                "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\"></input>" +
+                "<input id=\"myBoolean\" type=\"checkbox\" name=\"myBoolean\" value=\"true\" class=\"checkbox\" />" +
+                "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\" />" +
                 "</td>", text);
 
         booleanField.setBooleanValue(true);
@@ -96,8 +96,8 @@ public class BooleanFieldTest extends AbstractElementsTest {
         text = elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
-                "<input id=\"myBoolean\" type=\"checkbox\" name=\"myBoolean\" value=\"true\" checked=\"checked\" class=\"checkbox\"></input>" +
-                "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\"></input>" +
+                "<input id=\"myBoolean\" type=\"checkbox\" name=\"myBoolean\" value=\"true\" checked=\"checked\" class=\"checkbox\" />" +
+                "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\" />" +
                 "</td>", text);
     }
 
@@ -247,8 +247,8 @@ public class BooleanFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<div class=\"value\" id=\"myBoolean\"></div>" +
-                "<input type=\"hidden\" name=\"myBoolean\"></input>" +
-                "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\"></input>" +
+                "<input type=\"hidden\" name=\"myBoolean\" />" +
+                "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\" />" +
                 "</td>", text);
 
         booleanField.setBooleanValue(false);
@@ -257,8 +257,8 @@ public class BooleanFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<div class=\"value\" id=\"myBoolean\">No</div>" +
-                "<input type=\"hidden\" name=\"myBoolean\" value=\"false\"></input>" +
-                "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\"></input>" +
+                "<input type=\"hidden\" name=\"myBoolean\" value=\"false\" />" +
+                "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\" />" +
                 "</td>", text);
 
         booleanField.setBooleanValue(true);
@@ -267,8 +267,8 @@ public class BooleanFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<div class=\"value\" id=\"myBoolean\">Yes</div>" +
-                "<input type=\"hidden\" name=\"myBoolean\" value=\"true\"></input>" +
-                "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\"></input>" +
+                "<input type=\"hidden\" name=\"myBoolean\" value=\"true\" />" +
+                "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\" />" +
                 "</td>", text);
     }
 

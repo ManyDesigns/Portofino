@@ -421,11 +421,6 @@
                                         <reference fromColumn="userid"
                                                    toColumn="userid"/>
                                     </references>
-                                    <annotations>
-                                        <annotation type="com.manydesigns.elements.annotations.Autocomplete">
-                                            <value>true</value>
-                                        </annotation>
-                                    </annotations>
                                 </foreignKey>
                                 <foreignKey foreignKeyName="fk_ug_2"
                                             virtual="false"

@@ -195,11 +195,6 @@ Struttura dell'XML:
                                     <references>
                                         <reference fromColumn="userid" toColumn="userid"/>
                                     </references>
-                                    <annotations>
-                                        <annotation type="com.manydesigns.elements.annotations.Autocomplete">
-                                            <value>true</value>
-                                        </annotation>
-                                    </annotations>
                                 </foreignKey>
                                 <foreignKey foreignKeyName="fk_usersgroups_2" manyPropertyName="users" onDelete="NO ACTION" onUpdate="NO ACTION" onePropertyName="group" toDatabase="portofino" toSchema="public" toTable="groups" virtual="false">
                                     <references>

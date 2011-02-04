@@ -147,41 +147,42 @@ public class FileBlobField extends AbstractField
             writeBlobShortName(xb);
             xb.closeElement("div");
 
-            xb.openElement("div");
-            String keepIdStr = id + UPLOAD_KEEP;
+            String radioId = id + UPLOAD_KEEP;
             String script = "var inptxt = document.getElementById('"
                     + StringEscapeUtils.escapeJavaScript(innerId) + "');"
                     + "inptxt.disabled=true;inptxt.value='';";
-            xb.writeInputRadio(keepIdStr, operationInputName, UPLOAD_KEEP,
-                    true, false, script);
-            xb.writeLabel(getText("elements.field.upload.keep"), keepIdStr, null);
-            xb.closeElement("div");
+            printRadio(xb, radioId, "elements.field.upload.keep",
+                    UPLOAD_KEEP, true, script);
 
-            xb.openElement("div");
-            String modifyIdStr = id + UPLOAD_MODIFY;
+            radioId = id + UPLOAD_MODIFY;
             script = "var inptxt = document.getElementById('"
                     + StringEscapeUtils.escapeJavaScript(innerId) + "');"
                     + "inptxt.disabled=false;inptxt.value='';";
-            xb.writeInputRadio(modifyIdStr, operationInputName,
-                    UPLOAD_MODIFY, false, false, script);
-            xb.writeLabel(getText("elements.field.upload.update"), modifyIdStr, null);
-            xb.closeElement("div");
+            printRadio(xb, radioId, "elements.field.upload.update",
+                    UPLOAD_MODIFY, false, script);
 
-            xb.openElement("div");
-            String deleteIdStr = id + UPLOAD_DELETE;
+            radioId = id + UPLOAD_DELETE;
             script = "var inptxt = document.getElementById('"
                     + StringEscapeUtils.escapeJavaScript(innerId) + "');"
                     + "inptxt.disabled=true;inptxt.value='';";
-            xb.writeInputRadio(deleteIdStr, operationInputName,
-                    UPLOAD_DELETE, false, false, script);
-            xb.writeLabel(getText("elements.field.upload.delete"), deleteIdStr, null);
-            xb.closeElement("div");
+            printRadio(xb, radioId, "elements.field.upload.delete",
+                    UPLOAD_DELETE, false, script);
 
             xb.writeInputFile(innerId, inputName, true);
             xb.writeInputHidden(codeInputName, blob.getCode());
 
             xb.closeElement("div");
         }
+    }
+
+    protected void printRadio(XhtmlBuffer xb, String radioId, String labelKey,
+                              String value, boolean checked, String script
+    ) {
+        xb.writeInputRadio(radioId, operationInputName, value,
+                checked, false, script);
+        xb.writeNbsp();
+        xb.writeLabel(getText(labelKey), radioId, null);
+        xb.writeBr();
     }
 
     //**************************************************************************

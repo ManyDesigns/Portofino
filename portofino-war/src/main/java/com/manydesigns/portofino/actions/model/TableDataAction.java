@@ -39,7 +39,6 @@ import com.manydesigns.portofino.actions.AbstractCrudAction;
 import com.manydesigns.portofino.actions.CrudSelectionProvider;
 import com.manydesigns.portofino.actions.CrudUnit;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
-import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.Reference;
@@ -140,14 +139,6 @@ public class TableDataAction extends AbstractCrudAction {
         SelectionProvider selectionProvider =
                 DefaultSelectionProvider.create(foreignKey.getForeignKeyName(),
                         relatedObjects, classAccessor, textFormats);
-        boolean autocomplete = false;
-        for (Annotation current : foreignKey.getAnnotations()) {
-            if ("com.manydesigns.elements.annotations.Autocomplete"
-                    .equals(current.getType())) {
-                autocomplete = true;
-            }
-        }
-        selectionProvider.setAutocomplete(autocomplete);
 
         // create field names
         List<Reference> references = foreignKey.getReferences();

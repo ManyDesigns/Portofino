@@ -54,6 +54,11 @@ public class SelectField extends AbstractField {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public final static String AUTOCOMPLETE_SUFFIX = "_autocomplete";
+    public enum DisplayMode {
+        DROPDOWN,
+        RADIO,
+        AUTOCOMPLETE
+    }
 
     protected SelectionModel selectionModel;
     protected int selectionModelIndex;
@@ -61,6 +66,7 @@ public class SelectField extends AbstractField {
     protected SelectField nextSelectField;
 
     protected String comboLabel;
+    protected DisplayMode displayMode;
 
     protected String autocompleteId;
     protected String autocompleteInputName;
@@ -72,7 +78,9 @@ public class SelectField extends AbstractField {
         super(accessor, mode, prefix);
 
         Select annotation = accessor.getAnnotation(Select.class);
-        if (annotation != null) {
+        if (annotation == null) {
+            displayMode = DisplayMode.DROPDOWN;
+        } else {
             Object[] values = annotation.values();
             String[] labels = annotation.labels();
             assert(values.length == labels.length);
@@ -81,6 +89,7 @@ public class SelectField extends AbstractField {
                             accessor.getName(), values, labels);
             selectionModel = selectionProvider.createSelectionModel();
             selectionModelIndex = 0;
+            displayMode = annotation.displayMode();
         }
 
         comboLabel = getText("elements.field.select.select", label);
@@ -142,19 +151,33 @@ public class SelectField extends AbstractField {
         } else if (mode.isHidden()) {
             valueToXhtmlHidden(xb);
         } else {
-            throw new IllegalStateException("Unknown mode: " + mode);
+            throw new IllegalStateException("Unknown mode: " + mode.name());
         }
     }
 
-    private void valueToXhtmlEdit(XhtmlBuffer xb) {
+    public void valueToXhtmlEdit(XhtmlBuffer xb) {
+        switch (displayMode) {
+            case DROPDOWN:
+                valueToXhtmlEditDropDown(xb);
+                break;
+            case RADIO:
+                valueToXhtmlEditRadio(xb);
+                break;
+            case AUTOCOMPLETE:
+                valueToXhtmlEditAutocomplete(xb);
+                break;
+            default:
+                throw new IllegalStateException(
+                        "Unknown display mode: " + displayMode.name());
+        }
+        /* TODO: precedente versione
         if (selectionModel.getSelectionProvider().isAutocomplete()) {
-            valueToXhtmlEditAutocomplete(xb);
         } else {
-            valueToXhtmlEditDropDown(xb);
         }
+        */
     }
 
-    protected void valueToXhtmlEditDropDown(XhtmlBuffer xb) {
+    public void valueToXhtmlEditDropDown(XhtmlBuffer xb) {
         Object value = selectionModel.getValue(selectionModelIndex);
         Map<Object, String> options =
                 selectionModel.getOptions(selectionModelIndex);
@@ -185,7 +208,7 @@ public class SelectField extends AbstractField {
         }
     }
 
-    protected String composeDropDownJs() {
+    public String composeDropDownJs() {
         StringBuilder sb = new StringBuilder();
         sb.append(MessageFormat.format(
                 "$(''#{0}'').change(" +
@@ -199,7 +222,7 @@ public class SelectField extends AbstractField {
         return sb.toString();
     }
 
-    protected String composeAutocompleteJs() {
+    public String composeAutocompleteJs() {
         StringBuilder sb = new StringBuilder();
         sb.append(MessageFormat.format(
                 "setupAutocomplete(''#{0}'', ''{1}'', {2}",
@@ -211,9 +234,7 @@ public class SelectField extends AbstractField {
         return sb.toString();
     }
 
-
-
-    private void appendIds(StringBuilder sb) {
+    public void appendIds(StringBuilder sb) {
         SelectField rootField = this;
         while (rootField.previousSelectField != null) {
             rootField = rootField.previousSelectField;
@@ -226,7 +247,54 @@ public class SelectField extends AbstractField {
         }
     }
 
-    protected void valueToXhtmlEditAutocomplete(XhtmlBuffer xb) {
+    public void valueToXhtmlEditRadio(XhtmlBuffer xb) {
+        Object value = selectionModel.getValue(selectionModelIndex);
+        Map<Object, String> options =
+                selectionModel.getOptions(selectionModelIndex);
+
+        xb.openElement("fieldset");
+        xb.addAttribute("id", id);
+        xb.addAttribute("class", "radio");
+
+        int counter = 0;
+        
+        if (!required) {
+            String radioId = id + "_" + counter;
+            boolean checked = (value == null);
+            writeRadioWithLabel(xb, radioId,
+                    getText("elements.field.select.none"), "", checked);
+            counter++;
+        }
+
+        for (Map.Entry<Object,String> option :
+                options.entrySet()) {
+            Object optionValue = option.getKey();
+            String optionStringValue =
+                    (String) OgnlUtils.convertValue(optionValue, String.class);
+            String optionLabel = option.getValue();
+            String radioId = id + "_" + counter;
+            boolean checked =  optionValue.equals(value);
+            writeRadioWithLabel(xb, radioId, optionLabel,
+                    optionStringValue, checked);
+            counter++;
+        }
+        xb.closeElement("fieldset");
+
+        // TODO: gestire radio in cascata
+    }
+
+    protected void writeRadioWithLabel(XhtmlBuffer xb,
+                                       String radioId,
+                                       String label,
+                                       String stringValue,
+                                       boolean checked) {
+        xb.writeInputRadio(radioId, inputName, stringValue, checked);
+        xb.writeNbsp();
+        xb.writeLabel(label, radioId, null);
+        xb.writeBr();
+    }
+
+    public void valueToXhtmlEditAutocomplete(XhtmlBuffer xb) {
         Object value = selectionModel.getValue(selectionModelIndex);
         String stringValue = OgnlUtils.convertValueToString(value);
         xb.writeInputHidden(id, inputName, stringValue);
@@ -250,7 +318,7 @@ public class SelectField extends AbstractField {
         valueToXhtmlHidden(xb);
     }
 
-    private void valueToXhtmlHidden(XhtmlBuffer xb) {
+    public void valueToXhtmlHidden(XhtmlBuffer xb) {
         Object value = selectionModel.getValue(selectionModelIndex);
         String stringValue = OgnlUtils.convertValueToString(value);
         xb.writeInputHidden(id, inputName, stringValue);
@@ -391,5 +459,13 @@ public class SelectField extends AbstractField {
 
     public void setSelectionModelIndex(int selectionModelIndex) {
         this.selectionModelIndex = selectionModelIndex;
+    }
+
+    public DisplayMode getDisplayMode() {
+        return displayMode;
+    }
+
+    public void setDisplayMode(DisplayMode displayMode) {
+        this.displayMode = displayMode;
     }
 }
