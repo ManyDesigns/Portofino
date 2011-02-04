@@ -109,6 +109,10 @@ public class SelectField extends AbstractField {
         }
 
         String stringValue = req.getParameter(inputName);
+        if (stringValue == null) {
+            return;
+        }
+        
         Object value = OgnlUtils.convertValue(stringValue, accessor.getType());
         selectionModel.setValue(selectionModelIndex, value);
     }

@@ -452,6 +452,28 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals("value2", selectField.getValue());
     }
 
+    /**
+     * Questo test verifica un bug:
+     * Se un SelectField è stato valorizzato tramite una readFromObject(),
+     * una lettura tramite readFromRequest(req) dove req NON contiene
+     * il parametro (req.getParameter(inputName) == null)
+     * deve lasciare il valore inalterato
+     */
+    public void testReadFromObject2() {
+        setupSelectFields(Mode.EDIT);
+
+        assertNull(selectField.getValue());
+        myText = "value2";
+        selectField.readFromObject(this);
+        assertEquals("value2", selectField.getValue());
+
+        // leggiamo dalla request vuota (senza parametri)
+        selectField.readFromRequest(req);
+
+        // verifichiamo che abbia tenuto il valore
+        assertEquals("value2", selectField.getValue());
+    }
+
     public void testWriteToObject() {
         setupSelectFields(Mode.EDIT);
 
