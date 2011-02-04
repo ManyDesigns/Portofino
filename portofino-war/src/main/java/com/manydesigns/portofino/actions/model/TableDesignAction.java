@@ -31,7 +31,10 @@ package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.AnnotationsManager;
-import com.manydesigns.elements.forms.*;
+import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.forms.TableForm;
+import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
@@ -49,6 +52,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.annotation.Target;
+import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -66,9 +71,6 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     // Implementazione ServletRequestAware
     //**************************************************************************
     private HttpServletRequest req;
-
-
-
     public void setServletRequest(HttpServletRequest request) {
         req = request;
     }
@@ -81,19 +83,31 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     public String qualifiedTableName;
     public String cancelReturnUrl;
     public Table table;
+    public final List<String> annotations;
+    public List<AnnotationModel> colAnnotations;
     public PrimaryKeyModel pkModel;
-    public Integer ncol;
-    public Integer npkcol;
     public String pk_primaryKeyName;
     public String pk_column;
 
 
     public List<String> columnNames = new ArrayList<String>();
-    //colonne da rimuovere
+
+    //Contatori righe TableForm
+    public Integer ncol;
+    public Integer npkcol;
+    public Integer nAnnotations;
+
+    //righe da rimuovere
     public String[] cols_selection;
     public String[] pkCols_selection;
-    //testo parziale per autocomplite
+    public String[] colAnnT_selection;
+
+    //testo parziale per autocomplete
     public String term;
+
+    //Step
+    public Integer step;
+
 
     //**************************************************************************
     // Web parameters setters (for struts.xml inspections in IntelliJ)
@@ -110,10 +124,11 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     public Form columnForm;
     public Form pkForm;
     public Form pkColumnForm;
-    public SearchForm searchForm;
+    public Form colAnnotationForm;
+
     public TableForm columnTableForm;
     public TableForm pkColumnTableForm;
-
+    public TableForm colAnnotationTableForm;
 
 
     //**************************************************************************
@@ -132,11 +147,8 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     public String table_schemaName;
     public String table_tableName;
 
-    //**************************************************************************
-    // private fields
-    //**************************************************************************
 
-    private final List<String> annotations;
+
 
     //**************************************************************************
     // Constructor
@@ -147,9 +159,13 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
                 =  AnnotationsManager.getManager().getManagedAnnotationClasses();
 
         for (Class aClass: annotationsClasses){
-            annotations.add(aClass.getName());
+            Target target;
+            target = (Target) aClass.getAnnotation(Target.class);
+            if (null!= target && ArrayUtils.contains(target.value(), ElementType.FIELD)){
+                annotations.add(aClass.getName());
+            }
         }
-
+        colAnnotations = new ArrayList<AnnotationModel>();
     }
 
     //**************************************************************************
@@ -176,9 +192,6 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
                 .configMode(Mode.VIEW)
                 .build();
         columnTableForm.readFromObject(table.getColumns());
-
-
-
         return SUMMARY;
     }
 
@@ -232,29 +245,15 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }*/
-
         setupForms();
-        if(!readFromRequest()){
-            return CREATE;
-        }
-
-        String operation = req.getParameter("method:create");
-         if ("Remove column" .equals(operation)){
-            removeCol();
-        } else if ("Add primary key column".equals(operation)) {
-            addPkCol();
-        } else if ("Remove primary key column".equals(operation)) {
-            remPkCol();
-        }
-
-
-
+        step=1;
         return CREATE;
     }
 
 
 
     public String addCol() {
+        step = 2;
         setupForms();
         readFromRequest();
         Column col = new Column(table);
@@ -293,7 +292,12 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         return CREATE;
 }
 
-    private void removeCol() {
+    public String remCol() {
+        step=2;
+        setupForms();
+        if(!readFromRequest()){
+            return CREATE;
+        }
         columnNames.clear();
         for(TableForm.Row row : columnTableForm.getRows()) {
             try {
@@ -325,9 +329,75 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         columnTableForm.setSelectable(true);
         columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
         columnTableForm.readFromObject(table.getColumns());
+
+        return CREATE;
     }
 
-    private void addPkCol() {
+    public String addColAnnotation() {
+        step=4;
+        setupForms();
+        readFromRequest();
+        AnnotationModel annotation = new AnnotationModel();
+        colAnnotationForm.readFromRequest(req);
+        if(!colAnnotationForm.validate()){
+            return CREATE;
+        }
+
+        colAnnotationForm.writeToObject(annotation);
+        colAnnotations.add(annotation);
+        colAnnotationTableForm = new TableFormBuilder(AnnotationModel.class)
+            .configFields("columnName", "typeName", "values").configPrefix("colAnnT_")
+            .configNRows(colAnnotations.size())
+            .configMode(Mode.CREATE_PREVIEW)
+            .build();
+        nAnnotations++;
+        colAnnotationTableForm.setSelectable(true);
+        colAnnotationTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName+\"_\"+typeName}"));
+        colAnnotationTableForm.readFromObject(colAnnotations);
+
+        return CREATE;
+}
+
+    public String remColAnnotation() {
+        step=4;
+        setupForms();
+        if(!readFromRequest()){
+            return CREATE;
+        }
+
+        for(TableForm.Row row : colAnnotationTableForm.getRows()) {
+            try {
+                AnnotationModel annotation = new AnnotationModel();
+                row.writeToObject(annotation);
+                if (ArrayUtils.contains(colAnnT_selection, annotation.getColumnName()+"_"+
+                annotation.getTypeName())){
+                    colAnnotations.remove(annotation);
+                }
+            } catch (Throwable e) {
+                //do nothing: accetto errori quali assenza di pk sulla tabella
+            }
+        }
+
+        colAnnotationTableForm = new TableFormBuilder(AnnotationModel.class)
+            .configFields("columnName", "typeName", "values").configPrefix("colAnnT_")
+            .configNRows(colAnnotations.size())
+            .configMode(Mode.CREATE_PREVIEW)
+            .build();
+        colAnnotationTableForm.setSelectable(true);
+        colAnnotationTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName+\"_\"+typeName}"));
+        colAnnotationTableForm.readFromObject(colAnnotations);
+        nAnnotations=colAnnotations.size();
+
+        return CREATE;
+    }
+
+    public String addPkCol() {
+        step=3;
+        setupForms();
+        if(!readFromRequest()){
+            return CREATE;
+        }
+
         PrimaryKeyColumnModel colModel = new PrimaryKeyColumnModel();
 
         pkColumnForm.writeToObject(colModel);
@@ -345,9 +415,15 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         pkColumnTableForm.setKeyGenerator(OgnlTextFormat.create("%{column}"));
         pkColumnTableForm.readFromObject(pkModel);
 
+        return CREATE;
     }
 
-    private void remPkCol() {
+    public String remPkCol() {
+        step=3;
+        setupForms();
+        if(!readFromRequest()){
+            return CREATE;
+        }
         for(TableForm.Row row : pkColumnTableForm.getRows()) {
             try {
                 PrimaryKeyColumnModel currCol = new PrimaryKeyColumnModel();
@@ -357,7 +433,8 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
                     npkcol--;
                 } 
             } catch (Throwable e) {
-                //do nothing: accetto errori quali assenza di pk sulla tabella
+                // do nothing: accetto errori quali assenza di pk sulla tabella
+                // la classe mi serve solo come modello dei dati
             }
         }
         pkColumnTableForm = new TableFormBuilder(PrimaryKeyColumnModel.class)
@@ -370,6 +447,8 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         pkColumnTableForm.setSelectable(true);
         pkColumnTableForm.setKeyGenerator(OgnlTextFormat.create("%{column}"));
         pkColumnTableForm.readFromObject(pkModel);
+
+        return CREATE;
     }
 
     //**************************************************************************
@@ -399,8 +478,6 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
             return false;
         }
 
-
-
         //Gestione colonne
         columnTableForm = new TableFormBuilder(Column.class)
             .configFields("columnName", "columnType", "nullable",
@@ -423,10 +500,27 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
             }
         }
 
-        //Gestione Chiave primaria
-        if (npkcol==null){
-            npkcol = 0;
+        //Gestione annotations
+        colAnnotationTableForm =
+            new TableFormBuilder(AnnotationModel.class)
+                .configFields("columnName", "typeName", "values")
+                .configPrefix("colAnnT_").configNRows(nAnnotations)
+            .configMode(Mode.CREATE_PREVIEW)
+            .build();
+        colAnnotationTableForm.setSelectable(true);
+        colAnnotationTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName+\"_\"+typeName}"));
+        colAnnotationTableForm.readFromRequest(req);
+        for(TableForm.Row row : colAnnotationTableForm.getRows()) {
+            try {
+                AnnotationModel currAnnotation = new AnnotationModel();
+                row.writeToObject(currAnnotation);
+                colAnnotations.add(currAnnotation);
+            } catch (Throwable e) {
+                //Do nothing
+            }
         }
+
+        //Gestione Chiave primaria
         pkModel = new PrimaryKeyModel();
         pkColumnTableForm = new TableFormBuilder(PrimaryKeyColumnModel.class)
                 .configFields("column", "genType", "seqName",
@@ -438,15 +532,10 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         pkColumnTableForm.setSelectable(true);
         pkColumnTableForm.setKeyGenerator(OgnlTextFormat.create("%{column}"));
         pkColumnTableForm.readFromRequest(req);
-
-
-
         pkForm.readFromRequest(req);
                 pkModel.primaryKeyName = pk_primaryKeyName!=null?
                             pk_primaryKeyName:"pk_"+table_tableName;
-
         pkColumnForm.readFromRequest(req);
-        
         for(TableForm.Row row : pkColumnTableForm.getRows()) {
             try {
                 PrimaryKeyColumnModel currCol = new PrimaryKeyColumnModel();
@@ -456,7 +545,6 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
                 //Do nothing
             }
         }
-
         return true;
     }
 
@@ -464,9 +552,11 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         if (ncol == null){
             ncol = 0;
         }
-
         if (npkcol == null){
             npkcol = 0;
+        }
+        if (nAnnotations == null){
+            nAnnotations = 0;
         }
         //Available databases
         List<Database> databases = model.getDatabases();
@@ -475,6 +565,7 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         for (Database db : databases){
             databaseNames[i++] = db.getQualifiedName();
         }
+        //Costruisco form per Table
         FormBuilder formBuilder = new FormBuilder(Table.class)
                 .configFields("databaseName", "schemaName", "tableName")
                 .configMode(Mode.CREATE);
@@ -485,6 +576,7 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         formBuilder.configPrefix("table_");
         tableForm = formBuilder.build();
 
+        //Costruisco form per Column
         formBuilder = new FormBuilder(Column.class)
                 .configFields("columnName", "columnType", "nullable",
                         "autoincrement", "length", "scale",
@@ -493,6 +585,7 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         formBuilder.configPrefix("column_");
         columnForm = formBuilder.build();
 
+        //Costruisco form per Primary Key
         formBuilder = new FormBuilder(PrimaryKey.class)
                 .configFields("primaryKeyName")
                 .configMode(Mode.CREATE);
@@ -502,6 +595,37 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
                 .configFields("column", "genType", "seqName",
                         "tabName", "colName", "colValue").configPrefix("pk_")
                 .configMode(Mode.CREATE).build();
+
+        //Costruisco form per Annotations
+        formBuilder = new FormBuilder(AnnotationModel.class)
+                .configFields("columnName", "typeName", "values")
+                .configMode(Mode.CREATE);
+        formBuilder.configPrefix("colAnn_");
+        colAnnotationForm = formBuilder.build();
+        colAnnotationTableForm = new TableFormBuilder(AnnotationModel.class)
+                .configFields("columnName", "typeName", "values")
+                .configPrefix("colAnnT_")
+                .configMode(Mode.CREATE).build();
+    }
+
+    private String createJsonArray (List<String> collection) {
+        List<String> resulList = new ArrayList<String>();
+
+        for(String string : collection){
+
+                resulList.add("\""+string+"\"");
+        }
+        String result = "["+ StringUtils.join(resulList, ",")+"]";
+        inputStream = new ByteArrayInputStream(result.getBytes());
+        return "json";
+
+    }
+
+    //**************************************************************************
+    // Json output per lista Colonne
+    //**************************************************************************
+    public String jsonColumns() throws Exception {
+        return createJsonArray(columnNames);
     }
 
     //**************************************************************************
@@ -548,7 +672,7 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     }
     
     //**************************************************************************
-    // Json output per vedere se richiesta Precision
+    // Json output per vedere se richiesta Precision, Scale, ...
     //**************************************************************************
     public String jsonTypeInfo() throws Exception {
         Type[] types = context.getConnectionProvider(table_databaseName).getTypes();
@@ -571,5 +695,14 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         inputStream = new ByteArrayInputStream(result.getBytes());
         return "json";
     }
+
+    //**************************************************************************
+    // Json output per lista Annotations
+    //**************************************************************************
+    public String jsonAnnotation() throws Exception {
+        return createJsonArray(annotations);
+    }
+
+
 }
 
