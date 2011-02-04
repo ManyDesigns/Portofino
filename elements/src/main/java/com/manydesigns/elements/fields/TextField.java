@@ -140,7 +140,6 @@ public class TextField extends AbstractTextField {
             xb.addAttribute("cols", Integer.toString(textAreaWidth));
             xb.addAttribute("rows", Integer.toString(
                     numRowTextArea(stringValue, textAreaWidth)));
-            xb.addAttribute("onkeyup", "verifyLine(this);");
             xb.write(stringValue);
             xb.closeElement("textarea");
         } else {
@@ -169,7 +168,7 @@ public class TextField extends AbstractTextField {
         if (href != null) {
             xb.openElement("a");
             xb.addAttribute("href", href);
-            xb.addAttribute("alt", alt);
+            xb.addAttribute("alt", title);
         } else  if (highlightLinks) {
             escapedText = highlightLinks(escapedText);
         }

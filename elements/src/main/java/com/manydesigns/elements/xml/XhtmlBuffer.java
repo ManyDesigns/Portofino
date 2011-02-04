@@ -32,8 +32,8 @@ package com.manydesigns.elements.xml;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
-import java.io.Writer;
 import java.io.StringWriter;
+import java.io.Writer;
 
 /**
  * @author Paolo Predonzani - paolo.predonzani@manydesigns.com
@@ -86,9 +86,15 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
     public void writeAnchor(String href, String text,
                             String classStr, String title) {
         openElement("a");
-        addAttribute("href", href);
-        addAttribute("class", classStr);
-        addAttribute("title", title);
+        if (href != null) {
+            addAttribute("href", href);
+        }
+        if (classStr != null) {
+            addAttribute("class", classStr);
+        }
+        if (title != null) {
+            addAttribute("title", title);
+        }
         write(text);
         closeElement("a");
     }

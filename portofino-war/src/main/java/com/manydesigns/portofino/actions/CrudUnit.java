@@ -32,7 +32,6 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.fields.*;
-import com.manydesigns.portofino.context.CriteriaImpl;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.SelectionProvider;
@@ -43,6 +42,7 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.CriteriaImpl;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.site.usecases.Button;
@@ -555,8 +555,8 @@ public class CrudUnit {
         //TODO rimuovere
         if (first){
             for (PropertyAccessor property : classAccessor.getKeyProperties()) {
-                tableFormBuilder.configHyperlinkGenerators(
-                        property.getName(), hrefFormat, null);
+                tableFormBuilder.configHrefTextFormat(
+                        property.getName(), hrefFormat);
             }
         }
 

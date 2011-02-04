@@ -291,12 +291,12 @@ public class TableForm implements Element {
             int index = 0;
             for (Field field : fields) {
                 Column column = columns[index];
-                TextFormat hrefTextFormat = column.getHrefGenerator();
-                TextFormat altTextFormat = column.getAltGenerator();
+                TextFormat hrefTextFormat = column.getHrefTextFormat();
+                TextFormat titleTextFormat = column.getTitleTextFormat();
                 if (hrefTextFormat != null) {
                     field.setHref(hrefTextFormat.format(obj));
-                    if (altTextFormat != null) {
-                        field.setAlt(altTextFormat.format(obj));
+                    if (titleTextFormat != null) {
+                        field.setTitle(titleTextFormat.format(obj));
                     }
                 }
                 field.readFromObject(obj);
@@ -335,7 +335,7 @@ public class TableForm implements Element {
 
         protected String label;
         protected TextFormat hrefTextFormat;
-        protected TextFormat altTextFormat;
+        protected TextFormat titleTextFormat;
 
         //**************************************************************************
         // Costruttori
@@ -371,20 +371,20 @@ public class TableForm implements Element {
             xb.write(StringUtils.capitalize(label));
         }
 
-        public TextFormat getHrefGenerator() {
+        public TextFormat getHrefTextFormat() {
             return hrefTextFormat;
         }
 
-        public void setHrefGenerator(TextFormat hrefTextFormat) {
+        public void setHrefTextFormat(TextFormat hrefTextFormat) {
             this.hrefTextFormat = hrefTextFormat;
         }
 
-        public TextFormat getAltGenerator() {
-            return altTextFormat;
+        public TextFormat getTitleTextFormat() {
+            return titleTextFormat;
         }
 
-        public void setAltGenerator(TextFormat altTextFormat) {
-            this.altTextFormat = altTextFormat;
+        public void setTitleTextFormat(TextFormat altTextFormat) {
+            this.titleTextFormat = altTextFormat;
         }
     }
 }

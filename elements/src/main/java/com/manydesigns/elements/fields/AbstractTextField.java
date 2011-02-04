@@ -121,13 +121,10 @@ public abstract class AbstractTextField extends AbstractField {
         xb.openElement("div");
         xb.addAttribute("class", "value");
         xb.addAttribute("id", id);
-        if (href != null) {
-            xb.openElement("a");
-            xb.addAttribute("href", href);
-        }
-        xb.write(stringValue);
-        if (href != null) {
-            xb.closeElement("a");
+        if (href == null) {
+            xb.write(stringValue);
+        } else {
+            xb.writeAnchor(href, stringValue, null, title);
         }
         xb.closeElement("div");
     }
