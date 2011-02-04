@@ -30,6 +30,7 @@
 package com.manydesigns.elements.annotations.impl;
 
 import com.manydesigns.elements.annotations.Select;
+import com.manydesigns.elements.fields.SelectField;
 
 import java.lang.annotation.Annotation;
 
@@ -43,12 +44,19 @@ public class SelectImpl implements Select {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    private SelectField.DisplayMode displayMode;
     private String[] values;
     private String[] labels;
 
-    public SelectImpl(String[] values, String[] labels) {
+    public SelectImpl(SelectField.DisplayMode displayMode,
+                      String[] values, String[] labels) {
+        this.displayMode = displayMode;
         this.values = values;
         this.labels = labels;
+    }
+
+    public SelectField.DisplayMode displayMode() {
+        return displayMode;
     }
 
     public String[] values() {

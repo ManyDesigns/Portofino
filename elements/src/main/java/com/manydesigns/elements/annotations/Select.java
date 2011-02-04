@@ -29,6 +29,8 @@
 
 package com.manydesigns.elements.annotations;
 
+import com.manydesigns.elements.fields.SelectField;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -45,6 +47,8 @@ public @interface Select {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    String[] values();
-    String[] labels();
+    SelectField.DisplayMode displayMode()
+            default SelectField.DisplayMode.DROPDOWN;
+    String[] values() default {};
+    String[] labels() default {};
 }

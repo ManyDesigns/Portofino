@@ -83,8 +83,8 @@ public interface Field extends Element {
     String getHref();
     void setHref(String href);
 
-    String getAlt();
-    void setAlt(String alt);
+    String getTitle();
+    void setTitle(String alt);
 
     boolean isRequiredField();
 

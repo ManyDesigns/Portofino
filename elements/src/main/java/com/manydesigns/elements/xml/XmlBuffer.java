@@ -30,6 +30,7 @@
 
 package com.manydesigns.elements.xml;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.io.IOException;
@@ -57,14 +58,17 @@ public class XmlBuffer {
     //**************************************************************************
 
     public static boolean checkWellFormed = false;
+    public static String[] DEFAULT_EMPTY_TAG_ALLOWED_LIST = {};
 
     //**************************************************************************
     // Fields
     //**************************************************************************
 
-    private final Writer writer;
-    private int state;
-    private final Stack<String> tagStack;
+    protected final Writer writer;
+    protected int state;
+    protected final Stack<String> tagStack;
+    protected String[] allowedEmptyTags;
+
 
     //**************************************************************************
     // Constructors
@@ -80,6 +84,7 @@ public class XmlBuffer {
 
     /**
      * Creates a new instance of XmlBuffer
+     * @param writer The writer
      */
     public XmlBuffer(Writer writer) {
         this.writer = writer;
@@ -89,6 +94,7 @@ public class XmlBuffer {
         } else {
             tagStack = null;
         }
+        allowedEmptyTags = DEFAULT_EMPTY_TAG_ALLOWED_LIST;
     }
 
     //~--- methods ------------------------------------------------------------
@@ -151,10 +157,15 @@ public class XmlBuffer {
         try {
             switch (state) {
                 case OPEN:
-
-//          writer.write("/>");
-//          break;
-                    writer.write(">");
+                    if (ArrayUtils.contains(allowedEmptyTags, name)) {
+                        writer.write(" />");
+                    } else {
+                        writer.write(">");
+                        writer.write("</");
+                        writer.write(name);
+                        writer.write(">");
+                    }
+                    break;
                 case CLOSE:
                 case TEXT:
                     writer.write("</");
@@ -335,6 +346,14 @@ public class XmlBuffer {
 
     public String escape(String s) {
         return StringEscapeUtils.escapeXml(s);
+    }
+
+    public String[] getAllowedEmptyTags() {
+        return allowedEmptyTags;
+    }
+
+    public void setAllowedEmptyTags(String[] allowedEmptyTags) {
+        this.allowedEmptyTags = allowedEmptyTags;
     }
 }
 

@@ -64,8 +64,8 @@ public class TableFormBuilder extends AbstractFormBuilder {
     // Fields
     //**************************************************************************
 
-    protected final Map<String, TextFormat> hrefGenerators;
-    protected final Map<String, TextFormat> altGenerators;
+    protected final Map<String, TextFormat> hrefTextFormats;
+    protected final Map<String, TextFormat> titleTextFormats;
 
     protected List<PropertyAccessor> propertyAccessors;
     protected int nRows = DEFAULT_N_ROWS;
@@ -86,8 +86,8 @@ public class TableFormBuilder extends AbstractFormBuilder {
     public TableFormBuilder(ClassAccessor classAccessor) {
         super(classAccessor);
 
-        hrefGenerators = new HashMap<String, TextFormat>();
-        altGenerators = new HashMap<String, TextFormat>();
+        hrefTextFormats = new HashMap<String, TextFormat>();
+        titleTextFormats = new HashMap<String, TextFormat>();
     }
 
 
@@ -150,10 +150,15 @@ public class TableFormBuilder extends AbstractFormBuilder {
         }
     }
 
-    public TableFormBuilder configHyperlinkGenerators(
-            String fieldName, TextFormat hrefTextFormat, TextFormat altTextFormat) {
-        hrefGenerators.put(fieldName, hrefTextFormat);
-        altGenerators.put(fieldName, altTextFormat);
+    public TableFormBuilder configHrefTextFormat(
+            String fieldName, TextFormat hrefTextFormat) {
+        hrefTextFormats.put(fieldName, hrefTextFormat);
+        return this;
+    }
+
+    public TableFormBuilder configTitleTextFormat(
+            String fieldName, TextFormat titleTextFormat) {
+        titleTextFormats.put(fieldName, titleTextFormat);
         return this;
     }
 
@@ -194,8 +199,8 @@ public class TableFormBuilder extends AbstractFormBuilder {
     protected void setupColumns(TableForm tableForm) {
         for (TableForm.Column column : tableForm.getColumns()) {
             String propertyName = column.getPropertyAccessor().getName();
-            column.setHrefGenerator(hrefGenerators.get(propertyName));
-            column.setAltGenerator(altGenerators.get(propertyName));
+            column.setHrefTextFormat(hrefTextFormats.get(propertyName));
+            column.setTitleTextFormat(titleTextFormats.get(propertyName));
         }
     }
 

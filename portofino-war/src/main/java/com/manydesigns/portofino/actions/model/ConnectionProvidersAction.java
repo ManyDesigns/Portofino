@@ -107,7 +107,7 @@ public class ConnectionProvidersAction extends PortofinoAction implements Servle
         tableForm = new TableFormBuilder(ConnectionProvider.class)
                 .configFields("databaseName", "description", "status")
                 .configNRows(connectionProviders.size())
-                .configHyperlinkGenerators("databaseName", hrefFormat, null)
+                .configHrefTextFormat("databaseName", hrefFormat)
                 .configMode(Mode.VIEW)
                 .build();
         tableForm.setSelectable(true);

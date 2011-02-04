@@ -55,6 +55,21 @@ public class XmlBufferTest extends TestCase {
     }
 
     public void testWrite4() {
+        XmlBuffer xb = new XmlBuffer();
+        assertEquals(0, xb.getAllowedEmptyTags().length);
+
+        xb.setAllowedEmptyTags(new String[] {"elemento1"});
+
+        xb.openElement("elemento1");
+        xb.closeElement("elemento1");
+        xb.openElement("elemento2");
+        xb.closeElement("elemento2");
+
+        // for browser compatibility, the empty tag tequires a space before the "/"
+        assertEquals("<elemento1 /><elemento2></elemento2>", xb.toString());
+    }
+
+    public void testWrite5() {
         XmlBuffer xb1 = new XmlBuffer();
 
         xb1.write((String)null);

@@ -41,8 +41,5 @@ public interface SelectionProvider {
     String getName();
     int getFieldCount();
 
-    boolean isAutocomplete();
-    void setAutocomplete(boolean autocomplete);
-
     SelectionModel createSelectionModel();
 }

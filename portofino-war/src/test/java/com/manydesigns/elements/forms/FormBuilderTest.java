@@ -57,14 +57,14 @@ public class FormBuilderTest extends AbstractElementsTest {
 
     public void testRegistry() {
         FieldsManager fieldsManager = FieldsManager.getManager();
-        assertEquals(13, fieldsManager.getHelperList().size());
+        assertEquals(12, fieldsManager.getHelperList().size());
 
         Form form = formBuilder1.build();
 
         assertEquals(1, form.size());
 
         FieldSet fieldSet = form.get(0);
-        assertEquals(17, fieldSet.size());
+        assertEquals(16, fieldSet.size());
 
         Field field = fieldSet.get(0);
         assertEquals("A private int", field.getLabel());
@@ -132,19 +132,19 @@ public class FormBuilderTest extends AbstractElementsTest {
         assertEquals(PhoneField.class, field.getClass());
 
         field = fieldSet.get(13);
-        assertEquals("radio", field.getLabel());
-        assertFalse(field.isRequired());
-        assertEquals(SelectField.class, field.getClass());
-
-        field = fieldSet.get(14);
         assertEquals("select", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(SelectField.class, field.getClass());
 
-        field = fieldSet.get(15);
+        field = fieldSet.get(14);
         assertEquals("text", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(TextField.class, field.getClass());
+
+        field = fieldSet.get(15);
+        assertEquals("a blob", field.getLabel());
+        assertFalse(field.isRequired());
+        assertEquals(FileBlobField.class, field.getClass());
     }
 
     public void testConfigFields() throws NoSuchFieldException {
@@ -294,36 +294,36 @@ public class FormBuilderTest extends AbstractElementsTest {
                 "<tr><th>" +
                 "<label for=\"boolean1\" class=\"field\">Boolean1:</label></th>" +
                 "<td><input id=\"boolean1\" type=\"checkbox\" name=\"boolean1\" " +
-                "value=\"true\" class=\"checkbox\"></input>" +
-                "<input type=\"hidden\" name=\"__checkbox_boolean1\" value=\"true\"></input>" +
+                "value=\"true\" class=\"checkbox\" />" +
+                "<input type=\"hidden\" name=\"__checkbox_boolean1\" value=\"true\" />" +
                 "</td></tr><tr><th>" +
                 "<label for=\"boolean2\" class=\"field\">Boolean2:</label>" +
                 "</th><td><input id=\"boolean2\" type=\"checkbox\" " +
-                "name=\"boolean2\" value=\"true\" class=\"checkbox\"></input>" +
-                "<input type=\"hidden\" name=\"__checkbox_boolean2\" value=\"true\"></input>" +
+                "name=\"boolean2\" value=\"true\" class=\"checkbox\" />" +
+                "<input type=\"hidden\" name=\"__checkbox_boolean2\" value=\"true\" />" +
                 "</td></tr></table></fieldset>" +
                 "<fieldset><legend>foo</legend>" +
                 "<table class=\"details\"><tr><th>" +
                 "<label for=\"date\" class=\"field\">Date:</label></th>" +
                 "<td><input type=\"text\" class=\"text\" id=\"date\" " +
-                "name=\"date\" maxlength=\"15\" size=\"15\"></input> (yyyy-MM-dd) " +
+                "name=\"date\" maxlength=\"15\" size=\"15\" /> (yyyy-MM-dd) " +
                 "<script type=\"text/javascript\">setupDatePicker('#date', 'yy-mm-dd');</script>" +
                 "</td></tr><tr><th>" +
                 "<label for=\"decimal\" class=\"field\">Decimal:</label></th>" +
                 "<td><input id=\"decimal\" type=\"text\" name=\"decimal\" " +
-                "class=\"text\"></input></td></tr>" +
+                "class=\"text\" /></td></tr>" +
                 "<tr><th><label for=\"anInt\" class=\"field\">" +
                 "<span class=\"required\">*</span>&nbsp;An int:</label></th>" +
                 "<td><input id=\"anInt\" type=\"text\" name=\"anInt\" " +
-                "class=\"text\"></input></td></tr></table></fieldset>" +
+                "class=\"text\" /></td></tr></table></fieldset>" +
                 "<fieldset><legend>bar</legend>" +
                 "<table class=\"details\"><tr><th><label for=\"anInteger\" " +
                 "class=\"field\">An integer:</label></th><td>" +
                 "<input id=\"anInteger\" type=\"text\" name=\"anInteger\" " +
-                "class=\"text\"></input></td></tr><tr><th>" +
+                "class=\"text\" /></td></tr><tr><th>" +
                 "<label for=\"text\" class=\"field\">Text:</label></th><td>" +
-                "<input id=\"text\" type=\"text\" name=\"text\" class=\"text\">" +
-                "</input></td></tr></table></fieldset>", text);
+                "<input id=\"text\" type=\"text\" name=\"text\" class=\"text\" />" +
+                "</td></tr></table></fieldset>", text);
     }
 
 

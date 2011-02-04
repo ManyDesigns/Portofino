@@ -70,11 +70,11 @@ public class SelectFieldTest extends AbstractElementsTest {
             {"label1"}
     };
 
-    private SelectionProvider selectionProvider;
-    private SelectionModel selectionModel;
+    protected SelectionProvider selectionProvider;
+    protected SelectionModel selectionModel;
 
-    private SelectionProvider selectionProvider2;
-    private SelectionModel selectionModel2;
+    protected SelectionProvider selectionProvider2;
+    protected SelectionModel selectionModel2;
 
     @Override
     public void setUp() throws Exception {
@@ -113,6 +113,10 @@ public class SelectFieldTest extends AbstractElementsTest {
 
     public void testSimple() {
         setupSelectFields(Mode.EDIT);
+        assertEquals(SelectField.DisplayMode.DROPDOWN,
+                selectField.getDisplayMode());
+        assertEquals(SelectField.DisplayMode.DROPDOWN,
+                selectField2.getDisplayMode());
 
         assertNotNull(selectField.getComboLabel());
         assertEquals("-- Select my text --", selectField.getComboLabel());
@@ -129,6 +133,13 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals(1, selectField2.getOptions().size());
     }
 
+    public void testSimpleRadio() {
+        setupSelectFields(Mode.EDIT);
+        selectField.setDisplayMode(SelectField.DisplayMode.RADIO);
+        assertEquals(SelectField.DisplayMode.RADIO,
+                selectField.getDisplayMode());
+    }
+
     //--------------------------------------------------------------------------
     // Mode.EDIT
     //--------------------------------------------------------------------------
@@ -143,6 +154,20 @@ public class SelectFieldTest extends AbstractElementsTest {
                 "<option value=\"value2\">label2</option>" +
                 "<option value=\"value3\">label3</option>" +
                 "</select></td>", text);
+    }
+
+    public void testEditNullRadio() {
+        setupSelectFields(Mode.EDIT);
+        selectField.setDisplayMode(SelectField.DisplayMode.RADIO);
+
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+                "</label></th><td><fieldset id=\"myText\" class=\"radio\">" +
+                "<input type=\"radio\" id=\"myText_0\" name=\"myText\" value=\"\" checked=\"checked\" />&nbsp;<label for=\"myText_0\">None</label><br />" +
+                "<input type=\"radio\" id=\"myText_1\" name=\"myText\" value=\"value1\" />&nbsp;<label for=\"myText_1\">label1</label><br />" +
+                "<input type=\"radio\" id=\"myText_2\" name=\"myText\" value=\"value2\" />&nbsp;<label for=\"myText_2\">label2</label><br />" +
+                "<input type=\"radio\" id=\"myText_3\" name=\"myText\" value=\"value3\" />&nbsp;<label for=\"myText_3\">label3</label><br />" +
+                "</fieldset></td>", text);
     }
 
     public void testEditNullRequired() {
@@ -171,6 +196,20 @@ public class SelectFieldTest extends AbstractElementsTest {
                 "</select><ul class=\"errors\">" +
                 "<li>Required field" +
                 "</li></ul></td>", text);
+    }
+
+    public void testEditNullRadioRequired() {
+        setupSelectFields(Mode.EDIT);
+        selectField.setDisplayMode(SelectField.DisplayMode.RADIO);
+                
+        selectField.setRequired(true);
+        String text = elementToString(selectField);
+        assertEquals("<th><label for=\"myText\" class=\"field\"><span class=\"required\">*</span>&nbsp;My text:" +
+                "</label></th><td><fieldset id=\"myText\" class=\"radio\">" +
+                "<input type=\"radio\" id=\"myText_0\" name=\"myText\" value=\"value1\" />&nbsp;<label for=\"myText_0\">label1</label><br />" +
+                "<input type=\"radio\" id=\"myText_1\" name=\"myText\" value=\"value2\" />&nbsp;<label for=\"myText_1\">label2</label><br />" +
+                "<input type=\"radio\" id=\"myText_2\" name=\"myText\" value=\"value3\" />&nbsp;<label for=\"myText_2\">label3</label><br />" +
+                "</fieldset></td>", text);
     }
 
     public void testEditNullWithComboLabel() {
@@ -274,7 +313,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\"></div>" +
-                "<input type=\"hidden\" id=\"myText\" name=\"myText\"></input>" +
+                "<input type=\"hidden\" id=\"myText\" name=\"myText\" />" +
                 "</td>", text);
     }
 
@@ -286,7 +325,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\">label1</div>" +
-                "<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value1\"></input>" +
+                "<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value1\" />" +
                 "</td>", text);
     }
 
@@ -298,7 +337,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\">label3</div>" +
-                "<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value3\"></input>" +
+                "<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value3\" />" +
                 "</td>", text);
     }
 
@@ -310,7 +349,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\"></div>" +
-                "<input type=\"hidden\" id=\"myText\" name=\"myText\"></input>" +
+                "<input type=\"hidden\" id=\"myText\" name=\"myText\" />" +
                 "</td>", text);
     }
 
@@ -323,7 +362,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         setupSelectFields(Mode.HIDDEN);
 
         String text = elementToString(selectField);
-        assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\"></input>", text);
+        assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\" />", text);
     }
 
     public void testHiddenValidSelection() {
@@ -331,7 +370,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         selectField.setValue("value1");
         String text = elementToString(selectField);
-        assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value1\"></input>", text);
+        assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value1\" />", text);
     }
 
     public void testHiddenValidSelectionNoUrl() {
@@ -339,7 +378,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         selectField.setValue("value3");
         String text = elementToString(selectField);
-        assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value3\"></input>", text);
+        assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value3\" />", text);
     }
 
     public void testHiddenInvalidSelection() {
@@ -347,7 +386,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         selectField.setValue("value4");
         String text = elementToString(selectField);
-        assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\"></input>", text);
+        assertEquals("<input type=\"hidden\" id=\"myText\" name=\"myText\" />", text);
     }
 
     //--------------------------------------------------------------------------
@@ -410,6 +449,28 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertNull(selectField.getValue());
         myText = "value2";
         selectField.readFromObject(this);
+        assertEquals("value2", selectField.getValue());
+    }
+
+    /**
+     * Questo test verifica un bug:
+     * Se un SelectField è stato valorizzato tramite una readFromObject(),
+     * una lettura tramite readFromRequest(req) dove req NON contiene
+     * il parametro (req.getParameter(inputName) == null)
+     * deve lasciare il valore inalterato
+     */
+    public void testReadFromObject2() {
+        setupSelectFields(Mode.EDIT);
+
+        assertNull(selectField.getValue());
+        myText = "value2";
+        selectField.readFromObject(this);
+        assertEquals("value2", selectField.getValue());
+
+        // leggiamo dalla request vuota (senza parametri)
+        selectField.readFromRequest(req);
+
+        // verifichiamo che abbia tenuto il valore
         assertEquals("value2", selectField.getValue());
     }
 

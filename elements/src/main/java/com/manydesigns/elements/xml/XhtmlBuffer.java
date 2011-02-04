@@ -32,6 +32,7 @@ package com.manydesigns.elements.xml;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
+import java.io.StringWriter;
 import java.io.Writer;
 
 /**
@@ -43,15 +44,33 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
+    // Constants
+    //**************************************************************************
+
+    public static String[] XHTML_EMPTY_TAG_ALLOWED_LIST = {
+            "area",
+            "base",
+            "br",
+            "col",
+            "hr",
+            "img",
+            "input",
+            "link",
+            "meta",
+            "param"
+    };
+
+    //**************************************************************************
     // Constructors
     //**************************************************************************
 
     public XhtmlBuffer() {
-        super();
+        this(new StringWriter());
     }
 
     public XhtmlBuffer(Writer writer) {
         super(writer);
+        allowedEmptyTags = XHTML_EMPTY_TAG_ALLOWED_LIST;
     }
 
     //~--- methods ------------------------------------------------------------
@@ -67,9 +86,15 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
     public void writeAnchor(String href, String text,
                             String classStr, String title) {
         openElement("a");
-        addAttribute("href", href);
-        addAttribute("class", classStr);
-        addAttribute("title", title);
+        if (href != null) {
+            addAttribute("href", href);
+        }
+        if (classStr != null) {
+            addAttribute("class", classStr);
+        }
+        if (title != null) {
+            addAttribute("title", title);
+        }
         write(text);
         closeElement("a");
     }

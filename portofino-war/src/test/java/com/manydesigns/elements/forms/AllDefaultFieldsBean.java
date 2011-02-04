@@ -73,9 +73,6 @@ public class AllDefaultFieldsBean {
     @Phone
     public String phone;
 
-    @Radio(labels = {}, values = {})
-    public String radio;
-
     @Select(labels = {}, values = {})
     public String select;
 

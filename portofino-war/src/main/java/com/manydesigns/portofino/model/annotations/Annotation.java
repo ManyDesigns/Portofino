@@ -129,6 +129,16 @@ public class Annotation extends ArrayList<String> implements ModelObject {
                     Object value;
                     if (parameterType.isArray()) {
                         value = Util.matchStringArray(stringValue);
+                    } else if (parameterType.isEnum()) {
+                        Object[] enumValues = parameterType.getEnumConstants();
+                        value = stringValue;
+                        for (Object current : enumValues) {
+                            Enum enumValue = (Enum)current;
+                            if (enumValue.name().equals(stringValue)) {
+                                value = enumValue;
+                                break;
+                            }
+                        }
                     } else {
                         value = stringValue;
                     }
@@ -145,7 +155,7 @@ public class Annotation extends ArrayList<String> implements ModelObject {
         }
 
         if (javaAnnotation == null) {
-            logger.debug("Cannot instanciate annotation: {}", javaAnnotationClass);
+            logger.warn("Cannot instanciate annotation: {}", javaAnnotationClass);
         }
     }
 

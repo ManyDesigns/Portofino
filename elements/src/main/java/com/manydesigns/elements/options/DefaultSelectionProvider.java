@@ -61,8 +61,6 @@ public class DefaultSelectionProvider implements SelectionProvider {
     protected final Object[][] valuesArray;
     protected final String[][] labelsArray;
 
-    protected boolean autocomplete;
-
     public final static Logger logger =
             LoggerFactory.getLogger(DefaultSelectionProvider.class);
     public static final String NON_WORD_CHARACTERS =
@@ -246,14 +244,6 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
     public int getFieldCount() {
         return fieldCount;
-    }
-
-    public boolean isAutocomplete() {
-        return autocomplete;
-    }
-
-    public void setAutocomplete(boolean autocomplete) {
-        this.autocomplete = autocomplete;
     }
 
     public SelectionModel createSelectionModel() {
