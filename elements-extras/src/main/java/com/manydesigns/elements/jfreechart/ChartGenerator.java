@@ -29,17 +29,18 @@
 
 package com.manydesigns.elements.jfreechart;
 
-import org.jfree.chart.JFreeChart;
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.util.RandomUtil;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.ChartRenderingInfo;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.general.Dataset;
-import org.jfree.data.general.PieDataset;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.IntervalCategoryDataset;
+import org.jfree.data.general.Dataset;
+import org.jfree.data.general.PieDataset;
 import org.jfree.data.xy.XYSeriesCollection;
-import com.manydesigns.elements.ElementsThreadLocals;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +54,7 @@ public class ChartGenerator {
     public static final String copyright =
             "Copyright (c) 2005-2009, ManyDesigns srl";
 
+    public static final String CHART_FILENAME_FORMAT = "chart-{0}.png";
 
     public static String generateChart(int chartType, String title,
                                        String axisLabel, String valueLabel, Dataset dataset, ChartRenderingInfo info,
@@ -108,15 +110,14 @@ public class ChartGenerator {
                 throw new InternalError(ElementsThreadLocals.getText(
                         "Portlet_report_type_not_recognized"));
         }
-        File tempFile = null;
+        String code = RandomUtil.createRandomCode();
         try {
-            tempFile = File.createTempFile("MDChart", ".png",
-                    new File(System.getProperty("java.io.tmpdir")));
+            File tempFile = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, code);
             ChartUtilities.saveChartAsPNG(tempFile, chart, width, height, info);
         } catch (IOException e) {
             throw new InternalError("Cannot store images");
         }
 
-        return tempFile.getName();
+        return code;
     }
 }

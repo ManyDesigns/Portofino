@@ -30,7 +30,6 @@
 package com.manydesigns.elements.jfreechart;
 
 import com.manydesigns.elements.Element;
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.jfree.chart.ChartRenderingInfo;
@@ -55,7 +54,7 @@ public class JFreeChartElement implements Element{
     private String title;
     private Dataset dataset;
     private ChartRenderingInfo info = null;
-    private String servletName;
+    private String imageDisplayUrl;
     private String axisName;
     private String valueName;
 
@@ -75,18 +74,11 @@ public class JFreeChartElement implements Element{
         //Do nothing
     }
 
-    public Mode getMode() {
-        return Mode.VIEW;
-    }
-
-    public void setMode(Mode mode) {
-        //Do nothing
-    }
-
     public void toXhtml(XhtmlBuffer xb) {
 
-        String filename = ChartGenerator.generateChart(getChartType(), getTitle(),
-                getAxisName(), getValueName(), getDataset(), info, getWidth(), getHeight());
+        String code = ChartGenerator.generateChart(getChartType(),
+                getTitle(), getAxisName(), getValueName(), getDataset(),
+                info, getWidth(), getHeight());
         xb.openElement("div");
         xb.addAttribute("id", id);
         xb.openElement("img");
@@ -95,8 +87,9 @@ public class JFreeChartElement implements Element{
         //xb.addAttribute("usemap", "#prptmap"+id);
         alt = "";
         xb.addAttribute("alt", alt);
+
         xb.addAttribute("src",
-                Util.getAbsoluteUrl(getServletName()+"?f="+filename));
+                Util.getAbsoluteUrl(getImageDisplayUrl()+code));
         xb.closeElement("img");
         xb.closeElement("div");
     }
@@ -189,17 +182,17 @@ public class JFreeChartElement implements Element{
         this.info = info;
     }
 
-    public String getServletName() {
-        if (servletName!=null) {
-            return servletName;
+    public String getImageDisplayUrl() {
+        if (imageDisplayUrl !=null) {
+            return imageDisplayUrl;
         } else {
-            return "/DisplayChart";
+            return "/DisplayChart?code=";
         }
 
     }
 
-    public void setServletName(String servletName) {
-        this.servletName = servletName;
+    public void setImageDisplayUrl(String imageDisplayUrl) {
+        this.imageDisplayUrl = imageDisplayUrl;
     }
 
     public String getAxisName() {
@@ -224,5 +217,13 @@ public class JFreeChartElement implements Element{
 
     public void setValueName(String valueName) {
         this.valueName = valueName;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

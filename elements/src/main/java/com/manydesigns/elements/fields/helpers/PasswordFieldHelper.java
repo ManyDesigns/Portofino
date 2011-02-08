@@ -42,7 +42,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PasswordFieldHandler implements FieldHelper {
+public class PasswordFieldHelper implements FieldHelper {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
