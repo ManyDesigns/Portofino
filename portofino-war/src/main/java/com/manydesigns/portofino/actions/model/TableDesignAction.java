@@ -38,6 +38,8 @@ import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertiesAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
@@ -52,10 +54,13 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 /*
@@ -63,7 +68,8 @@ import java.util.Set;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class TableDesignAction extends PortofinoAction implements ServletRequestAware{
+public class TableDesignAction extends PortofinoAction
+        implements ServletRequestAware{
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -76,6 +82,14 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     }
 
     //**************************************************************************
+    // STEP del wizard
+    //**************************************************************************
+    private static final int ANNOTATION_STEP = 4;
+    private static final int COLUMN_STEP = 2;
+    private static final int TABLE_STEP = 1;
+    private static final int PRIMARYKEY_STEP = 3;
+
+    //**************************************************************************
     // Web parameters
     //**************************************************************************
     public InputStream inputStream;
@@ -84,13 +98,14 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     public String cancelReturnUrl;
     public Table table;
     public final List<String> annotations;
-    public List<AnnotationModel> colAnnotations;
+    public final List<String> annotationsImpl;
+    public List<AnnModel> colAnnotations;
     public PrimaryKeyModel pkModel;
     public String pk_primaryKeyName;
     public String pk_column;
+    public String colAnn_annotationName;
 
-
-    public List<String> columnNames = new ArrayList<String>();
+    public List<String> columnNames;
 
     //Contatori righe TableForm
     public Integer ncol;
@@ -124,7 +139,9 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     public Form columnForm;
     public Form pkForm;
     public Form pkColumnForm;
-    public Form colAnnotationForm;
+    //public Form colAnnotationForm;
+    public Form annForm;
+    public Form annPropForm;
 
     public TableForm columnTableForm;
     public TableForm pkColumnTableForm;
@@ -155,17 +172,22 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     //**************************************************************************
     public TableDesignAction() {
         annotations = new ArrayList<String>();
+        annotationsImpl = new ArrayList<String>();
         Set<Class> annotationsClasses
                 =  AnnotationsManager.getManager().getManagedAnnotationClasses();
 
         for (Class aClass: annotationsClasses){
             Target target;
             target = (Target) aClass.getAnnotation(Target.class);
-            if (null!= target && ArrayUtils.contains(target.value(), ElementType.FIELD)){
+            if (null!= target && ArrayUtils.contains(target.value(),
+                    ElementType.FIELD)){
                 annotations.add(aClass.getName());
+                annotationsImpl.add(AnnotationsManager.getManager()
+                        .getAnnotationImplementationClass(aClass).getName());
             }
         }
-        colAnnotations = new ArrayList<AnnotationModel>();
+        colAnnotations = new ArrayList<AnnModel>();
+        columnNames = new ArrayList<String>();
     }
 
     //**************************************************************************
@@ -246,14 +268,14 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }*/
         setupForms();
-        step=1;
+        step= TABLE_STEP;
         return CREATE;
     }
 
 
 
     public String addCol() {
-        step = 2;
+        step = COLUMN_STEP;
         setupForms();
         readFromRequest();
         Column col = new Column(table);
@@ -280,10 +302,11 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         columnTableForm = new TableFormBuilder(Column.class)
             .configFields("columnName", "columnType", "nullable",
                     "autoincrement", "length", "scale",
-                    "searchable", "javaType", "propertyName").configPrefix("cols_")
-            .configNRows(table.getColumns().size())
-            .configMode(Mode.CREATE_PREVIEW)
-            .build();
+                    "searchable", "javaType", "propertyName")
+                .configPrefix("cols_")
+                .configNRows(table.getColumns().size())
+                .configMode(Mode.CREATE_PREVIEW)
+                .build();
         ncol++;
         columnTableForm.setSelectable(true);
         columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
@@ -293,7 +316,7 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
 }
 
     public String remCol() {
-        step=2;
+        step= COLUMN_STEP;
         setupForms();
         if(!readFromRequest()){
             return CREATE;
@@ -318,10 +341,11 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         columnTableForm = new TableFormBuilder(Column.class)
             .configFields("columnName", "columnType", "nullable",
                     "autoincrement", "length", "scale",
-                    "searchable", "javaType", "propertyName").configPrefix("cols_")
-            .configNRows(table.getColumns().size())
-            .configMode(Mode.CREATE_PREVIEW)
-            .build();
+                    "searchable", "javaType", "propertyName")
+                .configPrefix("cols_")
+                .configNRows(table.getColumns().size())
+                .configMode(Mode.CREATE_PREVIEW)
+                .build();
         columnTableForm.setSelectable(true);
         columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
         columnTableForm.readFromObject(table.getColumns());
@@ -333,33 +357,49 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         return CREATE;
     }
 
+
     public String addColAnnotation() {
-        step=4;
+        step= ANNOTATION_STEP;
         setupForms();
         readFromRequest();
-        AnnotationModel annotation = new AnnotationModel();
-        colAnnotationForm.readFromRequest(req);
-        if(!colAnnotationForm.validate()){
-            return CREATE;
-        }
+        
+        AnnModel annotation = new AnnModel();
+        Properties properties = new Properties();
 
-        colAnnotationForm.writeToObject(annotation);
+        annForm.writeToObject(annotation);
+        annPropForm.writeToObject(properties);
+        annotation.properties=properties;
+
         colAnnotations.add(annotation);
-        colAnnotationTableForm = new TableFormBuilder(AnnotationModel.class)
-            .configFields("columnName", "typeName", "values").configPrefix("colAnnT_")
+        nAnnotations++;
+        colAnnotationTableForm = new TableFormBuilder(AnnModel.class)
+            .configFields("columnName", "annotationName", "propValues")
+                .configPrefix("colAnnT_")
             .configNRows(colAnnotations.size())
             .configMode(Mode.CREATE_PREVIEW)
             .build();
         nAnnotations++;
         colAnnotationTableForm.setSelectable(true);
-        colAnnotationTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName+\"_\"+typeName}"));
+        colAnnotationTableForm.setKeyGenerator(
+                OgnlTextFormat.create("%{columnName+\"_\"+annotationName}"));
         colAnnotationTableForm.readFromObject(colAnnotations);
 
         return CREATE;
-}
+    }
+
+    public String setAnnParameters() throws ClassNotFoundException, NoSuchFieldException {
+        step= ANNOTATION_STEP;
+        setupForms();
+        readFromRequest(); 
+        if (colAnn_annotationName==null){
+            SessionMessages.addErrorMessage("SELECT A ANNOTATION");
+ 
+        }
+        return CREATE;
+    }
 
     public String remColAnnotation() {
-        step=4;
+        step= ANNOTATION_STEP;
         setupForms();
         if(!readFromRequest()){
             return CREATE;
@@ -369,9 +409,10 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
             try {
                 AnnotationModel annotation = new AnnotationModel();
                 row.writeToObject(annotation);
-                if (ArrayUtils.contains(colAnnT_selection, annotation.getColumnName()+"_"+
-                annotation.getTypeName())){
-                    colAnnotations.remove(annotation);
+                if (ArrayUtils.contains(colAnnT_selection,
+                        annotation.getColumnName()+"_"+
+                        annotation.getTypeName())){
+                        colAnnotations.remove(annotation);
                 }
             } catch (Throwable e) {
                 //do nothing: accetto errori quali assenza di pk sulla tabella
@@ -379,12 +420,14 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         }
 
         colAnnotationTableForm = new TableFormBuilder(AnnotationModel.class)
-            .configFields("columnName", "typeName", "values").configPrefix("colAnnT_")
+            .configFields("columnName", "typeName", "values")
+                .configPrefix("colAnnT_")
             .configNRows(colAnnotations.size())
             .configMode(Mode.CREATE_PREVIEW)
             .build();
         colAnnotationTableForm.setSelectable(true);
-        colAnnotationTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName+\"_\"+typeName}"));
+        colAnnotationTableForm.setKeyGenerator(OgnlTextFormat
+                .create("%{columnName+\"_\"+typeName}"));
         colAnnotationTableForm.readFromObject(colAnnotations);
         nAnnotations=colAnnotations.size();
 
@@ -392,7 +435,7 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     }
 
     public String addPkCol() {
-        step=3;
+        step= PRIMARYKEY_STEP;
         setupForms();
         if(!readFromRequest()){
             return CREATE;
@@ -414,12 +457,11 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         pkColumnTableForm.setSelectable(true);
         pkColumnTableForm.setKeyGenerator(OgnlTextFormat.create("%{column}"));
         pkColumnTableForm.readFromObject(pkModel);
-
         return CREATE;
     }
 
     public String remPkCol() {
-        step=3;
+        step= PRIMARYKEY_STEP;
         setupForms();
         if(!readFromRequest()){
             return CREATE;
@@ -454,6 +496,90 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     //**************************************************************************
     // private methods
     //**************************************************************************
+    private void setupForms() {
+        if (ncol == null){
+            ncol = 0;
+        }
+        if (npkcol == null){
+            npkcol = 0;
+        }
+        if (nAnnotations == null){
+            nAnnotations = 0;
+        }
+        Mode mode = Mode.CREATE;
+
+        //Available databases
+        List<Database> databases = model.getDatabases();
+        String [] databaseNames = new String[databases.size()];
+        int i = 0;
+        for (Database db : databases){
+            databaseNames[i++] = db.getQualifiedName();
+        }
+        //Costruisco form per Table
+
+        FormBuilder formBuilder = new FormBuilder(Table.class)
+                .configFields("databaseName", "schemaName", "tableName")
+                .configMode(mode);
+
+        SelectionProvider selectionProvider = DefaultSelectionProvider
+                .create("databases",databaseNames, databaseNames);
+        formBuilder.configSelectionProvider(selectionProvider, "databaseName");
+        formBuilder.configPrefix("table_");
+        tableForm = formBuilder.build();
+
+        //Costruisco form per Column
+        formBuilder = new FormBuilder(Column.class)
+                .configFields("columnName", "columnType", "nullable",
+                        "autoincrement", "length", "scale",
+                        "searchable", "javaType", "propertyName")
+                .configMode(mode);
+        formBuilder.configPrefix("column_");
+        columnForm = formBuilder.build();
+
+        //Costruisco form per Primary Key
+        formBuilder = new FormBuilder(PrimaryKey.class)
+                .configFields("primaryKeyName")
+                .configMode(mode);
+        formBuilder.configPrefix("pk_");
+        pkForm = formBuilder.build();
+        pkColumnForm = new FormBuilder(PrimaryKeyColumnModel.class)
+                .configFields("column", "genType", "seqName",
+                        "tabName", "colName", "colValue").configPrefix("pk_")
+                .configMode(mode).build();
+
+        //Costruisco form per Annotations
+        formBuilder = new FormBuilder(AnnModel.class)
+                .configFields("columnName", "annotationName").configPrefix("colAnn_")
+                .configMode(mode);
+        String[] anns = new String[annotations.size()];
+        String[] annsImpl = new String[annotationsImpl.size()];
+        SelectionProvider selectionProviderAnns =
+                DefaultSelectionProvider.create("annotations",
+                annotationsImpl.toArray(annsImpl), annotations.toArray(anns));
+        formBuilder.configSelectionProvider(selectionProviderAnns, "annotationName");
+        annForm = formBuilder.build();
+
+        if (colAnn_annotationName!=null && colAnn_annotationName.length()>0){
+            try {
+                Class annotationClass =
+                        this.getClass().getClassLoader()
+                        .loadClass(colAnn_annotationName);
+                Properties properties = new Properties();
+                Field[] fields = annotationClass.getDeclaredFields();
+                for (Field field : fields){
+                    if (!Modifier.isStatic(field.getModifiers())){
+                        properties.put(field.getName(), "");
+                    }
+                }
+                ClassAccessor propertiesAccessor = new PropertiesAccessor(properties);
+                FormBuilder builder = new FormBuilder(propertiesAccessor);
+                annPropForm = builder.configMode(Mode.CREATE).build();
+            } catch (ClassNotFoundException e) {
+                SessionMessages.addErrorMessage(e.getMessage());
+            }
+        }
+
+    }
     private boolean readFromRequest() {
         if(null==table_databaseName){
             return false;
@@ -501,18 +627,20 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         }
 
         //Gestione annotations
-        colAnnotationTableForm =
-            new TableFormBuilder(AnnotationModel.class)
-                .configFields("columnName", "typeName", "values")
-                .configPrefix("colAnnT_").configNRows(nAnnotations)
+        colAnnotationTableForm = new TableFormBuilder(AnnModel.class)
+            .configFields("columnName", "annotationName", "propValues")
+                .configPrefix("colAnnT_")
+            .configNRows(nAnnotations)
             .configMode(Mode.CREATE_PREVIEW)
             .build();
+
         colAnnotationTableForm.setSelectable(true);
-        colAnnotationTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName+\"_\"+typeName}"));
+        colAnnotationTableForm.setKeyGenerator(
+                OgnlTextFormat.create("%{columnName+\"_\"+annotationName}"));
         colAnnotationTableForm.readFromRequest(req);
         for(TableForm.Row row : colAnnotationTableForm.getRows()) {
             try {
-                AnnotationModel currAnnotation = new AnnotationModel();
+                AnnModel currAnnotation = new AnnModel();
                 row.writeToObject(currAnnotation);
                 colAnnotations.add(currAnnotation);
             } catch (Throwable e) {
@@ -533,8 +661,8 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         pkColumnTableForm.setKeyGenerator(OgnlTextFormat.create("%{column}"));
         pkColumnTableForm.readFromRequest(req);
         pkForm.readFromRequest(req);
-                pkModel.primaryKeyName = pk_primaryKeyName!=null?
-                            pk_primaryKeyName:"pk_"+table_tableName;
+        pkModel.primaryKeyName = pk_primaryKeyName!=null?
+            pk_primaryKeyName:"pk_"+table_tableName;
         pkColumnForm.readFromRequest(req);
         for(TableForm.Row row : pkColumnTableForm.getRows()) {
             try {
@@ -545,68 +673,17 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
                 //Do nothing
             }
         }
+
+        annForm.readFromRequest(req);
+        annPropForm.readFromRequest(req);
+
+
         return true;
     }
 
-    private void setupForms() {
-        if (ncol == null){
-            ncol = 0;
-        }
-        if (npkcol == null){
-            npkcol = 0;
-        }
-        if (nAnnotations == null){
-            nAnnotations = 0;
-        }
-        //Available databases
-        List<Database> databases = model.getDatabases();
-        String [] databaseNames = new String[databases.size()];
-        int i = 0;
-        for (Database db : databases){
-            databaseNames[i++] = db.getQualifiedName();
-        }
-        //Costruisco form per Table
-        FormBuilder formBuilder = new FormBuilder(Table.class)
-                .configFields("databaseName", "schemaName", "tableName")
-                .configMode(Mode.CREATE);
 
-        SelectionProvider selectionProvider = DefaultSelectionProvider.create("databases",
-                databaseNames, databaseNames);
-        formBuilder.configSelectionProvider(selectionProvider, "databaseName");
-        formBuilder.configPrefix("table_");
-        tableForm = formBuilder.build();
 
-        //Costruisco form per Column
-        formBuilder = new FormBuilder(Column.class)
-                .configFields("columnName", "columnType", "nullable",
-                        "autoincrement", "length", "scale",
-                        "searchable", "javaType", "propertyName")
-                .configMode(Mode.CREATE);
-        formBuilder.configPrefix("column_");
-        columnForm = formBuilder.build();
 
-        //Costruisco form per Primary Key
-        formBuilder = new FormBuilder(PrimaryKey.class)
-                .configFields("primaryKeyName")
-                .configMode(Mode.CREATE);
-        formBuilder.configPrefix("pk_");
-        pkForm = formBuilder.build();
-        pkColumnForm = new FormBuilder(PrimaryKeyColumnModel.class)
-                .configFields("column", "genType", "seqName",
-                        "tabName", "colName", "colValue").configPrefix("pk_")
-                .configMode(Mode.CREATE).build();
-
-        //Costruisco form per Annotations
-        formBuilder = new FormBuilder(AnnotationModel.class)
-                .configFields("columnName", "typeName", "values")
-                .configMode(Mode.CREATE);
-        formBuilder.configPrefix("colAnn_");
-        colAnnotationForm = formBuilder.build();
-        colAnnotationTableForm = new TableFormBuilder(AnnotationModel.class)
-                .configFields("columnName", "typeName", "values")
-                .configPrefix("colAnnT_")
-                .configMode(Mode.CREATE).build();
-    }
 
     private String createJsonArray (List<String> collection) {
         List<String> resulList = new ArrayList<String>();
@@ -656,7 +733,8 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         List<String> javaTypesString = new ArrayList<String>();
 
         for(Type currentType : types){
-            if(StringUtils.equalsIgnoreCase(currentType.getTypeName(), req.getParameter("column_columnType"))){
+            if(StringUtils.equalsIgnoreCase(currentType.getTypeName(),
+                    req.getParameter("column_columnType"))){
                 String defJavaType;
                 try{
                     defJavaType= currentType.getDefaultJavaType().getName();
@@ -679,7 +757,8 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
         List<String> info = new ArrayList<String>();
 
         for(Type currentType : types){
-            if(StringUtils.equalsIgnoreCase(currentType.getTypeName(), req.getParameter("column_columnType"))){
+            if(StringUtils.equalsIgnoreCase(currentType.getTypeName(),
+                    req.getParameter("column_columnType"))){
 
                 info.add("\"precision\" : \""+
                         (currentType.isPrecisionRequired()?"true":"false")+"\"");
@@ -702,7 +781,6 @@ public class TableDesignAction extends PortofinoAction implements ServletRequest
     public String jsonAnnotation() throws Exception {
         return createJsonArray(annotations);
     }
-
 
 }
 

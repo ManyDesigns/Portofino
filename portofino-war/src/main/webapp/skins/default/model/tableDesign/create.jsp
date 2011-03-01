@@ -167,8 +167,14 @@
                     <s:submit id="remColAnnotation" method="remColAnnotation" value="Remove annotation" />
                 </s:if>
                 <p></p>
-                <mdes:write value="colAnnotationForm"/>
+                <mdes:write value="annForm"/>
+                <s:submit id="setAnnParameters" method="setAnnParameters" value="Show parameters" />
+
+                <mdes:write value="annPropForm"/>
+
                 <s:submit id="addColAnnotation" method="addColAnnotation" value="Add annotation" />
+
+
                 </div>
             </div>
         </div>
@@ -226,6 +232,9 @@
                         $("#column_autoincrement").attr('disabled', false);
                     }
                  });
+    });
+    $("#colAnn_annotationName").change(function() {
+        $("#setAnnParameters").click();
     });
   </script>
 <s:include value="/skins/default/footer.jsp"/>
