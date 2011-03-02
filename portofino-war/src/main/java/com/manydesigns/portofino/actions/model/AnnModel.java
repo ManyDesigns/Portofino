@@ -28,8 +28,9 @@
  */
 package com.manydesigns.portofino.actions.model;
 
-import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.Multiline;
+import org.apache.commons.lang.text.StrTokenizer;
 
 import java.util.Map;
 import java.util.Properties;
@@ -63,5 +64,38 @@ public class AnnModel {
         }
 
         return result.toString();
+    }
+
+    public void setPropValues(String propValues){
+        properties.clear();
+        StrTokenizer strTokenizer = new StrTokenizer(propValues, ";");
+        for (String property : strTokenizer.getTokenArray()){
+                StrTokenizer strTokenizer2 = new StrTokenizer(property, "=");
+                String key = strTokenizer2.getTokenArray()[0];
+                String value = strTokenizer2.getTokenArray()[1];
+                properties.put(key, value);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AnnModel annModel = (AnnModel) o;
+
+        if (annotationName != null ? !annotationName.equals(annModel.annotationName) : annModel.annotationName != null)
+            return false;
+        if (columnName != null ? !columnName.equals(annModel.columnName) : annModel.columnName != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = columnName != null ? columnName.hashCode() : 0;
+        result = 31 * result + (annotationName != null ? annotationName.hashCode() : 0);
+        return result;
     }
 }

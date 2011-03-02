@@ -371,7 +371,7 @@ public class TableDesignAction extends PortofinoAction
         annotation.properties=properties;
 
         colAnnotations.add(annotation);
-        nAnnotations++;
+
         colAnnotationTableForm = new TableFormBuilder(AnnModel.class)
             .configFields("columnName", "annotationName", "propValues")
                 .configPrefix("colAnnT_")
@@ -407,11 +407,11 @@ public class TableDesignAction extends PortofinoAction
 
         for(TableForm.Row row : colAnnotationTableForm.getRows()) {
             try {
-                AnnotationModel annotation = new AnnotationModel();
+                AnnModel annotation = new AnnModel();
                 row.writeToObject(annotation);
                 if (ArrayUtils.contains(colAnnT_selection,
-                        annotation.getColumnName()+"_"+
-                        annotation.getTypeName())){
+                        annotation.columnName+"_"+
+                        annotation.annotationName)){
                         colAnnotations.remove(annotation);
                 }
             } catch (Throwable e) {
@@ -419,15 +419,15 @@ public class TableDesignAction extends PortofinoAction
             }
         }
 
-        colAnnotationTableForm = new TableFormBuilder(AnnotationModel.class)
-            .configFields("columnName", "typeName", "values")
+        colAnnotationTableForm = new TableFormBuilder(AnnModel.class)
+            .configFields("columnName", "annotationName", "propValues")
                 .configPrefix("colAnnT_")
             .configNRows(colAnnotations.size())
             .configMode(Mode.CREATE_PREVIEW)
             .build();
         colAnnotationTableForm.setSelectable(true);
         colAnnotationTableForm.setKeyGenerator(OgnlTextFormat
-                .create("%{columnName+\"_\"+typeName}"));
+                .create("%{columnName+\"_\"+annotationName}"));
         colAnnotationTableForm.readFromObject(colAnnotations);
         nAnnotations=colAnnotations.size();
 
@@ -495,6 +495,9 @@ public class TableDesignAction extends PortofinoAction
 
     //**************************************************************************
     // private methods
+    //**************************************************************************
+    //**************************************************************************
+    // Preparazione dei form
     //**************************************************************************
     private void setupForms() {
         if (ncol == null){
@@ -580,6 +583,10 @@ public class TableDesignAction extends PortofinoAction
         }
 
     }
+
+    //**************************************************************************
+    // Inizializzazione dei form a partire dalla request
+    //**************************************************************************
     private boolean readFromRequest() {
         if(null==table_databaseName){
             return false;
@@ -626,28 +633,6 @@ public class TableDesignAction extends PortofinoAction
             }
         }
 
-        //Gestione annotations
-        colAnnotationTableForm = new TableFormBuilder(AnnModel.class)
-            .configFields("columnName", "annotationName", "propValues")
-                .configPrefix("colAnnT_")
-            .configNRows(nAnnotations)
-            .configMode(Mode.CREATE_PREVIEW)
-            .build();
-
-        colAnnotationTableForm.setSelectable(true);
-        colAnnotationTableForm.setKeyGenerator(
-                OgnlTextFormat.create("%{columnName+\"_\"+annotationName}"));
-        colAnnotationTableForm.readFromRequest(req);
-        for(TableForm.Row row : colAnnotationTableForm.getRows()) {
-            try {
-                AnnModel currAnnotation = new AnnModel();
-                row.writeToObject(currAnnotation);
-                colAnnotations.add(currAnnotation);
-            } catch (Throwable e) {
-                //Do nothing
-            }
-        }
-
         //Gestione Chiave primaria
         pkModel = new PrimaryKeyModel();
         pkColumnTableForm = new TableFormBuilder(PrimaryKeyColumnModel.class)
@@ -674,9 +659,31 @@ public class TableDesignAction extends PortofinoAction
             }
         }
 
+        //Gestione annotations
+        colAnnotationTableForm = new TableFormBuilder(AnnModel.class)
+            .configFields("columnName", "annotationName", "propValues")
+                .configPrefix("colAnnT_")
+            .configNRows(nAnnotations)
+            .configMode(Mode.CREATE_PREVIEW)
+            .build();
+
+        colAnnotationTableForm.setSelectable(true);
+        colAnnotationTableForm.setKeyGenerator(
+                OgnlTextFormat.create("%{columnName+\"_\"+annotationName}"));
+        colAnnotationTableForm.readFromRequest(req);
+        for(TableForm.Row row : colAnnotationTableForm.getRows()) {
+            try {
+                AnnModel currAnnotation = new AnnModel();
+                row.writeToObject(currAnnotation);
+                colAnnotations.add(currAnnotation);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+        
+        //Proprieta' delle annotation
         annForm.readFromRequest(req);
         annPropForm.readFromRequest(req);
-
 
         return true;
     }
