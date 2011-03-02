@@ -26,45 +26,39 @@
  * Boston, MA  02111-1307  USA
  *
  */
+package com.manydesigns.elements.forms;
 
-package com.manydesigns.elements.fields.helpers;
-
-import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.Select;
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.SelectField;
+import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.fields.search.SearchField;
-import com.manydesigns.elements.fields.search.SelectSearchField;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SelectFieldHelper implements FieldHelper {
+public class SearchFormTest extends AbstractElementsTest {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Field tryToInstantiateField(ClassAccessor classAccessor,
-                                  PropertyAccessor propertyAccessor,
-                                  Mode mode,
-                                  String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())
-                && propertyAccessor.isAnnotationPresent(Select.class)) {
-                return new SelectField(propertyAccessor, mode, prefix);
-        }
-        return null;
+    private SearchForm form;
+
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+
+        SearchFormBuilder builder =
+                new SearchFormBuilder(AnnotatedBean3.class);
+        form = builder.build();
     }
 
-    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
-                                                   PropertyAccessor propertyAccessor,
-                                                   String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())
-                && propertyAccessor.isAnnotationPresent(Select.class)) {
-                return new SelectSearchField(propertyAccessor, prefix);
+    public void testForm(){
+        try{
+            SearchField field =  form.get(0);
+        }catch (Throwable e){
+            e.printStackTrace();
+            fail("non c'è il campo select");
         }
-        return null;
     }
+
 }

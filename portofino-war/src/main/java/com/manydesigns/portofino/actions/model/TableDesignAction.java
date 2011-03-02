@@ -334,7 +334,7 @@ public class TableDesignAction extends PortofinoAction
                     columnNames.add(currCol.getColumnName());
                 }
             } catch (Throwable e) {
-                //do nothing: accetto errori quali assenza di pk sulla tabella
+                logger.info(e.getMessage());
             }
         }
 
@@ -416,6 +416,7 @@ public class TableDesignAction extends PortofinoAction
                 }
             } catch (Throwable e) {
                 //do nothing: accetto errori quali assenza di pk sulla tabella
+                logger.info(e.getMessage());
             }
         }
 
@@ -477,6 +478,7 @@ public class TableDesignAction extends PortofinoAction
             } catch (Throwable e) {
                 // do nothing: accetto errori quali assenza di pk sulla tabella
                 // la classe mi serve solo come modello dei dati
+                logger.info(e.getMessage());
             }
         }
         pkColumnTableForm = new TableFormBuilder(PrimaryKeyColumnModel.class)
@@ -578,6 +580,7 @@ public class TableDesignAction extends PortofinoAction
                 FormBuilder builder = new FormBuilder(propertiesAccessor);
                 annPropForm = builder.configMode(Mode.CREATE).build();
             } catch (ClassNotFoundException e) {
+                logger.error(e.getMessage());
                 SessionMessages.addErrorMessage(e.getMessage());
             }
         }
@@ -656,6 +659,7 @@ public class TableDesignAction extends PortofinoAction
                 pkModel.add(currCol);
             } catch (Throwable e) {
                 //Do nothing
+                logger.error(e.getMessage());
             }
         }
 
@@ -677,7 +681,7 @@ public class TableDesignAction extends PortofinoAction
                 row.writeToObject(currAnnotation);
                 colAnnotations.add(currAnnotation);
             } catch (Throwable e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
         

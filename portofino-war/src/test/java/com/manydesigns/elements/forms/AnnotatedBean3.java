@@ -26,45 +26,20 @@
  * Boston, MA  02111-1307  USA
  *
  */
+package com.manydesigns.elements.forms;
 
-package com.manydesigns.elements.fields.helpers;
-
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Select;
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.SelectField;
-import com.manydesigns.elements.fields.search.SearchField;
-import com.manydesigns.elements.fields.search.SelectSearchField;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SelectFieldHelper implements FieldHelper {
+public class AnnotatedBean3 {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public Field tryToInstantiateField(ClassAccessor classAccessor,
-                                  PropertyAccessor propertyAccessor,
-                                  Mode mode,
-                                  String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())
-                && propertyAccessor.isAnnotationPresent(Select.class)) {
-                return new SelectField(propertyAccessor, mode, prefix);
-        }
-        return null;
-    }
-
-    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
-                                                   PropertyAccessor propertyAccessor,
-                                                   String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())
-                && propertyAccessor.isAnnotationPresent(Select.class)) {
-                return new SelectSearchField(propertyAccessor, prefix);
-        }
-        return null;
-    }
+    @Select(values={"1", "2"},labels={"a", "b"})
+    public String field1;
+    public String field2;
 }
