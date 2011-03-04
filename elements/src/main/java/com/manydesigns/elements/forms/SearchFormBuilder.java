@@ -32,13 +32,19 @@ package com.manydesigns.elements.forms;
 import com.manydesigns.elements.annotations.Searchable;
 import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.fields.search.SearchField;
+import com.manydesigns.elements.fields.search.SelectSearchField;
+import com.manydesigns.elements.fields.SelectField;
+import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -138,16 +144,58 @@ public class SearchFormBuilder extends AbstractFormBuilder {
             configReflectiveFields();
         }
 
+
+        Map<String, SearchField> fieldMap = new HashMap<String,SearchField>();
         for (PropertyAccessor propertyAccessor : propertyAccessors) {
-            SearchField field = manager.tryToInstantiateSearchField(
+            SearchField field = null;
+            String fieldName = propertyAccessor.getName();
+            
+            for (Map.Entry<String[], SelectionProvider> current
+                : selectionProviders.entrySet()) {
+
+                String[] fieldNames = current.getKey();
+                int index = ArrayUtils.indexOf(fieldNames, fieldName);
+                if (index >= 0) {
+                    field = new SelectSearchField(propertyAccessor, prefix);
+                    
+                    break;
+                }
+            }
+
+            if (field == null) {
+                field = manager.tryToInstantiateSearchField(
                     classAccessor, propertyAccessor, prefix);
+            }
 
             if (field == null) {
                 logger.warn("Cannot instanciate field for property {}",
                         propertyAccessor);
                 continue;
             }
+            fieldMap.put(fieldName, field);
             searchForm.add(field);
+        }
+
+         // handle cascaded select fields
+        for (Map.Entry<String[], SelectionProvider> current :
+                selectionProviders.entrySet()) {
+            String[] fieldNames = current.getKey();
+            SelectionProvider selectionProvider = current.getValue();
+            SelectionModel selectionModel =
+                    selectionProvider.createSelectionModel();
+
+            SelectField previousField = null;
+            for (int i = 0; i < fieldNames.length; i++) {
+                SelectField selectField =
+                        (SelectField)fieldMap.get(fieldNames[i]);
+                selectField.setSelectionModel(selectionModel);
+                selectField.setSelectionModelIndex(i);
+                if (previousField != null) {
+                    selectField.setPreviousSelectField(previousField);
+                    previousField.setNextSelectField(selectField);
+                }
+                previousField = selectField;
+            }
         }
 
         return searchForm;

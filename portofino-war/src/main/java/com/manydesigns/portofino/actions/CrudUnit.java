@@ -485,6 +485,15 @@ public class CrudUnit {
     protected void setupSearchForm() {
         SearchFormBuilder searchFormBuilder =
                 new SearchFormBuilder(classAccessor);
+
+        // setup option providers
+        for (CrudSelectionProvider current : crudSelectionProviders) {
+            SelectionProvider selectionProvider =
+                    current.getSelectionProvider();
+            String[] fieldNames = current.getFieldNames();
+            searchFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
+        }
+        
         searchForm = searchFormBuilder
                 .configPrefix(prefix)
                 .build();

@@ -28,17 +28,20 @@
  */
 package com.manydesigns.elements.fields.search;
 
+import com.manydesigns.elements.annotations.Select;
+import com.manydesigns.elements.fields.SelectField;
+import com.manydesigns.elements.ognl.OgnlUtils;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import com.manydesigns.elements.ognl.OgnlUtils;
-import com.manydesigns.elements.annotations.Select;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,10 +52,20 @@ public class SelectSearchField extends AbstractSearchField {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    
+
     protected SelectionModel selectionModel;
     protected int selectionModelIndex;
     protected String comboLabel;
-    protected String value;
+    protected SelectField.DisplayMode displayMode;
+    protected String autocompleteId;
+    protected String autocompleteInputName;
+    protected SelectSearchField previousSelectField;
+    protected SelectSearchField nextSelectField;
+
+    public final static String AUTOCOMPLETE_SUFFIX = "_autocomplete";
+
+
 
     public SelectSearchField(PropertyAccessor accessor) {
         super(accessor);
@@ -61,15 +74,22 @@ public class SelectSearchField extends AbstractSearchField {
 
     private void initializeModel(PropertyAccessor accessor) {
         Select annotation = accessor.getAnnotation(Select.class);
-        Object[] values = annotation.values();
-        String[] labels = annotation.labels();
-        assert(values.length == labels.length);
-        SelectionProvider selectionProvider =
-                DefaultSelectionProvider.create(
-                        accessor.getName(), values, labels);
-        selectionModel = selectionProvider.createSelectionModel();
+        if (annotation != null) {
+            Object[] values = annotation.values();
+            String[] labels = annotation.labels();
+            assert(values.length == labels.length);
+            SelectionProvider selectionProvider =
+                    DefaultSelectionProvider.create(
+                            accessor.getName(), values, labels);
+            selectionModel = selectionProvider.createSelectionModel();
+            displayMode = annotation.displayMode();
+        } else {
+            displayMode = SelectField.DisplayMode.DROPDOWN;
+        }
         selectionModelIndex = 0;
         comboLabel = getText("elements.field.select.select", label);
+        autocompleteId = id + AUTOCOMPLETE_SUFFIX;
+        autocompleteInputName = inputName + AUTOCOMPLETE_SUFFIX;
     }
 
     public SelectSearchField(PropertyAccessor accessor, String prefix) {
@@ -80,11 +100,19 @@ public class SelectSearchField extends AbstractSearchField {
 
 
     public void toSearchString(StringBuilder sb) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        Object value = selectionModel.getValue(selectionModelIndex);
+        if (value != null) {
+            String valueString = OgnlUtils.convertValueToString(value);
+            appendToSearchString(sb, inputName,
+                valueString);
+        }
     }
 
     public void configureCriteria(Criteria criteria) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        Object value = selectionModel.getValue(selectionModelIndex);
+        if (value != null) {
+            criteria.eq(accessor, value);
+        }
     }
 
     //**************************************************************************
@@ -92,7 +120,9 @@ public class SelectSearchField extends AbstractSearchField {
     //**************************************************************************
 
     public void readFromRequest(HttpServletRequest req) {
-        value = req.getParameter(inputName);
+        String stringValue = StringUtils.trimToNull(req.getParameter(inputName));
+        Object value = OgnlUtils.convertValue(stringValue, accessor.getType());
+        selectionModel.setValue(selectionModelIndex, value);
     }
 
     public boolean validate() {
@@ -100,6 +130,23 @@ public class SelectSearchField extends AbstractSearchField {
     }
 
     public void toXhtml(XhtmlBuffer xb) {
+        switch (displayMode) {
+            case DROPDOWN:
+                valueToXhtmlEditDropDown(xb);
+                break;
+            case RADIO:
+                valueToXhtmlEditRadio(xb);
+                break;
+            case AUTOCOMPLETE:
+                valueToXhtmlEditAutocomplete(xb);
+                break;
+            default:
+                throw new IllegalStateException(
+                        "Unknown display mode: " + displayMode.name());
+        }
+
+    }
+    private void valueToXhtmlEditDropDown(XhtmlBuffer xb) {
         xb.openElement("fieldset");
         xb.writeLegend(StringUtils.capitalize(label), ATTR_NAME_HTML_CLASS);
 
@@ -127,18 +174,108 @@ public class SelectSearchField extends AbstractSearchField {
         xb.closeElement("select");
     }
 
+    public void valueToXhtmlEditRadio(XhtmlBuffer xb) {
+        Object value = selectionModel.getValue(selectionModelIndex);
+        Map<Object, String> options =
+                selectionModel.getOptions(selectionModelIndex);
+
+        xb.openElement("fieldset");
+        xb.addAttribute("id", id);
+        xb.addAttribute("class", "radio");
+
+        int counter = 0;
+
+        if (!required) {
+            String radioId = id + "_" + counter;
+            boolean checked = (value == null);
+            writeRadioWithLabel(xb, radioId,
+                    getText("elements.field.select.none"), "", checked);
+            counter++;
+        }
+
+        for (Map.Entry<Object,String> option :
+                options.entrySet()) {
+            Object optionValue = option.getKey();
+            String optionStringValue =
+                    (String) OgnlUtils.convertValue(optionValue, String.class);
+            String optionLabel = option.getValue();
+            String radioId = id + "_" + counter;
+            boolean checked =  optionValue.equals(value);
+            writeRadioWithLabel(xb, radioId, optionLabel,
+                    optionStringValue, checked);
+            counter++;
+        }
+        xb.closeElement("fieldset");
+
+        // TODO: gestire radio in cascata
+    }
+     protected void writeRadioWithLabel(XhtmlBuffer xb,
+                                       String radioId,
+                                       String label,
+                                       String stringValue,
+                                       boolean checked) {
+        xb.writeInputRadio(radioId, inputName, stringValue, checked);
+        xb.writeNbsp();
+        xb.writeLabel(label, radioId, null);
+        xb.writeBr();
+    }
+
+    public void valueToXhtmlEditAutocomplete(XhtmlBuffer xb) {
+        Object value = selectionModel.getValue(selectionModelIndex);
+        String stringValue = OgnlUtils.convertValueToString(value);
+        xb.writeInputHidden(id, inputName, stringValue);
+
+        xb.openElement("input");
+        xb.addAttribute("id", autocompleteId);
+        xb.addAttribute("type", "text");
+        xb.addAttribute("name", autocompleteInputName);
+        xb.addAttribute("value", getStringValue());
+        xb.addAttribute("class", null);
+        xb.addAttribute("size", null);
+        xb.closeElement("input");
+
+        String js = composeAutocompleteJs();
+
+        xb.writeJavaScript(js);
+    }
+
+
+
+    public String getStringValue() {
+        Object value = selectionModel.getValue(selectionModelIndex);
+        Map<Object, String> options =
+                selectionModel.getOptions(selectionModelIndex);
+        return options.get(value);
+    }
+
+    public String composeAutocompleteJs() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MessageFormat.format(
+                "setupAutocomplete(''#{0}'', ''{1}'', {2}",
+                StringEscapeUtils.escapeJavaScript(autocompleteId),
+                StringEscapeUtils.escapeJavaScript(selectionModel.getName()),
+                selectionModelIndex));
+        appendIds(sb);
+        sb.append(");");
+        return sb.toString();
+    }
+
+    public void appendIds(StringBuilder sb) {
+        SelectSearchField rootField = this;
+        while (rootField.previousSelectField != null) {
+            rootField = rootField.previousSelectField;
+        }
+        SelectSearchField currentField = rootField;
+        while (currentField != null) {
+            sb.append(MessageFormat.format(", ''#{0}''",
+                    StringEscapeUtils.escapeJavaScript(currentField.getId())));
+            currentField = currentField.nextSelectField;
+        }
+    }
+
     //**************************************************************************
     // Getter/setter
     //**************************************************************************
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
     public SelectionModel getSelectionModel() {
         return selectionModel;
     }
@@ -153,5 +290,53 @@ public class SelectSearchField extends AbstractSearchField {
 
     public void setSelectionModelIndex(int selectionModelIndex) {
         this.selectionModelIndex = selectionModelIndex;
+    }
+
+    public String getComboLabel() {
+        return comboLabel;
+    }
+
+    public void setComboLabel(String comboLabel) {
+        this.comboLabel = comboLabel;
+    }
+
+    public SelectField.DisplayMode getDisplayMode() {
+        return displayMode;
+    }
+
+    public void setDisplayMode(SelectField.DisplayMode displayMode) {
+        this.displayMode = displayMode;
+    }
+
+    public String getAutocompleteId() {
+        return autocompleteId;
+    }
+
+    public void setAutocompleteId(String autocompleteId) {
+        this.autocompleteId = autocompleteId;
+    }
+
+    public String getAutocompleteInputName() {
+        return autocompleteInputName;
+    }
+
+    public void setAutocompleteInputName(String autocompleteInputName) {
+        this.autocompleteInputName = autocompleteInputName;
+    }
+
+    public SelectSearchField getPreviousSelectField() {
+        return previousSelectField;
+    }
+
+    public void setPreviousSelectField(SelectSearchField previousSelectField) {
+        this.previousSelectField = previousSelectField;
+    }
+
+    public SelectSearchField getNextSelectField() {
+        return nextSelectField;
+    }
+
+    public void setNextSelectField(SelectSearchField nextSelectField) {
+        this.nextSelectField = nextSelectField;
     }
 }

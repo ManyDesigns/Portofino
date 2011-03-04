@@ -29,6 +29,7 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.annotations.Select;
+import com.manydesigns.elements.fields.SelectField;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,4 +43,9 @@ public class AnnotatedBean3 {
     @Select(values={"1", "2"},labels={"a", "b"})
     public String field1;
     public String field2;
+    @Select(values={"1", "2"},labels={"a", "b"}, displayMode = SelectField.DisplayMode.AUTOCOMPLETE)
+    public String field3;
+    @Select(values={"1", "2"},labels={"a", "b"}, displayMode = SelectField.DisplayMode.RADIO)
+    public String field4;
+
 }
