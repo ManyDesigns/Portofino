@@ -109,7 +109,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         Table table = context.getModel()
                 .findTableByQualifiedName("jpetstore.PUBLIC.category");
         TableAccessor tableAccessor = new TableAccessor(table);
-        CriteriaImpl criteria = new CriteriaImpl(table);
+        TableCriteria criteria = new TableCriteria(table);
         HashMap<String, String> category= findCategory(tableAccessor, criteria);
 
         int sizePrd = resultProd.size();
@@ -119,7 +119,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         assertEquals("Angelfish", prd0.get("name"));
     }
 
-    private HashMap<String, String> findCategory(TableAccessor tableAccessor, CriteriaImpl criteria) {
+    private HashMap<String, String> findCategory(TableAccessor tableAccessor, TableCriteria criteria) {
         HashMap<String, String> category=null;
         try {
             criteria.eq(tableAccessor.getProperty("catid"), "FISH");
@@ -140,7 +140,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         Table table = context.getModel()
                 .findTableByQualifiedName("jpetstore.PUBLIC.category");
         TableAccessor tableAccessor = new TableAccessor(table);
-        CriteriaImpl criteria = new CriteriaImpl(table);
+        TableCriteria criteria = new TableCriteria(table);
 
         List<Object> resultCat =
                 context.getAllObjects("jpetstore.PUBLIC.category");
@@ -156,7 +156,7 @@ public class HibernateTest extends AbstractPortofinoTest {
 
         //Controllo l'aggiornamento e riporto le cose come stavano
         context.openSession();
-        criteria = new CriteriaImpl(table);
+        criteria = new TableCriteria(table);
         categoria0 =  findCategory(tableAccessor, criteria);
         assertEquals("jpetstore_public_category", categoria0.get("$type$"));
         assertEquals("Pesciu", categoria0.get("name"));

@@ -33,7 +33,6 @@ import com.manydesigns.elements.annotations.Searchable;
 import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.fields.search.SelectSearchField;
-import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -184,17 +183,17 @@ public class SearchFormBuilder extends AbstractFormBuilder {
             SelectionModel selectionModel =
                     selectionProvider.createSelectionModel();
 
-            SelectField previousField = null;
+            SelectSearchField previousField = null;
             for (int i = 0; i < fieldNames.length; i++) {
-                SelectField selectField =
-                        (SelectField)fieldMap.get(fieldNames[i]);
-                selectField.setSelectionModel(selectionModel);
-                selectField.setSelectionModelIndex(i);
+                SelectSearchField selectSearchField =
+                        (SelectSearchField)fieldMap.get(fieldNames[i]);
+                selectSearchField.setSelectionModel(selectionModel);
+                selectSearchField.setSelectionModelIndex(i);
                 if (previousField != null) {
-                    selectField.setPreviousSelectField(previousField);
-                    previousField.setNextSelectField(selectField);
+                    selectSearchField.setPreviousSelectField(previousField);
+                    previousField.setNextSelectField(selectSearchField);
                 }
-                previousField = selectField;
+                previousField = selectSearchField;
             }
         }
 

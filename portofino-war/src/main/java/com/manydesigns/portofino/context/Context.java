@@ -95,7 +95,7 @@ public interface Context {
 
     List<Object> getAllObjects(String qualifiedTableName);
 
-    List<Object> getObjects(CriteriaImpl criteria);
+    List<Object> getObjects(TableCriteria criteria);
 
     List<Object> getObjects(String queryString, Object rootObject);
 
@@ -103,9 +103,9 @@ public interface Context {
 
     List<Object> getObjects(String queryString);
 
-    List<Object> getObjects(String queryString, CriteriaImpl criteria, Object rootObject);
+    List<Object> getObjects(String queryString, TableCriteria criteria, Object rootObject);
 
-    List<Object> getObjects(String queryString, CriteriaImpl criteria);
+    List<Object> getObjects(String queryString, TableCriteria criteria);
 
     void saveObject(String qualifiedTableName, Object obj);
 

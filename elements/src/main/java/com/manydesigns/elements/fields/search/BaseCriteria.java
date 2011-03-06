@@ -27,13 +27,9 @@
  *
  */
 
-package com.manydesigns.portofino.context;
+package com.manydesigns.elements.fields.search;
 
-import com.manydesigns.elements.fields.search.Criteria;
-import com.manydesigns.elements.fields.search.Criterion;
-import com.manydesigns.elements.fields.search.TextMatchMode;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.model.datamodel.Table;
 
 import java.util.ArrayList;
 
@@ -42,34 +38,27 @@ import java.util.ArrayList;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class CriteriaImpl extends ArrayList<Criterion> implements Criteria {
+public class BaseCriteria extends ArrayList<Criterion> implements Criteria {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // Fields
+    // Constructors
     //**************************************************************************
 
-    protected final Table table;
-
-
-    //**************************************************************************
-    // Constructor
-    //**************************************************************************
-
-    public CriteriaImpl(Table table) {
-        this.table = table;
+    public BaseCriteria() {
+        super();
     }
-
 
     //**************************************************************************
     // Criteria building
     //**************************************************************************
 
-    public CriteriaImpl eq(PropertyAccessor accessor, Object value) {
+    public Criteria eq(PropertyAccessor accessor, Object value) {
         add(new EqCriterion(accessor, value));
         return this;
     }
+
     public Criteria ne(PropertyAccessor accessor, Object value) {
         add(new NeCriterion(accessor, value));
         return this;
@@ -80,10 +69,11 @@ public class CriteriaImpl extends ArrayList<Criterion> implements Criteria {
         return this;
     }
 
-    public CriteriaImpl gt(PropertyAccessor accessor, Object value) {
+    public Criteria gt(PropertyAccessor accessor, Object value) {
         add(new GtCriterion(accessor, value));
         return this;
     }
+
     public Criteria ge(PropertyAccessor accessor, Object value) {
         add(new GeCriterion(accessor, value));
         return this;
@@ -93,6 +83,7 @@ public class CriteriaImpl extends ArrayList<Criterion> implements Criteria {
         add(new LtCriterion(accessor, value));
         return this;
     }
+
     public Criteria le(PropertyAccessor accessor, Object value) {
         add(new LeCriterion(accessor, value));
         return this;
@@ -114,17 +105,10 @@ public class CriteriaImpl extends ArrayList<Criterion> implements Criteria {
         add(new IsNullCriterion(accessor));
         return this;
     }
+
     public Criteria isNotNull(PropertyAccessor accessor) {
         add(new IsNotNullCriterion(accessor));
         return this;
-    }
-
-    //**************************************************************************
-    // Getter/setters
-    //**************************************************************************
-
-    public Table getTable() {
-        return table;
     }
 
     //**************************************************************************

@@ -68,8 +68,7 @@ public class SelectSearchField extends AbstractSearchField {
 
 
     public SelectSearchField(PropertyAccessor accessor) {
-        super(accessor);
-        initializeModel(accessor);
+        this(accessor, null);
     }
 
     private void initializeModel(PropertyAccessor accessor) {

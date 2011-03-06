@@ -37,7 +37,7 @@ import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.context.CriteriaImpl;
+import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.database.ConnectionProvider;
 import com.manydesigns.portofino.database.Connections;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
@@ -359,7 +359,7 @@ public class HibernateContextImpl implements Context {
     }
 
     public QueryStringWithParameters getQueryStringWithParametersForCriteria(
-            CriteriaImpl criteria) {
+            TableCriteria criteria) {
         if (criteria == null) {
             return new QueryStringWithParameters("", new Object[0]);
         }
@@ -371,69 +371,69 @@ public class HibernateContextImpl implements Context {
         for (Criterion criterion : criteria) {
             PropertyAccessor accessor = criterion.getPropertyAccessor();
             String hqlFormat;
-            if (criterion instanceof CriteriaImpl.EqCriterion) {
-                CriteriaImpl.EqCriterion eqCriterion =
-                        (CriteriaImpl.EqCriterion) criterion;
+            if (criterion instanceof TableCriteria.EqCriterion) {
+                TableCriteria.EqCriterion eqCriterion =
+                        (TableCriteria.EqCriterion) criterion;
                 Object value = eqCriterion.getValue();
                 hqlFormat = "{0} = ?";
                 parametersList.add(value);
-            } else if (criterion instanceof CriteriaImpl.NeCriterion) {
-                CriteriaImpl.NeCriterion neCriterion =
-                        (CriteriaImpl.NeCriterion) criterion;
+            } else if (criterion instanceof TableCriteria.NeCriterion) {
+                TableCriteria.NeCriterion neCriterion =
+                        (TableCriteria.NeCriterion) criterion;
                 Object value = neCriterion.getValue();
                 hqlFormat = "{0} <> ?";
                 parametersList.add(value);
-            } else if (criterion instanceof CriteriaImpl.BetweenCriterion) {
-                CriteriaImpl.BetweenCriterion betweenCriterion =
-                        (CriteriaImpl.BetweenCriterion) criterion;
+            } else if (criterion instanceof TableCriteria.BetweenCriterion) {
+                TableCriteria.BetweenCriterion betweenCriterion =
+                        (TableCriteria.BetweenCriterion) criterion;
                 Object min = betweenCriterion.getMin();
                 Object max = betweenCriterion.getMax();
                 hqlFormat = "{0} >= ? AND {0} <= ?";
                 parametersList.add(min);
                 parametersList.add(max);
-            } else if (criterion instanceof CriteriaImpl.GtCriterion) {
-                CriteriaImpl.GtCriterion gtCriterion =
-                        (CriteriaImpl.GtCriterion) criterion;
+            } else if (criterion instanceof TableCriteria.GtCriterion) {
+                TableCriteria.GtCriterion gtCriterion =
+                        (TableCriteria.GtCriterion) criterion;
                 Object value = gtCriterion.getValue();
                 hqlFormat = "{0} > ?";
                 parametersList.add(value);
-            } else if (criterion instanceof CriteriaImpl.GeCriterion) {
-                CriteriaImpl.GeCriterion gtCriterion =
-                        (CriteriaImpl.GeCriterion) criterion;
+            } else if (criterion instanceof TableCriteria.GeCriterion) {
+                TableCriteria.GeCriterion gtCriterion =
+                        (TableCriteria.GeCriterion) criterion;
                 Object value = gtCriterion.getValue();
                 hqlFormat = "{0} >= ?";
                 parametersList.add(value);
-            } else if (criterion instanceof CriteriaImpl.LtCriterion) {
-                CriteriaImpl.LtCriterion ltCriterion =
-                        (CriteriaImpl.LtCriterion) criterion;
+            } else if (criterion instanceof TableCriteria.LtCriterion) {
+                TableCriteria.LtCriterion ltCriterion =
+                        (TableCriteria.LtCriterion) criterion;
                 Object value = ltCriterion.getValue();
                 hqlFormat = "{0} < ?";
                 parametersList.add(value);
-            } else if (criterion instanceof CriteriaImpl.LeCriterion) {
-                CriteriaImpl.LeCriterion leCriterion =
-                        (CriteriaImpl.LeCriterion) criterion;
+            } else if (criterion instanceof TableCriteria.LeCriterion) {
+                TableCriteria.LeCriterion leCriterion =
+                        (TableCriteria.LeCriterion) criterion;
                 Object value = leCriterion.getValue();
                 hqlFormat = "{0} <= ?";
                 parametersList.add(value);
-            } else if (criterion instanceof CriteriaImpl.LikeCriterion) {
-                CriteriaImpl.LikeCriterion likeCriterion =
-                        (CriteriaImpl.LikeCriterion) criterion;
+            } else if (criterion instanceof TableCriteria.LikeCriterion) {
+                TableCriteria.LikeCriterion likeCriterion =
+                        (TableCriteria.LikeCriterion) criterion;
                 String value = (String) likeCriterion.getValue();
                 String pattern = processTextMatchMode(
                         likeCriterion.getTextMatchMode(), value);
                 hqlFormat = "{0} like ?";
                 parametersList.add(pattern);
-            } else if (criterion instanceof CriteriaImpl.IlikeCriterion) {
-                CriteriaImpl.IlikeCriterion ilikeCriterion =
-                        (CriteriaImpl.IlikeCriterion) criterion;
+            } else if (criterion instanceof TableCriteria.IlikeCriterion) {
+                TableCriteria.IlikeCriterion ilikeCriterion =
+                        (TableCriteria.IlikeCriterion) criterion;
                 String value = (String) ilikeCriterion.getValue();
                 String pattern = processTextMatchMode(
                         ilikeCriterion.getTextMatchMode(), value);
                 hqlFormat = "lower({0}) like lower(?)";
                 parametersList.add(pattern);
-            } else if (criterion instanceof CriteriaImpl.IsNullCriterion) {
+            } else if (criterion instanceof TableCriteria.IsNullCriterion) {
                 hqlFormat = "{0} is null";
-            } else if (criterion instanceof CriteriaImpl.IsNotNullCriterion) {
+            } else if (criterion instanceof TableCriteria.IsNotNullCriterion) {
                 hqlFormat = "{0} is not null";
             } else {
                 logger.error("Unrecognized criterion: {}", criterion);
@@ -493,7 +493,7 @@ public class HibernateContextImpl implements Context {
         return pattern;
     }
 
-    public List<Object> getObjects(CriteriaImpl criteria) {
+    public List<Object> getObjects(TableCriteria criteria) {
         QueryStringWithParameters queryStringWithParameters =
                 getQueryStringWithParametersForCriteria(criteria);
 
@@ -535,12 +535,12 @@ public class HibernateContextImpl implements Context {
         return table.getQualifiedName();
     }
 
-    public List<Object> getObjects(String queryString, CriteriaImpl criteria) {
+    public List<Object> getObjects(String queryString, TableCriteria criteria) {
         return getObjects(queryString, criteria, null);
     }
 
     public List<Object> getObjects(String queryString,
-                                   CriteriaImpl criteria,
+                                   TableCriteria criteria,
                                    Object rootObject) {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
         String formatString = sqlFormat.getFormatString();

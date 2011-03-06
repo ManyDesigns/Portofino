@@ -237,7 +237,7 @@ public class TextFieldTest extends AbstractElementsTest {
         String text = elementToString(textField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td><textarea id=\"myText\" name=\"myText\" " +
-                "cols=\"70\" rows=\"4\" onkeyup=\"verifyLine(this);\">myValue" +
+                "cols=\"70\" rows=\"4\">myValue" +
                 "</textarea></td>", text);
     }
 
@@ -252,7 +252,7 @@ public class TextFieldTest extends AbstractElementsTest {
         String text = elementToString(textField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td><textarea id=\"myText\" name=\"myText\" " +
-                "cols=\"60\" rows=\"5\" onkeyup=\"verifyLine(this);\">myValue" +
+                "cols=\"60\" rows=\"5\">myValue" +
                 "</textarea></td>", text);
     }
 

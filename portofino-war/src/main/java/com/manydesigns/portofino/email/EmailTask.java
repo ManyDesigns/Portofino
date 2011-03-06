@@ -32,7 +32,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.context.CriteriaImpl;
+import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
@@ -128,7 +128,8 @@ public class EmailTask extends TimerTask {
                     EmailUtils.EMAILQUEUE_TABLE);
             Table table = context.getModel()
                     .findTableByQualifiedName(EmailUtils.EMAILQUEUE_TABLE);
-            CriteriaImpl criteria = new CriteriaImpl(table);
+            TableCriteria criteria = new TableCriteria(table);
+            criteria.eq(accessor.getProperty("state"), EmailUtils.TOBESENT);
             List<Object> emails = context.getObjects(
                     criteria.eq(accessor.getProperty("state"),
                             EmailUtils.TOBESENT));
@@ -164,7 +165,7 @@ public class EmailTask extends TimerTask {
         try {
             Table table = context.getModel()
                     .findTableByQualifiedName(EmailUtils.EMAILQUEUE_TABLE);
-            CriteriaImpl criteria = new CriteriaImpl(table);
+            TableCriteria criteria = new TableCriteria(table);
 
             ClassAccessor accessor = context.getTableAccessor(USERTABLE);
             List<Object> users = context.getObjects(

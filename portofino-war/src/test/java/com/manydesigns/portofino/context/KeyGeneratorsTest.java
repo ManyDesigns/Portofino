@@ -70,7 +70,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         Table table = context.getModel()
                 .findTableByQualifiedName(supplierTable);
         TableAccessor tableAccessor = new TableAccessor(table);
-        CriteriaImpl criteria = new CriteriaImpl(table);
+        TableCriteria criteria = new TableCriteria(table);
         final int expectedId = 3;
         try {
             criteria.eq(tableAccessor.getProperty("suppid"), expectedId);
@@ -95,7 +95,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         Table table = context.getModel()
                 .findTableByQualifiedName(testTable);
         TableAccessor tableAccessor = new TableAccessor(table);
-        CriteriaImpl criteria = new CriteriaImpl(table);
+        TableCriteria criteria = new TableCriteria(table);
         final long expectedId = 1;
         try {
             criteria.eq(tableAccessor.getProperty("id"), expectedId);
@@ -142,7 +142,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         Table table = context.getModel()
                 .findTableByQualifiedName(ordersTable);
         TableAccessor tableAccessor = new TableAccessor(table);
-        CriteriaImpl criteria = new CriteriaImpl(table);
+        TableCriteria criteria = new TableCriteria(table);
         try {
             criteria.eq(tableAccessor.getProperty("orderid"), expectedId);
             List listObjs = context.getObjects(criteria);
@@ -167,7 +167,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         Table table = context.getModel()
                 .findTableByQualifiedName("portofino.public.groups");
         TableAccessor tableAccessor = new TableAccessor(table);
-        CriteriaImpl criteria = new CriteriaImpl(table);
+        TableCriteria criteria = new TableCriteria(table);
         final long expectedId = 3L;
         try {
             criteria.eq(tableAccessor.getProperty("groupId"), expectedId);

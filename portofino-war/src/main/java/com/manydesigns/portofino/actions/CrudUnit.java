@@ -42,7 +42,7 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.context.CriteriaImpl;
+import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.site.usecases.Button;
@@ -614,7 +614,7 @@ public class CrudUnit {
         //Se si passano dati sbagliati al criterio restituisco messaggio d'errore
         // ma nessun risultato
         try {
-            CriteriaImpl criteria = new CriteriaImpl(baseTable);
+            TableCriteria criteria = new TableCriteria(baseTable);
             searchForm.configureCriteria(criteria);
             objects = context.getObjects(query, criteria, root);
         } catch (ClassCastException e) {

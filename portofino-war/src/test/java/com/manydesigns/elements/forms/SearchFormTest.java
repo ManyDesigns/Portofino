@@ -156,54 +156,43 @@ public class SearchFormTest extends AbstractElementsTest {
 
     //testo il form builder aggiungendo un selection provider su field2
     public void testForm5(){
-        try{
-            String[] values = {"v1", "v2", "v3"};
-            String[] labels = {"ll", "l2", "l3"};
-            DefaultSelectionProvider provider = DefaultSelectionProvider.create("provider", values, labels);
+        String[] values = {"v1", "v2", "v3"};
+        String[] labels = {"ll", "l2", "l3"};
+        DefaultSelectionProvider provider = DefaultSelectionProvider.create("provider", values, labels);
 
-            SearchFormBuilder builder =
-                new SearchFormBuilder(AnnotatedBean3.class);
-            builder.configSelectionProvider(provider, "field2");
-            form = builder.build();
-            SelectSearchField field = (SelectSearchField) form.get(1);
+        SearchFormBuilder builder =
+            new SearchFormBuilder(AnnotatedBean3.class);
+        builder.configSelectionProvider(provider, "field2");
+        form = builder.build();
+        SelectSearchField field = (SelectSearchField) form.get(1);
 
-            //Controllo l'html prodotto
-            field.toXhtml(buffer);
-            writer.flush();
-            String result = writer.toString();
-            assertEquals("<fieldset><legend class=\"attr_name\">Field2</legend>" +
-                    "<select id=\"field2\" name=\"field2\"><option value=\"\" " +
-                    "selected=\"selected\">-- Select field2 --</option><option " +
-                    "value=\"v1\">ll</option><option value=\"v2\">l2</option>" +
-                    "<option value=\"v3\">l3</option></select>",
-                result);
-
-        }catch (Throwable e){
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
+        //Controllo l'html prodotto
+        field.toXhtml(buffer);
+        writer.flush();
+        String result = writer.toString();
+        assertEquals("<fieldset><legend class=\"attr_name\">Field2</legend>" +
+                "<select id=\"field2\" name=\"field2\"><option value=\"\" " +
+                "selected=\"selected\">-- Select field2 --</option><option " +
+                "value=\"v1\">ll</option><option value=\"v2\">l2</option>" +
+                "<option value=\"v3\">l3</option></select>",
+            result);
     }
 
     //**************************************************************************
     // test DISPLAYMODE
     //**************************************************************************
     public void testForm6(){
-        try{
-            SelectSearchField field = (SelectSearchField) form.get(2);
-            //Controllo l'html prodotto
-            field.toXhtml(buffer);
-            writer.flush();
-            String result = writer.toString();
-            assertEquals("<input type=\"hidden\" id=\"field3\" name=\"field3\" />" +
-                    "<input id=\"field3_autocomplete\" type=\"text\" " +
-                    "name=\"field3_autocomplete\" /><script " +
-                    "type=\"text/javascript\">" +
-                    "setupAutocomplete('#field3_autocomplete', 'field3', 0);</script>",
-                result);
-        }catch (Throwable e){
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
+        SelectSearchField field = (SelectSearchField) form.get(2);
+        //Controllo l'html prodotto
+        field.toXhtml(buffer);
+        writer.flush();
+        String result = writer.toString();
+        assertEquals("<input type=\"hidden\" id=\"field3\" name=\"field3\" />" +
+                "<input id=\"field3_autocomplete\" type=\"text\" " +
+                "name=\"field3_autocomplete\" /><script " +
+                "type=\"text/javascript\">" +
+                "setupAutocomplete('#field3_autocomplete', 'field3', 0, '#field3');</script>",
+            result);
     }
     public void testForm7(){
         try{
