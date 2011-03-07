@@ -60,98 +60,133 @@ public class SearchFormTest extends AbstractElementsTest {
     }
 
     public void testForm1(){
-        try{
-            SelectSearchField field = (SelectSearchField) form.get(0);
-            //Controllo l'html prodotto
-            field.toXhtml(buffer);
-            writer.flush();
-            String result = writer.toString();
-            assertEquals("<fieldset><legend class=\"attr_name\">Field1</legend>" +
-                    "<select id=\"field1\" name=\"field1\">" +
-                    "<option value=\"\" selected=\"selected\">-- Select field1 --" +
-                    "</option><option value=\"1\">a</option>" +
-                    "<option value=\"2\">b</option></select>",
-                result);
-        }catch (Throwable e){
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
+
+        SelectSearchField field = (SelectSearchField) form.get(0);
+        //Controllo l'html prodotto
+        field.toXhtml(buffer);
+        writer.flush();
+        String result = writer.toString();
+        assertEquals("<fieldset><legend class=\"attr_name\">Field1</legend>" +
+                "<select id=\"field1\" name=\"field1\">" +
+                "<option value=\"\" selected=\"selected\">-- Select field1 --" +
+                "</option><option value=\"1\">a</option>" +
+                "<option value=\"2\">b</option></select></fieldset>",
+            result);
+
     }
 
     //Lettura corretta da request
     public void testForm2(){
-        try{
-            SelectSearchField field = (SelectSearchField) form.get(0);
-            req.setParameter("field1", "1");
-            field.readFromRequest(req);
-            assertEquals("1", field.getSelectionModel().getValue(0));
-            field.toXhtml(buffer);
-            String result = writer.toString();
-            assertEquals("<fieldset><legend class=\"attr_name\">Field1</legend>" +
-                    "<select id=\"field1\" name=\"field1\">" +
-                    "<option value=\"\">-- Select field1 --" +
-                    "</option><option value=\"1\" selected=\"selected\">a</option>" +
-                    "<option value=\"2\">b</option></select>",
-                result);
-            StringBuilder sb = new StringBuilder();
-            field.toSearchString(sb);
-            result = sb.toString();
-            assertEquals("field1=1", result);
-        }catch (Throwable e){
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
+
+        SelectSearchField field = (SelectSearchField) form.get(0);
+        req.setParameter("field1", "1");
+        field.readFromRequest(req);
+        String[] value = (String[]) field.getSelectionModel().getValue(0);
+        assertEquals("1", value[0]);
+        field.toXhtml(buffer);
+        String result = writer.toString();
+        assertEquals("<fieldset><legend class=\"attr_name\">Field1</legend>" +
+                "<select id=\"field1\" name=\"field1\">" +
+                "<option value=\"\">-- Select field1 --" +
+                "</option><option value=\"1\" selected=\"selected\">a</option>" +
+                "<option value=\"2\">b</option></select></fieldset>",
+            result);
+        StringBuilder sb = new StringBuilder();
+        field.toSearchString(sb);
+        result = sb.toString();
+        assertEquals("field1=1", result);
+
+    }
+
+    //Lettura multipla da request con checkbox
+    public void testForm2a(){
+
+        SelectSearchField field = (SelectSearchField) form.get(4);
+        String[] field5Values = {"1", "2"};
+        req.setParameter("field5", field5Values);
+        field.readFromRequest(req);
+        String[] value = (String[]) field.getSelectionModel().getValue(0);
+        assertEquals("1", value[0]);
+        field.toXhtml(buffer);
+        String result = writer.toString();
+        assertEquals("<fieldset><legend class=\"attr_name\">Field5</legend>" +
+                "<input id=\"field5\" type=\"checkbox\" name=\"field5\" value=\"1\" checked=\"checked\" />" +
+                "&nbsp;<label for=\"field5\">a</label><br />" +
+                "<input id=\"field5\" type=\"checkbox\" name=\"field5\" value=\"2\" checked=\"checked\" />" +
+                "&nbsp;<label for=\"field5\">b</label><br /></fieldset>",
+            result);
+        StringBuilder sb = new StringBuilder();
+        field.toSearchString(sb);
+        result = sb.toString();
+        assertEquals("field5=1,field5=2", result);
+    }
+
+    //Lettura multipla da request con multipleselect
+    public void testForm2b(){
+
+        SelectSearchField field = (SelectSearchField) form.get(5);
+        String[] field6Values = {"1", "2"};
+        req.setParameter("field6", field6Values);
+        field.readFromRequest(req);
+        String[] value = (String[]) field.getSelectionModel().getValue(0);
+        assertEquals("1", value[0]);
+        field.toXhtml(buffer);
+        String result = writer.toString();
+        assertEquals("<fieldset><legend class=\"attr_name\">Field6</legend>" +
+                "<select id=\"field6\" name=\"field6\" multiple=\"multiple\" " +
+                "size=\"5\"><option value=\"1\" selected=\"selected\">a" +
+                "</option><option value=\"2\" selected=\"selected\">" +
+                "b</option></select></fieldset>",
+            result);
+        StringBuilder sb = new StringBuilder();
+        field.toSearchString(sb);
+        result = sb.toString();
+        assertEquals("field6=1,field6=2", result);
     }
 
     //Lettura dato non esitente da request
     public void testForm3(){
-        try{
-            SelectSearchField field = (SelectSearchField) form.get(0);
-            req.setParameter("field1", "3");
-            field.readFromRequest(req);
-            field.toXhtml(buffer);
-            String result = writer.toString();
 
-            //Il dato non è nel modello
-            assertNull(field.getSelectionModel().getValue(0));
+        SelectSearchField field = (SelectSearchField) form.get(0);
+        req.setParameter("field1", "3");
+        field.readFromRequest(req);
+        field.toXhtml(buffer);
+        String result = writer.toString();
 
-            //Devo avere il campo vuoto selezionato
-            assertEquals("<fieldset><legend class=\"attr_name\">Field1</legend>" +
-                    "<select id=\"field1\" name=\"field1\">" +
-                    "<option value=\"\" selected=\"selected\">-- Select field1 --" +
-                    "</option><option value=\"1\">a</option>" +
-                    "<option value=\"2\">b</option></select>",
-                result);
-        }catch (Throwable e){
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
+        //Il dato non è nel modello
+        assertNull(field.getSelectionModel().getValue(0));
+
+        //Devo avere il campo vuoto selezionato
+        assertEquals("<fieldset><legend class=\"attr_name\">Field1</legend>" +
+                "<select id=\"field1\" name=\"field1\">" +
+                "<option value=\"\" selected=\"selected\">-- Select field1 --" +
+                "</option><option value=\"1\">a</option>" +
+                "<option value=\"2\">b</option></select></fieldset>",
+            result);
+
     }
 
     //Lettura da request vuota
     public void testForm4(){
-        try{
-            SelectSearchField field = (SelectSearchField) form.get(0);
 
-            field.readFromRequest(req);
-            field.toXhtml(buffer);
-            String result = writer.toString();
+        SelectSearchField field = (SelectSearchField) form.get(0);
 
-            //Il dato non è nel modello
-            assertNull(field.getSelectionModel().getValue(0));
+        field.readFromRequest(req);
+        field.toXhtml(buffer);
+        String result = writer.toString();
 
-            //Devo avere il campo vuoto selezionato
-            assertEquals("<fieldset><legend class=\"attr_name\">Field1</legend>" +
-                    "<select id=\"field1\" name=\"field1\">" +
-                    "<option value=\"\" selected=\"selected\">-- Select field1 --" +
-                    "</option><option value=\"1\">a</option>" +
-                    "<option value=\"2\">b</option></select>",
-                result);
+        //Il dato non è nel modello
+        assertNull(field.getSelectionModel().getValue(0));
 
-        }catch (Throwable e){
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
+        //Devo avere il campo vuoto selezionato
+        assertEquals("<fieldset><legend class=\"attr_name\">Field1</legend>" +
+                "<select id=\"field1\" name=\"field1\">" +
+                "<option value=\"\" selected=\"selected\">-- Select field1 --" +
+                "</option><option value=\"1\">a</option>" +
+                "<option value=\"2\">b</option></select></fieldset>",
+            result);
+
+
     }
 
     //testo il form builder aggiungendo un selection provider su field2
@@ -174,7 +209,7 @@ public class SearchFormTest extends AbstractElementsTest {
                 "<select id=\"field2\" name=\"field2\"><option value=\"\" " +
                 "selected=\"selected\">-- Select field2 --</option><option " +
                 "value=\"v1\">ll</option><option value=\"v2\">l2</option>" +
-                "<option value=\"v3\">l3</option></select>",
+                "<option value=\"v3\">l3</option></select></fieldset>",
             result);
     }
 
@@ -195,24 +230,48 @@ public class SearchFormTest extends AbstractElementsTest {
             result);
     }
     public void testForm7(){
-        try{
-            SelectSearchField field = (SelectSearchField) form.get(3);
-            //Controllo l'html prodotto
-            field.toXhtml(buffer);
-            writer.flush();
-            String result = writer.toString();
-            assertEquals("<fieldset id=\"field4\" class=\"radio\"><input type=\"radio\"" +
-                    " id=\"field4_0\" name=\"field4\" value=\"\" checked=\"checked\" />" +
-                    "&nbsp;<label for=\"field4_0\">None</label><br /><input type=\"radio\"" +
-                    " id=\"field4_1\" name=\"field4\" value=\"1\" />" +
-                    "&nbsp;<label for=\"field4_1\">a</label><br />" +
-                    "<input type=\"radio\" id=\"field4_2\" name=\"field4\" value=\"2\" />" +
-                    "&nbsp;<label for=\"field4_2\">b</label><br /></fieldset>",
-                result);
-        }catch (Throwable e){
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
+        SelectSearchField field = (SelectSearchField) form.get(3);
+        //Controllo l'html prodotto
+        field.toXhtml(buffer);
+        writer.flush();
+        String result = writer.toString();
+        assertEquals("<fieldset id=\"field4\" class=\"radio\"><input type=\"radio\"" +
+                " id=\"field4_0\" name=\"field4\" value=\"\" checked=\"checked\" />" +
+                "&nbsp;<label for=\"field4_0\">None</label><br /><input type=\"radio\"" +
+                " id=\"field4_1\" name=\"field4\" value=\"1\" />" +
+                "&nbsp;<label for=\"field4_1\">a</label><br />" +
+                "<input type=\"radio\" id=\"field4_2\" name=\"field4\" value=\"2\" />" +
+                "&nbsp;<label for=\"field4_2\">b</label><br /></fieldset>",
+            result);
+    }
+    public void testForm8(){
+
+        SelectSearchField field = (SelectSearchField) form.get(4);
+        //Controllo l'html prodotto
+        field.toXhtml(buffer);
+        writer.flush();
+        String result = writer.toString();
+        assertEquals("<fieldset><legend class=\"attr_name\">Field5</legend>" +
+                "<input id=\"field5\" type=\"checkbox\" name=\"field5\" value=\"1\" />" +
+                "&nbsp;<label for=\"field5\">a</label><br />" +
+                "<input id=\"field5\" type=\"checkbox\" name=\"field5\" value=\"2\" />" +
+                "&nbsp;<label for=\"field5\">b</label><br /></fieldset>",
+            result);
+
+    }
+    public void testForm9(){
+
+        SelectSearchField field = (SelectSearchField) form.get(5);
+        //Controllo l'html prodotto
+        field.toXhtml(buffer);
+        writer.flush();
+        String result = writer.toString();
+        assertEquals("<fieldset>" +
+                "<legend class=\"attr_name\">Field6</legend>" +
+                "<select id=\"field6\" name=\"field6\" multiple=\"multiple\" size=\"5\">" +
+                "<option value=\"1\">a</option><option value=\"2\">b</option>" +
+                "</select></fieldset>",
+            result);
     }
     @Override
     public void tearDown() throws Exception {

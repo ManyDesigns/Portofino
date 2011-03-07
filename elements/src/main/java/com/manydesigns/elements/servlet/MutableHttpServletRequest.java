@@ -85,6 +85,11 @@ public class MutableHttpServletRequest implements MultipartRequest {
         parameterMap.put(key, values);
     }
 
+    public void setParameter(String key, String[] value) {
+        String[] values = value;
+        parameterMap.put(key, values);
+    }
+
     public void addFileItem(String name, FileItem item) {
         FileItem[] oldValues = fileItemMap.get(name);
         FileItem[] newValues = (FileItem[]) ArrayUtils.add(oldValues, item);

@@ -31,6 +31,7 @@ package com.manydesigns.elements.annotations.impl;
 
 import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.fields.SelectField;
+import com.manydesigns.elements.fields.search.SelectSearchField;
 
 import java.lang.annotation.Annotation;
 
@@ -45,18 +46,24 @@ public class SelectImpl implements Select {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     private SelectField.DisplayMode displayMode;
+    private SelectSearchField.DisplayMode searchDisplayMode;
     private String[] values;
     private String[] labels;
 
-    public SelectImpl(SelectField.DisplayMode displayMode,
+    public SelectImpl(SelectField.DisplayMode displayMode, SelectSearchField.DisplayMode searchDisplayMode,
                       String[] values, String[] labels) {
         this.displayMode = displayMode;
+        this.searchDisplayMode=searchDisplayMode;
         this.values = values;
         this.labels = labels;
     }
 
     public SelectField.DisplayMode displayMode() {
         return displayMode;
+    }
+
+    public SelectSearchField.DisplayMode searchDisplayMode() {
+        return searchDisplayMode;
     }
 
     public String[] values() {

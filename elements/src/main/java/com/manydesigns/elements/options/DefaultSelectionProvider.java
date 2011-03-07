@@ -34,6 +34,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -345,7 +346,14 @@ public class DefaultSelectionProvider implements SelectionProvider {
                         if (j > maxMatchingIndex) {
                             maxMatchingIndex = j;
                         }
-                    } else {
+                    } else if (matching && value!=null &&
+                            value instanceof Object[]
+                            && ArrayUtils.contains((Object[]) value, cellValue)) {
+                         if (j > maxMatchingIndex) {
+                            maxMatchingIndex = j;
+                         }
+                    }
+                    else {
                         matching = false;
                     }
                 }
@@ -372,5 +380,4 @@ public class DefaultSelectionProvider implements SelectionProvider {
         }
         return false;
     }
-
 }
