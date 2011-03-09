@@ -80,8 +80,8 @@ public class SearchFormTest extends AbstractElementsTest {
         SelectSearchField field = (SelectSearchField) form.get(0);
         req.setParameter("field1", "1");
         field.readFromRequest(req);
-        String[] value = (String[]) field.getSelectionModel().getValue(0);
-        assertEquals("1", value[0]);
+        Object[] value = (Object[]) field.getSelectionModel().getValue(0);
+        assertEquals("1", (String) value[0]);
         field.toXhtml(buffer);
         String result = writer.toString();
         assertEquals("<fieldset><legend class=\"attr_name\">Field1</legend>" +
@@ -103,8 +103,8 @@ public class SearchFormTest extends AbstractElementsTest {
         String[] field5Values = {"1", "2"};
         req.setParameter("field5", field5Values);
         field.readFromRequest(req);
-        String[] value = (String[]) field.getSelectionModel().getValue(0);
-        assertEquals("1", value[0]);
+        Object[] value = (Object[]) field.getSelectionModel().getValue(0);
+        assertEquals("1", (String) value[0]);
         field.toXhtml(buffer);
         String result = writer.toString();
         assertEquals("<fieldset><legend class=\"attr_name\">Field5</legend>" +
@@ -126,8 +126,8 @@ public class SearchFormTest extends AbstractElementsTest {
         String[] field6Values = {"1", "2"};
         req.setParameter("field6", field6Values);
         field.readFromRequest(req);
-        String[] value = (String[]) field.getSelectionModel().getValue(0);
-        assertEquals("1", value[0]);
+        Object[] value = (Object[]) field.getSelectionModel().getValue(0);
+        assertEquals("1", (String) value[0]);
         field.toXhtml(buffer);
         String result = writer.toString();
         assertEquals("<fieldset><legend class=\"attr_name\">Field6</legend>" +
@@ -203,7 +203,7 @@ public class SearchFormTest extends AbstractElementsTest {
         field.toXhtml(buffer);
         writer.flush();
         String result = writer.toString();
-        assertEquals("<fieldset id=\"field2\" class=\"radio\"><legend class=\"attr_name\">Field2</legend><input type=\"radio\" id=\"field2_0\" name=\"field2\" value=\"\" checked=\"checked\" />&nbsp;<label for=\"field2_0\">None</label><br /><input type=\"radio\" id=\"field2_1\" name=\"field2\" value=\"v1\" />&nbsp;<label for=\"field2_1\">ll</label><br /><input type=\"radio\" id=\"field2_2\" name=\"field2\" value=\"v2\" />&nbsp;<label for=\"field2_2\">l2</label><br /><input type=\"radio\" id=\"field2_3\" name=\"field2\" value=\"v3\" />&nbsp;<label for=\"field2_3\">l3</label><br /></fieldset>",
+        assertEquals("<fieldset><legend class=\"attr_name\">Field2</legend><select id=\"field2\" name=\"field2\"><option value=\"\" selected=\"selected\">-- Select field2 --</option><option value=\"v1\">ll</option><option value=\"v2\">l2</option><option value=\"v3\">l3</option></select></fieldset>",
             result);
     }
 
@@ -281,7 +281,7 @@ public class SearchFormTest extends AbstractElementsTest {
         field.toXhtml(buffer);
         writer.flush();
         String result = writer.toString();
-        assertEquals("<fieldset id=\"field2\" class=\"radio\"><legend class=\"attr_name\">Field2</legend><input type=\"radio\" id=\"field2_0\" name=\"field2\" value=\"\" checked=\"checked\" />&nbsp;<label for=\"field2_0\">None</label><br /><input type=\"radio\" id=\"field2_1\" name=\"field2\" value=\"v1\" />&nbsp;<label for=\"field2_1\">ll</label><br /><input type=\"radio\" id=\"field2_2\" name=\"field2\" value=\"v2\" />&nbsp;<label for=\"field2_2\">l2</label><br /><input type=\"radio\" id=\"field2_3\" name=\"field2\" value=\"v3\" />&nbsp;<label for=\"field2_3\">l3</label><br /></fieldset>",
+        assertEquals("<fieldset><legend class=\"attr_name\">Field2</legend><select id=\"field2\" name=\"field2\"><option value=\"\" selected=\"selected\">-- Select field2 --</option><option value=\"v1\">ll</option><option value=\"v2\">l2</option><option value=\"v3\">l3</option></select></fieldset>",
             result);
     }
 }

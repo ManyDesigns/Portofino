@@ -89,7 +89,7 @@ public class SelectSearchField extends AbstractSearchField {
             selectionModel = selectionProvider.createSelectionModel();
             displayMode = annotation.searchDisplayMode();
         } else {
-            displayMode = DisplayMode.MULTIPLESELECT;
+            displayMode = DisplayMode.DROPDOWN;
         }
         selectionModelIndex = 0;
         comboLabel = getText("elements.field.select.select", label);

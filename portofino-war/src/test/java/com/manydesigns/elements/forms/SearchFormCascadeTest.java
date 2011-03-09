@@ -96,7 +96,6 @@ public class SearchFormCascadeTest  extends AbstractElementsTest {
                 "<select id=\"p2\" name=\"p2\"></select>" +
                 "</fieldset></li></ul>", text);
         req.addParameter("p1", "1");
-        req.addParameter("p1", "2");
         form.readFromRequest(req);
         text = elementToString(form);
         assertNotNull(selectField1.getValues());
@@ -106,11 +105,11 @@ public class SearchFormCascadeTest  extends AbstractElementsTest {
         assertNotNull(options0);
         assertEquals(2, options0.size());
         assertEquals("paperino", options0.get(1));
-        assertEquals("cip", options0.get(2));
+
 
         Map<Object,String> options1 = selectField2.getOptions();
         assertNotNull(options1);
-        assertEquals(4, options1.size());
+        assertEquals(3, options1.size());
         assertEquals("qui", options1.get(1));
         assertEquals("quo", options1.get(2));
         assertEquals("qua", options1.get(3));
