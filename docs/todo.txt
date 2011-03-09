@@ -1,0 +1,6 @@
+************************** TEST DA IMPLEMENTARE ********************************
+- CrudUnit nella Search prevaleva sempre la SearchString sulla lettura dati dalla
+  request. In questo modo non si riuscivano più a fare nuove ricerche a meno di
+  ricare la pagina. Giampiero: Ho tolto la searchString come parametro hidden in
+  search.jsp.
+  Bisogna farci un test sopra.

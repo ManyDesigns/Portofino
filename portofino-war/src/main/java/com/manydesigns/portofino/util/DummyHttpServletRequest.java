@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.util;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
@@ -284,6 +286,17 @@ public class DummyHttpServletRequest implements HttpServletRequest {
 
     public int getLocalPort() {
         throw new UnsupportedOperationException();
+    }
+
+    public void addParameter(String key, String value) {
+        if(parameterMap.get(key)!=null){
+            String[] values = parameterMap.remove(key);
+            values = (String[]) ArrayUtils.add(values, value);
+            parameterMap.put(key, values);
+        } else {
+            String[] values = {value};
+            parameterMap.put(key, values);
+        }
     }
 
     public void setParameter(String key, String value) {

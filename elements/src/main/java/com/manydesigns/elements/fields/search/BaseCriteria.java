@@ -59,6 +59,11 @@ public class BaseCriteria extends ArrayList<Criterion> implements Criteria {
         return this;
     }
 
+    public Criteria in(PropertyAccessor accessor, Object[] values) {
+        add(new InCriterion(accessor, values));
+        return this;
+    }
+
     public Criteria ne(PropertyAccessor accessor, Object value) {
         add(new NeCriterion(accessor, value));
         return this;
@@ -137,6 +142,19 @@ public class BaseCriteria extends ArrayList<Criterion> implements Criteria {
 
         public Object getValue() {
             return value;
+        }
+    }
+
+    public static class InCriterion extends AbstractCriterion {
+        protected final Object[] values;
+
+        public InCriterion(PropertyAccessor accessor, Object[] values) {
+            super(accessor);
+            this.values = values;
+        }
+
+        public Object[] getValues() {
+            return values;
         }
     }
 

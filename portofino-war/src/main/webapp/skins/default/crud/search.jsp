@@ -15,9 +15,6 @@
             </div>
         </s:if>
         <mdes:write value="tableForm"/>
-        <s:if test="searchString != null">
-            <s:hidden name="searchString" value="%{searchString}"/>
-        </s:if>
         <s:set name="cancelReturnUrl"
                value="%{pkHelper.generateSearchUrl(searchString)}"/>
         <s:hidden name="cancelReturnUrl" value="%{#cancelReturnUrl}"/>

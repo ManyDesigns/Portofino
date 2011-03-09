@@ -497,32 +497,30 @@ public class CrudUnit {
         searchForm = searchFormBuilder
                 .configPrefix(prefix)
                 .build();
-        //TODO Giampiero fare un check:
-        // faccio prima passare dalla request e poi da searchstring 
-        //if (searchString == null) {
-        searchForm.readFromRequest(req);
-        searchString = searchForm.toSearchString();
-        if (searchString.length() == 0) {
-            searchString = null;
-        }
-        //} else {
-        if (searchString != null){
-        DummyHttpServletRequest dummyRequest =
-                new DummyHttpServletRequest();
-        String[] parts = searchString.split(",");
-        Pattern pattern = Pattern.compile("(.*)=(.*)");
-        for (String part : parts) {
-            Matcher matcher = pattern.matcher(part);
-            if (matcher.matches()) {
-                String key = matcher.group(1);
-                String value = matcher.group(2);
-                logger.debug("Matched part: {}={}", key, value);
-                dummyRequest.setParameter(key, value);
-            } else {
-                logger.debug("Could not match part: {}", part);
+
+        if (StringUtils.isBlank(searchString)) {
+            searchForm.readFromRequest(req);
+            searchString = searchForm.toSearchString();
+            if (searchString.length() == 0) {
+                searchString = null;
             }
-        }
-        searchForm.readFromRequest(dummyRequest);
+        } else {
+            DummyHttpServletRequest dummyRequest =
+                    new DummyHttpServletRequest();
+            String[] parts = searchString.split(",");
+            Pattern pattern = Pattern.compile("(.*)=(.*)");
+            for (String part : parts) {
+                Matcher matcher = pattern.matcher(part);
+                if (matcher.matches()) {
+                    String key = matcher.group(1);
+                    String value = matcher.group(2);
+                    logger.debug("Matched part: {}={}", key, value);
+                    dummyRequest.addParameter(key, value);
+                } else {
+                    logger.debug("Could not match part: {}", part);
+                }
+            }
+            searchForm.readFromRequest(dummyRequest);
         }
     }
 

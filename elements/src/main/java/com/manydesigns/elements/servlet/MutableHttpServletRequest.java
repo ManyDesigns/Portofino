@@ -85,8 +85,7 @@ public class MutableHttpServletRequest implements MultipartRequest {
         parameterMap.put(key, values);
     }
 
-    public void setParameter(String key, String[] value) {
-        String[] values = value;
+    public void setParameter(String key, String[] values) {
         parameterMap.put(key, values);
     }
 

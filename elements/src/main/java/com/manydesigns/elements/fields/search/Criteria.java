@@ -38,6 +38,8 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 public interface Criteria {
     Criteria eq(PropertyAccessor accessor, Object value);
 
+    Criteria in(PropertyAccessor accessor, Object[] value);
+
     Criteria ne(PropertyAccessor accessor, Object value);
 
     Criteria between(PropertyAccessor accessor, Object min, Object max);

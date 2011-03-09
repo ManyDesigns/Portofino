@@ -205,11 +205,7 @@ public class SearchFormTest extends AbstractElementsTest {
         field.toXhtml(buffer);
         writer.flush();
         String result = writer.toString();
-        assertEquals("<fieldset><legend class=\"attr_name\">Field2</legend>" +
-                "<select id=\"field2\" name=\"field2\"><option value=\"\" " +
-                "selected=\"selected\">-- Select field2 --</option><option " +
-                "value=\"v1\">ll</option><option value=\"v2\">l2</option>" +
-                "<option value=\"v3\">l3</option></select></fieldset>",
+        assertEquals("<fieldset id=\"field2\" class=\"radio\"><legend class=\"attr_name\">Field2</legend><input type=\"radio\" id=\"field2_0\" name=\"field2\" value=\"\" checked=\"checked\" />&nbsp;<label for=\"field2_0\">None</label><br /><input type=\"radio\" id=\"field2_1\" name=\"field2\" value=\"v1\" />&nbsp;<label for=\"field2_1\">ll</label><br /><input type=\"radio\" id=\"field2_2\" name=\"field2\" value=\"v2\" />&nbsp;<label for=\"field2_2\">l2</label><br /><input type=\"radio\" id=\"field2_3\" name=\"field2\" value=\"v3\" />&nbsp;<label for=\"field2_3\">l3</label><br /></fieldset>",
             result);
     }
 
@@ -222,11 +218,7 @@ public class SearchFormTest extends AbstractElementsTest {
         field.toXhtml(buffer);
         writer.flush();
         String result = writer.toString();
-        assertEquals("<input type=\"hidden\" id=\"field3\" name=\"field3\" />" +
-                "<input id=\"field3_autocomplete\" type=\"text\" " +
-                "name=\"field3_autocomplete\" /><script " +
-                "type=\"text/javascript\">" +
-                "setupAutocomplete('#field3_autocomplete', 'field3', 0, '#field3');</script>",
+        assertEquals("<input type=\"hidden\" id=\"field3\" name=\"field3\" /><fieldset><legend class=\"attr_name\">Field3</legend><input id=\"field3_autocomplete\" type=\"text\" name=\"field3_autocomplete\" /><script type=\"text/javascript\">setupAutocomplete('#field3_autocomplete', 'field3', 0, '#field3');</script></fieldset>",
             result);
     }
     public void testForm7(){
@@ -235,13 +227,7 @@ public class SearchFormTest extends AbstractElementsTest {
         field.toXhtml(buffer);
         writer.flush();
         String result = writer.toString();
-        assertEquals("<fieldset id=\"field4\" class=\"radio\"><input type=\"radio\"" +
-                " id=\"field4_0\" name=\"field4\" value=\"\" checked=\"checked\" />" +
-                "&nbsp;<label for=\"field4_0\">None</label><br /><input type=\"radio\"" +
-                " id=\"field4_1\" name=\"field4\" value=\"1\" />" +
-                "&nbsp;<label for=\"field4_1\">a</label><br />" +
-                "<input type=\"radio\" id=\"field4_2\" name=\"field4\" value=\"2\" />" +
-                "&nbsp;<label for=\"field4_2\">b</label><br /></fieldset>",
+        assertEquals("<fieldset id=\"field4\" class=\"radio\"><legend class=\"attr_name\">Field4</legend><input type=\"radio\" id=\"field4_0\" name=\"field4\" value=\"\" checked=\"checked\" />&nbsp;<label for=\"field4_0\">None</label><br /><input type=\"radio\" id=\"field4_1\" name=\"field4\" value=\"1\" />&nbsp;<label for=\"field4_1\">a</label><br /><input type=\"radio\" id=\"field4_2\" name=\"field4\" value=\"2\" />&nbsp;<label for=\"field4_2\">b</label><br /></fieldset>",
             result);
     }
     public void testForm8(){
@@ -279,5 +265,25 @@ public class SearchFormTest extends AbstractElementsTest {
         if (writer!=null){
             writer.close();
         }
+    }
+
+    //testo il form builder aggiungendo un selection provider a cascata su field2
+    public void testForm10(){
+        String[] values = {"v1", "v2", "v3"};
+        String[] labels = {"ll", "l2", "l3"};
+        DefaultSelectionProvider provider = DefaultSelectionProvider.create("provider", values, labels);
+
+        SearchFormBuilder builder =
+            new SearchFormBuilder(AnnotatedBean3.class);
+        builder.configSelectionProvider(provider, "field2");
+        form = builder.build();
+        SelectSearchField field = (SelectSearchField) form.get(1);
+
+        //Controllo l'html prodotto
+        field.toXhtml(buffer);
+        writer.flush();
+        String result = writer.toString();
+        assertEquals("<fieldset id=\"field2\" class=\"radio\"><legend class=\"attr_name\">Field2</legend><input type=\"radio\" id=\"field2_0\" name=\"field2\" value=\"\" checked=\"checked\" />&nbsp;<label for=\"field2_0\">None</label><br /><input type=\"radio\" id=\"field2_1\" name=\"field2\" value=\"v1\" />&nbsp;<label for=\"field2_1\">ll</label><br /><input type=\"radio\" id=\"field2_2\" name=\"field2\" value=\"v2\" />&nbsp;<label for=\"field2_2\">l2</label><br /><input type=\"radio\" id=\"field2_3\" name=\"field2\" value=\"v3\" />&nbsp;<label for=\"field2_3\">l3</label><br /></fieldset>",
+            result);
     }
 }

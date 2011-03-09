@@ -78,6 +78,11 @@ public class TableCriteria extends BaseCriteria {
     }
 
     @Override
+    public TableCriteria in(PropertyAccessor accessor, Object[] values) {
+        return (TableCriteria)super.in(accessor, values);
+    }
+
+    @Override
     public TableCriteria ne(PropertyAccessor accessor, Object value) {
         return (TableCriteria)super.ne(accessor, value);
     }

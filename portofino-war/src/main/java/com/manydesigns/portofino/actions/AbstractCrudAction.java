@@ -173,7 +173,6 @@ public abstract class  AbstractCrudAction extends PortofinoAction
                 return (String) method.invoke(targetCrudUnit);
             }
         }
-
         return rootCrudUnit.execute();
     }
 

@@ -57,8 +57,7 @@ public class SelectSearchField extends AbstractSearchField {
         RADIO,
         AUTOCOMPLETE,
         MULTIPLESELECT,
-        CHECKBOX,
-        TREE
+        CHECKBOX
     }
 
     protected SelectionModel selectionModel;
@@ -103,22 +102,22 @@ public class SelectSearchField extends AbstractSearchField {
         initializeModel(accessor);
     }
 
-
-
     public void toSearchString(StringBuilder sb) {
         Object[] values = (Object[]) selectionModel.getValue(selectionModelIndex);
-        for (Object value : values){
-            String valueString = OgnlUtils.convertValueToString(value);
-            appendToSearchString(sb, inputName,
-                valueString);
+        if (null==values){
+            return;
+        } else {
+            for (Object value : values){
+                String valueString = OgnlUtils.convertValueToString(value);
+                appendToSearchString(sb, inputName,
+                    valueString);
+            }
         }
     }
 
     public void configureCriteria(Criteria criteria) {
-        Object[] values = (Object[]) selectionModel.getValue(selectionModelIndex);
-        for (Object value : values) {
-            criteria.eq(accessor, OgnlUtils.convertValue(value, accessor.getType()));
-        }
+       Object[] values = (Object[]) selectionModel.getValue(selectionModelIndex);
+       criteria.in(accessor, values);
     }
 
     //**************************************************************************
@@ -159,7 +158,6 @@ public class SelectSearchField extends AbstractSearchField {
                 throw new IllegalStateException(
                         "Unknown display mode: " + displayMode.name());
         }
-
     }
 
     private void valueToXhtmlDropDown(XhtmlBuffer xb) {
@@ -199,7 +197,8 @@ public class SelectSearchField extends AbstractSearchField {
         xb.openElement("fieldset");
         xb.addAttribute("id", id);
         xb.addAttribute("class", "radio");
-
+        xb.writeLegend(StringUtils.capitalize(label), ATTR_NAME_HTML_CLASS);
+        
         int counter = 0;
 
         if (!required) {
@@ -245,6 +244,8 @@ public class SelectSearchField extends AbstractSearchField {
         } else {
             xb.writeInputHidden(id, inputName, null);
         }
+        xb.openElement("fieldset");
+        xb.writeLegend(StringUtils.capitalize(label), ATTR_NAME_HTML_CLASS);
 
         xb.openElement("input");
         xb.addAttribute("id", autocompleteId);
@@ -258,8 +259,8 @@ public class SelectSearchField extends AbstractSearchField {
         xb.closeElement("input");
 
         String js = composeAutocompleteJs();
-
         xb.writeJavaScript(js);
+        xb.closeElement("fieldset");
     }
 
     private void valueToXhtmlCheckbox(XhtmlBuffer xb) {

@@ -31,6 +31,7 @@ package com.manydesigns.portofino.context.hibernate;
 
 import com.manydesigns.elements.fields.search.Criterion;
 import com.manydesigns.elements.fields.search.TextMatchMode;
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlSqlFormat;
@@ -68,9 +69,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
@@ -377,6 +378,27 @@ public class HibernateContextImpl implements Context {
                 Object value = eqCriterion.getValue();
                 hqlFormat = "{0} = ?";
                 parametersList.add(value);
+            }else if (criterion instanceof TableCriteria.InCriterion) {
+                TableCriteria.InCriterion inCriterion =
+                        (TableCriteria.InCriterion) criterion;
+                Object[] values = inCriterion.getValues();
+                StringBuffer params = new StringBuffer();
+                boolean first = true;
+                if (values!=null){
+                    for (Object value : values){
+                        if (!first){
+                            params.append(", ?");
+                        } else {
+                            params.append("?");
+                            first = false;
+                        }
+                        parametersList.add(OgnlUtils.convertValue(value,
+                                inCriterion.getPropertyAccessor().getType()));
+                    }
+                    hqlFormat = "{0} in ("+params.toString()+")";
+                } else {
+                    hqlFormat ="";
+                }
             } else if (criterion instanceof TableCriteria.NeCriterion) {
                 TableCriteria.NeCriterion neCriterion =
                         (TableCriteria.NeCriterion) criterion;
