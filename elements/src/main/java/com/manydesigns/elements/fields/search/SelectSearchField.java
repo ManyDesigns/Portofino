@@ -89,7 +89,7 @@ public class SelectSearchField extends AbstractSearchField {
             selectionModel = selectionProvider.createSelectionModel();
             displayMode = annotation.searchDisplayMode();
         } else {
-            displayMode = DisplayMode.DROPDOWN;
+            displayMode = DisplayMode.MULTIPLESELECT;
         }
         selectionModelIndex = 0;
         comboLabel = getText("elements.field.select.select", label);
@@ -126,10 +126,17 @@ public class SelectSearchField extends AbstractSearchField {
 
     public void readFromRequest(HttpServletRequest req) {
         Object[] values = req.getParameterValues(inputName);
+
+
         if (values == null){
             return;
         } else {
-            selectionModel.setValue(selectionModelIndex, values);
+            Object[] castedValues = new Object[values.length];
+            for (int i=0;i<values.length;i++){
+                castedValues[i] =
+                        OgnlUtils.convertValue((String) values[i], accessor.getType());
+            }
+            selectionModel.setValue(selectionModelIndex, castedValues);
         }
     }
 
@@ -403,5 +410,21 @@ public class SelectSearchField extends AbstractSearchField {
 
     public void setNextSelectField(SelectSearchField nextSelectField) {
         this.nextSelectField = nextSelectField;
+    }
+
+    public Object[] getValues() {
+        return (Object[]) selectionModel.getValue(selectionModelIndex);
+    }
+
+    public void setValue(Object[] values) {
+        selectionModel.setValue(selectionModelIndex, values);
+    }
+
+    public Map<Object, String> getOptions() {
+        return selectionModel.getOptions(selectionModelIndex);
+    }
+
+    public String getLabelSearch() {
+        return selectionModel.getLabelSearch(selectionModelIndex);
     }
 }

@@ -31,7 +31,6 @@ package com.manydesigns.portofino.context.hibernate;
 
 import com.manydesigns.elements.fields.search.Criterion;
 import com.manydesigns.elements.fields.search.TextMatchMode;
-import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlSqlFormat;
@@ -392,8 +391,7 @@ public class HibernateContextImpl implements Context {
                             params.append("?");
                             first = false;
                         }
-                        parametersList.add(OgnlUtils.convertValue(value,
-                                inCriterion.getPropertyAccessor().getType()));
+                        parametersList.add(value);
                     }
                     hqlFormat = "{0} in ("+params.toString()+")";
                 } else {

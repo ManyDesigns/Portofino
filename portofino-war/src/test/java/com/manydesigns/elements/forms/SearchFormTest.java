@@ -77,7 +77,6 @@ public class SearchFormTest extends AbstractElementsTest {
 
     //Lettura corretta da request
     public void testForm2(){
-
         SelectSearchField field = (SelectSearchField) form.get(0);
         req.setParameter("field1", "1");
         field.readFromRequest(req);
@@ -95,7 +94,6 @@ public class SearchFormTest extends AbstractElementsTest {
         field.toSearchString(sb);
         result = sb.toString();
         assertEquals("field1=1", result);
-
     }
 
     //Lettura multipla da request con checkbox
