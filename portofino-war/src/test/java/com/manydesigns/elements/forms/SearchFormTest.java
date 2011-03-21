@@ -108,10 +108,10 @@ public class SearchFormTest extends AbstractElementsTest {
         field.toXhtml(buffer);
         String result = writer.toString();
         assertEquals("<fieldset><legend class=\"attr_name\">Field5</legend>" +
-                "<input id=\"field5\" type=\"checkbox\" name=\"field5\" value=\"1\" checked=\"checked\" />" +
-                "&nbsp;<label for=\"field5\">a</label><br />" +
-                "<input id=\"field5\" type=\"checkbox\" name=\"field5\" value=\"2\" checked=\"checked\" />" +
-                "&nbsp;<label for=\"field5\">b</label><br /></fieldset>",
+                "<input id=\"field5_0\" type=\"checkbox\" name=\"field5\" value=\"1\" checked=\"checked\" />" +
+                "&nbsp;<label for=\"field5_0\">a</label><br />" +
+                "<input id=\"field5_1\" type=\"checkbox\" name=\"field5\" value=\"2\" checked=\"checked\" />" +
+                "&nbsp;<label for=\"field5_1\">b</label><br /></fieldset>",
             result);
         StringBuilder sb = new StringBuilder();
         field.toSearchString(sb);
@@ -236,10 +236,10 @@ public class SearchFormTest extends AbstractElementsTest {
         writer.flush();
         String result = writer.toString();
         assertEquals("<fieldset><legend class=\"attr_name\">Field5</legend>" +
-                "<input id=\"field5\" type=\"checkbox\" name=\"field5\" value=\"1\" />" +
-                "&nbsp;<label for=\"field5\">a</label><br />" +
-                "<input id=\"field5\" type=\"checkbox\" name=\"field5\" value=\"2\" />" +
-                "&nbsp;<label for=\"field5\">b</label><br /></fieldset>",
+                "<input id=\"field5_0\" type=\"checkbox\" name=\"field5\" value=\"1\" />" +
+                "&nbsp;<label for=\"field5_0\">a</label><br />" +
+                "<input id=\"field5_1\" type=\"checkbox\" name=\"field5\" value=\"2\" />" +
+                "&nbsp;<label for=\"field5_1\">b</label><br /></fieldset>",
             result);
 
     }

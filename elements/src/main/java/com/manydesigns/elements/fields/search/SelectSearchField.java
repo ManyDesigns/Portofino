@@ -277,6 +277,7 @@ public class SelectSearchField extends AbstractSearchField {
         Object[] values = (Object[]) selectionModel.getValue(selectionModelIndex);
         Map<Object, String> options =
                 selectionModel.getOptions(selectionModelIndex);
+        int counter=0;
         for (Map.Entry<Object,String> option :
                 options.entrySet()) {
             Object optionValue = option.getKey();
@@ -284,10 +285,11 @@ public class SelectSearchField extends AbstractSearchField {
                     OgnlUtils.convertValueToString(optionValue);
             String optionLabel = option.getValue();
             boolean checked =  ArrayUtils.contains(values, optionValue);
-            xb.writeInputCheckbox(id,inputName, optionStringValue, checked);
+            xb.writeInputCheckbox(id + "_" + counter,inputName, optionStringValue, checked);
             xb.writeNbsp();
-            xb.writeLabel(optionLabel, id, null);
+            xb.writeLabel(optionLabel, id + "_" + counter, null);
             xb.writeBr();
+            counter++;
         }
         xb.closeElement("fieldset");
     }
