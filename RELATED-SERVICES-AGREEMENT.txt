@@ -1,0 +1,183 @@
+ManyDesigns Related Services Agreement
+Version 1.4, XX YYY 2010
+
+
+1. Definitions
+
+"Licensed Software" means all the software items supplied in this package
+including programs, data files, databases, documentation, notes, images, fixes,
+updates and upgrades.
+
+"Related Services" means all the services provided in relation to the Licensed
+Software.
+
+"ManyDesigns" means ManyDesigns srl (VAT number IT01565350996) of
+Via G. D'Annunzio 2/51, 16121, Genoa, Italy.
+
+"Customer" means the person or organization acquiring a license and is,
+accordingly, the licensee in respect of it.
+
+
+2. Grant of license
+
+This agreement defines the Related Services provided by ManyDesigns to the Customer
+in relation to the Licensed Software. These services are support, upgrades and
+maintenance, as detailed in the following clauses.
+
+
+3. Support
+
+ManyDesigns will provide support to the Customer regarding any permitted use of 
+the Licensed Software under its license terms.
+
+Examples of usage of the Licensed Software include:
+- installation and configuration
+- application modeling
+- security policy definition
+- integration
+- customization
+- upgrade and migration.
+
+
+4. Upgrades
+
+ManyDesigns will develop and make available to the Customer upgrade releases
+containing improvements and new features of the Licensed Software.
+
+The planning and the content of the upgrade releases is entirely at ManyDesigns' discretion.
+
+
+5. Maintenance
+
+ManyDesigns will maintain the Licensed Software to correct errors that may arise 
+during its use provided that:
+- the Licenced Software is used under its license terms,
+- the Licensed Software is used only on the supported environments listed in clause 7,
+- the errors are not due to performance requirements not explicitly agreed
+  between the parties.
+
+The planning of the maintenance releases is entirely at ManyDesigns' discretion.
+Upon Customer's request, ManyDesigns will provide an estimate of the release dates.
+
+
+6. Costs
+
+ManyDesigns will charge the Customer for services as follows:
+- support will be charged on a time and materials basis,
+- upgrades are included in this agreement's fees,
+- maintenance is included in this agreement's fees.
+
+
+7. Supported environments
+
+List of supported operating systems:
+- Microsoft Windows 2000
+- Microsoft Windows XP
+- Microsoft Windows 2003/2008 Server Editions
+- Microsoft Windows Vista
+- Microsoft Windows 7
+- Ubuntu Linux 6.06 (Dapper Drake) or later
+- Redhat Enterprise Linux
+- Mac OS 10.4 or later
+
+List of supported Java platforms:
+- Sun/Oracle J2SE 5.0
+- Sun/Oracle Java SE 6
+
+List of supported application servers:
+- Apache Tomcat 5.5 or 6.x
+- JBoss Application Server 4.2.x
+- Glassfish V2 or later
+
+List of supported relational databases:
+- Oracle 9 or later
+- Microsoft SQL Server 2005
+- IBM DB2 9
+- PostgreSQL 8.1 or later
+- MySQL 5.1
+
+ManyDesigns will keep the list of supported environments updated and notify the
+Customer in writing of any changes.
+
+
+8. Support requests and response times
+
+The Customer will initiate a support request by sending an email to the address 
+support@manydesigns.com. The Customer may choose a level of priority for the
+request among the following: low, medium and high. If not indicated, the request
+will be considered as having low priority.
+
+ManyDesigns will provide a first answer to the request according to the following
+service levels:
+- High priority requests: within 4 working hors
+- Medium priority requests: within 8 working hours
+- Low priority requests: within 16 working hours
+
+Support hours are Monday to Friday, from 9:00 to 13:00 and from 14:00 to 18:00, 
+Central European Time, excluding Italian official holidays.
+
+
+9. Designated contact persons
+
+The Customer may designate up to <<inserire numero>> contact persons within the
+Customer's organization who will be allowed to use the support services.
+
+The contact persons must not be end users of applications developed using the
+Licensed Software.
+
+The Customer shall communicate to ManyDesigns in writing the initial list of contact
+persons and any subsequent change of the list.
+
+
+10. Transfer
+
+The rights and obligations arising from this agreement cannot be transfered to
+any third party.
+
+
+11. Entire agreement
+
+This agreement represents the entire agreement between ManyDesigns and the
+Customer and supersedes all previous agreements or representations whether
+written or oral.
+
+Any changes to this agreement must be approved in writing by both parties.
+
+
+12. Term
+
+The term of this agreement begins on the date ManyDesigns processes payment of
+the license and Related Services fee and will continue in full force and effect
+for one year or until terminated in accordance with clause 13.
+
+
+13. Termination
+
+This agreement may be terminated by either party if the other party commits a
+material breach. Either party will have thirty (30) calendar days following
+receipt of written notice to remedy any material breaches. Immediately upon
+termination, any copies in possession, custody or control of the Customer must
+be destroyed and written confirmation of such destruction provided to
+ManyDesigns. Clauses 13, 14 and 15 shall survive any termination of this
+agreement.
+
+
+14. Intellectual property
+
+The Customer acknowledges that the intellectual property to Licensed Software
+and Related Services are the property of ManyDesigns.
+
+ManyDesigns and the Customer agree to maintain each other's confidential
+information in strict confidence.
+
+The Customer grants ManyDesigns the right to use any information provided by the
+Customer to ManyDesigns in relation to the use of the Licensed Software for the
+purpose of developing and improving Licensed Software and Related Services.
+
+
+15. Applicable law
+
+This agreement is subject to the laws of Italy and the parties irrevocably and
+unconditionally submit to the exclusive jurisdiction of the courts of Genoa,
+Italy.
+
