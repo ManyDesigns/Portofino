@@ -1,5 +1,5 @@
 ManyDesigns Related Services Agreement
-Version 1.4, XX YYY 2010
+Version 1.4, XX YYY 2011
 
 
 1. Definitions
@@ -31,12 +31,12 @@ ManyDesigns will provide support to the Customer regarding any permitted use of
 the Licensed Software under its license terms.
 
 Examples of usage of the Licensed Software include:
-- installation and configuration
-- application modeling
-- security policy definition
-- integration
-- customization
-- upgrade and migration.
+(a) installation and configuration
+(b) application modeling
+(c) security policy definition
+(d) integration
+(e) customization
+(f) upgrade and migration.
 
 
 4. Upgrades
@@ -51,10 +51,10 @@ The planning and the content of the upgrade releases is entirely at ManyDesigns'
 
 ManyDesigns will maintain the Licensed Software to correct errors that may arise 
 during its use provided that:
-- the Licenced Software is used under its license terms,
-- the Licensed Software is used only on the supported environments listed in clause 7,
-- the errors are not due to performance requirements not explicitly agreed
-  between the parties.
+(a) the Licenced Software is used under its license terms,
+(b) the Licensed Software is used exclusively on the supported environments listed in clause 7,
+(c) the errors are not due to performance requirements not explicitly agreed
+    between the parties.
 
 The planning of the maintenance releases is entirely at ManyDesigns' discretion.
 Upon Customer's request, ManyDesigns will provide an estimate of the release dates.
@@ -63,38 +63,38 @@ Upon Customer's request, ManyDesigns will provide an estimate of the release dat
 6. Costs
 
 ManyDesigns will charge the Customer for services as follows:
-- support will be charged on a time and materials basis,
-- upgrades are included in this agreement's fees,
-- maintenance is included in this agreement's fees.
+(a) support will be charged on a time and materials basis,
+(b) upgrades are included in this agreement's fees,
+(c) maintenance is included in this agreement's fees.
 
 
 7. Supported environments
 
 List of supported operating systems:
-- Microsoft Windows 2000
-- Microsoft Windows XP
-- Microsoft Windows 2003/2008 Server Editions
-- Microsoft Windows Vista
-- Microsoft Windows 7
-- Ubuntu Linux 6.06 (Dapper Drake) or later
-- Redhat Enterprise Linux
-- Mac OS 10.4 or later
+(a1) Microsoft Windows 2000
+(a2) Microsoft Windows XP
+(a3) Microsoft Windows 2003/2008 Server Editions
+(a4) Microsoft Windows Vista
+(a5) Microsoft Windows 7
+(a6) Ubuntu Linux 6.06 (Dapper Drake) or later
+(a7) Redhat Enterprise Linux
+(a8) Mac OS 10.4 or later
 
 List of supported Java platforms:
-- Sun/Oracle J2SE 5.0
-- Sun/Oracle Java SE 6
+(b1) Sun/Oracle J2SE 5.0
+(b2) Sun/Oracle Java SE 6
 
 List of supported application servers:
-- Apache Tomcat 5.5 or 6.x
-- JBoss Application Server 4.2.x
-- Glassfish V2 or later
+(c1) Apache Tomcat 5.5 or 6.x
+(c2) JBoss Application Server 4.2.x
+(c3) Glassfish V2 or later
 
 List of supported relational databases:
-- Oracle 9 or later
-- Microsoft SQL Server 2005
-- IBM DB2 9
-- PostgreSQL 8.1 or later
-- MySQL 5.1
+(d1) Oracle 9 or later
+(d2) Microsoft SQL Server 2005
+(d3) IBM DB2 9
+(d4) PostgreSQL 8.1 or later
+(d5) MySQL 5.1
 
 ManyDesigns will keep the list of supported environments updated and notify the
 Customer in writing of any changes.
@@ -109,9 +109,9 @@ will be considered as having low priority.
 
 ManyDesigns will provide a first answer to the request according to the following
 service levels:
-- High priority requests: within 4 working hors
-- Medium priority requests: within 8 working hours
-- Low priority requests: within 16 working hours
+(a) High priority requests: within 4 working hors
+(b) Medium priority requests: within 8 working hours
+(c) Low priority requests: within 16 working hours
 
 Support hours are Monday to Friday, from 9:00 to 13:00 and from 14:00 to 18:00, 
 Central European Time, excluding Italian official holidays.

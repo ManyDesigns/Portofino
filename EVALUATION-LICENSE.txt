@@ -1,4 +1,4 @@
-ManyDesigns Portofino Commercial License
+ManyDesigns Portofino Evaluation License
 Version 1.4, XX YYY 2011
 
 
@@ -27,14 +27,11 @@ together on the same workloads as if they were a single physical computer.
 2. Grant of license
 
 Subject to payment and the terms of this agreement, ManyDesigns grants the
-Customer, and Customer accepts from ManyDesigns a perpetual, worldwide,
-non-exclusive, non-transferable, non-sublicensable, limited license to:
-(a) make one copy of the Licensed Software for the purpose of running one web
-    application instance on one Computing Environment;
-(b) make one additional copy for the sole purpose of backup or disaster
-    recovery;
-(c) make one additional copy for the sole purpose of application development
-    and testing.
+Customer, and Customer accepts from ManyDesigns a worldwide, non-exclusive, 
+non-transferable, non-sublicensable, limited license to:
+(a) make one copy of the Licensed Software for the sole purpose of internal
+    evaluation on one Computing Environment;
+(c) make one additional copy for the sole purpose of backup.
 
 The Customer must ensure that any copies of the Licensed Software are clearly
 labeled as such and include a prominent notice to the effect that ManyDesigns
@@ -45,35 +42,17 @@ Licensed Software from unauthorized use, access, copying, modification,
 reproduction, distribution or publication.
 
 
-3. Transfer
-
-As an exception to the non-transferability as stated in clause 2, only if the
-Customer purchased his license directly from ManyDesigns, the Customer may make
-a one-time permanent transfer of all of his license rights to the Licensed
-Software to another party, provided that:
-(a) The Customer must transfer all the Licensed Software and Related Services
-    including any copies made in accordance with this agreement together with
-    this license agreement to another party under a written agreement signed by
-    that other party.
-(b) The written agreement must include a statement to the effect that the
-    transferee agrees to abide by the terms of the license agreement as the
-    Customer.
-(c) The transferor of the Licensed Software and Related Services must give
-    ManyDesigns written confirmation of such transfer within 14 days of it
-    taking effect together with a copy of the signed written agreement
-    hereinbefore referred to.
-
-Transferor and any transferee must comply with all applicable export laws and
-regulations.
-
-Upon transfer, all transferor's rights on the Licensed Software and Related
-Services under this agreement are terminated. The transferor's obligations in
-accordance with clauses 4, 5, 6, 7, 8, 9, 10 and 11 survive any transfer.
-
-
-4. Prohibited uses
+3. Prohibited uses
 
 The Customer may not make copies of the software items except as provided above.
+
+The Customer may not use the Licensed Software for any purposes other than internal
+evaluation. Specifically, the Customer may not:
+(a) use the software in connection with or in support of any business processes,
+(b) charge for the use of the software,
+(c) grant use of the software to users outside the Customer's organization,
+(d) use the software in connection with data that are not exclusively intended 
+    for evaluation.
 
 The Customer must not sub-license, rent, lease, lend, share, disclose, transmit
 or transfer the Licensed Software and Related Services except as provided above.
@@ -81,7 +60,7 @@ or transfer the Licensed Software and Related Services except as provided above.
 The Customer must not modify or separate into parts the Licensed Software.
 
 
-5. Liability
+4. Liability
 
 The Licensed Software is provided on an "as is" and "as available" basis without
 warranty, express or implied, of any kind or nature, including, but not limited
@@ -99,7 +78,7 @@ from the use of the Licensed Software and related items, however caused.
 This agreement is without prejudice to the Customer's statutory rights, if any.
 
 
-6. Entire agreement
+5. Entire agreement
 
 This agreement represents the entire agreement between ManyDesigns and the
 Customer and supersedes all previous agreements or representations whether
@@ -108,25 +87,25 @@ written or oral.
 Any changes to this agreement must be approved in writing by both parties.
 
 
-7. Term
+6. Term
 
 The term of this agreement begins on the date ManyDesigns processes payment of
 the license and Related Services fee and will continue in full force and effect
 until terminated in accordance with clause 8.
 
 
-8. Termination
+7. Termination
 
 This agreement may be terminated by either party if the other party commits a
 material breach. Either party will have thirty (30) calendar days following
 receipt of written notice to remedy any material breaches. Immediately upon
 termination, any copies in possession, custody or control of the Customer must
 be destroyed and written confirmation of such destruction provided to
-ManyDesigns. Clauses 4, 5, 6, 9, 10 and 11 shall survive any termination of this
+ManyDesigns. Clauses 3, 4, 5, 8, 9 and 10 shall survive any termination of this
 agreement.
 
 
-9. Intellectual property
+8. Intellectual property
 
 The Customer acknowledges that the intellectual property to Licensed Software
 and Related Services are the property of ManyDesigns.
@@ -140,7 +119,7 @@ the Related Services for the purpose of developing and improving Licensed
 Software and Related Services.
 
 
-10. Third-party software
+9. Third-party software
 
 The Licensed Software may include other software developed by third parties (the
 "Third-Party Software"). ManyDesigns grants the Customer, and Customer accepts
@@ -148,7 +127,7 @@ from ManyDesigns a license to use the Third-Party Software subject to the terms
 as specified in the file THIRDPARTIES.txt included in the Licensed Software.
 
 
-11. Applicable law
+10. Applicable law
 
 This agreement is subject to the laws of Italy and the parties irrevocably and
 unconditionally submit to the exclusive jurisdiction of the courts of Genoa,
