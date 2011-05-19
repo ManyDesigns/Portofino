@@ -65,7 +65,10 @@ public class ReflectionUtil {
 
     public static Class loadClass(String className) {
         try {
-            Class<?> aClass = classLoader.loadClass(className);
+            // loadClass() non sa gestire nomi di classi tipo "[B" (byte array)
+            // Class.forName() ce la fa.
+//            Class<?> aClass = classLoader.loadClass(className);
+            Class<?> aClass = Class.forName(className);
             logger.debug("Loaded class: {}", aClass);
             return aClass;
         } catch (Throwable e) {

@@ -116,7 +116,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                     }
                 }
                 Schema schema = new Schema(database, schemaName);
-                logger.info("Found schema: {0}", schema.getQualifiedName());
+                logger.info("Found schema: {}", schema.getQualifiedName());
                 database.getSchemas().add(schema);
             }
         } finally {
