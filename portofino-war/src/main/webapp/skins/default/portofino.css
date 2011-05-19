@@ -192,8 +192,6 @@ Search form
 *******************************************************************************/
 
 .search_form {
-    float: right;
-    width: 250px;
     background-color: #f0f0f0;
     border: 1px solid #888;
     padding: 10px;
@@ -253,6 +251,9 @@ Search form
     color: gray;
 }
 
+.search_results {
+    overflow-x: scroll;
+}
 
 /*******************************************************************************
 General
@@ -339,4 +340,5 @@ div#content-login table tr td, div#login table tr th {
 .treeTable tr.expanded td .expander {
     background-image:url("../../jquery-treetable-2.3.0/toggle-collapse-dark.png");
 }
+
 
