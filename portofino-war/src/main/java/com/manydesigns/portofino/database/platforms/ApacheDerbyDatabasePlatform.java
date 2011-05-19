@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.database.platforms;
 
-import com.manydesigns.portofino.database.ConnectionProvider;
+import com.manydesigns.portofino.model.connections.ConnectionProvider;
 import org.hibernate.dialect.DerbyDialect;
 
 /*

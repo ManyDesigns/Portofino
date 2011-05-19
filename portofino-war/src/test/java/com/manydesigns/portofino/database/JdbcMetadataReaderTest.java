@@ -31,6 +31,7 @@ package com.manydesigns.portofino.database;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.model.annotations.Annotation;
+import com.manydesigns.portofino.model.connections.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;

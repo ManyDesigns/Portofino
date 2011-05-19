@@ -27,68 +27,60 @@
  *
  */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.model.connections;
 
-import com.manydesigns.portofino.xml.XmlAttribute;
-import org.apache.commons.dbutils.DbUtils;
-
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.text.MessageFormat;
+import javax.xml.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class JndiConnectionProvider extends ConnectionProvider {
+
+@XmlRootElement(name = "connections")
+@XmlAccessorType(XmlAccessType.NONE)
+public class Connections {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
 
     //**************************************************************************
     // Fields
     //**************************************************************************
 
-    private String jndiResource;
-
+    protected List<ConnectionProvider> connections;
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public JndiConnectionProvider() {
-        super();
+    public Connections() {
+        connections = new ArrayList<ConnectionProvider>();
     }
 
     //**************************************************************************
-    // Implementation of ConnectionProvider
+    // Initialization
     //**************************************************************************
 
-    public String getDescription() {
-        return MessageFormat.format("JNDI data source: {0}", jndiResource);
+    public void reset() {
+        for (ConnectionProvider connection : connections) {
+            connection.reset();
+        }
     }
 
-    public Connection acquireConnection() throws Exception {
-        InitialContext ic = new InitialContext();
-        DataSource ds = (DataSource) ic.lookup(jndiResource);
-        return ds.getConnection();
+    public void init() {
+        for (ConnectionProvider connection : connections) {
+            connection.init();
+        }
     }
 
-    public void releaseConnection(Connection conn) {
-        DbUtils.closeQuietly(conn);
-    }
-
-    //**************************************************************************
-    // Getters/setters
-    //**************************************************************************
-
-    @XmlAttribute(required = true, order = 10)
-    public String getJndiResource() {
-        return jndiResource;
-    }
-
-    public void setJndiResource(String jndiResource) {
-        this.jndiResource = jndiResource;
+    @XmlElements({
+        @XmlElement(name="jdbcConnection", type=JdbcConnectionProvider.class),
+        @XmlElement(name="jndiConnection", type=JndiConnectionProvider.class)
+    })
+    public List<ConnectionProvider> getConnections() {
+        return connections;
     }
 }

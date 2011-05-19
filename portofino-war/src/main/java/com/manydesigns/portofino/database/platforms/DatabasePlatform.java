@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.elements.annotations.Status;
-import com.manydesigns.portofino.database.ConnectionProvider;
+import com.manydesigns.portofino.model.connections.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
 import org.hibernate.dialect.Dialect;
 

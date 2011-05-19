@@ -32,7 +32,7 @@ package com.manydesigns.portofino.database.platforms;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.database.ConnectionProvider;
+import com.manydesigns.portofino.model.connections.ConnectionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

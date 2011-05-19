@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.context;
 
-import com.manydesigns.portofino.database.ConnectionProvider;
+import com.manydesigns.portofino.model.connections.ConnectionProvider;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;

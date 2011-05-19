@@ -27,16 +27,16 @@
  *
  */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.model.connections;
 
-import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.Password;
-import com.manydesigns.portofino.xml.XmlAttribute;
 import org.apache.commons.dbutils.DbUtils;
-import org.apache.commons.lang.builder.ToStringBuilder;
 
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.text.MessageFormat;
 
 /*
@@ -44,25 +44,23 @@ import java.text.MessageFormat;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class JdbcConnectionProvider extends ConnectionProvider {
+@XmlAccessorType(XmlAccessType.NONE)
+public class JndiConnectionProvider extends ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // Fields (configured values)
+    // Fields
     //**************************************************************************
 
-    protected String driver;
-    protected String url;
-    protected String username;
-    protected String password;
+    private String jndiResource;
 
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public JdbcConnectionProvider() {
+    public JndiConnectionProvider() {
         super();
     }
 
@@ -71,76 +69,29 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     //**************************************************************************
 
     public String getDescription() {
-        return MessageFormat.format(
-                "JDBC connection to URL: {0}", url);
+        return MessageFormat.format("JNDI data source: {0}", jndiResource);
     }
 
     public Connection acquireConnection() throws Exception {
-        Class.forName(driver);
-        return DriverManager.getConnection(url,
-                username, password);
+        InitialContext ic = new InitialContext();
+        DataSource ds = (DataSource) ic.lookup(jndiResource);
+        return ds.getConnection();
     }
 
     public void releaseConnection(Connection conn) {
         DbUtils.closeQuietly(conn);
     }
 
-
     //**************************************************************************
-    // Getters
-    //**************************************************************************
-
-    @XmlAttribute(required = true, order = 10)
-    public String getDriver() {
-        return driver;
-    }
-
-    public void setDriver(String driver) {
-        this.driver = driver;
-    }
-
-    @Label("connection URL")
-    @XmlAttribute(required = true, order = 11)
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    @XmlAttribute(required = true, order = 12)
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    @Password
-    @XmlAttribute(required = true, order = 13)
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-
-    //**************************************************************************
-    // Other methods
+    // Getters/setters
     //**************************************************************************
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("databaseName", databaseName)
-                .append("driver", driver)
-                .append("url", url)
-                .append("username", username)
-                .append("password", password)
-                .toString();
+    @XmlAttribute(required = true)
+    public String getJndiResource() {
+        return jndiResource;
+    }
+
+    public void setJndiResource(String jndiResource) {
+        this.jndiResource = jndiResource;
     }
 }

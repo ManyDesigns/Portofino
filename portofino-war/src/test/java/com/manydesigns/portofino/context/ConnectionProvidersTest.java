@@ -29,11 +29,10 @@
 package com.manydesigns.portofino.context;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
-import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.database.JdbcConnectionProvider;
+import com.manydesigns.portofino.model.connections.ConnectionProvider;
+import com.manydesigns.portofino.model.connections.JdbcConnectionProvider;
 import com.manydesigns.portofino.io.FileManager;
 import org.apache.commons.transaction.file.FileResourceManager;
-import org.apache.commons.transaction.file.ResourceManagerException;
 
 import java.io.*;
 import java.util.List;

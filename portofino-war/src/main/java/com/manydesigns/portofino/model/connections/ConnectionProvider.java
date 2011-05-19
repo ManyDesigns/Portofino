@@ -27,17 +27,19 @@
  *
  */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.model.connections;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Status;
+import com.manydesigns.portofino.database.DbUtil;
+import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.xml.XmlAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -261,7 +263,7 @@ public abstract class ConnectionProvider {
     // Getters/setters
     //**************************************************************************
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true)
     public String getDatabaseName() {
         return databaseName;
     }
@@ -270,7 +272,7 @@ public abstract class ConnectionProvider {
         this.databaseName = databaseName;
     }
 
-    @XmlAttribute(required = false, order = 2)
+    @XmlAttribute()
     public String getIncludeSchemas() {
         return includeSchemas;
     }
@@ -279,7 +281,7 @@ public abstract class ConnectionProvider {
         this.includeSchemas = includeSchemas;
     }
 
-    @XmlAttribute(required = false, order = 3)
+    @XmlAttribute()
     public String getExcludeSchemas() {
         return excludeSchemas;
     }

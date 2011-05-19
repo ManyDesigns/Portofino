@@ -38,11 +38,11 @@ import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.TableCriteria;
-import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.database.Connections;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.io.FileManager;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.connections.ConnectionProvider;
+import com.manydesigns.portofino.model.connections.Connections;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.diff.DatabaseDiff;
 import com.manydesigns.portofino.model.diff.DiffUtil;
@@ -67,6 +67,8 @@ import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -128,17 +130,16 @@ public class HibernateContextImpl implements Context {
 
             InputStream is = frm.readResource(txId, fileName);
 
-            XmlParser parser = new XmlParser();
-
-            connectionProviders = (Connections)
-                    parser.parse(is, Connections.class, "connections");
-            for (ConnectionProvider current : connectionProviders) {
-                current.reset();
-                current.init();
-            }
+            JAXBContext jc = JAXBContext.newInstance(
+                    "com.manydesigns.portofino.model.connections");
+            Unmarshaller um = jc.createUnmarshaller();
+            Connections connections = (Connections) um.unmarshal(is);
+            connections.reset();
+            connections.init();
+            connectionProviders = connections.getConnections();
 
             frm.commitTransaction(txId);
-            } catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Cannot load/parse file: " + fileName, e);
         }
     }

@@ -40,12 +40,12 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.database.ConnectionProvider;
-import com.manydesigns.portofino.database.JdbcConnectionProvider;
-import com.manydesigns.portofino.database.JndiConnectionProvider;
+import com.manydesigns.portofino.model.connections.ConnectionProvider;
+import com.manydesigns.portofino.model.connections.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.model.connections.JndiConnectionProvider;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;

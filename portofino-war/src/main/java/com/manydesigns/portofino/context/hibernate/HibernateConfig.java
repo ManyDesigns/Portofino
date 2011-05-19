@@ -31,9 +31,10 @@ package com.manydesigns.portofino.context.hibernate;
 
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.database.ConnectionProvider;
+import com.manydesigns.portofino.model.connections.ConnectionProvider;
 import static com.manydesigns.portofino.database.DbUtil.getHibernateType;
-import com.manydesigns.portofino.database.JdbcConnectionProvider;
+
+import com.manydesigns.portofino.model.connections.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
