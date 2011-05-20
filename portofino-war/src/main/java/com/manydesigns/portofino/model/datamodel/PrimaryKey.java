@@ -29,13 +29,14 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
+import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.xml.XmlAttribute;
-import com.manydesigns.portofino.xml.XmlCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.annotation.*;
+import java.lang.annotation.Retention;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,8 +46,10 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-@XmlCollection(itemClasses = PrimaryKeyColumn.class, itemNames = "column", order = 1)
-public class PrimaryKey extends ArrayList<PrimaryKeyColumn> implements ModelObject {
+
+@XmlAccessorType(value = XmlAccessType.NONE)
+
+public class PrimaryKey implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -55,8 +58,8 @@ public class PrimaryKey extends ArrayList<PrimaryKeyColumn> implements ModelObje
     //**************************************************************************
 
     protected final Table table;
-
     protected String primaryKeyName;
+    protected List<PrimaryKeyColumn> primaryKeyColumns;
 
     //**************************************************************************
     // Fields for wire-up
@@ -73,6 +76,7 @@ public class PrimaryKey extends ArrayList<PrimaryKeyColumn> implements ModelObje
     public PrimaryKey(Table table) {
         this.table = table;
         columns = new ArrayList<Column>();
+        primaryKeyColumns = new ArrayList<PrimaryKeyColumn>();
     }
 
     public PrimaryKey(Table table, String primaryKeyName) {
@@ -92,19 +96,19 @@ public class PrimaryKey extends ArrayList<PrimaryKeyColumn> implements ModelObje
     public void reset() {
         columns.clear();
 
-        for (PrimaryKeyColumn pkc : this) {
+        for (PrimaryKeyColumn pkc : primaryKeyColumns) {
             pkc.reset();
         }
     }
 
     public void init(Model model) {
-        if (this.isEmpty()) {
+        if (primaryKeyColumns.isEmpty()) {
             throw new Error(MessageFormat.format(
                     "Primary key {0} has no columns",
                     getQualifiedName()));
         }
 
-        for (PrimaryKeyColumn pkc : this) {
+        for (PrimaryKeyColumn pkc : primaryKeyColumns) {
             pkc.init(model);
             Column column = pkc.getActualColumn();
             columns.add(column);
@@ -120,7 +124,7 @@ public class PrimaryKey extends ArrayList<PrimaryKeyColumn> implements ModelObje
     //**************************************************************************
 
     public PrimaryKeyColumn findPrimaryKeyColumnByName(String columnName) {
-        for (PrimaryKeyColumn primaryKeyColumn : this) {
+        for (PrimaryKeyColumn primaryKeyColumn : primaryKeyColumns) {
             if (primaryKeyColumn.getColumnName().equals(columnName)) {
                 return primaryKeyColumn;
             }
@@ -152,13 +156,21 @@ public class PrimaryKey extends ArrayList<PrimaryKeyColumn> implements ModelObje
         return table.getTableName();
     }
 
-    @XmlAttribute(required = true, order = 1, identifier = true)
+    @Required
+    @XmlAttribute(required = true)
     public String getPrimaryKeyName() {
         return primaryKeyName;
     }
 
     public void setPrimaryKeyName(String primaryKeyName) {
         this.primaryKeyName = primaryKeyName;
+    }
+
+
+    @XmlElementWrapper(name="primaryKeyColumns")
+    @XmlElement(name="column",type=PrimaryKeyColumn.class)
+    public List<PrimaryKeyColumn> getPrimaryKeyColumns() {
+        return primaryKeyColumns;
     }
 
     //**************************************************************************

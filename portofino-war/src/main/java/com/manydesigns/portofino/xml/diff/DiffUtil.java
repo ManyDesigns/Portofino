@@ -377,7 +377,7 @@ public class DiffUtil {
         if (primaryKey == null) {
             return;
         }
-        for (PrimaryKeyColumn primaryKeyColumn : primaryKey) {
+        for (PrimaryKeyColumn primaryKeyColumn : primaryKey.getPrimaryKeyColumns()) {
             columnNames.add(primaryKeyColumn.getColumnName());
         }
     }

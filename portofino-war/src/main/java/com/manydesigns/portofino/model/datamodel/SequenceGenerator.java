@@ -29,13 +29,17 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.xml.XmlAttribute;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+@XmlAccessorType(value = XmlAccessType.NONE)
 public class SequenceGenerator extends Generator{
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -58,7 +62,7 @@ public class SequenceGenerator extends Generator{
         return name;
     }
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true)
     public String getName() {
         return name;
     }

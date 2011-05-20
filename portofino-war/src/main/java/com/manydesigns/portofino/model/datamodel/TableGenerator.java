@@ -29,13 +29,16 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.xml.XmlAttribute;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+@XmlAccessorType(value = XmlAccessType.NONE)
 public class TableGenerator extends Generator{
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -64,7 +67,7 @@ public class TableGenerator extends Generator{
         return table;
     }
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true)
     public String getTable() {
         return table;
     }
@@ -73,7 +76,7 @@ public class TableGenerator extends Generator{
         this.table = table;
     }
 
-    @XmlAttribute(required = true, order = 2)
+    @XmlAttribute(required = true)
     public String getKeyColumn() {
         return keyColumn;
     }
@@ -82,7 +85,7 @@ public class TableGenerator extends Generator{
         this.keyColumn = keyColumn;
     }
 
-    @XmlAttribute(required = true, order = 3)
+    @XmlAttribute(required = true)
     public String getKeyValue() {
         return keyValue;
     }
@@ -91,7 +94,7 @@ public class TableGenerator extends Generator{
         this.keyValue = keyValue;
     }
 
-    @XmlAttribute(required = true, order = 4)
+    @XmlAttribute(required = true)
     public String getValueColumn() {
         return valueColumn;
     }

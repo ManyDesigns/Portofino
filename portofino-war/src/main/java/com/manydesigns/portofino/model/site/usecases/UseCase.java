@@ -33,9 +33,9 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
-import com.manydesigns.portofino.xml.XmlAttribute;
-import com.manydesigns.portofino.xml.XmlCollection;
-
+import com.manydesigns.portofino.model.site.*;
+import com.manydesigns.portofino.xml.Identifier;
+import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +45,8 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+
+@XmlAccessorType(value = XmlAccessType.NONE)
 public class UseCase {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -176,33 +178,39 @@ public class UseCase {
         return parentUseCase;
     }
 
-    @XmlCollection(itemClasses = UseCaseProperty.class, itemNames = "property", order = 1)
+    @XmlElementWrapper(name="properties")
+    @XmlElement(name="property",type=UseCaseProperty.class)
     public List<UseCaseProperty> getProperties() {
         return properties;
     }
 
-    @XmlCollection(itemClasses = ModelSelectionProvider.class, itemNames = "selectionProvider", order = 2)
+    @XmlElementWrapper(name="selectionProviders")
+    @XmlElement(name="selectionProvider",type=ModelSelectionProvider.class)
     public List<ModelSelectionProvider> getSelectionProviders() {
         return selectionProviders;
     }
 
-    @XmlCollection(itemClasses = Annotation.class, itemNames = "annotation", order = 3)
+    @XmlElementWrapper(name="annotations")
+        @XmlElement(name="annotation",type=Annotation.class)
     public List<Annotation> getModelAnnotations() {
         return annotations;
     }
 
-    @XmlCollection(itemClasses = Button.class, itemNames = "button", order = 4)
+    @XmlElementWrapper(name="buttons")
+    @XmlElement(name="button",type=Button.class)
     public List<Button> getButtons() {
         return buttons;
     }
 
-    @XmlCollection(itemClasses = UseCase.class, itemNames = "useCase", order = 5)
+
+    @XmlElementWrapper(name="subUseCases")
+    @XmlElement(name="useCase",type=UseCase.class)
     public List<UseCase> getSubUseCases() {
         return subUseCases;
     }
 
-
-    @XmlAttribute(required = true, order = 1, identifier = true)
+    @Identifier
+    @XmlAttribute(required = true)
     public String getName() {
         return name;
     }
@@ -211,7 +219,7 @@ public class UseCase {
         this.name = name;
     }
 
-    @XmlAttribute(required = true, order = 2)
+    @XmlAttribute(required = true)
     public String getTable() {
         return table;
     }
@@ -228,7 +236,7 @@ public class UseCase {
         this.actualTable = actualTable;
     }
 
-    @XmlAttribute(required = true, order = 3)
+    @XmlAttribute(required = true)
     public String getQuery() {
         return query;
     }
@@ -237,7 +245,7 @@ public class UseCase {
         this.query = query;
     }
 
-    @XmlAttribute(required = false, order = 4)
+    @XmlAttribute(required = false)
     public String getSearchTitle() {
         return searchTitle;
     }
@@ -246,7 +254,7 @@ public class UseCase {
         this.searchTitle = searchTitle;
     }
 
-    @XmlAttribute(required = false, order = 5)
+    @XmlAttribute(required = false)
     public String getCreateTitle() {
         return createTitle;
     }
@@ -255,7 +263,7 @@ public class UseCase {
         this.createTitle = createTitle;
     }
 
-    @XmlAttribute(required = false, order = 6)
+    @XmlAttribute(required = false)
     public String getReadTitle() {
         return readTitle;
     }
@@ -264,7 +272,7 @@ public class UseCase {
         this.readTitle = readTitle;
     }
 
-    @XmlAttribute(required = false, order = 7)
+    @XmlAttribute(required = false)
     public String getEditTitle() {
         return editTitle;
     }

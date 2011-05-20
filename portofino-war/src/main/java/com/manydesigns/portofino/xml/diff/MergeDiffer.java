@@ -34,8 +34,9 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.xml.XmlAttribute;
 
+
+import javax.xml.bind.annotation.XmlAttribute;
 import java.text.MessageFormat;
 
 /*
@@ -197,13 +198,13 @@ public class MergeDiffer extends AbstractDiffer {
     //--------------------------------------------------------------------------
 
     public void diffPrimaryKeyColumnSourceNull(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
-        targetPrimaryKey.remove(targetPrimaryKeyColumn);
+        targetPrimaryKey.getPrimaryKeyColumns().remove(targetPrimaryKeyColumn);
         diffPrimaryKeyColumnChildren(primaryKeyColumnDiff);
     }
 
     public void diffPrimaryKeyColumnTargetNull(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
         targetPrimaryKeyColumn = new PrimaryKeyColumn(targetPrimaryKey);
-        targetPrimaryKey.add(targetPrimaryKeyColumn);
+        targetPrimaryKey.getPrimaryKeyColumns().add(targetPrimaryKeyColumn);
         diffPrimaryKeyColumnSourceTarget(primaryKeyColumnDiff);
     }
 

@@ -31,10 +31,12 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.xml.XmlAttribute;
-import com.manydesigns.portofino.xml.XmlElement;
+import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
 
 
 /*
@@ -108,7 +110,8 @@ public class PrimaryKeyColumn implements ModelObject {
         return primaryKey;
     }
 
-    @XmlAttribute(required = true, order = 1, identifier = true)
+    @Identifier
+    @XmlAttribute(required = true)
     public String getColumnName() {
         return columnName;
     }
@@ -121,9 +124,12 @@ public class PrimaryKeyColumn implements ModelObject {
         return actualColumn;
     }
 
-    @XmlElement(required = false, order = 1,
-            itemClasses = {SequenceGenerator.class, IncrementGenerator.class, TableGenerator.class},
-            itemNames = {"sequenceGenerator", "incrementGenerator", "tableGenerator"})
+
+    @XmlElements({
+          @XmlElement(name="sequenceGenerator",type=SequenceGenerator.class),
+          @XmlElement(name="incrementGenerator",type=IncrementGenerator.class),
+          @XmlElement(name="tableGenerator",type=TableGenerator.class)
+    })
     public Generator getGenerator() {
         return generator;
     }

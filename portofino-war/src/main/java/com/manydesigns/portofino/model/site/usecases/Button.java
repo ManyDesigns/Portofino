@@ -31,13 +31,19 @@ package com.manydesigns.portofino.model.site.usecases;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.xml.XmlAttribute;
+import com.manydesigns.portofino.xml.Identifier;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+
+@XmlAccessorType(value = XmlAccessType.NONE)
 public class Button implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -122,7 +128,8 @@ public class Button implements ModelObject {
         return useCase;
     }
 
-    @XmlAttribute(required = true, order = 1, identifier = true)
+    @Identifier
+    @XmlAttribute(required = true)
     public String getName() {
         return name;
     }
@@ -131,7 +138,7 @@ public class Button implements ModelObject {
         this.name = name;
     }
 
-    @XmlAttribute(required = true, order = 2)
+    @XmlAttribute(required = true)
     public String getLabel() {
         return label;
     }
@@ -140,7 +147,7 @@ public class Button implements ModelObject {
         this.label = label;
     }
 
-    @XmlAttribute(required = false, order = 3)
+    @XmlAttribute(required = false)
     public String getMethod() {
         return method;
     }
@@ -149,7 +156,7 @@ public class Button implements ModelObject {
         this.method = method;
     }
 
-    @XmlAttribute(required = false, order = 4)
+    @XmlAttribute(required = false)
     public String getGuard() {
         return guard;
     }
@@ -158,7 +165,7 @@ public class Button implements ModelObject {
         this.guard = guard;
     }
 
-    @XmlAttribute(required = false, order = 5)
+    @XmlAttribute(required = false)
     public String getScript() {
         return script;
     }
@@ -167,7 +174,7 @@ public class Button implements ModelObject {
         this.script = script;
     }
 
-    @XmlAttribute(required = false, order = 6)
+    @XmlAttribute(required = false)
     public String getScriptLanguage() {
         return scriptLanguage;
     }

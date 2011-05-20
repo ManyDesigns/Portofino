@@ -30,9 +30,10 @@
 package com.manydesigns.portofino.model.site;
 
 import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.xml.XmlAttribute;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -100,8 +101,8 @@ public class PortletNode extends SiteNode {
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
-
-    @XmlAttribute(required = true, order = 10)
+    @Required
+    @XmlAttribute()
     public String getName() {
         return name;
     }
@@ -110,7 +111,7 @@ public class PortletNode extends SiteNode {
         this.name = name;
     }
 
-    @XmlAttribute(required = true, order = 11)
+    @XmlAttribute(required = true)
     public String getType() {
         return type;
     }
@@ -119,7 +120,7 @@ public class PortletNode extends SiteNode {
         this.type = type;
     }
 
-    @XmlAttribute(required = true, order = 12)
+    @XmlAttribute(required = true)
     public String getTitle() {
         return title;
     }
@@ -128,7 +129,7 @@ public class PortletNode extends SiteNode {
         this.title = title;
     }
 
-    @XmlAttribute(required = true, order = 13)
+    @XmlAttribute(required = true)
     public String getLegend() {
         return legend;
     }
@@ -137,7 +138,7 @@ public class PortletNode extends SiteNode {
         this.legend = legend;
     }
 
-    @XmlAttribute(required = true, order = 14)
+    @XmlAttribute(required = true)
     public String getDatabase() {
         return database;
     }
@@ -147,7 +148,7 @@ public class PortletNode extends SiteNode {
     }
 
     @Label("SQL")
-    @XmlAttribute(required = true, order = 15)
+    @XmlAttribute(required = true)
     public String getQuery() {
         return query;
     }
@@ -157,7 +158,7 @@ public class PortletNode extends SiteNode {
     }
 
     @Label("URL expression")
-    @XmlAttribute(required = true, order = 16)
+    @XmlAttribute(required = true)
     public String getUrlExpression() {
         return urlExpression;
     }

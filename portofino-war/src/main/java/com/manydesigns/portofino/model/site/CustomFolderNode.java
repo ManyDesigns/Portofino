@@ -28,7 +28,8 @@
  */
 package com.manydesigns.portofino.model.site;
 
-import com.manydesigns.portofino.xml.XmlAttribute;
+
+import javax.xml.bind.annotation.XmlAttribute;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -47,7 +48,7 @@ public class CustomFolderNode extends SiteNode{
         super(parent);
     }
 
-    @XmlAttribute(required = true, order = 10)
+    @XmlAttribute(required = true)
     public String getType() {
         return type;
     }

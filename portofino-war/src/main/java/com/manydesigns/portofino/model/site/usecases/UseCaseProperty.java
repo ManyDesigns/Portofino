@@ -32,9 +32,10 @@ package com.manydesigns.portofino.model.site.usecases;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
-import com.manydesigns.portofino.xml.XmlAttribute;
-import com.manydesigns.portofino.xml.XmlCollection;
+import com.manydesigns.portofino.model.site.*;
+import com.manydesigns.portofino.xml.Identifier;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +44,8 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+
+@XmlAccessorType(value = XmlAccessType.NONE)
 public class UseCaseProperty implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -96,7 +99,8 @@ public class UseCaseProperty implements ModelObject {
     // Getters/setters
     //**************************************************************************
 
-    @XmlAttribute(required = true, order = 1, identifier = true)
+    @Identifier
+    @XmlAttribute(required = true)
     public String getName() {
         return name;
     }
@@ -105,7 +109,8 @@ public class UseCaseProperty implements ModelObject {
         this.name = name;
     }
 
-    @XmlCollection (itemClasses = Annotation.class, itemNames = "annotation", order = 1)
+    @XmlElementWrapper(name="annotations")
+    @XmlElement(name="annotaion",type=Annotation.class)
     public List<Annotation> getAnnotations() {
         return annotations;
     }

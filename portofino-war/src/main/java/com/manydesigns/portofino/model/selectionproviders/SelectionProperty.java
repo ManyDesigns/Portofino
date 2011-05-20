@@ -31,13 +31,17 @@ package com.manydesigns.portofino.model.selectionproviders;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.xml.XmlAttribute;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+
+@XmlAccessorType(value = XmlAccessType.NONE)
 public class SelectionProperty implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -84,7 +88,7 @@ public class SelectionProperty implements ModelObject {
     // Getters/setters
     //**************************************************************************
 
-    @XmlAttribute(required = true, order = 1)
+    @XmlAttribute(required = true)
     public String getName() {
         return name;
     }

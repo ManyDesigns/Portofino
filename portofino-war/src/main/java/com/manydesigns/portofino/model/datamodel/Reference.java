@@ -31,13 +31,19 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.xml.XmlAttribute;
+import com.manydesigns.portofino.xml.Identifier;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+@XmlAccessorType(value = XmlAccessType.NONE)
 public class Reference implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -112,7 +118,8 @@ public class Reference implements ModelObject {
         return foreignKey.getFromTableName();
     }
 
-    @XmlAttribute(required = true, order = 1, identifier = true)
+    @Identifier
+    @XmlAttribute(required = true)
     public String getFromColumn() {
         return fromColumn;
     }
@@ -133,7 +140,8 @@ public class Reference implements ModelObject {
         return foreignKey.getToTable();
     }
 
-    @XmlAttribute(required = true, order = 2, identifier = true)
+    @Identifier
+    @XmlAttribute(required = true)
     public String getToColumn() {
         return toColumn;
     }

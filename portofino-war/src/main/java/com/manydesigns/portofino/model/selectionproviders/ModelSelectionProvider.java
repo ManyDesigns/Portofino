@@ -31,9 +31,9 @@ package com.manydesigns.portofino.model.selectionproviders;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.xml.XmlAttribute;
-import com.manydesigns.portofino.xml.XmlCollection;
+import com.manydesigns.portofino.xml.Identifier;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +42,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+@XmlAccessorType(value = XmlAccessType.NONE)
 public class ModelSelectionProvider implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -90,13 +91,14 @@ public class ModelSelectionProvider implements ModelObject {
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
-
-    @XmlCollection(itemClasses = SelectionProperty.class, itemNames = "selectionProperty", order = 1)
+    @XmlElementWrapper(name="SelectionProperties")
+    @XmlElement(name="selectionProperty",type=SelectionProperty.class)
     public List<SelectionProperty> getSelectionProperties() {
         return selectionProperties;
     }
 
-    @XmlAttribute(required = true, order = 1, identifier = true)
+    @Identifier
+    @XmlAttribute(required = true)
     public String getName() {
         return name;
     }
@@ -105,7 +107,7 @@ public class ModelSelectionProvider implements ModelObject {
         this.name = name;
     }
 
-    @XmlAttribute(required = true, order = 2)
+    @XmlAttribute(required = true)
     public String getDatabase() {
         return database;
     }
@@ -114,7 +116,7 @@ public class ModelSelectionProvider implements ModelObject {
         this.database = database;
     }
 
-    @XmlAttribute(required = false, order = 3)
+    @XmlAttribute(required = false)
     public String getSql() {
         return sql;
     }
@@ -123,7 +125,7 @@ public class ModelSelectionProvider implements ModelObject {
         this.sql = sql;
     }
 
-    @XmlAttribute(required = false, order = 4)
+    @XmlAttribute(required = false)
     public String getHql() {
         return hql;
     }

@@ -38,6 +38,7 @@ import org.apache.commons.collections.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -121,7 +122,8 @@ public class XmlDiffer {
                 continue;
             }
 
-            if (xmlAttribute.identifier()) {
+            Identifier identifier = current.getAnnotation(Identifier.class);;
+            if (identifier != null) {
                 properties.add(current);
             }
         }

@@ -33,12 +33,12 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.util.Pair;
-import com.manydesigns.portofino.xml.XmlAttribute;
-import com.manydesigns.portofino.xml.XmlCollection;
+import com.manydesigns.portofino.xml.Identifier;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +48,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+@XmlAccessorType(value = XmlAccessType.NONE)
 public class ForeignKey implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -234,7 +235,8 @@ public class ForeignKey implements ModelObject {
         return fromTable.getTableName();
     }
 
-    @XmlAttribute(required = true, order = 1, identifier = true)
+    @Identifier
+    @XmlAttribute(required = true)
     public String getForeignKeyName() {
         return foreignKeyName;
     }
@@ -243,7 +245,7 @@ public class ForeignKey implements ModelObject {
         this.foreignKeyName = foreignKeyName;
     }
 
-    @XmlAttribute(required = true, order = 2)
+    @XmlAttribute(required = true)
     public String getToDatabase() {
         return toDatabase;
     }
@@ -252,7 +254,7 @@ public class ForeignKey implements ModelObject {
         this.toDatabase = toDatabase;
     }
 
-    @XmlAttribute(required = true, order = 3)
+    @XmlAttribute(required = true)
     public String getToSchema() {
         return toSchema;
     }
@@ -261,7 +263,7 @@ public class ForeignKey implements ModelObject {
         this.toSchema = toSchema;
     }
 
-    @XmlAttribute(required = true, order = 4)
+    @XmlAttribute(required = true)
     public String getToTable() {
         return toTable;
     }
@@ -270,7 +272,7 @@ public class ForeignKey implements ModelObject {
         this.toTable = toTable;
     }
 
-    @XmlAttribute(required = true, order = 5)
+    @XmlAttribute(required = true)
     public String getOnUpdate() {
         return onUpdate;
     }
@@ -279,7 +281,7 @@ public class ForeignKey implements ModelObject {
         this.onUpdate = onUpdate;
     }
 
-    @XmlAttribute(required = true, order = 6)
+    @XmlAttribute(required = true)
     public String getOnDelete() {
         return onDelete;
     }
@@ -288,12 +290,14 @@ public class ForeignKey implements ModelObject {
         this.onDelete = onDelete;
     }
 
-    @XmlCollection(itemMin = 1, itemClasses = Reference.class, itemNames = "reference", order = 1)
+
+    @XmlElementWrapper(name="references")
+    @XmlElement(name="reference", type=Reference.class)
     public List<Reference> getReferences() {
         return references;
     }
 
-    @XmlAttribute(required = false, order = 7)
+    @XmlAttribute(required = false)
     public String getManyPropertyName() {
         return manyPropertyName;
     }
@@ -302,12 +306,12 @@ public class ForeignKey implements ModelObject {
         this.manyPropertyName = manyPropertyName;
     }
 
-    @XmlAttribute(required = false, order = 8)
+    @XmlAttribute(required = false)
     public String getOnePropertyName() {
         return onePropertyName;
     }
 
-    @XmlAttribute(required = true, order = 9)
+    @XmlAttribute(required = true)
     public boolean isVirtual() {
         return virtual;
     }
@@ -320,7 +324,8 @@ public class ForeignKey implements ModelObject {
         this.onePropertyName = onePropertyName;
     }
 
-    @XmlCollection(itemClasses = Annotation.class, itemNames = "annotation", order = 1)
+    @XmlElementWrapper(name="annotations")
+    @XmlElement(name="annotation",type=Annotation.class)
     public List<Annotation> getAnnotations() {
         return annotations;
     }

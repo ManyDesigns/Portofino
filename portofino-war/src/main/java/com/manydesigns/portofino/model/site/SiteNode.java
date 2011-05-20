@@ -29,12 +29,11 @@
 
 package com.manydesigns.portofino.model.site;
 
+import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.xml.XmlAttribute;
-import com.manydesigns.portofino.xml.XmlCollection;
-import com.manydesigns.portofino.xml.XmlElement;
-
+import com.manydesigns.portofino.xml.Identifier;
+import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +43,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+@XmlAccessorType(value = XmlAccessType.NONE)
 public abstract class  SiteNode implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -122,7 +122,9 @@ public abstract class  SiteNode implements ModelObject {
     // Getters/Setters
     //**************************************************************************
 
-    @XmlAttribute(required = true, order = 1, identifier = true)
+
+    @Identifier
+    @XmlAttribute(required = true)
     public String getId() {
         return id;
     }
@@ -131,7 +133,7 @@ public abstract class  SiteNode implements ModelObject {
         this.id = id;
     }
 
-    @XmlAttribute(required = true, order = 2)
+    @XmlAttribute(required = true)
     public String getTitle() {
         return title;
     }
@@ -140,7 +142,7 @@ public abstract class  SiteNode implements ModelObject {
         this.title = title;
     }
 
-    @XmlAttribute(required = true, order = 3)
+    @XmlAttribute(required = true)
     public String getDescription() {
         return description;
     }
@@ -149,7 +151,7 @@ public abstract class  SiteNode implements ModelObject {
         this.description = description;
     }
 
-    @XmlElement(order = 2)
+    @XmlElement()
     public Permissions getPermissions() {
         return permissions;
     }
@@ -158,8 +160,15 @@ public abstract class  SiteNode implements ModelObject {
         this.permissions = permissions;
     }
 
-    @XmlCollection(itemClasses = {DocumentNode.class, FolderNode.class, CustomNode.class, CustomFolderNode.class, UseCaseNode.class, PortletNode.class},
-            itemNames = {"documentNode", "folderNode", "customNode", "customFolderNode", "useCaseNode", "portletNode"}, order = 1)
+    @XmlElementWrapper(name="childNodes")
+    @XmlElements({
+          @XmlElement(name="documentNode",type=DocumentNode.class),
+          @XmlElement(name="folderNode",type=FolderNode.class),
+          @XmlElement(name="customNode",type=CustomNode.class),
+          @XmlElement(name="customFolderNode",type=CustomFolderNode.class),
+          @XmlElement(name="useCaseNode",type=UseCaseNode.class),
+          @XmlElement(name="portletNode",type=PortletNode.class)
+    })
     public List<SiteNode> getChildNodes() {
         return childNodes;
     }
@@ -180,7 +189,7 @@ public abstract class  SiteNode implements ModelObject {
         this.actualId = actualId;
     }
 
-    @XmlAttribute(required = false, order = 4)
+    @XmlAttribute()
     public String getUrl() {
         return url;
     }

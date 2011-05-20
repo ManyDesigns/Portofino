@@ -28,7 +28,7 @@
  */
 package com.manydesigns.portofino.model.site;
 
-import com.manydesigns.portofino.xml.XmlAttribute;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -48,7 +48,7 @@ public class DocumentNode extends SiteNode{
         return urlFormat;
     }
 
-    @XmlAttribute(required = false, order = 4)
+    @XmlAttribute(required = false)
     public String getFileName() {
         return fileName;
     }
