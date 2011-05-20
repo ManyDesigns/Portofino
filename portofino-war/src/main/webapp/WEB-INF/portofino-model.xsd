@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="model" type="modelType">
+    <xs:annotation>
+      <xs:documentation>Struttura dell'XML:
+
+-model
+ +-databases
+ | +-database
+ |   +-schemas
+ |     +-schema
+ |       +-tables
+ |         +-table
+ |           +-columns
+ |           | +-column
+ |           |   +-annotations
+ |           |     +-annotation
+ |           |       +-value
+ |           |
+ |           +-primaryKey
+ |           | +-column
+ |           |
+ |           +-foreignKeys
+ |           | +-foreignKey
+ |           | | +-references
+ |           | |   +-reference
+ |           | +-annotations
+ |           |   +-annotation
+ |           |     +-value
+ |           |
+ |           +-annotations
+ |             +-annotation
+ |               +-value
+ |
+ +-rootNode
+   +-childNodes (accetta i nodi figlio in qualunque ordine)
+   | +-folderNode
+   | | +-childNodes (come rootNode)
+   | | +-permissions (come rootNode)
+   | |
+   | +-documentNode
+   | | +-childNodes (come rootNode)
+   | | +-permissions (come rootNode)
+   | |
+   | +-customNode
+   | | +-childNodes (come rootNode)
+   | | +-permissions (come rootNode)
+   | |
+   | +-customFolderNode
+   | | +-childNodes (come rootNode)
+   | | +-permissions (come rootNode)
+   | |
+   | +-useCaseNode
+   | | +-useCase
+   | | | +-properties
+   | | | | +-property
+   | | | |   +-annotations
+   | | | |     +-annotation
+   | | | |       +-value
+   | | | |
+   | | | +-selectionProviders
+   | | | | +-selectionProvider
+   | | | |   +-selectionProperties
+   | | | |     +-selectionProperty
+   | | | |
+   | | | +-annotations
+   | | | | +-annotation
+   | | | |   +-value
+   | | | |
+   | | | +-buttons
+   | | | | +-button
+   | | | |
+   | | | +-subUseCases
+   | | |   +-useCase (ricorsivamente)
+   | | |
+   | | +-childNodes (come rootNode)
+   | | +-permissions (come rootNode)
+   | |
+   | +-portletNode
+   |   +-childNodes (come rootNode)
+   |   +-permissions (come rootNode)
+   |
+   |
+   +-permissions
+     +-allow
+     | +-group
+     |
+     +-deny
+       +-group</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="databaseType">
+    <xs:sequence>
+      <xs:element type="schemasType" name="schemas"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="databaseName" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="foreignKeysType">
+    <xs:sequence>
+      <xs:element type="foreignKeyType" name="foreignKey" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="selectionPropertyType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="schemaType">
+    <xs:sequence>
+      <xs:element type="tablesType" name="tables"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="schemaName" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="columnType" mixed="true">
+    <xs:sequence>
+      <xs:element type="annotationsType" name="annotations" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="columnName" use="optional"/>
+    <xs:attribute type="xs:string" name="columnType" use="optional"/>
+    <xs:attribute type="xs:string" name="nullable" use="optional"/>
+    <xs:attribute type="xs:string" name="length" use="optional"/>
+    <xs:attribute type="xs:string" name="scale" use="optional"/>
+    <xs:attribute type="xs:string" name="autoincrement" use="optional"/>
+    <xs:attribute type="xs:string" name="searchable" use="optional"/>
+    <xs:attribute type="xs:string" name="javaType" use="optional"/>
+    <xs:attribute type="xs:string" name="propertyName" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="propertiesType">
+    <xs:sequence>
+      <xs:element type="propertyType" name="property" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="customNodeType" mixed="true">
+    <xs:sequence>
+      <xs:element type="permissionsType" name="permissions" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="id" use="optional"/>
+    <xs:attribute type="xs:string" name="title" use="optional"/>
+    <xs:attribute type="xs:string" name="description" use="optional"/>
+    <xs:attribute type="xs:string" name="url" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="tablesType">
+    <xs:sequence>
+      <xs:element type="tableType" name="table" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="databasesType">
+    <xs:sequence>
+      <xs:element type="databaseType" name="database" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="selectionProviderType">
+    <xs:sequence>
+      <xs:element type="selectionPropertiesType" name="selectionProperties"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="name" use="optional"/>
+    <xs:attribute type="xs:string" name="database" use="optional"/>
+    <xs:attribute type="xs:string" name="hql" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="selectionPropertiesType">
+    <xs:sequence>
+      <xs:element type="selectionPropertyType" name="selectionProperty"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="columnsType">
+    <xs:sequence>
+      <xs:element type="columnType" name="column" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="referenceType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="fromColumn" use="optional"/>
+        <xs:attribute type="xs:string" name="toColumn" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="modelType">
+    <xs:sequence>
+      <xs:element type="databasesType" name="databases"/>
+      <xs:element type="rootNodeType" name="rootNode"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="buttonType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+        <xs:attribute type="xs:string" name="label" use="optional"/>
+        <xs:attribute type="xs:string" name="method" use="optional"/>
+        <xs:attribute type="xs:string" name="guard" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="annotationType" mixed="true">
+    <xs:sequence>
+      <xs:element name="value" maxOccurs="unbounded" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="%{userName} (%{email})"/>
+            <xs:enumeration value="admin"/>
+            <xs:enumeration value=""/>
+            <xs:enumeration value="%{name} "/>
+            <xs:enumeration value="%{name}"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="type" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="rootNodeType">
+    <xs:sequence>
+      <xs:element type="childNodesType" name="childNodes"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="id"/>
+    <xs:attribute type="xs:string" name="title"/>
+    <xs:attribute type="xs:string" name="description"/>
+    <xs:attribute type="xs:string" name="url"/>
+  </xs:complexType>
+  <xs:complexType name="permissionsType">
+    <xs:sequence>
+      <xs:element type="allowType" name="allow"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="annotationsType">
+    <xs:sequence>
+      <xs:element type="annotationType" name="annotation"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="allowType">
+    <xs:sequence>
+      <xs:element name="group">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="anonymous"/>
+            <xs:enumeration value="admins"/>
+            <xs:enumeration value="registered"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="useCaseType">
+    <xs:sequence>
+      <xs:element type="propertiesType" name="properties"/>
+      <xs:element type="selectionProvidersType" name="selectionProviders" minOccurs="0"/>
+      <xs:element type="buttonsType" name="buttons" minOccurs="0"/>
+      <xs:element type="subUseCasesType" name="subUseCases" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="name" use="optional"/>
+    <xs:attribute type="xs:string" name="table" use="optional"/>
+    <xs:attribute type="xs:string" name="query" use="optional"/>
+    <xs:attribute type="xs:string" name="searchTitle" use="optional"/>
+    <xs:attribute type="xs:string" name="createTitle" use="optional"/>
+    <xs:attribute type="xs:string" name="readTitle" use="optional"/>
+    <xs:attribute type="xs:string" name="editTitle" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="folderNodeType">
+    <xs:sequence>
+      <xs:element type="childNodesType" name="childNodes"/>
+      <xs:element type="permissionsType" name="permissions" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="id" use="optional"/>
+    <xs:attribute type="xs:string" name="title" use="optional"/>
+    <xs:attribute type="xs:string" name="description" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="foreignKeyType">
+    <xs:sequence>
+      <xs:element type="referencesType" name="references"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="foreignKeyName" use="optional"/>
+    <xs:attribute type="xs:string" name="toDatabase" use="optional"/>
+    <xs:attribute type="xs:string" name="toSchema" use="optional"/>
+    <xs:attribute type="xs:string" name="toTable" use="optional"/>
+    <xs:attribute type="xs:string" name="onUpdate" use="optional"/>
+    <xs:attribute type="xs:string" name="onDelete" use="optional"/>
+    <xs:attribute type="xs:string" name="manyPropertyName" use="optional"/>
+    <xs:attribute type="xs:string" name="onePropertyName" use="optional"/>
+    <xs:attribute type="xs:string" name="virtual" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="propertyType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="primaryKeyType">
+    <xs:sequence>
+      <xs:element type="columnType" name="column" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="primaryKeyName" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="tableType">
+    <xs:sequence>
+      <xs:element type="columnsType" name="columns"/>
+      <xs:element type="primaryKeyType" name="primaryKey"/>
+      <xs:element type="foreignKeysType" name="foreignKeys" minOccurs="0"/>
+      <xs:element type="annotationsType" name="annotations" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="tableName" use="optional"/>
+    <xs:attribute type="xs:string" name="javaClass" use="optional"/>
+    <xs:attribute type="xs:string" name="manyToMany" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="useCaseNodeType">
+    <xs:sequence>
+      <xs:element type="useCaseType" name="useCase"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="id" use="optional"/>
+    <xs:attribute type="xs:string" name="title" use="optional"/>
+    <xs:attribute type="xs:string" name="description" use="optional"/>
+    <xs:attribute type="xs:string" name="url" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="subUseCasesType">
+    <xs:sequence>
+      <xs:element type="useCaseType" name="useCase" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="buttonsType">
+    <xs:sequence>
+      <xs:element type="buttonType" name="button" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="referencesType">
+    <xs:sequence>
+      <xs:element type="referenceType" name="reference"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="schemasType">
+    <xs:sequence>
+      <xs:element type="schemaType" name="schema"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="selectionProvidersType">
+    <xs:sequence>
+      <xs:element type="selectionProviderType" name="selectionProvider"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="documentNodeType" mixed="true">
+    <xs:sequence>
+      <xs:element type="permissionsType" name="permissions" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="id" use="optional"/>
+    <xs:attribute type="xs:string" name="title" use="optional"/>
+    <xs:attribute type="xs:string" name="description" use="optional"/>
+    <xs:attribute type="xs:string" name="fileName" use="optional"/>
+    <xs:attribute type="xs:string" name="url" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="childNodesType">
+    <xs:choice maxOccurs="unbounded" minOccurs="0">
+      <xs:element type="customNodeType" name="customNode"/>
+      <xs:element type="customFolderNodeType" name="customFolderNode"/>
+      <xs:element type="documentNodeType" name="documentNode"/>
+      <xs:element type="folderNodeType" name="folderNode"/>
+      <xs:element type="useCaseNodeType" name="useCaseNode"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="customFolderNodeType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="id" use="optional"/>
+        <xs:attribute type="xs:string" name="title" use="optional"/>
+        <xs:attribute type="xs:string" name="description" use="optional"/>
+        <xs:attribute type="xs:string" name="url" use="optional"/>
+        <xs:attribute type="xs:string" name="type" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>

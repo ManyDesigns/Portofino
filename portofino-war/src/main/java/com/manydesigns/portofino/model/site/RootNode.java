@@ -30,6 +30,8 @@ package com.manydesigns.portofino.model.site;
 
 import com.manydesigns.portofino.model.Model;
 
+import javax.xml.bind.Unmarshaller;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -38,7 +40,12 @@ import com.manydesigns.portofino.model.Model;
 public class RootNode extends SiteNode {
     private final String urlFormat = "{0}/Index.action";
     public RootNode() {
-        super(null);
+        super();
+    }
+
+    @Override
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        // do nothing
     }
 
     @Override

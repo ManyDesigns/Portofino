@@ -46,13 +46,8 @@ public class UseCaseNode extends SiteNode{
     // Fields
     //**************************************************************************
 
-    public UseCaseNode(SiteNode parent, UseCase useCase) {
-        this(parent);
-        this.useCase = useCase;
-    }
-
-    public UseCaseNode(SiteNode parent) {
-        super(parent);
+    public UseCaseNode() {
+        super();
     }
 
     @XmlElement()

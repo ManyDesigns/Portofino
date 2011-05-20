@@ -39,6 +39,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -78,7 +80,7 @@ public class XmlDiffer {
     //--------------------------------------------------------------------------
 
     public static final Logger logger =
-            LoggerFactory.getLogger(XmlWriter.class);
+            LoggerFactory.getLogger(XmlDiffer.class);
 
     //--------------------------------------------------------------------------
     // Constructor
@@ -296,15 +298,15 @@ public class XmlDiffer {
 
             diffAttributes();
 
-            XmlCollection ownCollectionAnnotation =
-                    commonClassAccessor.getAnnotation(XmlCollection.class);
+            XmlElementWrapper ownCollectionAnnotation =
+                    commonClassAccessor.getAnnotation(XmlElementWrapper.class);
             if (ownCollectionAnnotation != null) {
                 CollectionDiffer collectionDiffer =
                         new CollectionDiffer(elementName,
                                 ownCollectionAnnotation,
                                 (List)sourceElement,
                                 (List)targetElement,
-                                ownCollectionAnnotation.order());
+                                1);
                 collectionDiffer.diff();
             }
 
@@ -312,16 +314,15 @@ public class XmlDiffer {
                     : commonClassAccessor.getProperties()) {
                 XmlElement elementAnnotation =
                         propertyAccessor.getAnnotation(XmlElement.class);
-                XmlCollection collectionAnnotation =
-                        propertyAccessor.getAnnotation(XmlCollection.class);
+                XmlElementWrapper collectionAnnotation =
+                        propertyAccessor.getAnnotation(XmlElementWrapper.class);
 
                 if (elementAnnotation != null) {
                     Object sourceChildElement = propertyAccessor.get(sourceElement);
                     Object targetChildElement = propertyAccessor.get(targetElement);
                     ElementDiffer elementDiffer =
                             new ElementDiffer(
-                                    sourceChildElement, targetChildElement, propertyAccessor.getName(),
-                                    elementAnnotation.order()
+                                    sourceChildElement, targetChildElement, propertyAccessor.getName(), 0
                             );
                     elementDiffer.diff();
                     childDiffers.add(elementDiffer);
@@ -343,7 +344,7 @@ public class XmlDiffer {
                                 propertyAccessor.getName(),
                                 collectionAnnotation,
                                 sourceCollection, targetCollection,
-                                collectionAnnotation.order());
+                                0);
                     collectionDiffer.diff();
                     childDiffers.add(collectionDiffer);
                 }
@@ -410,7 +411,7 @@ public class XmlDiffer {
     //--------------------------------------------------------------------------
 
     class CollectionDiffer extends AbstractDiffer {
-        final XmlCollection collectionAnnotation;
+        final XmlElementWrapper collectionAnnotation;
         final Class itemClass;
         final ClassAccessor itemClassAccessor;
         final PropertyAccessor[] itemIdProperties;
@@ -420,20 +421,20 @@ public class XmlDiffer {
         List<Object[]> allItemIdentifiers;
 
         CollectionDiffer(String elementName,
-                         XmlCollection collectionAnnotation,
+                         XmlElementWrapper collectionAnnotation,
                          List sourceElement,
                          List targetElement,
                          int order) {
             super(sourceElement, targetElement, elementName, order);
             this.collectionAnnotation = collectionAnnotation;
 
-            itemClass = collectionAnnotation.itemClasses()[0];
+            itemClass = null; //collectionAnnotation.itemClasses()[0];
             itemClassAccessor = JavaClassAccessor.getClassAccessor(itemClass);
             itemIdProperties = getIdentifierProperties(itemClassAccessor);
         }
 
         void diff() {
-            String itemName = collectionAnnotation.itemNames()[0];
+            String itemName = null; //collectionAnnotation.itemNames()[0];
 
             if (sourceElement == null || ((List)sourceElement).isEmpty()) {
                 int index = 0;
@@ -615,7 +616,7 @@ public class XmlDiffer {
         }
 
         public int getOrder() {
-            return attributeAnnotation.order();
+            return 0;
         }
     }
 

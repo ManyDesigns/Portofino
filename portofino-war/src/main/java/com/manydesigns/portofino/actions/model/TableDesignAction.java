@@ -278,7 +278,8 @@ public class TableDesignAction extends PortofinoAction
         step = COLUMN_STEP;
         setupForms();
         readFromRequest();
-        Column col = new Column(table);
+        Column col = new Column();
+        col.setTable(table);
         columnForm.readFromRequest(req);
         if(!columnForm.validate()){
             return CREATE;
@@ -324,7 +325,8 @@ public class TableDesignAction extends PortofinoAction
         columnNames.clear();
         for(TableForm.Row row : columnTableForm.getRows()) {
             try {
-                Column currCol = new Column(table);
+                Column currCol = new Column();
+                currCol.setTable(table);
                 row.writeToObject(currCol);
                 if (ArrayUtils.contains(cols_selection, currCol.getColumnName())){
                     table.getColumns().remove(
@@ -601,11 +603,15 @@ public class TableDesignAction extends PortofinoAction
             return false;
         }
         //Gestione tabella
-        Database database  =
-            new Database(model.findDatabaseByName(table_databaseName)
+        Database database = new Database();
+        database.setDatabaseName(model.findDatabaseByName(table_databaseName)
                     .getDatabaseName());
-        Schema schema = new Schema(database, table_schemaName);
-        table = new Table(schema, table_tableName);
+        Schema schema = new Schema();
+        schema.setDatabase(database);
+        schema.setSchemaName(table_schemaName);
+        table = new Table();
+        table.setSchema(schema);
+        table.setTableName(table_tableName);
 
         schema.getTables().add(table);
         tableForm.readFromObject(table);
@@ -627,7 +633,8 @@ public class TableDesignAction extends PortofinoAction
         columnTableForm.readFromRequest(req);
         for(TableForm.Row row : columnTableForm.getRows()) {
             try {
-                Column currCol = new Column(table);
+                Column currCol = new Column();
+                currCol.setTable(table);
                 row.writeToObject(currCol);
                 table.getColumns().add(currCol);
                 columnNames.add(currCol.getColumnName());

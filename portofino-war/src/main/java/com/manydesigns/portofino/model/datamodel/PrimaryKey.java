@@ -35,8 +35,8 @@ import com.manydesigns.portofino.model.ModelObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
-import java.lang.annotation.Retention;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,9 +57,10 @@ public class PrimaryKey implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected final Table table;
+    protected final List<PrimaryKeyColumn> primaryKeyColumns;
+
+    protected Table table;
     protected String primaryKeyName;
-    protected List<PrimaryKeyColumn> primaryKeyColumns;
 
     //**************************************************************************
     // Fields for wire-up
@@ -73,15 +74,9 @@ public class PrimaryKey implements ModelObject {
     // Constructors and wire up
     //**************************************************************************
 
-    public PrimaryKey(Table table) {
-        this.table = table;
+    public PrimaryKey() {
         columns = new ArrayList<Column>();
         primaryKeyColumns = new ArrayList<PrimaryKeyColumn>();
-    }
-
-    public PrimaryKey(Table table, String primaryKeyName) {
-        this(table);
-        this.primaryKeyName = primaryKeyName;
     }
 
     //**************************************************************************
@@ -93,6 +88,10 @@ public class PrimaryKey implements ModelObject {
                 table.getQualifiedName(), primaryKeyName);
     }
 
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        table = (Table) parent;
+    }
+
     public void reset() {
         columns.clear();
 
@@ -102,6 +101,9 @@ public class PrimaryKey implements ModelObject {
     }
 
     public void init(Model model) {
+        assert table != null;
+        assert primaryKeyName != null;
+
         if (primaryKeyColumns.isEmpty()) {
             throw new Error(MessageFormat.format(
                     "Primary key {0} has no columns",
@@ -140,6 +142,10 @@ public class PrimaryKey implements ModelObject {
         return table;
     }
 
+    public void setTable(Table table) {
+        this.table = table;
+    }
+
     public List<Column> getColumns() {
         return columns;
     }
@@ -166,8 +172,6 @@ public class PrimaryKey implements ModelObject {
         this.primaryKeyName = primaryKeyName;
     }
 
-
-    @XmlElementWrapper(name="primaryKeyColumns")
     @XmlElement(name="column",type=PrimaryKeyColumn.class)
     public List<PrimaryKeyColumn> getPrimaryKeyColumns() {
         return primaryKeyColumns;

@@ -33,6 +33,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import org.apache.commons.collections.CollectionUtils;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -69,6 +70,8 @@ public class Permissions implements ModelObject {
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
+
+    public void afterUnmarshal(Unmarshaller u, Object parent) {}
 
     public void reset() {}
 

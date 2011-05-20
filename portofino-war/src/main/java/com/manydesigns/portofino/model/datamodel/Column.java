@@ -38,6 +38,7 @@ import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class Column implements ModelObject {
     // Fields (physical JDBC)
     //**************************************************************************
 
-    protected final Table table;
+    protected Table table;
     protected String columnName;
     protected String columnType;
     protected boolean nullable;
@@ -87,38 +88,8 @@ public class Column implements ModelObject {
     //**************************************************************************
     // Constructors and init
     //**************************************************************************
-    public Column(Table table) {
-        this.table = table;
+    public Column() {
         annotations = new ArrayList<Annotation>();
-    }
-
-    public Column(Table table, String columnName, String columnType,
-                  boolean nullable, boolean autoincrement,
-                  Integer length, Integer scale, boolean searchable) {
-        this(table);
-        this.columnName = columnName;
-        this.columnType = columnType;
-        this.nullable = nullable;
-        this.autoincrement = autoincrement;
-        this.length = length;
-        this.scale = scale;
-        this.searchable = searchable;
-    }
-
-    public Column(Table table,
-                  String columnName,
-                  String columnType,
-                  boolean nullable,
-                  boolean autoincrement,
-                  Integer length,
-                  Integer scale,
-                  boolean searchable,
-                  String javaType,
-                  String propertyName) {
-        this(table, columnName, columnType, nullable,
-                autoincrement, length, scale, searchable);
-        this.javaType = javaType;
-        this.propertyName = propertyName;
     }
 
     //**************************************************************************
@@ -128,6 +99,10 @@ public class Column implements ModelObject {
     public String getQualifiedName() {
         return MessageFormat.format("{0}.{1}",
                 table.getQualifiedName(), columnName);
+    }
+
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        table = (Table) parent;
     }
 
     public void reset() {
@@ -140,6 +115,12 @@ public class Column implements ModelObject {
     }
 
     public void init(Model model) {
+        assert table != null;
+        assert columnName != null;
+        assert columnType != null;
+        assert length != null;
+        assert scale != null;
+
         if (propertyName == null) {
             actualPropertyName = columnName;
         } else {
@@ -162,6 +143,10 @@ public class Column implements ModelObject {
 
     public Table getTable() {
         return table;
+    }
+
+    public void setTable(Table table) {
+        this.table = table;
     }
 
     public String getDatabaseName() {

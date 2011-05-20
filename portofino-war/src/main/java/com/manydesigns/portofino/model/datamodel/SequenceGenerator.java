@@ -46,16 +46,15 @@ public class SequenceGenerator extends Generator{
 
     protected String name;
 
-    public SequenceGenerator(PrimaryKeyColumn primaryKeyColumn) {
-        super(primaryKeyColumn);
-    }
+    public SequenceGenerator() {}
 
     public void reset() {
-
+        super.reset();
     }
 
     public void init(Model model) {
-
+        super.init(model);
+        assert name != null;
     }
 
     public String getQualifiedName() {

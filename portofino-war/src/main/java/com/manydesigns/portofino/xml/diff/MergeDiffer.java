@@ -84,7 +84,8 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffSchemaTargetNull(SchemaDiff schemaDiff) {
-        targetSchema = new Schema(targetDatabase);
+        targetSchema = new Schema();
+        targetSchema.setDatabase(targetDatabase);
         targetDatabase.getSchemas().add(targetSchema);
         diffSchemaSourceTarget(schemaDiff);
     }
@@ -103,7 +104,8 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffTableTargetNull(TableDiff tableDiff) {
-        targetTable = new Table(targetSchema);
+        targetTable = new Table();
+        targetTable.setSchema(targetSchema);
         targetSchema.getTables().add(targetTable);
         diffTableSourceTarget(tableDiff);
     }
@@ -141,7 +143,8 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffColumnTargetNull(ColumnDiff columnDiff) {
-        targetColumn = new Column(targetTable);
+        targetColumn = new Column();
+        targetColumn.setTable(targetTable);
         targetTable.getColumns().add(targetColumn);
         diffColumnSourceTarget(columnDiff);
     }
@@ -180,7 +183,8 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffPrimaryKeyTargetNull(PrimaryKeyDiff primaryKeyDiff) {
-        targetPrimaryKey = new PrimaryKey(targetTable);
+        targetPrimaryKey = new PrimaryKey();
+        targetPrimaryKey.setTable(targetTable);
         targetTable.setPrimaryKey(targetPrimaryKey);
         diffPrimaryKeySourceTarget(primaryKeyDiff);
     }
@@ -203,7 +207,8 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffPrimaryKeyColumnTargetNull(PrimaryKeyColumnDiff primaryKeyColumnDiff) {
-        targetPrimaryKeyColumn = new PrimaryKeyColumn(targetPrimaryKey);
+        targetPrimaryKeyColumn = new PrimaryKeyColumn();
+        targetPrimaryKeyColumn.setPrimaryKey(targetPrimaryKey);
         targetPrimaryKey.getPrimaryKeyColumns().add(targetPrimaryKeyColumn);
         diffPrimaryKeyColumnSourceTarget(primaryKeyColumnDiff);
     }
@@ -223,7 +228,8 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffForeignKeyTargetNull(ForeignKeyDiff foreignKeyDiff) {
-        targetForeignKey = new ForeignKey(targetTable);
+        targetForeignKey = new ForeignKey();
+        targetForeignKey.setFromTable(targetTable);
         targetTable.getForeignKeys().add(targetForeignKey);
         diffForeignKeySourceTarget(foreignKeyDiff);
     }
@@ -246,7 +252,8 @@ public class MergeDiffer extends AbstractDiffer {
     }
 
     public void diffReferenceTargetNull(ReferenceDiff referenceDiff) {
-        targetReference = new Reference(targetForeignKey);
+        targetReference = new Reference();
+        targetReference.setForeignKey(targetForeignKey);
         targetForeignKey.getReferences().add(targetReference);
         diffReferenceSourceTarget(referenceDiff);
     }

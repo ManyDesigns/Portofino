@@ -28,7 +28,10 @@
  */
 package com.manydesigns.portofino.model.datamodel;
 
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+
+import javax.xml.bind.Unmarshaller;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,18 +44,39 @@ public abstract class Generator implements ModelObject{
     //**************************************************************************
     // Fields
     //**************************************************************************
-    protected final PrimaryKeyColumn primaryKeyColumn;
+    protected PrimaryKeyColumn primaryKeyColumn;
 
 
     //**************************************************************************
     // Constructor
     //**************************************************************************
-    public Generator(PrimaryKeyColumn primaryKeyColumn) {
-        this.primaryKeyColumn = primaryKeyColumn;
-    }
+
+    public Generator() {}
+
+
+    //**************************************************************************
+    // Getter/setter
+    //**************************************************************************
 
     public PrimaryKeyColumn getPrimaryKeyColumn() {
         return primaryKeyColumn;
     }
 
+    public void setPrimaryKeyColumn(PrimaryKeyColumn primaryKeyColumn) {
+        this.primaryKeyColumn = primaryKeyColumn;
+    }
+
+    //**************************************************************************
+    // DatamodelObject implementation
+    //**************************************************************************
+
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        primaryKeyColumn = (PrimaryKeyColumn) parent;
+    }
+
+    public void reset() {}
+
+    public void init(Model model) {
+        assert primaryKeyColumn != null;
+    }
 }

@@ -36,8 +36,8 @@ package com.manydesigns.portofino.model.site;
 public class FolderNode extends SiteNode{
     private final String urlFormat = "{0}/Index.action";
 
-    public FolderNode(SiteNode parent) {
-        super(parent);
+    public FolderNode() {
+        super();
     }
 
     protected String getUrlFormat() {

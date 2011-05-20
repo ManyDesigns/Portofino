@@ -33,6 +33,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.Identifier;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -52,7 +53,7 @@ public class Reference implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected final ForeignKey foreignKey;
+    protected ForeignKey foreignKey;
     protected String fromColumn;
     protected String toColumn;
 
@@ -68,20 +69,17 @@ public class Reference implements ModelObject {
     // Constructors
     //**************************************************************************
 
-    public Reference(ForeignKey foreignKey) {
+    public Reference() {
         this.foreignKey = foreignKey;
-    }
-
-    public Reference(ForeignKey foreignKey,
-                     String fromColumn, String toColumn) {
-        this(foreignKey);
-        this.fromColumn = fromColumn;
-        this.toColumn = toColumn;
     }
 
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
+
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        foreignKey = (ForeignKey) parent;
+    }
 
     public void reset() {
         actualFromColumn = null;
@@ -89,6 +87,10 @@ public class Reference implements ModelObject {
     }
 
     public void init(Model model) {
+        assert foreignKey != null;
+        assert fromColumn != null;
+        assert toColumn != null;
+
         actualFromColumn =
                 foreignKey.getFromTable().findColumnByName(fromColumn);
 
@@ -102,9 +104,18 @@ public class Reference implements ModelObject {
         return null;
     }
 
-//**************************************************************************
+    //**************************************************************************
     // Getters/setter
     //**************************************************************************
+
+
+    public ForeignKey getForeignKey() {
+        return foreignKey;
+    }
+
+    public void setForeignKey(ForeignKey foreignKey) {
+        this.foreignKey = foreignKey;
+    }
 
     public String getFromDatabaseName() {
         return foreignKey.getFromDatabaseName();

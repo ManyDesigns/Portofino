@@ -9,7 +9,7 @@
         <version>4.0.beta5</version>
     </parent>
     <artifactId>portofino-war</artifactId>
-    <packaging>war</packaging> 
+    <packaging>war</packaging>
     <name>manydesigns-portofino-war</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
@@ -24,11 +24,6 @@
             <artifactId>elements-extras</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>stax</groupId>
-            <artifactId>stax</artifactId>
-            <version>${stax.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.xml.bind</groupId>
@@ -231,7 +226,7 @@
             <groupId>rhino</groupId>
             <artifactId>js</artifactId>
             <version>1.6R5</version>
-        </dependency> 
+        </dependency>
         <dependency>
             <groupId>com.mockrunner</groupId>
             <artifactId>mockrunner</artifactId>

@@ -35,6 +35,7 @@ import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -73,14 +74,11 @@ public class Database implements ModelObject {
         this.schemas = new ArrayList<Schema>();
     }
 
-    public Database(String databaseName) {
-        this();
-        this.databaseName = databaseName;
-    }
-
     //**************************************************************************
     // DatamodelObject implementation
     //**************************************************************************
+
+    public void afterUnmarshal(Unmarshaller u, Object parent) {}
 
     public String getQualifiedName() {
         return databaseName;
@@ -93,6 +91,7 @@ public class Database implements ModelObject {
     }
 
     public void init(Model model) {
+        assert databaseName != null;
         for (Schema schema : schemas) {
             schema.init(model);
         }

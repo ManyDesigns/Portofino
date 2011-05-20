@@ -44,6 +44,7 @@ import java.util.List;
 public class Connections {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+    public static final String JAXB_CONNECTIONS_PACKAGES = "com.manydesigns.portofino.connections";
 
 
     //**************************************************************************

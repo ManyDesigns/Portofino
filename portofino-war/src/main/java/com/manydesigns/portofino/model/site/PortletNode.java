@@ -30,9 +30,9 @@
 package com.manydesigns.portofino.model.site;
 
 import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Database;
+
 import javax.xml.bind.annotation.XmlAttribute;
 
 /*
@@ -69,20 +69,8 @@ public class PortletNode extends SiteNode {
     //**************************************************************************
 
 
-    public PortletNode(SiteNode parent) {
-        super(parent);
-    }
-
-    public PortletNode(SiteNode parent, String name, String type, String title, String legend,
-                   String database, String query, String urlExpression) {
-        super(parent);
-        this.name = name;
-        this.type = type;
-        this.title = title;
-        this.legend = legend;
-        this.database = database;
-        this.query = query;
-        this.urlExpression = urlExpression;
+    public PortletNode() {
+        super();
     }
 
     //**************************************************************************
@@ -90,7 +78,22 @@ public class PortletNode extends SiteNode {
     //**************************************************************************
 
     public void reset() {
+        super.reset();
         actualDatabase = null;
+    }
+
+    @Override
+    public void init(Model model) {
+        super.init(model);
+        assert name != null;
+        assert type != null;
+        assert title != null;
+        assert legend != null;
+        assert database != null;
+        assert query != null;
+        assert urlExpression != null;
+
+        actualDatabase = model.findDatabaseByName(database);
     }
 
 
@@ -101,8 +104,7 @@ public class PortletNode extends SiteNode {
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
-    @Required
-    @XmlAttribute()
+    @XmlAttribute(required = true)
     public String getName() {
         return name;
     }
@@ -173,12 +175,6 @@ public class PortletNode extends SiteNode {
 
     public void setActualDatabase(Database actualDatabase) {
         this.actualDatabase = actualDatabase;
-    }
-
-    @Override
-    public void init(Model model) {
-        super.init(model);
-        actualDatabase = model.findDatabaseByName(database);
     }
 
     protected String getUrlFormat() {

@@ -31,6 +31,8 @@ package com.manydesigns.portofino.model.selectionproviders;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -51,7 +53,7 @@ public class SelectionProperty implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected final ModelSelectionProvider modelSelectionProvider;
+    protected ModelSelectionProvider modelSelectionProvider;
 
     protected String name;
 
@@ -60,24 +62,23 @@ public class SelectionProperty implements ModelObject {
     // Constructors
     //**************************************************************************
 
-    public SelectionProperty(
-            ModelSelectionProvider modelSelectionProvider) {
-        this.modelSelectionProvider = modelSelectionProvider;
-    }
 
-    public SelectionProperty(
-            ModelSelectionProvider modelSelectionProvider, String name) {
-        this(modelSelectionProvider);
-        this.name = name;
-    }
+    public SelectionProperty() {}
 
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
 
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        modelSelectionProvider = (ModelSelectionProvider) parent;
+    }
+
     public void reset() {}
 
-    public void init(Model model) {}
+    public void init(Model model) {
+        assert modelSelectionProvider != null;
+        assert name != null;
+    }
 
     public String getQualifiedName() {
         return String.format("%s.%s",
@@ -95,5 +96,13 @@ public class SelectionProperty implements ModelObject {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public ModelSelectionProvider getModelSelectionProvider() {
+        return modelSelectionProvider;
+    }
+
+    public void setModelSelectionProvider(ModelSelectionProvider modelSelectionProvider) {
+        this.modelSelectionProvider = modelSelectionProvider;
     }
 }

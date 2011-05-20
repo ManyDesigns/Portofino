@@ -35,6 +35,7 @@ import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class Schema implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected final Database database;
+    protected Database database;
     protected final List<Table> tables;
 
     protected String schemaName;
@@ -70,19 +71,17 @@ public class Schema implements ModelObject {
     //**************************************************************************
     // Constructors and init
     //**************************************************************************
-    public Schema(Database database) {
-        this.database = database;
-        this.tables = new ArrayList<Table>();
-    }
-
-    public Schema(Database database, String schemaName) {
-        this(database);
-        this.schemaName = schemaName;
+    public Schema() {
+        tables = new ArrayList<Table>();
     }
 
     //**************************************************************************
     // DatamodelObject implementation
     //**************************************************************************
+
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        database = (Database)parent;
+    }
 
     public String getQualifiedName() {
         return MessageFormat.format("{0}.{1}", getDatabaseName(), schemaName);
@@ -95,6 +94,8 @@ public class Schema implements ModelObject {
     }
 
     public void init(Model model) {
+        assert database != null;
+        assert schemaName != null;
         for (Table table : tables) {
             table.init(model);
         }
@@ -106,6 +107,10 @@ public class Schema implements ModelObject {
 
     public Database getDatabase() {
         return database;
+    }
+
+    public void setDatabase(Database database) {
+        this.database = database;
     }
 
     public String getDatabaseName() {

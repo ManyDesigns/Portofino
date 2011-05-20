@@ -39,8 +39,8 @@ public class CustomNode extends SiteNode{
     //**************************************************************************
     // Fields
     //**************************************************************************
-    public CustomNode(SiteNode parent) {
-        super(parent);
+    public CustomNode() {
+        super();
     }
 
     protected String getUrlFormat() {

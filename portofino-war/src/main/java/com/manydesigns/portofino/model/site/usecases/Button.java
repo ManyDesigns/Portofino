@@ -33,6 +33,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.Identifier;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -59,7 +60,7 @@ public class Button implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected final UseCase useCase;
+    protected UseCase useCase;
 
     protected String name;
     protected String label;
@@ -79,27 +80,15 @@ public class Button implements ModelObject {
     // Constructors
     //**************************************************************************
 
-    public Button(UseCase useCase) {
-        this.useCase = useCase;
-    }
-
-    public Button(UseCase useCase, String name, String label) {
-        this(useCase);
-        this.name = name;
-        this.label = label;
-    }
-
-    public Button(UseCase useCase, String name, String label,
-                  String guard, String script, String scriptLanguage) {
-        this(useCase, name, label);
-        this.guard = guard;
-        this.script = script;
-        this.scriptLanguage = scriptLanguage;
-    }
+    public Button() {}
 
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
+
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        useCase = (UseCase) parent;
+    }
 
     public void reset() {
         actualMethod = null;
@@ -107,6 +96,10 @@ public class Button implements ModelObject {
     }
 
     public void init(Model model) {
+        assert useCase != null;
+        assert name != null;
+        assert label != null;
+
         actualMethod = (method == null)
                 ? DEFAULT_BUTTON_METHOD
                 : method;
@@ -126,6 +119,10 @@ public class Button implements ModelObject {
 
     public UseCase getUseCase() {
         return useCase;
+    }
+
+    public void setUseCase(UseCase useCase) {
+        this.useCase = useCase;
     }
 
     @Identifier

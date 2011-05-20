@@ -39,6 +39,7 @@ import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -61,6 +62,7 @@ public class Annotation implements ModelObject {
     // Fields
     //**************************************************************************
 
+    protected Object parent;
     protected String type;
     protected List<String> values;
 
@@ -94,6 +96,10 @@ public class Annotation implements ModelObject {
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
+
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        this.parent = parent;
+    }
 
     public void reset() {
         javaAnnotation = null;
@@ -174,6 +180,14 @@ public class Annotation implements ModelObject {
     //**************************************************************************
     // Getters and setters
     //**************************************************************************
+
+    public Object getParent() {
+        return parent;
+    }
+
+    public void setParent(Object parent) {
+        this.parent = parent;
+    }
 
     @Identifier
     @XmlAttribute(required = true)

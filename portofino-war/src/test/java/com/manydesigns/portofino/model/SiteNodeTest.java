@@ -79,7 +79,8 @@ public class SiteNodeTest extends TestCase{
         //Nessun permesso
 
         //1.1
-        n1_1 = new DocumentNode(root);
+        n1_1 = new DocumentNode();
+        n1_1.setParent(root);
         n1_1_perm = new Permissions();
         n1_1.setPermissions(n1_1_perm);
         n1_1.setDescription("homepage description");
@@ -89,7 +90,8 @@ public class SiteNodeTest extends TestCase{
         n1_1_perm.getAllow().add(Group.ANONYMOUS);
 
         //1.2
-        n1_2 = new FolderNode(root);
+        n1_2 = new FolderNode();
+        n1_2.setParent(root);
         n1_2_perm = new Permissions();
         n1_2.setPermissions(n1_2_perm);
         n1_2.setDescription("Model description");
@@ -98,7 +100,8 @@ public class SiteNodeTest extends TestCase{
 
         n1_2_perm.getAllow().add(Group.REGISTERED);
 
-        n1_2_1 = new CustomFolderNode(n1_2);
+        n1_2_1 = new CustomFolderNode();
+        n1_2_1.setParent(n1_2);
         n1_2_1_perm = new Permissions();
         n1_2_1.setPermissions(n1_2_1_perm);
         n1_2_1.setType("table-data");
@@ -110,7 +113,8 @@ public class SiteNodeTest extends TestCase{
 
         n1_2_1_perm.getAllow().add("admins");
 
-        n1_2_2 = new CustomFolderNode(n1_2);
+        n1_2_2 = new CustomFolderNode();
+        n1_2_2.setParent(n1_2);
         n1_2_2_perm = new Permissions();
         n1_2_2.setPermissions(n1_2_2_perm);
         n1_2_2.setType("table-design");
@@ -122,7 +126,8 @@ public class SiteNodeTest extends TestCase{
 
 
 
-        n1_2_3 = new CustomNode(n1_2);
+        n1_2_3 = new CustomNode();
+        n1_2_3.setParent(n1_2);
         n1_2_3_perm = new Permissions();
         n1_2_3.setPermissions(n1_2_3_perm);
         n1_2_3.setDescription("Somewhere description");
@@ -134,7 +139,8 @@ public class SiteNodeTest extends TestCase{
         n1_2_3_perm.getDeny().add("cattivi");
 
         //1.3
-        n1_3 = new CustomNode(root);
+        n1_3 = new CustomNode();
+        n1_3.setParent(root);
         n1_3_perm = new Permissions();
         n1_3.setPermissions(n1_3_perm);
         n1_3.setDescription("Profile");
@@ -146,7 +152,8 @@ public class SiteNodeTest extends TestCase{
         n1_3_perm.getAllow().add("buoni");
 
         //1.4
-        n1_4 = new FolderNode(root);
+        n1_4 = new FolderNode();
+        n1_4.setParent(root);
         n1_4_perm = new Permissions();
         n1_4.setPermissions(n1_4_perm);
         n1_4.setDescription("user administration");

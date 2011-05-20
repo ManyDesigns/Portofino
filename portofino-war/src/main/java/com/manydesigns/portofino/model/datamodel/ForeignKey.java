@@ -38,6 +38,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class ForeignKey implements ModelObject {
     // Fields (physical JDBC)
     //**************************************************************************
 
-    protected final Table fromTable;
+    protected Table fromTable;
     protected final List<Reference> references;
     protected final List<Annotation> annotations;
 
@@ -110,33 +111,9 @@ public class ForeignKey implements ModelObject {
     // Constructors and init
     //**************************************************************************
 
-    public ForeignKey(Table fromTable) {
-        this.fromTable = fromTable;
+    public ForeignKey() {
         references = new ArrayList<Reference>();
         annotations = new ArrayList<Annotation>();
-    }
-
-    public ForeignKey(Table fromTable, String foreignKeyName,
-                      String toDatabase, String toSchema,
-                      String toTable, String onUpdate, String onDelete) {
-        this(fromTable);
-        this.foreignKeyName = foreignKeyName;
-        this.toDatabase = toDatabase;
-        this.toSchema = toSchema;
-        this.toTable = toTable;
-        this.onUpdate = onUpdate;
-        this.onDelete = onDelete;        
-    }
-
-    public ForeignKey(Table fromTable, String foreignKeyName,
-                      String toDatabase, String toSchema,
-                      String toTable, String onUpdate, String onDelete,
-                      String manyPropertyName, String onePropertyName, boolean virtual) {
-        this(fromTable, foreignKeyName, toDatabase,
-                toSchema, toTable, onUpdate, onDelete);
-        this.manyPropertyName = manyPropertyName;
-        this.onePropertyName = onePropertyName;
-        this.virtual = virtual;
     }
 
     //**************************************************************************
@@ -146,6 +123,10 @@ public class ForeignKey implements ModelObject {
     public String getQualifiedName() {
         return MessageFormat.format("{0}${1}",
                 fromTable.getQualifiedName(), foreignKeyName);
+    }
+
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        fromTable = (Table) parent;
     }
 
     public void reset() {
@@ -159,6 +140,12 @@ public class ForeignKey implements ModelObject {
     }
 
     public void init(Model model) {
+        assert fromTable != null;
+        assert foreignKeyName != null;
+        assert toDatabase != null;
+        assert toSchema != null;
+        assert toTable != null;
+
         // wire up ForeignKey.toTable
         String qualifiedToTableName =
                 Table.composeQualifiedName(toDatabase, toSchema, toTable);
@@ -221,6 +208,10 @@ public class ForeignKey implements ModelObject {
 
     public Table getFromTable() {
         return fromTable;
+    }
+
+    public void setFromTable(Table fromTable) {
+        this.fromTable = fromTable;
     }
 
     public String getFromDatabaseName() {

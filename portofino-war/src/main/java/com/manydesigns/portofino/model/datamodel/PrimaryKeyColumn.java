@@ -34,6 +34,8 @@ import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
@@ -51,7 +53,7 @@ public class PrimaryKeyColumn implements ModelObject {
     //**************************************************************************
     // Fields
     //**************************************************************************
-    protected final PrimaryKey primaryKey;
+    protected PrimaryKey primaryKey;
     protected String columnName;
     protected Generator generator;
 
@@ -72,18 +74,15 @@ public class PrimaryKeyColumn implements ModelObject {
     // Constructors
     //**************************************************************************
 
-    public PrimaryKeyColumn(PrimaryKey primaryKey) {
-        this.primaryKey = primaryKey;
-    }
-
-    public PrimaryKeyColumn(PrimaryKey primaryKey, String columnName) {
-        this(primaryKey);
-        this.columnName = columnName;
-    }
+    public PrimaryKeyColumn() {}
 
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
+
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        primaryKey = (PrimaryKey) parent;
+    }
 
     public void reset() {
         actualColumn = null;
@@ -94,6 +93,9 @@ public class PrimaryKeyColumn implements ModelObject {
     }
 
     public void init(Model model) {
+        assert primaryKey != null;
+        assert columnName != null;
+
         actualColumn = primaryKey.getTable().findColumnByName(columnName);
         if (actualColumn == null) {
             logger.warn("Cannor wire primary key column '{}' to primary key '{}'",
@@ -108,6 +110,10 @@ public class PrimaryKeyColumn implements ModelObject {
 
     public PrimaryKey getPrimaryKey() {
         return primaryKey;
+    }
+
+    public void setPrimaryKey(PrimaryKey primaryKey) {
+        this.primaryKey = primaryKey;
     }
 
     @Identifier

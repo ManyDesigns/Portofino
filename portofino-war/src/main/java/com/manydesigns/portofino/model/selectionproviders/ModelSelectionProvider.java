@@ -33,6 +33,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.Identifier;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,26 +64,18 @@ public class ModelSelectionProvider implements ModelObject {
         selectionProperties = new ArrayList<SelectionProperty>();
     }
 
-    public ModelSelectionProvider(String name, String database) {
-        this();
-        this.name = name;
-        this.database = database;
-    }
-
-    public ModelSelectionProvider(String name, String database,
-                                  String sql, String hql) {
-        this(name, database);
-        this.sql = sql;
-        this.hql = hql;
-    }
-
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
 
+    public void afterUnmarshal(Unmarshaller u, Object parent) {}
+
     public void reset() {}
 
-    public void init(Model model) {}
+    public void init(Model model) {
+        assert name != null;
+        assert database != null;
+    }
 
     public String getQualifiedName() {
         return name;

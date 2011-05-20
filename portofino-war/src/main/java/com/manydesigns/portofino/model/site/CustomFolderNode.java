@@ -44,8 +44,8 @@ public class CustomFolderNode extends SiteNode{
     //**************************************************************************
     protected String type;
 
-    public CustomFolderNode(SiteNode parent) {
-        super(parent);
+    public CustomFolderNode() {
+        super();
     }
 
     @XmlAttribute(required = true)

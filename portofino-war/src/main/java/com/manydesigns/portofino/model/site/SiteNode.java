@@ -29,10 +29,11 @@
 
 package com.manydesigns.portofino.model.site;
 
-import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.Identifier;
+
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public abstract class  SiteNode implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected final SiteNode parent;
+    protected SiteNode parent;
     protected final ArrayList<SiteNode> childNodes;
 
     protected Permissions permissions;
@@ -69,22 +70,17 @@ public abstract class  SiteNode implements ModelObject {
     // Constructors
     //**************************************************************************
 
-    public SiteNode(SiteNode parent) {
+    public SiteNode() {
         this.childNodes = new ArrayList<SiteNode>();
-        this.parent= parent;
     }
-
-    public SiteNode( SiteNode parent, String id, String title, String description) {
-        this(parent);
-        this.id = id;
-        this.title = title;
-        this.description = description;
-    }
-
 
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
+
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        this.parent = (SiteNode) parent;
+    }
 
     public void reset() {
         for (SiteNode childNode : childNodes) {
@@ -93,6 +89,10 @@ public abstract class  SiteNode implements ModelObject {
     }
 
     public void init(Model model) {
+        assert id != null;
+        assert title != null;
+        assert description != null;
+
         if (parent!=null){
             actualId = parent.actualId;
             actualId = (actualId.endsWith("/")?actualId:actualId+"/");
@@ -121,6 +121,7 @@ public abstract class  SiteNode implements ModelObject {
     //**************************************************************************
     // Getters/Setters
     //**************************************************************************
+
 
 
     @Identifier
@@ -175,6 +176,10 @@ public abstract class  SiteNode implements ModelObject {
 
     public SiteNode getParent() {
         return parent;
+    }
+
+    public void setParent(SiteNode parent) {
+        this.parent = parent;
     }
 
     public String getActualUrl() {

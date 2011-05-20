@@ -43,6 +43,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -127,7 +128,8 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     //**************************************************************************
 
     public Database readModel(ConnectionProvider connectionProvider) {
-        Database database = new Database(connectionProvider.getDatabaseName());
+        Database database = new Database();
+        database.setDatabaseName(connectionProvider.getDatabaseName());
         Connection conn = null;
         try {
             conn = connectionProvider.acquireConnection();
@@ -183,7 +185,9 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                         continue;
                     }
                 }
-                Schema schema = new Schema(database, schemaName);
+                Schema schema = new Schema();
+                schema.setDatabase(database);
+                schema.setSchemaName(schemaName);
                 logger.info("Found schema: {}", schema.getQualifiedName());
                 database.getSchemas().add(schema);
             }
@@ -234,7 +238,9 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                     continue;
                 }
 
-                Table table = new Table(schema, tableName);
+                Table table = new Table();
+                table.setSchema(schema);
+                table.setTableName(tableName);
                 logger.debug("Found table: {}", table.getQualifiedName());
                 schema.getTables().add(table);
             }
@@ -297,10 +303,15 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 }
 
                 Type type = connectionProvider.getTypeByName(columnType);
-                Column column = new Column(table,
-                        columnName, columnType,
-                        nullable, type.isAutoincrement(),
-                        length, scale, type.isSearchable());
+                Column column = new Column();
+                column.setTable(table);
+                column.setColumnName(columnName);
+                column.setColumnType(columnType);
+                column.setNullable(nullable);
+                column.setAutoincrement(type.isAutoincrement());
+                column.setLength(length);
+                column.setScale(scale);
+                column.setSearchable(type.isSearchable());
                 logger.debug("Found column: {} of type {}",
                         column.getQualifiedName(),
                         column.getColumnType());
@@ -368,7 +379,9 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 }
 
                 if (primaryKey == null) {
-                    primaryKey = new PrimaryKey(table, pkName);
+                    primaryKey = new PrimaryKey();
+                    primaryKey.setTable(table);
+                    primaryKey.setPrimaryKeyName(pkName);
                     logger.debug("Found primary key: {}", pkName);
                 } else if (!primaryKey.getPrimaryKeyName().equals(pkName)) {
                     //sanity check
@@ -380,7 +393,9 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
 
                 Column column = table.findColumnByName(columnName);
                 PrimaryKeyColumn primaryKeyColumn =
-                        new PrimaryKeyColumn(primaryKey, columnName);
+                        new PrimaryKeyColumn();
+                primaryKeyColumn.setPrimaryKey(primaryKey);
+                primaryKeyColumn.setColumnName(columnName);
 
                 // sanity check
                 if (column == null) {
@@ -404,15 +419,17 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 return;
             }
 
+            List<PrimaryKeyColumn> primaryKeyColumns =
+                    primaryKey.getPrimaryKeyColumns();
             // copy non-null elements of array
             for (PrimaryKeyColumn current : pkColumnArray) {
                 if (current == null) {
                     continue;
                 }
-                primaryKey.add(current);
+                primaryKeyColumns.add(current);
             }
             // sanity check
-            if (primaryKey.size() == 0) {
+            if (primaryKeyColumns.size() == 0) {
                 logger.warn("Primary key {} is empty. Discarding.",
                         primaryKey.getPrimaryKeyName());
                 return;
@@ -420,7 +437,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
             table.setPrimaryKey(primaryKey);
             logger.debug("Installed PK {} with number of columns: {}",
                     primaryKey.getPrimaryKeyName(),
-                    primaryKey.size());
+                    primaryKeyColumns.size());
         } finally {
             DbUtil.closeResultSetAndStatement(rs);
         }
@@ -494,23 +511,24 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                         installRelationship(table, relationship, referenceArray);
                     }
 
-                    relationship = new ForeignKey(
-                            table, fkName,
-                            referencedDatabaseName,
-                            referencedSchemaName,
-                            referencedTableName,
-                            decodeUpdateDeleteRule(updateRule),
-                            decodeUpdateDeleteRule(deleteRule));
+                    relationship = new ForeignKey();
+                    relationship.setFromTable(table);
+                    relationship.setForeignKeyName(fkName);
+                    relationship.setToDatabase(referencedDatabaseName);
+                    relationship.setToSchema(referencedSchemaName);
+                    relationship.setToTable(referencedTableName);
+                    relationship.setOnUpdate(decodeUpdateDeleteRule(updateRule));
+                    relationship.setOnDelete(decodeUpdateDeleteRule(deleteRule));
 
                     // reset the refernceArray
                     referenceArray = new Reference[0];
                     logger.debug("Found foreign key: {}", fkName);
                 }
 
-                Reference reference = new Reference(
-                        relationship,
-                        columnName,
-                        referencedColumnName);
+                Reference reference = new Reference();
+                reference.setForeignKey(relationship);
+                reference.setFromColumn(columnName);
+                reference.setToColumn(referencedColumnName);
 
                 String qualifiedFromColumnName = MessageFormat.format(
                         "{0}.{1}.{2}.{3}",

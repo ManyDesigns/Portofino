@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.model;
 
+import javax.xml.bind.Unmarshaller;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -37,6 +39,8 @@ package com.manydesigns.portofino.model;
 public interface ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    void afterUnmarshal(Unmarshaller u, Object parent);
 
     void reset();
     void init(Model model);

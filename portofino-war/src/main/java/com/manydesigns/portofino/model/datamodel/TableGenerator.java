@@ -51,16 +51,18 @@ public class TableGenerator extends Generator{
     protected String keyValue;
     protected String valueColumn;
 
-    public TableGenerator(PrimaryKeyColumn primaryKeyColumn) {
-        super(primaryKeyColumn);
-    }
+    public TableGenerator() {}
 
     public void reset() {
-
+        super.reset();
     }
 
     public void init(Model model) {
-
+        super.init(model);
+        assert table != null;
+        assert keyColumn != null;
+        assert keyValue != null;
+        assert valueColumn != null;
     }
 
     public String getQualifiedName() {

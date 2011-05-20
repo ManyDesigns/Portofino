@@ -39,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -58,11 +59,11 @@ public class Table implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected final Schema schema;
     protected final List<Column> columns;
     protected final List<ForeignKey> foreignKeys;
     protected final List<Annotation> annotations;
 
+    protected Schema schema;
     protected String tableName;
 
     protected String entityName;
@@ -89,24 +90,11 @@ public class Table implements ModelObject {
     //**************************************************************************
     // Constructors and init
     //**************************************************************************
-    public Table(Schema schema) {
-        this.schema = schema;
+    public Table() {
         columns = new ArrayList<Column>();
         foreignKeys = new ArrayList<ForeignKey>();
         oneToManyRelationships = new ArrayList<ForeignKey>();
         annotations = new ArrayList<Annotation>();
-    }
-
-    public Table(Schema schema, String tableName) {
-        this(schema);
-        this.tableName = tableName;
-    }
-
-    public Table(Schema schema, String tableName,
-                 Boolean manyToMany, String javaClass) {
-        this(schema, tableName);
-        this.manyToMany = manyToMany;
-        this.javaClass = javaClass;
     }
 
     //**************************************************************************
@@ -118,6 +106,9 @@ public class Table implements ModelObject {
                 schema.getQualifiedName(), tableName);
     }
 
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        schema = (Schema) parent;
+    }
 
     public void reset() {
         actualJavaClass = null;
@@ -141,6 +132,9 @@ public class Table implements ModelObject {
     }
 
     public void init(Model model) {
+        assert schema != null;
+        assert tableName != null;
+        
         // wire up javaClass
         actualJavaClass = ReflectionUtil.loadClass(javaClass);
 
@@ -164,7 +158,6 @@ public class Table implements ModelObject {
             foreignKey.init(model);
         }
 
-
         for (Annotation annotation : annotations) {
             annotation.init(model);
         }
@@ -176,6 +169,10 @@ public class Table implements ModelObject {
 
     public Schema getSchema() {
         return schema;
+    }
+
+    public void setSchema(Schema schema) {
+        this.schema = schema;
     }
 
     @Required

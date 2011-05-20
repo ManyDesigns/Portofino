@@ -66,10 +66,7 @@ Struttura dell'XML:
    | | | |   +-value
    | | | |
    | | | +-buttons
-   | | | | +-button
-   | | | |
-   | | | +-subUseCases
-   | | |   +-useCase (ricorsivamente)
+   | | |   +-button
    | | |
    | | +-childNodes (come rootNode)
    | | +-permissions (come rootNode)
@@ -1167,6 +1164,178 @@ Struttura dell'XML:
                     </allow>
                 </permissions>
             </customNode>
+            <useCaseNode id="projects" title="Projects" description="Projects">
+                <useCase name="projects"
+                         attribute="projectId"
+                         table="redmine.redmine.projects"
+                         query="FROM redmine_redmine_projects"
+                         searchTitle="Project search"
+                         createTitle="Create project"
+                         readTitle="Project"
+                         editTitle="Edit project">
+                    <properties>
+                        <property name="productid">
+                            <annotations>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Label">
+                                    <value>product id</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.InSummary">
+                                    <value>true</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Searchable">
+                                    <value>true</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Access">
+                                    <value>write</value>
+                                </annotation>
+                            </annotations>
+                        </property>
+                        <property name="category">
+                            <annotations>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.InSummary">
+                                    <value>false</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Searchable">
+                                    <value>false</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Access">
+                                    <value>read</value>
+                                </annotation>
+                            </annotations>
+                        </property>
+                        <property name="name">
+                            <annotations>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.InSummary">
+                                    <value>true</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Searchable">
+                                    <value>true</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Access">
+                                    <value>write</value>
+                                </annotation>
+                            </annotations>
+                        </property>
+                        <property name="descn">
+                            <annotations>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.InSummary">
+                                    <value>true</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Searchable">
+                                    <value>true</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Access">
+                                    <value>write</value>
+                                </annotation>
+                            </annotations>
+                        </property>
+                    </properties>
+                </useCase>
+                <childNodes>
+                    <useCaseNode id="issues" title="Issues" description="Issues">
+                        <embedInParent order="1"
+                                         inSearch="false"
+                                         inDetails="true"
+                                />
+                        <useCase name="issue"
+                                 attribute="issueId"
+                                 table="redmine.redmine.issues"
+                                 query="FROM redmine_redmine_issues WHERE project_id = %{projectId}"
+                                 searchTitle="Issue search"
+                                 createTitle="Create issue"
+                                 readTitle="Issue"
+                                 editTitle="Edit issue"
+                                >
+                            <properties>
+                                <property name="productid">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Label">
+                                            <value>product id</value>
+                                        </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.InSummary">
+                                            <value>true</value>
+                                        </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Searchable">
+                                            <value>true</value>
+                                        </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Access">
+                                            <value>write</value>
+                                        </annotation>
+                                    </annotations>
+                                </property>
+                                <property name="category">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.InSummary">
+                                            <value>false</value>
+                                        </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Searchable">
+                                            <value>false</value>
+                                        </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Access">
+                                            <value>read</value>
+                                        </annotation>
+                                    </annotations>
+                                </property>
+                                <property name="name">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.InSummary">
+                                            <value>true</value>
+                                        </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Searchable">
+                                            <value>true</value>
+                                        </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Access">
+                                            <value>write</value>
+                                        </annotation>
+                                    </annotations>
+                                </property>
+                                <property name="descn">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.InSummary">
+                                            <value>true</value>
+                                        </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Searchable">
+                                            <value>true</value>
+                                        </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Access">
+                                            <value>write</value>
+                                        </annotation>
+                                    </annotations>
+                                </property>
+                            </properties>
+                        </useCase>
+                    </useCaseNode>
+                    <portletNode>
+
+                    </portletNode>
+                </childNodes>
+            </useCaseNode>
         </childNodes>
     </rootNode>
 </model>

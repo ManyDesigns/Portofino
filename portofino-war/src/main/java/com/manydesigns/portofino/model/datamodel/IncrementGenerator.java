@@ -39,14 +39,14 @@ public class IncrementGenerator extends Generator{
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public IncrementGenerator(PrimaryKeyColumn primaryKeyColumn) {
-        super(primaryKeyColumn);
-    }
+    public IncrementGenerator() {}
 
     public void reset() {
+        super.reset();
     }
 
     public void init(Model model) {
+        super.init(model);
     }
 
     public String getQualifiedName() {

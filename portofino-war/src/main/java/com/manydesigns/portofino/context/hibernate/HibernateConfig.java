@@ -32,8 +32,6 @@ package com.manydesigns.portofino.context.hibernate;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.connections.ConnectionProvider;
-import static com.manydesigns.portofino.database.DbUtil.getHibernateType;
-
 import com.manydesigns.portofino.connections.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.datamodel.*;
@@ -56,6 +54,8 @@ import org.slf4j.LoggerFactory;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.List;
+
+import static com.manydesigns.portofino.database.DbUtil.getHibernateType;
 
 
 /**
@@ -331,7 +331,7 @@ public class HibernateConfig {
                                   String pkName, RootClass clazz,
                                   Table tab,
                                   List<com.manydesigns.portofino.model.datamodel.Column> columnPKList) {
-        PrimaryKeyColumn pkcol =mdTable.getPrimaryKey().get(0);
+        PrimaryKeyColumn pkcol =mdTable.getPrimaryKey().getPrimaryKeyColumns().get(0);
         com.manydesigns.portofino.model.datamodel.Column
                 column = columnPKList.get(0);
         SimpleValue id = new SimpleValue(tab);

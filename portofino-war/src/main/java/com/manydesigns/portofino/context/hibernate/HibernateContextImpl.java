@@ -36,25 +36,24 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.connections.ConnectionProvider;
+import com.manydesigns.portofino.connections.Connections;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.io.FileManager;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.connections.Connections;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.xml.diff.DatabaseDiff;
-import com.manydesigns.portofino.xml.diff.DiffUtil;
-import com.manydesigns.portofino.xml.diff.MergeDiffer;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.UseCaseAccessor;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
-import com.manydesigns.portofino.xml.XmlParser;
-import com.manydesigns.portofino.xml.XmlWriter;
+import com.manydesigns.portofino.xml.diff.DatabaseDiff;
+import com.manydesigns.portofino.xml.diff.DiffUtil;
+import com.manydesigns.portofino.xml.diff.MergeDiffer;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.transaction.file.FileResourceManager;
@@ -68,6 +67,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.InputStream;
@@ -97,7 +97,7 @@ public class HibernateContextImpl implements Context {
     // Fields
     //**************************************************************************
 
-    protected List<ConnectionProvider> connectionProviders;
+    protected Connections connectionProviders;
     protected FileManager fm;
     protected Model model;
     protected Map<String, HibernateDatabaseSetup> setups;
@@ -131,12 +131,11 @@ public class HibernateContextImpl implements Context {
             InputStream is = frm.readResource(txId, fileName);
 
             JAXBContext jc = JAXBContext.newInstance(
-                    "com.manydesigns.portofino.connections");
+                    Connections.JAXB_CONNECTIONS_PACKAGES);
             Unmarshaller um = jc.createUnmarshaller();
-            Connections connections = (Connections) um.unmarshal(is);
-            connections.reset();
-            connections.init();
-            connectionProviders = connections.getConnections();
+            connectionProviders = (Connections) um.unmarshal(is);
+            connectionProviders.reset();
+            connectionProviders.init();
 
             frm.commitTransaction(txId);
         } catch (Exception e) {
@@ -148,9 +147,10 @@ public class HibernateContextImpl implements Context {
         logger.info("Loading xml model from file: {}",
                 file.getAbsolutePath());
 
-        XmlParser parser = new XmlParser();
         try {
-            Model loadedModel = (Model) parser.parse(file, Model.class, "model");
+            JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
+            Unmarshaller um = jc.createUnmarshaller();
+            Model loadedModel = (Model) um.unmarshal(file);
             loadedModel.init();
             installDataModel(loadedModel);
             xmlModelFile = file;
@@ -160,9 +160,11 @@ public class HibernateContextImpl implements Context {
     }
 
     public void saveXmlModel() {
-        XmlWriter modelWriter = new XmlWriter();
         try {
-            modelWriter.write(xmlModelFile, model, "model");
+            JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
+            Marshaller m = jc.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            m.marshal(model, xmlModelFile);
             logger.info("Saved xml model to file: {}", xmlModelFile);
         } catch (Throwable e) {
             logger.error("Cannot save xml model to file: " + xmlModelFile, e);
@@ -202,7 +204,7 @@ public class HibernateContextImpl implements Context {
     //**************************************************************************
 
     public ConnectionProvider getConnectionProvider(String databaseName) {
-        for (ConnectionProvider current : connectionProviders) {
+        for (ConnectionProvider current : connectionProviders.getConnections()) {
             if (current.getDatabaseName().equals(databaseName)) {
                 return current;
             }
@@ -211,33 +213,30 @@ public class HibernateContextImpl implements Context {
     }
 
     public void addConnectionProvider(ConnectionProvider connectionProvider) {
-        logger.info("Adding a new connection Provider: {}",
-                        connectionProvider.toString());
-        connectionProviders.add(connectionProvider);
+        logger.info("Adding a new connection Provider: {}", connectionProvider);
+        connectionProviders.getConnections().add(connectionProvider);
         writeToConnectionFile();
     }
 
     public void deleteConnectionProvider(String[] connectionProvider) {
-        logger.info("Deleting connection Provider: {}",
-                connectionProvider.toString());
+        logger.info("Deleting connection Provider: {}", connectionProvider);
         List<ConnectionProvider> toBeRemoved = new ArrayList<ConnectionProvider>();
         for(String databaseName : connectionProvider){
-            for(ConnectionProvider current : connectionProviders){
+            for(ConnectionProvider current : connectionProviders.getConnections()){
                 if(current.getDatabaseName().equals(databaseName)){
                     toBeRemoved.add(current);
                 }
             }
         }
-        connectionProviders.removeAll(toBeRemoved);
+        connectionProviders.getConnections().removeAll(toBeRemoved);
         writeToConnectionFile();
     }
 
      public void deleteConnectionProvider(String connectionProvider) {
-        logger.info("Deleting connection Provider: {}",
-                connectionProvider.toString());
-        for(ConnectionProvider current : connectionProviders){
+        logger.info("Deleting connection Provider: {}", connectionProvider);
+        for(ConnectionProvider current : connectionProviders.getConnections()){
             if(current.getDatabaseName().equals(connectionProvider)){
-                connectionProviders.remove(current);
+                connectionProviders.getConnections().remove(current);
                 break;
             }
         }
@@ -248,7 +247,7 @@ public class HibernateContextImpl implements Context {
     public void updateConnectionProvider(ConnectionProvider connectionProvider) {
         logger.info("Updating connection Provider: {}", 
                 connectionProvider.toString());
-        for (ConnectionProvider conn : connectionProviders){
+        for (ConnectionProvider conn : connectionProviders.getConnections()){
             if (conn.getDatabaseName().equals(connectionProvider.getDatabaseName())){
                 deleteConnectionProvider(connectionProvider.getDatabaseName());
                 addConnectionProvider(connectionProvider);
@@ -283,7 +282,7 @@ public class HibernateContextImpl implements Context {
     //**************************************************************************
 
     public List<ConnectionProvider> getConnectionProviders() {
-        return connectionProviders;
+        return connectionProviders.getConnections();
     }
 
     public Model getModel() {
@@ -293,7 +292,7 @@ public class HibernateContextImpl implements Context {
     public void syncDataModel() {
         MergeDiffer mergeDiffer = new MergeDiffer();
 
-        for (ConnectionProvider current : connectionProviders) {
+        for (ConnectionProvider current : connectionProviders.getConnections()) {
             Database sourceDatabase = current.readModel();
 
             Database targetDatabase =
@@ -992,30 +991,28 @@ public class HibernateContextImpl implements Context {
     //**************************************************************************
 
     private void writeToConnectionFile() {
-        XmlWriter connectionWriter = new XmlWriter();
         final Properties portofinoProperties = PortofinoProperties.getProperties();
         String fileName = portofinoProperties.getProperty(PortofinoProperties.CONNECTION_FILE_PROPERTY,
                 "portofino-connections.xml");
+        OutputStream os = null;
         try {
             FileResourceManager frm = fm.getFrm();
             String txId = frm.generatedUniqueTxId();
             frm.startTransaction(txId);
-            OutputStream os = null;
-            try {
+            frm.createResource(txId, fileName);
+            os = frm.writeResource(txId, fileName);
 
-                frm.createResource(txId, fileName);
-                os = frm.writeResource(txId, fileName);
-                connectionWriter.write(os, connectionProviders, "connections");
-            } finally {
-                if(os!=null){
-                    os.flush();
-                    os.close();
-                }
-            }
+            JAXBContext jc = JAXBContext.newInstance(Connections.JAXB_CONNECTIONS_PACKAGES);
+            Marshaller m = jc.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            m.marshal(connectionProviders, xmlModelFile);
+            os.flush();
             frm.commitTransaction(txId);
             logger.info("Saved connection to file: {}", fileName);
         } catch (Throwable e) {
             logger.error("Cannot save xml model to file: " + fileName, e);
+        } finally {
+            IOUtils.closeQuietly(os);
         }
     }
 

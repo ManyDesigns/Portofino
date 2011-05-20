@@ -32,9 +32,9 @@ package com.manydesigns.portofino.model.site.usecases;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
-import com.manydesigns.portofino.model.site.*;
 import com.manydesigns.portofino.xml.Identifier;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +55,7 @@ public class UseCaseProperty implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected final UseCase useCase;
+    protected UseCase useCase;
 
     protected String name;
     protected final List<Annotation> annotations;
@@ -65,19 +65,17 @@ public class UseCaseProperty implements ModelObject {
     // Constructors
     //**************************************************************************
 
-    public UseCaseProperty(UseCase useCase) {
-        this.useCase = useCase;
+    public UseCaseProperty() {
         annotations = new ArrayList<Annotation>();
-    }
-
-    public UseCaseProperty(UseCase useCase, String name) {
-        this(useCase);
-        this.name = name;
     }
 
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
+
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        useCase = (UseCase) parent;
+    }
 
     public void reset() {
         for (Annotation annotation : annotations) {
@@ -86,6 +84,8 @@ public class UseCaseProperty implements ModelObject {
     }
 
     public void init(Model model) {
+        assert useCase != null;
+        assert name != null;
         for (Annotation annotation : annotations) {
             annotation.init(model);
         }
@@ -98,6 +98,15 @@ public class UseCaseProperty implements ModelObject {
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
+
+
+    public UseCase getUseCase() {
+        return useCase;
+    }
+
+    public void setUseCase(UseCase useCase) {
+        this.useCase = useCase;
+    }
 
     @Identifier
     @XmlAttribute(required = true)

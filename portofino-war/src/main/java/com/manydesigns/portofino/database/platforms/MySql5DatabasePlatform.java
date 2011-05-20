@@ -38,6 +38,7 @@ import org.hibernate.dialect.MySQLDialect;
 
 import java.sql.*;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -115,7 +116,9 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                         continue;
                     }
                 }
-                Schema schema = new Schema(database, schemaName);
+                Schema schema = new Schema();
+                schema.setDatabase(database);
+                schema.setSchemaName(schemaName);
                 logger.info("Found schema: {}", schema.getQualifiedName());
                 database.getSchemas().add(schema);
             }
@@ -157,7 +160,9 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                     continue;
                 }
 
-                Table table = new Table(schema, tableName);
+                Table table = new Table();
+                table.setSchema(schema);
+                table.setTableName(tableName);
                 logger.debug("Found table: {}", table.getQualifiedName());
                 schema.getTables().add(table);
             }
@@ -197,10 +202,15 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                 boolean autoincrement = rsmd.isAutoIncrement(i);
                 boolean searchable = rsmd.isSearchable(i);
 
-                Column column = new Column(table,
-                        columnName, columnType,
-                        nullable, autoincrement,
-                        length, scale, searchable);
+                Column column = new Column();
+                column.setTable(table);
+                column.setColumnName(columnName);
+                column.setColumnType(columnType);
+                column.setNullable(nullable);
+                column.setAutoincrement(autoincrement);
+                column.setLength(length);
+                column.setScale(scale);
+                column.setSearchable(searchable);
                 logger.debug("Found column: {} of type {}",
                         column.getQualifiedName(),
                         column.getColumnType());
@@ -262,7 +272,9 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                 }
 
                 if (primaryKey == null) {
-                    primaryKey = new PrimaryKey(table, pkName);
+                    primaryKey = new PrimaryKey();
+                    primaryKey.setTable(table);
+                    primaryKey.setPrimaryKeyName(pkName);
                     logger.debug("Found primary key: {}", pkName);
                 } else if (!primaryKey.getPrimaryKeyName().equals(pkName)) {
                     //sanity check
@@ -274,7 +286,9 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
 
                 Column column = table.findColumnByName(columnName);
                 PrimaryKeyColumn primaryKeyColumn =
-                        new PrimaryKeyColumn(primaryKey, columnName);
+                        new PrimaryKeyColumn();
+                primaryKeyColumn.setPrimaryKey(primaryKey);
+                primaryKeyColumn.setColumnName(columnName);
 
                 // sanity check
                 if (column == null) {
@@ -298,15 +312,17 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                 return;
             }
 
+            List<PrimaryKeyColumn> primaryKeyColumns =
+                    primaryKey.getPrimaryKeyColumns();
             // copy non-null elements of array
             for (PrimaryKeyColumn current : pkColumnArray) {
                 if (current == null) {
                     continue;
                 }
-                primaryKey.add(current);
+                primaryKeyColumns.add(current);
             }
             // sanity check
-            if (primaryKey.size() == 0) {
+            if (primaryKeyColumns.size() == 0) {
                 logger.warn("Primary key {} is empty. Discarding.",
                         primaryKey.getPrimaryKeyName());
                 return;
@@ -314,7 +330,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
             table.setPrimaryKey(primaryKey);
             logger.debug("Installed PK {} with number of columns: {}",
                     primaryKey.getPrimaryKeyName(),
-                    primaryKey.size());
+                    primaryKeyColumns.size());
         } finally {
             DbUtil.closeResultSetAndStatement(rs);
         }
@@ -393,23 +409,25 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                         }
                     }
 
-                    relationship = new ForeignKey(
-                            table, fkName,
-                            referencedDatabaseName,
-                            referencedSchemaName,
-                            referencedTableName,
-                            decodeUpdateDeleteRule(updateRule),
-                            decodeUpdateDeleteRule(deleteRule));
+                    relationship = new ForeignKey();
+                    relationship.setFromTable(table);
+                    relationship.setForeignKeyName(fkName);
+                    relationship.setToDatabase(referencedDatabaseName);
+                    relationship.setToSchema(referencedSchemaName);
+                    relationship.setToTable(referencedTableName);
+                    relationship.setOnUpdate(decodeUpdateDeleteRule(updateRule));
+                    relationship.setOnDelete(decodeUpdateDeleteRule(deleteRule));
+
 
                     // reset the refernceArray
                     referenceArray = new Reference[0];
                     logger.debug("Found foreign key: {}", fkName);
                 }
 
-                Reference reference = new Reference(
-                        relationship,
-                        columnName,
-                        referencedColumnName);
+                Reference reference = new Reference();
+                reference.setForeignKey(relationship);
+                reference.setFromColumn(columnName);
+                reference.setToColumn(referencedColumnName);
 
                 String qualifiedFromColumnName = MessageFormat.format(
                         "{0}.{1}.{2}.{3}",

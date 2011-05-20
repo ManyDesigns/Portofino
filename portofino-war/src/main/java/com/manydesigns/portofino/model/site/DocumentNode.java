@@ -40,8 +40,8 @@ public class DocumentNode extends SiteNode{
     private final String urlFormat = "{0}/Document.action";
     private String fileName;
 
-    public DocumentNode(SiteNode parent) {
-        super(parent);
+    public DocumentNode() {
+        super();
     }
 
     protected String getUrlFormat() {
