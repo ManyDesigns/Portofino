@@ -33,7 +33,7 @@ import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.model.io.IndentingXMLStreamWriter;
+import com.manydesigns.portofino.xml.io.IndentingXMLStreamWriter;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

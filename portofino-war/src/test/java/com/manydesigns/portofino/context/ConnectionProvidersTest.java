@@ -29,8 +29,8 @@
 package com.manydesigns.portofino.context;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
-import com.manydesigns.portofino.model.connections.ConnectionProvider;
-import com.manydesigns.portofino.model.connections.JdbcConnectionProvider;
+import com.manydesigns.portofino.connections.ConnectionProvider;
+import com.manydesigns.portofino.connections.JdbcConnectionProvider;
 import com.manydesigns.portofino.io.FileManager;
 import org.apache.commons.transaction.file.FileResourceManager;
 

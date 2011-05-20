@@ -27,49 +27,41 @@
  *
  */
 
-package com.manydesigns.portofino.model.diff;
+package com.manydesigns.portofino.xml.diff;
 
-import com.manydesigns.portofino.model.datamodel.Schema;
+import com.manydesigns.portofino.model.datamodel.PrimaryKey;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SchemaDiff {
+public class PrimaryKeyDiff {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private Schema sourceSchema;
-    private Schema targetSchema;
-    private final List<TableDiff> tableDiffs;
+    private final PrimaryKey sourcePrimaryKey;
+    private final PrimaryKey targetPrimaryKey;
+    private final List<PrimaryKeyColumnDiff> primaryKeyColumnDiffs;
 
-    public SchemaDiff(Schema sourceSchema, Schema targetSchema) {
-        this.sourceSchema = sourceSchema;
-        this.targetSchema = targetSchema;
-        tableDiffs = new ArrayList<TableDiff>();
+    public PrimaryKeyDiff(PrimaryKey sourcePrimaryKey, PrimaryKey targetPrimaryKey) {
+        this.sourcePrimaryKey = sourcePrimaryKey;
+        this.targetPrimaryKey = targetPrimaryKey;
+        primaryKeyColumnDiffs = new ArrayList<PrimaryKeyColumnDiff>();
     }
 
-    public Schema getSourceSchema() {
-        return sourceSchema;
+    public PrimaryKey getSourcePrimaryKey() {
+        return sourcePrimaryKey;
     }
 
-    public void setSourceSchema(Schema sourceSchema) {
-        this.sourceSchema = sourceSchema;
+    public PrimaryKey getTargetPrimaryKey() {
+        return targetPrimaryKey;
     }
 
-    public Schema getTargetSchema() {
-        return targetSchema;
-    }
-
-    public void setTargetSchema(Schema targetSchema) {
-        this.targetSchema = targetSchema;
-    }
-
-    public List<TableDiff> getTableDiffs() {
-        return tableDiffs;
+    public List<PrimaryKeyColumnDiff> getPrimaryKeyColumnDiffs() {
+        return primaryKeyColumnDiffs;
     }
 }

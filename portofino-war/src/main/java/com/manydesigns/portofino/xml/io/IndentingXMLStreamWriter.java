@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.model.io;
+package com.manydesigns.portofino.xml.io;
 
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.XMLStreamException;

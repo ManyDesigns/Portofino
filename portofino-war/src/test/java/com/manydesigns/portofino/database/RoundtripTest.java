@@ -33,9 +33,9 @@ import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.diff.DatabaseDiff;
-import com.manydesigns.portofino.model.diff.DiffUtil;
-import com.manydesigns.portofino.model.diff.MessageDiffer;
+import com.manydesigns.portofino.xml.diff.DatabaseDiff;
+import com.manydesigns.portofino.xml.diff.DiffUtil;
+import com.manydesigns.portofino.xml.diff.MessageDiffer;
 import com.manydesigns.portofino.xml.XmlParser;
 import com.manydesigns.portofino.xml.XmlWriter;
 

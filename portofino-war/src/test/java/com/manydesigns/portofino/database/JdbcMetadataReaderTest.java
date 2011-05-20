@@ -31,11 +31,11 @@ package com.manydesigns.portofino.database;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.model.annotations.Annotation;
-import com.manydesigns.portofino.model.connections.ConnectionProvider;
+import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.diff.DatabaseDiff;
-import com.manydesigns.portofino.model.diff.DiffUtil;
-import com.manydesigns.portofino.model.diff.MessageDiffer;
+import com.manydesigns.portofino.xml.diff.DatabaseDiff;
+import com.manydesigns.portofino.xml.diff.DiffUtil;
+import com.manydesigns.portofino.xml.diff.MessageDiffer;
 
 import java.util.List;
 

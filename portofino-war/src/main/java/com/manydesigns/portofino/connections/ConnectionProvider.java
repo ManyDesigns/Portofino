@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.model.connections;
+package com.manydesigns.portofino.connections;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Status;

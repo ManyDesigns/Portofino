@@ -31,11 +31,11 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.xml.XmlAttribute;
-import com.manydesigns.portofino.xml.XmlCollection;
+import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +45,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+@XmlAccessorType(XmlAccessType.NONE)
 public class Schema implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -111,7 +112,8 @@ public class Schema implements ModelObject {
         return database.getDatabaseName();
     }
 
-    @XmlAttribute(required = true, order = 1, identifier = true)
+    @Identifier
+    @XmlAttribute(required = true)
     public String getSchemaName() {
         return schemaName;
     }
@@ -120,7 +122,9 @@ public class Schema implements ModelObject {
         this.schemaName = schemaName;
     }
 
-    @XmlCollection(itemClasses = Table.class, itemNames = "table", order = 1)
+    @XmlElementWrapper(name="tables")
+    @XmlElement(name = "table",
+            type = com.manydesigns.portofino.model.datamodel.Table.class)
     public List<Table> getTables() {
         return tables;
     }

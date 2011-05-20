@@ -27,48 +27,49 @@
  *
  */
 
-package com.manydesigns.portofino.model.diff;
+package com.manydesigns.portofino.xml.diff;
 
-import com.manydesigns.portofino.model.datamodel.ForeignKey;
+import com.manydesigns.portofino.model.datamodel.Database;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ForeignKeyDiff {
+public class DatabaseDiff {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final ForeignKey sourceForeignKey;
-    private final ForeignKey targetForeignKey;
-    private final List<ReferenceDiff> referenceDiffs;
-    private final List<ModelAnnotationDiff> modelAnnotationDiffs;
+    private Database sourceDatabase;
+    private Database targetDatabase;
+    private final List<SchemaDiff> schemaDiffs;
 
-    public ForeignKeyDiff(ForeignKey sourceForeignKey,
-                          ForeignKey targetForeignKey) {
-        this.sourceForeignKey = sourceForeignKey;
-        this.targetForeignKey = targetForeignKey;
-        referenceDiffs = new ArrayList<ReferenceDiff>();
-        modelAnnotationDiffs = new ArrayList<ModelAnnotationDiff>();
+    public DatabaseDiff(Database sourceDatabase, Database targetDatabase) {
+        this.sourceDatabase = sourceDatabase;
+        this.targetDatabase = targetDatabase;
+        schemaDiffs = new ArrayList<SchemaDiff>();
     }
 
-    public ForeignKey getSourceForeignKey() {
-        return sourceForeignKey;
+    public Database getSourceDatabase() {
+        return sourceDatabase;
     }
 
-    public ForeignKey getTargetForeignKey() {
-        return targetForeignKey;
+    public void setSourceDatabase(Database sourceDatabase) {
+        this.sourceDatabase = sourceDatabase;
     }
 
-    public List<ReferenceDiff> getReferenceDiffs() {
-        return referenceDiffs;
+    public Database getTargetDatabase() {
+        return targetDatabase;
     }
 
-    public List<ModelAnnotationDiff> getModelAnnotationDiffs() {
-        return modelAnnotationDiffs;
+    public void setTargetDatabase(Database targetDatabase) {
+        this.targetDatabase = targetDatabase;
+    }
+
+    public List<SchemaDiff> getSchemaDiffs() {
+        return schemaDiffs;
     }
 }

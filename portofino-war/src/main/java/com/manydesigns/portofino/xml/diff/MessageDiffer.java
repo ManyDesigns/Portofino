@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.model.diff;
+package com.manydesigns.portofino.xml.diff;
 
 import org.apache.commons.lang.ObjectUtils;
 

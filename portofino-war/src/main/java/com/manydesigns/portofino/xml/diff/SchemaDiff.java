@@ -27,28 +27,49 @@
  *
  */
 
-package com.manydesigns.portofino.xml;
+package com.manydesigns.portofino.xml.diff;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.manydesigns.portofino.model.datamodel.Schema;
+
+import java.util.List;
+import java.util.ArrayList;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
-public @interface XmlCollection {
+public class SchemaDiff {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    Class[] itemClasses();
-    String[] itemNames();
-    boolean required() default false;
-    int itemMin() default 0;
-    int itemMax() default -1;
-    int order();
+    private Schema sourceSchema;
+    private Schema targetSchema;
+    private final List<TableDiff> tableDiffs;
+
+    public SchemaDiff(Schema sourceSchema, Schema targetSchema) {
+        this.sourceSchema = sourceSchema;
+        this.targetSchema = targetSchema;
+        tableDiffs = new ArrayList<TableDiff>();
+    }
+
+    public Schema getSourceSchema() {
+        return sourceSchema;
+    }
+
+    public void setSourceSchema(Schema sourceSchema) {
+        this.sourceSchema = sourceSchema;
+    }
+
+    public Schema getTargetSchema() {
+        return targetSchema;
+    }
+
+    public void setTargetSchema(Schema targetSchema) {
+        this.targetSchema = targetSchema;
+    }
+
+    public List<TableDiff> getTableDiffs() {
+        return tableDiffs;
+    }
 }

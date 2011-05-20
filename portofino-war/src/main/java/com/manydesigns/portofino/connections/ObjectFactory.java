@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.model.connections;
+package com.manydesigns.portofino.connections;
 
 import javax.xml.bind.annotation.XmlRegistry;
 

@@ -31,7 +31,7 @@ package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.model.connections.ConnectionProvider;
+import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.xml.XmlDiffer;
 import com.manydesigns.portofino.xml.XmlWriter;

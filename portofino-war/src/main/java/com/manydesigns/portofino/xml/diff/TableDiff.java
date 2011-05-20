@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.model.diff;
+package com.manydesigns.portofino.xml.diff;
 
 import com.manydesigns.portofino.model.datamodel.PrimaryKey;
 import com.manydesigns.portofino.model.datamodel.Table;

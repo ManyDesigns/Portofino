@@ -31,11 +31,10 @@ package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.site.RootNode;
-import com.manydesigns.portofino.xml.XmlCollection;
-import com.manydesigns.portofino.xml.XmlElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +43,8 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.NONE)
 public class Model {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -222,12 +223,14 @@ public class Model {
     // Getters/setter
     //**************************************************************************
 
-    @XmlCollection(itemClasses = Database.class, itemNames = "database", order = 1)
+    @XmlElementWrapper(name="databases")
+    @XmlElement(name = "database",
+            type = com.manydesigns.portofino.model.datamodel.Database.class)
     public List<Database> getDatabases() {
         return databases;
     }
 
-    @XmlElement(required = false, order = 2)
+    @XmlElement(required = false)
     public RootNode getRootNode() {
         return rootNode;
     }

@@ -34,13 +34,12 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
-import com.manydesigns.portofino.xml.XmlAttribute;
-import com.manydesigns.portofino.xml.XmlCollection;
-import com.manydesigns.portofino.xml.XmlElement;
+import com.manydesigns.portofino.xml.Identifier;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +49,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+@XmlAccessorType(XmlAccessType.NONE)
 public class Table implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -188,8 +188,9 @@ public class Table implements ModelObject {
         return schema.getSchemaName();
     }
 
+    @Identifier
     @Required
-    @XmlAttribute(required = true, order = 1, identifier = true)
+    @XmlAttribute(required = true)
     public String getTableName() {
         return tableName;
     }
@@ -199,7 +200,7 @@ public class Table implements ModelObject {
         this.tableName = tableName;
     }
 
-    @XmlAttribute(required = false, order = 2)
+    @XmlAttribute(required = false)
     public Boolean getManyToMany() {
         return manyToMany;
     }
@@ -208,7 +209,7 @@ public class Table implements ModelObject {
         this.manyToMany = manyToMany;
     }
 
-    @XmlAttribute(required = false, order = 3)
+    @XmlAttribute(required = false)
     public String getJavaClass() {
         return javaClass;
     }
@@ -217,12 +218,14 @@ public class Table implements ModelObject {
         this.javaClass = javaClass;
     }
 
-    @XmlCollection(itemClasses = Column.class, itemNames = "column", order = 1)
+    @XmlElementWrapper(name="columns")
+    @XmlElement(name = "column",
+            type = com.manydesigns.portofino.model.datamodel.Column.class)
     public List<Column> getColumns() {
         return columns;
     }
 
-    @XmlElement(order = 2)
+    @XmlElement()
     public PrimaryKey getPrimaryKey() {
         return primaryKey;
     }
@@ -235,12 +238,14 @@ public class Table implements ModelObject {
         return actualJavaClass;
     }
 
-    @XmlCollection(itemClasses = ForeignKey.class, itemNames = "foreignKey", order = 3)
+    @XmlElementWrapper(name="foreignKeys")
+    @XmlElement(name = "foreignKey",
+            type = com.manydesigns.portofino.model.datamodel.ForeignKey.class)
     public List<ForeignKey> getForeignKeys() {
         return foreignKeys;
     }
 
-    @XmlAttribute(required = false, order = 4)
+    @XmlAttribute(required = false)
     public String getEntityName() {
         return entityName;
     }
@@ -261,7 +266,9 @@ public class Table implements ModelObject {
         return oneToManyRelationships;
     }
 
-    @XmlCollection(itemClasses = Annotation.class, itemNames = "annotation", order = 4)
+    @XmlElementWrapper(name="annotations")
+    @XmlElement(name = "annotation",
+            type = com.manydesigns.portofino.model.annotations.Annotation.class)
     public List<Annotation> getAnnotations() {
         return annotations;
     }

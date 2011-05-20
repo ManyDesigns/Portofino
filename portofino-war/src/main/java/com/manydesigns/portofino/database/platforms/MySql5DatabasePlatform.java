@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.database.platforms;
 
-import com.manydesigns.portofino.model.connections.ConnectionProvider;
+import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.datamodel.*;

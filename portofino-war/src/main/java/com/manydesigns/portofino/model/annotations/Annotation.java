@@ -35,21 +35,25 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.xml.XmlAttribute;
-import com.manydesigns.portofino.xml.XmlCollection;
+import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-@XmlCollection(itemClasses = String.class, itemNames = "value", order = 1)
-public class Annotation extends ArrayList<String> implements ModelObject {
+@XmlAccessorType(XmlAccessType.NONE)
+public class Annotation implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -58,6 +62,7 @@ public class Annotation extends ArrayList<String> implements ModelObject {
     //**************************************************************************
 
     protected String type;
+    protected List<String> values;
 
     //**************************************************************************
     // Fields for wire up
@@ -77,7 +82,9 @@ public class Annotation extends ArrayList<String> implements ModelObject {
     // Contruction
     //**************************************************************************
 
-    public Annotation() {}
+    public Annotation() {
+        values = new ArrayList<String>();
+    }
 
     public Annotation(String type) {
         this();
@@ -117,7 +124,7 @@ public class Annotation extends ArrayList<String> implements ModelObject {
         for (Constructor candidateConstructor : constructors) {
             Class[] parameterTypes =
                     candidateConstructor.getParameterTypes();
-            if (parameterTypes.length != this.size()) {
+            if (parameterTypes.length != values.size()) {
                 continue;
             }
 
@@ -125,7 +132,7 @@ public class Annotation extends ArrayList<String> implements ModelObject {
                 Object castValues[] = new Object[parameterTypes.length];
                 for (int i = 0; i < parameterTypes.length; i++) {
                     Class parameterType = parameterTypes[i];
-                    String stringValue = this.get(i);
+                    String stringValue = values.get(i);
                     Object value;
                     if (parameterType.isArray()) {
                         value = Util.matchStringArray(stringValue);
@@ -168,13 +175,19 @@ public class Annotation extends ArrayList<String> implements ModelObject {
     // Getters and setters
     //**************************************************************************
 
-    @XmlAttribute(required = true, order = 1, identifier = true)
+    @Identifier
+    @XmlAttribute(required = true)
     public String getType() {
         return type;
     }
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @XmlElement(name = "value", type = java.lang.String.class)
+    public List<String> getValues() {
+        return values;
     }
 
     public Class getJavaAnnotationClass() {

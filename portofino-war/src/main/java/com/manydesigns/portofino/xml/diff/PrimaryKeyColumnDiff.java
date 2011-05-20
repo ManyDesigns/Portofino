@@ -27,49 +27,33 @@
  *
  */
 
-package com.manydesigns.portofino.model.diff;
+package com.manydesigns.portofino.xml.diff;
 
-import com.manydesigns.portofino.model.datamodel.Database;
-
-import java.util.List;
-import java.util.ArrayList;
+import com.manydesigns.portofino.model.datamodel.PrimaryKeyColumn;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DatabaseDiff {
+public class PrimaryKeyColumnDiff {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private Database sourceDatabase;
-    private Database targetDatabase;
-    private final List<SchemaDiff> schemaDiffs;
+    private final PrimaryKeyColumn sourcePrimaryKeyColumn;
+    private final PrimaryKeyColumn targetPrimaryKeyColumn;
 
-    public DatabaseDiff(Database sourceDatabase, Database targetDatabase) {
-        this.sourceDatabase = sourceDatabase;
-        this.targetDatabase = targetDatabase;
-        schemaDiffs = new ArrayList<SchemaDiff>();
+    public PrimaryKeyColumnDiff(PrimaryKeyColumn sourcePrimaryKeyColumn,
+                                PrimaryKeyColumn targetPrimaryKeyColumn) {
+        this.sourcePrimaryKeyColumn = sourcePrimaryKeyColumn;
+        this.targetPrimaryKeyColumn = targetPrimaryKeyColumn;
     }
 
-    public Database getSourceDatabase() {
-        return sourceDatabase;
+    public PrimaryKeyColumn getSourcePrimaryKeyColumn() {
+        return sourcePrimaryKeyColumn;
     }
 
-    public void setSourceDatabase(Database sourceDatabase) {
-        this.sourceDatabase = sourceDatabase;
-    }
-
-    public Database getTargetDatabase() {
-        return targetDatabase;
-    }
-
-    public void setTargetDatabase(Database targetDatabase) {
-        this.targetDatabase = targetDatabase;
-    }
-
-    public List<SchemaDiff> getSchemaDiffs() {
-        return schemaDiffs;
+    public PrimaryKeyColumn getTargetPrimaryKeyColumn() {
+        return targetPrimaryKeyColumn;
     }
 }

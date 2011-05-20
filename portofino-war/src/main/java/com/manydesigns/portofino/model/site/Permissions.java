@@ -31,9 +31,12 @@ package com.manydesigns.portofino.model.site;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.xml.XmlCollection;
 import org.apache.commons.collections.CollectionUtils;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +45,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+@XmlAccessorType(XmlAccessType.NONE)
 public class Permissions implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -95,12 +99,14 @@ public class Permissions implements ModelObject {
     // Getters/setters
     //**************************************************************************
 
-    @XmlCollection(itemClasses = String.class, itemNames = "group", order = 1)
+    @XmlElementWrapper(name="allow")
+    @XmlElement(name = "group", type = java.lang.String.class)
     public List<String> getAllow() {
         return allow;
     }
 
-    @XmlCollection(itemClasses = String.class, itemNames = "group", order = 2)
+    @XmlElementWrapper(name="deny")
+    @XmlElement(name = "group", type = java.lang.String.class)
     public List<String> getDeny() {
         return deny;
     }

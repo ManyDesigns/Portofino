@@ -27,41 +27,60 @@
  *
  */
 
-package com.manydesigns.portofino.model.diff;
+package com.manydesigns.portofino.connections;
 
-import com.manydesigns.portofino.model.datamodel.Column;
-
-import java.util.List;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ColumnDiff {
+
+@XmlRootElement(name = "connections")
+@XmlAccessorType(XmlAccessType.NONE)
+public class Connections {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final Column sourceColumn;
-    private final Column targetColumn;
-    private final List<ModelAnnotationDiff> modelAnnotationDiffs;
 
-    public ColumnDiff(Column sourceColumn, Column targetColumn) {
-        this.sourceColumn = sourceColumn;
-        this.targetColumn = targetColumn;
-        modelAnnotationDiffs = new ArrayList<ModelAnnotationDiff>();
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
+    protected List<ConnectionProvider> connections;
+
+    //**************************************************************************
+    // Constructors
+    //**************************************************************************
+
+    public Connections() {
+        connections = new ArrayList<ConnectionProvider>();
     }
 
-    public Column getSourceColumn() {
-        return sourceColumn;
+    //**************************************************************************
+    // Initialization
+    //**************************************************************************
+
+    public void reset() {
+        for (ConnectionProvider connection : connections) {
+            connection.reset();
+        }
     }
 
-    public Column getTargetColumn() {
-        return targetColumn;
+    public void init() {
+        for (ConnectionProvider connection : connections) {
+            connection.init();
+        }
     }
 
-    public List<ModelAnnotationDiff> getModelAnnotationDiffs() {
-        return modelAnnotationDiffs;
+    @XmlElements({
+        @XmlElement(name="jdbcConnection", type=JdbcConnectionProvider.class),
+        @XmlElement(name="jndiConnection", type=JndiConnectionProvider.class)
+    })
+    public List<ConnectionProvider> getConnections() {
+        return connections;
     }
 }

@@ -34,11 +34,11 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
-import com.manydesigns.portofino.xml.XmlAttribute;
-import com.manydesigns.portofino.xml.XmlCollection;
+import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +48,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+@XmlAccessorType(XmlAccessType.NONE)
 public class Column implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -176,7 +177,8 @@ public class Column implements ModelObject {
     }
 
     @Required
-    @XmlAttribute(required = true, order = 1, identifier = true)
+    @Identifier
+    @XmlAttribute(required = true)
     public String getColumnName() {
         return columnName;
     }
@@ -186,7 +188,7 @@ public class Column implements ModelObject {
     }
 
     @Required
-    @XmlAttribute(required = true, order = 2)
+    @XmlAttribute(required = true)
     public String getColumnType() {
         return columnType;
     }
@@ -195,7 +197,7 @@ public class Column implements ModelObject {
         this.columnType = columnType;
     }
 
-    @XmlAttribute(required = true, order = 3)
+    @XmlAttribute(required = true)
     public boolean isNullable() {
         return nullable;
     }
@@ -204,7 +206,7 @@ public class Column implements ModelObject {
         this.nullable = nullable;
     }
 
-    @XmlAttribute(required = true, order = 4)
+    @XmlAttribute(required = true)
     public Integer getLength() {
         return length;
     }
@@ -213,7 +215,7 @@ public class Column implements ModelObject {
         this.length = length;
     }
 
-    @XmlAttribute(required = true, order = 5)
+    @XmlAttribute(required = true)
     public Integer getScale() {
         return scale;
     }
@@ -222,7 +224,7 @@ public class Column implements ModelObject {
         this.scale = scale;
     }
 
-    @XmlAttribute(required = true, order = 6)
+    @XmlAttribute(required = true)
     public boolean isAutoincrement() {
         return autoincrement;
     }
@@ -231,7 +233,7 @@ public class Column implements ModelObject {
         this.autoincrement = autoincrement;
     }
 
-    @XmlAttribute(required = true, order = 7)
+    @XmlAttribute(required = true)
     public boolean isSearchable() {
         return searchable;
     }
@@ -241,7 +243,7 @@ public class Column implements ModelObject {
     }
 
     @Required
-    @XmlAttribute(required = false, order = 8)
+    @XmlAttribute(required = false)
     public String getJavaType() {
         return javaType;
     }
@@ -254,7 +256,7 @@ public class Column implements ModelObject {
         return actualPropertyName;
     }
 
-    @XmlAttribute(required = false, order = 9)
+    @XmlAttribute(required = false)
     public String getPropertyName() {
         return propertyName;
     }
@@ -267,7 +269,9 @@ public class Column implements ModelObject {
         this.searchable = searchable;
     }
 
-    @XmlCollection(itemClasses = Annotation.class, itemNames = "annotation", order = 1)
+    @XmlElementWrapper(name="annotations")
+    @XmlElement(name = "annotation",
+            type = com.manydesigns.portofino.model.annotations.Annotation.class)
     public List<Annotation> getAnnotations() {
         return annotations;
     }

@@ -41,12 +41,12 @@ import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.io.FileManager;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.connections.ConnectionProvider;
-import com.manydesigns.portofino.model.connections.Connections;
+import com.manydesigns.portofino.connections.ConnectionProvider;
+import com.manydesigns.portofino.connections.Connections;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.diff.DatabaseDiff;
-import com.manydesigns.portofino.model.diff.DiffUtil;
-import com.manydesigns.portofino.model.diff.MergeDiffer;
+import com.manydesigns.portofino.xml.diff.DatabaseDiff;
+import com.manydesigns.portofino.xml.diff.DiffUtil;
+import com.manydesigns.portofino.xml.diff.MergeDiffer;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -131,7 +131,7 @@ public class HibernateContextImpl implements Context {
             InputStream is = frm.readResource(txId, fileName);
 
             JAXBContext jc = JAXBContext.newInstance(
-                    "com.manydesigns.portofino.model.connections");
+                    "com.manydesigns.portofino.connections");
             Unmarshaller um = jc.createUnmarshaller();
             Connections connections = (Connections) um.unmarshal(is);
             connections.reset();
