@@ -29,14 +29,16 @@
 
 package com.manydesigns.elements.xml;
 
+import org.jetbrains.annotations.NotNull;
+
 /*
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- */
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+*/
 public interface XhtmlFragment {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public void toXhtml(XhtmlBuffer xb);
+    public void toXhtml(@NotNull XhtmlBuffer xb);
 }

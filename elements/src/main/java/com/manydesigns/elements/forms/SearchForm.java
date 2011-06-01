@@ -33,6 +33,7 @@ import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.jetbrains.annotations.NotNull;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,7 +44,7 @@ public class SearchForm extends AbstractCompositeElement<SearchField> {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("ul");
         xb.addAttribute("class", "searchform");
 

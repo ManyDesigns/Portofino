@@ -31,6 +31,7 @@ package com.manydesigns.elements.jfreechart;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
+import org.jetbrains.annotations.NotNull;
 import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -72,7 +73,7 @@ public class JBla implements XhtmlFragment {
 
     }
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("img");
         xb.addAttribute("src", chartUrl);
         xb.addAttribute("width", "" + width);

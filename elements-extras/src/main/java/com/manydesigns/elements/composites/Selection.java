@@ -35,6 +35,7 @@ import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -99,7 +100,7 @@ public class Selection extends AbstractReflectiveCompositeElement {
         return component.validate();
     }
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         /*
         if (_mode.isEdit() || _mode.isPreview() || _mode.isView()) {
             xb.openElement("fieldset");

@@ -34,6 +34,7 @@ import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.jetbrains.annotations.NotNull;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -50,7 +51,7 @@ public class Form extends AbstractCompositeElement<FieldSet> {
         this.mode = mode;
     }
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         for (FieldSet current : this) {
             current.toXhtml(xb);
         }

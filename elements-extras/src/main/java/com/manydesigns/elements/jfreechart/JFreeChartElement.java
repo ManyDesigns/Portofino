@@ -32,6 +32,7 @@ package com.manydesigns.elements.jfreechart;
 import com.manydesigns.elements.Element;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.jetbrains.annotations.NotNull;
 import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.data.general.Dataset;
 import org.jfree.data.general.DefaultPieDataset;
@@ -74,7 +75,7 @@ public class JFreeChartElement implements Element{
         //Do nothing
     }
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
 
         String code = ChartGenerator.generateChart(getChartType(),
                 getTitle(), getAxisName(), getValueName(), getDataset(),

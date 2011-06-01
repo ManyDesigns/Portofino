@@ -93,6 +93,7 @@ public class NumericField extends AbstractTextField {
             minValue = absMaxValue.negate();
         }
 
+        // gestione valore minimo
         if (accessor.isAnnotationPresent(MinDecimalValue.class)) {
             double minDecimalValue =
                     accessor.getAnnotation(MinDecimalValue.class).value();
@@ -103,6 +104,7 @@ public class NumericField extends AbstractTextField {
             minValue = new BigDecimal(minIntValue);
         }
 
+        // gestione valore massimo
         if (accessor.isAnnotationPresent(MaxDecimalValue.class)) {
             double maxDecimalValue =
                     accessor.getAnnotation(MaxDecimalValue.class).value();
@@ -110,7 +112,7 @@ public class NumericField extends AbstractTextField {
         } else if (accessor.isAnnotationPresent(MaxIntValue.class)) {
             int maxIntValue =
                     accessor.getAnnotation(MaxIntValue.class).value();
-            minValue = new BigDecimal(maxIntValue);
+            maxValue = new BigDecimal(maxIntValue);
         }
 
         if (accessor.isAnnotationPresent(com.manydesigns.elements.annotations.Memory.class)) {

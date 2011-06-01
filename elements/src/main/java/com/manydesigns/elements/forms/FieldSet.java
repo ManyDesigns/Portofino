@@ -34,6 +34,7 @@ import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.MultipartRequestField;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.jetbrains.annotations.NotNull;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -58,7 +59,7 @@ public class FieldSet extends AbstractCompositeElement<Field> {
         this.mode = mode;
     }
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         if (mode.isHidden()) {
             for (Field current : this) {
                 current.toXhtml(xb);

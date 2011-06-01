@@ -29,10 +29,11 @@
 
 package com.manydesigns.elements.portal;
 
-import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.Element;
+import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
+import org.jetbrains.annotations.NotNull;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,7 +44,7 @@ public class PortalColumn extends AbstractCompositeElement<Element> {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         boolean first = true;
         for (XhtmlFragment current : this) {
             xb.openElement("div");

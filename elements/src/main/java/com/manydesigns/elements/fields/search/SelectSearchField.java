@@ -35,9 +35,10 @@ import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
@@ -144,7 +145,7 @@ public class SelectSearchField extends AbstractSearchField {
         return true;
     }
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         switch (displayMode) {
             case DROPDOWN:
                 valueToXhtmlDropDown(xb);

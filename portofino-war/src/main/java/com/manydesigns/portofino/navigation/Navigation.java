@@ -33,6 +33,7 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.site.*;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,7 +159,7 @@ public class Navigation implements XhtmlFragment {
     // XhtmlFragment implementation
     //**************************************************************************
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         print(rootNodes, xb);
     }
 

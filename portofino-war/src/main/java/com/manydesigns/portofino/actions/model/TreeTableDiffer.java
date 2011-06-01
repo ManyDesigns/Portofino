@@ -32,6 +32,7 @@ package com.manydesigns.portofino.actions.model;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.xml.XmlDiffer;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.MessageFormat;
 
@@ -174,7 +175,7 @@ public class TreeTableDiffer implements XhtmlFragment {
     //--------------------------------------------------------------------------
     // XhtmlFragment implementation
     //--------------------------------------------------------------------------
-    public void toXhtml(XhtmlBuffer toBuffer) {
+    public void toXhtml(@NotNull XhtmlBuffer toBuffer) {
         xb.toXhtml(toBuffer);
     }
 

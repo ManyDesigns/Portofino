@@ -31,6 +31,7 @@ package com.manydesigns.elements.composites;
 
 import com.manydesigns.elements.Element;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -79,7 +80,7 @@ public class Wizard extends AbstractReflectiveCompositeElement {
         return true;
     }
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         int index = 0;
         for (Element component : elements()) {
             if (index == _step) {

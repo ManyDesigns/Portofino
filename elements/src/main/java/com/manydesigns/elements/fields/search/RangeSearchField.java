@@ -33,6 +33,7 @@ import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -85,7 +86,7 @@ public class RangeSearchField extends AbstractSearchField {
     // Element implementation
     //**************************************************************************
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("fieldset");
         xb.writeLegend(StringUtils.capitalize(label), ATTR_NAME_HTML_CLASS);
 

@@ -32,6 +32,7 @@ package com.manydesigns.elements.googlemaps;
 import com.manydesigns.elements.Element;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
@@ -84,7 +85,7 @@ public class GoogleMapsElement implements Element {
         this.mode = mode;
     }
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("script");
         xb.addAttribute("type", "text/javascript");
         xb.writeNoHtmlEscape("function initialize() {" +

@@ -31,6 +31,7 @@ package com.manydesigns.elements.googlemaps;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
+import org.jetbrains.annotations.NotNull;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -79,7 +80,7 @@ public class GoogleMapsMarker implements XhtmlFragment {
         this.longitude = longitude;
     }
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         // genera un id univoco
         String markerName = "marker" + this.hashCode();
         StringBuffer options = new StringBuffer();

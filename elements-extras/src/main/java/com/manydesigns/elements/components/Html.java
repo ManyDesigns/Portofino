@@ -32,6 +32,7 @@ package com.manydesigns.elements.components;
 import com.manydesigns.elements.Element;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -68,7 +69,7 @@ public class Html implements Element {
 
     public void writeToObject(Object o) {}
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         if (mode.isEdit() || mode.isPreview() || mode.isView()) {
             xb.writeNoHtmlEscape(html);
         } else if (mode.isHidden()) {

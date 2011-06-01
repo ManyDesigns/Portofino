@@ -35,6 +35,7 @@ import com.manydesigns.elements.annotations.Password;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -120,7 +121,7 @@ public class PasswordField extends TextField {
     }
 
     @Override
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         if (mode.isEdit() && (mode.isCreate() || !immutable)) {
             // print out regular input field
             xb.openElement("th");

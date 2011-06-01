@@ -38,6 +38,7 @@ import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Array;
@@ -84,7 +85,7 @@ public class TableForm implements Element {
     // Implementazione di Element
     //**************************************************************************
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("table");
         if (caption != null) {
             xb.writeCaption(caption);
@@ -249,7 +250,7 @@ public class TableForm implements Element {
             this.index = index;
         }
 
-        public void toXhtml(XhtmlBuffer xb) {
+        public void toXhtml(@NotNull XhtmlBuffer xb) {
             xb.openElement("tr");
             String[] inputNameArgs = {prefix, "selection"};
             String selection = StringUtils.join(inputNameArgs);

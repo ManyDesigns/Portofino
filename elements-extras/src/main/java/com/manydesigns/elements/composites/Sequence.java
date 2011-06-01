@@ -31,6 +31,7 @@ package com.manydesigns.elements.composites;
 
 import com.manydesigns.elements.Element;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.jetbrains.annotations.NotNull;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -55,7 +56,7 @@ public class Sequence extends AbstractReflectiveCompositeElement {
     //**************************************************************************
     // Implementazione di Element
     //**************************************************************************
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         for (Element component : elements()) {
             component.toXhtml(xb);
         }

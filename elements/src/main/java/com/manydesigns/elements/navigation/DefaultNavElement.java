@@ -30,6 +30,7 @@
 package com.manydesigns.elements.navigation;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.jetbrains.annotations.NotNull;
 
 /*
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -62,7 +63,7 @@ public class DefaultNavElement implements NavElement {
         return selected;
     }
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("a");
         xb.addAttribute("href", href);
         xb.openElement("span");

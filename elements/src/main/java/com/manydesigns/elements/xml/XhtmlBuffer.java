@@ -31,6 +31,8 @@
 package com.manydesigns.elements.xml;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.StringWriter;
 import java.io.Writer;
@@ -153,13 +155,19 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
         closeElement("hr");
     }
 
-    public void writeInputCheckbox(String id, String name, String value,
+    public void writeInputCheckbox(@Nullable String id,
+                                   @Nullable String name,
+                                   @Nullable String value,
                                    boolean checked) {
         writeInputCheckbox(id, name, value, checked, false, null);
     }
 
-    public void writeInputCheckbox(String id, String name, String value,
-                                   boolean checked, boolean disabed, String cssClass) {
+    public void writeInputCheckbox(@Nullable String id,
+                                   @Nullable String name,
+                                   @Nullable String value,
+                                   boolean checked,
+                                   boolean disabed,
+                                   @Nullable String cssClass) {
         openElement("input");
         addAttribute("id", id);
         addAttribute("type", "checkbox");
@@ -195,18 +203,27 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
         closeElement("input");
     }
 
-    public void writeInputRadio(String id, String name, String value,
+    public void writeInputRadio(@Nullable String id,
+                                @Nullable String name,
+                                @Nullable String value,
                                 boolean checked) {
         writeInputRadio(id, name, value, checked, false, null);
     }
 
-    public void writeInputRadio(String id, String name, String value,
-                                boolean checked, boolean disabled) {
+    public void writeInputRadio(@Nullable String id,
+                                @Nullable String name,
+                                @Nullable String value,
+                                boolean checked,
+                                boolean disabled) {
         writeInputRadio(id, name, value, checked, disabled, null);
     }
 
-    public void writeInputRadio(String id, String name, String value,
-                                boolean checked, boolean disabled, String onClickEvent) {
+    public void writeInputRadio(@Nullable String id,
+                                @Nullable String name,
+                                @Nullable String value,
+                                boolean checked,
+                                boolean disabled,
+                                @Nullable String onClickEvent) {
         openElement("input");
         addAttribute("type", "radio");
         addAttribute("id", id);
@@ -224,7 +241,9 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
         closeElement("input");
     }
 
-    public void writeInputSubmit(String name, String value, java.lang.String onSubmit) {
+    public void writeInputSubmit(String name,
+                                 String value,
+                                 @Nullable String onSubmit) {
         openElement("input");
         addAttribute("type", "submit");
         addAttribute("name", name);
@@ -324,7 +343,7 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
     }
 
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.write(this);
     }
 }

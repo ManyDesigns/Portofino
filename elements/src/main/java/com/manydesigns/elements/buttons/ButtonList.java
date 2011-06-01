@@ -30,6 +30,7 @@ package com.manydesigns.elements.buttons;
 
 import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.jetbrains.annotations.NotNull;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -39,7 +40,7 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 public class ButtonList extends AbstractCompositeElement<Button> {
         public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         boolean first = true;
         for (Button button : this) {
             if (first) {

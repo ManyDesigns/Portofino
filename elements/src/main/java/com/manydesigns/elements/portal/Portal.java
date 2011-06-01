@@ -31,6 +31,7 @@ package com.manydesigns.elements.portal;
 
 import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.jetbrains.annotations.NotNull;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,7 +44,7 @@ public class Portal extends AbstractCompositeElement<PortalColumn> {
 
     public Portal() {}
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         boolean first = true;
         for (PortalColumn current : this) {
             xb.openElement("div");

@@ -29,9 +29,10 @@
 
 package com.manydesigns.elements;
 
-import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.composites.AbstractCompositeElement;
+import com.manydesigns.elements.xml.XhtmlBuffer;
 import junit.framework.TestCase;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -73,7 +74,7 @@ public class ElementsThreadLocalsTest extends TestCase {
     }
 
     class TestComposite1<T extends Element> extends AbstractCompositeElement<T> {
-        public void toXhtml(XhtmlBuffer xb) {
+        public void toXhtml(@NotNull XhtmlBuffer xb) {
             for (Element current : this) {
                 current.toXhtml(xb);
             }
@@ -98,7 +99,7 @@ public class ElementsThreadLocalsTest extends TestCase {
         public void writeToObject(Object obj) {
         }
 
-        public void toXhtml(XhtmlBuffer xb) {
+        public void toXhtml(@NotNull XhtmlBuffer xb) {
         }
 
         public Mode getMode() {

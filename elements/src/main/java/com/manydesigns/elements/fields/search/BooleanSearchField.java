@@ -33,6 +33,7 @@ import com.manydesigns.elements.fields.BooleanSearchValue;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -113,7 +114,7 @@ public class BooleanSearchField extends AbstractSearchField {
         return true;
     }
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("fieldset");
         xb.writeLegend(StringUtils.capitalize(label), ATTR_NAME_HTML_CLASS);
 

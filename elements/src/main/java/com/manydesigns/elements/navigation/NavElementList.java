@@ -31,6 +31,7 @@ package com.manydesigns.elements.navigation;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -51,7 +52,7 @@ public class NavElementList
         this.id = id;
     }
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("div");
         xb.addAttribute("id", id);
         listToUl(xb);

@@ -29,9 +29,10 @@
 
 package com.manydesigns.elements.buttons;
 
-import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.Element;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -69,7 +70,7 @@ public class Button implements Element {
 
     public void writeToObject(Object obj) {}
 
-    public void toXhtml(XhtmlBuffer xb) {
+    public void toXhtml(@NotNull XhtmlBuffer xb) {
         if (mode.isView()) {
             xb.openElement("input");
             xb.addAttribute("id", id);

@@ -38,6 +38,8 @@ import com.manydesigns.elements.servlet.WebFramework;
 import com.manydesigns.elements.util.MemoryUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -75,7 +77,9 @@ public class FileBlobField extends AbstractField
         this(accessor, mode, null);
     }
 
-    public FileBlobField(PropertyAccessor accessor, Mode mode, String prefix) {
+    public FileBlobField(@NotNull PropertyAccessor accessor,
+                         @NotNull Mode mode,
+                         @Nullable String prefix) {
         super(accessor, mode, prefix);
         blobsManager = BlobsManager.getManager();
 
@@ -127,20 +131,20 @@ public class FileBlobField extends AbstractField
             xb.write(blobError);
             xb.closeElement("div");
         } else if (blob != null) {
-            if (href != null) {
-                xb.openElement("a");
-                xb.addAttribute("href", href);
-            }
-            writeBlobShortName(xb);
-            if (href != null) {
-                xb.closeElement("a");
-            }
+            writeBlobFilenameAndSize(xb);
         }
         xb.closeElement("div");
     }
 
-    public void writeBlobShortName(XhtmlBuffer xb) {
+    public void writeBlobFilenameAndSize(XhtmlBuffer xb) {
+        if (href != null) {
+            xb.openElement("a");
+            xb.addAttribute("href", href);
+        }
         xb.write(blob.getFilename());
+        if (href != null) {
+            xb.closeElement("a");
+        }
         xb.write(" (");
         xb.write(MemoryUtil.bytesToHumanString(blob.getSize()));
         xb.write(")");
@@ -156,7 +160,7 @@ public class FileBlobField extends AbstractField
             xb.addAttribute("id", id);
 
             xb.openElement("div");
-            writeBlobShortName(xb);
+            writeBlobFilenameAndSize(xb);
             xb.closeElement("div");
 
             String radioId = id + UPLOAD_KEEP;
