@@ -93,9 +93,9 @@ public class FileBlobField extends AbstractField
         } else if (mode.isEdit()) {
             valueToXhtmlEdit(xb);
         } else if (mode.isPreview()) {
-            valueToXhtmlView(xb);
+            valueToXhtmlPreview(xb);
         } else if (mode.isHidden()) {
-            // do nothing
+            valueToXhtmlHidden(xb);
         } else {
             throw new IllegalStateException("Unknown mode: " + mode);
         }
@@ -105,7 +105,19 @@ public class FileBlobField extends AbstractField
         return null;
     }
 
-    private void valueToXhtmlView(XhtmlBuffer xb) {
+    public void valueToXhtmlPreview(XhtmlBuffer xb) {
+        valueToXhtmlView(xb);
+        valueToXhtmlHidden(xb);
+    }
+
+    private void valueToXhtmlHidden(XhtmlBuffer xb) {
+        xb.writeInputHidden(operationInputName, UPLOAD_KEEP);
+        if (blob != null) {
+            xb.writeInputHidden(codeInputName, blob.getCode());
+        }
+    }
+
+    public void valueToXhtmlView(XhtmlBuffer xb) {
         xb.openElement("div");
         xb.addAttribute("id", id);
         xb.addAttribute("class", "value");
@@ -127,7 +139,7 @@ public class FileBlobField extends AbstractField
         xb.closeElement("div");
     }
 
-    private void writeBlobShortName(XhtmlBuffer xb) {
+    public void writeBlobShortName(XhtmlBuffer xb) {
         xb.write(blob.getFilename());
         xb.write(" (");
         xb.write(MemoryUtil.bytesToHumanString(blob.getSize()));

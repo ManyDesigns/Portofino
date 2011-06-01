@@ -189,35 +189,31 @@ public class DateField extends AbstractTextField {
     //**************************************************************************
 
     @Override
-    public void valueToXhtml(XhtmlBuffer xb) {
-        if (mode.isEdit()) {
-            xb.openElement("input");
-            xb.addAttribute("type", "text");
-            xb.addAttribute("class", "text");
-            xb.addAttribute("id", id);
-            xb.addAttribute("name", inputName);
-            if (stringValue != null) {
-                xb.addAttribute("value", stringValue);
-            }
-            if (maxLength != null) {
-                xb.addAttribute("maxlength", Integer.toString(maxLength));
-                xb.addAttribute("size", Integer.toString(maxLength));
-            }
+    public void valueToXhtmlEdit(XhtmlBuffer xb) {
+        xb.openElement("input");
+        xb.addAttribute("type", "text");
+        xb.addAttribute("class", "text");
+        xb.addAttribute("id", id);
+        xb.addAttribute("name", inputName);
+        if (stringValue != null) {
+            xb.addAttribute("value", stringValue);
+        }
+        if (maxLength != null) {
+            xb.addAttribute("maxlength", Integer.toString(maxLength));
+            xb.addAttribute("size", Integer.toString(maxLength));
+        }
 
-            xb.closeElement("input");
-            xb.write(" (");
-            xb.write(datePattern);
-            xb.write(") ");
+        xb.closeElement("input");
+        xb.write(" (");
+        xb.write(datePattern);
+        xb.write(") ");
 
-            if (!containsTime) {
-                String js = MessageFormat.format(
-                        "setupDatePicker(''#{0}'', ''{1}'');",
-                        StringEscapeUtils.escapeJavaScript(id),
-                        StringEscapeUtils.escapeJavaScript(jsDatePattern));
-                xb.writeJavaScript(js);
-            }
-        } else {
-            super.valueToXhtml(xb);
+        if (!containsTime) {
+            String js = MessageFormat.format(
+                    "setupDatePicker(''#{0}'', ''{1}'');",
+                    StringEscapeUtils.escapeJavaScript(id),
+                    StringEscapeUtils.escapeJavaScript(jsDatePattern));
+            xb.writeJavaScript(js);
         }
     }
 

@@ -30,6 +30,7 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.Element;
+import com.manydesigns.elements.annotations.Help;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -99,6 +100,9 @@ public class TableForm implements Element {
 
         for (Column column : columns) {
             xb.openElement("th");
+            if (column.title != null) {
+                xb.addAttribute("title", column.title);
+            }
             column.labelToXhtml(xb);
             xb.closeElement("th");
         }
@@ -334,6 +338,7 @@ public class TableForm implements Element {
         protected final PropertyAccessor propertyAccessor;
 
         protected String label;
+        protected String title;
         protected TextFormat hrefTextFormat;
         protected TextFormat titleTextFormat;
 
@@ -348,6 +353,10 @@ public class TableForm implements Element {
                 label = propertyAccessor.getAnnotation(Label.class).value();
             } else {
                 label = Util.camelCaseToWords(propertyAccessor.getName());
+            }
+
+            if (propertyAccessor.isAnnotationPresent(Help.class)) {
+                title = propertyAccessor.getAnnotation(Help.class).value();
             }
         }
 
@@ -385,6 +394,14 @@ public class TableForm implements Element {
 
         public void setTitleTextFormat(TextFormat altTextFormat) {
             this.titleTextFormat = altTextFormat;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
         }
     }
 }

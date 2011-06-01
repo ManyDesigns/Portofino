@@ -113,7 +113,12 @@ public class SelectField extends AbstractField {
             return;
         }
         
-        Object value = OgnlUtils.convertValue(stringValue, accessor.getType());
+        Object value;
+        if (stringValue.length() == 0) {
+            value = null;
+        } else {
+            value = OgnlUtils.convertValue(stringValue, accessor.getType());
+        }
         selectionModel.setValue(selectionModelIndex, value);
     }
 

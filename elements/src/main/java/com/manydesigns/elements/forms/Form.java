@@ -31,6 +31,8 @@ package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.composites.AbstractCompositeElement;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 
 /*
@@ -74,5 +76,17 @@ public class Form extends AbstractCompositeElement<FieldSet> {
 
     public Mode getMode() {
         return mode;
+    }
+
+    public Field findFieldByPropertyName(String propertyName) {
+        for (FieldSet fieldSet : this) {
+            for (Field field : fieldSet) {
+                PropertyAccessor accessor = field.getPropertyAccessor();
+                if (accessor.getName().equals(propertyName)) {
+                    return field;
+                }
+            }
+        }
+        return null;
     }
 }
