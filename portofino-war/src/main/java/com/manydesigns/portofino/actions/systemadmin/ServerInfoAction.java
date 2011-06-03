@@ -32,27 +32,21 @@ package com.manydesigns.portofino.actions.systemadmin;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.portofino.annotations.InjectServerInfo;
 import com.manydesigns.portofino.context.ServerInfo;
-import com.manydesigns.portofino.servlets.PortofinoListener;
 import com.opensymphony.xwork2.ActionSupport;
-import org.apache.struts2.util.ServletContextAware;
-
-import javax.servlet.ServletContext;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ServerInfoAction extends ActionSupport
-        implements ServletContextAware {
+public class ServerInfoAction extends ActionSupport {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     @Override
     public String execute() {
-        serverInfo = (ServerInfo)servletContext.getAttribute(
-                PortofinoListener.SERVER_INFO_ATTRIBUTE);
         form = new FormBuilder(ServerInfo.class).
                 configFields("contextPath",
                         "realPath",
@@ -69,11 +63,8 @@ public class ServerInfoAction extends ActionSupport
         return SUCCESS;
     }
 
-    public ServletContext servletContext;
+    @InjectServerInfo
     public ServerInfo serverInfo;
-    public Form form;
 
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
+    public Form form;
 }

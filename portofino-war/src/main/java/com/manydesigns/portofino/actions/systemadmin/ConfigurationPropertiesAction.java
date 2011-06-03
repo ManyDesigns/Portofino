@@ -36,7 +36,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertiesAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.opensymphony.xwork2.ActionSupport;
 
 import java.util.Properties;
 
@@ -45,7 +45,7 @@ import java.util.Properties;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ConfigurationPropertiesAction extends PortofinoAction {
+public class ConfigurationPropertiesAction extends ActionSupport {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 

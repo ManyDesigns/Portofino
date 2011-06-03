@@ -29,11 +29,10 @@
 
 package com.manydesigns.portofino.actions.systemadmin;
 
+import com.manydesigns.portofino.annotations.InjectServerInfo;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.opensymphony.xwork2.ActionSupport;
-import org.apache.struts2.util.ServletContextAware;
 
-import javax.servlet.ServletContext;
 import java.util.*;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
@@ -44,8 +43,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class LogsAction extends ActionSupport
-        implements ServletContextAware {
+public class LogsAction extends ActionSupport {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -72,12 +70,8 @@ public class LogsAction extends ActionSupport
         return SUCCESS;
     }
 
-    public ServletContext servletContext;
+    @InjectServerInfo
     public ServerInfo serverInfo;
-
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
 
     public class LoggerComparator implements Comparator<Logger> {
         public int compare(Logger l1, Logger l2) {

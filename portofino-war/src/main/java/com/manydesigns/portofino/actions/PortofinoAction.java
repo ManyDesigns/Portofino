@@ -29,25 +29,12 @@
 
 package com.manydesigns.portofino.actions;
 
-import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.interceptors.ContextAware;
-import com.manydesigns.portofino.interceptors.NavigationAware;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.navigation.Navigation;
-import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.xml.XhtmlBuffer;
-import com.opensymphony.xwork2.ActionSupport;
-import org.apache.struts2.interceptor.SessionAware;
-
-import java.util.Map;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PortofinoAction extends ActionSupport
-        implements ContextAware, NavigationAware, SessionAware {
+public class PortofinoAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -89,75 +76,4 @@ public class PortofinoAction extends ActionSupport
     public final static String JSON_SELECT_FIELD_OPTIONS = "jsonSelectFieldOptions";
     public final static String INDEX = "index";
     
-    //**************************************************************************
-    // ContextAware implementation
-    //**************************************************************************
-
-    public Context context;
-    public Model model;
-
-    public void setContext(Context context) {
-        this.context = context;
-        model = context.getModel();
-    }
-
-    //**************************************************************************
-    // NavigationAware implementation
-    //**************************************************************************
-
-    public Navigation navigation;
-
-    public void setNavigation(Navigation navigation) {
-        this.navigation = navigation;
-    }
-
-    //**************************************************************************
-    // SessionAware implmentation
-    //**************************************************************************
-
-    private Map<String, Object> session;
-    public void setSession(Map<String, Object> session) {
-        this.session = session;
-    }
-
-    public Map<String, Object> getSession() {
-        return session;
-    }
-    //**************************************************************************
-    // Simplified access to SessionMessages
-    //**************************************************************************
-
-    public void addInfoMessage(String message) {
-        SessionMessages.addInfoMessage(message);
-    }
-
-    public void addInfoMessage(XhtmlBuffer xb) {
-        SessionMessages.addInfoMessage(xb);
-    }
-
-    public void addWarningMessage(String message) {
-        SessionMessages.addWarningMessage(message);
-    }
-
-    public void addWarningMessage(XhtmlBuffer xb) {
-        SessionMessages.addWarningMessage(xb);
-    }
-
-    public void addErrorMessage(String message) {
-        SessionMessages.addErrorMessage(message);
-    }
-
-    public void addErrorMessage(XhtmlBuffer xb) {
-        SessionMessages.addErrorMessage(xb);
-    }
-
-    //**************************************************************************
-    // Configuration and setters
-    //**************************************************************************
-
-    public String skin = DEFAULT_SKIN;
-
-    public void setSkin(String skin) {
-        this.skin = skin;
-    }
 }

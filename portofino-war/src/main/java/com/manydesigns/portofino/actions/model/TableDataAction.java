@@ -38,7 +38,12 @@ import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.portofino.actions.AbstractCrudAction;
 import com.manydesigns.portofino.actions.CrudSelectionProvider;
 import com.manydesigns.portofino.actions.CrudUnit;
+import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectModel;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.Reference;
@@ -56,6 +61,15 @@ public class TableDataAction extends AbstractCrudAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
+    //**************************************************************************
+    // Injections
+    //**************************************************************************
+
+    @InjectModel
+    public Model model;
+
+    @InjectContext
+    public Context context;
 
     //**************************************************************************
     // Setup
@@ -199,10 +213,10 @@ public class TableDataAction extends AbstractCrudAction {
     public String redirectToFirst() {
         List<Table> tables = model.getAllTables();
         if (tables.isEmpty()) {
-            return NO_CLASSES;
+            return PortofinoAction.NO_CLASSES;
         } else {
             qualifiedName = tables.get(0).getQualifiedName();
-            return REDIRECT_TO_FIRST;
+            return PortofinoAction.REDIRECT_TO_FIRST;
         }
     }
 

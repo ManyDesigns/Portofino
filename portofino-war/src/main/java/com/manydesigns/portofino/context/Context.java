@@ -30,12 +30,12 @@
 package com.manydesigns.portofino.context;
 
 import com.manydesigns.portofino.connections.ConnectionProvider;
+import com.manydesigns.portofino.io.FileManager;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.UseCaseAccessor;
 import com.manydesigns.portofino.system.model.users.User;
-import com.manydesigns.portofino.io.FileManager;
 
 import java.io.File;
 import java.io.Serializable;
@@ -50,6 +50,12 @@ import java.util.List;
 public interface Context {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    //**************************************************************************
+    // KEY (for application scope attribute)
+    //**************************************************************************
+
+    public final static String KEY = Context.class.getName();
 
     //**************************************************************************
     // Model loading

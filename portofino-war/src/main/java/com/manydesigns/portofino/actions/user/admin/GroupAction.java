@@ -29,6 +29,7 @@
 package com.manydesigns.portofino.actions.user.admin;
 
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.UseCaseAction;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.UserUtils;
@@ -61,14 +62,14 @@ public class GroupAction extends UseCaseAction {
                 .getDatabaseName();
         context.commit(databaseName);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
-        return RETURN_TO_READ;
+        return PortofinoAction.RETURN_TO_READ;
     }
 
     public String bulkDelete() {        
         if (rootCrudUnit.selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
-            return CANCEL;
+            return PortofinoAction.CANCEL;
         }
         for (String current : rootCrudUnit.selection) {
             Group pkGrp = new Group(new Long(current));
@@ -88,7 +89,7 @@ public class GroupAction extends UseCaseAction {
         SessionMessages.addInfoMessage(MessageFormat.format(
                 "DELETE di {0} oggetti avvenuto con successo",
                 rootCrudUnit.selection.length));
-        return RETURN_TO_SEARCH;
+        return PortofinoAction.RETURN_TO_SEARCH;
     }
 
 

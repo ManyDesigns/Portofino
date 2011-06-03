@@ -27,18 +27,21 @@
  *
  */
 
-package com.manydesigns.portofino.interceptors;
+package com.manydesigns.portofino.annotations;
 
-import com.manydesigns.portofino.navigation.Navigation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface NavigationAware {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface InjectNavigation {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-
-    public void setNavigation(Navigation navigation);
 }

@@ -28,7 +28,10 @@
  */
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.portofino.annotations.InjectNavigation;
 import com.manydesigns.portofino.model.site.DocumentNode;
+import com.manydesigns.portofino.navigation.Navigation;
+import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.util.ServletContextAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,11 +45,18 @@ import java.text.MessageFormat;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DocumentAction extends PortofinoAction implements ServletContextAware{
+public class DocumentAction extends ActionSupport implements ServletContextAware{
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public String content;
+
+    //**************************************************************************
+    // Injections
+    //**************************************************************************
+
+    @InjectNavigation
+    public Navigation navigation;
 
     public static final Logger logger =
             LoggerFactory.getLogger(DocumentAction.class);

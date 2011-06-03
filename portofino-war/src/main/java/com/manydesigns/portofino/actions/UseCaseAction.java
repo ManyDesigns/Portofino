@@ -36,13 +36,19 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
+import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectModel;
+import com.manydesigns.portofino.annotations.InjectNavigation;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
 import com.manydesigns.portofino.model.site.UseCaseNode;
 import com.manydesigns.portofino.model.site.usecases.Button;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
+import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.reflection.TableAccessor;
 
 import java.text.MessageFormat;
@@ -57,6 +63,15 @@ import java.util.List;
 public class UseCaseAction extends AbstractCrudAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    @InjectContext
+    public Context context;
+
+    @InjectModel
+    public Model model;
+
+    @InjectNavigation
+    public Navigation navigation;
 
     //**************************************************************************
     // Setup
@@ -184,6 +199,6 @@ public class UseCaseAction extends AbstractCrudAction {
     //TODO da eliminare
     @Override
     public String redirectToFirst() {
-            return REDIRECT_TO_FIRST;
+        return PortofinoAction.REDIRECT_TO_FIRST;
     }
 }

@@ -36,10 +36,11 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
+import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.email.EmailTask;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -74,15 +75,6 @@ public class PortofinoListener
             "----------------------------------------" +
             "----------------------------------------";
 
-    public static final String ELEMENTS_PROPERTIES_ATTRIBUTE =
-            "elementsProperties";
-    public static final String PORTOFINO_PROPERTIES_ATTRIBUTE =
-            "portofinoProperties";
-    public static final String SERVER_INFO_ATTRIBUTE =
-            "serverInfo";
-    public static final String CONTEXT_ATTRIBUTE =
-            "context";
-
     //**************************************************************************
     // Fields
     //**************************************************************************
@@ -92,6 +84,7 @@ public class PortofinoListener
     protected ServletContext servletContext;
     protected ServerInfo serverInfo;
     protected Context context;
+    protected Dispatcher dispatcher;
     protected Timer scheduler;
 
     public static final Logger logger =
@@ -130,13 +123,12 @@ public class PortofinoListener
                 }
         );
 
-        servletContext.setAttribute(SERVER_INFO_ATTRIBUTE,
-                serverInfo);
+        servletContext.setAttribute(ServerInfo.KEY,serverInfo);
 
-        servletContext.setAttribute(ELEMENTS_PROPERTIES_ATTRIBUTE,
-                elementsProperties);
-        servletContext.setAttribute(PORTOFINO_PROPERTIES_ATTRIBUTE,
-                portofinoProperties);
+        servletContext.setAttribute(
+                ElementsProperties.KEY, elementsProperties);
+        servletContext.setAttribute(
+                PortofinoProperties.KEY, portofinoProperties);
 
         boolean success = true;
 
@@ -151,16 +143,17 @@ public class PortofinoListener
 
         if (success) {
             createContext();
+            createDispatcher();
         }
 
         if (success) {
-            String securityType = (String) portofinoProperties
+            String securityType = portofinoProperties
                     .getProperty(PortofinoProperties.SECURITY_TYPE_PROPERTY, "application");
-            String mailHost = (String) portofinoProperties
+            String mailHost = portofinoProperties
                     .getProperty(PortofinoProperties.MAIL_SMTP_HOST);
-            String mailSender = (String) portofinoProperties
+            String mailSender = portofinoProperties
                     .getProperty(PortofinoProperties.MAIL_SMTP_SENDER);
-            Boolean mailEnabled = Boolean.parseBoolean((String) portofinoProperties
+            Boolean mailEnabled = Boolean.parseBoolean(portofinoProperties
                     .getProperty(PortofinoProperties.MAIL_ENABLED, "false"));
             if ("application".equals(securityType)&&mailEnabled)
             {
@@ -191,6 +184,11 @@ public class PortofinoListener
         }
     }
 
+    public void createDispatcher() {
+        dispatcher = new Dispatcher(context);
+        servletContext.setAttribute(Dispatcher.KEY, dispatcher);
+    }
+
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         // clear the Mapping Diagnostic Context for logging
         MDC.clear();
@@ -218,12 +216,6 @@ public class PortofinoListener
         } catch (Exception e) {
             logger.warn("cannot stop FileManager");
         }
-
-        // remove attributes from application context
-        servletContext.removeAttribute(CONTEXT_ATTRIBUTE);
-        servletContext.removeAttribute(SERVER_INFO_ATTRIBUTE);
-        servletContext.removeAttribute(PORTOFINO_PROPERTIES_ATTRIBUTE);
-        servletContext.removeAttribute(ELEMENTS_PROPERTIES_ATTRIBUTE);
 
         logger.info("ManyDesigns Portofino stopped.");
     }
@@ -285,8 +277,7 @@ public class PortofinoListener
                             HibernateContextImpl.class,
                             logger);
             context = builder.createInstance(managerClassName);
-
-            servletContext.setAttribute(CONTEXT_ATTRIBUTE, context);
+            servletContext.setAttribute(Context.KEY, context);
 
             String storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
                 PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));

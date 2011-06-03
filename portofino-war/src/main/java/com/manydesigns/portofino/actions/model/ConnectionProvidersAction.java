@@ -40,12 +40,15 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.annotations.InjectContext;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.connections.JdbcConnectionProvider;
+import com.manydesigns.portofino.connections.JndiConnectionProvider;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
-import com.manydesigns.portofino.connections.JndiConnectionProvider;
+import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +59,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ConnectionProvidersAction extends PortofinoAction implements ServletRequestAware{
+public class ConnectionProvidersAction extends ActionSupport implements ServletRequestAware{
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -78,6 +81,13 @@ public class ConnectionProvidersAction extends PortofinoAction implements Servle
     public String connectionType;
 
     public String[] selection;
+
+    //**************************************************************************
+    // Injections
+    //**************************************************************************
+
+    @InjectContext
+    public Context context;
 
     //**************************************************************************
     // Request aware
@@ -128,7 +138,7 @@ public class ConnectionProvidersAction extends PortofinoAction implements Servle
                         .build();
         databasePlatformsTableForm.readFromObject(databasePlatforms);
 
-        return LIST;
+        return PortofinoAction.LIST;
     }
 
     public String read() {
@@ -156,7 +166,7 @@ public class ConnectionProvidersAction extends PortofinoAction implements Servle
             configureDetectedAndTypes();
         }
 
-        return READ;
+        return PortofinoAction.READ;
     }
 
     protected void configureDetectedAndTypes() {
@@ -195,7 +205,7 @@ public class ConnectionProvidersAction extends PortofinoAction implements Servle
     }
 
     public String returnToSearch() {
-        return RETURN_TO_LIST;
+        return PortofinoAction.RETURN_TO_LIST;
     }
 
     public String test() {
@@ -209,12 +219,12 @@ public class ConnectionProvidersAction extends PortofinoAction implements Servle
                     String.format("Connection failed. Status: %s. Error message: %s",
                             status, connectionProvider.getErrorMessage()));
         }
-        return RETURN_TO_READ;
+        return PortofinoAction.RETURN_TO_READ;
     }
 
     public String create() {
         setupForm(Mode.CREATE);
-        return CREATE;
+        return PortofinoAction.CREATE;
     }
 
     public String save() {
@@ -283,7 +293,7 @@ public class ConnectionProvidersAction extends PortofinoAction implements Servle
         }
 
         form.readFromObject(connectionProvider);
-        return EDIT;
+        return PortofinoAction.EDIT;
     }
 
     public String update() {
@@ -332,7 +342,7 @@ public class ConnectionProvidersAction extends PortofinoAction implements Servle
             context.deleteConnectionProvider(databaseName);
             SessionMessages.addInfoMessage("Connection providers deleted");
         } 
-        return RETURN_TO_LIST;
+        return PortofinoAction.RETURN_TO_LIST;
     }
 
     public String bulkDelete(){
@@ -343,11 +353,11 @@ public class ConnectionProvidersAction extends PortofinoAction implements Servle
         } else {
             SessionMessages.addInfoMessage("No Connection providers selected");
         }
-        return RETURN_TO_LIST;
+        return PortofinoAction.RETURN_TO_LIST;
     }
 
     public String cancel() {
-        return RETURN_TO_LIST;        
+        return PortofinoAction.RETURN_TO_LIST;
     }
 
     private void setupForm(Mode mode) {

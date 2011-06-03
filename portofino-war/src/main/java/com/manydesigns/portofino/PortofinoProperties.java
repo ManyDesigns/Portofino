@@ -46,6 +46,12 @@ public class PortofinoProperties {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
+    // KEY (for aplication scope attribute)
+    //**************************************************************************
+
+    public final static String KEY = "portofinoProperties";
+
+    //**************************************************************************
     // Default and custom properties location
     //**************************************************************************
 

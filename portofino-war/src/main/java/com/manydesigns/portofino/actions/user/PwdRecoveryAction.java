@@ -30,11 +30,13 @@ package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectHttpRequest;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.email.EmailUtils;
-import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.email.EmailBean;
-import org.apache.struts2.interceptor.ServletRequestAware;
+import com.manydesigns.portofino.system.model.users.User;
+import com.opensymphony.xwork2.ActionSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,16 +49,19 @@ import java.util.Properties;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PwdRecoveryAction extends PortofinoAction
-        implements ServletRequestAware, LoginUnAware{
+public class PwdRecoveryAction extends ActionSupport implements LoginUnAware{
     public static final String copyright
             = "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    HttpServletRequest req;
-        public void setServletRequest(HttpServletRequest req) {
-        this.req=req;
-    }
+    //**************************************************************************
+    // Injections
+    //**************************************************************************
 
+    @InjectContext
+    public Context context;
+
+    @InjectHttpRequest
+    HttpServletRequest req;
 
     public static final Logger logger =
         LoggerFactory.getLogger(PwdRecoveryAction.class);

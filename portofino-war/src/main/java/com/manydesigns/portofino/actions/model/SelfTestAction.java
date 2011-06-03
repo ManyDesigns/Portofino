@@ -30,11 +30,14 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectModel;
 import com.manydesigns.portofino.connections.ConnectionProvider;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.xml.XmlDiffer;
+import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,9 +55,19 @@ import java.text.MessageFormat;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SelfTestAction extends PortofinoAction {
+public class SelfTestAction extends ActionSupport {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    //**************************************************************************
+    // Injections
+    //**************************************************************************
+
+    @InjectContext
+    public Context context;
+
+    @InjectModel
+    public Model model;
 
     //--------------------------------------------------------------------------
     // Fields

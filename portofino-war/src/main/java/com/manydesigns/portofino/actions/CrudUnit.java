@@ -49,6 +49,7 @@ import com.manydesigns.portofino.model.site.usecases.Button;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
+import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.util.CompoundRoot;
 import com.opensymphony.xwork2.util.ValueStack;
 import jxl.Workbook;
@@ -453,7 +454,7 @@ public class CrudUnit {
             }
         }
         if (crudSelectionProvider == null) {
-            return PortofinoAction.ERROR;
+            return ActionSupport.ERROR;
         }
 
         SelectionProvider selectionProvider =

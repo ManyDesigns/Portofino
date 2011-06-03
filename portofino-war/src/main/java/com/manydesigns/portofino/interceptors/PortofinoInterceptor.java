@@ -30,25 +30,34 @@
 package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.util.Util;
+import com.manydesigns.portofino.annotations.*;
 import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.ServerInfo;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.navigation.NavigationNode;
-import com.manydesigns.portofino.servlets.PortofinoListener;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.lang.xwork.StringUtils;
 import org.apache.struts2.StrutsStatics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -64,9 +73,19 @@ public class PortofinoInterceptor implements Interceptor {
     private static final String LOGIN_ACTION = "login";
     private static final String UNAUTHORIZED = "unauthorized";
 
-    public void destroy() {}
+    public final static Logger logger =
+            LoggerFactory.getLogger(PortofinoInterceptor.class);
 
-    public void init() {}
+    protected Map<Class, Map<Class<? extends Annotation>, Field[]>> annotationCache;
+
+    public void destroy() {
+        annotationCache.clear();
+        annotationCache = null;
+    }
+
+    public void init() {
+        annotationCache = new ConcurrentHashMap<Class, Map<Class<? extends Annotation>, Field[]>>();
+    }
 
     public String intercept(ActionInvocation invocation) throws Exception {
 
@@ -76,18 +95,20 @@ public class PortofinoInterceptor implements Interceptor {
 
         Object action = invocation.getAction();
         ActionContext actionContext = invocation.getInvocationContext();
-        Map<String, Object> session = actionContext.getSession();
         HttpServletRequest req =
                 (HttpServletRequest)actionContext.get(StrutsStatics.HTTP_REQUEST);
+        HttpSession session = req.getSession(false);
         ServletContext servletContext =
                 (ServletContext)actionContext.get(StrutsStatics.SERVLET_CONTEXT);
-        Context context =
-                (Context)servletContext.getAttribute(
-                        PortofinoListener.CONTEXT_ATTRIBUTE);
+        Context context = (Context)servletContext.getAttribute(Context.KEY);
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
 
-        Long userId = (Long) session.get(UserUtils.USERID);
-        String userName = (String) session.get(UserUtils.USERNAME);
+        Long userId = null;
+        String userName = null;
+        if (session != null) {
+            userId = (Long) session.getAttribute(UserUtils.USERID);
+            userName = (String) session.getAttribute(UserUtils.USERNAME);
+        }
 
         try{
             MDC.clear();
@@ -102,19 +123,26 @@ public class PortofinoInterceptor implements Interceptor {
             }
             context.resetDbTimer();
             context.openSession();
+            Model model = context.getModel();
             String requestUrl = Util.getAbsoluteUrl(req.getServletPath());
-            if (action instanceof ContextAware) {
-                ((ContextAware)action).setContext(context);
-            }
 
             List<String> groups=UserUtils.manageGroups(context, userId);
 
             Navigation navigation = new Navigation(context, requestUrl, groups);
             req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
-            if (action instanceof NavigationAware) {
-                ((NavigationAware)action).setNavigation(navigation);
-            }
             NavigationNode selectedNode = navigation.getSelectedNavigationNode();
+
+            ServerInfo serverInfo =
+                    (ServerInfo) servletContext.getAttribute(ServerInfo.KEY);
+
+            /* injections */
+            injectAnnotatedFields(action, InjectContext.class, context);
+            injectAnnotatedFields(action, InjectModel.class, model);
+            injectAnnotatedFields(action, InjectNavigation.class, navigation);
+            injectAnnotatedFields(action, InjectServerInfo.class, serverInfo);
+            injectAnnotatedFields(action, InjectHttpRequest.class, req);
+            injectAnnotatedFields(action, InjectHttpSession.class, session);
+
 
             //2. Se è fuori dall'albero di navigazione e non ho permessi
             if (selectedNode==null ) {
@@ -156,4 +184,53 @@ public class PortofinoInterceptor implements Interceptor {
                 context.closeSession();
         }
     }
+
+    public void injectAnnotatedFields(Object object,
+                                       Class<? extends Annotation> annotation,
+                                       Object value) {
+        Class clazz = object.getClass();
+        Field[] annotatedFields = findAnnotatedFields(clazz, annotation);
+        for (Field field : annotatedFields) {
+            try {
+                field.set(object, value);
+            } catch (IllegalAccessException e) {
+                String msg = String.format(
+                        "Cannot inject object %s, field %s, annotation %s with value %s",
+                        ObjectUtils.toString(object),
+                        field.getName(),
+                        annotation,
+                        ObjectUtils.toString(value));
+                logger.warn(msg, e);
+            }
+        }
+    }
+
+    public Field[] findAnnotatedFields(Class clazz,
+                                       Class<? extends Annotation> annotation) {
+        Map<Class<? extends Annotation>, Field[]> annotationMap =
+                annotationCache.get(clazz);
+        if (annotationMap == null) {
+            annotationMap = new ConcurrentHashMap<Class<? extends Annotation>, Field[]>();
+            annotationCache.put(clazz, annotationMap);
+        }
+
+        Field[] result = annotationMap.get(annotation);
+
+        if (result != null) {
+            return result;
+        }
+
+        List<Field> foundFields = new ArrayList<Field>();
+        for (Field field : clazz.getFields()) {
+            if (field.isAnnotationPresent(annotation)) {
+                field.setAccessible(true);
+                foundFields.add(field);
+            }
+        }
+        result = new Field[foundFields.size()];
+        foundFields.toArray(result);
+        return result;
+    }
+
+
 }

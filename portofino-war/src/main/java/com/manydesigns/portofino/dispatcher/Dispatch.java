@@ -27,40 +27,43 @@
  *
  */
 
-package com.manydesigns.portofino.actions.model;
+package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.portofino.annotations.InjectContext;
-import com.manydesigns.portofino.context.Context;
-import com.opensymphony.xwork2.ActionSupport;
-
-import java.sql.SQLException;
-import java.util.List;
+import com.manydesigns.portofino.model.site.SiteNode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DDLWriterAction extends ActionSupport {
+public class Dispatch {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public List<String> ddlsCreate;
-    public List<String> ddlsUpdate;
+    public final static String KEY = Dispatch.class.getName();
 
-    //**************************************************************************
-    // Injections
-    //**************************************************************************
 
-    @InjectContext
-    public Context context;
+    protected final String originalPath;
+    protected final String rewrittenPath;
+    protected final SiteNode[] siteNodePath;
 
-    public String execute() throws SQLException {
-        ddlsCreate = context.getDDLCreate();
-        ddlsUpdate = context.getDDLUpdate();
-
-        return ActionSupport.SUCCESS;
+    public Dispatch(String originalPath,
+                    String rewrittenPath,
+                    SiteNode[] siteNodePath) {
+        this.originalPath = originalPath;
+        this.rewrittenPath = rewrittenPath;
+        this.siteNodePath = siteNodePath;
     }
 
+    public String getOriginalPath() {
+        return originalPath;
+    }
 
+    public String getRewrittenPath() {
+        return rewrittenPath;
+    }
+
+    public SiteNode[] getSiteNodePath() {
+        return siteNodePath;
+    }
 }

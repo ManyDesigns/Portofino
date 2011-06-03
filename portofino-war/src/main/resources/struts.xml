@@ -92,25 +92,12 @@
                 <param name="prependServletContext">false</param>
             </result>
         </action>
-        <action name="**/Document"
-                class="com.manydesigns.portofino.actions.DocumentAction">
-            <result name="success">/skins/default/document.jsp</result>
-        </action>
         <action name="Document"
                 class="com.manydesigns.portofino.actions.DocumentAction">
             <result name="success">/skins/default/document.jsp</result>
         </action>
         <action name="UseCase"
                 class="com.manydesigns.portofino.actions.UseCaseAction">
-            <result name="redirectToFirst" type="redirectAction">
-                <param name="actionName">%{qualifiedName}/UseCase</param>
-            </result>
-            <result name="noClasses">/skins/default/crud/noClasses.jsp</result>
-        </action>
-        <action name="**/UseCase"
-                class="com.manydesigns.portofino.actions.UseCaseAction">
-            <param name="qualifiedName">{1}</param>
-
             <result name="search">/skins/default/crud/search.jsp</result>
 
             <result name="read">/skins/default/crud/read.jsp</result>
@@ -186,15 +173,6 @@
         </action>
         <action name="Portlet"
                 class="com.manydesigns.portofino.actions.model.PortletDesignAction">
-            <result name="redirectToFirst" type="redirectAction">
-                <param name="actionName">%{portletName}/PortletDesign</param>
-            </result>
-        </action>
-        <action name="**/Portlet"
-                class="com.manydesigns.portofino.actions.model.PortletDesignAction">
-            <param name="skin">default</param>
-            <param name="portletName">{1}</param>
-
             <result name="summary">/skins/default/model/portletDesign/summary.jsp</result>
 
             <result name="cancel" type="redirect">
@@ -339,7 +317,6 @@
         </action>
         <action name="*/TableDesign"
                 class="com.manydesigns.portofino.actions.model.TableDesignAction">
-            <param name="skin">default</param>
             <param name="qualifiedTableName">{1}</param>
             <result name="summary">/skins/default/model/tableDesign/summary.jsp</result>
             <result name="create">/skins/default/model/tableDesign/create.jsp</result>

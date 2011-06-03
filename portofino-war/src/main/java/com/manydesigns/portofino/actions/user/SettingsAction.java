@@ -29,14 +29,14 @@
 
 package com.manydesigns.portofino.actions.user;
 
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.opensymphony.xwork2.ActionSupport;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SettingsAction extends PortofinoAction {
+public class SettingsAction extends ActionSupport {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 

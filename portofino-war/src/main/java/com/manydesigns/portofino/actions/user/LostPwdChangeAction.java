@@ -33,9 +33,11 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectHttpRequest;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.system.model.users.User;
-import org.apache.struts2.interceptor.ServletRequestAware;
+import com.opensymphony.xwork2.ActionSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,18 +50,19 @@ import java.util.Date;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class LostPwdChangeAction extends PortofinoAction 
-        implements ServletRequestAware, LoginUnAware {
+public class LostPwdChangeAction extends ActionSupport implements LoginUnAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // ServletRequestAware implementation
+    // Injections
     //**************************************************************************
+
+    @InjectContext
+    public Context context;
+
+    @InjectHttpRequest
     public HttpServletRequest req;
-    public void setServletRequest(HttpServletRequest req) {
-        this.req = req;
-    }
 
     public Form form;
     public String token;

@@ -38,9 +38,14 @@ import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectNavigation;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.site.PortletNode;
+import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
+import com.opensymphony.xwork2.ActionSupport;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.DrawingSupplier;
@@ -69,7 +74,7 @@ import java.util.HashMap;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PortletDesignAction extends PortofinoAction {
+public class PortletDesignAction extends ActionSupport {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -78,6 +83,16 @@ public class PortletDesignAction extends PortofinoAction {
     //**************************************************************************
 
     public static final String CHART_FILENAME_FORMAT = "chart-{0}.png";
+
+    //**************************************************************************
+    // Injections
+    //**************************************************************************
+
+    @InjectContext
+    public Context context;
+
+    @InjectNavigation
+    public Navigation navigation;
 
     //**************************************************************************
     // Web parameters
@@ -288,7 +303,7 @@ public class PortletDesignAction extends PortofinoAction {
     //**************************************************************************
 
     public String cancel() {
-        return CANCEL;
+        return PortofinoAction.CANCEL;
     }
 
 }

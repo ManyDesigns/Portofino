@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.actions.model;
 
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.opensymphony.xwork2.ActionSupport;
 
 import java.sql.SQLException;
 
@@ -38,7 +38,7 @@ import java.sql.SQLException;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SiteMap extends PortofinoAction {
+public class SiteMap extends ActionSupport {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 

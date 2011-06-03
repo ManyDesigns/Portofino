@@ -36,11 +36,15 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectHttpRequest;
+import com.manydesigns.portofino.annotations.InjectHttpSession;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
-import org.apache.struts2.interceptor.ServletRequestAware;
+import com.opensymphony.xwork2.ActionSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,14 +53,13 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ProfileAction extends PortofinoAction implements ServletRequestAware {
+public class ProfileAction extends ActionSupport {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -64,9 +67,18 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     public static final String UPDATE_PWD = "updatePwd";
 
     //**************************************************************************
-    // ServletRequestAware implementation
+    // Injections
     //**************************************************************************
+
+    @InjectContext
+    public Context context;
+
+    @InjectHttpRequest
     public HttpServletRequest req;
+
+    @InjectHttpSession
+    public HttpServletRequest session;
+
     public List<Group> groups;
 
     private Boolean enc;
@@ -93,8 +105,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
             LoggerFactory.getLogger(ProfileAction.class);
 
     public String execute() {
-        Map session = getSession();
-        userId = (Long) session.get(UserUtils.USERID);
+        userId = (Long) session.getAttribute(UserUtils.USERID);
         return read();
     }
 
@@ -116,12 +127,11 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
                 .configMode(Mode.VIEW)
                 .build();
         form.readFromObject(thisUser);
-        return READ;
+        return PortofinoAction.READ;
     }
 
     public String edit() {
-        Map session = getSession();
-        userId = (Long) session.get(UserUtils.USERID);
+        userId = (Long) session.getAttribute(UserUtils.USERID);
         User thisUser =
             (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 
@@ -133,12 +143,11 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
                 .configMode(Mode.EDIT)
                 .build();
         form.readFromObject(thisUser);
-        return EDIT;
+        return PortofinoAction.EDIT;
     }
 
     public String update() {
-        Map session = getSession();
-        userId = (Long) session.get(UserUtils.USERID);
+        userId = (Long) session.getAttribute(UserUtils.USERID);
         User thisUser =
             (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
         ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
@@ -157,15 +166,14 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
             context.commit("portofino");
             logger.debug("User {} updated", thisUser.getEmail());
             SessionMessages.addInfoMessage("Utente aggiornato correttamente");
-            return UPDATE;
+            return PortofinoAction.UPDATE;
         } else {
-            return EDIT;
+            return PortofinoAction.EDIT;
         }
     }
 
     public String changePwd() {
-        Map session = getSession();
-        userId = (Long) session.get(UserUtils.USERID);
+        userId = (Long) session.getAttribute(UserUtils.USERID);
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)
                 .build();
@@ -173,8 +181,7 @@ public class ProfileAction extends PortofinoAction implements ServletRequestAwar
     }
 
     public String updatePwd() {
-        Map session = getSession();
-        userId = (Long) session.get(UserUtils.USERID);
+        userId = (Long) session.getAttribute(UserUtils.USERID);
         User thisUser =
             (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 

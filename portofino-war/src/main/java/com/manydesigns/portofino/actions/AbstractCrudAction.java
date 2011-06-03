@@ -33,6 +33,7 @@ import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobsManager;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
+import com.manydesigns.portofino.annotations.InjectHttpRequest;
 import com.opensymphony.xwork2.ModelDriven;
 import com.opensymphony.xwork2.Preparable;
 import jxl.Workbook;
@@ -40,7 +41,6 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 import org.apache.fop.apps.FOPException;
-import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,8 +55,8 @@ import java.util.Enumeration;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public abstract class  AbstractCrudAction extends PortofinoAction
-        implements ServletRequestAware, Preparable, ModelDriven<CrudUnit> {
+public abstract class  AbstractCrudAction
+        implements Preparable, ModelDriven<CrudUnit> {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -67,14 +67,11 @@ public abstract class  AbstractCrudAction extends PortofinoAction
     public final String DEFAULT_EXPORT_FILENAME_FORMAT = "export-{0}";
 
     //**************************************************************************
-    // ServletRequestAware implementation
+    // Injections
     //**************************************************************************
 
+    @InjectHttpRequest
     public HttpServletRequest req;
-
-    public void setServletRequest(HttpServletRequest req) {
-        this.req = req;
-    }
 
     //**************************************************************************
     // ModelDriven implementation
@@ -184,7 +181,7 @@ public abstract class  AbstractCrudAction extends PortofinoAction
 
     public String returnToSearch() {
         rootCrudUnit.pk = null;
-        return RETURN_TO_SEARCH;
+        return PortofinoAction.RETURN_TO_SEARCH;
     }
 
     //**************************************************************************
@@ -192,7 +189,7 @@ public abstract class  AbstractCrudAction extends PortofinoAction
     //**************************************************************************
 
     public String cancel() {
-        return CANCEL;
+        return PortofinoAction.CANCEL;
     }
 
     //**************************************************************************
@@ -205,7 +202,7 @@ public abstract class  AbstractCrudAction extends PortofinoAction
         contentType = blob.getContentType();
         inputStream = new FileInputStream(blob.getDataFile());
         fileName = blob.getFilename();
-        return EXPORT;
+        return PortofinoAction.EXPORT;
     }
 
     //**************************************************************************
@@ -216,14 +213,14 @@ public abstract class  AbstractCrudAction extends PortofinoAction
         String text = rootCrudUnit.jsonOptions(
                 relName, selectionProviderIndex, labelSearch, true);
         inputStream = new StringBufferInputStream(text);
-        return JSON_SELECT_FIELD_OPTIONS;
+        return PortofinoAction.JSON_SELECT_FIELD_OPTIONS;
     }
 
     public String jsonAutocompleteOptions() {
         String text = rootCrudUnit.jsonOptions(
                 relName, selectionProviderIndex, labelSearch, false);
         inputStream = new StringBufferInputStream(text);
-        return JSON_SELECT_FIELD_OPTIONS;
+        return PortofinoAction.JSON_SELECT_FIELD_OPTIONS;
     }
 
 
@@ -236,7 +233,7 @@ public abstract class  AbstractCrudAction extends PortofinoAction
         rootCrudUnit.exportSearchExcel(fileTemp);
         paramExportXls(fileTemp);
         fileName = rootCrudUnit.searchTitle + ".xls";
-        return EXPORT;
+        return PortofinoAction.EXPORT;
     }
 
     private File createExportTempFile() {
@@ -306,7 +303,7 @@ public abstract class  AbstractCrudAction extends PortofinoAction
 
         fileName = rootCrudUnit.searchTitle + ".pdf";
 
-        return EXPORT;
+        return PortofinoAction.EXPORT;
     }
 
 
@@ -323,7 +320,7 @@ public abstract class  AbstractCrudAction extends PortofinoAction
 
         fileName = rootCrudUnit.readTitle + ".pdf";
 
-        return EXPORT;
+        return PortofinoAction.EXPORT;
     }
 
     private void paramExportPdf(File tempPdfFile) throws FileNotFoundException {

@@ -29,7 +29,10 @@
 
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.portofino.annotations.InjectNavigation;
+import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.navigation.NavigationNode;
+import com.opensymphony.xwork2.ActionSupport;
 
 import java.util.List;
 
@@ -38,9 +41,16 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class FolderAction extends PortofinoAction {
+public class FolderAction extends ActionSupport {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+    //**************************************************************************
+    // Injections
+    //**************************************************************************
+
+    @InjectNavigation
+    public Navigation navigation;
 
     public String redirectUrl;
 

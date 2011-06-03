@@ -32,17 +32,20 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectHttpSession;
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.util.ValueStack;
 import org.apache.commons.lang.StringUtils;
-import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.Date;
@@ -52,8 +55,7 @@ import java.util.Date;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class LoginAction extends PortofinoAction
-        implements ServletRequestAware, LoginUnAware {
+public class LoginAction extends ActionSupport implements LoginUnAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -67,6 +69,15 @@ public class LoginAction extends PortofinoAction
         this.req = req;
     }
 
+    //**************************************************************************
+    // Injections
+    //**************************************************************************
+
+    @InjectContext
+    public Context context;
+
+    @InjectHttpSession
+    public HttpSession session;
 
     //**************************************************************************
     // Presentation elements
@@ -93,8 +104,8 @@ public class LoginAction extends PortofinoAction
     }
 
     public String execute () {
-        getSession().remove(UserUtils.USERID);
-        getSession().remove(UserUtils.USERNAME);
+        session.removeAttribute(UserUtils.USERID);
+        session.removeAttribute(UserUtils.USERNAME);
         return INPUT;
     }
 
@@ -132,8 +143,8 @@ public class LoginAction extends PortofinoAction
         ValueStack vs = ActionContext.getContext().getValueStack();
 
         logger.info("User {} login", user.getUserName());
-        getSession().put(UserUtils.USERID, user.getUserId());
-        getSession().put(UserUtils.USERNAME, user.getUserName());
+        session.setAttribute(UserUtils.USERID, user.getUserId());
+        session.setAttribute(UserUtils.USERNAME, user.getUserName());
         updateUser(user);
         returnUrl = StringUtils.trimToNull(returnUrl);
         returnUrl=(returnUrl!=null)?returnUrl:home;
@@ -163,7 +174,7 @@ public class LoginAction extends PortofinoAction
     }
 
     public String logout(){
-        getSession().remove(UserUtils.USERID);
+        session.removeAttribute(UserUtils.USERID);
         SessionMessages.addInfoMessage("User disconnetected");
 
         return "logout";

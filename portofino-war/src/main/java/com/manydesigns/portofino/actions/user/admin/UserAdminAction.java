@@ -29,10 +29,12 @@
 package com.manydesigns.portofino.actions.user.admin;
 
 
-import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.UseCaseAction;
+import com.manydesigns.portofino.annotations.InjectHttpSession;
+import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.email.EmailUtils;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.email.EmailBean;
@@ -41,6 +43,7 @@ import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
 
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -55,16 +58,25 @@ import java.util.Properties;
 public class UserAdminAction extends UseCaseAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
+
+
     //**************************************************************************
     // Constants
     //**************************************************************************
+
     private static final String userTable = "portofino.public.users";
     private static final String groupTable = "portofino.public.groups";
     private static final String usersGroupsTable = "portofino.public.users_groups";
     private final int pwdLength;
     private final Boolean enc;
 
+    //**************************************************************************
+    // Injections
+    //**************************************************************************
 
+
+    @InjectHttpSession
+    public HttpSession session;
 
     public UserAdminAction() {
         super();
@@ -84,7 +96,7 @@ public class UserAdminAction extends UseCaseAction {
         String pk = rootCrudUnit.pk;
         if (null==rootCrudUnit.subCrudUnits.get(1).selection) {
             SessionMessages.addInfoMessage("No group selected");
-            return RETURN_TO_READ;
+            return PortofinoAction.RETURN_TO_READ;
         }
         for (String current : rootCrudUnit.subCrudUnits.get(1).selection) {
             TableAccessor ugAccessor = context.getTableAccessor(usersGroupsTable);
@@ -103,7 +115,7 @@ public class UserAdminAction extends UseCaseAction {
         }
         context.commit("portofino");
         SessionMessages.addInfoMessage("Group(s) removed");
-        return RETURN_TO_READ;
+        return PortofinoAction.RETURN_TO_READ;
     }
 
     //**************************************************************************
@@ -114,7 +126,7 @@ public class UserAdminAction extends UseCaseAction {
         String pk = rootCrudUnit.pk;
         if (null==rootCrudUnit.subCrudUnits.get(0).selection) {
             SessionMessages.addInfoMessage("No group selected");
-            return RETURN_TO_READ;
+            return PortofinoAction.RETURN_TO_READ;
         }
         for (String current : rootCrudUnit.subCrudUnits.get(0).selection) {
             UsersGroups newUg = new UsersGroups();
@@ -130,7 +142,7 @@ public class UserAdminAction extends UseCaseAction {
         }
         context.commit("portofino");
         SessionMessages.addInfoMessage("Group added");
-        return RETURN_TO_READ;
+        return PortofinoAction.RETURN_TO_READ;
     }
 
 
@@ -154,7 +166,7 @@ public class UserAdminAction extends UseCaseAction {
 
         if (mailEnabled) {
             String msg = "La tua nuova password è " + generatedPwd;
-            Long userId = (Long) getSession().get(UserUtils.USERID);
+            Long userId = (Long) session.getAttribute(UserUtils.USERID);
             User thisUser =
             (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
             EmailBean email = new EmailBean("new password", msg,
@@ -173,6 +185,6 @@ public class UserAdminAction extends UseCaseAction {
         context.commit(databaseName);
 
         SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
-        return RETURN_TO_READ;
+        return PortofinoAction.RETURN_TO_READ;
     }
 }

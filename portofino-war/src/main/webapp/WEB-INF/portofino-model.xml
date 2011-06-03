@@ -1331,9 +1331,6 @@ Struttura dell'XML:
                             </properties>
                         </useCase>
                     </useCaseNode>
-                    <portletNode>
-
-                    </portletNode>
                 </childNodes>
             </useCaseNode>
         </childNodes>

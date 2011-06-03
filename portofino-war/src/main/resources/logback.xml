@@ -6,6 +6,7 @@
     </appender>
 
     <logger name="org.hibernate" level="warn"/>
+    <logger name="com.manydesigns.portofino.dispatcher" level="debug"/>
 
     <root level="info">
         <appender-ref ref="STDOUT"/>

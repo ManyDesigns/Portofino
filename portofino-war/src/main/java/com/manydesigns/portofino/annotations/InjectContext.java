@@ -27,40 +27,21 @@
  *
  */
 
-package com.manydesigns.portofino.actions.model;
+package com.manydesigns.portofino.annotations;
 
-import com.manydesigns.portofino.annotations.InjectContext;
-import com.manydesigns.portofino.context.Context;
-import com.opensymphony.xwork2.ActionSupport;
-
-import java.sql.SQLException;
-import java.util.List;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DDLWriterAction extends ActionSupport {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface InjectContext {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-
-    public List<String> ddlsCreate;
-    public List<String> ddlsUpdate;
-
-    //**************************************************************************
-    // Injections
-    //**************************************************************************
-
-    @InjectContext
-    public Context context;
-
-    public String execute() throws SQLException {
-        ddlsCreate = context.getDDLCreate();
-        ddlsUpdate = context.getDDLUpdate();
-
-        return ActionSupport.SUCCESS;
-    }
-
-
 }
