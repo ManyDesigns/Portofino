@@ -38,7 +38,6 @@ import javax.xml.bind.Unmarshaller;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class RootNode extends SiteNode {
-    private final String urlFormat = "{0}/Index.action";
     public RootNode() {
         super();
     }
@@ -54,9 +53,5 @@ public class RootNode extends SiteNode {
         super.init(model);
         url="/";
         actualUrl = "/";
-    }
-
-    protected String getUrlFormat() {
-        return urlFormat;
     }
 }

@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -77,7 +78,7 @@ public class ProfileAction extends ActionSupport {
     public HttpServletRequest req;
 
     @InjectHttpSession
-    public HttpServletRequest session;
+    public HttpSession session;
 
     public List<Group> groups;
 

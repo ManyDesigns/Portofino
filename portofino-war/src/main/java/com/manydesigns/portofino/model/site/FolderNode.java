@@ -34,13 +34,7 @@ package com.manydesigns.portofino.model.site;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class FolderNode extends SiteNode{
-    private final String urlFormat = "{0}/Index.action";
-
     public FolderNode() {
         super();
-    }
-
-    protected String getUrlFormat() {
-        return urlFormat;
     }
 }

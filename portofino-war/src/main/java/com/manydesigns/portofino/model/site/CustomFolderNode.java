@@ -37,7 +37,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class CustomFolderNode extends SiteNode{
-    private final String urlFormat = "{0}/Index.action";
 
     //**************************************************************************
     // Fields
@@ -55,9 +54,5 @@ public class CustomFolderNode extends SiteNode{
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    protected String getUrlFormat() {
-        return urlFormat;
     }
 }

@@ -35,7 +35,6 @@ import com.manydesigns.portofino.xml.Identifier;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,13 +105,11 @@ public abstract class  SiteNode implements ModelObject {
         }
 
         if (url==null){
-            actualUrl = MessageFormat.format(getUrlFormat(), actualId);
+            actualUrl = actualId;
         } else {
             actualUrl = url;
         }
     }
-
-    protected abstract String getUrlFormat();
 
     public String getQualifiedName() {
         return null;

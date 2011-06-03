@@ -31,10 +31,7 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.site.DocumentNode;
-import com.manydesigns.portofino.model.site.PortletNode;
-import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.site.UseCaseNode;
+import com.manydesigns.portofino.model.site.*;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -89,15 +86,19 @@ public class Dispatcher {
         }
 
         SiteNode siteNode = siteNodePath.get(siteNodePath.size()-1);
-        String rewrittenPath;
-        if (siteNode instanceof DocumentNode) {
-            rewrittenPath = "/Document.action";
-        } else if (siteNode instanceof PortletNode) {
-            rewrittenPath = "/Portlet.action";
-        } else if (siteNode instanceof UseCaseNode) {
-            rewrittenPath = "/UseCase.action";
-        } else {
-            throw new Error("Unrecognized node type");
+        String rewrittenPath = siteNode.getUrl();
+        if (rewrittenPath == null) {
+            if (siteNode instanceof DocumentNode) {
+                rewrittenPath = "/Document.action";
+            } else if (siteNode instanceof PortletNode) {
+                rewrittenPath = "/Portlet.action";
+            } else if (siteNode instanceof FolderNode) {
+                rewrittenPath = "/Index.action";
+            } else if (siteNode instanceof UseCaseNode) {
+                rewrittenPath = "/UseCase.action";
+            } else {
+                throw new Error("Unrecognized node type");
+            }
         }
 
         SiteNode[] siteNodeArray = new SiteNode[siteNodePath.size()];

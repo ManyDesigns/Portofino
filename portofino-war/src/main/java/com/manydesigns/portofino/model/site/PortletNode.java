@@ -44,8 +44,6 @@ public class PortletNode extends SiteNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    private final String urlFormat = "{0}/Portlet.action";
-
     //**************************************************************************
     // Fields
     //**************************************************************************
@@ -177,7 +175,4 @@ public class PortletNode extends SiteNode {
         this.actualDatabase = actualDatabase;
     }
 
-    protected String getUrlFormat() {
-        return urlFormat;
-    }
 }

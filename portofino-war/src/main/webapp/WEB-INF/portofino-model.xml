@@ -1024,7 +1024,7 @@ Struttura dell'XML:
     <rootNode id="/" title="Portofino4" description="portofino 4" url="/">
         <childNodes>
 
-            <documentNode id="homepage" title="Homepage" description="Homepage" fileName="skins/default/homepage.html" url="Document.action">
+            <documentNode id="homepage" title="Homepage" description="Homepage" fileName="skins/default/homepage.html" >
                 <permissions>
                     <allow>
                         <group>anonymous</group>

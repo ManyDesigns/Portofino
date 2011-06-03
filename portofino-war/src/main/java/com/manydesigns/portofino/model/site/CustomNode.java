@@ -34,7 +34,6 @@ package com.manydesigns.portofino.model.site;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class CustomNode extends SiteNode{
-    private final String urlFormat = "{0}/Custom.action";
 
     //**************************************************************************
     // Fields
@@ -43,7 +42,4 @@ public class CustomNode extends SiteNode{
         super();
     }
 
-    protected String getUrlFormat() {
-        return urlFormat;
-    }
 }

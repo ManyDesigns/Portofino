@@ -26,29 +26,22 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.model.site;
 
-import javax.xml.bind.annotation.XmlAttribute;
+package com.manydesigns.portofino.annotations;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DocumentNode extends SiteNode{
-
-    private String fileName;
-
-    public DocumentNode() {
-        super();
-    }
-
-    @XmlAttribute(required = false)
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface InjectDispatch {
+    public static final String copyright =
+            "Copyright (c) 2005-2010, ManyDesigns srl";
 }

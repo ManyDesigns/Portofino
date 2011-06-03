@@ -28,8 +28,11 @@
  */
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.portofino.annotations.InjectDispatch;
 import com.manydesigns.portofino.annotations.InjectNavigation;
+import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.model.site.DocumentNode;
+import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.navigation.Navigation;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.util.ServletContextAware;
@@ -55,6 +58,9 @@ public class DocumentAction extends ActionSupport implements ServletContextAware
     // Injections
     //**************************************************************************
 
+    @InjectDispatch
+    public Dispatch dispatch;
+
     @InjectNavigation
     public Navigation navigation;
 
@@ -68,8 +74,9 @@ public class DocumentAction extends ActionSupport implements ServletContextAware
 
     @Override
     public String execute() throws Exception {
-        DocumentNode node = (DocumentNode)
-                navigation.getSelectedNavigationNode().getSiteNode();
+        SiteNode[] siteNodePath = dispatch.getSiteNodePath();
+        DocumentNode node =
+                (DocumentNode) siteNodePath[siteNodePath.length - 1];
         String fileName = node.getFileName();
         try {
             content = convertStreamToString(

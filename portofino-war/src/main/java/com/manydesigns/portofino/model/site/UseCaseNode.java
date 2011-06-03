@@ -39,8 +39,6 @@ import javax.xml.bind.annotation.XmlElement;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class UseCaseNode extends SiteNode{
-    private final String urlFormat = "{0}/UseCase.action";
-
     protected UseCase useCase;
     //**************************************************************************
     // Fields
@@ -65,7 +63,4 @@ public class UseCaseNode extends SiteNode{
         useCase.init(model);
     }
 
-    protected String getUrlFormat() {
-        return urlFormat;
-    }
 }

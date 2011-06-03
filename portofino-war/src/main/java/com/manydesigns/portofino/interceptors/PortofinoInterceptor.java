@@ -33,6 +33,7 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.annotations.*;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.ServerInfo;
+import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.navigation.Navigation;
@@ -132,12 +133,15 @@ public class PortofinoInterceptor implements Interceptor {
             req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
             NavigationNode selectedNode = navigation.getSelectedNavigationNode();
 
+            Dispatch dispatch =
+                    (Dispatch) req.getAttribute(Dispatch.KEY);
             ServerInfo serverInfo =
                     (ServerInfo) servletContext.getAttribute(ServerInfo.KEY);
 
             /* injections */
             injectAnnotatedFields(action, InjectContext.class, context);
             injectAnnotatedFields(action, InjectModel.class, model);
+            injectAnnotatedFields(action, InjectDispatch.class, dispatch);
             injectAnnotatedFields(action, InjectNavigation.class, navigation);
             injectAnnotatedFields(action, InjectServerInfo.class, serverInfo);
             injectAnnotatedFields(action, InjectHttpRequest.class, req);

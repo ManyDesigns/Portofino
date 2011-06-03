@@ -33,6 +33,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectHttpRequest;
 import com.manydesigns.portofino.annotations.InjectHttpSession;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.system.model.users.User;
@@ -60,21 +61,14 @@ public class LoginAction extends ActionSupport implements LoginUnAware {
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     //**************************************************************************
-    // ServletRequestAware implementation
-    //**************************************************************************
-    public HttpServletRequest req;
-
-
-    public void setServletRequest(HttpServletRequest req) {
-        this.req = req;
-    }
-
-    //**************************************************************************
     // Injections
     //**************************************************************************
 
     @InjectContext
     public Context context;
+
+    @InjectHttpRequest
+    public HttpServletRequest req;
 
     @InjectHttpSession
     public HttpSession session;
@@ -88,7 +82,7 @@ public class LoginAction extends ActionSupport implements LoginUnAware {
     public String returnUrl;
     //public Map parameters;
     
-    private static final String home = "/Document.action";
+    private static final String home = "/";
     public static final Logger logger =
             LoggerFactory.getLogger(LoginAction.class);
 
