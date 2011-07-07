@@ -138,18 +138,23 @@ public class Navigation implements XhtmlFragment {
     //**************************************************************************
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
-        print(rootNodes, xb);
+        print(rootNodes, xb, false);
     }
 
-    private void print(List<NavigationNode> nodes, XhtmlBuffer xb) {
-        if (nodes == null || nodes.isEmpty()) {
+    private void print(List<NavigationNode> nodes, XhtmlBuffer xb, boolean recursive) {
+        if (nodes == null) {
             return;
         }
-        xb.openElement("ul");
+        boolean first = true;
         List<NavigationNode> expand = null;
         for (NavigationNode current : nodes) {
-            if(!current.isAllowed()){
+            if(!current.isAllowed() || !current.isEnabled()){
                 continue;
+            }
+            if(first) {
+                if(recursive) { xb.writeHr(); }
+                xb.openElement("ul");
+                first = false;
             }
             xb.openElement("li");
             SiteNode siteNode = current.getSiteNode();
@@ -163,10 +168,11 @@ public class Navigation implements XhtmlFragment {
             xb.writeAnchor(current.getUrl(), current.getTitle(), null, current.getDescription());
             xb.closeElement("li");
         }
-        xb.closeElement("ul");
-        if (expand != null && !expand.isEmpty()) {
-            xb.writeHr();
-            print(expand, xb);
+        if(!first) {
+            xb.closeElement("ul");
+        }
+        if (expand != null) {
+            print(expand, xb, true);
         }
     }
 

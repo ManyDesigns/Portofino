@@ -93,6 +93,10 @@ public class DispatcherTest extends AbstractPortofinoTest {
         siteNode = siteNode.getChildNodes().get(0);
         assertEquals(siteNode, navigationNode.getSiteNode());
         assertFalse(navigationNode.isEnabled());
+
+        String htmlOutput = elementToString(navigation);
+        assertEquals("<ul><li class=\"selected\"><a href=\"/projects\" title=\"projects\">projects</a></li></ul>",
+                     htmlOutput);
     }
 
     public void testProjectNew() {
@@ -164,6 +168,12 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(siteNode, navigationNode.getSiteNode());
         assertTrue(navigationNode.isEnabled());
 
+        String htmlOutput = elementToString(navigation);
+        assertEquals("<ul><li class=\"selected\">" +
+                "<a href=\"/projects\" title=\"projects\">projects</a></li></ul>" +
+                "<hr /><ul><li><a href=\"/projects/10/tickets\" title=\"tickets\">tickets</a></li></ul>",
+                htmlOutput);
+
         // Navigation node per /projects/tickets
         assertEquals(1, navigationNode.getChildNodes().size());
         navigationNode = navigationNode.getChildNodes().get(0);
@@ -216,6 +226,13 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals("/projects/10/tickets", navigationNode.getUrl());
         assertEquals(siteNode, navigationNode.getSiteNode());
         assertTrue(navigationNode.isEnabled());
+
+
+        String htmlOutput = elementToString(navigation);
+        assertEquals("<ul><li class=\"path\">" +
+                "<a href=\"/projects\" title=\"projects\">projects</a></li></ul>" +
+                "<hr /><ul><li class=\"selected\"><a href=\"/projects/10/tickets\" title=\"tickets\">tickets</a></li></ul>",
+                htmlOutput);
     }
 
 

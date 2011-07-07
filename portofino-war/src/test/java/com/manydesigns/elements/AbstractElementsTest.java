@@ -5,6 +5,7 @@ import ch.qos.logback.core.util.StatusPrinter;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.elements.servlet.WebFramework;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
 import junit.framework.TestCase;
@@ -77,7 +78,7 @@ public abstract class AbstractElementsTest extends TestCase {
         ElementsThreadLocals.removeElementsContext();
     }
 
-    public String elementToString(Element element) {
+    public String elementToString(XhtmlFragment element) {
         XhtmlBuffer xb = new XhtmlBuffer();
         element.toXhtml(xb);
         return xb.toString();
