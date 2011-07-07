@@ -28,8 +28,6 @@
  */
 package com.manydesigns.portofino.model.site;
 
-import com.manydesigns.portofino.model.Model;
-
 import javax.xml.bind.Unmarshaller;
 
 /*
@@ -47,11 +45,4 @@ public class RootNode extends SiteNode {
         // do nothing
     }
 
-    @Override
-    public void init(Model model) {
-        actualId="/";
-        super.init(model);
-        url="/";
-        actualUrl = "/";
-    }
 }

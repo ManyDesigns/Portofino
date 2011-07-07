@@ -36,7 +36,9 @@ import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -59,25 +61,28 @@ public class Dispatcher {
     public Dispatch createDispatch(HttpServletRequest request) {
         String originalPath = request.getServletPath();
 
-        List<SiteNode> siteNodePath = new ArrayList<SiteNode>();
+        List<SiteNodeInstance> siteNodePath = new ArrayList<SiteNodeInstance>();
 
         Model model = context.getModel();
         SiteNode rootNode = model.getRootNode();
         List<SiteNode> nodeList = rootNode.getChildNodes();
         String[] fragments = StringUtils.split(originalPath, '/');
-        for (String fragment : fragments) {
-            SiteNode foundNode = null;
+        List<String> fragmentList = Arrays.asList(fragments);
+        ListIterator<String> iterator = fragmentList.listIterator();
+        while (iterator.hasNext()) {
+            String fragment = iterator.next();
+            SiteNodeInstance foundNodeInstance = null;
             for (SiteNode node : nodeList) {
                 if (fragment.equals(node.getId())) {
-                    foundNode = node;
+                    foundNodeInstance = createSiteNodeInstance(iterator, node);
                     break;
                 }
             }
-            if (foundNode == null) {
+            if (foundNodeInstance == null) {
                 return null;
             } else {
-                siteNodePath.add(foundNode);
-                nodeList = foundNode.getChildNodes();
+                siteNodePath.add(foundNodeInstance);
+                nodeList = foundNodeInstance.getSiteNode().getChildNodes();
             }
         }
 
@@ -85,7 +90,9 @@ public class Dispatcher {
             return null;
         }
 
-        SiteNode siteNode = siteNodePath.get(siteNodePath.size()-1);
+        SiteNodeInstance siteNodeInstance =
+                siteNodePath.get(siteNodePath.size() - 1);
+        SiteNode siteNode = siteNodeInstance.getSiteNode();
         String rewrittenPath = siteNode.getUrl();
         if (rewrittenPath == null) {
             if (siteNode instanceof DocumentNode) {
@@ -101,9 +108,39 @@ public class Dispatcher {
             }
         }
 
-        SiteNode[] siteNodeArray = new SiteNode[siteNodePath.size()];
+        SiteNodeInstance[] siteNodeArray =
+                new SiteNodeInstance[siteNodePath.size()];
         siteNodePath.toArray(siteNodeArray);
 
         return new Dispatch(originalPath, rewrittenPath, siteNodeArray);
+    }
+
+    private SiteNodeInstance createSiteNodeInstance(
+            ListIterator<String> iterator, SiteNode foundNode) {
+        SiteNodeInstance result;
+        if (foundNode instanceof UseCaseNode) {
+            String mode;
+            String param;
+            if (iterator.hasNext()) {
+                String peek = iterator.next();
+                if (UseCaseNode.MODE_NEW.equals((peek))) {
+                    mode = UseCaseNode.MODE_NEW;
+                    param = null;
+                    if (iterator.hasNext()) {
+                        return null;
+                    }
+                } else {
+                    mode = UseCaseNode.MODE_DETAIL;
+                    param = peek;
+                }
+            } else {
+                mode = UseCaseNode.MODE_SEARCH;
+                param = null;
+            }
+            result = new SiteNodeInstance(foundNode, mode, param);
+        } else {
+            result = new SiteNodeInstance(foundNode, null, null);
+        }
+        return result;
     }
 }

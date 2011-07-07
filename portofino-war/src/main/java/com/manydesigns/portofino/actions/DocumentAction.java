@@ -28,12 +28,9 @@
  */
 package com.manydesigns.portofino.actions;
 
-import com.manydesigns.portofino.annotations.InjectDispatch;
-import com.manydesigns.portofino.annotations.InjectNavigation;
-import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
+import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.DocumentNode;
-import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.navigation.Navigation;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.util.ServletContextAware;
 import org.slf4j.Logger;
@@ -58,11 +55,8 @@ public class DocumentAction extends ActionSupport implements ServletContextAware
     // Injections
     //**************************************************************************
 
-    @InjectDispatch
-    public Dispatch dispatch;
-
-    @InjectNavigation
-    public Navigation navigation;
+    @InjectSiteNodeInstance
+    public SiteNodeInstance siteNodeInstance;
 
     public static final Logger logger =
             LoggerFactory.getLogger(DocumentAction.class);
@@ -74,9 +68,7 @@ public class DocumentAction extends ActionSupport implements ServletContextAware
 
     @Override
     public String execute() throws Exception {
-        SiteNode[] siteNodePath = dispatch.getSiteNodePath();
-        DocumentNode node =
-                (DocumentNode) siteNodePath[siteNodePath.length - 1];
+        DocumentNode node = (DocumentNode) siteNodeInstance.getSiteNode();
         String fileName = node.getFileName();
         try {
             content = convertStreamToString(

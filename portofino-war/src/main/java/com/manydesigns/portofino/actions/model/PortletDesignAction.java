@@ -39,11 +39,11 @@ import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.annotations.InjectContext;
-import com.manydesigns.portofino.annotations.InjectNavigation;
+import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
+import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.PortletNode;
-import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
 import com.opensymphony.xwork2.ActionSupport;
 import org.jfree.chart.ChartFactory;
@@ -91,8 +91,8 @@ public class PortletDesignAction extends ActionSupport {
     @InjectContext
     public Context context;
 
-    @InjectNavigation
-    public Navigation navigation;
+    @InjectSiteNodeInstance
+    public SiteNodeInstance siteNodeInstance;
 
     //**************************************************************************
     // Web parameters
@@ -291,8 +291,7 @@ public class PortletDesignAction extends ActionSupport {
     //**************************************************************************
 
     public void setupPortlet() {
-        portlet = (PortletNode) navigation.getSelectedNavigationNode()
-                .getActualSiteNode();
+        portlet = (PortletNode) siteNodeInstance.getSiteNode();
         if (portlet == null) {
             throw new ModelObjectNotFoundError(portletName);
         }

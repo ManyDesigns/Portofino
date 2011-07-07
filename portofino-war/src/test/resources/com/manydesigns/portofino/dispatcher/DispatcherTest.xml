@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+    <rootNode title="Portofino4" description="portofino 4" id="/">
+        <childNodes>
+            <useCaseNode description="projects" id="projects" title="projects">
+                <useCase name="projects-name"
+                         table="projects-table"
+                         query="projects-query">
+                </useCase>
+                <childNodes>
+                    <useCaseNode description="tickets" id="tickets" title="tickets">
+                        <useCase name="tickets-name"
+                                 table="tickets-table"
+                                 query="tickets-query">
+                        </useCase>
+                    </useCaseNode>
+                </childNodes>
+            </useCaseNode>
+        </childNodes>
+    </rootNode>
+</model>

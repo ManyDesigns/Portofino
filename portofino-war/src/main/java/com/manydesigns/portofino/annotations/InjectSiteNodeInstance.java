@@ -27,23 +27,21 @@
  *
  */
 
-package com.manydesigns.portofino.navigation;
+package com.manydesigns.portofino.annotations;
 
-import com.manydesigns.portofino.model.site.UseCaseNode;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCaseNavigationNode extends SimpleNavigationNode {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface InjectSiteNodeInstance {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-
-    //**************************************************************************
-    // Constructors
-    //**************************************************************************
-    public UseCaseNavigationNode(UseCaseNode siteNode, boolean allowed) {
-       super(siteNode, allowed);
-    }
 }

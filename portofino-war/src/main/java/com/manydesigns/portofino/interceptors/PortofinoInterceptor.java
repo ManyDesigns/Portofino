@@ -29,15 +29,14 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.annotations.*;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.navigation.Navigation;
-import com.manydesigns.portofino.navigation.NavigationNode;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
@@ -125,16 +124,13 @@ public class PortofinoInterceptor implements Interceptor {
             context.resetDbTimer();
             context.openSession();
             Model model = context.getModel();
-            String requestUrl = Util.getAbsoluteUrl(req.getServletPath());
 
             List<String> groups=UserUtils.manageGroups(context, userId);
 
-            Navigation navigation = new Navigation(context, requestUrl, groups);
+            Dispatch dispatch = (Dispatch) req.getAttribute(Dispatch.KEY);
+            Navigation navigation = new Navigation(context, dispatch, groups);
             req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
-            NavigationNode selectedNode = navigation.getSelectedNavigationNode();
 
-            Dispatch dispatch =
-                    (Dispatch) req.getAttribute(Dispatch.KEY);
             ServerInfo serverInfo =
                     (ServerInfo) servletContext.getAttribute(ServerInfo.KEY);
 
@@ -142,6 +138,12 @@ public class PortofinoInterceptor implements Interceptor {
             injectAnnotatedFields(action, InjectContext.class, context);
             injectAnnotatedFields(action, InjectModel.class, model);
             injectAnnotatedFields(action, InjectDispatch.class, dispatch);
+            SiteNodeInstance[] siteNodeInstances =
+                    dispatch.getSiteNodeInstancePath();
+            SiteNodeInstance siteNodeInstance =
+                    siteNodeInstances[siteNodeInstances.length-1];
+            injectAnnotatedFields(action, InjectSiteNodeInstance.class,
+                    siteNodeInstance);
             injectAnnotatedFields(action, InjectNavigation.class, navigation);
             injectAnnotatedFields(action, InjectServerInfo.class, serverInfo);
             injectAnnotatedFields(action, InjectHttpRequest.class, req);
@@ -149,12 +151,12 @@ public class PortofinoInterceptor implements Interceptor {
 
 
             //2. Se è fuori dall'albero di navigazione e non ho permessi
-            if (selectedNode==null ) {
+            if (siteNodeInstance == null ) {
                 stopWatch.stop();
                 return invocation.invoke();
             }
 
-            SiteNode node = selectedNode.getActualSiteNode();
+            SiteNode node = siteNodeInstance.getSiteNode();
             //3. Ho i permessi necessari vado alla pagina
             if(node.isAllowed(groups)){
                 stopWatch.stop();

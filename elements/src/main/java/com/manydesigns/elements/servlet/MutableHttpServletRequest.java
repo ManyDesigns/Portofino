@@ -60,6 +60,7 @@ public class MutableHttpServletRequest implements MultipartRequest {
 
     private String method;
     private String contextPath;
+    private String servletPath;
 
     //**************************************************************************
     // Constructor
@@ -117,6 +118,9 @@ public class MutableHttpServletRequest implements MultipartRequest {
         this.contextPath=context;
     }
 
+    public void setServletPath(String servletPath) {
+        this.servletPath = servletPath;
+    }
 
     //**************************************************************************
     // HttpServletRequest implementation
@@ -149,6 +153,10 @@ public class MutableHttpServletRequest implements MultipartRequest {
 
     public String getContextPath() {
         return contextPath;
+    }
+
+    public String getServletPath() {
+        return servletPath;
     }
 
     //**************************************************************************
@@ -216,10 +224,6 @@ public class MutableHttpServletRequest implements MultipartRequest {
     }
 
     public StringBuffer getRequestURL() {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getServletPath() {
         throw new UnsupportedOperationException();
     }
 

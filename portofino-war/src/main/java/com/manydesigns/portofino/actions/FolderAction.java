@@ -29,12 +29,10 @@
 
 package com.manydesigns.portofino.actions;
 
-import com.manydesigns.portofino.annotations.InjectDispatch;
-import com.manydesigns.portofino.annotations.InjectNavigation;
-import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
+import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.FolderNode;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.navigation.Navigation;
 import com.opensymphony.xwork2.ActionSupport;
 
 import java.util.List;
@@ -52,24 +50,20 @@ public class FolderAction extends ActionSupport {
     // Injections
     //**************************************************************************
 
-    @InjectDispatch
-    public Dispatch dispatch;
-
-    @InjectNavigation
-    public Navigation navigation;
+    @InjectSiteNodeInstance
+    public SiteNodeInstance siteNodeInstance;
 
     public String redirectUrl;
 
     public String execute() {
-        SiteNode[] dispatchNodePath = dispatch.getSiteNodePath();
-        FolderNode navigationNode =
-                (FolderNode) dispatchNodePath[dispatchNodePath.length - 1];
+        FolderNode navigationNode = (FolderNode) siteNodeInstance.getSiteNode();
         List<SiteNode> childNodes = navigationNode.getChildNodes();
         if (childNodes.isEmpty()) {
+            // TODO: far restituire un valore che indica l'assenza di figli
             return null;
         } else {
             SiteNode firstChild = childNodes.get(0);
-            redirectUrl = firstChild.getActualId();
+            redirectUrl = "TODO: redirigere al primo nodo";
             return SUCCESS;
         }
     }

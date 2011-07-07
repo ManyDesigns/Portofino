@@ -32,14 +32,16 @@ package com.manydesigns.portofino.navigation;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.model.site.*;
+import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
+import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.site.UseCaseNode;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -55,9 +57,8 @@ public class Navigation implements XhtmlFragment {
     //**************************************************************************
 
     protected final Context context;
-    protected final String requestUrl;
-    protected final String normalizedRequestUrl;
-    protected final List<NavigationNode> foundPath;
+    protected final Dispatch dispatch;
+    protected final SiteNodeInstance[] siteNodeInstancePath;
     protected final List<NavigationNode> rootNodes;
     protected final List<String> groups;
 
@@ -68,91 +69,59 @@ public class Navigation implements XhtmlFragment {
     // Constructors
     //**************************************************************************
 
-    public Navigation(Context context, String requestUrl, List<String> groups) {
+    public Navigation(Context context, Dispatch dispatch, List<String> groups) {
         this.context = context;
-        this.requestUrl = requestUrl;
+        this.dispatch = dispatch;
+        siteNodeInstancePath = dispatch.getSiteNodeInstancePath();
         this.groups = groups;
-        int i = requestUrl.lastIndexOf("!");
-        int j = requestUrl.lastIndexOf(".");
-        if (i >= 0 && j > i) {
-            normalizedRequestUrl =
-                    requestUrl.substring(0, i) +
-                            requestUrl.substring(j, requestUrl.length());
-        } else {
-            normalizedRequestUrl = requestUrl;
-        }
-        Stack<NavigationNode> stack = new Stack<NavigationNode>();
-        foundPath = new ArrayList<NavigationNode>();
         rootNodes = new ArrayList<NavigationNode>();
-        final List<SiteNode> rootChildNodes = context.getModel().getRootNode().getChildNodes();
-        generateNavigationNodes(rootChildNodes, rootNodes);
-        searchPath(rootNodes, stack);
+        final List<SiteNode> rootChildNodes =
+                context.getModel().getRootNode().getChildNodes();
+        generateNavigationNodes(rootChildNodes, rootNodes, "", true);
     }
 
     protected void generateNavigationNodes(List<SiteNode> siteNodes,
-                                           List<NavigationNode> navigationNodes) {
+                                           List<NavigationNode> navigationNodes,
+                                           String prefixUrl, boolean useCaseEnabled) {
         for (SiteNode siteNode : siteNodes) {
+            String url = String.format("%s/%s", prefixUrl, siteNode.getId());
+            String title = siteNode.getTitle();
+            String description = siteNode.getDescription();
             boolean allowed = siteNode.isAllowed(groups);
-            NavigationNode navigationNode;
-            if (siteNode instanceof DocumentNode
-                    || siteNode instanceof PortletNode
-                    || siteNode instanceof UseCaseNode
-                    || siteNode instanceof CustomNode) {
-                navigationNode = new SimpleNavigationNode(siteNode,
-                        allowed);
-                generateNavigationNodes(siteNode.getChildNodes(),
-                        navigationNode.getChildNodes());
-            }else if (siteNode instanceof FolderNode) {
-                navigationNode = new FolderNavigationNode(siteNode,
-                         allowed);
-                generateNavigationNodes(siteNode.getChildNodes(),
-                        navigationNode.getChildNodes());
-            } else if (siteNode instanceof CustomFolderNode) {
-                CustomFolderNode node = (CustomFolderNode) siteNode;
-                if("table-data".equals(node.getType())) {
-                    navigationNode =
-                        new TableDataNavigationNode(context, siteNode,
-                                 allowed);
-                } else if("table-design".equals(node.getType())) {
-                    navigationNode =
-                        new TableDesignNavigationNode(context, siteNode,
-                                 allowed);
+
+            boolean ownEnabled;
+            boolean childUseCaseEnabled;
+            String childUrl;
+
+            if (siteNode instanceof UseCaseNode) {
+                ownEnabled = useCaseEnabled;
+                SiteNodeInstance siteNodeInstance = findInPath(siteNode);
+                if (siteNodeInstance != null) {
+                    String mode = siteNodeInstance.getMode();
+                    if (UseCaseNode.MODE_DETAIL.equals(mode)) {
+                        childUseCaseEnabled = useCaseEnabled;
+                        childUrl = url + "/" + siteNodeInstance.getParam();
+                    } else {
+                        childUseCaseEnabled = false;
+                        childUrl = url;
+                    }
                 } else {
-                logger.warn("Unrecognized site node type: {}",
-                        siteNode.getClass().getName());
-                continue;
+                    childUseCaseEnabled = false;
+                    childUrl = url;
                 }
             } else {
-                logger.warn("Unrecognized site node type: {}",
-                        siteNode.getClass().getName());
-                continue;
+                ownEnabled = true;
+                childUseCaseEnabled = useCaseEnabled;
+                childUrl = url;
             }
+
+            NavigationNode navigationNode =
+                    new NavigationNode(siteNode, url, title, description,
+                            allowed, ownEnabled);
+            generateNavigationNodes(siteNode.getChildNodes(),
+                    navigationNode.getChildNodes(), childUrl, childUseCaseEnabled);
             navigationNodes.add(navigationNode);
         }
-    }
-
-    protected boolean searchPath(List<NavigationNode> nodes,
-                                 Stack<NavigationNode> stack) {
-        if (nodes == null || nodes.isEmpty()) {
-            return false;
-        }
-        for (NavigationNode current : nodes) {
-            boolean found;
-            stack.push(current);
-            String nodeUrl = current.getUrl();
-            if (normalizedRequestUrl.equals(nodeUrl)) {
-                foundPath.clear();
-                foundPath.addAll(stack);
-                found = true;
-            } else {
-                found = searchPath(current.getChildNodes(), stack);
-            }
-            stack.pop();
-            if (found) {
-                return true;
-            }
-        }
-        return false;
     }
 
     //**************************************************************************
@@ -174,15 +143,15 @@ public class Navigation implements XhtmlFragment {
                 continue;
             }
             xb.openElement("li");
-            String nodeUrl = current.getUrl();
-            if (normalizedRequestUrl.equals(nodeUrl)) {
+            SiteNode siteNode = current.getSiteNode();
+            if (isSelected(siteNode)) {
                 xb.addAttribute("class", "selected");
                 expand = current.getChildNodes();
-            } else if (foundPath != null && foundPath.contains(current)) {
+            } else if (isInPath(siteNode)) {
                 xb.addAttribute("class", "path");
                 expand = current.getChildNodes();
             }
-            xb.writeAnchor(nodeUrl, current.getTitle(), null, current.getDescription());
+            xb.writeAnchor(current.getUrl(), current.getTitle(), null, current.getDescription());
             xb.closeElement("li");
         }
         xb.closeElement("ul");
@@ -192,27 +161,31 @@ public class Navigation implements XhtmlFragment {
         }
     }
 
+    protected boolean isSelected(SiteNode siteNode) {
+        SiteNodeInstance last =
+                siteNodeInstancePath[siteNodeInstancePath.length - 1];
+        return siteNode == last.getSiteNode();
+    }
+
+    protected boolean isInPath(SiteNode siteNode) {
+        return findInPath(siteNode) != null;
+    }
+
+    protected SiteNodeInstance findInPath(SiteNode siteNode) {
+        for (SiteNodeInstance current : siteNodeInstancePath) {
+            if (siteNode == current.getSiteNode()) {
+                return current;
+            }
+        }
+        return null;
+    }
+
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
 
     public Context getContext() {
         return context;
-    }
-
-    public List<NavigationNode> getFoundPath() {
-        return foundPath;
-    }
-
-    public NavigationNode getSelectedNavigationNode() {
-        if (foundPath == null || foundPath.size() == 0) {
-            return null;
-        }
-        return foundPath.get(foundPath.size() - 1);
-    }
-
-    public String getRequestUrl() {
-        return requestUrl;
     }
 
     public List<NavigationNode> getRootNodes() {

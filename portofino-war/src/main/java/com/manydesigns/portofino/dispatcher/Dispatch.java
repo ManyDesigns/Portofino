@@ -29,30 +29,29 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.portofino.model.site.SiteNode;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla - alessio.stalle@manydesigns.com
 */
 public class Dispatch {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public final static String KEY = Dispatch.class.getName();
 
 
     protected final String originalPath;
     protected final String rewrittenPath;
-    protected final SiteNode[] siteNodePath;
+    protected final SiteNodeInstance[] siteNodeInstancePath;
 
     public Dispatch(String originalPath,
                     String rewrittenPath,
-                    SiteNode[] siteNodePath) {
+                    SiteNodeInstance[] siteNodeInstancePath) {
         this.originalPath = originalPath;
         this.rewrittenPath = rewrittenPath;
-        this.siteNodePath = siteNodePath;
+        this.siteNodeInstancePath = siteNodeInstancePath;
     }
 
     public String getOriginalPath() {
@@ -63,7 +62,7 @@ public class Dispatch {
         return rewrittenPath;
     }
 
-    public SiteNode[] getSiteNodePath() {
-        return siteNodePath;
+    public SiteNodeInstance[] getSiteNodeInstancePath() {
+        return siteNodeInstancePath;
     }
 }

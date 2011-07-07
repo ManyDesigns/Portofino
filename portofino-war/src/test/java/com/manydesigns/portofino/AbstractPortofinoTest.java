@@ -29,7 +29,6 @@
 package com.manydesigns.portofino;
 
 import com.manydesigns.elements.AbstractElementsTest;
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.context.Context;
@@ -58,6 +57,7 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     public Connection connDBTest;
     public Context context = null;
     public Model model;
+    public String storeDir;
 
     public static final String PORTOFINO_CONNECTIONS_RESOURCE =
             "portofino-connections.xml";
@@ -73,16 +73,29 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
             "database/portofino4.sql";
     public static final String TEST_DB =
             "database/hibernatetest.sql";
-    private static final String PORTOFINO_TEST_PROPERTIES = "portofino_test.properties";
+    private static final String PORTOFINO_PROPERTIES_RESOURCE = "portofino_test.properties";
 
+    //--------------------------------------------------------------------------
+    // Setup e teardown
+    //--------------------------------------------------------------------------
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        PortofinoProperties.loadProperties(PORTOFINO_TEST_PROPERTIES);
+        PortofinoProperties.loadProperties(getPortofinoPropertiesResource());
 
-        copyResource(PORTOFINO_CONNECTIONS_RESOURCE);
-        copyResource(PORTOFINO_MODEL_RESOURCE);
+        // crea store dir se non c'è
+        storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
+                PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));
+        File file = new File(storeDir);
+        if (!file.exists() && !file.mkdirs()) {
+            throw new Error("Errore in creazione di: " + storeDir);
+        }
+
+        copyResource(getPortofinoConnectionsResource(),
+                PORTOFINO_CONNECTIONS_RESOURCE);
+        copyResource(getPortofinoModelResource(),
+                PORTOFINO_MODEL_RESOURCE);
 
         createContext();
 
@@ -103,7 +116,6 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         RunScript.execute(connDBTest,
                 new InputStreamReader(
                         cl.getResourceAsStream(TEST_DB)));
-        ElementsThreadLocals.setupDefaultElementsContext();        
     }
 
     @Override
@@ -112,12 +124,39 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         super.tearDown();
     }
 
-    private void copyResource(String resourceName) throws IOException {
-        String storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
-                PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));
+    //--------------------------------------------------------------------------
+    // Parametrizzazione del test
+    //--------------------------------------------------------------------------
+
+    public String getPortofinoPropertiesResource() {
+        return PORTOFINO_PROPERTIES_RESOURCE;
+    }
+
+    public String getPortofinoConnectionsResource() {
+        return PORTOFINO_CONNECTIONS_RESOURCE;
+    }
+
+    public String getPortofinoModelResource() {
+        String className = getClass().getName();
+        String resourceName = className.replace('.', '/') + ".xml";
+        ClassLoader cl = getClass().getClassLoader();
+        InputStream is = cl.getResourceAsStream(resourceName);
+        if (is == null) {
+            return PORTOFINO_MODEL_RESOURCE;
+        } else {
+            return resourceName;
+        }
+    }
+        
+
+    //--------------------------------------------------------------------------
+    // utilità
+    //--------------------------------------------------------------------------
+
+    protected void copyResource(String resourceName, String fileName) throws IOException {
         InputStream is =
                 ReflectionUtil.getResourceAsStream(resourceName);
-        File tempFile = new File(storeDir+"/"+resourceName);
+        File tempFile = new File(storeDir+"/"+fileName);
         Writer writer = new FileWriter(tempFile);
         IOUtils.copy(is, writer);
         IOUtils.closeQuietly(writer);
@@ -132,8 +171,7 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         // create and register the container first, without exceptions
 
         try {
-            
-            ElementsThreadLocals.setupDefaultElementsContext();
+            // ElementsThreadLocals è già stato impostato da AbstractElementsTest
 
             String managerClassName =
                     portofinoProperties.getProperty(
@@ -172,8 +210,6 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
-        } finally {
-            ElementsThreadLocals.removeElementsContext();
         }
     }
 

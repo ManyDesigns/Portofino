@@ -39,10 +39,19 @@ import javax.xml.bind.annotation.XmlElement;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 public class UseCaseNode extends SiteNode{
-    protected UseCase useCase;
+    //**************************************************************************
+    // Constants
+    //**************************************************************************
+
+    public static final String MODE_SEARCH = "search";
+    public static final String MODE_NEW = "new";
+    public static final String MODE_DETAIL = "detail";
+
     //**************************************************************************
     // Fields
     //**************************************************************************
+
+    protected UseCase useCase;
 
     public UseCaseNode() {
         super();

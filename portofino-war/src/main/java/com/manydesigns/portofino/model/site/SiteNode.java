@@ -58,8 +58,6 @@ public abstract class  SiteNode implements ModelObject {
 
     protected Permissions permissions;
     protected String id;
-    protected String actualId;
-    protected String actualUrl;
     protected String title;
     protected String description;
     protected String url;
@@ -92,22 +90,8 @@ public abstract class  SiteNode implements ModelObject {
         assert title != null;
         assert description != null;
 
-        if (parent!=null){
-            actualId = parent.actualId;
-            actualId = (actualId.endsWith("/")?actualId:actualId+"/");
-            actualId = actualId+id;
-        }else {
-            actualId = id;
-        }
-
         for (SiteNode childNode : childNodes) {
             childNode.init(model);
-        }
-
-        if (url==null){
-            actualUrl = actualId;
-        } else {
-            actualUrl = url;
         }
     }
 
@@ -177,18 +161,6 @@ public abstract class  SiteNode implements ModelObject {
 
     public void setParent(SiteNode parent) {
         this.parent = parent;
-    }
-
-    public String getActualUrl() {
-        return actualUrl;
-    }
-
-    public String getActualId() {
-        return actualId;
-    }
-
-    public void setActualId(String actualId) {
-        this.actualId = actualId;
     }
 
     @XmlAttribute()

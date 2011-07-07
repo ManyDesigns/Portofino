@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.navigation;
+package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.portofino.model.site.SiteNode;
 
@@ -35,21 +35,28 @@ import com.manydesigns.portofino.model.site.SiteNode;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla - alessio.stalla@manydesigns.com
 */
-public class FolderNavigationNode extends SimpleNavigationNode {
-    public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+public class SiteNodeInstance {
+    protected SiteNode siteNode;
+    protected String mode;
+    protected String param;
 
-    public FolderNavigationNode(SiteNode siteNode, boolean allowed) {
-        super(siteNode, allowed);
+    public SiteNodeInstance(SiteNode siteNode, String mode, String param) {
+        this.siteNode = siteNode;
+        this.mode = mode;
+        this.param = param;
     }
 
+    public SiteNode getSiteNode() {
+        return siteNode;
+    }
 
-    public SiteNode getActualSiteNode() {
-        if (siteNode.getChildNodes().size()==0){
-            return siteNode;
-        } else {
-            return siteNode.getChildNodes().get(0);
-        }
+    public String getMode() {
+        return mode;
+    }
+
+    public String getParam() {
+        return param;
     }
 }

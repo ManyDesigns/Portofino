@@ -31,6 +31,7 @@ package com.manydesigns.portofino.navigation;
 
 import com.manydesigns.portofino.model.site.SiteNode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -38,16 +39,68 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface NavigationNode {
+public class NavigationNode {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    String getUrl();
-    String getTitle();
-    String getDescription();
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
 
-    boolean isAllowed();
-    List<NavigationNode> getChildNodes();
-    SiteNode getSiteNode();
-    SiteNode getActualSiteNode();
+    protected final SiteNode siteNode;
+    protected final List<NavigationNode> childNodes;
+    protected final String url;
+    protected final String title;
+    protected final String description;
+    protected final boolean allowed;
+    protected final boolean enabled;
+
+    //**************************************************************************
+    // Constructors
+    //**************************************************************************
+
+    public NavigationNode(SiteNode siteNode, String url,
+                          String title, String description,
+                          boolean allowed, boolean enabled) {
+        this.siteNode = siteNode;
+        childNodes = new ArrayList<NavigationNode>();
+        this.url = url;
+        this.title = title;
+        this.description = description;
+        this.allowed= allowed;
+        this.enabled = enabled;
+    }
+
+    //**************************************************************************
+    // Getter/setter
+    //**************************************************************************
+
+
+    public SiteNode getSiteNode() {
+        return siteNode;
+    }
+
+    public List<NavigationNode> getChildNodes() {
+        return childNodes;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isAllowed() {
+        return allowed;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
 }

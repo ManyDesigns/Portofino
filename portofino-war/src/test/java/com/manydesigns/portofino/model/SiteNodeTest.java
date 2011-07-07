@@ -32,15 +32,15 @@ import com.manydesigns.portofino.model.site.*;
 import com.manydesigns.portofino.system.model.users.Group;
 import junit.framework.TestCase;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SiteNodeTest extends TestCase{
+public class SiteNodeTest extends TestCase {
 
     Model model;
     RootNode root;
@@ -185,34 +185,6 @@ public class SiteNodeTest extends TestCase{
         groups = new ArrayList<String>();
 
     }
-
-    public void testSiteNodes (){
-        assertEquals("/", root.getActualUrl());
-        assertEquals("/", root.getActualId());
-
-        assertEquals("/homepage/Document.action", n1_1.getActualUrl());
-        assertEquals("/homepage", n1_1.getActualId());
-
-        assertEquals("/model/Index.action", n1_2.getActualUrl());
-        assertEquals("/model", n1_2.getActualId());
-
-        assertEquals("/model/TableData.action", n1_2_1.getActualUrl());
-        assertEquals("/model/TableData", n1_2_1.getActualId());
-
-        assertEquals("/model/TableDesign.action", n1_2_2.getActualUrl());
-        assertEquals("/model/TableDesign", n1_2_2.getActualId());
-
-        assertEquals("http://www.manydesigns.com/", n1_2_3.getActualUrl());
-        assertEquals("/model/somewhere", n1_2_3.getActualId());
-
-        assertEquals("/Profile.action", n1_3.getActualUrl());
-        assertEquals("/Profile", n1_3.getActualId());
-        assertEquals("/userAdmin/Index.action", n1_4.getActualUrl());
-        assertEquals("/userAdmin", n1_4.getActualId());
-    }
-
-
-
 
 
     public void testAnonymous() {
