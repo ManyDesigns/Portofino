@@ -29,7 +29,9 @@
 
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.portofino.annotations.InjectDispatch;
 import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
+import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.FolderNode;
 import com.manydesigns.portofino.model.site.SiteNode;
@@ -53,6 +55,9 @@ public class FolderAction extends ActionSupport {
     @InjectSiteNodeInstance
     public SiteNodeInstance siteNodeInstance;
 
+    @InjectDispatch
+    public Dispatch dispatch;
+
     public String redirectUrl;
 
     public String execute() {
@@ -63,7 +68,7 @@ public class FolderAction extends ActionSupport {
             return null;
         } else {
             SiteNode firstChild = childNodes.get(0);
-            redirectUrl = "TODO: redirigere al primo nodo";
+            redirectUrl = dispatch.getOriginalPath() + "/" + firstChild.getId();
             return SUCCESS;
         }
     }

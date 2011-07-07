@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.navigation;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.context.Context;
@@ -40,6 +41,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,12 +74,19 @@ public class Navigation implements XhtmlFragment {
     public Navigation(Context context, Dispatch dispatch, List<String> groups) {
         this.context = context;
         this.dispatch = dispatch;
-        siteNodeInstancePath = dispatch.getSiteNodeInstancePath();
+        if(dispatch != null) {
+            siteNodeInstancePath = dispatch.getSiteNodeInstancePath();
+        } else {
+            siteNodeInstancePath = null;
+        }
         this.groups = groups;
         rootNodes = new ArrayList<NavigationNode>();
         final List<SiteNode> rootChildNodes =
                 context.getModel().getRootNode().getChildNodes();
-        generateNavigationNodes(rootChildNodes, rootNodes, "", true);
+        HttpServletRequest req =
+                ElementsThreadLocals.getHttpServletRequest();
+        //TODO gestire deploy sotto ROOT
+        generateNavigationNodes(rootChildNodes, rootNodes, req.getContextPath(), true);
     }
 
     protected void generateNavigationNodes(List<SiteNode> siteNodes,
@@ -162,6 +171,7 @@ public class Navigation implements XhtmlFragment {
     }
 
     protected boolean isSelected(SiteNode siteNode) {
+        if(siteNodeInstancePath == null) { return false; }
         SiteNodeInstance last =
                 siteNodeInstancePath[siteNodeInstancePath.length - 1];
         return siteNode == last.getSiteNode();
@@ -172,6 +182,7 @@ public class Navigation implements XhtmlFragment {
     }
 
     protected SiteNodeInstance findInPath(SiteNode siteNode) {
+        if(siteNodeInstancePath == null) { return null; }
         for (SiteNodeInstance current : siteNodeInstancePath) {
             if (siteNode == current.getSiteNode()) {
                 return current;

@@ -138,12 +138,15 @@ public class PortofinoInterceptor implements Interceptor {
             injectAnnotatedFields(action, InjectContext.class, context);
             injectAnnotatedFields(action, InjectModel.class, model);
             injectAnnotatedFields(action, InjectDispatch.class, dispatch);
-            SiteNodeInstance[] siteNodeInstances =
-                    dispatch.getSiteNodeInstancePath();
-            SiteNodeInstance siteNodeInstance =
-                    siteNodeInstances[siteNodeInstances.length-1];
-            injectAnnotatedFields(action, InjectSiteNodeInstance.class,
-                    siteNodeInstance);
+            SiteNodeInstance siteNodeInstance;
+            if(dispatch != null) {
+                SiteNodeInstance[] siteNodeInstances = dispatch.getSiteNodeInstancePath();
+                siteNodeInstance =  siteNodeInstances[siteNodeInstances.length-1];
+                injectAnnotatedFields(action, InjectSiteNodeInstance.class,
+                        siteNodeInstance);
+            } else {
+                siteNodeInstance = null;
+            }
             injectAnnotatedFields(action, InjectNavigation.class, navigation);
             injectAnnotatedFields(action, InjectServerInfo.class, serverInfo);
             injectAnnotatedFields(action, InjectHttpRequest.class, req);
