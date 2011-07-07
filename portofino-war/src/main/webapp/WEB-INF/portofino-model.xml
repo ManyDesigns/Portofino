@@ -1174,11 +1174,11 @@ Struttura dell'XML:
                          readTitle="Project"
                          editTitle="Edit project">
                     <properties>
-                        <property name="productid">
+                        <property name="id">
                             <annotations>
                                 <annotation
                                         type="com.manydesigns.elements.annotations.Label">
-                                    <value>product id</value>
+                                    <value>id</value>
                                 </annotation>
                                 <annotation
                                         type="com.manydesigns.elements.annotations.InSummary">
@@ -1191,22 +1191,6 @@ Struttura dell'XML:
                                 <annotation
                                         type="com.manydesigns.elements.annotations.Access">
                                     <value>write</value>
-                                </annotation>
-                            </annotations>
-                        </property>
-                        <property name="category">
-                            <annotations>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.InSummary">
-                                    <value>false</value>
-                                </annotation>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.Searchable">
-                                    <value>false</value>
-                                </annotation>
-                                <annotation
-                                        type="com.manydesigns.elements.annotations.Access">
-                                    <value>read</value>
                                 </annotation>
                             </annotations>
                         </property>
@@ -1226,7 +1210,7 @@ Struttura dell'XML:
                                 </annotation>
                             </annotations>
                         </property>
-                        <property name="descn">
+                        <property name="description">
                             <annotations>
                                 <annotation
                                         type="com.manydesigns.elements.annotations.InSummary">
@@ -1260,11 +1244,11 @@ Struttura dell'XML:
                                  editTitle="Edit issue"
                                 >
                             <properties>
-                                <property name="productid">
+                                <property name="id">
                                     <annotations>
                                         <annotation
                                                 type="com.manydesigns.elements.annotations.Label">
-                                            <value>product id</value>
+                                            <value>id</value>
                                         </annotation>
                                         <annotation
                                                 type="com.manydesigns.elements.annotations.InSummary">
@@ -1280,23 +1264,7 @@ Struttura dell'XML:
                                         </annotation>
                                     </annotations>
                                 </property>
-                                <property name="category">
-                                    <annotations>
-                                        <annotation
-                                                type="com.manydesigns.elements.annotations.InSummary">
-                                            <value>false</value>
-                                        </annotation>
-                                        <annotation
-                                                type="com.manydesigns.elements.annotations.Searchable">
-                                            <value>false</value>
-                                        </annotation>
-                                        <annotation
-                                                type="com.manydesigns.elements.annotations.Access">
-                                            <value>read</value>
-                                        </annotation>
-                                    </annotations>
-                                </property>
-                                <property name="name">
+                                <property name="subject">
                                     <annotations>
                                         <annotation
                                                 type="com.manydesigns.elements.annotations.InSummary">
@@ -1312,7 +1280,7 @@ Struttura dell'XML:
                                         </annotation>
                                     </annotations>
                                 </property>
-                                <property name="descn">
+                                <property name="description">
                                     <annotations>
                                         <annotation
                                                 type="com.manydesigns.elements.annotations.InSummary">

@@ -1,16 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
+    <databases>
+        <database databaseName="test-database">
+            <schemas>
+                <schema schemaName="public">
+                    <tables>
+                        <table tableName="projects">
+                            <columns>
+
+                                <column columnName="id" columnType="INT" nullable="false" length="11" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="name" columnType="VARCHAR" nullable="false" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
+                                <column columnName="description" columnType="VARCHAR" nullable="true" length="21845" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
+                                <column columnName="homepage" columnType="VARCHAR" nullable="true" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
+                                <column columnName="is_public" columnType="TINYINT" nullable="false" length="1" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Byte"/>
+                                <column columnName="parent_id" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="created_on" columnType="DATETIME" nullable="true" length="19" scale="0" autoincrement="false" searchable="true" javaType="java.util.Date"/>
+                                <column columnName="updated_on" columnType="DATETIME" nullable="true" length="19" scale="0" autoincrement="false" searchable="true" javaType="java.util.Date"/>
+                                <column columnName="identifier" columnType="VARCHAR" nullable="true" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
+
+                                <column columnName="status" columnType="INT" nullable="false" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="lft" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="rgt" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                            </columns>
+                            <primaryKey primaryKeyName="PRIMARY">
+                                <column columnName="id"/>
+                            </primaryKey>
+                        </table>
+                        <table tableName="tickets">
+                            <columns>
+                                <column columnName="id" columnType="INT" nullable="false" length="11" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="tracker_id" columnType="INT" nullable="false" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+
+                                <column columnName="project_id" columnType="INT" nullable="false" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="subject" columnType="VARCHAR" nullable="false" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
+                                <column columnName="description" columnType="VARCHAR" nullable="true" length="21845" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
+                                <column columnName="due_date" columnType="DATE" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.sql.Date"/>
+                                <column columnName="category_id" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="status_id" columnType="INT" nullable="false" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="assigned_to_id" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="priority_id" columnType="INT" nullable="false" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="fixed_version_id" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+
+                                <column columnName="author_id" columnType="INT" nullable="false" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="lock_version" columnType="INT" nullable="false" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="created_on" columnType="DATETIME" nullable="true" length="19" scale="0" autoincrement="false" searchable="true" javaType="java.util.Date"/>
+                                <column columnName="updated_on" columnType="DATETIME" nullable="true" length="19" scale="0" autoincrement="false" searchable="true" javaType="java.util.Date"/>
+                                <column columnName="start_date" columnType="DATE" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.sql.Date"/>
+                                <column columnName="done_ratio" columnType="INT" nullable="false" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="estimated_hours" columnType="FLOAT" nullable="true" length="12" scale="31" autoincrement="false" searchable="true" javaType="java.lang.Double"/>
+                                <column columnName="parent_id" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="root_id" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+
+                                <column columnName="lft" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="rgt" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                            </columns>
+                            <primaryKey primaryKeyName="PRIMARY">
+                                <column columnName="id"/>
+                            </primaryKey>
+                        </table>
+                    </tables>
+                </schema>
+            </schemas>
+        </database>
+    </databases>
     <rootNode title="Portofino4" description="portofino 4" id="/">
         <childNodes>
             <useCaseNode description="projects" id="projects" title="projects">
-                <useCase name="projects-name"
-                         table="projects-table"
+                <useCase name="projects"
+                         table="projects"
                          query="projects-query">
                 </useCase>
                 <childNodes>
                     <useCaseNode description="tickets" id="tickets" title="tickets">
-                        <useCase name="tickets-name"
-                                 table="tickets-table"
+                        <useCase name="tickets"
+                                 table="tickets"
                                  query="tickets-query">
                         </useCase>
                     </useCaseNode>

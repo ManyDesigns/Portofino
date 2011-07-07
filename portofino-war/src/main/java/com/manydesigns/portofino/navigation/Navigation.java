@@ -35,6 +35,7 @@ import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
+import com.manydesigns.portofino.dispatcher.UseCaseNodeInstance;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.site.UseCaseNode;
 import org.jetbrains.annotations.NotNull;
@@ -105,11 +106,11 @@ public class Navigation implements XhtmlFragment {
             if (siteNode instanceof UseCaseNode) {
                 ownEnabled = useCaseEnabled;
                 SiteNodeInstance siteNodeInstance = findInPath(siteNode);
-                if (siteNodeInstance != null) {
+                if (siteNodeInstance instanceof UseCaseNodeInstance) {
                     String mode = siteNodeInstance.getMode();
                     if (UseCaseNode.MODE_DETAIL.equals(mode)) {
                         childUseCaseEnabled = useCaseEnabled;
-                        childUrl = url + "/" + siteNodeInstance.getParam();
+                        childUrl = url + "/" + ((UseCaseNodeInstance) siteNodeInstance).getPk();
                     } else {
                         childUseCaseEnabled = false;
                         childUrl = url;

@@ -29,26 +29,7 @@
 package com.manydesigns.portofino.actions.user.admin;
 
 
-import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.UseCaseAction;
-import com.manydesigns.portofino.annotations.InjectHttpSession;
-import com.manydesigns.portofino.context.TableCriteria;
-import com.manydesigns.portofino.email.EmailUtils;
-import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.system.model.email.EmailBean;
-import com.manydesigns.portofino.system.model.users.Group;
-import com.manydesigns.portofino.system.model.users.User;
-import com.manydesigns.portofino.system.model.users.UserUtils;
-import com.manydesigns.portofino.system.model.users.UsersGroups;
-
-import javax.servlet.http.HttpSession;
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -58,7 +39,7 @@ import java.util.Properties;
 public class UserAdminAction extends UseCaseAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
-
+/*
 
     //**************************************************************************
     // Constants
@@ -93,8 +74,7 @@ public class UserAdminAction extends UseCaseAction {
     //**************************************************************************
 
     public String removeGroups() throws NoSuchFieldException {
-        String pk = rootCrudUnit.pk;
-        if (null==rootCrudUnit.subCrudUnits.get(1).selection) {
+        if (null==subCrudUnits.get(1).selection) {
             SessionMessages.addInfoMessage("No group selected");
             return PortofinoAction.RETURN_TO_READ;
         }
@@ -187,4 +167,5 @@ public class UserAdminAction extends UseCaseAction {
         SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
         return PortofinoAction.RETURN_TO_READ;
     }
+    */
 }

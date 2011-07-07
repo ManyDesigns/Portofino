@@ -137,9 +137,9 @@ public class Dispatcher {
                 mode = UseCaseNode.MODE_SEARCH;
                 param = null;
             }
-            result = new SiteNodeInstance(foundNode, mode, param);
+            result = new UseCaseNodeInstance(context, (UseCaseNode) foundNode, mode, param);
         } else {
-            result = new SiteNodeInstance(foundNode, null, null);
+            result = new SiteNodeInstance(context, foundNode, null);
         }
         return result;
     }

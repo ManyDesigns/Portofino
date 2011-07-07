@@ -54,7 +54,7 @@ public class GroupAction extends UseCaseAction {
     //**************************************************************************
 
     public String delete() {
-        Group pkGrp = new Group(Long.parseLong(rootCrudUnit.pk));
+        Group pkGrp = new Group(Long.parseLong(pk));
         Group aGroup = (Group) context.getObjectByPk(UserUtils.GROUPTABLE, pkGrp);
         aGroup.setDeletionDate(new Timestamp(System.currentTimeMillis()));
         context.saveObject(UserUtils.GROUPTABLE, aGroup);
@@ -66,12 +66,12 @@ public class GroupAction extends UseCaseAction {
     }
 
     public String bulkDelete() {        
-        if (rootCrudUnit.selection == null) {
+        if (selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
             return PortofinoAction.CANCEL;
         }
-        for (String current : rootCrudUnit.selection) {
+        for (String current : selection) {
             Group pkGrp = new Group(new Long(current));
             Group aGroup = (Group) context
                     .getObjectByPk(UserUtils.GROUPTABLE, pkGrp);
@@ -88,7 +88,7 @@ public class GroupAction extends UseCaseAction {
         context.commit(databaseName);
         SessionMessages.addInfoMessage(MessageFormat.format(
                 "DELETE di {0} oggetti avvenuto con successo",
-                rootCrudUnit.selection.length));
+                selection.length));
         return PortofinoAction.RETURN_TO_SEARCH;
     }
 

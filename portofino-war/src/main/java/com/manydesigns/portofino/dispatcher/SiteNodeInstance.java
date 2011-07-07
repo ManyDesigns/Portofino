@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.site.SiteNode;
 
 /*
@@ -38,14 +39,15 @@ import com.manydesigns.portofino.model.site.SiteNode;
 * @author Alessio Stalla - alessio.stalla@manydesigns.com
 */
 public class SiteNodeInstance {
-    protected SiteNode siteNode;
-    protected String mode;
-    protected String param;
 
-    public SiteNodeInstance(SiteNode siteNode, String mode, String param) {
+    protected final Context context;
+    protected final SiteNode siteNode;
+    protected final String mode;
+
+    public SiteNodeInstance(Context context, SiteNode siteNode, String mode) {
+        this.context = context;
         this.siteNode = siteNode;
         this.mode = mode;
-        this.param = param;
     }
 
     public SiteNode getSiteNode() {
@@ -56,7 +58,7 @@ public class SiteNodeInstance {
         return mode;
     }
 
-    public String getParam() {
-        return param;
+    public Context getContext() {
+        return context;
     }
 }
