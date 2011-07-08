@@ -99,6 +99,8 @@ public interface Context {
 
     Object getObjectByPk(String qualifiedTableName, Serializable pk);
 
+    Object getObjectByPk(String qualifiedTableName, Serializable pk, String queryString, Object rootObject);
+
     List<Object> getAllObjects(String qualifiedTableName);
 
     List<Object> getObjects(TableCriteria criteria);

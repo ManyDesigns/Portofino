@@ -336,6 +336,34 @@ public class HibernateContextImpl implements Context {
         return result;
     }
 
+    public Object getObjectByPk(String qualifiedTableName,
+                                Serializable pk, String queryString, Object rootObject) {
+        if(queryString.toUpperCase().indexOf("WHERE") == -1) {
+            return getObjectByPk(qualifiedTableName, pk);
+        }
+        Session session = getSession(qualifiedTableName);
+        TableAccessor table = getTableAccessor(qualifiedTableName);
+        String actualEntityName = table.getTable().getActualEntityName();
+        List<Object> result;
+        PropertyAccessor[] keyProperties = table.getKeyProperties();
+        OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
+        String formatString = sqlFormat.getFormatString();
+        Object[] ognlParameters = sqlFormat.evaluateOgnlExpressions(rootObject);
+        int i = ognlParameters.length;
+        Object[] parameters = new Object[i + keyProperties.length];
+        System.arraycopy(ognlParameters, 0, parameters, 0, i);
+        for(PropertyAccessor propertyAccessor : keyProperties) {
+            formatString += " AND " + propertyAccessor.getName() + " = ?";
+            parameters[i] = propertyAccessor.get(pk);
+            i++;
+        }
+        result = runHqlQuery(qualifiedTableName, formatString, parameters);
+        if(result != null && !result.isEmpty()) {
+            return result.get(0);
+        } else {
+            return null;
+        }
+    }
 
     public List<Object> getAllObjects(String qualifiedTableName) {
         Session session = getSession(qualifiedTableName);

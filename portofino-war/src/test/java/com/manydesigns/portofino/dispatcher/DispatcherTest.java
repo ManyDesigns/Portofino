@@ -272,10 +272,8 @@ public class DispatcherTest extends AbstractPortofinoTest {
     public void testIllegal1() {
         String originalPath = "/projects/tickets/bla";
         req.setServletPath(originalPath);
-        try {
-            dispatcher.createDispatch(req);
-            fail("Exception not thrown despite 'tickets' not being a valid project id");
-        } catch (Exception e) {}
+        Dispatch dispatch = dispatcher.createDispatch(req);
+        assertNull(dispatch);
     }
 
     public void testIllegal2() {

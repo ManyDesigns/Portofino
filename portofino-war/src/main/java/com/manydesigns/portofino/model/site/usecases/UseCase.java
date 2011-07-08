@@ -33,8 +33,8 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
-import com.manydesigns.portofino.model.site.*;
 import com.manydesigns.portofino.xml.Identifier;
+
 import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -70,6 +70,7 @@ public class UseCase {
     protected String createTitle;
     protected String readTitle;
     protected String editTitle;
+    protected String variable;
 
     //**************************************************************************
     // Fields for wire-up
@@ -279,5 +280,18 @@ public class UseCase {
 
     public void setEditTitle(String editTitle) {
         this.editTitle = editTitle;
+    }
+
+    @XmlAttribute(required = false)
+    public String getVariable() {
+        return variable;
+    }
+
+    public void setVariable(String variable) {
+        this.variable = variable;
+    }
+
+    public String getActualVariable() {
+        return variable != null ? variable : name;
     }
 }

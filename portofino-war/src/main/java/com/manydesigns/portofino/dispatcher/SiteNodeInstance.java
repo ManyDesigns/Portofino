@@ -32,6 +32,8 @@ package com.manydesigns.portofino.dispatcher;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.model.site.SiteNode;
 
+import java.util.Map;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -60,5 +62,9 @@ public class SiteNodeInstance {
 
     public Context getContext() {
         return context;
+    }
+
+    public Map<String, Object> realize(Object rootObject) {
+        return null;
     }
 }

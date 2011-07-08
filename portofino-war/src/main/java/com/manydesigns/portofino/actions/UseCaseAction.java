@@ -125,7 +125,6 @@ public class UseCaseAction implements Preparable {
     public List<CrudButton> crudButtons;
     public List<CrudSelectionProvider> crudSelectionProviders;
     public String pk;
-    public int projectId = 1;
 
     public final static String prefix = null;
 

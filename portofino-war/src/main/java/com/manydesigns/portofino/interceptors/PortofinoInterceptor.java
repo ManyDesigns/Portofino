@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.interceptors;
 
+import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.portofino.annotations.*;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.ServerInfo;
@@ -41,6 +42,7 @@ import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
+import com.opensymphony.xwork2.util.ValueStack;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.lang.xwork.StringUtils;
@@ -141,6 +143,11 @@ public class PortofinoInterceptor implements Interceptor {
             SiteNodeInstance siteNodeInstance;
             if(dispatch != null) {
                 SiteNodeInstance[] siteNodeInstances = dispatch.getSiteNodeInstancePath();
+                ValueStack valueStack = Struts2Utils.getValueStack();
+                for(SiteNodeInstance node : siteNodeInstances) {
+                    Map<String, Object> newValues = node.realize(valueStack.getRoot());
+                    valueStack.push(newValues);
+                }
                 siteNodeInstance =  siteNodeInstances[siteNodeInstances.length-1];
                 injectAnnotatedFields(action, InjectSiteNodeInstance.class,
                         siteNodeInstance);
@@ -189,7 +196,7 @@ public class PortofinoInterceptor implements Interceptor {
             }
         } finally {
             MDC.clear();
-            if (context!=null)
+            if (context!=null && context.getModel() != null)
                 context.closeSession();
         }
     }

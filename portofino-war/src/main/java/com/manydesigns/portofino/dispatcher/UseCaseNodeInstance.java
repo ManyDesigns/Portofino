@@ -37,6 +37,8 @@ import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.util.PkHelper;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -62,18 +64,25 @@ public class UseCaseNodeInstance extends SiteNodeInstance {
         classAccessor = context.getUseCaseAccessor(useCase);
         baseTable = useCase.getActualTable();
         pkHelper = new PkHelper(classAccessor);
+    }
+
+    public Map<String, Object> realize(Object rootObject) {
         if(UseCaseNode.MODE_DETAIL.equals(mode)) {
-            loadObject();
+            loadObject(pk, rootObject);
+            if(object != null) {
+                Map<String, Object> newValue = new HashMap<String, Object>();
+                newValue.put(useCase.getActualVariable(), object);
+                return newValue;
+            } else {
+                throw new RuntimeException("Not in use case: " + useCase.getName());
+            }
         }
+        return null;
     }
 
-    private void loadObject() {
-        loadObject(pk);
-    }
-
-    private void loadObject(String pk) {
+    private void loadObject(String pk, Object rootObject) {
         Serializable pkObject = pkHelper.parsePkString(pk);
-        object = context.getObjectByPk(baseTable.getQualifiedName(), pkObject);
+        object = context.getObjectByPk(baseTable.getQualifiedName(), pkObject, useCase.getQuery(), rootObject);
     }
 
     // Getter/setter

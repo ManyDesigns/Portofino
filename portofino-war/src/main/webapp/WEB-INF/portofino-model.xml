@@ -1166,7 +1166,7 @@ Struttura dell'XML:
             </customNode>
             <useCaseNode id="projects" title="Projects" description="Projects">
                 <useCase name="projects"
-                         attribute="projectId"
+                         variable="project"
                          table="redmine.redmine.projects"
                          query="FROM redmine_redmine_projects"
                          searchTitle="Project search"
@@ -1235,9 +1235,9 @@ Struttura dell'XML:
                                          inDetails="true"
                                 />
                         <useCase name="issue"
-                                 attribute="issueId"
+                                 variable="issue"
                                  table="redmine.redmine.issues"
-                                 query="FROM redmine_redmine_issues WHERE project_id = %{projectId}"
+                                 query="FROM redmine_redmine_issues WHERE project_id = %{project.id}"
                                  searchTitle="Issue search"
                                  createTitle="Create issue"
                                  readTitle="Issue"
