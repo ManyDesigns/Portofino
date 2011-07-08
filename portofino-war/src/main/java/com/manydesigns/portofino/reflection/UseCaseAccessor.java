@@ -123,7 +123,7 @@ public class UseCaseAccessor
             }
         }
 
-        throw new NoSuchFieldException(propertyName);
+        throw new NoSuchFieldException(propertyName + " (of use case " + getName() + ")");
     }
 
     public PropertyAccessor[] getProperties() {

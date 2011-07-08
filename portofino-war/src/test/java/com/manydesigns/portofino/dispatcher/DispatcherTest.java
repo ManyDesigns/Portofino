@@ -54,6 +54,13 @@ public class DispatcherTest extends AbstractPortofinoTest {
     public void setUp() throws Exception {
         super.setUp();
         dispatcher = new Dispatcher(context);
+        context.openSession();
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+        context.closeSession();
     }
 
     public void testProjectSearch() {
@@ -237,7 +244,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
 
 
     public void testTicketDetail() {
-        String originalPath = "/projects/10/tickets/bla";
+        String originalPath = "/projects/10/tickets/20";
         req.setServletPath(originalPath);
         Dispatch dispatch = dispatcher.createDispatch(req);
         assertNotNull(dispatch);
@@ -259,14 +266,16 @@ public class DispatcherTest extends AbstractPortofinoTest {
         expected = expected.getChildNodes().get(0);
         assertEquals(expected, siteNodeInstance.getSiteNode());
         assertEquals(UseCaseNode.MODE_DETAIL, siteNodeInstance.getMode());
-        assertEquals("bla", siteNodeInstance.getPk());
+        assertEquals("20", siteNodeInstance.getPk());
     }
 
     public void testIllegal1() {
         String originalPath = "/projects/tickets/bla";
         req.setServletPath(originalPath);
-        Dispatch dispatch = dispatcher.createDispatch(req);
-        assertNull(dispatch);
+        try {
+            dispatcher.createDispatch(req);
+            fail("Exception not thrown despite 'tickets' not being a valid project id");
+        } catch (Exception e) {}
     }
 
     public void testIllegal2() {

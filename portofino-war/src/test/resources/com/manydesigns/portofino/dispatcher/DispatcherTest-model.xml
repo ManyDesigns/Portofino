@@ -8,10 +8,10 @@
                         <table tableName="projects">
                             <columns>
 
-                                <column columnName="id" columnType="INT" nullable="false" length="11" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="id" columnType="integer" nullable="false" length="11" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Integer"/>
                                 <column columnName="name" columnType="VARCHAR" nullable="false" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
                                 <column columnName="description" columnType="VARCHAR" nullable="true" length="21845" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
-                                <column columnName="homepage" columnType="VARCHAR" nullable="true" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
+<!--                                <column columnName="homepage" columnType="VARCHAR" nullable="true" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
                                 <column columnName="is_public" columnType="TINYINT" nullable="false" length="1" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Byte"/>
                                 <column columnName="parent_id" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
                                 <column columnName="created_on" columnType="DATETIME" nullable="true" length="19" scale="0" autoincrement="false" searchable="true" javaType="java.util.Date"/>
@@ -20,7 +20,7 @@
 
                                 <column columnName="status" columnType="INT" nullable="false" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
                                 <column columnName="lft" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
-                                <column columnName="rgt" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="rgt" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>-->
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -28,13 +28,13 @@
                         </table>
                         <table tableName="tickets">
                             <columns>
-                                <column columnName="id" columnType="INT" nullable="false" length="11" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Integer"/>
-                                <column columnName="tracker_id" columnType="INT" nullable="false" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="id" columnType="integer" nullable="false" length="11" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Integer"/>
+                                <!--<column columnName="tracker_id" columnType="INT" nullable="false" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>-->
 
-                                <column columnName="project_id" columnType="INT" nullable="false" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="project_id" columnType="integer" nullable="false" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
                                 <column columnName="subject" columnType="VARCHAR" nullable="false" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
                                 <column columnName="description" columnType="VARCHAR" nullable="true" length="21845" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
-                                <column columnName="due_date" columnType="DATE" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.sql.Date"/>
+                                <!--<column columnName="due_date" columnType="DATE" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.sql.Date"/>
                                 <column columnName="category_id" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
                                 <column columnName="status_id" columnType="INT" nullable="false" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
                                 <column columnName="assigned_to_id" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
@@ -52,7 +52,7 @@
                                 <column columnName="root_id" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
 
                                 <column columnName="lft" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
-                                <column columnName="rgt" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="rgt" columnType="INT" nullable="true" length="11" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>-->
                             </columns>
                             <primaryKey primaryKeyName="PRIMARY">
                                 <column columnName="id"/>
@@ -67,14 +67,25 @@
         <childNodes>
             <useCaseNode description="projects" id="projects" title="projects">
                 <useCase name="projects"
-                         table="projects"
+                         table="test-database.public.projects"
                          query="projects-query">
+                    <properties>
+                        <property name="id"/>
+                        <property name="name"/>
+                        <property name="description"/>
+                    </properties>
                 </useCase>
                 <childNodes>
                     <useCaseNode description="tickets" id="tickets" title="tickets">
                         <useCase name="tickets"
-                                 table="tickets"
+                                 table="test-database.public.tickets"
                                  query="tickets-query">
+                            <properties>
+                                <property name="id"/>
+                                <property name="subject"/>
+                                <property name="description"/>
+                                <property name="projectId"/>
+                            </properties>
                         </useCase>
                     </useCaseNode>
                 </childNodes>

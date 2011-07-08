@@ -31,13 +31,16 @@ package com.manydesigns.portofino;
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.context.Context;
 import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
 import com.manydesigns.portofino.model.Model;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.h2.tools.RunScript;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,6 +119,25 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         RunScript.execute(connDBTest,
                 new InputStreamReader(
                         cl.getResourceAsStream(TEST_DB)));
+
+        setupAdditionalDatabases("portofino", "jpetstore", "hibernatetest");
+    }
+
+    private void setupAdditionalDatabases(String... excludes) throws Exception {
+        ClassLoader cl = getClass().getClassLoader();
+        for(ConnectionProvider cp : context.getConnectionProviders()) {
+            if(!ArrayUtils.contains(excludes, cp.getDatabaseName())) {
+                Connection conn = cp.acquireConnection();
+                String schemaResource = getResource("-schema.sql", null);
+                if(schemaResource != null) {
+                    RunScript.execute(conn, new InputStreamReader(cl.getResourceAsStream(schemaResource)));
+                }
+                String dataResource = getResource("-dataload.sql", null);
+                if(dataResource != null) {
+                    RunScript.execute(conn, new InputStreamReader(cl.getResourceAsStream(dataResource)));
+                }
+            }
+        }
     }
 
     @Override
@@ -133,21 +155,25 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     }
 
     public String getPortofinoConnectionsResource() {
-        return PORTOFINO_CONNECTIONS_RESOURCE;
+        return getResource("-connections.xml", PORTOFINO_CONNECTIONS_RESOURCE);
     }
 
     public String getPortofinoModelResource() {
+        return getResource("-model.xml", PORTOFINO_MODEL_RESOURCE);
+    }
+
+    public String getResource(String suffix, @Nullable String defaultResource) {
         String className = getClass().getName();
-        String resourceName = className.replace('.', '/') + ".xml";
+        String resourceName = className.replace('.', '/') + suffix;
         ClassLoader cl = getClass().getClassLoader();
         InputStream is = cl.getResourceAsStream(resourceName);
         if (is == null) {
-            return PORTOFINO_MODEL_RESOURCE;
+            return defaultResource;
         } else {
             return resourceName;
         }
     }
-        
+
 
     //--------------------------------------------------------------------------
     // utilità
