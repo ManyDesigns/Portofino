@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,13 @@ public class DispatcherFilter implements Filter {
         // invoke the dispatcher to create a dispatch
         Dispatcher dispatcher =
                 (Dispatcher) servletContext.getAttribute(Dispatcher.KEY);
-        Dispatch dispatch = dispatcher.createDispatch(httpRequest);
+        Dispatch dispatch;
+        try {
+            ElementsThreadLocals.setupDefaultElementsContext();
+            dispatch = dispatcher.createDispatch(httpRequest);
+        } finally {
+            ElementsThreadLocals.removeElementsContext();
+        }
         if (dispatch == null) {
             // we can't handle this path. Let's do the normal filter chain
             chain.doFilter(request, response);
