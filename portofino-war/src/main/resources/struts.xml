@@ -103,6 +103,10 @@
 
             <result name="edit">/skins/default/crud/edit.jsp</result>
 
+            <result name="redirectToEdit" type="redirect">
+                <param name="location">%{dispatch.originalPath}/%{pk}?method%3Aedit</param>
+            </result>
+
             <result name="update" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/UseCase</param>
                 <param name="pk">%{pk}</param>

@@ -396,7 +396,7 @@ public class UseCaseAction implements Preparable {
 
         if (selection.length == 1) {
             pk = selection[0];
-            return edit();
+            return "redirectToEdit";
         }
 
         setupForm(Mode.BULK_EDIT);

@@ -3,7 +3,7 @@
 %><%@ taglib prefix="s" uri="/struts-tags"
 %><%@ taglib prefix="mdes" uri="/manydesigns-elements-struts2"
 %><s:include value="/skins/default/header.jsp"/>
-<s:form method="post"
+<s:form method="post" action="%{dispatch.originalPath}"
         enctype="%{form.multipartRequest ? 'multipart/form-data' : 'application/x-www-form-urlencoded'}">
     <s:include value="/skins/default/crud/editButtonsBar.jsp"/>
     <div id="inner-content">

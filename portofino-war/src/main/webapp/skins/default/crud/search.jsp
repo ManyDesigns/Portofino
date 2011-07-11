@@ -3,7 +3,7 @@
 %><%@ taglib prefix="s" uri="/struts-tags"
 %><%@taglib prefix="mdes" uri="/manydesigns-elements-struts2"
 %><s:include value="/skins/default/header.jsp"/>
-<s:form method="post">
+<form method="post" action="">
     <s:include value="/skins/default/crud/searchButtonsBar.jsp"/>
     <div id="inner-content">
         <h1><s:property value="searchTitle"/></h1>
@@ -17,7 +17,7 @@
                 <s:if test="!searchForm.isEmpty()">
                     <div class="search_form">
                         <mdes:write value="searchForm"/>
-                        <s:submit name="crud::search" value="Search"/>
+                        <s:submit method="search" value="Search"/>
                         <s:reset value="Reset form"/>
                     </div>
                 </s:if>
@@ -28,5 +28,5 @@
         <s:hidden name="cancelReturnUrl" value="%{#cancelReturnUrl}"/>
     </div>
     <s:include value="/skins/default/crud/searchButtonsBar.jsp"/>
-</s:form>
+</form>
 <s:include value="/skins/default/footer.jsp"/>
