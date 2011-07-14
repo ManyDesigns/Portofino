@@ -51,31 +51,31 @@ public class HibernateTest extends AbstractPortofinoTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        context.openSession();
+        application.openSession();
     }
 
     public void tearDown() {
-        context.closeSession();
+        application.closeSession();
     }
 
     public void testReadProdotti() {
         List<Object> resultProd =
-                context.getAllObjects("jpetstore.PUBLIC.product");
+                application.getAllObjects("jpetstore.PUBLIC.product");
         int sizePrd = resultProd.size();
         assertEquals("prodotti", 16, sizePrd);
     }
 
     public void testUsers() {
         List<Object> groupList =
-                context.getAllObjects("portofino.public.groups");
+                application.getAllObjects("portofino.public.groups");
         assertEquals( 2, groupList.size());
 
         List<Object> usergroups =
-                context.getAllObjects("portofino.public.users_groups");
+                application.getAllObjects("portofino.public.users_groups");
         assertEquals( 3, usergroups.size());
 
         List<Object> users =
-                context.getAllObjects(PORTOFINO_PUBLIC_USER);
+                application.getAllObjects(PORTOFINO_PUBLIC_USER);
         assertEquals("numero utenti", 2, users.size());
         User admin = (User) users.get(0);
         List<UsersGroups> groups = admin.getGroups();
@@ -85,7 +85,7 @@ public class HibernateTest extends AbstractPortofinoTest {
     }
     public void testSearchAndReadCategorieProdotti() {
         List<Object> resultCat =
-                context.getAllObjects("jpetstore.PUBLIC.category");
+                application.getAllObjects("jpetstore.PUBLIC.category");
 
         int sizeCat = resultCat.size();
         assertEquals("categorie", 5, sizeCat);
@@ -104,9 +104,9 @@ public class HibernateTest extends AbstractPortofinoTest {
         assertNotNull(categoria0.get("name"));
 
         List<Object> resultProd =
-                context.getAllObjects("jpetstore.PUBLIC.product");
+                application.getAllObjects("jpetstore.PUBLIC.product");
 
-        Table table = context.getModel()
+        Table table = application.getModel()
                 .findTableByQualifiedName("jpetstore.PUBLIC.category");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
@@ -123,7 +123,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         HashMap<String, String> category=null;
         try {
             criteria.eq(tableAccessor.getProperty("catid"), "FISH");
-            List<Object> listObjs = context.getObjects(criteria);
+            List<Object> listObjs = application.getObjects(criteria);
             assertEquals(1, listObjs.size());
             category = (HashMap<String, String>) listObjs.get(0);
             String catid = category.get("catid");
@@ -136,38 +136,38 @@ public class HibernateTest extends AbstractPortofinoTest {
     }
 
     public void testSearchAndUpdateCategorie() {
-        context.openSession();
-        Table table = context.getModel()
+        application.openSession();
+        Table table = application.getModel()
                 .findTableByQualifiedName("jpetstore.PUBLIC.category");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
 
         List<Object> resultCat =
-                context.getAllObjects("jpetstore.PUBLIC.category");
+                application.getAllObjects("jpetstore.PUBLIC.category");
         int sizeCat = resultCat.size();
         assertEquals("categorie", 5, sizeCat);
         Map<String, String> categoria0 =  findCategory(tableAccessor, criteria);
         assertEquals("jpetstore_public_category", categoria0.get("$type$"));
         assertEquals("Fish", categoria0.get("name"));
         categoria0.put("name", "Pesciu");
-        context.updateObject("jpetstore.PUBLIC.category", categoria0);
-        context.commit("jpetstore");
-        context.closeSession();
+        application.updateObject("jpetstore.PUBLIC.category", categoria0);
+        application.commit("jpetstore");
+        application.closeSession();
 
         //Controllo l'aggiornamento e riporto le cose come stavano
-        context.openSession();
+        application.openSession();
         criteria = new TableCriteria(table);
         categoria0 =  findCategory(tableAccessor, criteria);
         assertEquals("jpetstore_public_category", categoria0.get("$type$"));
         assertEquals("Pesciu", categoria0.get("name"));
         categoria0.put("name", "Fish");
-        context.updateObject("jpetstore.PUBLIC.category", categoria0);
-        context.commit("jpetstore");
-        context.closeSession();
+        application.updateObject("jpetstore.PUBLIC.category", categoria0);
+        application.commit("jpetstore");
+        application.closeSession();
     }
 
     public void testSaveCategoria() {
-        context.openSession();
+        application.openSession();
         Map<String, Object> worms = new HashMap<String, Object>();
         worms.put("$type$", "jpetstore.PUBLIC.category");
         worms.put("catid", "VERMI");
@@ -175,12 +175,12 @@ public class HibernateTest extends AbstractPortofinoTest {
         worms.put("descn",
           "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
                   "Worms</font>");
-        context.saveObject("jpetstore.PUBLIC.category",worms);
-        context.commit("jpetstore");
+        application.saveObject("jpetstore.PUBLIC.category",worms);
+        application.commit("jpetstore");
     }
 
     public void testSaveLineItem() {
-        context.openSession();
+        application.openSession();
         Map<String, Object> lineItem = new HashMap<String, Object>();
         lineItem.put("$type$", "jpetstore.PUBLIC.lineitem");
         lineItem.put("orderid", 2);
@@ -190,32 +190,32 @@ public class HibernateTest extends AbstractPortofinoTest {
         lineItem.put("quantity", 20);
         lineItem.put("unitprice", new BigDecimal(10.80));
 
-        context.saveObject("jpetstore.PUBLIC.lineitem", lineItem);
-        context.commit("jpetstore");
-        context.closeSession();
+        application.saveObject("jpetstore.PUBLIC.lineitem", lineItem);
+        application.commit("jpetstore");
+        application.closeSession();
 
         //e ora cancello
-        context.openSession();
+        application.openSession();
         try {
-            context.deleteObject("jpetstore.PUBLIC.lineitem", lineItem);
-            context.commit("jpetstore");
+            application.deleteObject("jpetstore.PUBLIC.lineitem", lineItem);
+            application.commit("jpetstore");
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             fail();
         }
-        context.closeSession();
+        application.closeSession();
     }
 
 
     public void testSaveTestElement() {
         try {
-            context.openSession();
+            application.openSession();
             Map<String, Object> testItem = new HashMap<String, Object>();
             testItem.put("$type$", "hibernatetest.PUBLIC.table1");
             testItem.put("testo", "esempio");
             //salvo
-            context.saveObject("hibernatetest.PUBLIC.table1", testItem);
-            context.commit("hibernatetest");
+            application.saveObject("hibernatetest.PUBLIC.table1", testItem);
+            application.commit("hibernatetest");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -225,7 +225,7 @@ public class HibernateTest extends AbstractPortofinoTest {
 
     public void testDeleteCategoria() {
         try {
-            context.openSession();
+            application.openSession();
             Map<String, Object> worms = new HashMap<String, Object>();
             worms.put("$type$", "jpetstore.PUBLIC.category");
             worms.put("catid", "VERMI");
@@ -233,11 +233,11 @@ public class HibernateTest extends AbstractPortofinoTest {
             worms.put("descn",
           "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
                       "Worms</font>");
-            context.saveObject("jpetstore.PUBLIC.category", worms);
-            context.commit("jpetstore");
-            context.deleteObject("jpetstore.PUBLIC.category", worms);
+            application.saveObject("jpetstore.PUBLIC.category", worms);
+            application.commit("jpetstore");
+            application.deleteObject("jpetstore.PUBLIC.category", worms);
             //test commit globale
-            context.commit();
+            application.commit();
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -247,20 +247,20 @@ public class HibernateTest extends AbstractPortofinoTest {
 
     public void testDeleteCategoriaAndCascadedProducys() {
         try {
-            context.openSession();
+            application.openSession();
             HashMap birdsPk = new HashMap();
             birdsPk.put("catid", "BIRDS");
-            Map<String, Object> birdCat = (Map<String, Object>) context.getObjectByPk("jpetstore.PUBLIC.category", birdsPk);
-            assertEquals(16,context.getAllObjects("jpetstore.PUBLIC.product").size());
+            Map<String, Object> birdCat = (Map<String, Object>) application.getObjectByPk("jpetstore.PUBLIC.category", birdsPk);
+            assertEquals(16, application.getAllObjects("jpetstore.PUBLIC.product").size());
 
-            context.deleteObject("jpetstore.PUBLIC.category", birdCat);
+            application.deleteObject("jpetstore.PUBLIC.category", birdCat);
 
             //Perdo i due prodotti associati alla categoria Birds
-            assertEquals(14,context.getAllObjects("jpetstore.PUBLIC.product").size());
+            assertEquals(14, application.getAllObjects("jpetstore.PUBLIC.product").size());
 
 
             //test commit globale
-            context.commit();
+            application.commit();
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -269,7 +269,7 @@ public class HibernateTest extends AbstractPortofinoTest {
     }
 
         public void testSpaccaSession(){
-        context.openSession();
+        application.openSession();
 
         try {
             //Inserisco un valore troppo grande per email
@@ -298,19 +298,19 @@ public class HibernateTest extends AbstractPortofinoTest {
             "123456789012345678901234567890123456789012345678901234567890" +
             "123456789012345678901234567890123456789012345678901234567890");
 
-            context.saveObject(PORTOFINO_PUBLIC_USER, user);
-            context.commit("portofino");
+            application.saveObject(PORTOFINO_PUBLIC_USER, user);
+            application.commit("portofino");
 
             fail();
         } catch (Exception e) {
             //corretto
         }
-        context.closeSession();
-        context.openSession();
+        application.closeSession();
+        application.openSession();
 
         //Faccio una seconda operazione
         try{
-            List<Object> users= context.getAllObjects(PORTOFINO_PUBLIC_USER);
+            List<Object> users= application.getAllObjects(PORTOFINO_PUBLIC_USER);
             assertNotNull(users);
         }catch (Exception e){
             e.printStackTrace();
@@ -322,7 +322,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         //Test Chiave singola
         HashMap<String, Object> pk = new HashMap<String, Object>();
         pk.put("catid", "BIRDS");
-        Object bird =  context.getObjectByPk
+        Object bird =  application.getObjectByPk
                 ("jpetstore.PUBLIC.category", pk);
         assertEquals("Birds", ((MapProxy) bird).get("name"));
 
@@ -330,7 +330,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         pk = new HashMap<String, Object>();
         pk.put("orderid", 1);
         pk.put("linenum", 1);
-        Map lineItem = (Map) context.getObjectByPk
+        Map lineItem = (Map) application.getObjectByPk
                 ("jpetstore.PUBLIC.lineitem", pk);
         assertEquals("EST-1", lineItem.get("itemid"));
     }
@@ -338,20 +338,20 @@ public class HibernateTest extends AbstractPortofinoTest {
     public void testGetRelatedObjects(){
         HashMap<String, Object> pk = new HashMap<String, Object>();
         pk.put("catid", "BIRDS");
-        Object bird = context.getObjectByPk
+        Object bird = application.getObjectByPk
                 ("jpetstore.PUBLIC.category", pk);
         assertEquals("Birds", ((MapProxy) bird).get("name"));
 
-        List objs = context.getRelatedObjects("jpetstore.PUBLIC.category",
+        List objs = application.getRelatedObjects("jpetstore.PUBLIC.category",
                 bird, "fk_product_1");
         assertTrue(objs.size()>0);
     }
 
     public void testFkComposite(){
         List<Object> list1 =
-                context.getAllObjects("hibernatetest.PUBLIC.table1");
+                application.getAllObjects("hibernatetest.PUBLIC.table1");
         List<Object> list2 =
-                context.getAllObjects("hibernatetest.PUBLIC.table2");
+                application.getAllObjects("hibernatetest.PUBLIC.table2");
         HashMap map = (HashMap)list2.get(0);
         List obj =  (List) map.get("fk_tb_2");
         assertNotNull(obj);
@@ -360,15 +360,15 @@ public class HibernateTest extends AbstractPortofinoTest {
         assertNotNull(obj2);
         assertEquals(5, obj2.keySet().size());
         List<Object> list3 =
-                context.getAllObjects("hibernatetest.PUBLIC.table3");
+                application.getAllObjects("hibernatetest.PUBLIC.table3");
 
 
         List<Object> listu =
-                context.getAllObjects(PORTOFINO_PUBLIC_USER);
+                application.getAllObjects(PORTOFINO_PUBLIC_USER);
         List<Object> listg =
-                context.getAllObjects("portofino.public.groups");
+                application.getAllObjects("portofino.public.groups");
         List<Object> listug =
-                context.getAllObjects("portofino.public.users_groups");
+                application.getAllObjects("portofino.public.users_groups");
     }
 }
 

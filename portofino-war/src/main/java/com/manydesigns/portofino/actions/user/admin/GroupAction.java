@@ -28,14 +28,7 @@
  */
 package com.manydesigns.portofino.actions.user.admin;
 
-import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.UseCaseAction;
-import com.manydesigns.portofino.system.model.users.Group;
-import com.manydesigns.portofino.system.model.users.UserUtils;
-
-import java.sql.Timestamp;
-import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,15 +45,15 @@ public class GroupAction extends UseCaseAction {
     //**************************************************************************
     // Delete
     //**************************************************************************
-
+/*
     public String delete() {
         Group pkGrp = new Group(Long.parseLong(pk));
-        Group aGroup = (Group) context.getObjectByPk(UserUtils.GROUPTABLE, pkGrp);
+        Group aGroup = (Group) application.getObjectByPk(UserUtils.GROUPTABLE, pkGrp);
         aGroup.setDeletionDate(new Timestamp(System.currentTimeMillis()));
-        context.saveObject(UserUtils.GROUPTABLE, aGroup);
+        application.saveObject(UserUtils.GROUPTABLE, aGroup);
         String databaseName = model.findTableByQualifiedName(UserUtils.GROUPTABLE)
                 .getDatabaseName();
-        context.commit(databaseName);
+        application.commit(databaseName);
         SessionMessages.addInfoMessage("DELETE avvenuto con successo");
         return PortofinoAction.RETURN_TO_READ;
     }
@@ -73,10 +66,10 @@ public class GroupAction extends UseCaseAction {
         }
         for (String current : selection) {
             Group pkGrp = new Group(new Long(current));
-            Group aGroup = (Group) context
+            Group aGroup = (Group) application
                     .getObjectByPk(UserUtils.GROUPTABLE, pkGrp);
             aGroup.setDeletionDate(new Timestamp(System.currentTimeMillis()));
-            context.saveObject(UserUtils.GROUPTABLE, aGroup);
+            application.saveObject(UserUtils.GROUPTABLE, aGroup);
             String databaseName = model
                     .findTableByQualifiedName(UserUtils.GROUPTABLE)
                     .getDatabaseName();
@@ -85,12 +78,12 @@ public class GroupAction extends UseCaseAction {
         String databaseName = model
                 .findTableByQualifiedName(UserUtils.GROUPTABLE)
                 .getDatabaseName();
-        context.commit(databaseName);
+        application.commit(databaseName);
         SessionMessages.addInfoMessage(MessageFormat.format(
                 "DELETE di {0} oggetti avvenuto con successo",
                 selection.length));
         return PortofinoAction.RETURN_TO_SEARCH;
     }
-
+*/
 
 }

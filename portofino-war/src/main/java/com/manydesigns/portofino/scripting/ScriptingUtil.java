@@ -31,9 +31,6 @@ package com.manydesigns.portofino.scripting;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
-import com.manydesigns.elements.struts2.Struts2Utils;
-import com.opensymphony.xwork2.util.CompoundRoot;
-import com.opensymphony.xwork2.util.ValueStack;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import ognl.OgnlContext;
@@ -47,11 +44,11 @@ public class ScriptingUtil {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    public static Object runScript(String script, String scriptLanguage)
+    public static Object runScript(String script,
+                                   String scriptLanguage,
+                                   Object root)
             throws Exception {
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        ValueStack valueStack = Struts2Utils.getValueStack();
-        CompoundRoot root = valueStack.getRoot();
         if ("ognl".equals(scriptLanguage)) {
             return OgnlUtils.getValueQuietly(script, ognlContext, root);
         } else if ("groovy".equals(scriptLanguage)) {

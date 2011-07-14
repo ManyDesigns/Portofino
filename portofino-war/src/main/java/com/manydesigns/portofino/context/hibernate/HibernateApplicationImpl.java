@@ -38,7 +38,7 @@ import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.connections.Connections;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.io.FileManager;
@@ -48,6 +48,7 @@ import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.UseCaseAccessor;
+import com.manydesigns.portofino.servlets.PortofinoListener;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.xml.diff.DatabaseDiff;
@@ -84,7 +85,7 @@ import java.util.regex.Pattern;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class HibernateContextImpl implements Context {
+public class HibernateApplicationImpl implements Application {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -106,14 +107,14 @@ public class HibernateContextImpl implements Context {
     protected File xmlModelFile;
 
     public static final Logger logger =
-            LoggerFactory.getLogger(HibernateContextImpl.class);
+            LoggerFactory.getLogger(HibernateApplicationImpl.class);
     private static final String PORTOFINO_PUBLIC_USERS = "portofino.public.users";
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public HibernateContextImpl() {
+    public HibernateApplicationImpl() {
         stopWatches = new ThreadLocal<StopWatch>();
         siteNodes = new ArrayList<SiteNode>();
     }
@@ -140,6 +141,8 @@ public class HibernateContextImpl implements Context {
             frm.commitTransaction(txId);
         } catch (Exception e) {
             logger.error("Cannot load/parse file: " + fileName, e);
+        } finally {
+            PortofinoListener.clearJaxb();
         }
     }
 
@@ -156,6 +159,8 @@ public class HibernateContextImpl implements Context {
             xmlModelFile = file;
         } catch (Exception e) {
             logger.error("Cannot load/parse model: " + file, e);
+        } finally {
+            PortofinoListener.clearJaxb();
         }
     }
 
@@ -168,6 +173,8 @@ public class HibernateContextImpl implements Context {
             logger.info("Saved xml model to file: {}", xmlModelFile);
         } catch (Throwable e) {
             logger.error("Cannot save xml model to file: " + xmlModelFile, e);
+        } finally {
+            PortofinoListener.clearJaxb();
         }
     }
 
@@ -1041,6 +1048,7 @@ public class HibernateContextImpl implements Context {
             logger.error("Cannot save xml model to file: " + fileName, e);
         } finally {
             IOUtils.closeQuietly(os);
+            PortofinoListener.clearJaxb();
         }
     }
 

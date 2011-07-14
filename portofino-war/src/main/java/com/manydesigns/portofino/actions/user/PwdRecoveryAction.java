@@ -30,13 +30,13 @@ package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectHttpRequest;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.email.EmailUtils;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.User;
-import com.opensymphony.xwork2.ActionSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ import java.util.Properties;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PwdRecoveryAction extends ActionSupport implements LoginUnAware{
+public class PwdRecoveryAction extends AbstractActionBean implements LoginUnAware{
     public static final String copyright
             = "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -57,8 +57,8 @@ public class PwdRecoveryAction extends ActionSupport implements LoginUnAware{
     // Injections
     //**************************************************************************
 
-    @InjectContext
-    public Context context;
+    @InjectApplication
+    public Application application;
 
     @InjectHttpRequest
     HttpServletRequest req;
@@ -76,14 +76,14 @@ public class PwdRecoveryAction extends ActionSupport implements LoginUnAware{
         User user;
         try {
 
-            user = context.findUserByEmail(email);
+            user = application.findUserByEmail(email);
             if (user==null){
                 SessionMessages.addErrorMessage("email non esistente");
                 return INPUT;
             }
             user.tokenGenerator();
-            context.updateObject("portofino.public.users", user);
-            context.commit("portofino");
+            application.updateObject("portofino.public.users", user);
+            application.commit("portofino");
         } catch (Exception e) {
             final String errore = "Errore nella verifica della email. " +
                     "L'email non è stata inviata";
@@ -115,10 +115,10 @@ public class PwdRecoveryAction extends ActionSupport implements LoginUnAware{
                 .append(" to insert a new one. \n\n")
                 .append("Thank you.").toString();
         EmailBean emailBean = new EmailBean(subject, body, email , from);
-        context.saveObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
+        application.saveObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
         SessionMessages.addInfoMessage("An email was sent to your address. " +
                 "Please check your email.");
-        context.commit();
+        application.commit();
         return SUCCESS;
     }
 }

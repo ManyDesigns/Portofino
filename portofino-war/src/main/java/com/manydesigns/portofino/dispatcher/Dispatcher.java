@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.*;
 import org.apache.commons.lang.StringUtils;
@@ -52,10 +52,10 @@ public class Dispatcher {
     public final static String KEY = Dispatcher.class.getName();
 
 
-    protected final Context context;
+    protected final Application application;
 
-    public Dispatcher(Context context) {
-        this.context = context;
+    public Dispatcher(Application application) {
+        this.application = application;
     }
 
     public Dispatch createDispatch(HttpServletRequest request) {
@@ -63,7 +63,7 @@ public class Dispatcher {
 
         List<SiteNodeInstance> siteNodePath = new ArrayList<SiteNodeInstance>();
 
-        Model model = context.getModel();
+        Model model = application.getModel();
         SiteNode rootNode = model.getRootNode();
         List<SiteNode> nodeList = rootNode.getChildNodes();
         String[] fragments = StringUtils.split(originalPath, '/');
@@ -137,9 +137,9 @@ public class Dispatcher {
                 mode = UseCaseNode.MODE_SEARCH;
                 param = null;
             }
-            result = new UseCaseNodeInstance(context, (UseCaseNode) foundNode, mode, param);
+            result = new UseCaseNodeInstance(application, (UseCaseNode) foundNode, mode, param);
         } else {
-            result = new SiteNodeInstance(context, foundNode, null);
+            result = new SiteNodeInstance(application, foundNode, null);
         }
         return result;
     }

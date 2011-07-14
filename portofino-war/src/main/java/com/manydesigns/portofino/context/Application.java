@@ -47,7 +47,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public interface Context {
+public interface Application {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -55,7 +55,7 @@ public interface Context {
     // KEY (for application scope attribute)
     //**************************************************************************
 
-    public final static String KEY = Context.class.getName();
+    public final static String KEY = Application.class.getName();
 
     //**************************************************************************
     // Model loading

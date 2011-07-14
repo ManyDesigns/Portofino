@@ -46,15 +46,15 @@ public class VirtualRelationshipsTest  extends AbstractPortofinoTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        context.openSession();
+        application.openSession();
     }
 
     public void tearDown() {
-        context.closeSession();
+        application.closeSession();
     }
 
     public void testModel(){
-        Model model = context.getModel();
+        Model model = application.getModel();
         List<ForeignKey> list = model.getAllForeignKeys();
         boolean test = false;
 
@@ -73,10 +73,10 @@ public class VirtualRelationshipsTest  extends AbstractPortofinoTest {
         pk.put("comune", "genova");
         pk.put("provincia", "genova");
         pk.put("regione", "liguria");
-        Object comune = context.getObjectByPk
+        Object comune = application.getObjectByPk
                 ("hibernatetest.PUBLIC.comune", pk);
 
-        List objs = context.getRelatedObjects("hibernatetest.PUBLIC.comune",
+        List objs = application.getRelatedObjects("hibernatetest.PUBLIC.comune",
                 comune, "fk_delibera_1");
         assertEquals(1, objs.size());
 
@@ -86,9 +86,9 @@ public class VirtualRelationshipsTest  extends AbstractPortofinoTest {
         //Relazione virtuale fra database
         HashMap<String, Object> pkCat = new HashMap<String, Object>();
         pkCat.put("catid", "FISH");
-        Object catObj = context.getObjectByPk
+        Object catObj = application.getObjectByPk
                 ("jpetstore.PUBLIC.category", pkCat);
-        List cats = context.getRelatedObjects("jpetstore.PUBLIC.category",
+        List cats = application.getRelatedObjects("jpetstore.PUBLIC.category",
                 catObj, "fk_delibera_2");
         assertNotNull(cats);
 

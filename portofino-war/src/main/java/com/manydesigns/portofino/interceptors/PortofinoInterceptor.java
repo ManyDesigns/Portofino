@@ -29,9 +29,8 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.portofino.annotations.*;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
@@ -39,14 +38,17 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.system.model.users.UserUtils;
-import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.ActionInvocation;
-import com.opensymphony.xwork2.interceptor.Interceptor;
-import com.opensymphony.xwork2.util.ValueStack;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.ErrorResolution;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.controller.ExecutionContext;
+import net.sourceforge.stripes.controller.Interceptor;
+import net.sourceforge.stripes.controller.Intercepts;
+import net.sourceforge.stripes.controller.LifecycleStage;
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
-import org.apache.commons.lang.xwork.StringUtils;
-import org.apache.struts2.StrutsStatics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -66,6 +68,7 @@ import java.util.concurrent.ConcurrentHashMap;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
+@Intercepts(LifecycleStage.EventHandling)
 public class PortofinoInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -73,36 +76,26 @@ public class PortofinoInterceptor implements Interceptor {
     public final static String STOP_WATCH_ATTRIBUTE = "stopWatch";
     public final static String NAVIGATION_ATTRIBUTE = "navigation";
     private static final String LOGIN_ACTION = "login";
-    private static final String UNAUTHORIZED = "unauthorized";
+    private static final int UNAUTHORIZED = 401;
 
     public final static Logger logger =
             LoggerFactory.getLogger(PortofinoInterceptor.class);
 
-    protected Map<Class, Map<Class<? extends Annotation>, Field[]>> annotationCache;
+    protected Map<Class, Map<Class<? extends Annotation>, Field[]>> annotationCache =
+            new ConcurrentHashMap<Class, Map<Class<? extends Annotation>, Field[]>>();
 
-    public void destroy() {
-        annotationCache.clear();
-        annotationCache = null;
-    }
-
-    public void init() {
-        annotationCache = new ConcurrentHashMap<Class, Map<Class<? extends Annotation>, Field[]>>();
-    }
-
-    public String intercept(ActionInvocation invocation) throws Exception {
+    public Resolution intercept(ExecutionContext context) throws Exception {
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
 
-        Object action = invocation.getAction();
-        ActionContext actionContext = invocation.getInvocationContext();
-        HttpServletRequest req =
-                (HttpServletRequest)actionContext.get(StrutsStatics.HTTP_REQUEST);
+        Object action = context.getActionBean();
+        ActionBeanContext actionContext = context.getActionBeanContext();
+        HttpServletRequest req = actionContext.getRequest();
         HttpSession session = req.getSession(false);
-        ServletContext servletContext =
-                (ServletContext)actionContext.get(StrutsStatics.SERVLET_CONTEXT);
-        Context context = (Context)servletContext.getAttribute(Context.KEY);
+        ServletContext servletContext = actionContext.getServletContext();
+        Application application = (Application)servletContext.getAttribute(Application.KEY);
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
 
         Long userId = null;
@@ -120,33 +113,32 @@ public class PortofinoInterceptor implements Interceptor {
             MDC.put(UserUtils.USERNAME, userName);
 
             //1. Non ho modello
-            if (context == null || context.getModel() == null) {
-                return "modelNotFound";
+            if (application == null || application.getModel() == null) {
+                return new ForwardResolution("/errors/model-not-found.jsp");
             }
-            context.resetDbTimer();
-            context.openSession();
-            Model model = context.getModel();
+            application.resetDbTimer();
+            application.openSession();
+            Model model = application.getModel();
 
-            List<String> groups=UserUtils.manageGroups(context, userId);
+            List<String> groups=UserUtils.manageGroups(application, userId);
 
             Dispatch dispatch = (Dispatch) req.getAttribute(Dispatch.KEY);
-            Navigation navigation = new Navigation(context, dispatch, groups);
+            Navigation navigation = new Navigation(application, dispatch, groups);
             req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
 
             ServerInfo serverInfo =
                     (ServerInfo) servletContext.getAttribute(ServerInfo.KEY);
 
             /* injections */
-            injectAnnotatedFields(action, InjectContext.class, context);
+            injectAnnotatedFields(action, InjectApplication.class, application);
             injectAnnotatedFields(action, InjectModel.class, model);
             injectAnnotatedFields(action, InjectDispatch.class, dispatch);
             SiteNodeInstance siteNodeInstance;
             if(dispatch != null) {
                 SiteNodeInstance[] siteNodeInstances = dispatch.getSiteNodeInstancePath();
-                ValueStack valueStack = Struts2Utils.getValueStack();
+                Map<String, Object> newValues = null;
                 for(SiteNodeInstance node : siteNodeInstances) {
-                    Map<String, Object> newValues = node.realize(valueStack.getRoot());
-                    valueStack.push(newValues);
+                    newValues = node.realize(newValues);
                 }
                 siteNodeInstance =  siteNodeInstances[siteNodeInstances.length-1];
                 injectAnnotatedFields(action, InjectSiteNodeInstance.class,
@@ -163,14 +155,14 @@ public class PortofinoInterceptor implements Interceptor {
             //2. Se è fuori dall'albero di navigazione e non ho permessi
             if (siteNodeInstance == null ) {
                 stopWatch.stop();
-                return invocation.invoke();
+                return context.proceed();
             }
 
             SiteNode node = siteNodeInstance.getSiteNode();
             //3. Ho i permessi necessari vado alla pagina
             if(node.isAllowed(groups)){
                 stopWatch.stop();
-                return invocation.invoke();
+                return context.proceed();
             } else {
                 //4. Non ho i permessi, ma non sono loggato, vado alla pagina di login
                 if (userId==null){
@@ -182,22 +174,24 @@ public class PortofinoInterceptor implements Interceptor {
                         for (Object key : parameters.keySet()){
                             params.add(key+"="+((String[]) parameters.get(key))[0]);
                         }
-                        returnUrl += "?"+ StringUtils.join(params,  "&");
+                        returnUrl += "?"+ StringUtils.join(params, "&");
                     }
                     UrlBean bean = new UrlBean(returnUrl);
+                    /*
                     actionContext.getValueStack().getRoot().push(bean);
                     invocation.getStack().push(bean);
-                    return LOGIN_ACTION;
+                    */
+                    return new ForwardResolution("/skins/default/user/login.jsp");
                 } else {
-                    //5. Non ho i permessi, ma sono loggato, errore 404
+                    //5. Non ho i permessi, ma sono loggato, errore 401
                     stopWatch.stop();
-                    return UNAUTHORIZED;
+                    return new ErrorResolution(UNAUTHORIZED);
                 }
             }
         } finally {
             MDC.clear();
-            if (context!=null && context.getModel() != null)
-                context.closeSession();
+            if (application !=null && application.getModel() != null)
+                application.closeSession();
         }
     }
 

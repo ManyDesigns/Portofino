@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.model.site.SiteNode;
 
 import java.util.Map;
@@ -42,12 +42,12 @@ import java.util.Map;
 */
 public class SiteNodeInstance {
 
-    protected final Context context;
+    protected final Application application;
     protected final SiteNode siteNode;
     protected final String mode;
 
-    public SiteNodeInstance(Context context, SiteNode siteNode, String mode) {
-        this.context = context;
+    public SiteNodeInstance(Application application, SiteNode siteNode, String mode) {
+        this.application = application;
         this.siteNode = siteNode;
         this.mode = mode;
     }
@@ -60,8 +60,8 @@ public class SiteNodeInstance {
         return mode;
     }
 
-    public Context getContext() {
-        return context;
+    public Application getApplication() {
+        return application;
     }
 
     public Map<String, Object> realize(Object rootObject) {

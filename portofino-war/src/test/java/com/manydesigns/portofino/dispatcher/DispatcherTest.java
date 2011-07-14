@@ -53,14 +53,14 @@ public class DispatcherTest extends AbstractPortofinoTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        dispatcher = new Dispatcher(context);
-        context.openSession();
+        dispatcher = new Dispatcher(application);
+        application.openSession();
     }
 
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
-        context.closeSession();
+        application.closeSession();
     }
 
     public void testProjectSearch() {
@@ -83,7 +83,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNull(siteNodeInstance.getPk());
 
         Navigation navigation =
-                new Navigation(context, dispatch, Collections.EMPTY_LIST);
+                new Navigation(application, dispatch, Collections.EMPTY_LIST);
         List<NavigationNode> rootNodes = navigation.getRootNodes();
 
         // Navigation node per /projects
@@ -126,7 +126,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNull(siteNodeInstance.getPk());
         
         Navigation navigation =
-                new Navigation(context, dispatch, Collections.EMPTY_LIST);
+                new Navigation(application, dispatch, Collections.EMPTY_LIST);
         List<NavigationNode> rootNodes = navigation.getRootNodes();
 
         // Navigation node per /projects
@@ -165,7 +165,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals("10", siteNodeInstance.getPk());
 
         Navigation navigation =
-                new Navigation(context, dispatch, Collections.EMPTY_LIST);
+                new Navigation(application, dispatch, Collections.EMPTY_LIST);
         List<NavigationNode> rootNodes = navigation.getRootNodes();
 
         // Navigation node per /projects
@@ -205,7 +205,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(2, siteNodeInstancePath.length);
 
         Navigation navigation =
-                new Navigation(context, dispatch, Collections.EMPTY_LIST);
+                new Navigation(application, dispatch, Collections.EMPTY_LIST);
         List<NavigationNode> rootNodes = navigation.getRootNodes();
 
         // SiteNode e NavigationNode per /projects

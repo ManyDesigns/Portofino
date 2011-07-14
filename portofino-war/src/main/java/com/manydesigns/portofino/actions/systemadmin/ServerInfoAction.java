@@ -32,20 +32,19 @@ package com.manydesigns.portofino.actions.systemadmin;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.annotations.InjectServerInfo;
 import com.manydesigns.portofino.context.ServerInfo;
-import com.opensymphony.xwork2.ActionSupport;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ServerInfoAction extends ActionSupport {
+public class ServerInfoAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
-    @Override
     public String execute() {
         form = new FormBuilder(ServerInfo.class).
                 configFields("contextPath",
@@ -60,7 +59,7 @@ public class ServerInfoAction extends ActionSupport {
                 .configMode(Mode.VIEW)
                 .build();
         form.readFromObject(serverInfo);
-        return SUCCESS;
+        return "SUCCESS";
     }
 
     @InjectServerInfo

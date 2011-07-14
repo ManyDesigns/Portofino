@@ -31,12 +31,13 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.DocumentNode;
-import com.opensymphony.xwork2.ActionSupport;
-import org.apache.struts2.util.ServletContextAware;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
 import java.io.*;
 import java.text.MessageFormat;
 
@@ -45,7 +46,8 @@ import java.text.MessageFormat;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class DocumentAction extends ActionSupport implements ServletContextAware{
+@UrlBinding("/Document.action")
+public class DocumentAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -61,23 +63,18 @@ public class DocumentAction extends ActionSupport implements ServletContextAware
     public static final Logger logger =
             LoggerFactory.getLogger(DocumentAction.class);
 
-    ServletContext servletContext;
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
-
-    @Override
-    public String execute() throws Exception {
+    @DefaultHandler
+    public Resolution execute() throws Exception {
         DocumentNode node = (DocumentNode) siteNodeInstance.getSiteNode();
         String fileName = node.getFileName();
         try {
             content = convertStreamToString(
-                    servletContext.getResourceAsStream(fileName));
+                    context.getServletContext().getResourceAsStream(fileName));
         } catch (IOException e) {
             logger.warn(MessageFormat.format("IOException opening file {0}",
                     fileName));
         }
-        return SUCCESS;
+        return new ForwardResolution("/skins/default/document.jsp");
     }
 
 
@@ -101,6 +98,17 @@ public class DocumentAction extends ActionSupport implements ServletContextAware
             return "";
         }
     }
-    
 
+    //**************************************************************************
+    // Getters/setters
+    //**************************************************************************
+
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }

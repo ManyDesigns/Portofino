@@ -12,14 +12,14 @@ import com.manydesigns.portofino.model.datamodel.Table;
  * Copyright Paolo Predonzani (paolo.predonzani@gmail.com)
  * All rights reserved
  */
-public class ContextTest extends AbstractPortofinoTest {
+public class ApplicationTest extends AbstractPortofinoTest {
 
 
     Model model;
 
     public void setUp() throws Exception {
         super.setUp();
-        model = context.getModel();
+        model = application.getModel();
     }
 
 

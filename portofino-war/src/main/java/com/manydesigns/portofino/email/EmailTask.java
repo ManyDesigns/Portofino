@@ -31,7 +31,7 @@ package com.manydesigns.portofino.email;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.User;
@@ -67,12 +67,12 @@ public class EmailTask extends TimerTask {
     protected final POP3Client client;
     protected static final Logger logger =
             LoggerFactory.getLogger(TimerTask.class);
-    protected final Context context;
+    protected final Application application;
     private static final String USERTABLE = UserUtils.USERTABLE;
 
 
-    public EmailTask(Context context) {
-        this.context = context;
+    public EmailTask(Application application) {
+        this.application = application;
         //Setto il client smtp per il bouncing
         String popHost = PortofinoProperties.getProperties()
                 .getProperty(PortofinoProperties.MAIL_POP3_HOST, "127.0.0.1");
@@ -114,33 +114,33 @@ public class EmailTask extends TimerTask {
 
     public void run() {
         try {
-            context.openSession();
+            application.openSession();
             createQueue();
             checkBounce();
         } finally {
-            context.closeSession();
+            application.closeSession();
         }
     }
 
     public synchronized void createQueue() {
         try {
-            ClassAccessor accessor = context.getTableAccessor(
+            ClassAccessor accessor = application.getTableAccessor(
                     EmailUtils.EMAILQUEUE_TABLE);
-            Table table = context.getModel()
+            Table table = application.getModel()
                     .findTableByQualifiedName(EmailUtils.EMAILQUEUE_TABLE);
             TableCriteria criteria = new TableCriteria(table);
             criteria.eq(accessor.getProperty("state"), EmailUtils.TOBESENT);
-            List<Object> emails = context.getObjects(
+            List<Object> emails = application.getObjects(
                     criteria.eq(accessor.getProperty("state"),
                             EmailUtils.TOBESENT));
             for (Object obj : emails) {
-                EmailSender emailSender = new EmailSender(context,
+                EmailSender emailSender = new EmailSender(application,
                         (EmailBean) obj);
                 EmailBean email = emailSender.getEmailBean();
                 try {
                     email.setState(EmailUtils.SENDING);
-                    context.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
-                    context.commit(EmailUtils.PORTOFINO);
+                    application.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
+                    application.commit(EmailUtils.PORTOFINO);
                 } catch (Throwable e) {
                     logger.warn("cannot store email state", e);
                 }
@@ -163,12 +163,12 @@ public class EmailTask extends TimerTask {
 
     private void incrementBounce(String email) {
         try {
-            Table table = context.getModel()
+            Table table = application.getModel()
                     .findTableByQualifiedName(EmailUtils.EMAILQUEUE_TABLE);
             TableCriteria criteria = new TableCriteria(table);
 
-            ClassAccessor accessor = context.getTableAccessor(USERTABLE);
-            List<Object> users = context.getObjects(
+            ClassAccessor accessor = application.getTableAccessor(USERTABLE);
+            List<Object> users = application.getObjects(
                     criteria.gt(accessor.getProperty("email"), email));
             if (users.size() == 0) {
                 logger.warn("no user found for email {}", email);
@@ -182,7 +182,7 @@ public class EmailTask extends TimerTask {
                 value++;
             }
             user.setBounced(value);
-            context.saveObject(USERTABLE, user);
+            application.saveObject(USERTABLE, user);
         } catch (NoSuchFieldException e) {
             logger.warn("cannot increment bounce for user", e);
         }

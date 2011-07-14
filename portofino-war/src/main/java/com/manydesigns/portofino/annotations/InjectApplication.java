@@ -27,46 +27,21 @@
  *
  */
 
-package com.manydesigns.portofino.dispatcher;
+package com.manydesigns.portofino.annotations;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla - alessio.stalle@manydesigns.com
 */
-public class Dispatch {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface InjectApplication {
     public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
-
-    public final static String KEY = Dispatch.class.getName();
-
-
-    protected final String originalPath;
-    protected final String rewrittenPath;
-    protected final SiteNodeInstance[] siteNodeInstancePath;
-
-    public Dispatch(String originalPath,
-                    String rewrittenPath,
-                    SiteNodeInstance[] siteNodeInstancePath) {
-        this.originalPath = originalPath;
-        this.rewrittenPath = rewrittenPath;
-        this.siteNodeInstancePath = siteNodeInstancePath;
-    }
-
-    public String getOriginalPath() {
-        return originalPath;
-    }
-
-    public String getRewrittenPath() {
-        return rewrittenPath;
-    }
-
-    public SiteNodeInstance[] getSiteNodeInstancePath() {
-        return siteNodeInstancePath;
-    }
-
-    public SiteNodeInstance getLastSiteNodeInstance() {
-        return siteNodeInstancePath[siteNodeInstancePath.length - 1];
-    }
+            "Copyright (c) 2005-2010, ManyDesigns srl";
 }

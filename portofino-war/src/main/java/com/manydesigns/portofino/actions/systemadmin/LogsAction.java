@@ -29,9 +29,9 @@
 
 package com.manydesigns.portofino.actions.systemadmin;
 
+import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.annotations.InjectServerInfo;
 import com.manydesigns.portofino.context.ServerInfo;
-import com.opensymphony.xwork2.ActionSupport;
 
 import java.util.*;
 import java.util.logging.Handler;
@@ -43,7 +43,7 @@ import java.util.logging.Logger;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class LogsAction extends ActionSupport {
+public class LogsAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -51,7 +51,6 @@ public class LogsAction extends ActionSupport {
     public List<Logger> loggers;
     public Set<Handler> handlers;
 
-    @Override
     public String execute() {
         logManager = LogManager.getLogManager();
         loggers = new ArrayList<Logger>();
@@ -67,7 +66,7 @@ public class LogsAction extends ActionSupport {
             this.handlers.addAll(Arrays.asList(handlers));
         }
         Collections.sort(loggers, new LoggerComparator());
-        return SUCCESS;
+        return "SUCCESS";
     }
 
     @InjectServerInfo

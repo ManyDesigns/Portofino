@@ -44,8 +44,11 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
-import com.manydesigns.portofino.annotations.*;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.annotations.InjectApplication;
+import com.manydesigns.portofino.annotations.InjectDispatch;
+import com.manydesigns.portofino.annotations.InjectModel;
+import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.UseCaseNodeInstance;
@@ -60,14 +63,11 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
-import com.opensymphony.xwork2.ActionSupport;
-import com.opensymphony.xwork2.Preparable;
-import com.opensymphony.xwork2.util.CompoundRoot;
-import com.opensymphony.xwork2.util.ValueStack;
 import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
+import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fop.apps.FOPException;
@@ -77,7 +77,6 @@ import org.apache.fop.apps.MimeConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
@@ -97,18 +96,18 @@ import java.util.regex.Pattern;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class UseCaseAction implements Preparable {
+@UrlBinding("/UseCase")
+public class UseCaseAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    @InjectContext
-    public Context context;
+    public final static String SEARCH_STRING_PARAM = "searchString";
+
+    @InjectApplication
+    public Application application;
 
     @InjectModel
     public Model model;
-
-    @InjectHttpRequest
-    public HttpServletRequest req;
 
     @InjectDispatch
     public Dispatch dispatch;
@@ -134,6 +133,8 @@ public class UseCaseAction implements Preparable {
 
     public String[] selection;
     public String searchString;
+    public String cancelReturnUrl;
+    public String successReturnUrl;
 
     //--------------------------------------------------------------------------
     // UI forms
@@ -165,10 +166,25 @@ public class UseCaseAction implements Preparable {
     private static final String TEMPLATE_FOP_SEARCH = "templateFOP-Search.xsl";
     private static final String TEMPLATE_FOP_READ = "templateFOP-Read.xsl";
 
+    //--------------------------------------------------------------------------
+    // ActionBean implementation
+    //--------------------------------------------------------------------------
+
+    public ActionBeanContext context;
+
+    public void setContext(ActionBeanContext context) {
+        this.context = context;
+    }
+
+    public ActionBeanContext getContext() {
+        return context;
+    }
+
     //**************************************************************************
     // Setup
     //**************************************************************************
 
+    @Before
     public void prepare() {
         pk = siteNodeInstance.getPk();
         useCaseNode = siteNodeInstance.getSiteNode();
@@ -211,15 +227,15 @@ public class UseCaseAction implements Preparable {
 
             SelectionProvider selectionProvider;
             if (sql != null) {
-                Collection<Object[]> objects = context.runSql(database, sql);
+                Collection<Object[]> objects = application.runSql(database, sql);
                 selectionProvider = DefaultSelectionProvider.create(
                         name, fieldNames.length, fieldTypes, objects);
             } else if (hql != null) {
-                Collection<Object> objects = context.getObjects(hql);
+                Collection<Object> objects = application.getObjects(hql);
                 String qualifiedTableName = 
-                        context.getQualifiedTableNameFromQueryString(hql);
+                        application.getQualifiedTableNameFromQueryString(hql);
                 TableAccessor tableAccessor =
-                        context.getTableAccessor(qualifiedTableName);
+                        application.getTableAccessor(qualifiedTableName);
                 ShortName shortNameAnnotation =
                         tableAccessor.getAnnotation(ShortName.class);
                 TextFormat[] textFormats = null;
@@ -247,7 +263,8 @@ public class UseCaseAction implements Preparable {
     // Crud operations
     //--------------------------------------------------------------------------
 
-    public String execute() {
+    @DefaultHandler
+    public Resolution execute() {
         if (StringUtils.isEmpty(pk)) {
             return search();
         } else {
@@ -259,18 +276,18 @@ public class UseCaseAction implements Preparable {
     // Search
     //**************************************************************************
 
-    public String search() {
+    public Resolution search() {
         setupSearchForm();
         loadObjects();
         setupTableForm(Mode.VIEW);
-        return PortofinoAction.SEARCH;
+        return new ForwardResolution("/skins/default/crud/search.jsp");
     }
 
     //**************************************************************************
     // Read
     //**************************************************************************
 
-    public String read() {
+    public Resolution read() {
         setupSearchForm();
         loadObjects();
 
@@ -288,10 +305,10 @@ public class UseCaseAction implements Preparable {
 
         // refresh crud buttons (enabled/disabled)
         for (CrudButton crudButton : crudButtons) {
-            crudButton.runGuard();
+            crudButton.runGuard(this);
         }
 
-        return PortofinoAction.READ;
+        return new ForwardResolution("/skins/default/crud/read.jsp");
     }
 
     protected void refreshBlobDownloadHref() {
@@ -321,33 +338,34 @@ public class UseCaseAction implements Preparable {
     // Create/Save
     //**************************************************************************
 
-    public String create() {
+    public Resolution create() {
         setupForm(Mode.CREATE);
 
-        return PortofinoAction.CREATE;
+        return new ForwardResolution("/skins/default/crud/create.jsp");
     }
 
-    public String save() {
+    public Resolution save() {
         setupForm(Mode.CREATE);
 
-        form.readFromRequest(req);
+        form.readFromRequest(context.getRequest());
         if (form.validate()) {
             object = classAccessor.newInstance();
             form.writeToObject(object);
-            context.saveObject(baseTable.getQualifiedName(), object);
+            application.saveObject(baseTable.getQualifiedName(), object);
             try {
-                context.commit(baseTable.getDatabaseName());
+                application.commit(baseTable.getDatabaseName());
             } catch (Throwable e) {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
                 SessionMessages.addErrorMessage(rootCauseMessage);
-                return PortofinoAction.CREATE;
+                return new ForwardResolution("/skins/default/crud/create.jsp");
             }
             pk = pkHelper.generatePkString(object);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
-            return PortofinoAction.SAVE;
+            String url = dispatch.getOriginalPath() + "/" + pk;
+            return new RedirectResolution(url);
         } else {
-            return PortofinoAction.CREATE;
+            return new ForwardResolution("/skins/default/crud/create.jsp");
         }
     }
 
@@ -355,31 +373,32 @@ public class UseCaseAction implements Preparable {
     // Edit/Update
     //**************************************************************************
 
-    public String edit() {
+    public Resolution edit() {
         setupForm(Mode.EDIT);
         form.readFromObject(object);
-        return PortofinoAction.EDIT;
+        return new ForwardResolution("/skins/default/crud/edit.jsp");
     }
 
-    public String update() {
+    public Resolution update() {
         setupForm(Mode.EDIT);
         form.readFromObject(object);
-        form.readFromRequest(req);
+        form.readFromRequest(context.getRequest());
         if (form.validate()) {
             form.writeToObject(object);
-            context.updateObject(baseTable.getQualifiedName(), object);
+            application.updateObject(baseTable.getQualifiedName(), object);
             try {
-                context.commit(baseTable.getDatabaseName());
+                application.commit(baseTable.getDatabaseName());
             } catch (Throwable e) {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
                 SessionMessages.addErrorMessage(rootCauseMessage);
-                return PortofinoAction.EDIT;
+                return new ForwardResolution("/skins/default/crud/edit.jsp");
             }
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
-            return PortofinoAction.UPDATE;
+            return new RedirectResolution(dispatch.getOriginalPath())
+                    .addParameter(SEARCH_STRING_PARAM, searchString);
         } else {
-            return PortofinoAction.EDIT;
+            return new ForwardResolution("/skins/default/crud/edit.jsp");
         }
     }
 
@@ -387,47 +406,51 @@ public class UseCaseAction implements Preparable {
     // Bulk Edit/Update
     //**************************************************************************
 
-    public String bulkEdit() {
+    public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage(
                     "Nessun oggetto selezionato");
-            return PortofinoAction.CANCEL;
+            return new RedirectResolution(cancelReturnUrl, false);
         }
 
         if (selection.length == 1) {
             pk = selection[0];
-            return "redirectToEdit";
+            String url = dispatch.getOriginalPath() + "/" + pk;
+            return new RedirectResolution(url)
+                    .addParameter(SEARCH_STRING_PARAM, searchString)
+                    .addParameter("edit");
         }
 
         setupForm(Mode.BULK_EDIT);
 
-        return PortofinoAction.BULK_EDIT;
+        return new ForwardResolution("/skins/default/crud/bulkEdit.jsp");
     }
 
-    public String bulkUpdate() {
+    public Resolution bulkUpdate() {
         setupForm(Mode.BULK_EDIT);
-        form.readFromRequest(req);
+        form.readFromRequest(context.getRequest());
         if (form.validate()) {
             for (String current : selection) {
                 loadObject(current);
                 form.writeToObject(object);
             }
             form.writeToObject(object);
-            context.updateObject(baseTable.getQualifiedName(), object);
+            application.updateObject(baseTable.getQualifiedName(), object);
             try {
-                context.commit(baseTable.getDatabaseName());
+                application.commit(baseTable.getDatabaseName());
             } catch (Throwable e) {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
                 SessionMessages.addErrorMessage(rootCauseMessage);
-                return PortofinoAction.BULK_EDIT;
+                return new ForwardResolution("/skins/default/crud/bulkEdit.jsp");
             }
             SessionMessages.addInfoMessage(MessageFormat.format(
                     "UPDATE di {0} oggetti avvenuto con successo",
                     selection.length));
-            return PortofinoAction.BULK_UPDATE;
+            return new RedirectResolution(dispatch.getOriginalPath())
+                    .addParameter(SEARCH_STRING_PARAM, searchString);
         } else {
-            return PortofinoAction.BULK_EDIT;
+            return new ForwardResolution("/skins/default/crud/bulkEdit.jsp");
         }
     }
 
@@ -435,11 +458,11 @@ public class UseCaseAction implements Preparable {
     // Delete
     //**************************************************************************
 
-    public String delete() {
+    public Resolution delete() {
         Object pkObject = pkHelper.parsePkString(pk);
-        context.deleteObject(baseTable.getQualifiedName(), pkObject);
+        application.deleteObject(baseTable.getQualifiedName(), pkObject);
         try {
-            context.commit(baseTable.getDatabaseName());
+            application.commit(baseTable.getDatabaseName());
             SessionMessages.addInfoMessage("DELETE avvenuto con successo");
 
             // invalidate the pk on this crud unit
@@ -449,22 +472,26 @@ public class UseCaseAction implements Preparable {
             logger.debug(rootCauseMessage, e);
             SessionMessages.addErrorMessage(rootCauseMessage);
         }
-        return PortofinoAction.DELETE;
+        int lastSlashPos = dispatch.getOriginalPath().lastIndexOf("/");
+        String url = dispatch.getOriginalPath().substring(0, lastSlashPos);
+        return new RedirectResolution(url)
+                .addParameter(SEARCH_STRING_PARAM, searchString);
     }
 
-    public String bulkDelete() {
+    public Resolution bulkDelete() {
         if (selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
-            return PortofinoAction.CANCEL;
+            return new RedirectResolution(dispatch.getOriginalPath())
+                    .addParameter(SEARCH_STRING_PARAM, searchString);
         }
         for (String current : selection) {
             Object pkObject = pkHelper.parsePkString(current);
-            context.deleteObject(baseTable.getQualifiedName(), pkObject);
+            application.deleteObject(baseTable.getQualifiedName(), pkObject);
 
         }
         try {
-                context.commit(baseTable.getDatabaseName());
+                application.commit(baseTable.getDatabaseName());
                 SessionMessages.addInfoMessage(MessageFormat.format(
                 "DELETE di {0} oggetti avvenuto con successo",
                 selection.length));
@@ -473,7 +500,8 @@ public class UseCaseAction implements Preparable {
                 SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
         }
 
-        return PortofinoAction.DELETE;
+        return new RedirectResolution(dispatch.getOriginalPath())
+                .addParameter(SEARCH_STRING_PARAM, searchString);
     }
 
     //**************************************************************************
@@ -481,13 +509,13 @@ public class UseCaseAction implements Preparable {
     //**************************************************************************
 
     public String button() throws Exception {
-        String value = req.getParameter("method:button");
+        String value = context.getRequest().getParameter("method:button");
         for (CrudButton crudButton : crudButtons) {
             Button button = crudButton.getButton();
             if (button.getLabel().equals(value)) {
                 String script = button.getScript();
                 String scriptLanguage = button.getActualScriptLanguage();
-                return (String) ScriptingUtil.runScript(script, scriptLanguage);
+                return (String) ScriptingUtil.runScript(script, scriptLanguage, this);
             }
         }
         throw new Error("No button found");
@@ -511,7 +539,7 @@ public class UseCaseAction implements Preparable {
             }
         }
         if (crudSelectionProvider == null) {
-            return ActionSupport.ERROR;
+            return "ActionSupport.ERROR";
         }
 
         SelectionProvider selectionProvider =
@@ -524,7 +552,7 @@ public class UseCaseAction implements Preparable {
                 .configPrefix(prefix)
                 .configMode(Mode.EDIT)
                 .build();
-        form.readFromRequest(req);
+        form.readFromRequest(context.getRequest());
 
         SelectField targetField =
                 (SelectField) form.get(0).get(selectionProviderIndex);
@@ -557,7 +585,7 @@ public class UseCaseAction implements Preparable {
                 .build();
 
         if (StringUtils.isBlank(searchString)) {
-            searchForm.readFromRequest(req);
+            searchForm.readFromRequest(context.getRequest());
             searchString = searchForm.toSearchString();
             if (searchString.length() == 0) {
                 searchString = null;
@@ -660,15 +688,12 @@ public class UseCaseAction implements Preparable {
     //**************************************************************************
 
     public void loadObjects() {
-        ValueStack valueStack = Struts2Utils.getValueStack();
-        CompoundRoot root = valueStack.getRoot();
-
         //Se si passano dati sbagliati al criterio restituisco messaggio d'errore
         // ma nessun risultato
         try {
             TableCriteria criteria = new TableCriteria(baseTable);
             searchForm.configureCriteria(criteria);
-            objects = context.getObjects(useCase.getQuery(), criteria, root);
+            objects = application.getObjects(useCase.getQuery(), criteria, this);
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
             logger.warn("Incorrect Field Type", e);
@@ -678,7 +703,7 @@ public class UseCaseAction implements Preparable {
 
     private void loadObject(String pk) {
         Serializable pkObject = pkHelper.parsePkString(pk);
-        object = context.getObjectByPk(baseTable.getQualifiedName(), pkObject);
+        object = application.getObjectByPk(baseTable.getQualifiedName(), pkObject);
     }
 
 

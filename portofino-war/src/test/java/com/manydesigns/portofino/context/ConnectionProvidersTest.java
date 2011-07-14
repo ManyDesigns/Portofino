@@ -57,7 +57,7 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
     }
 
     public void testConnectionProvider() {
-        List<ConnectionProvider> connectionProviders = context.getConnectionProviders();
+        List<ConnectionProvider> connectionProviders = application.getConnectionProviders();
         assertEquals(3, connectionProviders.size());
 
         JdbcConnectionProvider conn = new JdbcConnectionProvider();
@@ -68,9 +68,9 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
         conn.setPassword("manydesigns");
 
 
-        context.addConnectionProvider(conn);
+        application.addConnectionProvider(conn);
         assertEquals(4, connectionProviders.size());
-        FileManager fm = context.getFileManager();
+        FileManager fm = application.getFileManager();
         FileResourceManager frm = fm.getFrm();
         try {
             String id = frm.generatedUniqueTxId();
@@ -91,7 +91,7 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
         conn.setUsername("manydesigns2");
         conn.setPassword("manydesigns2");
 
-        context.updateConnectionProvider(conn);
+        application.updateConnectionProvider(conn);
         assertEquals(4, connectionProviders.size());
         try {
             String id = frm.generatedUniqueTxId();
@@ -105,7 +105,7 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
             fail();
         }
 
-        context.deleteConnectionProvider("test");
+        application.deleteConnectionProvider("test");
         assertEquals(3, connectionProviders.size());
         try {
             String id = frm.generatedUniqueTxId();

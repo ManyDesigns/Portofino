@@ -32,20 +32,16 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.annotations.InjectContext;
-import com.manydesigns.portofino.annotations.InjectHttpRequest;
+import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectHttpSession;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
-import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.ActionSupport;
-import com.opensymphony.xwork2.util.ValueStack;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
@@ -56,7 +52,7 @@ import java.util.Date;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class LoginAction extends ActionSupport implements LoginUnAware {
+public class LoginAction extends AbstractActionBean implements LoginUnAware {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -64,11 +60,8 @@ public class LoginAction extends ActionSupport implements LoginUnAware {
     // Injections
     //**************************************************************************
 
-    @InjectContext
-    public Context context;
-
-    @InjectHttpRequest
-    public HttpServletRequest req;
+    @InjectApplication
+    public Application application;
 
     @InjectHttpSession
     public HttpSession session;
@@ -100,11 +93,11 @@ public class LoginAction extends ActionSupport implements LoginUnAware {
     public String execute () {
         session.removeAttribute(UserUtils.USERID);
         session.removeAttribute(UserUtils.USERNAME);
-        return INPUT;
+        return "INPUT";
     }
 
     public String login (){
-        form.readFromRequest(req);
+        form.readFromRequest(context.getRequest());
         User user = new User();
         form.writeToObject(user);
         Boolean enc = Boolean.parseBoolean(PortofinoProperties.getProperties()
@@ -115,7 +108,7 @@ public class LoginAction extends ActionSupport implements LoginUnAware {
         }
         String username = user.getUserName();
         String password = user.getPwd();
-        user = context.login(username, password);
+        user = application.login(username, password);
 
         if (user==null) {
             String errMsg = MessageFormat.format("FAILED AUTH for user {0}",
@@ -123,7 +116,7 @@ public class LoginAction extends ActionSupport implements LoginUnAware {
             SessionMessages.addInfoMessage(errMsg);
             logger.warn(errMsg);
             updateFailedUser(username);
-            return INPUT;
+            return "INPUT";
         }
 
         if (!user.getState().equals(UserUtils.ACTIVE)) {
@@ -131,10 +124,8 @@ public class LoginAction extends ActionSupport implements LoginUnAware {
                     "Please contact the administrator", username);
             SessionMessages.addInfoMessage(errMsg);
             logger.warn(errMsg);
-            return INPUT;
+            return "INPUT";
         }
-
-        ValueStack vs = ActionContext.getContext().getValueStack();
 
         logger.info("User {} login", user.getUserName());
         session.setAttribute(UserUtils.USERID, user.getUserId());
@@ -143,28 +134,28 @@ public class LoginAction extends ActionSupport implements LoginUnAware {
         returnUrl = StringUtils.trimToNull(returnUrl);
         returnUrl=(returnUrl!=null)?returnUrl:home;
 
-        return SUCCESS;
+        return "SUCCESS";
     }
 
     private void updateFailedUser(String username) {
         User user;
-        user = context.findUserByUserName(username);
+        user = application.findUserByUserName(username);
         if (user == null) {
             return;
         }
         user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
         int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
         user.setFailedLoginAttempts(failedAttempts+1);
-        context.updateObject(UserUtils.USERTABLE, user);
-        context.commit("portofino");
+        application.updateObject(UserUtils.USERTABLE, user);
+        application.commit("portofino");
     }
 
     private void updateUser(User user) {
         user.setFailedLoginAttempts(0);
         user.setLastLoginDate(new Timestamp(new Date().getTime()));
         user.setToken(null);
-        context.updateObject(UserUtils.USERTABLE, user);
-        context.commit("portofino");
+        application.updateObject(UserUtils.USERTABLE, user);
+        application.commit("portofino");
     }
 
     public String logout(){

@@ -7,7 +7,7 @@
     response.setDateHeader("Expires", 0);
 %><%@ page contentType="text/html;charset=ISO-8859-1" language="java"
            pageEncoding="ISO-8859-1"
-%><%@ taglib prefix="s" uri="/struts-tags"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@ taglib prefix="mdes" uri="/manydesigns-elements-struts2"
 %><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
@@ -16,35 +16,36 @@
     <meta http-equiv="Content-Script-Type" content="text/javascript"/>
     <meta http-equiv="Content-Style-Type" content="text/css"/>
     <link rel="stylesheet" type="text/css"
-          href="<s:url value="/yui-2.8.1/build/reset-fonts-grids/reset-fonts-grids.css"/>"/>
+          href="<stripes:url value="/yui-2.8.1/build/reset-fonts-grids/reset-fonts-grids.css"/>"/>
     <link rel="stylesheet" type="text/css"
-          href="<s:url value="/yui-2.8.1/build/base/base-min.css"/>"/>
+          href="<stripes:url value="/yui-2.8.1/build/base/base-min.css"/>"/>
     <link rel="stylesheet" type="text/css"
-          href="<s:url value="/jquery-ui-1.8.9/css/smoothness/jquery-ui-1.8.9.custom.css"/>"/>
+          href="<stripes:url value="/jquery-ui-1.8.9/css/smoothness/jquery-ui-1.8.9.custom.css"/>"/>
     <link rel="stylesheet" type="text/css"
-          href="<s:url value="/skins/default/portofino.css"/>"/>
+          href="<stripes:url value="/skins/default/portofino.css"/>"/>
     <script type="text/javascript"
-            src="<s:url value="/yui-2.8.1/build/yuiloader-dom-event/yuiloader-dom-event.js"/>"></script>
+            src="<stripes:url value="/yui-2.8.1/build/yuiloader-dom-event/yuiloader-dom-event.js"/>"></script>
     <script type="text/javascript"
-            src="<s:url value="/jquery-ui-1.8.9/js/jquery-1.4.4.min.js"/>"></script>
+            src="<stripes:url value="/jquery-ui-1.8.9/js/jquery-1.4.4.min.js"/>"></script>
     <script type="text/javascript"
-            src="<s:url value="/jquery-ui-1.8.9/js/jquery-ui-1.8.9.custom.min.js"/>"></script>
+            src="<stripes:url value="/jquery-ui-1.8.9/js/jquery-ui-1.8.9.custom.min.js"/>"></script>
     <script type="text/javascript"
-            src="<s:url value="/jquery-treetable-2.3.0/jquery.treeTable.min.js"/>"></script>
+            src="<stripes:url value="/jquery-treetable-2.3.0/jquery.treeTable.min.js"/>"></script>
     <script type="text/javascript"
-            src="<s:url value="/elements.js"/>"></script>
+            src="<stripes:url value="/elements.js"/>"></script>
     <script type="text/javascript"
-            src="<s:url value="/skins/default/portofino.js"/>"></script>
-    <title><s:property value="#request.navigation.selectedNavigationNode.description"/></title>
+            src="<stripes:url value="/skins/default/portofino.js"/>"></script>
+    <jsp:useBean id="dispatch" class="com.manydesigns.portofino.dispatcher.Dispatch" scope="request"/>
+    <title>${dispatch.lastSiteNodeInstance.siteNode.description}</title>
 </head>
 <body>
 <div id="doc3" class="yui-t2">
-    <s:url var="indexUrl" namespace="/" action="Index"/>
-    <s:url var="profileUrl" namespace="/" action="Profile"/>
-    <s:url var="settingsUrl" namespace="/user" action="Settings"/>
-    <s:url var="helpUrl" namespace="/user" action="Help"/>
-    <s:url var="loginUrl" namespace="/user" action="Login"/>
-    <s:url var="logoutUrl" namespace="/user" action="Login" method="logout"/>
+    <stripes:url var="indexUrl" value="/Index.action"/>
+    <stripes:url var="profileUrl" value="/Profile.action"/>
+    <stripes:url var="settingsUrl" value="/user/Settings.action"/>
+    <stripes:url var="helpUrl" value="/user/Help.action"/>
+    <stripes:url var="loginUrl" value="/user/Login.action"/>
+    <stripes:url var="logoutUrl" value="/user/Login.action?logout="/>
 
 
     <div id="hd">

@@ -32,8 +32,8 @@ import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
+import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.context.hibernate.HibernateApplicationImpl;
 import com.manydesigns.portofino.model.Model;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -58,7 +58,7 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     public Connection connPetStore;
     public Connection connPortofino;
     public Connection connDBTest;
-    public Context context = null;
+    public Application application = null;
     public Model model;
     public String storeDir;
 
@@ -103,9 +103,9 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         createContext();
 
         ClassLoader cl = AbstractPortofinoTest.class.getClassLoader();
-        connPortofino = context.getConnectionProvider("portofino").acquireConnection();
-        connPetStore = context.getConnectionProvider("jpetstore").acquireConnection();
-        connDBTest = context.getConnectionProvider("hibernatetest").acquireConnection();
+        connPortofino = application.getConnectionProvider("portofino").acquireConnection();
+        connPetStore = application.getConnectionProvider("jpetstore").acquireConnection();
+        connDBTest = application.getConnectionProvider("hibernatetest").acquireConnection();
 
         RunScript.execute(connPortofino,
                 new InputStreamReader(
@@ -125,7 +125,7 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
     private void setupAdditionalDatabases(String... excludes) throws Exception {
         ClassLoader cl = getClass().getClassLoader();
-        for(ConnectionProvider cp : context.getConnectionProviders()) {
+        for(ConnectionProvider cp : application.getConnectionProviders()) {
             if(!ArrayUtils.contains(excludes, cp.getDatabaseName())) {
                 Connection conn = cp.acquireConnection();
                 String schemaResource = getResource("-schema.sql", null);
@@ -142,7 +142,7 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
     @Override
     public void tearDown() throws Exception {
-        context.stopFileManager();
+        application.stopFileManager();
         super.tearDown();
     }
 
@@ -202,12 +202,12 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
             String managerClassName =
                     portofinoProperties.getProperty(
                             PortofinoProperties.CONTEXT_CLASS_PROPERTY);
-            InstanceBuilder<Context> builder =
-                    new InstanceBuilder<Context>(
-                            Context.class,
-                            HibernateContextImpl.class,
+            InstanceBuilder<Application> builder =
+                    new InstanceBuilder<Application>(
+                            Application.class,
+                            HibernateApplicationImpl.class,
                             logger);
-            context = builder.createInstance(managerClassName);
+            application = builder.createInstance(managerClassName);
 
             String storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
                 PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));
@@ -227,11 +227,11 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
             logger.info("Storing directory:" + storeDir);
             logger.info("Working directory:" + workDir);
-            context.createFileManager(storeDir, workDir);
-            context.startFileManager();
-            context.loadConnections(connectionsFileName);
-            context.loadXmlModel(modelFile);
-            model = context.getModel();
+            application.createFileManager(storeDir, workDir);
+            application.startFileManager();
+            application.loadConnections(connectionsFileName);
+            application.loadXmlModel(modelFile);
+            model = application.getModel();
 
 
         } catch (Throwable e) {

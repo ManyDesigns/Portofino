@@ -31,10 +31,7 @@ package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
-import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.portofino.model.site.usecases.Button;
-import com.opensymphony.xwork2.util.CompoundRoot;
-import com.opensymphony.xwork2.util.ValueStack;
 import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -77,7 +74,7 @@ public class CrudButton {
     // Guard management
     //--------------------------------------------------------------------------
 
-    public void runGuard() {
+    public void runGuard(Object root) {
         String guard = button.getGuard();
         if (StringUtils.isBlank(guard)) {
             enabled = true;
@@ -86,10 +83,6 @@ public class CrudButton {
 
         // Ognl context
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-
-        // Ognl root
-        ValueStack valueStack = Struts2Utils.getValueStack();
-        CompoundRoot root = valueStack.getRoot();
 
         Object result = OgnlUtils.getValueQuietly(guard, ognlContext, root);
 

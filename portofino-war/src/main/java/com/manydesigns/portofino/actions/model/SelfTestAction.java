@@ -30,14 +30,15 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectModel;
 import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.servlets.PortofinoListener;
 import com.manydesigns.portofino.xml.XmlDiffer;
-import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,7 @@ import java.text.MessageFormat;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SelfTestAction extends ActionSupport {
+public class SelfTestAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -63,8 +64,8 @@ public class SelfTestAction extends ActionSupport {
     // Injections
     //**************************************************************************
 
-    @InjectContext
-    public Context context;
+    @InjectApplication
+    public Application application;
 
     @InjectModel
     public Model model;
@@ -110,7 +111,7 @@ public class SelfTestAction extends ActionSupport {
         treeTableDiffer.setShowEqual(showEqual);
         treeTableDiffer.setShowDifferent(showDifferent);
 
-        for (ConnectionProvider current : context.getConnectionProviders()) {
+        for (ConnectionProvider current : application.getConnectionProviders()) {
             Database sourceDatabase = current.readModel();
             Database targetDatabase =
                     model.findDatabaseByName(current.getDatabaseName());
@@ -118,12 +119,12 @@ public class SelfTestAction extends ActionSupport {
                     xmlDiffer.diff("database", sourceDatabase, targetDatabase);
             treeTableDiffer.run(rootDiffer);
         }
-        return SUCCESS;
+        return "SUCCESS";
     }
 
     public String sync() throws SQLException {
         try {
-            context.syncDataModel();
+            application.syncDataModel();
             SessionMessages.addInfoMessage(
                     "In-memory model synchronized to database model");
         } catch (Throwable e) {
@@ -139,13 +140,16 @@ public class SelfTestAction extends ActionSupport {
         contentType= "text/xml";
         contentDisposition= MessageFormat.format("inline; filename={0}.xml",
                     "datamodel");
-        File tempFile = File.createTempFile("portofino", ".xml");
-        JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
-        Marshaller m = jc.createMarshaller();
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        m.marshal(model, tempFile);
-        inputStream = new FileInputStream(tempFile);
-
+        try {
+            File tempFile = File.createTempFile("portofino", ".xml");
+            JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
+            Marshaller m = jc.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            m.marshal(model, tempFile);
+            inputStream = new FileInputStream(tempFile);
+        } finally {
+            PortofinoListener.clearJaxb();
+        }
         return "export";
     }
 

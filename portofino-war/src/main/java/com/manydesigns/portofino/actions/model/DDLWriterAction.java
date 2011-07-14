@@ -29,9 +29,12 @@
 
 package com.manydesigns.portofino.actions.model;
 
-import com.manydesigns.portofino.annotations.InjectContext;
-import com.manydesigns.portofino.context.Context;
-import com.opensymphony.xwork2.ActionSupport;
+import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.annotations.InjectApplication;
+import com.manydesigns.portofino.context.Application;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -40,10 +43,11 @@ import java.util.List;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class DDLWriterAction extends ActionSupport {
+public class DDLWriterAction extends AbstractActionBean {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public List<String> ddlsCreate;
     public List<String> ddlsUpdate;
@@ -52,14 +56,15 @@ public class DDLWriterAction extends ActionSupport {
     // Injections
     //**************************************************************************
 
-    @InjectContext
-    public Context context;
+    @InjectApplication
+    public Application application;
 
-    public String execute() throws SQLException {
-        ddlsCreate = context.getDDLCreate();
-        ddlsUpdate = context.getDDLUpdate();
+    @DefaultHandler
+    public Resolution execute() throws SQLException {
+        ddlsCreate = application.getDDLCreate();
+        ddlsUpdate = application.getDDLUpdate();
 
-        return ActionSupport.SUCCESS;
+        return new ForwardResolution("/skins/default/model/ddl.jsp");
     }
 
 

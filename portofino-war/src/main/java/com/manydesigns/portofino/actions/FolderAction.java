@@ -35,7 +35,6 @@ import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.FolderNode;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.opensymphony.xwork2.ActionSupport;
 
 import java.util.List;
 
@@ -44,7 +43,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class FolderAction extends ActionSupport {
+public class FolderAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 

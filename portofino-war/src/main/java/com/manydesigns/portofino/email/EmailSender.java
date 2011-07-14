@@ -29,7 +29,7 @@
 package com.manydesigns.portofino.email;
 
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import org.apache.commons.mail.*;
 import org.slf4j.Logger;
@@ -51,16 +51,16 @@ public class EmailSender implements Runnable{
     protected final String server;
     protected final int port;
     protected final EmailBean emailBean;
-    protected final Context context;
+    protected final Application application;
     protected static final Logger logger =
             LoggerFactory.getLogger(EmailSender.class);
 
 
 
     //Costruttore con proprietà da inserire
-    public EmailSender(Context context, EmailBean emailBean, String server, int port, boolean ssl,
+    public EmailSender(Application application, EmailBean emailBean, String server, int port, boolean ssl,
                        String login, String password) {
-        this.context = context;
+        this.application = application;
         this.emailBean = emailBean;
         this.server = server;
         this.port = port;
@@ -70,8 +70,8 @@ public class EmailSender implements Runnable{
     }
 
     //Costruttore che prende le proprietà dal portofino.properties
-    public EmailSender(Context context, EmailBean emailBean) {
-        this.context = context;
+    public EmailSender(Application application, EmailBean emailBean) {
+        this.application = application;
         this.emailBean = emailBean;
         this.server = PortofinoProperties.getProperties()
                     .getProperty(PortofinoProperties.MAIL_SMTP_HOST);
@@ -113,27 +113,27 @@ public class EmailSender implements Runnable{
             email.setTLS(ssl);
             email.send();
 
-            if (context != null) {
-                context.openSession();
+            if (application != null) {
+                application.openSession();
                 if ("true".equals(PortofinoProperties.getProperties()
                         .getProperty(PortofinoProperties.KEEP_SENT))) {
                     emailBean.setState(EmailUtils.SENT);
-                    context.updateObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
+                    application.updateObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
                 } else {
-                    context.deleteObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
+                    application.deleteObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
                 }
-                context.commit(EmailUtils.PORTOFINO);
+                application.commit(EmailUtils.PORTOFINO);
             }
         } catch (Throwable e) {
             logger.warn("Cannot send email with id " + emailBean.getId(), e);
             emailBean.setState(EmailUtils.TOBESENT);
-            if (context != null){
-                context.updateObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
-                context.commit(EmailUtils.PORTOFINO);
+            if (application != null){
+                application.updateObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
+                application.commit(EmailUtils.PORTOFINO);
             }
         }finally {
-            if (context!= null)
-            context.closeSession();
+            if (application != null)
+            application.closeSession();
         }
     }
 

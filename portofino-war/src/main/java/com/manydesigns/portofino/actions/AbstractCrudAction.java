@@ -34,8 +34,6 @@ import com.manydesigns.elements.blobs.BlobsManager;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.annotations.InjectHttpRequest;
-import com.opensymphony.xwork2.ModelDriven;
-import com.opensymphony.xwork2.Preparable;
 import jxl.Workbook;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
@@ -55,8 +53,7 @@ import java.util.Enumeration;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public abstract class  AbstractCrudAction
-        implements Preparable, ModelDriven<CrudUnit> {
+public abstract class  AbstractCrudAction {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 

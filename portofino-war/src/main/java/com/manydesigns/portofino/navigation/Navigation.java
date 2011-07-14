@@ -32,7 +32,7 @@ package com.manydesigns.portofino.navigation;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.dispatcher.UseCaseNodeInstance;
@@ -59,7 +59,7 @@ public class Navigation implements XhtmlFragment {
     // Fields
     //**************************************************************************
 
-    protected final Context context;
+    protected final Application application;
     protected final Dispatch dispatch;
     protected final SiteNodeInstance[] siteNodeInstancePath;
     protected final List<NavigationNode> rootNodes;
@@ -72,8 +72,8 @@ public class Navigation implements XhtmlFragment {
     // Constructors
     //**************************************************************************
 
-    public Navigation(Context context, Dispatch dispatch, List<String> groups) {
-        this.context = context;
+    public Navigation(Application application, Dispatch dispatch, List<String> groups) {
+        this.application = application;
         this.dispatch = dispatch;
         if(dispatch != null) {
             siteNodeInstancePath = dispatch.getSiteNodeInstancePath();
@@ -83,7 +83,7 @@ public class Navigation implements XhtmlFragment {
         this.groups = groups;
         rootNodes = new ArrayList<NavigationNode>();
         final List<SiteNode> rootChildNodes =
-                context.getModel().getRootNode().getChildNodes();
+                application.getModel().getRootNode().getChildNodes();
         HttpServletRequest req =
                 ElementsThreadLocals.getHttpServletRequest();
         //TODO gestire deploy sotto ROOT
@@ -202,8 +202,8 @@ public class Navigation implements XhtmlFragment {
     // Getters/setters
     //**************************************************************************
 
-    public Context getContext() {
-        return context;
+    public Application getApplication() {
+        return application;
     }
 
     public List<NavigationNode> getRootNodes() {

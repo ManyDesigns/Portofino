@@ -54,7 +54,7 @@ public class EmailTest extends AbstractPortofinoTest {
         super.setUp();
         server = SimpleSmtpServer.start(SMTP_PORT);
         PortofinoProperties.loadProperties("portofino_test.properties");
-        context.openSession();
+        application.openSession();
     }
 
     public void testSimple() {
@@ -134,11 +134,11 @@ public class EmailTest extends AbstractPortofinoTest {
             EmailBean bean = new EmailBean ("subj:" + i,
                     "body:" + i, "granatella@gmail.com",
                     "spammer@spam.it");
-            context.saveObject(EmailUtils.EMAILQUEUE_TABLE, bean);
-            context.commit("portofino");
+            application.saveObject(EmailUtils.EMAILQUEUE_TABLE, bean);
+            application.commit("portofino");
         }
         try {
-            scheduler.schedule(new EmailTask(context), 0, 10);
+            scheduler.schedule(new EmailTask(application), 0, 10);
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -160,7 +160,7 @@ public class EmailTest extends AbstractPortofinoTest {
         }
         assertEquals(10, server.getReceivedEmailSize());
         List<Object> emailList =
-                context.getAllObjects("portofino.public.emailqueue");
+                application.getAllObjects("portofino.public.emailqueue");
         assertEquals(0, emailList.size());
     }
 
@@ -169,13 +169,13 @@ public class EmailTest extends AbstractPortofinoTest {
                 ("portofino_smtpsbagliato.properties");
         Timer scheduler = new Timer(true);
         for (int i = 1; i <= 10; i++) {
-            EmailUtils.addEmail(context, "subj:" + i,
+            EmailUtils.addEmail(application, "subj:" + i,
                     "body:" + i, "granatella@gmail.com",
                     "spammer@spam.it");
-            context.commit("portofino");
+            application.commit("portofino");
         }
         try {
-            scheduler.schedule(new EmailTask(context), 0, 10);
+            scheduler.schedule(new EmailTask(application), 0, 10);
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -199,13 +199,13 @@ public class EmailTest extends AbstractPortofinoTest {
         }
         assertEquals(0, server.getReceivedEmailSize());
         List<Object> emailList =
-                context.getAllObjects("portofino.public.emailqueue");
+                application.getAllObjects("portofino.public.emailqueue");
         assertEquals(10, emailList.size());
     }
 
     public void tearDown() {
         server.stop();
-        context.closeSession();
+        application.closeSession();
         Runtime r = Runtime.getRuntime();
         r.gc();
         r.runFinalization();

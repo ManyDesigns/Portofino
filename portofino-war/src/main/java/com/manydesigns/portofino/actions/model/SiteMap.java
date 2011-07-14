@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.actions.model;
 
-import com.opensymphony.xwork2.ActionSupport;
+import com.manydesigns.portofino.actions.AbstractActionBean;
 
 import java.sql.SQLException;
 
@@ -38,11 +38,11 @@ import java.sql.SQLException;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class SiteMap extends ActionSupport {
+public class SiteMap extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
     public String execute() throws SQLException {
-        return SUCCESS;
+        return "SUCCESS";
     }
 }

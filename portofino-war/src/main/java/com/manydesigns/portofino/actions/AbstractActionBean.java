@@ -27,21 +27,31 @@
  *
  */
 
-package com.manydesigns.portofino.annotations;
+package com.manydesigns.portofino.actions;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import net.sourceforge.stripes.action.ActionBean;
+import net.sourceforge.stripes.action.ActionBeanContext;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
-public @interface InjectContext {
+public abstract class AbstractActionBean implements ActionBean {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
+
+    public final static String INPUT = "input";
+    public final static String SUCCESS = "success";
+
+    protected ActionBeanContext context;
+
+    public void setContext(ActionBeanContext context) {
+        this.context = context;
+    }
+
+    public ActionBeanContext getContext() {
+        return context;
+    }
 }

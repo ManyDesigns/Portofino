@@ -28,7 +28,7 @@
  */
 package com.manydesigns.portofino.system.model.users;
 
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,12 +55,12 @@ public class UserUtils {
     public static final Long BANNED = 3L;
     public static final Long SELFREGITRED = 4L;
 
-    public static List<String> manageGroups(Context context, Long userId) {
+    public static List<String> manageGroups(Application application, Long userId) {
         List<String> groups = new ArrayList<String>();
         if (userId == null) {
             groups.add(Group.ANONYMOUS);
         } else {
-            User u = (User) context.getObjectByPk(UserUtils.USERTABLE,
+            User u = (User) application.getObjectByPk(UserUtils.USERTABLE,
                     new User(userId));
             groups.add(Group.ANONYMOUS);
             groups.add(Group.REGISTERED);

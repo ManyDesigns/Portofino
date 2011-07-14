@@ -17,6 +17,18 @@
     </listener>
 
     <filter>
+        <filter-name>elements-filter</filter-name>
+        <filter-class>
+            com.manydesigns.elements.servlet.ElementsFilter
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>elements-filter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+    <filter>
         <filter-name>portofino-dispatcher</filter-name>
         <filter-class>
             com.manydesigns.portofino.dispatcher.DispatcherFilter
@@ -29,6 +41,45 @@
     </filter-mapping>
 
     <filter>
+		<display-name>Stripes Filter</display-name>
+		<filter-name>StripesFilter</filter-name>
+		<filter-class>net.sourceforge.stripes.controller.StripesFilter</filter-class>
+		<init-param>
+			<param-name>ActionResolver.Packages</param-name>
+			<param-value>com.manydesigns.portofino.actions</param-value>
+		</init-param>
+        <init-param>
+            <param-name>Interceptor.Classes</param-name>
+            <param-value>com.manydesigns.portofino.interceptors.PortofinoInterceptor</param-value>
+        </init-param>
+ 	</filter>
+
+    <filter-mapping>
+		<filter-name>StripesFilter</filter-name>
+		<url-pattern>*.jsp</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>StripesFilter</filter-name>
+		<servlet-name>StripesDispatcher</servlet-name>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+	</filter-mapping>
+
+	<servlet>
+		<servlet-name>StripesDispatcher</servlet-name>
+		<servlet-class>net.sourceforge.stripes.controller.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>StripesDispatcher</servlet-name>
+		<url-pattern>*.action</url-pattern>
+	</servlet-mapping>
+    
+<!--
+    <filter>
         <filter-name>struts2</filter-name>
         <filter-class>
             org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter
@@ -40,7 +91,7 @@
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
-
+-->
 <!--
     <servlet>
         <servlet-name>LoginErrorPage</servlet-name>
@@ -60,6 +111,7 @@
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
+    <!--
     <jsp-config>
         <taglib>
             <taglib-uri>/manydesigns-elements-struts2</taglib-uri>
@@ -70,6 +122,7 @@
             <page-encoding>ISO-8859-1</page-encoding>
         </jsp-property-group>
     </jsp-config>
+    -->
     <!-- Uncomment and configure this section to enable container-managed security
         <security-constraint>
             <web-resource-collection>

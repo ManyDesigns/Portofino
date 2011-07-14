@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.site.UseCaseNode;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
@@ -57,11 +57,11 @@ public class UseCaseNodeInstance extends SiteNodeInstance {
 
     protected Object object;
 
-    public UseCaseNodeInstance(Context context, UseCaseNode siteNode, String mode, String param) {
-        super(context, siteNode, mode);
+    public UseCaseNodeInstance(Application application, UseCaseNode siteNode, String mode, String param) {
+        super(application, siteNode, mode);
         this.pk = param;
         this.useCase = siteNode.getUseCase();
-        classAccessor = context.getUseCaseAccessor(useCase);
+        classAccessor = application.getUseCaseAccessor(useCase);
         baseTable = useCase.getActualTable();
         pkHelper = new PkHelper(classAccessor);
     }
@@ -82,7 +82,7 @@ public class UseCaseNodeInstance extends SiteNodeInstance {
 
     private void loadObject(String pk, Object rootObject) {
         Serializable pkObject = pkHelper.parsePkString(pk);
-        object = context.getObjectByPk(baseTable.getQualifiedName(), pkObject, useCase.getQuery(), rootObject);
+        object = application.getObjectByPk(baseTable.getQualifiedName(), pkObject, useCase.getQuery(), rootObject);
     }
 
     // Getter/setter

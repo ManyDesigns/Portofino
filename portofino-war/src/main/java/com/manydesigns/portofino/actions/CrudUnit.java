@@ -41,7 +41,7 @@ import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
@@ -49,9 +49,6 @@ import com.manydesigns.portofino.model.site.usecases.Button;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
-import com.opensymphony.xwork2.ActionSupport;
-import com.opensymphony.xwork2.util.CompoundRoot;
-import com.opensymphony.xwork2.util.ValueStack;
 import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
@@ -107,7 +104,7 @@ public class CrudUnit {
     public final List<CrudSelectionProvider> crudSelectionProviders;
     private final boolean first;
 
-    public Context context;
+    public Application application;
     public Model model;
     public HttpServletRequest req;
 
@@ -208,30 +205,6 @@ public class CrudUnit {
     //**************************************************************************
 
     public String read() {
-        setupSearchForm();
-        loadObjects();
-        loadObject();
-
-        if (!objects.contains(object)) {
-            //throw new Error("Object not found");
-        }
-        setupForm(Mode.VIEW);
-        form.readFromObject(object);
-        refreshBlobDownloadHref();
-
-        // refresh crud buttons (enabled/disabled)
-        for (CrudButton crudButton : crudButtons) {
-            crudButton.runGuard();
-        }
-
-        ValueStack valueStack = Struts2Utils.getValueStack();
-
-        valueStack.push(object);
-        for (CrudUnit subCrudUnit : subCrudUnits) {
-            subCrudUnit.search();
-        }
-        valueStack.pop();
-
         return PortofinoAction.READ;
     }
 
@@ -275,9 +248,9 @@ public class CrudUnit {
         if (form.validate()) {
             object = classAccessor.newInstance();
             form.writeToObject(object);
-            context.saveObject(baseTable.getQualifiedName(), object);
+            application.saveObject(baseTable.getQualifiedName(), object);
             try {
-                context.commit(baseTable.getDatabaseName());
+                application.commit(baseTable.getDatabaseName());
             } catch (Throwable e) {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
@@ -310,9 +283,9 @@ public class CrudUnit {
         form.readFromRequest(req);
         if (form.validate()) {
             form.writeToObject(object);
-            context.updateObject(baseTable.getQualifiedName(), object);
+            application.updateObject(baseTable.getQualifiedName(), object);
             try {
-                context.commit(baseTable.getDatabaseName());
+                application.commit(baseTable.getDatabaseName());
             } catch (Throwable e) {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
@@ -356,9 +329,9 @@ public class CrudUnit {
                 form.writeToObject(object);
             }
             form.writeToObject(object);
-            context.updateObject(baseTable.getQualifiedName(), object);
+            application.updateObject(baseTable.getQualifiedName(), object);
             try {
-                context.commit(baseTable.getDatabaseName());
+                application.commit(baseTable.getDatabaseName());
             } catch (Throwable e) {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
@@ -380,9 +353,9 @@ public class CrudUnit {
 
     public String delete() {
         Object pkObject = pkHelper.parsePkString(pk);
-        context.deleteObject(baseTable.getQualifiedName(), pkObject);
+        application.deleteObject(baseTable.getQualifiedName(), pkObject);
         try {
-            context.commit(baseTable.getDatabaseName());
+            application.commit(baseTable.getDatabaseName());
             SessionMessages.addInfoMessage("DELETE avvenuto con successo");
 
             // invalidate the pk on this crud unit
@@ -403,11 +376,11 @@ public class CrudUnit {
         }
         for (String current : selection) {
             Object pkObject = pkHelper.parsePkString(current);
-            context.deleteObject(baseTable.getQualifiedName(), pkObject);
+            application.deleteObject(baseTable.getQualifiedName(), pkObject);
 
         }
         try {
-                context.commit(baseTable.getDatabaseName());
+                application.commit(baseTable.getDatabaseName());
                 SessionMessages.addInfoMessage(MessageFormat.format(
                 "DELETE di {0} oggetti avvenuto con successo",
                 selection.length));
@@ -430,7 +403,7 @@ public class CrudUnit {
             if (button.getLabel().equals(value)) {
                 String script = button.getScript();
                 String scriptLanguage = button.getActualScriptLanguage();
-                return (String) ScriptingUtil.runScript(script, scriptLanguage);
+                return (String) ScriptingUtil.runScript(script, scriptLanguage, this);
             }
         }
         throw new Error("No button found");
@@ -444,36 +417,7 @@ public class CrudUnit {
                               int selectionProviderIndex,
                               String labelSearch,
                               boolean includeSelectPrompt) {
-        CrudSelectionProvider crudSelectionProvider = null;
-        for (CrudSelectionProvider current : crudSelectionProviders) {
-            SelectionProvider selectionProvider =
-                    current.getSelectionProvider();
-            if (selectionProvider.getName().equals(selectionProviderName)) {
-                crudSelectionProvider = current;
-                break;
-            }
-        }
-        if (crudSelectionProvider == null) {
-            return ActionSupport.ERROR;
-        }
-
-        SelectionProvider selectionProvider =
-                crudSelectionProvider.getSelectionProvider();
-        String[] fieldNames = crudSelectionProvider.getFieldNames();
-
-        Form form = new FormBuilder(classAccessor)
-                .configFields(fieldNames)
-                .configSelectionProvider(selectionProvider, fieldNames)
-                .configPrefix(prefix)
-                .configMode(Mode.EDIT)
-                .build();
-        form.readFromRequest(req);
-
-        SelectField targetField =
-                (SelectField) form.get(0).get(selectionProviderIndex);
-        targetField.setLabelSearch(labelSearch);
-
-        String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
+        String text = null;
         logger.debug("jsonSelectFieldOptions: {}", text);
         return text;
     }
@@ -607,15 +551,12 @@ public class CrudUnit {
     //**************************************************************************
 
     public void loadObjects() {
-        ValueStack valueStack = Struts2Utils.getValueStack();
-        CompoundRoot root = valueStack.getRoot();
-
         //Se si passano dati sbagliati al criterio restituisco messaggio d'errore
         // ma nessun risultato
         try {
             TableCriteria criteria = new TableCriteria(baseTable);
             searchForm.configureCriteria(criteria);
-            objects = context.getObjects(query, criteria, root);
+            objects = application.getObjects(query, criteria, this);
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
             logger.warn("Incorrect Field Type", e);
@@ -629,7 +570,7 @@ public class CrudUnit {
 
     private void loadObject(String pk) {
         Serializable pkObject = pkHelper.parsePkString(pk);
-        object = context.getObjectByPk(baseTable.getQualifiedName(), pkObject);
+        object = application.getObjectByPk(baseTable.getQualifiedName(), pkObject);
     }
 
 
@@ -720,9 +661,6 @@ public class CrudUnit {
             i++;
         }
 
-        ValueStack valueStack = Struts2Utils.getValueStack();
-        valueStack.push(object);
-
         //Aggiungo le relazioni/sheet
         WritableCellFormat formatCell = headerExcel();
         for (CrudUnit subCrudUnit: subCrudUnits) {
@@ -748,7 +686,6 @@ public class CrudUnit {
                 k++;
             }
         }
-        valueStack.pop();
         workbook.write();
     }
 
@@ -966,9 +903,6 @@ public class CrudUnit {
             xb.closeElement("tableData");
         }
 
-        ValueStack valueStack = Struts2Utils.getValueStack();
-        valueStack.push(object);
-
         //Aggiungo le relazioni
         for (CrudUnit subCrudUnit: subCrudUnits) {
             xb.openElement("tablerel");
@@ -1002,7 +936,6 @@ public class CrudUnit {
             }
             xb.closeElement("tablerel");
         }
-        valueStack.pop();
 
         xb.closeElement("class");
         return xb;

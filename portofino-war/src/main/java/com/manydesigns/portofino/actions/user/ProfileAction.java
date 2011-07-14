@@ -35,16 +35,16 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectHttpRequest;
 import com.manydesigns.portofino.annotations.InjectHttpSession;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
-import com.opensymphony.xwork2.ActionSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class ProfileAction extends ActionSupport {
+public class ProfileAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -71,8 +71,8 @@ public class ProfileAction extends ActionSupport {
     // Injections
     //**************************************************************************
 
-    @InjectContext
-    public Context context;
+    @InjectApplication
+    public Application application;
 
     @InjectHttpRequest
     public HttpServletRequest req;
@@ -112,8 +112,8 @@ public class ProfileAction extends ActionSupport {
 
     private String read() {
         User thisUser =
-            (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
-        ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
+            (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
+        ClassAccessor accessor = application.getTableAccessor(UserUtils.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         formBuilder.configFields("email", "userName", "firstName",
                 "middleName", "lastName", "creationDate");
@@ -134,9 +134,9 @@ public class ProfileAction extends ActionSupport {
     public String edit() {
         userId = (Long) session.getAttribute(UserUtils.USERID);
         User thisUser =
-            (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
+            (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 
-        ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
+        ClassAccessor accessor = application.getTableAccessor(UserUtils.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
                 .configFields("email", "userName", "firstName",
@@ -150,8 +150,8 @@ public class ProfileAction extends ActionSupport {
     public String update() {
         userId = (Long) session.getAttribute(UserUtils.USERID);
         User thisUser =
-            (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
-        ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
+            (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
+        ClassAccessor accessor = application.getTableAccessor(UserUtils.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
                 .configFields("email", "userName", "firstName",
@@ -163,8 +163,8 @@ public class ProfileAction extends ActionSupport {
         
         if(form.validate()){
             form.writeToObject(thisUser);
-            context.updateObject(UserUtils.USERTABLE, thisUser);
-            context.commit("portofino");
+            application.updateObject(UserUtils.USERTABLE, thisUser);
+            application.commit("portofino");
             logger.debug("User {} updated", thisUser.getEmail());
             SessionMessages.addInfoMessage("Utente aggiornato correttamente");
             return PortofinoAction.UPDATE;
@@ -184,7 +184,7 @@ public class ProfileAction extends ActionSupport {
     public String updatePwd() {
         userId = (Long) session.getAttribute(UserUtils.USERID);
         User thisUser =
-            (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
+            (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)
@@ -201,8 +201,8 @@ public class ProfileAction extends ActionSupport {
                     thisUser.encryptPwd();
                 }
                 thisUser.setPwdModDate(new Timestamp(new Date().getTime()));
-                context.updateObject(UserUtils.USERTABLE, thisUser);
-                context.commit("portofino");
+                application.updateObject(UserUtils.USERTABLE, thisUser);
+                application.commit("portofino");
 
                 logger.debug("User {} updated", thisUser.getEmail());
                 SessionMessages.addInfoMessage("Password correctely updated");

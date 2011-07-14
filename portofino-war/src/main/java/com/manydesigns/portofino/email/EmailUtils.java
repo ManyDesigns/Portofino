@@ -28,7 +28,7 @@
  */
 package com.manydesigns.portofino.email;
 
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 
 /*
@@ -61,11 +61,11 @@ public class EmailUtils {
 
 
 
-    public static synchronized void addEmail(Context context, String subject, String body,
+    public static synchronized void addEmail(Application application, String subject, String body,
     String to, String from) {
         EmailBean email = new EmailBean(subject, body, to,
                 from);
-        context.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
+        application.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
     }
 
 }

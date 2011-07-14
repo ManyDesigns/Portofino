@@ -37,15 +37,15 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
+import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.PortletNode;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
-import com.opensymphony.xwork2.ActionSupport;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.DrawingSupplier;
@@ -74,7 +74,7 @@ import java.util.HashMap;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class PortletDesignAction extends ActionSupport {
+public class PortletDesignAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -88,8 +88,8 @@ public class PortletDesignAction extends ActionSupport {
     // Injections
     //**************************************************************************
 
-    @InjectContext
-    public Context context;
+    @InjectApplication
+    public Application application;
 
     @InjectSiteNodeInstance
     public SiteNodeInstance siteNodeInstance;
@@ -194,7 +194,7 @@ public class PortletDesignAction extends ActionSupport {
         DefaultPieDataset dataset = new DefaultPieDataset();
         java.util.List<Object[]> result;
         try {
-            result = context.runSql(portlet.getDatabase(), portlet.getQuery());
+            result = application.runSql(portlet.getDatabase(), portlet.getQuery());
             for (Object[] current : result) {
                 dataset.setValue((Comparable)current[0], (Number)current[1]);
             }
@@ -241,7 +241,7 @@ public class PortletDesignAction extends ActionSupport {
 //        plot.setLabelGenerator(new MyPieSectionLabelGenerator());
 
         // imposta il messaggio se non ci sono dati
-        plot.setNoDataMessage(getText("No_data_available"));
+        plot.setNoDataMessage("TODO i18n: No_data_available");
 
         plot.setCircular(true);
 

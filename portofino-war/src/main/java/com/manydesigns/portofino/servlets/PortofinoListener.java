@@ -33,11 +33,13 @@ import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.ServerInfo;
-import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
+import com.manydesigns.portofino.context.hibernate.HibernateApplicationImpl;
 import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.email.EmailTask;
+import com.sun.xml.bind.v2.ClassFactory;
+import com.sun.xml.bind.v2.runtime.Coordinator;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -53,6 +55,10 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Timer;
 
@@ -83,7 +89,7 @@ public class PortofinoListener
     protected Properties portofinoProperties;
     protected ServletContext servletContext;
     protected ServerInfo serverInfo;
-    protected Context context;
+    protected Application application;
     protected Dispatcher dispatcher;
     protected Timer scheduler;
 
@@ -166,7 +172,7 @@ public class PortofinoListener
                     try {
 
                         //Invio mail
-                        scheduler.schedule(new EmailTask(context),
+                        scheduler.schedule(new EmailTask(application),
                                 DELAY2, PERIOD);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -185,7 +191,7 @@ public class PortofinoListener
     }
 
     public void createDispatcher() {
-        dispatcher = new Dispatcher(context);
+        dispatcher = new Dispatcher(application);
         servletContext.setAttribute(Dispatcher.KEY, dispatcher);
     }
 
@@ -202,22 +208,69 @@ public class PortofinoListener
         }
 
         // clean up ThreadLocals and possible memory leaks
+
+
+        clearJaxbThreadLocal();
+
+        Enumeration<Driver> en = DriverManager.getDrivers();
+        while ( en.hasMoreElements() )
+            try {
+                Driver driver = en.nextElement();
+                if ( driver.getClass().getClassLoader() == getClass().getClassLoader() )
+                    DriverManager.deregisterDriver(driver);
+            } catch ( SQLException e1 ) {
+                
+            }
+
+        Field field = getFieldByReflection("com.mysql.jdbc.ConnectionImpl", "cancelTimer");
+        if (field != null) {
+            try {
+                Timer timer = (Timer) field.get(null);
+                timer.cancel();
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+
         ElementsThreadLocals.destroy();
-        setFieldValue("org.apache.commons.lang.builder.ToStringStyle", "registry", null, null);
-        setFieldValue("org.apache.struts2.config.Settings", "settingsImpl", null, null);
-        setFieldValue("org.apache.struts2.config.Settings", "defaultImpl", null, null);
-        setFieldValue("org.apache.struts2.dispatcher.Dispatcher", "instance", null, null);
-        setFieldValue("org.apache.struts2.dispatcher.Dispatcher", "dispatcherListeners", null, null);
-        setFieldValue("com.opensymphony.xwork2.ActionContext", "actionContext", null, null);
         System.gc();
 
+
         try {
-            context.stopFileManager();
+            application.stopFileManager();
         } catch (Exception e) {
             logger.warn("cannot stop FileManager");
         }
 
         logger.info("ManyDesigns Portofino stopped.");
+    }
+
+    public static void clearJaxbThreadLocal() {
+        try {
+            Field f = ClassFactory.class.getDeclaredField( "tls" );
+            f.setAccessible( true );
+            ( (ThreadLocal<?>) f.get( null ) ).set( null );
+            f = Coordinator.class.getDeclaredField( "activeTable" );
+            f.setAccessible( true );
+            ( (ThreadLocal<?>) f.get( null ) ).set( null );
+        } catch ( Throwable e ) {
+            logger.error( "Failed to plug thread local leaks of jaxb." );
+            logger.trace( "Stack trace:", e );
+        }
+    }
+
+    public static void clearJaxb() {
+        try {
+            Field f = ClassFactory.class.getDeclaredField( "tls" );
+            f.setAccessible( true );
+            ( (ThreadLocal<?>) f.get( null ) ).remove();
+            f = Coordinator.class.getDeclaredField( "activeTable" );
+            f.setAccessible( true );
+            ( (ThreadLocal<?>) f.get( null ) ).remove();
+        } catch ( Throwable e ) {
+            logger.error( "Failed to plug thread local leaks of jaxb." );
+            logger.trace( "Stack trace:", e );
+        }
     }
 
     public void setFieldValue(String className, String fieldName, Object obj, Object fieldValue) {
@@ -271,13 +324,13 @@ public class PortofinoListener
             String managerClassName =
                     portofinoProperties.getProperty(
                             PortofinoProperties.CONTEXT_CLASS_PROPERTY);
-            InstanceBuilder<Context> builder =
-                    new InstanceBuilder<Context>(
-                            Context.class,
-                            HibernateContextImpl.class,
+            InstanceBuilder<Application> builder =
+                    new InstanceBuilder<Application>(
+                            Application.class,
+                            HibernateApplicationImpl.class,
                             logger);
-            context = builder.createInstance(managerClassName);
-            servletContext.setAttribute(Context.KEY, context);
+            application = builder.createInstance(managerClassName);
+            servletContext.setAttribute(Application.KEY, application);
 
             String storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
                 PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));
@@ -310,14 +363,14 @@ public class PortofinoListener
             }
             logger.info("Storing directory:" + storeDir);
             logger.info("Working directory:" + workDir);
-            context.createFileManager(storeDir, workDir);
+            application.createFileManager(storeDir, workDir);
 
-            context.startFileManager();
+            application.startFileManager();
 
 
 
-            context.loadConnections(connectionsFileName);
-            context.loadXmlModel(modelFile);
+            application.loadConnections(connectionsFileName);
+            application.loadXmlModel(modelFile);
 
 
         } catch (Throwable e) {

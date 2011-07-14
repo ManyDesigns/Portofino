@@ -39,9 +39,9 @@ import com.manydesigns.portofino.actions.AbstractCrudAction;
 import com.manydesigns.portofino.actions.CrudSelectionProvider;
 import com.manydesigns.portofino.actions.CrudUnit;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectModel;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Column;
@@ -68,8 +68,8 @@ public class TableDataAction extends AbstractCrudAction {
     @InjectModel
     public Model model;
 
-    @InjectContext
-    public Context context;
+    @InjectApplication
+    public Application application;
 
     //**************************************************************************
     // Setup
@@ -89,7 +89,7 @@ public class TableDataAction extends AbstractCrudAction {
     protected CrudUnit createRootCrudUnit(Table table) {
         String qualifiedTableName = table.getQualifiedName();
         ClassAccessor classAccessor =
-                    context.getTableAccessor(qualifiedTableName);
+                    application.getTableAccessor(qualifiedTableName);
         String query = MessageFormat.format(
                 "FROM {0}", table.getActualEntityName());
         String searchTitle = MessageFormat.format(
@@ -128,7 +128,7 @@ public class TableDataAction extends AbstractCrudAction {
     }
 
     protected void injectValues(CrudUnit crudUnit) {
-        crudUnit.context = context;
+        crudUnit.application = application;
         crudUnit.model = model;
         crudUnit.req = req;
     }
@@ -137,9 +137,9 @@ public class TableDataAction extends AbstractCrudAction {
         // retrieve the related objects
         Table relatedTable = foreignKey.getActualToTable();
         ClassAccessor classAccessor =
-                context.getTableAccessor(relatedTable.getQualifiedName());
+                application.getTableAccessor(relatedTable.getQualifiedName());
         List<Object> relatedObjects =
-                context.getAllObjects(relatedTable.getQualifiedName());
+                application.getAllObjects(relatedTable.getQualifiedName());
 
         // Create selection provider
         ShortName shortNameAnnotation =
@@ -171,7 +171,7 @@ public class TableDataAction extends AbstractCrudAction {
                                          int index) {
         Table subTable = foreignKey.getFromTable();
         ClassAccessor subClassAccessor =
-                context.getTableAccessor(subTable.getQualifiedName());
+                application.getTableAccessor(subTable.getQualifiedName());
         StringBuilder sb = new StringBuilder();
         sb.append("FROM ");
         sb.append(subTable.getActualEntityName());
