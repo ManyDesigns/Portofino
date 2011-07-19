@@ -1,32 +1,32 @@
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
-%><%@ taglib prefix="s" uri="/struts-tags"
-%><%@taglib prefix="mdes" uri="/manydesigns-elements-struts2"
-%><s:include value="/skins/default/header.jsp"/>
-<form method="post" action="">
-    <s:include value="/skins/default/crud/searchButtonsBar.jsp"/>
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+%><%@taglib prefix="mde" uri="/manydesigns-elements"
+%><jsp:include page="/skins/default/header.jsp"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.UseCaseAction"/>
+<stripes:form action="${actionBean.dispatch.absolutePath}" method="post">
+    <jsp:include page="/skins/default/crud/searchButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1><s:property value="searchTitle"/></h1>
+        <h1><c:out value="${actionBean.useCase.searchTitle}"/></h1>
         <div class="yui-ge">
             <div class="yui-u first">
                 <div class="search_results">
-                    <mdes:write value="tableForm"/>
+                    <mde:write name="actionBean" property="tableForm"/>
                 </div>
             </div>
             <div class="yui-u">
-                <s:if test="!searchForm.isEmpty()">
+                <c:if test="${not empty actionBean.searchForm}">
                     <div class="search_form">
-                        <mdes:write value="searchForm"/>
-                        <s:submit method="search" value="Search"/>
-                        <s:reset value="Reset form"/>
+                        <mde:write name="actionBean" property="searchForm"/>
+                        <stripes:submit name="search" value="Search"/>
+                        <stripes:submit name="resetSearch" value="Reset form"/>
                     </div>
-                </s:if>
+                </c:if>
             </div>
         </div>
-        <s:set name="cancelReturnUrl"
-               value="%{pkHelper.generateSearchUrl(searchString)}"/>
-        <s:hidden name="cancelReturnUrl" value="%{#cancelReturnUrl}"/>
+        <stripes:hidden name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
     </div>
-    <s:include value="/skins/default/crud/searchButtonsBar.jsp"/>
-</form>
-<s:include value="/skins/default/footer.jsp"/>
+    <jsp:include page="/skins/default/crud/searchButtonsBar.jsp"/>
+</stripes:form>
+<jsp:include page="/skins/default/footer.jsp"/>

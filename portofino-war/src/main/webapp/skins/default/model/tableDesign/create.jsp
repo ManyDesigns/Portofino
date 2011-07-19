@@ -1,8 +1,8 @@
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
-%><%@ taglib prefix="s" uri="/struts-tags"
-%><%@ taglib prefix="mdes" uri="/manydesigns-elements-struts2"
-%><s:include value="/skins/default/header.jsp"/>
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="mde" uri="/manydesigns-elements"
+%><jsp:include page="/skins/default/header.jsp"/>
 <script type="text/javascript">
     $(document).ready(function(){
         $("#column_columnType")
@@ -63,7 +63,7 @@
   </script>
 
 <s:form method="post">
-    <s:include value="/skins/default/model/tableDesign/createButtonsBar.jsp"/>
+    <jsp:include page="/skins/default/model/tableDesign/createButtonsBar.jsp"/>
     <div id="inner-content">
         <div id="table-create">
             <h1>Create new table </h1>
@@ -183,7 +183,7 @@
         <s:hidden name="npkcol" value="%{npkcol}"/>
         <s:hidden name="nAnnotations" value="%{nAnnotations}"/>
     </div>
-    <s:include value="/skins/default/model/tableDesign/createButtonsBar.jsp"/>
+    <jsp:include page="/skins/default/model/tableDesign/createButtonsBar.jsp"/>
 </s:form>
 <script type="text/javascript">
 
@@ -237,4 +237,4 @@
         $("#setAnnParameters").click();
     });
   </script>
-<s:include value="/skins/default/footer.jsp"/>
+<jsp:include page="/skins/default/footer.jsp"/>

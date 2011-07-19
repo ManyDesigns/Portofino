@@ -1,8 +1,8 @@
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
-%><%@ taglib prefix="s" uri="/struts-tags"
-%><%@taglib prefix="mdes" uri="/manydesigns-elements-struts2"
-%><s:include value="/skins/default/header.jsp"/>
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@taglib prefix="mde" uri="/manydesigns-elements"
+%><jsp:include page="/skins/default/header.jsp"/>
 <div class="tabs-bar-top">
     <s:url var="portofinoPropertiesUrl" method="portofinoProperties"/>
     <s:url var="elementsPropertiesUrl" method="elementsProperties"/>
@@ -17,4 +17,4 @@
     <h1>System properties</h1>
     <mdes:write value="form"/>
 </div>
-<s:include value="/skins/default/footer.jsp"/>
+<jsp:include page="/skins/default/footer.jsp"/>

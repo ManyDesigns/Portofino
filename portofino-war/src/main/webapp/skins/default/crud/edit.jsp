@@ -1,30 +1,24 @@
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
-%><%@ taglib prefix="s" uri="/struts-tags"
-%><%@ taglib prefix="mdes" uri="/manydesigns-elements-struts2"
-%><s:include value="/skins/default/header.jsp"/>
-<s:form method="post" action="%{dispatch.originalPath}"
-        enctype="%{form.multipartRequest ? 'multipart/form-data' : 'application/x-www-form-urlencoded'}">
-    <s:include value="/skins/default/crud/editButtonsBar.jsp"/>
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+%><%@taglib prefix="mde" uri="/manydesigns-elements"
+%><jsp:include page="/skins/default/header.jsp"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.UseCaseAction"/>
+<stripes:form action="${actionBean.dispatch.absolutePath}" method="post" enctype="multipart/form-data">
+    <jsp:include page="/skins/default/crud/editButtonsBar.jsp"/>
     <div id="inner-content">
-        <s:if test="form != null">
-            <h1><s:property value="editTitle"/></h1>
-            <s:if test="form.requiredFieldsPresent">
-                Fields marked with a "*" are required.
-            </s:if>
-            <mdes:write value="form"/>
-        </s:if>
-        <s:iterator var="current" value="subCrudUnits" status="status">
-            <h2><s:property value="#current.editTitle"/></h2>
-            <mdes:write value="#current.form"/>
-            <s:hidden name="subCrudUnits[%{#status.index}].pk" value="%{#current.pk}"/>
-        </s:iterator>
-        <s:hidden name="pk" value="%{pk}"/>
-        <s:if test="searchString != null">
-            <s:hidden name="searchString" value="%{searchString}"/>
-        </s:if>
-        <s:hidden name="cancelReturnUrl" value="%{cancelReturnUrl}"/>
+        <h1><c:out value="${actionBean.useCase.editTitle}"/></h1>
+        <c:if test="${actionBean.requiredFieldsPresent}">
+            Fields marked with a "*" are required.
+        </c:if>
+        <mde:write name="actionBean" property="form"/>
+        <stripes:hidden name="pk" value="${actionBean.pk}"/>
+        <c:if test="${not empty actionBean.searchString}">
+            <stripes:hidden name="searchString" value="${actionBean.searchString}"/>
+        </c:if>
+        <stripes:hidden name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
     </div>
-    <s:include value="/skins/default/crud/editButtonsBar.jsp"/>
-</s:form>
-<s:include value="/skins/default/footer.jsp"/>
+    <jsp:include page="/skins/default/crud/editButtonsBar.jsp"/>
+</stripes:form>
+<jsp:include page="/skins/default/footer.jsp"/>

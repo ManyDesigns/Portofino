@@ -1,46 +1,41 @@
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
-         pageEncoding="ISO-8859-1" %>
-<%@ taglib prefix="s" uri="/struts-tags" %>
-<s:if test="#buttonsBarBottom">
+         pageEncoding="ISO-8859-1"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:if test="${not empty buttonsBarBottom}">
     <div class="buttons-bar-bottom">
-</s:if><s:else>
-    <s:set var="buttonsBarBottom" value="true"/>
+</c:if><c:if test="${empty buttonsBarBottom}">
+    <c:set var="buttonsBarBottom" value="true"/>
     <div class="buttons-bar-top">
-</s:else>
-    <s:set name="position" value="objects.indexOf(object)"/>
-    <s:set name="size" value="objects.size()"/>
-    <s:if test="#position >= 0">
+</c:if>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.UseCaseAction"/>
+    <c:if test="${actionBean.position >= 0}">
         <div style="float: right;">
-            <s:if test="#position > 0">
-                <s:set name="firstUrl"
-                       value="%{pkHelper.generateUrl(objects.get(0), searchString)}" />
-                <s:a id="first" href="%{#firstUrl}">first</s:a>
-                <s:set name="previousUrl"
-                       value="%{pkHelper.generateUrl(objects.get(#position-1), searchString)}" />
-                <s:a id="previous" href="%{#previousUrl}">previous</s:a>
-            </s:if><s:else>
+            <c:if test="${not empty actionBean.firstUrl}">
+                <stripes:link id="first" href="${actionBean.firstUrl}">first</stripes:link>
+                <stripes:link id="previous" href="${actionBean.previousUrl}">previous</stripes:link>
+            </c:if>
+            <c:if test="${empty actionBean.firstUrl}">
                 <span class="disabled">first</span> <span class="disabled">previous</span>
-            </s:else>
-            <s:property value="#position+1"/> of <s:property value="objects.size()"/>
-            <s:if test="#position < #size-1">
-                <s:set name="nextUrl"
-                       value="%{pkHelper.generateUrl(objects.get(#position+1), searchString)}" />
-                <s:a id="next" href="%{#nextUrl}">next</s:a>
-                <s:set name="lastUrl"
-                       value="%{pkHelper.generateUrl(objects.get(#size - 1), searchString)}" />
-                <s:a id="last" href="%{#lastUrl}">last</s:a>
-            </s:if><s:else>
+            </c:if>
+            <c:out value="${actionBean.position + 1}"/> of <c:out value="${actionBean.size}"/>
+            <c:if test="${not empty actionBean.lastUrl}">
+                <stripes:link id="next" href="${actionBean.nextUrl}">next</stripes:link>
+                <stripes:link id="last" href="${actionBean.lastUrl}">last</stripes:link>
+            </c:if>
+            <c:if test="${empty actionBean.lastUrl}">
                 <span class="disabled">next</span> <span class="disabled">last</span>
-            </s:else>
+            </c:if>
         </div>
-    </s:if>
-    <s:submit id="Table_returnToSearch" method="returnToSearch" value="<< Return to search"/>
-    <s:submit id="Table_edit" method="edit" value="Edit"/>
-    <s:submit id="Table_delete" method="delete" value="Delete"
+    </c:if>
+    <stripes:submit id="Table_returnToSearch" name="returnToSearch" value="<< Return to search"/>
+    <stripes:submit id="Table_edit" name="edit" value="Edit"/>
+    <stripes:submit id="Table_delete" name="delete" value="Delete"
               onclick="return confirm ('Are you sure?');"/>
-    <s:submit id="Table_duplicate" method="duplicate" value="Duplicate" disabled="true"/>
-    <s:submit id="Table_print" method="print" value="Print" disabled="true"/>
-    <s:submit id="Table_exportExcel" method="exportReadExcel" value="Excel" disabled="false"/>
-    <s:submit id="Table_exportPdf" method="exportReadPdf" value="Pdf" disabled="false"/>
-    <s:include value="crudButtons.jsp"/>
+    <stripes:submit id="Table_duplicate" name="duplicate" value="Duplicate" disabled="true"/>
+    <stripes:submit id="Table_print" name="print" value="Print" disabled="true"/>
+    <stripes:submit id="Table_exportExcel" name="exportReadExcel" value="Excel" disabled="false"/>
+    <stripes:submit id="Table_exportPdf" name="exportReadPdf" value="Pdf" disabled="false"/>
+    <jsp:include page="crudButtons.jsp"/>
 </div>

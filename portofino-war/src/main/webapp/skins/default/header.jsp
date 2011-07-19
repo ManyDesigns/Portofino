@@ -7,8 +7,9 @@
     response.setDateHeader("Expires", 0);
 %><%@ page contentType="text/html;charset=ISO-8859-1" language="java"
            pageEncoding="ISO-8859-1"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
-%><%@ taglib prefix="mdes" uri="/manydesigns-elements-struts2"
+%><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
@@ -35,29 +36,28 @@
             src="<stripes:url value="/elements.js"/>"></script>
     <script type="text/javascript"
             src="<stripes:url value="/skins/default/portofino.js"/>"></script>
-    <jsp:useBean id="dispatch" class="com.manydesigns.portofino.dispatcher.Dispatch" scope="request"/>
-    <title>${dispatch.lastSiteNodeInstance.siteNode.description}</title>
+    <jsp:useBean id="dispatch" type="com.manydesigns.portofino.dispatcher.Dispatch" scope="request"/>
+    <title><c:out value="${dispatch.lastSiteNodeInstance.siteNode.description}"/></title>
 </head>
 <body>
 <div id="doc3" class="yui-t2">
-    <stripes:url var="indexUrl" value="/Index.action"/>
     <stripes:url var="profileUrl" value="/Profile.action"/>
-    <stripes:url var="settingsUrl" value="/user/Settings.action"/>
-    <stripes:url var="helpUrl" value="/user/Help.action"/>
     <stripes:url var="loginUrl" value="/user/Login.action"/>
     <stripes:url var="logoutUrl" value="/user/Login.action?logout="/>
-
-
+    <jsp:useBean id="portofinoProperties" scope="application" type="java.util.Properties"/>
     <div id="hd">
         <div id="globalLinks">
 
-            <s:if test="#application.portofinoProperties['user.enabled'].equals('true') 
+            <!--
+            <s:if test="#application.portofinoProperties['user.enabled'].equals('true')
             && #session.get('userId') != null">
                 Welcome, <s:a href="%{#profileUrl}">
                 <s:property value="#session.get('userName')"/></s:a> -
             </s:if>
-            <s:a href="%{#settingsUrl}">Settings</s:a> -
-            <s:a href="%{#helpUrl}">Help</s:a>
+            -->
+            <stripes:link href="/user/Settings.action">Settings</stripes:link> -
+            <stripes:link href="/user/Help.action">Help</stripes:link> -
+            <!--
             <s:if test="#application.portofinoProperties['user.enabled'].equals('true')
             && #session.get('userId') == null">
               - <s:a href="%{#loginUrl}">Log in</s:a>
@@ -66,12 +66,13 @@
             && #session.get('userId') != null">
                 - <s:a href="%{#logoutUrl}">Log out</s:a>    
             </s:if>
+            -->
 
         </div>
         <div style="position: absolute; left: 20em;">
-            <mdes:sessionMessages/>
+            <mde:sessionMessages/>
         </div>
-        <h1><s:a href="%{#indexUrl}"><s:property value="#application.portofinoProperties['application.name']"/></s:a></h1>
+        <h1><stripes:link href="/"><c:out value="${portofinoProperties['application.name']}"/></stripes:link></h1>
     </div>
     <div id="bd">
         <div id="yui-main">

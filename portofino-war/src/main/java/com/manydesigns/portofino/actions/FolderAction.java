@@ -67,7 +67,7 @@ public class FolderAction extends AbstractActionBean {
             return null;
         } else {
             SiteNode firstChild = childNodes.get(0);
-            redirectUrl = dispatch.getOriginalPath() + "/" + firstChild.getId();
+            redirectUrl = dispatch.getServletPath() + "/" + firstChild.getId();
             return SUCCESS;
         }
     }

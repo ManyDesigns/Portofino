@@ -112,7 +112,7 @@ public class Dispatcher {
                 new SiteNodeInstance[siteNodePath.size()];
         siteNodePath.toArray(siteNodeArray);
 
-        return new Dispatch(originalPath, rewrittenPath, siteNodeArray);
+        return new Dispatch(request, rewrittenPath, siteNodeArray);
     }
 
     private SiteNodeInstance createSiteNodeInstance(

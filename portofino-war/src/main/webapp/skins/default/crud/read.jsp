@@ -1,21 +1,21 @@
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
-%><%@ taglib prefix="s" uri="/struts-tags"
-%><%@ taglib prefix="mdes" uri="/manydesigns-elements-struts2"
-%><s:include value="/skins/default/header.jsp"/>
-<s:form method="post">
-    <s:include value="/skins/default/crud/readButtonsBar.jsp"/>
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="mde" uri="/manydesigns-elements"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+%><jsp:include page="/skins/default/header.jsp"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.UseCaseAction"/>
+<stripes:form action="${actionBean.dispatch.absolutePath}" method="post">
+    <jsp:include page="/skins/default/crud/readButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1><s:property value="readTitle"/></h1>
-        <mdes:write value="form"/>
-        <s:hidden name="pk" value="%{pk}"/>
-        <s:if test="searchString != null">
-            <s:hidden name="searchString" value="%{searchString}"/>
-        </s:if>
-        <s:set name="cancelReturnUrl"
-               value="%{pkHelper.generateUrl(object, searchString)}"/>
-        <s:hidden name="cancelReturnUrl" value="%{#cancelReturnUrl}"/>
+        <h1><c:out value="${actionBean.useCase.readTitle}"/></h1>
+        <mde:write name="actionBean" property="form"/>
+        <stripes:hidden name="pk" value="${actionBean.pk}"/>
+        <c:if test="${not empty actionBean.searchString}">
+            <stripes:hidden name="searchString" value="${actionBean.searchString}"/>
+        </c:if>
+        <stripes:hidden name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
     </div>
-    <s:include value="/skins/default/crud/readButtonsBar.jsp"/>
-</s:form>
-<s:include value="/skins/default/footer.jsp"/>
+    <jsp:include page="/skins/default/crud/readButtonsBar.jsp"/>
+</stripes:form>
+<jsp:include page="/skins/default/footer.jsp"/>

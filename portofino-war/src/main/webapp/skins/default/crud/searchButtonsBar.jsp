@@ -1,18 +1,19 @@
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
-         pageEncoding="ISO-8859-1" %>
-<%@ taglib prefix="s" uri="/struts-tags" %>
-<s:if test="#buttonsBarBottom">
+         pageEncoding="ISO-8859-1"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:if test="${not empty buttonsBarBottom}">
     <div class="buttons-bar-bottom">
-</s:if><s:else>
-    <s:set var="buttonsBarBottom" value="true"/>
+</c:if><c:if test="${empty buttonsBarBottom}">
+    <c:set var="buttonsBarBottom" value="true"/>
     <div class="buttons-bar-top">
-</s:else>
-    <s:submit id="Table_create" method="create" value="Create new"/>
-    <s:submit id="Table_bulkEdit" method="bulkEdit" value="Edit"/>
-    <s:submit id="Table_bulkDelete" method="bulkDelete" value="Delete"
+</c:if>
+    <stripes:submit id="Table_create" name="create" value="Create new"/>
+    <stripes:submit id="Table_bulkEdit" name="bulkEdit" value="Edit"/>
+    <stripes:submit id="Table_bulkDelete" name="bulkDelete" value="Delete"
               onclick="return confirm ('Are you sure?');"/>
-    <s:submit id="Table_print" method="print" value="Print" disabled="true"/>
-    <s:submit id="Table_exportExcel" method="exportSearchExcel" value="Excel" disabled="false"/>
-    <s:submit id="Table_exportPdf" method="exportSearchPdf" value="Pdf" disabled="false"/>
-    <s:include value="crudButtons.jsp"/>
+    <stripes:submit id="Table_print" name="print" value="Print" disabled="true"/>
+    <stripes:submit id="Table_exportExcel" name="exportSearchExcel" value="Excel" disabled="false"/>
+    <stripes:submit id="Table_exportPdf" name="exportSearchPdf" value="Pdf" disabled="false"/>
+    <jsp:include page="crudButtons.jsp"/>
 </div>

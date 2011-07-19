@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import javax.servlet.http.HttpServletRequest;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -39,23 +41,24 @@ public class Dispatch {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public final static String KEY = Dispatch.class.getName();
+//    public final static String KEY = Dispatch.class.getName();
+    public final static String KEY = "dispatch";
 
 
-    protected final String originalPath;
+    protected final HttpServletRequest request;
     protected final String rewrittenPath;
     protected final SiteNodeInstance[] siteNodeInstancePath;
 
-    public Dispatch(String originalPath,
+    public Dispatch(HttpServletRequest request,
                     String rewrittenPath,
                     SiteNodeInstance[] siteNodeInstancePath) {
-        this.originalPath = originalPath;
+        this.request = request;
         this.rewrittenPath = rewrittenPath;
         this.siteNodeInstancePath = siteNodeInstancePath;
     }
 
-    public String getOriginalPath() {
-        return originalPath;
+    public HttpServletRequest getRequest() {
+        return request;
     }
 
     public String getRewrittenPath() {
@@ -68,5 +71,18 @@ public class Dispatch {
 
     public SiteNodeInstance getLastSiteNodeInstance() {
         return siteNodeInstancePath[siteNodeInstancePath.length - 1];
+    }
+
+    public String getServletPath() {
+        return request.getServletPath();
+    }
+
+    public String getAbsolutePath() {
+        String contextPath = request.getContextPath();
+        if ("/".equals(contextPath)) {
+            return getServletPath();
+        } else {
+            return contextPath + getServletPath();
+        }
     }
 }

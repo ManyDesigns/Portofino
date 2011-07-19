@@ -55,7 +55,8 @@ public interface Application {
     // KEY (for application scope attribute)
     //**************************************************************************
 
-    public final static String KEY = Application.class.getName();
+//    public final static String KEY = Application.class.getName();
+    public final static String KEY = "context";
 
     //**************************************************************************
     // Model loading

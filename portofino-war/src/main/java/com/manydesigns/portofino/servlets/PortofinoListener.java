@@ -222,16 +222,6 @@ public class PortofinoListener
                 
             }
 
-        Field field = getFieldByReflection("com.mysql.jdbc.ConnectionImpl", "cancelTimer");
-        if (field != null) {
-            try {
-                Timer timer = (Timer) field.get(null);
-                timer.cancel();
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
-
         ElementsThreadLocals.destroy();
         System.gc();
 

@@ -68,6 +68,7 @@ import jxl.write.*;
 import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
 import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fop.apps.FOPException;
@@ -83,10 +84,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,7 +94,7 @@ import java.util.regex.Pattern;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@UrlBinding("/UseCase")
+@UrlBinding("/UseCase.action")
 public class UseCaseAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
@@ -151,7 +149,17 @@ public class UseCaseAction extends AbstractActionBean {
     public List objects;
     public Object object;
 
+    //--------------------------------------------------------------------------
+    // Pagination objects
+    //--------------------------------------------------------------------------
 
+    public int position;
+    public int size;
+    public String firstUrl;
+    public String previousUrl;
+    public String nextUrl;
+    public String lastUrl;
+    
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -280,7 +288,16 @@ public class UseCaseAction extends AbstractActionBean {
         setupSearchForm();
         loadObjects();
         setupTableForm(Mode.VIEW);
+        cancelReturnUrl = new UrlBuilder(
+                Locale.getDefault(), dispatch.getAbsolutePath(), false)
+                .addParameter("searchString", searchString)
+                .toString();
+//        cancelReturnUrl = pkHelper.generateSearchUrl(searchString);
         return new ForwardResolution("/skins/default/crud/search.jsp");
+    }
+
+    public Resolution resetSearch() {
+        return new RedirectResolution(dispatch.getServletPath());
     }
 
     //**************************************************************************
@@ -308,7 +325,51 @@ public class UseCaseAction extends AbstractActionBean {
             crudButton.runGuard(this);
         }
 
+        cancelReturnUrl = new UrlBuilder(
+                Locale.getDefault(), dispatch.getAbsolutePath(), false)
+                .addParameter("searchString", searchString)
+                .toString();
+
+        setupPagination();
+
         return new ForwardResolution("/skins/default/crud/read.jsp");
+    }
+
+    protected void setupPagination() {
+        position = objects.indexOf(object);
+        size = objects.size();
+        String baseUrl = calculateBaseSearchUrl();
+        if(position >= 0) {
+            if(position > 0) {
+                firstUrl = generateObjectUrl(baseUrl, 0);
+                previousUrl = generateObjectUrl(baseUrl, position - 1);
+            }
+            if(position < size - 1) {
+                lastUrl = generateObjectUrl(baseUrl, size - 1);
+                nextUrl = generateObjectUrl(baseUrl, position + 1);
+            }
+        }
+    }
+
+    protected String calculateBaseSearchUrl() {
+        assert pk != null; //Ha senso solo in modalità read/detail
+        String baseUrl = dispatch.getAbsolutePath();
+        int lastSlashIndex = baseUrl.lastIndexOf('/');
+        baseUrl = baseUrl.substring(0, lastSlashIndex);
+        return baseUrl;
+    }
+
+    protected String generateObjectUrl(String baseUrl, int index) {
+        Object o = objects.get(index);
+        return generateObjectUrl(baseUrl, o);
+    }
+
+    protected String generateObjectUrl(String baseUrl, Object o) {
+        String objPk = pkHelper.generatePkString(o);
+        return new UrlBuilder(
+                Locale.getDefault(), baseUrl + "/" + objPk, false)
+                .addParameter("searchString", searchString)
+                .toString();
     }
 
     protected void refreshBlobDownloadHref() {
@@ -362,7 +423,7 @@ public class UseCaseAction extends AbstractActionBean {
             }
             pk = pkHelper.generatePkString(object);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
-            String url = dispatch.getOriginalPath() + "/" + pk;
+            String url = dispatch.getServletPath() + "/" + pk;
             return new RedirectResolution(url);
         } else {
             return new ForwardResolution("/skins/default/crud/create.jsp");
@@ -395,7 +456,7 @@ public class UseCaseAction extends AbstractActionBean {
                 return new ForwardResolution("/skins/default/crud/edit.jsp");
             }
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
-            return new RedirectResolution(dispatch.getOriginalPath())
+            return new RedirectResolution(dispatch.getServletPath())
                     .addParameter(SEARCH_STRING_PARAM, searchString);
         } else {
             return new ForwardResolution("/skins/default/crud/edit.jsp");
@@ -415,7 +476,7 @@ public class UseCaseAction extends AbstractActionBean {
 
         if (selection.length == 1) {
             pk = selection[0];
-            String url = dispatch.getOriginalPath() + "/" + pk;
+            String url = dispatch.getServletPath() + "/" + pk;
             return new RedirectResolution(url)
                     .addParameter(SEARCH_STRING_PARAM, searchString)
                     .addParameter("edit");
@@ -447,7 +508,7 @@ public class UseCaseAction extends AbstractActionBean {
             SessionMessages.addInfoMessage(MessageFormat.format(
                     "UPDATE di {0} oggetti avvenuto con successo",
                     selection.length));
-            return new RedirectResolution(dispatch.getOriginalPath())
+            return new RedirectResolution(dispatch.getServletPath())
                     .addParameter(SEARCH_STRING_PARAM, searchString);
         } else {
             return new ForwardResolution("/skins/default/crud/bulkEdit.jsp");
@@ -472,8 +533,8 @@ public class UseCaseAction extends AbstractActionBean {
             logger.debug(rootCauseMessage, e);
             SessionMessages.addErrorMessage(rootCauseMessage);
         }
-        int lastSlashPos = dispatch.getOriginalPath().lastIndexOf("/");
-        String url = dispatch.getOriginalPath().substring(0, lastSlashPos);
+        int lastSlashPos = dispatch.getServletPath().lastIndexOf("/");
+        String url = dispatch.getServletPath().substring(0, lastSlashPos);
         return new RedirectResolution(url)
                 .addParameter(SEARCH_STRING_PARAM, searchString);
     }
@@ -482,7 +543,7 @@ public class UseCaseAction extends AbstractActionBean {
         if (selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
-            return new RedirectResolution(dispatch.getOriginalPath())
+            return new RedirectResolution(dispatch.getServletPath())
                     .addParameter(SEARCH_STRING_PARAM, searchString);
         }
         for (String current : selection) {
@@ -500,7 +561,7 @@ public class UseCaseAction extends AbstractActionBean {
                 SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
         }
 
-        return new RedirectResolution(dispatch.getOriginalPath())
+        return new RedirectResolution(dispatch.getServletPath())
                 .addParameter(SEARCH_STRING_PARAM, searchString);
     }
 
@@ -519,6 +580,22 @@ public class UseCaseAction extends AbstractActionBean {
             }
         }
         throw new Error("No button found");
+    }
+
+    //**************************************************************************
+    // Cancel
+    //**************************************************************************
+
+    public Resolution cancel() {
+        return new RedirectResolution(cancelReturnUrl, false);
+    }
+
+    public Resolution returnToSearch() {
+        RedirectResolution resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
+        if(!StringUtils.isEmpty(searchString)) {
+            resolution.addParameter("searchString", searchString);
+        }
+        return resolution;
     }
 
     //**************************************************************************
@@ -661,7 +738,7 @@ public class UseCaseAction extends AbstractActionBean {
 
     protected String getReadLinkExpression() {
         StringBuilder sb = new StringBuilder();
-        sb.append(dispatch.getOriginalPath());
+        sb.append(dispatch.getServletPath());
         sb.append("/");
         boolean first = true;
 
@@ -1137,5 +1214,201 @@ public class UseCaseAction extends AbstractActionBean {
                 SessionMessages.addErrorMessage(e.getMessage());
             }
         }
+    }
+
+    public boolean isRequiredFieldsPresent() {
+        return form.isRequiredFieldsPresent();
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+    public void setApplication(Application application) {
+        this.application = application;
+    }
+
+    public Model getModel() {
+        return model;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
+    }
+
+    public Dispatch getDispatch() {
+        return dispatch;
+    }
+
+    public void setDispatch(Dispatch dispatch) {
+        this.dispatch = dispatch;
+    }
+
+    public UseCaseNodeInstance getSiteNodeInstance() {
+        return siteNodeInstance;
+    }
+
+    public void setSiteNodeInstance(UseCaseNodeInstance siteNodeInstance) {
+        this.siteNodeInstance = siteNodeInstance;
+    }
+
+    public UseCaseNode getUseCaseNode() {
+        return useCaseNode;
+    }
+
+    public void setUseCaseNode(UseCaseNode useCaseNode) {
+        this.useCaseNode = useCaseNode;
+    }
+
+    public UseCase getUseCase() {
+        return useCase;
+    }
+
+    public void setUseCase(UseCase useCase) {
+        this.useCase = useCase;
+    }
+
+    public ClassAccessor getClassAccessor() {
+        return classAccessor;
+    }
+
+    public void setClassAccessor(ClassAccessor classAccessor) {
+        this.classAccessor = classAccessor;
+    }
+
+    public Table getBaseTable() {
+        return baseTable;
+    }
+
+    public void setBaseTable(Table baseTable) {
+        this.baseTable = baseTable;
+    }
+
+    public PkHelper getPkHelper() {
+        return pkHelper;
+    }
+
+    public void setPkHelper(PkHelper pkHelper) {
+        this.pkHelper = pkHelper;
+    }
+
+    public List<CrudButton> getCrudButtons() {
+        return crudButtons;
+    }
+
+    public void setCrudButtons(List<CrudButton> crudButtons) {
+        this.crudButtons = crudButtons;
+    }
+
+    public List<CrudSelectionProvider> getCrudSelectionProviders() {
+        return crudSelectionProviders;
+    }
+
+    public void setCrudSelectionProviders(List<CrudSelectionProvider> crudSelectionProviders) {
+        this.crudSelectionProviders = crudSelectionProviders;
+    }
+
+    public String getPk() {
+        return pk;
+    }
+
+    public void setPk(String pk) {
+        this.pk = pk;
+    }
+
+    public String[] getSelection() {
+        return selection;
+    }
+
+    public void setSelection(String[] selection) {
+        this.selection = selection;
+    }
+
+    public String getSearchString() {
+        return searchString;
+    }
+
+    public void setSearchString(String searchString) {
+        this.searchString = searchString;
+    }
+
+    public String getCancelReturnUrl() {
+        return cancelReturnUrl;
+    }
+
+    public void setCancelReturnUrl(String cancelReturnUrl) {
+        this.cancelReturnUrl = cancelReturnUrl;
+    }
+
+    public String getSuccessReturnUrl() {
+        return successReturnUrl;
+    }
+
+    public void setSuccessReturnUrl(String successReturnUrl) {
+        this.successReturnUrl = successReturnUrl;
+    }
+
+    public SearchForm getSearchForm() {
+        return searchForm;
+    }
+
+    public void setSearchForm(SearchForm searchForm) {
+        this.searchForm = searchForm;
+    }
+
+    public TableForm getTableForm() {
+        return tableForm;
+    }
+
+    public void setTableForm(TableForm tableForm) {
+        this.tableForm = tableForm;
+    }
+
+    public Form getForm() {
+        return form;
+    }
+
+    public void setForm(Form form) {
+        this.form = form;
+    }
+
+    public List getObjects() {
+        return objects;
+    }
+
+    public void setObjects(List objects) {
+        this.objects = objects;
+    }
+
+    public Object getObject() {
+        return object;
+    }
+
+    public void setObject(Object object) {
+        this.object = object;
+    }
+
+    public String getFirstUrl() {
+        return firstUrl;
+    }
+
+    public String getPreviousUrl() {
+        return previousUrl;
+    }
+
+    public String getNextUrl() {
+        return nextUrl;
+    }
+
+    public String getLastUrl() {
+        return lastUrl;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public int getSize() {
+        return size;
     }
 }

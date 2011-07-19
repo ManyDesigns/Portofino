@@ -30,7 +30,6 @@
 package com.manydesigns.elements.servlet;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import org.apache.commons.fileupload.FileUploadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,19 +84,20 @@ public class ElementsFilter implements Filter {
         ServletContext context = config.getServletContext();
 
         try {
-            MultipartRequestWrapper wrappedRequest =
-                    new MultipartRequestWrapper(req);
+            // TODO: la seguente riga dà fastidio a Stripes ma serve per
+            // usi di Elements senza framework (servlet-api only)
+//            req = new MultipartRequestWrapper(req);
 
             ElementsThreadLocals.setupDefaultElementsContext();
 
-            ElementsThreadLocals.setHttpServletRequest(wrappedRequest);
+            ElementsThreadLocals.setHttpServletRequest(req);
             ElementsThreadLocals.setHttpServletResponse(res);
             ElementsThreadLocals.setServletContext(context);
 
             filterChain.doFilter(req, res);
-        } catch (FileUploadException e) {
-            logger.error("FileUploadException caught", e);
-            throw new ServletException(e);
+//        } catch (FileUploadException e) {
+//            logger.error("FileUploadException caught", e);
+//            throw new ServletException(e);
         } finally {
             ElementsThreadLocals.removeElementsContext();
         }

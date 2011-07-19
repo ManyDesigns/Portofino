@@ -76,7 +76,7 @@ public class DispatcherFilter implements Filter {
             // forward
             String rewrittenPath = dispatch.getRewrittenPath();
             logger.debug("Forwarding '{}' to '{}'",
-                    dispatch.getOriginalPath(),
+                    dispatch.getServletPath(),
                     rewrittenPath);
             RequestDispatcher requestDispatcher =
                     servletContext.getRequestDispatcher(rewrittenPath);

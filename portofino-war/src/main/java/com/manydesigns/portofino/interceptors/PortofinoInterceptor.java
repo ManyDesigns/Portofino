@@ -67,8 +67,9 @@ import java.util.concurrent.ConcurrentHashMap;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@Intercepts(LifecycleStage.EventHandling)
+@Intercepts(LifecycleStage.CustomValidation)
 public class PortofinoInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
@@ -105,93 +106,87 @@ public class PortofinoInterceptor implements Interceptor {
             userName = (String) session.getAttribute(UserUtils.USERNAME);
         }
 
-        try{
-            MDC.clear();
-            String userIdString =
-                    (userId == null) ? null : Long.toString(userId);
-            MDC.put(UserUtils.USERID, userIdString);
-            MDC.put(UserUtils.USERNAME, userName);
+        MDC.clear();
+        String userIdString =
+                (userId == null) ? null : Long.toString(userId);
+        MDC.put(UserUtils.USERID, userIdString);
+        MDC.put(UserUtils.USERNAME, userName);
 
-            //1. Non ho modello
-            if (application == null || application.getModel() == null) {
-                return new ForwardResolution("/errors/model-not-found.jsp");
+        //1. Non ho modello
+        if (application == null || application.getModel() == null) {
+            return new ForwardResolution("/errors/model-not-found.jsp");
+        }
+        application.resetDbTimer();
+        application.openSession();
+        Model model = application.getModel();
+
+        List<String> groups=UserUtils.manageGroups(application, userId);
+
+        Dispatch dispatch = (Dispatch) req.getAttribute(Dispatch.KEY);
+        Navigation navigation = new Navigation(application, dispatch, groups);
+        req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
+
+        ServerInfo serverInfo =
+                (ServerInfo) servletContext.getAttribute(ServerInfo.KEY);
+
+        /* injections */
+        injectAnnotatedFields(action, InjectApplication.class, application);
+        injectAnnotatedFields(action, InjectModel.class, model);
+        injectAnnotatedFields(action, InjectDispatch.class, dispatch);
+        SiteNodeInstance siteNodeInstance;
+        if(dispatch != null) {
+            SiteNodeInstance[] siteNodeInstances = dispatch.getSiteNodeInstancePath();
+            Map<String, Object> newValues = null;
+            for(SiteNodeInstance node : siteNodeInstances) {
+                newValues = node.realize(newValues);
             }
-            application.resetDbTimer();
-            application.openSession();
-            Model model = application.getModel();
-
-            List<String> groups=UserUtils.manageGroups(application, userId);
-
-            Dispatch dispatch = (Dispatch) req.getAttribute(Dispatch.KEY);
-            Navigation navigation = new Navigation(application, dispatch, groups);
-            req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
-
-            ServerInfo serverInfo =
-                    (ServerInfo) servletContext.getAttribute(ServerInfo.KEY);
-
-            /* injections */
-            injectAnnotatedFields(action, InjectApplication.class, application);
-            injectAnnotatedFields(action, InjectModel.class, model);
-            injectAnnotatedFields(action, InjectDispatch.class, dispatch);
-            SiteNodeInstance siteNodeInstance;
-            if(dispatch != null) {
-                SiteNodeInstance[] siteNodeInstances = dispatch.getSiteNodeInstancePath();
-                Map<String, Object> newValues = null;
-                for(SiteNodeInstance node : siteNodeInstances) {
-                    newValues = node.realize(newValues);
-                }
-                siteNodeInstance =  siteNodeInstances[siteNodeInstances.length-1];
-                injectAnnotatedFields(action, InjectSiteNodeInstance.class,
-                        siteNodeInstance);
-            } else {
-                siteNodeInstance = null;
-            }
-            injectAnnotatedFields(action, InjectNavigation.class, navigation);
-            injectAnnotatedFields(action, InjectServerInfo.class, serverInfo);
-            injectAnnotatedFields(action, InjectHttpRequest.class, req);
-            injectAnnotatedFields(action, InjectHttpSession.class, session);
+            siteNodeInstance =  siteNodeInstances[siteNodeInstances.length-1];
+            injectAnnotatedFields(action, InjectSiteNodeInstance.class,
+                    siteNodeInstance);
+        } else {
+            siteNodeInstance = null;
+        }
+        injectAnnotatedFields(action, InjectNavigation.class, navigation);
+        injectAnnotatedFields(action, InjectServerInfo.class, serverInfo);
+        injectAnnotatedFields(action, InjectHttpRequest.class, req);
+        injectAnnotatedFields(action, InjectHttpSession.class, session);
 
 
-            //2. Se è fuori dall'albero di navigazione e non ho permessi
-            if (siteNodeInstance == null ) {
+        //2. Se è fuori dall'albero di navigazione e non ho permessi
+        if (siteNodeInstance == null ) {
+            stopWatch.stop();
+            return context.proceed();
+        }
+
+        SiteNode node = siteNodeInstance.getSiteNode();
+        //3. Ho i permessi necessari vado alla pagina
+        if(node.isAllowed(groups)){
+            stopWatch.stop();
+            return context.proceed();
+        } else {
+            //4. Non ho i permessi, ma non sono loggato, vado alla pagina di login
+            if (userId==null){
                 stopWatch.stop();
-                return context.proceed();
-            }
-
-            SiteNode node = siteNodeInstance.getSiteNode();
-            //3. Ho i permessi necessari vado alla pagina
-            if(node.isAllowed(groups)){
-                stopWatch.stop();
-                return context.proceed();
-            } else {
-                //4. Non ho i permessi, ma non sono loggato, vado alla pagina di login
-                if (userId==null){
-                    stopWatch.stop();
-                    String returnUrl=req.getServletPath();
-                    Map parameters = req.getParameterMap();
-                    if (parameters.size()!=0){                        
-                        List<String> params = new ArrayList<String>();
-                        for (Object key : parameters.keySet()){
-                            params.add(key+"="+((String[]) parameters.get(key))[0]);
-                        }
-                        returnUrl += "?"+ StringUtils.join(params, "&");
+                String returnUrl=req.getServletPath();
+                Map parameters = req.getParameterMap();
+                if (parameters.size()!=0){
+                    List<String> params = new ArrayList<String>();
+                    for (Object key : parameters.keySet()){
+                        params.add(key+"="+((String[]) parameters.get(key))[0]);
                     }
-                    UrlBean bean = new UrlBean(returnUrl);
-                    /*
-                    actionContext.getValueStack().getRoot().push(bean);
-                    invocation.getStack().push(bean);
-                    */
-                    return new ForwardResolution("/skins/default/user/login.jsp");
-                } else {
-                    //5. Non ho i permessi, ma sono loggato, errore 401
-                    stopWatch.stop();
-                    return new ErrorResolution(UNAUTHORIZED);
+                    returnUrl += "?"+ StringUtils.join(params, "&");
                 }
+                UrlBean bean = new UrlBean(returnUrl);
+                /*
+                actionContext.getValueStack().getRoot().push(bean);
+                invocation.getStack().push(bean);
+                */
+                return new ForwardResolution("/skins/default/user/login.jsp");
+            } else {
+                //5. Non ho i permessi, ma sono loggato, errore 401
+                stopWatch.stop();
+                return new ErrorResolution(UNAUTHORIZED);
             }
-        } finally {
-            MDC.clear();
-            if (application !=null && application.getModel() != null)
-                application.closeSession();
         }
     }
 

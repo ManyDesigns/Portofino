@@ -1,12 +1,13 @@
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
-         pageEncoding="ISO-8859-1" %>
-<%@ taglib prefix="s" uri="/struts-tags" %>
-<s:if test="#buttonsBarBottom">
+         pageEncoding="ISO-8859-1"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:if test="${not empty buttonsBarBottom}">
     <div class="buttons-bar-bottom">
-</s:if><s:else>
-    <s:set var="buttonsBarBottom" value="true"/>
+</c:if><c:if test="${empty buttonsBarBottom}">
+    <c:set var="buttonsBarBottom" value="true"/>
     <div class="buttons-bar-top">
-</s:else>
-    <s:submit id="TableData_save" method="save" value="Save"/>
-    <s:submit id="TableData_cancel" method="cancel" value="Cancel"/>
+</c:if>
+    <stripes:submit id="TableData_save" name="save" value="Save"/>
+    <stripes:submit id="TableData_cancel" name="cancel" value="Cancel"/>
 </div>
