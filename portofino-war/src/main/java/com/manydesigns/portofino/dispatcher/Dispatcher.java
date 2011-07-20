@@ -32,6 +32,7 @@ package com.manydesigns.portofino.dispatcher;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.*;
+import net.sourceforge.stripes.controller.StripesConstants;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,7 +60,7 @@ public class Dispatcher {
     }
 
     public Dispatch createDispatch(HttpServletRequest request) {
-        String originalPath = (String) request.getAttribute("javax.servlet.include.servlet_path");
+        String originalPath = (String) request.getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH);
         if(originalPath == null) { originalPath = request.getServletPath(); }
 
         List<SiteNodeInstance> siteNodePath = new ArrayList<SiteNodeInstance>();
@@ -103,7 +104,7 @@ public class Dispatcher {
             } else if (siteNode instanceof FolderNode) {
                 rewrittenPath = "/Index.action";
             } else if (siteNode instanceof UseCaseNode) {
-                rewrittenPath = "/UseCase.action";
+                rewrittenPath = "/UseCase/" + originalPath + ".action";
             } else {
                 throw new Error("Unrecognized node type");
             }

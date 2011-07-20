@@ -3,8 +3,7 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%>
-<stripes:layout-render name="/skins/${skin}/crud/common.jsp">
+%><stripes:layout-render name="/skins/${skin}/crud/common.jsp">
     <stripes:layout-component name="buttons">
         <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.UseCaseAction"/>
         <c:if test="${actionBean.position >= 0}">
@@ -45,7 +44,6 @@
         </c:if>
         <stripes:hidden name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
 
-        <%--<c:set var="skin" value="embedded" scope="request"/>
-        <jsp:include page="${actionBean.dispatch.servletPath}/issues" />--%>
+        <jsp:include page="${actionBean.dispatch.servletPath}/issues" />
     </stripes:layout-component>
 </stripes:layout-render>

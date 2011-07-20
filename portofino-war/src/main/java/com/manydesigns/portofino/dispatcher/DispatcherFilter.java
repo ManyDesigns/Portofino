@@ -29,12 +29,14 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import net.sourceforge.stripes.controller.StripesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -71,16 +73,55 @@ public class DispatcherFilter implements Filter {
             // we can't handle this path. Let's do the normal filter chain
             chain.doFilter(request, response);
         } else {
-            request.setAttribute(Dispatch.KEY, dispatch);
-
             // forward
             String rewrittenPath = dispatch.getRewrittenPath();
-            logger.debug("Forwarding '{}' to '{}'",
-                    dispatch.getServletPath(),
-                    rewrittenPath);
             RequestDispatcher requestDispatcher =
                     servletContext.getRequestDispatcher(rewrittenPath);
-            requestDispatcher.forward(request, response);
+            if(request.getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) == null) {
+                logger.debug("Forwarding '{}' to '{}'",
+                    dispatch.getServletPath(),
+                    rewrittenPath);
+                request.setAttribute(Dispatch.KEY, dispatch);
+                requestDispatcher.forward(request, response);
+            } else {
+                logger.debug("Including '{}' to '{}'",
+                    dispatch.getServletPath(),
+                    rewrittenPath);
+
+                Map<String,Object> savedAttributes = new HashMap<String, Object>();
+                System.out.println("--- req dump ---");
+                Enumeration attrNames = request.getAttributeNames();
+                while(attrNames.hasMoreElements()) {
+                    String attrName = (String) attrNames.nextElement();
+                    Object attrValue = request.getAttribute(attrName);
+                    System.out.println(attrName + " = " + attrValue);
+                    savedAttributes.put(attrName, attrValue);
+                }
+                for(String attrName : savedAttributes.keySet()) {
+                    if(!attrName.startsWith("javax.servlet")) {
+                        //request.removeAttribute(attrName);
+                    }
+                }
+                System.out.println("--- end req dump ---");
+
+                try {
+                    request.setAttribute(Dispatch.KEY, dispatch);
+                    request.setAttribute("skin", "embedded");
+                    requestDispatcher.include(request, response);
+                } finally {
+                    List<String> attrNamesToRemove = new ArrayList<String>();
+                    attrNames = request.getAttributeNames();
+                    while(attrNames.hasMoreElements()) {
+                        attrNamesToRemove.add((String) attrNames.nextElement());
+                    }
+                    for(String attrName : attrNamesToRemove) {
+                        //request.removeAttribute(attrName);
+                    }
+                    for(Map.Entry<String, Object> entry : savedAttributes.entrySet()) {
+                        //request.setAttribute(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
         }
     }
 

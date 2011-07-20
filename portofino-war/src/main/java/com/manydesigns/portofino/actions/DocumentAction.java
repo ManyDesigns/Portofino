@@ -74,7 +74,7 @@ public class DocumentAction extends AbstractActionBean {
             logger.warn(MessageFormat.format("IOException opening file {0}",
                     fileName));
         }
-        return new ForwardResolution("/skins/default/document.jsp");
+        return new ForwardResolution("/layouts/document.jsp");
     }
 
 

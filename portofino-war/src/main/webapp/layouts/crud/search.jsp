@@ -3,8 +3,7 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%>
-<stripes:layout-render name="/skins/${skin}/crud/common.jsp">
+%><stripes:layout-render name="/skins/${skin}/crud/common.jsp">
     <stripes:layout-component name="buttons">
         <stripes:submit id="Table_create" name="create" value="Create new"/>
         <stripes:submit id="Table_bulkEdit" name="bulkEdit" value="Edit"/>

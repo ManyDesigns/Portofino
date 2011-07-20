@@ -38,7 +38,7 @@
         <filter-name>portofino-dispatcher</filter-name>
         <url-pattern>/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
-        <!--<dispatcher>INCLUDE</dispatcher>-->
+        <dispatcher>INCLUDE</dispatcher>
     </filter-mapping>
 
     <filter>
@@ -58,14 +58,9 @@
 
     <filter-mapping>
 		<filter-name>StripesFilter</filter-name>
-		<url-pattern>*.jsp</url-pattern>
-		<dispatcher>REQUEST</dispatcher>
-	</filter-mapping>
-	
-	<filter-mapping>
-		<filter-name>StripesFilter</filter-name>
 		<servlet-name>StripesDispatcher</servlet-name>
         <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
         <dispatcher>FORWARD</dispatcher>
 	</filter-mapping>
 

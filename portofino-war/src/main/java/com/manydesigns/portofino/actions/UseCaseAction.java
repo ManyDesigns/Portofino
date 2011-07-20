@@ -94,7 +94,8 @@ import java.util.regex.Pattern;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@UrlBinding("/UseCase.action")
+@UrlBinding("/UseCase/{ignore}.action")
+//@UrlBinding("/__portofino_reserved__/{ignore}/UseCase.action")
 public class UseCaseAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
