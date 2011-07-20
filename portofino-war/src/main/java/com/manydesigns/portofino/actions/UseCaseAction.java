@@ -275,7 +275,11 @@ public class UseCaseAction extends AbstractActionBean {
     @DefaultHandler
     public Resolution execute() {
         if (StringUtils.isEmpty(pk)) {
-            return search();
+            if(UseCaseNode.MODE_EMBEDDED_SEARCH.equals(siteNodeInstance.getMode())) {
+                return embeddedSearch();
+            } else {
+                return search();
+            }
         } else {
             return read();
         }
@@ -294,6 +298,13 @@ public class UseCaseAction extends AbstractActionBean {
                 .addParameter("searchString", searchString)
                 .toString();
 //        cancelReturnUrl = pkHelper.generateSearchUrl(searchString);
+        return new ForwardResolution("/layouts/crud/search.jsp");
+    }
+
+    public Resolution embeddedSearch() {
+//        setupSearchForm();
+        loadObjects();
+        setupTableForm(Mode.VIEW);
         return new ForwardResolution("/layouts/crud/search.jsp");
     }
 
@@ -662,7 +673,7 @@ public class UseCaseAction extends AbstractActionBean {
                 .configPrefix(prefix)
                 .build();
 
-        if (StringUtils.isBlank(searchString)) {
+        if (StringUtils.isBlank(searchString) || UseCaseNode.MODE_EMBEDDED_SEARCH.equals(getMode())) {
             searchForm.readFromRequest(context.getRequest());
             searchString = searchForm.toSearchString();
             if (searchString.length() == 0) {
@@ -770,7 +781,9 @@ public class UseCaseAction extends AbstractActionBean {
         // ma nessun risultato
         try {
             TableCriteria criteria = new TableCriteria(baseTable);
-            searchForm.configureCriteria(criteria);
+            if(searchForm != null) {
+                searchForm.configureCriteria(criteria);
+            }
             objects = application.getObjects(useCase.getQuery(), criteria, this);
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
@@ -1416,4 +1429,9 @@ public class UseCaseAction extends AbstractActionBean {
     public boolean isMultipartRequest() {
         return form != null && form.isMultipartRequest();
     }
+
+    public String getMode() {
+        return siteNodeInstance.getMode();
+    }
+
 }

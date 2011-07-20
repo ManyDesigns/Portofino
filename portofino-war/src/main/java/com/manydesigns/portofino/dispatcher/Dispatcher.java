@@ -125,8 +125,14 @@ public class Dispatcher {
             String param;
             if (iterator.hasNext()) {
                 String peek = iterator.next();
-                if (UseCaseNode.MODE_NEW.equals((peek))) {
+                if (UseCaseNode.MODE_NEW.equals(peek)) {
                     mode = UseCaseNode.MODE_NEW;
+                    param = null;
+                    if (iterator.hasNext()) {
+                        return null;
+                    }
+                } else if(UseCaseNode.MODE_EMBEDDED_SEARCH.equals(peek)) {
+                    mode = UseCaseNode.MODE_EMBEDDED_SEARCH;
                     param = null;
                     if (iterator.hasNext()) {
                         return null;

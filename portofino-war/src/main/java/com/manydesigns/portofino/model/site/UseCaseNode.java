@@ -46,6 +46,7 @@ public class UseCaseNode extends SiteNode{
     public static final String MODE_SEARCH = "search";
     public static final String MODE_NEW = "new";
     public static final String MODE_DETAIL = "detail";
+    public static final String MODE_EMBEDDED_SEARCH = "embeddedSearch";
 
     //**************************************************************************
     // Fields
