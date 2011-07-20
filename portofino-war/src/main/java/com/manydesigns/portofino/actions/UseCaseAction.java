@@ -293,7 +293,7 @@ public class UseCaseAction extends AbstractActionBean {
                 .addParameter("searchString", searchString)
                 .toString();
 //        cancelReturnUrl = pkHelper.generateSearchUrl(searchString);
-        return new ForwardResolution("/skins/default/crud/search.jsp");
+        return new ForwardResolution("/layouts/crud/search.jsp");
     }
 
     public Resolution resetSearch() {
@@ -332,7 +332,7 @@ public class UseCaseAction extends AbstractActionBean {
 
         setupPagination();
 
-        return new ForwardResolution("/skins/default/crud/read.jsp");
+        return new ForwardResolution("/layouts/crud/read.jsp");
     }
 
     protected void setupPagination() {
@@ -402,7 +402,7 @@ public class UseCaseAction extends AbstractActionBean {
     public Resolution create() {
         setupForm(Mode.CREATE);
 
-        return new ForwardResolution("/skins/default/crud/create.jsp");
+        return new ForwardResolution("/layouts/crud/create.jsp");
     }
 
     public Resolution save() {
@@ -419,14 +419,14 @@ public class UseCaseAction extends AbstractActionBean {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
                 SessionMessages.addErrorMessage(rootCauseMessage);
-                return new ForwardResolution("/skins/default/crud/create.jsp");
+                return new ForwardResolution("/layouts/crud/create.jsp");
             }
             pk = pkHelper.generatePkString(object);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
             String url = dispatch.getServletPath() + "/" + pk;
             return new RedirectResolution(url);
         } else {
-            return new ForwardResolution("/skins/default/crud/create.jsp");
+            return new ForwardResolution("/layouts/crud/create.jsp");
         }
     }
 
@@ -437,7 +437,7 @@ public class UseCaseAction extends AbstractActionBean {
     public Resolution edit() {
         setupForm(Mode.EDIT);
         form.readFromObject(object);
-        return new ForwardResolution("/skins/default/crud/edit.jsp");
+        return new ForwardResolution("/layouts/crud/edit.jsp");
     }
 
     public Resolution update() {
@@ -453,13 +453,13 @@ public class UseCaseAction extends AbstractActionBean {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
                 SessionMessages.addErrorMessage(rootCauseMessage);
-                return new ForwardResolution("/skins/default/crud/edit.jsp");
+                return new ForwardResolution("/layouts/crud/edit.jsp");
             }
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
             return new RedirectResolution(dispatch.getServletPath())
                     .addParameter(SEARCH_STRING_PARAM, searchString);
         } else {
-            return new ForwardResolution("/skins/default/crud/edit.jsp");
+            return new ForwardResolution("/layouts/crud/edit.jsp");
         }
     }
 
@@ -484,7 +484,7 @@ public class UseCaseAction extends AbstractActionBean {
 
         setupForm(Mode.BULK_EDIT);
 
-        return new ForwardResolution("/skins/default/crud/bulkEdit.jsp");
+        return new ForwardResolution("/layouts/crud/bulkEdit.jsp");
     }
 
     public Resolution bulkUpdate() {
@@ -503,7 +503,7 @@ public class UseCaseAction extends AbstractActionBean {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
                 SessionMessages.addErrorMessage(rootCauseMessage);
-                return new ForwardResolution("/skins/default/crud/bulkEdit.jsp");
+                return new ForwardResolution("/layouts/crud/bulkEdit.jsp");
             }
             SessionMessages.addInfoMessage(MessageFormat.format(
                     "UPDATE di {0} oggetti avvenuto con successo",
@@ -511,7 +511,7 @@ public class UseCaseAction extends AbstractActionBean {
             return new RedirectResolution(dispatch.getServletPath())
                     .addParameter(SEARCH_STRING_PARAM, searchString);
         } else {
-            return new ForwardResolution("/skins/default/crud/bulkEdit.jsp");
+            return new ForwardResolution("/layouts/crud/bulkEdit.jsp");
         }
     }
 
@@ -1410,5 +1410,9 @@ public class UseCaseAction extends AbstractActionBean {
 
     public int getSize() {
         return size;
+    }
+
+    public boolean isMultipartRequest() {
+        return form != null && form.isMultipartRequest();
     }
 }

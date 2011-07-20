@@ -59,7 +59,8 @@ public class Dispatcher {
     }
 
     public Dispatch createDispatch(HttpServletRequest request) {
-        String originalPath = request.getServletPath();
+        String originalPath = (String) request.getAttribute("javax.servlet.include.servlet_path");
+        if(originalPath == null) { originalPath = request.getServletPath(); }
 
         List<SiteNodeInstance> siteNodePath = new ArrayList<SiteNodeInstance>();
 

@@ -3,11 +3,13 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><jsp:include page="/skins/default/header.jsp"/>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.UseCaseAction"/>
-<stripes:form action="${actionBean.dispatch.absolutePath}" method="post" enctype="multipart/form-data">
-    <jsp:include page="/skins/default/crud/editButtonsBar.jsp"/>
-    <div id="inner-content">
+%>
+<stripes:layout-render name="/skins/${skin}/crud/common.jsp">
+    <stripes:layout-component name="buttons">
+        <stripes:submit id="TableData_update" name="update" value="Update"/>
+        <stripes:submit id="TableData_cancel" name="cancel" value="Cancel"/>
+    </stripes:layout-component>
+    <stripes:layout-component name="innerContent">
         <h1><c:out value="${actionBean.useCase.editTitle}"/></h1>
         <c:if test="${actionBean.requiredFieldsPresent}">
             Fields marked with a "*" are required.
@@ -18,7 +20,5 @@
             <stripes:hidden name="searchString" value="${actionBean.searchString}"/>
         </c:if>
         <stripes:hidden name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
-    </div>
-    <jsp:include page="/skins/default/crud/editButtonsBar.jsp"/>
-</stripes:form>
-<jsp:include page="/skins/default/footer.jsp"/>
+    </stripes:layout-component>
+</stripes:layout-render>

@@ -98,6 +98,9 @@ public class PortofinoInterceptor implements Interceptor {
         ServletContext servletContext = actionContext.getServletContext();
         Application application = (Application)servletContext.getAttribute(Application.KEY);
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
+        if(req.getAttribute("skin") == null) {
+            req.setAttribute("skin", "default");
+        }
 
         Long userId = null;
         String userName = null;
