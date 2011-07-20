@@ -66,6 +66,7 @@
 		<servlet-name>StripesDispatcher</servlet-name>
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
 	</filter-mapping>
 
 	<servlet>

@@ -29,16 +29,16 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.site.UseCaseNode;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
 import com.manydesigns.portofino.util.PkHelper;
+import ognl.OgnlContext;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -66,23 +66,23 @@ public class UseCaseNodeInstance extends SiteNodeInstance {
         pkHelper = new PkHelper(classAccessor);
     }
 
-    public Map<String, Object> realize(Object rootObject) {
+    public void realize() {
         if(UseCaseNode.MODE_DETAIL.equals(mode)) {
-            loadObject(pk, rootObject);
+            OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+            loadObject(pk);
             if(object != null) {
-                Map<String, Object> newValue = new HashMap<String, Object>();
-                newValue.put(useCase.getActualVariable(), object);
-                return newValue;
+                ognlContext.put(useCase.getActualVariable(), object);
             } else {
                 throw new RuntimeException("Not in use case: " + useCase.getName());
             }
         }
-        return null;
     }
 
-    private void loadObject(String pk, Object rootObject) {
+    private void loadObject(String pk) {
         Serializable pkObject = pkHelper.parsePkString(pk);
-        object = application.getObjectByPk(baseTable.getQualifiedName(), pkObject, useCase.getQuery(), rootObject);
+        object = application.getObjectByPk(
+                baseTable.getQualifiedName(), pkObject,
+                useCase.getQuery(), null);
     }
 
     // Getter/setter

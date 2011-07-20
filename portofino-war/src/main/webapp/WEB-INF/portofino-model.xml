@@ -1237,7 +1237,7 @@ Struttura dell'XML:
                         <useCase name="issue"
                                  variable="issue"
                                  table="redmine.redmine.issues"
-                                 query="FROM redmine_redmine_issues WHERE project_id = %{project.id}"
+                                 query="FROM redmine_redmine_issues WHERE project_id = %{#project.id}"
                                  searchTitle="Issue search"
                                  createTitle="Create issue"
                                  readTitle="Issue"

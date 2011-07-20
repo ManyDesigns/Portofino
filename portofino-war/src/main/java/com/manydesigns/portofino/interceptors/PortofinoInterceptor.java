@@ -136,9 +136,8 @@ public class PortofinoInterceptor implements Interceptor {
         SiteNodeInstance siteNodeInstance;
         if(dispatch != null) {
             SiteNodeInstance[] siteNodeInstances = dispatch.getSiteNodeInstancePath();
-            Map<String, Object> newValues = null;
             for(SiteNodeInstance node : siteNodeInstances) {
-                newValues = node.realize(newValues);
+                node.realize();
             }
             siteNodeInstance =  siteNodeInstances[siteNodeInstances.length-1];
             injectAnnotatedFields(action, InjectSiteNodeInstance.class,
