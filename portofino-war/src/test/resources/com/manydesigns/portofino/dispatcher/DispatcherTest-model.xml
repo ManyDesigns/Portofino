@@ -84,7 +84,7 @@
                                 <property name="id"/>
                                 <property name="subject"/>
                                 <property name="description"/>
-                                <property name="projectId"/>
+                                <property name="project_id"/>
                             </properties>
                         </useCase>
                     </useCaseNode>

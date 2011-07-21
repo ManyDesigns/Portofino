@@ -104,7 +104,8 @@ public class Dispatcher {
             } else if (siteNode instanceof FolderNode) {
                 rewrittenPath = "/Index.action";
             } else if (siteNode instanceof UseCaseNode) {
-                rewrittenPath = "/UseCase/" + originalPath + ".action";
+                rewrittenPath = "/UseCase.action";
+//                rewrittenPath = "/UseCase/" + originalPath + ".action";
             } else {
                 throw new Error("Unrecognized node type");
             }
@@ -114,7 +115,7 @@ public class Dispatcher {
                 new SiteNodeInstance[siteNodePath.size()];
         siteNodePath.toArray(siteNodeArray);
 
-        return new Dispatch(request, rewrittenPath, siteNodeArray);
+        return new Dispatch(request, originalPath, rewrittenPath, siteNodeArray);
     }
 
     private SiteNodeInstance createSiteNodeInstance(
@@ -131,12 +132,12 @@ public class Dispatcher {
                     if (iterator.hasNext()) {
                         return null;
                     }
-                } else if(UseCaseNode.MODE_EMBEDDED_SEARCH.equals(peek)) {
-                    mode = UseCaseNode.MODE_EMBEDDED_SEARCH;
-                    param = null;
-                    if (iterator.hasNext()) {
-                        return null;
-                    }
+//                } else if(UseCaseNode.MODE_EMBEDDED_SEARCH.equals(peek)) {
+//                    mode = UseCaseNode.MODE_EMBEDDED_SEARCH;
+//                    param = null;
+//                    if (iterator.hasNext()) {
+//                        return null;
+//                    }
                 } else {
                     mode = UseCaseNode.MODE_DETAIL;
                     param = peek;

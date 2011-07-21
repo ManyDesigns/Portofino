@@ -7,7 +7,7 @@
     <stripes:layout-render name="/skins/default/common.jsp">
         <stripes:layout-component name="content">
             <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.UseCaseAction"/>
-            <stripes:form action="${actionBean.dispatch.absolutePath}" method="post"
+            <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post"
                           enctype="${actionBean.multipartRequest ? 'multipart/form-data' : 'application/x-www-form-urlencoded'}">
                 <div class="buttons-bar-top">
                     <stripes:layout-component name="buttons" />

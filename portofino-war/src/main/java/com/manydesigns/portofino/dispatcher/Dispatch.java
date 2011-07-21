@@ -46,13 +46,16 @@ public class Dispatch {
 
 
     protected final HttpServletRequest request;
+    protected final String originalPath;
     protected final String rewrittenPath;
     protected final SiteNodeInstance[] siteNodeInstancePath;
 
     public Dispatch(HttpServletRequest request,
+                    String originalPath,
                     String rewrittenPath,
                     SiteNodeInstance[] siteNodeInstancePath) {
         this.request = request;
+        this.originalPath = originalPath;
         this.rewrittenPath = rewrittenPath;
         this.siteNodeInstancePath = siteNodeInstancePath;
     }
@@ -73,16 +76,16 @@ public class Dispatch {
         return siteNodeInstancePath[siteNodeInstancePath.length - 1];
     }
 
-    public String getServletPath() {
-        return request.getServletPath();
+    public String getOriginalPath() {
+        return originalPath;
     }
 
-    public String getAbsolutePath() {
+    public String getAbsoluteOriginalPath() {
         String contextPath = request.getContextPath();
         if ("/".equals(contextPath)) {
-            return getServletPath();
+            return getOriginalPath();
         } else {
-            return contextPath + getServletPath();
+            return contextPath + getOriginalPath();
         }
     }
 }

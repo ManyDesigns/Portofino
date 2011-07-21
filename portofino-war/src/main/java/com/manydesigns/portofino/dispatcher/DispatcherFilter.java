@@ -79,13 +79,13 @@ public class DispatcherFilter implements Filter {
                     servletContext.getRequestDispatcher(rewrittenPath);
             if(request.getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) == null) {
                 logger.debug("Forwarding '{}' to '{}'",
-                    dispatch.getServletPath(),
+                    dispatch.getOriginalPath(),
                     rewrittenPath);
                 request.setAttribute(Dispatch.KEY, dispatch);
                 requestDispatcher.forward(request, response);
             } else {
                 logger.debug("Including '{}' to '{}'",
-                    dispatch.getServletPath(),
+                    dispatch.getOriginalPath(),
                     rewrittenPath);
 
                 Map<String,Object> savedAttributes = new HashMap<String, Object>();
@@ -99,14 +99,13 @@ public class DispatcherFilter implements Filter {
                 }
                 for(String attrName : savedAttributes.keySet()) {
                     if(!attrName.startsWith("javax.servlet")) {
-                        //request.removeAttribute(attrName);
+                        request.removeAttribute(attrName);
                     }
                 }
                 System.out.println("--- end req dump ---");
 
                 try {
                     request.setAttribute(Dispatch.KEY, dispatch);
-                    request.setAttribute("skin", "embedded");
                     requestDispatcher.include(request, response);
                 } finally {
                     List<String> attrNamesToRemove = new ArrayList<String>();
@@ -115,10 +114,10 @@ public class DispatcherFilter implements Filter {
                         attrNamesToRemove.add((String) attrNames.nextElement());
                     }
                     for(String attrName : attrNamesToRemove) {
-                        //request.removeAttribute(attrName);
+                        request.removeAttribute(attrName);
                     }
                     for(Map.Entry<String, Object> entry : savedAttributes.entrySet()) {
-                        //request.setAttribute(entry.getKey(), entry.getValue());
+                        request.setAttribute(entry.getKey(), entry.getValue());
                     }
                 }
             }

@@ -94,7 +94,8 @@ import java.util.regex.Pattern;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@UrlBinding("/UseCase/{ignore}.action")
+@UrlBinding("/UseCase.action")
+//@UrlBinding("/UseCase/{ignore}.action")
 //@UrlBinding("/__portofino_reserved__/{ignore}/UseCase.action")
 public class UseCaseAction extends AbstractActionBean {
     public static final String copyright =
@@ -174,20 +175,6 @@ public class UseCaseAction extends AbstractActionBean {
     //**************************************************************************
     private static final String TEMPLATE_FOP_SEARCH = "templateFOP-Search.xsl";
     private static final String TEMPLATE_FOP_READ = "templateFOP-Read.xsl";
-
-    //--------------------------------------------------------------------------
-    // ActionBean implementation
-    //--------------------------------------------------------------------------
-
-    public ActionBeanContext context;
-
-    public void setContext(ActionBeanContext context) {
-        this.context = context;
-    }
-
-    public ActionBeanContext getContext() {
-        return context;
-    }
 
     //**************************************************************************
     // Setup
@@ -275,7 +262,7 @@ public class UseCaseAction extends AbstractActionBean {
     @DefaultHandler
     public Resolution execute() {
         if (StringUtils.isEmpty(pk)) {
-            if(UseCaseNode.MODE_EMBEDDED_SEARCH.equals(siteNodeInstance.getMode())) {
+            if(isEmbedded()) {
                 return embeddedSearch();
             } else {
                 return search();
@@ -294,7 +281,7 @@ public class UseCaseAction extends AbstractActionBean {
         loadObjects();
         setupTableForm(Mode.VIEW);
         cancelReturnUrl = new UrlBuilder(
-                Locale.getDefault(), dispatch.getAbsolutePath(), false)
+                Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
                 .addParameter("searchString", searchString)
                 .toString();
 //        cancelReturnUrl = pkHelper.generateSearchUrl(searchString);
@@ -305,11 +292,11 @@ public class UseCaseAction extends AbstractActionBean {
 //        setupSearchForm();
         loadObjects();
         setupTableForm(Mode.VIEW);
-        return new ForwardResolution("/layouts/crud/search.jsp");
+        return new ForwardResolution("/layouts/crud/embeddedSearch.jsp");
     }
 
     public Resolution resetSearch() {
-        return new RedirectResolution(dispatch.getServletPath());
+        return new RedirectResolution(dispatch.getOriginalPath());
     }
 
     //**************************************************************************
@@ -338,7 +325,7 @@ public class UseCaseAction extends AbstractActionBean {
         }
 
         cancelReturnUrl = new UrlBuilder(
-                Locale.getDefault(), dispatch.getAbsolutePath(), false)
+                Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
                 .addParameter("searchString", searchString)
                 .toString();
 
@@ -365,7 +352,7 @@ public class UseCaseAction extends AbstractActionBean {
 
     protected String calculateBaseSearchUrl() {
         assert pk != null; //Ha senso solo in modalità read/detail
-        String baseUrl = dispatch.getAbsolutePath();
+        String baseUrl = dispatch.getAbsoluteOriginalPath();
         int lastSlashIndex = baseUrl.lastIndexOf('/');
         baseUrl = baseUrl.substring(0, lastSlashIndex);
         return baseUrl;
@@ -435,7 +422,7 @@ public class UseCaseAction extends AbstractActionBean {
             }
             pk = pkHelper.generatePkString(object);
             SessionMessages.addInfoMessage("SAVE avvenuto con successo");
-            String url = dispatch.getServletPath() + "/" + pk;
+            String url = dispatch.getOriginalPath() + "/" + pk;
             return new RedirectResolution(url);
         } else {
             return new ForwardResolution("/layouts/crud/create.jsp");
@@ -468,7 +455,7 @@ public class UseCaseAction extends AbstractActionBean {
                 return new ForwardResolution("/layouts/crud/edit.jsp");
             }
             SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
-            return new RedirectResolution(dispatch.getServletPath())
+            return new RedirectResolution(dispatch.getOriginalPath())
                     .addParameter(SEARCH_STRING_PARAM, searchString);
         } else {
             return new ForwardResolution("/layouts/crud/edit.jsp");
@@ -488,7 +475,7 @@ public class UseCaseAction extends AbstractActionBean {
 
         if (selection.length == 1) {
             pk = selection[0];
-            String url = dispatch.getServletPath() + "/" + pk;
+            String url = dispatch.getOriginalPath() + "/" + pk;
             return new RedirectResolution(url)
                     .addParameter(SEARCH_STRING_PARAM, searchString)
                     .addParameter("edit");
@@ -520,7 +507,7 @@ public class UseCaseAction extends AbstractActionBean {
             SessionMessages.addInfoMessage(MessageFormat.format(
                     "UPDATE di {0} oggetti avvenuto con successo",
                     selection.length));
-            return new RedirectResolution(dispatch.getServletPath())
+            return new RedirectResolution(dispatch.getOriginalPath())
                     .addParameter(SEARCH_STRING_PARAM, searchString);
         } else {
             return new ForwardResolution("/layouts/crud/bulkEdit.jsp");
@@ -545,8 +532,8 @@ public class UseCaseAction extends AbstractActionBean {
             logger.debug(rootCauseMessage, e);
             SessionMessages.addErrorMessage(rootCauseMessage);
         }
-        int lastSlashPos = dispatch.getServletPath().lastIndexOf("/");
-        String url = dispatch.getServletPath().substring(0, lastSlashPos);
+        int lastSlashPos = dispatch.getOriginalPath().lastIndexOf("/");
+        String url = dispatch.getOriginalPath().substring(0, lastSlashPos);
         return new RedirectResolution(url)
                 .addParameter(SEARCH_STRING_PARAM, searchString);
     }
@@ -555,7 +542,7 @@ public class UseCaseAction extends AbstractActionBean {
         if (selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
-            return new RedirectResolution(dispatch.getServletPath())
+            return new RedirectResolution(dispatch.getOriginalPath())
                     .addParameter(SEARCH_STRING_PARAM, searchString);
         }
         for (String current : selection) {
@@ -573,7 +560,7 @@ public class UseCaseAction extends AbstractActionBean {
                 SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
         }
 
-        return new RedirectResolution(dispatch.getServletPath())
+        return new RedirectResolution(dispatch.getOriginalPath())
                 .addParameter(SEARCH_STRING_PARAM, searchString);
     }
 
@@ -673,7 +660,7 @@ public class UseCaseAction extends AbstractActionBean {
                 .configPrefix(prefix)
                 .build();
 
-        if (StringUtils.isBlank(searchString) || UseCaseNode.MODE_EMBEDDED_SEARCH.equals(getMode())) {
+        if (StringUtils.isBlank(searchString)) {
             searchForm.readFromRequest(context.getRequest());
             searchString = searchForm.toSearchString();
             if (searchString.length() == 0) {
@@ -750,7 +737,7 @@ public class UseCaseAction extends AbstractActionBean {
 
     protected String getReadLinkExpression() {
         StringBuilder sb = new StringBuilder();
-        sb.append(dispatch.getServletPath());
+        sb.append(dispatch.getOriginalPath());
         sb.append("/");
         boolean first = true;
 

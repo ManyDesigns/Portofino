@@ -31,6 +31,7 @@ package com.manydesigns.portofino.actions;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.controller.StripesConstants;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -54,4 +55,9 @@ public abstract class AbstractActionBean implements ActionBean {
     public ActionBeanContext getContext() {
         return context;
     }
+
+    public boolean isEmbedded() {
+        return context.getRequest().getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) != null;
+    }
+
 }

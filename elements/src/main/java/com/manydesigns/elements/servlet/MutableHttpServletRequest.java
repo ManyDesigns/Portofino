@@ -55,6 +55,7 @@ public class MutableHttpServletRequest implements MultipartRequest {
     // Fields
     //**************************************************************************
 
+    protected final Map<String, Object> attributeMap;
     protected final Map<String, String[]> parameterMap;
     protected final Map<String, FileItem[]> fileItemMap;
 
@@ -67,6 +68,7 @@ public class MutableHttpServletRequest implements MultipartRequest {
     //**************************************************************************
 
     public MutableHttpServletRequest() {
+        attributeMap= new HashMap<String, Object>();
         parameterMap = new HashMap<String, String[]>();
         fileItemMap = new HashMap<String, FileItem[]>();
     }
@@ -157,6 +159,18 @@ public class MutableHttpServletRequest implements MultipartRequest {
 
     public String getServletPath() {
         return servletPath;
+    }
+
+    public Object getAttribute(String s) {
+        return attributeMap.get(s);
+    }
+
+    public void setAttribute(String s, Object o) {
+        attributeMap.put(s, o);
+    }
+
+    public void removeAttribute(String s) {
+        attributeMap.remove(s);
     }
 
     //**************************************************************************
@@ -251,10 +265,6 @@ public class MutableHttpServletRequest implements MultipartRequest {
         throw new UnsupportedOperationException();
     }
 
-    public Object getAttribute(String s) {
-        throw new UnsupportedOperationException();
-    }
-
     public Enumeration getAttributeNames() {
         throw new UnsupportedOperationException();
     }
@@ -304,14 +314,6 @@ public class MutableHttpServletRequest implements MultipartRequest {
     }
 
     public String getRemoteHost() {
-        throw new UnsupportedOperationException();
-    }
-
-    public void setAttribute(String s, Object o) {
-        throw new UnsupportedOperationException();
-    }
-
-    public void removeAttribute(String s) {
         throw new UnsupportedOperationException();
     }
 

@@ -16,32 +16,22 @@
     </stripes:layout-component>
     <stripes:layout-component name="innerContent">
         <h1><c:out value="${actionBean.useCase.searchTitle}"/></h1>
-        <c:choose>
-            <c:when test="${'embeddedSearch' == actionBean.mode}">
+        <div class="yui-ge">
+            <div class="yui-u first">
                 <div class="search_results">
                     <mde:write name="actionBean" property="tableForm"/>
-                    &gt;&gt; Advanced search
                 </div>
-            </c:when>
-            <c:otherwise>
-                <div class="yui-ge">
-                    <div class="yui-u first">
-                        <div class="search_results">
-                            <mde:write name="actionBean" property="tableForm"/>
-                        </div>
+            </div>
+            <div class="yui-u">
+                <c:if test="${not empty actionBean.searchForm}">
+                    <div class="search_form">
+                        <mde:write name="actionBean" property="searchForm"/>
+                        <stripes:submit name="search" value="Search"/>
+                        <stripes:submit name="resetSearch" value="Reset form"/>
                     </div>
-                    <div class="yui-u">
-                        <c:if test="${not empty actionBean.searchForm}">
-                            <div class="search_form">
-                                <mde:write name="actionBean" property="searchForm"/>
-                                <stripes:submit name="search" value="Search"/>
-                                <stripes:submit name="resetSearch" value="Reset form"/>
-                            </div>
-                        </c:if>
-                    </div>
-                </div>
-            </c:otherwise>
-        </c:choose>
+                </c:if>
+            </div>
+        </div>
         <stripes:hidden name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
     </stripes:layout-component>
 </stripes:layout-render>

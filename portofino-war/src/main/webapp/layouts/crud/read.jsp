@@ -44,6 +44,6 @@
         </c:if>
         <stripes:hidden name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
 
-        <jsp:include page="${actionBean.dispatch.servletPath}/issues/embeddedSearch" />
+        <jsp:include page="${actionBean.dispatch.originalPath}/issues" />
     </stripes:layout-component>
 </stripes:layout-render>

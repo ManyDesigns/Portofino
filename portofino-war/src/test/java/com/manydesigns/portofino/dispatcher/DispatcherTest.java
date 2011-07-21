@@ -69,7 +69,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         Dispatch dispatch = dispatcher.createDispatch(req);
         assertNotNull(dispatch);
 
-        assertEquals(originalPath, dispatch.getServletPath());
+        assertEquals(originalPath, dispatch.getOriginalPath());
         assertEquals(USE_CASE_ACTION, dispatch.getRewrittenPath());
 
         SiteNodeInstance[] siteNodeInstancePath =
@@ -112,7 +112,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         Dispatch dispatch = dispatcher.createDispatch(req);
         assertNotNull(dispatch);
 
-        assertEquals(originalPath, dispatch.getServletPath());
+        assertEquals(originalPath, dispatch.getOriginalPath());
         assertEquals(USE_CASE_ACTION, dispatch.getRewrittenPath());
 
         SiteNodeInstance[] siteNodeInstancePath =
@@ -151,7 +151,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         Dispatch dispatch = dispatcher.createDispatch(req);
         assertNotNull(dispatch);
 
-        assertEquals(originalPath, dispatch.getServletPath());
+        assertEquals(originalPath, dispatch.getOriginalPath());
         assertEquals(USE_CASE_ACTION, dispatch.getRewrittenPath());
 
         SiteNodeInstance[] siteNodeInstancePath =
@@ -197,7 +197,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         Dispatch dispatch = dispatcher.createDispatch(req);
         assertNotNull(dispatch);
 
-        assertEquals(originalPath, dispatch.getServletPath());
+        assertEquals(originalPath, dispatch.getOriginalPath());
         assertEquals(USE_CASE_ACTION, dispatch.getRewrittenPath());
 
         SiteNodeInstance[] siteNodeInstancePath =
@@ -249,7 +249,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         Dispatch dispatch = dispatcher.createDispatch(req);
         assertNotNull(dispatch);
 
-        assertEquals(originalPath, dispatch.getServletPath());
+        assertEquals(originalPath, dispatch.getOriginalPath());
         assertEquals(USE_CASE_ACTION, dispatch.getRewrittenPath());
 
         SiteNodeInstance[] siteNodeInstancePath =
