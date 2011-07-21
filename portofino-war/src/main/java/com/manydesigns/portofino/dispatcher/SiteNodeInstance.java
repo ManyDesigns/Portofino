@@ -64,4 +64,8 @@ public class SiteNodeInstance {
 
     public void realize() {
     }
+
+    public String getUrlFragment() {
+        return siteNode.getId();
+    }
 }

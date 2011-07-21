@@ -58,6 +58,10 @@ public class Dispatch {
         this.originalPath = originalPath;
         this.rewrittenPath = rewrittenPath;
         this.siteNodeInstancePath = siteNodeInstancePath;
+
+        String pathUrl = getPathUrl();
+        assert pathUrl.equals(originalPath);
+
     }
 
     public HttpServletRequest getRequest() {
@@ -87,5 +91,26 @@ public class Dispatch {
         } else {
             return contextPath + getOriginalPath();
         }
+    }
+
+    public String getPathUrl() {
+        return getPathUrl(siteNodeInstancePath.length);
+    }
+
+    public String getPathUrl(int length) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("/");
+        boolean first = true;
+        for (int i = 0; i < length; i++) {
+            SiteNodeInstance current = siteNodeInstancePath[i];
+            String fragment = current.getUrlFragment();
+            if (first) {
+                first = false;
+            } else {
+                sb.append("/");
+            }
+            sb.append(fragment);
+        }
+        return sb.toString();
     }
 }

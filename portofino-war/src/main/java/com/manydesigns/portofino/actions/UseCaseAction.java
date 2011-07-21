@@ -51,6 +51,7 @@ import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.dispatcher.UseCaseNodeInstance;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
@@ -63,6 +64,7 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
+import com.manydesigns.portofino.util.ShortNameUtils;
 import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
@@ -161,7 +163,13 @@ public class UseCaseAction extends AbstractActionBean {
     public String previousUrl;
     public String nextUrl;
     public String lastUrl;
-    
+
+    //--------------------------------------------------------------------------
+    // UI search parameterization
+    //--------------------------------------------------------------------------
+
+    public String returnToSearchTarget;
+
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -309,7 +317,7 @@ public class UseCaseAction extends AbstractActionBean {
 
         if (!objects.contains(object)) {
             // TODO: gestire situazione:
-            // pratiche da approvare; seleziono una protica; la approvo;
+            // pratiche da approvare; seleziono una pratica; la approvo;
             // la pratica "esce" dallo use case perché lo stato non è più
             // "in approvazione". Prima dava "object not found".
             // Adesso dovrebbe tornare alla ricerca o comunque non dare errore.
@@ -331,7 +339,29 @@ public class UseCaseAction extends AbstractActionBean {
 
         setupPagination();
 
+        setupReturnToSearchTarget();
+
         return new ForwardResolution("/layouts/crud/read.jsp");
+    }
+
+    private void setupReturnToSearchTarget() {
+        SiteNodeInstance[] siteNodeInstancePath =
+                dispatch.getSiteNodeInstancePath();
+        int previousPos = siteNodeInstancePath.length - 2;
+        returnToSearchTarget = null;
+        if (previousPos >= 0) {
+            SiteNodeInstance previousNode = siteNodeInstancePath[previousPos];
+            if (previousNode instanceof UseCaseNodeInstance) {
+                UseCaseNodeInstance useCaseNodeInstance =
+                        (UseCaseNodeInstance) previousNode;
+                Object previousNodeObject = useCaseNodeInstance.getObject();
+                ClassAccessor previousNodeClassAccessor =
+                        useCaseNodeInstance.getClassAccessor();
+                returnToSearchTarget = ShortNameUtils.getName(
+                        previousNodeClassAccessor, previousNodeObject);
+            }
+        }
+
     }
 
     protected void setupPagination() {
@@ -590,10 +620,28 @@ public class UseCaseAction extends AbstractActionBean {
     }
 
     public Resolution returnToSearch() {
-        RedirectResolution resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
-        if(!StringUtils.isEmpty(searchString)) {
-            resolution.addParameter("searchString", searchString);
+        SiteNodeInstance[] siteNodeInstancePath =
+                dispatch.getSiteNodeInstancePath();
+        int previousPos = siteNodeInstancePath.length - 2;
+        RedirectResolution resolution;
+        if (previousPos >= 0) {
+            SiteNodeInstance previousNode = siteNodeInstancePath[previousPos];
+            if (previousNode instanceof UseCaseNodeInstance) {
+                String url = dispatch.getPathUrl(previousPos + 1);
+                resolution = new RedirectResolution(url, true);
+            } else {
+                resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
+                if(!StringUtils.isEmpty(searchString)) {
+                    resolution.addParameter("searchString", searchString);
+                }
+            }
+        } else {
+            resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
+            if(!StringUtils.isEmpty(searchString)) {
+                resolution.addParameter("searchString", searchString);
+            }
         }
+
         return resolution;
     }
 
@@ -1421,4 +1469,11 @@ public class UseCaseAction extends AbstractActionBean {
         return siteNodeInstance.getMode();
     }
 
+    public String getReturnToSearchTarget() {
+        return returnToSearchTarget;
+    }
+
+    public void setReturnToSearchTarget(String returnToSearchTarget) {
+        this.returnToSearchTarget = returnToSearchTarget;
+    }
 }

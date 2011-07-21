@@ -96,6 +96,15 @@ public class UseCaseNodeInstance extends SiteNodeInstance {
         return (UseCaseNode) super.getSiteNode();
     }
 
+    @Override
+    public String getUrlFragment() {
+        if (pk == null) {
+            return super.getUrlFragment();
+        } else {
+            return String.format("%s/%s", super.getUrlFragment(), pk);
+        }
+    }
+
     public UseCase getUseCase() {
         return useCase;
     }

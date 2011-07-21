@@ -25,7 +25,11 @@
                 </c:if>
             </div>
         </c:if>
-        <stripes:submit id="Table_returnToSearch" name="returnToSearch" value="<< Return to search"/>
+        <c:if test="${empty actionBean.returnToSearchTarget}">
+            <stripes:submit id="Table_returnToSearch" name="returnToSearch" value="<< Return to search"/>
+        </c:if><c:if test="${not empty actionBean.returnToSearchTarget}">
+            <stripes:submit id="Table_returnToSearch" name="returnToSearch" value="<< Return to ${actionBean.returnToSearchTarget}"/>
+        </c:if>
         <stripes:submit id="Table_edit" name="edit" value="Edit"/>
         <stripes:submit id="Table_delete" name="delete" value="Delete"
                   onclick="return confirm ('Are you sure?');"/>
