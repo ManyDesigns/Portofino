@@ -35,9 +35,9 @@ import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
-import com.manydesigns.portofino.dispatcher.UseCaseNodeInstance;
+import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.site.UseCaseNode;
+import com.manydesigns.portofino.model.site.CrudNode;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +92,7 @@ public class Navigation implements XhtmlFragment {
 
     protected void generateNavigationNodes(List<SiteNode> siteNodes,
                                            List<NavigationNode> navigationNodes,
-                                           String prefixUrl, boolean useCaseEnabled) {
+                                           String prefixUrl, boolean crudEnabled) {
         for (SiteNode siteNode : siteNodes) {
             String url = String.format("%s/%s", prefixUrl, siteNode.getId());
             String title = siteNode.getTitle();
@@ -100,28 +100,28 @@ public class Navigation implements XhtmlFragment {
             boolean allowed = siteNode.isAllowed(groups);
 
             boolean ownEnabled;
-            boolean childUseCaseEnabled;
+            boolean childCrudEnabled;
             String childUrl;
 
-            if (siteNode instanceof UseCaseNode) {
-                ownEnabled = useCaseEnabled;
+            if (siteNode instanceof CrudNode) {
+                ownEnabled = crudEnabled;
                 SiteNodeInstance siteNodeInstance = findInPath(siteNode);
-                if (siteNodeInstance instanceof UseCaseNodeInstance) {
+                if (siteNodeInstance instanceof CrudNodeInstance) {
                     String mode = siteNodeInstance.getMode();
-                    if (UseCaseNode.MODE_DETAIL.equals(mode)) {
-                        childUseCaseEnabled = useCaseEnabled;
-                        childUrl = url + "/" + ((UseCaseNodeInstance) siteNodeInstance).getPk();
+                    if (CrudNode.MODE_DETAIL.equals(mode)) {
+                        childCrudEnabled = crudEnabled;
+                        childUrl = url + "/" + ((CrudNodeInstance) siteNodeInstance).getPk();
                     } else {
-                        childUseCaseEnabled = false;
+                        childCrudEnabled = false;
                         childUrl = url;
                     }
                 } else {
-                    childUseCaseEnabled = false;
+                    childCrudEnabled = false;
                     childUrl = url;
                 }
             } else {
                 ownEnabled = true;
-                childUseCaseEnabled = useCaseEnabled;
+                childCrudEnabled = crudEnabled;
                 childUrl = url;
             }
 
@@ -129,7 +129,7 @@ public class Navigation implements XhtmlFragment {
                     new NavigationNode(siteNode, url, title, description,
                             allowed, ownEnabled);
             generateNavigationNodes(siteNode.getChildNodes(),
-                    navigationNode.getChildNodes(), childUrl, childUseCaseEnabled);
+                    navigationNode.getChildNodes(), childUrl, childCrudEnabled);
             navigationNodes.add(navigationNode);
         }
     }

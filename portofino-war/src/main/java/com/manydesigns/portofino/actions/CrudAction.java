@@ -52,16 +52,16 @@ import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
-import com.manydesigns.portofino.dispatcher.UseCaseNodeInstance;
+import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
 import com.manydesigns.portofino.model.site.EmbeddableNode;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.site.UseCaseNode;
-import com.manydesigns.portofino.model.site.usecases.Button;
-import com.manydesigns.portofino.model.site.usecases.UseCase;
+import com.manydesigns.portofino.model.site.CrudNode;
+import com.manydesigns.portofino.model.site.crud.Button;
+import com.manydesigns.portofino.model.site.crud.Crud;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
@@ -98,10 +98,10 @@ import java.util.regex.Pattern;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@UrlBinding("/UseCase.action")
-//@UrlBinding("/UseCase/{ignore}.action")
-//@UrlBinding("/__portofino_reserved__/{ignore}/UseCase.action")
-public class UseCaseAction extends AbstractActionBean {
+@UrlBinding("/Crud.action")
+//@UrlBinding("/Crud/{ignore}.action")
+//@UrlBinding("/__portofino_reserved__/{ignore}/Crud.action")
+public class CrudAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -117,10 +117,10 @@ public class UseCaseAction extends AbstractActionBean {
     public Dispatch dispatch;
 
     @InjectSiteNodeInstance
-    public UseCaseNodeInstance siteNodeInstance;
+    public CrudNodeInstance siteNodeInstance;
 
-    public UseCaseNode useCaseNode;
-    public UseCase useCase;
+    public CrudNode crudNode;
+    public Crud crud;
     public List<String> embeddedChildren;
 
     public ClassAccessor classAccessor;
@@ -178,7 +178,7 @@ public class UseCaseAction extends AbstractActionBean {
     //**************************************************************************
 
     public static final Logger logger =
-            LoggerFactory.getLogger(UseCaseAction.class);
+            LoggerFactory.getLogger(CrudAction.class);
     private static final String CONSTRAINT_VIOLATION = "Constraint violation";
 
     //**************************************************************************
@@ -194,8 +194,8 @@ public class UseCaseAction extends AbstractActionBean {
     @Before
     public void prepare() {
         pk = siteNodeInstance.getPk();
-        useCaseNode = siteNodeInstance.getSiteNode();
-        useCase = useCaseNode.getUseCase();
+        crudNode = siteNodeInstance.getSiteNode();
+        crud = crudNode.getCrud();
         classAccessor = siteNodeInstance.getClassAccessor();
         baseTable = siteNodeInstance.getBaseTable();
         pkHelper = siteNodeInstance.getPkHelper();
@@ -207,7 +207,7 @@ public class UseCaseAction extends AbstractActionBean {
     }
 
     private void setupSelectionProviders() {
-        for (ModelSelectionProvider current : useCase.getSelectionProviders()) {
+        for (ModelSelectionProvider current : crud.getSelectionProviders()) {
             String name = current.getName();
             String database = current.getDatabase();
             String sql = current.getSql();
@@ -577,7 +577,7 @@ public class UseCaseAction extends AbstractActionBean {
         RedirectResolution resolution;
         if (previousPos >= 0) {
             SiteNodeInstance previousNode = siteNodeInstancePath[previousPos];
-            if (previousNode instanceof UseCaseNodeInstance) {
+            if (previousNode instanceof CrudNodeInstance) {
                 String url = dispatch.getPathUrl(previousPos + 1);
                 resolution = new RedirectResolution(url, true);
             } else {
@@ -650,12 +650,12 @@ public class UseCaseAction extends AbstractActionBean {
         returnToSearchTarget = null;
         if (previousPos >= 0) {
             SiteNodeInstance previousNode = siteNodeInstancePath[previousPos];
-            if (previousNode instanceof UseCaseNodeInstance) {
-                UseCaseNodeInstance useCaseNodeInstance =
-                        (UseCaseNodeInstance) previousNode;
-                Object previousNodeObject = useCaseNodeInstance.getObject();
+            if (previousNode instanceof CrudNodeInstance) {
+                CrudNodeInstance crudNodeInstance =
+                        (CrudNodeInstance) previousNode;
+                Object previousNodeObject = crudNodeInstance.getObject();
                 ClassAccessor previousNodeClassAccessor =
-                        useCaseNodeInstance.getClassAccessor();
+                        crudNodeInstance.getClassAccessor();
                 returnToSearchTarget = ShortNameUtils.getName(
                         previousNodeClassAccessor, previousNodeObject);
             }
@@ -702,7 +702,7 @@ public class UseCaseAction extends AbstractActionBean {
 
     protected void setupEmbeddedChildren() {
         embeddedChildren = new ArrayList<String>();
-        for(SiteNode node : useCaseNode.getChildNodes()) {
+        for(SiteNode node : crudNode.getChildNodes()) {
             if(node instanceof EmbeddableNode) {
                 embeddedChildren.add(dispatch.getOriginalPath() + "/" + node.getId());
             }
@@ -836,7 +836,7 @@ public class UseCaseAction extends AbstractActionBean {
             if(searchForm != null) {
                 searchForm.configureCriteria(criteria);
             }
-            objects = application.getObjects(useCase.getQuery(), criteria, this);
+            objects = application.getObjects(crud.getQuery(), criteria, this);
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
             logger.warn("Incorrect Field Type", e);
@@ -866,7 +866,7 @@ public class UseCaseAction extends AbstractActionBean {
         try {
             workbook = Workbook.createWorkbook(fileTemp);
             WritableSheet sheet =
-                    workbook.createSheet(useCase.getSearchTitle(), 0);
+                    workbook.createSheet(crud.getSearchTitle(), 0);
 
             addHeaderToSheet(sheet);
 
@@ -919,7 +919,7 @@ public class UseCaseAction extends AbstractActionBean {
     private void writeFileReadExcel(WritableWorkbook workbook)
             throws IOException, WriteException {
         WritableSheet sheet =
-                workbook.createSheet(useCase.getReadTitle(),
+                workbook.createSheet(crud.getReadTitle(),
                         workbook.getNumberOfSheets());
 
         addHeaderToSheet(sheet);
@@ -1109,7 +1109,7 @@ public class UseCaseAction extends AbstractActionBean {
         xb.writeXmlHeader("UTF-8");
         xb.openElement("class");
         xb.openElement("table");
-        xb.write(useCase.getSearchTitle());
+        xb.write(crud.getSearchTitle());
         xb.closeElement("table");
 
         for (TableForm.Column col : tableForm.getColumns()) {
@@ -1158,7 +1158,7 @@ public class UseCaseAction extends AbstractActionBean {
         xb.writeXmlHeader("UTF-8");
         xb.openElement("class");
         xb.openElement("table");
-        xb.write(useCase.getReadTitle());
+        xb.write(crud.getReadTitle());
         xb.closeElement("table");
 
         for (FieldSet fieldset : form) {
@@ -1308,28 +1308,28 @@ public class UseCaseAction extends AbstractActionBean {
         this.dispatch = dispatch;
     }
 
-    public UseCaseNodeInstance getSiteNodeInstance() {
+    public CrudNodeInstance getSiteNodeInstance() {
         return siteNodeInstance;
     }
 
-    public void setSiteNodeInstance(UseCaseNodeInstance siteNodeInstance) {
+    public void setSiteNodeInstance(CrudNodeInstance siteNodeInstance) {
         this.siteNodeInstance = siteNodeInstance;
     }
 
-    public UseCaseNode getUseCaseNode() {
-        return useCaseNode;
+    public CrudNode getCrudNode() {
+        return crudNode;
     }
 
-    public void setUseCaseNode(UseCaseNode useCaseNode) {
-        this.useCaseNode = useCaseNode;
+    public void setCrudNode(CrudNode crudNode) {
+        this.crudNode = crudNode;
     }
 
-    public UseCase getUseCase() {
-        return useCase;
+    public Crud getCrud() {
+        return crud;
     }
 
-    public void setUseCase(UseCase useCase) {
-        this.useCase = useCase;
+    public void setCrud(Crud crud) {
+        this.crud = crud;
     }
 
     public ClassAccessor getClassAccessor() {

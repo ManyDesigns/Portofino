@@ -45,9 +45,9 @@ import com.manydesigns.portofino.io.FileManager;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.site.usecases.UseCase;
+import com.manydesigns.portofino.model.site.crud.Crud;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.reflection.UseCaseAccessor;
+import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.servlets.PortofinoListener;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
@@ -883,10 +883,10 @@ public class HibernateApplicationImpl implements Application {
         return new TableAccessor(table);
     }
 
-    public UseCaseAccessor getUseCaseAccessor(UseCase useCase) {
-        String qualifiedTableName = useCase.getTable();
+    public CrudAccessor getCrudAccessor(Crud crud) {
+        String qualifiedTableName = crud.getTable();
         TableAccessor tableAccessor = getTableAccessor(qualifiedTableName);
-        return new UseCaseAccessor(useCase, tableAccessor);
+        return new CrudAccessor(crud, tableAccessor);
     }
 
     //**************************************************************************

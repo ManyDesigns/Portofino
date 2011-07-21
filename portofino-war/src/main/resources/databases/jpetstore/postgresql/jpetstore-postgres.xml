@@ -137,7 +137,7 @@
     </databases>
     <siteNodes>
         <siteNode type="simple" url="/Homepage.action" title="Homepage" description="Homepage"/>
-        <siteNode type="use-cases" url="/UseCase.action" title="Use cases" description="Use cases"/>
+        <siteNode type="use-cases" url="/Crud.action" title="Use cases" description="Use cases"/>
         <siteNode url="/model/Index.action" title="Model" description="Model">
             <childNodes>
                 <siteNode url="/model/ConnectionProviders.action" title="Connection providers" description="Connection providers"/>
@@ -169,6 +169,4 @@
     </siteNodes>
     <portlets>
     </portlets>
-    <useCases>
-    </useCases>
 </model>

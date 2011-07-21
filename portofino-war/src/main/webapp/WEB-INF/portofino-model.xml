@@ -48,8 +48,8 @@ Struttura dell'XML:
    | | +-childNodes (come rootNode)
    | | +-permissions (come rootNode)
    | |
-   | +-useCaseNode
-   | | +-useCase
+   | +-crudNode
+   | | +-crud
    | | | +-properties
    | | | | +-property
    | | | |   +-annotations
@@ -1072,8 +1072,8 @@ Struttura dell'XML:
             <folderNode id="usersAdmin" title="User administration" description="User administration">
 
                 <childNodes>
-                    <useCaseNode id="userAdmin" title="userAdmin" description="user administration" url="/usersAdmin/Users.action">
-                        <useCase name="users" table="portofino.public.users" query="FROM portofino_public_users" searchTitle="Users" createTitle="Create new user" readTitle="User" editTitle="Edit user">
+                    <crudNode id="userAdmin" title="userAdmin" description="user administration" url="/usersAdmin/Users.action">
+                        <crud name="users" table="portofino.public.users" query="FROM portofino_public_users" searchTitle="Users" createTitle="Create new user" readTitle="User" editTitle="Edit user">
                             <properties>
                                 <property name="userId"/>
                                 <property name="userName"/>
@@ -1098,24 +1098,24 @@ Struttura dell'XML:
                                 <button name="rem_group" label="Remove  selected groups" method="removeGroups" guard=""/>
                                 <button name="reset" label="Reset password" method="resetPassword" guard=""/>
                             </buttons>
-                            <subUseCases>
-                                <useCase name="active" table="portofino.public.groups" query="FROM portofino_public_groups groups WHERE groups.groupId NOT IN (SELECT groups2.groupId FROM portofino_public_users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) " searchTitle="Active groups">
+                            <subCruds>
+                                <crud name="active" table="portofino.public.groups" query="FROM portofino_public_groups groups WHERE groups.groupId NOT IN (SELECT groups2.groupId FROM portofino_public_users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) " searchTitle="Active groups">
 
                                     <properties>
                                         <property name="groupId"/>
                                         <property name="name"/>
                                         <property name="description"/>
                                     </properties>
-                                </useCase>
-                                <useCase name="current" table="portofino.public.groups" query="FROM portofino_public_groups groups WHERE groups.groupId in (SELECT groups2.groupId FROM portofino_public_users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) " searchTitle="Current groups">
+                                </crud>
+                                <crud name="current" table="portofino.public.groups" query="FROM portofino_public_groups groups WHERE groups.groupId in (SELECT groups2.groupId FROM portofino_public_users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) " searchTitle="Current groups">
                                     <properties>
                                         <property name="groupId"/>
 
                                         <property name="name"/>
                                         <property name="description"/>
                                     </properties>
-                                </useCase>
-                                <useCase name="past" table="portofino.public.users_groups" query="FROM portofino_public_users_groups ug WHERE ug.userid=%{userId} AND ug.deletionDate IS NOT null" searchTitle="Past groups">
+                                </crud>
+                                <crud name="past" table="portofino.public.users_groups" query="FROM portofino_public_users_groups ug WHERE ug.userid=%{userId} AND ug.deletionDate IS NOT null" searchTitle="Past groups">
                                     <properties>
                                         <property name="userid"/>
                                         <property name="groupid"/>
@@ -1123,12 +1123,12 @@ Struttura dell'XML:
 
                                         <property name="deletionDate"/>
                                     </properties>
-                                </useCase>
-                            </subUseCases>
-                        </useCase>
-                    </useCaseNode>
-                    <useCaseNode id="groupAdmin" title="groupAdmin" description="groups administration" url="/usersAdmin/Groups.action">
-                        <useCase name="groupAdmin" table="portofino.public.groups" query="from portofino_public_groups" searchTitle="Groups" createTitle="Create new group" readTitle="Group" editTitle="Edit group">
+                                </crud>
+                            </subCruds>
+                        </crud>
+                    </crudNode>
+                    <crudNode id="groupAdmin" title="groupAdmin" description="groups administration" url="/usersAdmin/Groups.action">
+                        <crud name="groupAdmin" table="portofino.public.groups" query="from portofino_public_groups" searchTitle="Groups" createTitle="Create new group" readTitle="Group" editTitle="Edit group">
                             <properties>
 
                                 <property name="groupId"/>
@@ -1146,8 +1146,8 @@ Struttura dell'XML:
                                     </selectionProperties>
                                 </selectionProvider>
                             </selectionProviders>
-                        </useCase>
-                    </useCaseNode>
+                        </crud>
+                    </crudNode>
                 </childNodes>
                 <permissions>
 
@@ -1164,8 +1164,8 @@ Struttura dell'XML:
                     </allow>
                 </permissions>
             </customNode>
-            <useCaseNode id="projects" title="Projects" description="Projects">
-                <useCase name="projects"
+            <crudNode id="projects" title="Projects" description="Projects">
+                <crud name="projects"
                          variable="project"
                          table="redmine.redmine.projects"
                          query="FROM redmine_redmine_projects"
@@ -1227,14 +1227,14 @@ Struttura dell'XML:
                             </annotations>
                         </property>
                     </properties>
-                </useCase>
+                </crud>
                 <childNodes>
-                    <useCaseNode id="issues" title="Issues" description="Issues">
+                    <crudNode id="issues" title="Issues" description="Issues">
                         <embedInParent order="1"
                                          inSearch="false"
                                          inDetails="true"
                                 />
-                        <useCase name="issue"
+                        <crud name="issue"
                                  variable="issue"
                                  table="redmine.redmine.issues"
                                  query="FROM redmine_redmine_issues WHERE project_id = %{#project.id}"
@@ -1297,10 +1297,10 @@ Struttura dell'XML:
                                     </annotations>
                                 </property>
                             </properties>
-                        </useCase>
-                    </useCaseNode>
+                        </crud>
+                    </crudNode>
                 </childNodes>
-            </useCaseNode>
+            </crudNode>
         </childNodes>
     </rootNode>
 </model>

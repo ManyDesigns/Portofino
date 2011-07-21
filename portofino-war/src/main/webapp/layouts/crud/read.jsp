@@ -4,8 +4,8 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><stripes:layout-render name="/skins/${skin}/crud/common.jsp">
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
     <stripes:layout-component name="buttons">
-        <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.UseCaseAction"/>
         <c:if test="${actionBean.position >= 0}">
             <div style="float: right;">
                 <c:if test="${not empty actionBean.firstUrl}">
@@ -40,7 +40,7 @@
         <!-- TODO custom buttons -->
     </stripes:layout-component>
     <stripes:layout-component name="innerContent">
-        <h1><c:out value="${actionBean.useCase.readTitle}"/></h1>
+        <h1><c:out value="${actionBean.crud.readTitle}"/></h1>
         <mde:write name="actionBean" property="form"/>
         <stripes:hidden name="pk" value="${actionBean.pk}"/>
         <c:if test="${not empty actionBean.searchString}">

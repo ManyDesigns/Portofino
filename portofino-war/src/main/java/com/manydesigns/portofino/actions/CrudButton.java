@@ -31,7 +31,7 @@ package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
-import com.manydesigns.portofino.model.site.usecases.Button;
+import com.manydesigns.portofino.model.site.crud.Button;
 import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

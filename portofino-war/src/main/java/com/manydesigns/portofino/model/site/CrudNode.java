@@ -29,7 +29,7 @@
 package com.manydesigns.portofino.model.site;
 
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.site.usecases.UseCase;
+import com.manydesigns.portofino.model.site.crud.Crud;
 
 import javax.xml.bind.annotation.XmlElement;
 
@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlElement;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCaseNode extends SiteNode implements EmbeddableNode {
+public class CrudNode extends SiteNode implements EmbeddableNode {
     //**************************************************************************
     // Constants
     //**************************************************************************
@@ -52,25 +52,25 @@ public class UseCaseNode extends SiteNode implements EmbeddableNode {
     // Fields
     //**************************************************************************
 
-    protected UseCase useCase;
+    protected Crud crud;
 
-    public UseCaseNode() {
+    public CrudNode() {
         super();
     }
 
     @XmlElement()
-    public UseCase getUseCase() {
-        return useCase;
+    public Crud getCrud() {
+        return crud;
     }
 
-    public void setUseCase(UseCase useCase) {
-        this.useCase = useCase;
+    public void setCrud(Crud crud) {
+        this.crud = crud;
     }
 
     @Override
     public void init(Model model) {
         super.init(model);
-        useCase.init(model);
+        crud.init(model);
     }
 
 }

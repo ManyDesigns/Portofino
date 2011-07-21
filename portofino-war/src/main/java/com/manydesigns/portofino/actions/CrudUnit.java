@@ -45,7 +45,7 @@ import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.model.site.usecases.Button;
+import com.manydesigns.portofino.model.site.crud.Button;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;

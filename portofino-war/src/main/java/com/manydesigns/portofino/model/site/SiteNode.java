@@ -148,7 +148,7 @@ public abstract class  SiteNode implements ModelObject {
           @XmlElement(name="folderNode",type=FolderNode.class),
           @XmlElement(name="customNode",type=CustomNode.class),
           @XmlElement(name="customFolderNode",type=CustomFolderNode.class),
-          @XmlElement(name="useCaseNode",type=UseCaseNode.class),
+          @XmlElement(name="crudNode",type=CrudNode.class),
           @XmlElement(name="portletNode",type=PortletNode.class)
     })
     public List<SiteNode> getChildNodes() {

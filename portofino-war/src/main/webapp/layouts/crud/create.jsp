@@ -4,12 +4,13 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><stripes:layout-render name="/skins/${skin}/crud/common.jsp">
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
     <stripes:layout-component name="buttons">
         <stripes:submit id="TableData_save" name="save" value="Save"/>
         <stripes:submit id="TableData_cancel" name="cancel" value="Cancel"/>
     </stripes:layout-component>
     <stripes:layout-component name="innerContent">
-        <h1><c:out value="${actionBean.useCase.createTitle}"/></h1>
+        <h1><c:out value="${actionBean.crud.createTitle}"/></h1>
         <c:if test="${actionBean.requiredFieldsPresent}">
             Fields marked with a "*" are required.
         </c:if>

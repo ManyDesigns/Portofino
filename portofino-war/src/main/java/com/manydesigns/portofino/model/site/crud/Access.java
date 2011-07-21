@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.model.site.usecases;
+package com.manydesigns.portofino.model.site.crud;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

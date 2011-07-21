@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.model.site.usecases;
+package com.manydesigns.portofino.model.site.crud;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
@@ -46,7 +46,7 @@ import java.util.List;
 */
 
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class UseCaseProperty implements ModelObject {
+public class CrudProperty implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
 
@@ -55,7 +55,7 @@ public class UseCaseProperty implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected UseCase useCase;
+    protected Crud crud;
 
     protected String name;
     protected final List<Annotation> annotations;
@@ -65,7 +65,7 @@ public class UseCaseProperty implements ModelObject {
     // Constructors
     //**************************************************************************
 
-    public UseCaseProperty() {
+    public CrudProperty() {
         annotations = new ArrayList<Annotation>();
     }
 
@@ -74,7 +74,7 @@ public class UseCaseProperty implements ModelObject {
     //**************************************************************************
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
-        useCase = (UseCase) parent;
+        crud = (Crud) parent;
     }
 
     public void reset() {
@@ -84,7 +84,7 @@ public class UseCaseProperty implements ModelObject {
     }
 
     public void init(Model model) {
-        assert useCase != null;
+        assert crud != null;
         assert name != null;
         for (Annotation annotation : annotations) {
             annotation.init(model);
@@ -92,7 +92,7 @@ public class UseCaseProperty implements ModelObject {
     }
 
     public String getQualifiedName() {
-        return String.format("%s.%s", useCase.getQualifiedName(), name);
+        return String.format("%s.%s", crud.getQualifiedName(), name);
     }
 
     //**************************************************************************
@@ -100,12 +100,12 @@ public class UseCaseProperty implements ModelObject {
     //**************************************************************************
 
 
-    public UseCase getUseCase() {
-        return useCase;
+    public Crud getCrud() {
+        return crud;
     }
 
-    public void setUseCase(UseCase useCase) {
-        this.useCase = useCase;
+    public void setCrud(Crud crud) {
+        this.crud = crud;
     }
 
     @Identifier

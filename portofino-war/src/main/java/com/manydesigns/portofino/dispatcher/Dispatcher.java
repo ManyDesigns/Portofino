@@ -114,9 +114,9 @@ public class Dispatcher {
                 rewrittenPath = "/Portlet.action";
             } else if (siteNode instanceof FolderNode) {
                 rewrittenPath = "/Index.action";
-            } else if (siteNode instanceof UseCaseNode) {
-                rewrittenPath = "/UseCase.action";
-//                rewrittenPath = "/UseCase/" + originalPath + ".action";
+            } else if (siteNode instanceof CrudNode) {
+                rewrittenPath = "/Crud.action";
+//                rewrittenPath = "/Crud/" + originalPath + ".action";
             } else {
                 throw new Error("Unrecognized node type");
             }
@@ -132,32 +132,32 @@ public class Dispatcher {
     private SiteNodeInstance createSiteNodeInstance(
             ListIterator<String> iterator, SiteNode foundNode) {
         SiteNodeInstance result;
-        if (foundNode instanceof UseCaseNode) {
+        if (foundNode instanceof CrudNode) {
             String mode;
             String param;
             if (iterator.hasNext()) {
                 String peek = iterator.next();
-                if (UseCaseNode.MODE_NEW.equals(peek)) {
-                    mode = UseCaseNode.MODE_NEW;
+                if (CrudNode.MODE_NEW.equals(peek)) {
+                    mode = CrudNode.MODE_NEW;
                     param = null;
                     if (iterator.hasNext()) {
                         return null;
                     }
-//                } else if(UseCaseNode.MODE_EMBEDDED_SEARCH.equals(peek)) {
-//                    mode = UseCaseNode.MODE_EMBEDDED_SEARCH;
+//                } else if(CrudNode.MODE_EMBEDDED_SEARCH.equals(peek)) {
+//                    mode = CrudNode.MODE_EMBEDDED_SEARCH;
 //                    param = null;
 //                    if (iterator.hasNext()) {
 //                        return null;
 //                    }
                 } else {
-                    mode = UseCaseNode.MODE_DETAIL;
+                    mode = CrudNode.MODE_DETAIL;
                     param = peek;
                 }
             } else {
-                mode = UseCaseNode.MODE_SEARCH;
+                mode = CrudNode.MODE_SEARCH;
                 param = null;
             }
-            result = new UseCaseNodeInstance(application, (UseCaseNode) foundNode, mode, param);
+            result = new CrudNodeInstance(application, (CrudNode) foundNode, mode, param);
         } else {
             result = new SiteNodeInstance(application, foundNode, null);
         }

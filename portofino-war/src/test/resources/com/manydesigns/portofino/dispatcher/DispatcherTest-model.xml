@@ -65,8 +65,8 @@
     </databases>
     <rootNode title="Portofino4" description="portofino 4" id="/">
         <childNodes>
-            <useCaseNode description="projects" id="projects" title="projects">
-                <useCase name="projects"
+            <crudNode description="projects" id="projects" title="projects">
+                <crud name="projects"
                          table="test-database.public.projects"
                          query="projects-query">
                     <properties>
@@ -74,10 +74,10 @@
                         <property name="name"/>
                         <property name="description"/>
                     </properties>
-                </useCase>
+                </crud>
                 <childNodes>
-                    <useCaseNode description="tickets" id="tickets" title="tickets">
-                        <useCase name="tickets"
+                    <crudNode description="tickets" id="tickets" title="tickets">
+                        <crud name="tickets"
                                  table="test-database.public.tickets"
                                  query="tickets-query">
                             <properties>
@@ -86,10 +86,10 @@
                                 <property name="description"/>
                                 <property name="project_id"/>
                             </properties>
-                        </useCase>
-                    </useCaseNode>
+                        </crud>
+                    </crudNode>
                 </childNodes>
-            </useCaseNode>
+            </crudNode>
         </childNodes>
     </rootNode>
 </model>

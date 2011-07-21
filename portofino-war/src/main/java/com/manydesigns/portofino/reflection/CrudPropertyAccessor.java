@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.reflection;
 
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.model.site.usecases.UseCaseProperty;
+import com.manydesigns.portofino.model.site.crud.CrudProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ import java.lang.annotation.Annotation;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCasePropertyAccessor
+public class CrudPropertyAccessor
         extends AbstractAnnotatedAccessor
         implements PropertyAccessor {
     public static final String copyright =
@@ -51,21 +51,21 @@ public class UseCasePropertyAccessor
     // Fields
     //**************************************************************************
 
-    protected final UseCaseProperty useCaseProperty;
+    protected final CrudProperty crudProperty;
     protected final PropertyAccessor nestedAccessor;
 
     public static final Logger logger =
-            LoggerFactory.getLogger(UseCasePropertyAccessor.class);
+            LoggerFactory.getLogger(CrudPropertyAccessor.class);
 
     
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public UseCasePropertyAccessor(UseCaseProperty useCaseProperty,
-                                   PropertyAccessor nestedAccessor) {
-        super(useCaseProperty.getAnnotations());
-        this.useCaseProperty = useCaseProperty;
+    public CrudPropertyAccessor(CrudProperty crudProperty,
+                                PropertyAccessor nestedAccessor) {
+        super(crudProperty.getAnnotations());
+        this.crudProperty = crudProperty;
         this.nestedAccessor = nestedAccessor;
     }
 

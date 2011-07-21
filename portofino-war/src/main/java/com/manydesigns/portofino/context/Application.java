@@ -32,9 +32,9 @@ package com.manydesigns.portofino.context;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.io.FileManager;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.site.usecases.UseCase;
+import com.manydesigns.portofino.model.site.crud.Crud;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.reflection.UseCaseAccessor;
+import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.system.model.users.User;
 
 import java.io.File;
@@ -150,7 +150,7 @@ public interface Application {
     //**************************************************************************
 
     public TableAccessor getTableAccessor(String qualifiedTableName);
-    public UseCaseAccessor getUseCaseAccessor(UseCase useCase);
+    public CrudAccessor getCrudAccessor(Crud crud);
 
     //**************************************************************************
     // User

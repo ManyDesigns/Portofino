@@ -33,8 +33,8 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.model.site.UseCaseNode;
-import com.manydesigns.portofino.model.site.usecases.UseCase;
+import com.manydesigns.portofino.model.site.CrudNode;
+import com.manydesigns.portofino.model.site.crud.Crud;
 import com.manydesigns.portofino.util.PkHelper;
 import ognl.OgnlContext;
 
@@ -46,10 +46,10 @@ import java.io.Serializable;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla - alessio.stalla@manydesigns.com
 */
-public class UseCaseNodeInstance extends SiteNodeInstance {
+public class CrudNodeInstance extends SiteNodeInstance {
 
     protected final String pk;
-    protected final UseCase useCase;
+    protected final Crud crud;
 
     protected final ClassAccessor classAccessor;
     protected final Table baseTable;
@@ -57,23 +57,23 @@ public class UseCaseNodeInstance extends SiteNodeInstance {
 
     protected Object object;
 
-    public UseCaseNodeInstance(Application application, UseCaseNode siteNode, String mode, String param) {
+    public CrudNodeInstance(Application application, CrudNode siteNode, String mode, String param) {
         super(application, siteNode, mode);
         this.pk = param;
-        this.useCase = siteNode.getUseCase();
-        classAccessor = application.getUseCaseAccessor(useCase);
-        baseTable = useCase.getActualTable();
+        this.crud = siteNode.getCrud();
+        classAccessor = application.getCrudAccessor(crud);
+        baseTable = crud.getActualTable();
         pkHelper = new PkHelper(classAccessor);
     }
 
     public void realize() {
-        if(UseCaseNode.MODE_DETAIL.equals(mode)) {
+        if(CrudNode.MODE_DETAIL.equals(mode)) {
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
             loadObject(pk);
             if(object != null) {
-                ognlContext.put(useCase.getActualVariable(), object);
+                ognlContext.put(crud.getActualVariable(), object);
             } else {
-                throw new RuntimeException("Not in use case: " + useCase.getName());
+                throw new RuntimeException("Not in use case: " + crud.getName());
             }
         }
     }
@@ -82,7 +82,7 @@ public class UseCaseNodeInstance extends SiteNodeInstance {
         Serializable pkObject = pkHelper.parsePkString(pk);
         object = application.getObjectByPk(
                 baseTable.getQualifiedName(), pkObject,
-                useCase.getQuery(), null);
+                crud.getQuery(), null);
     }
 
     // Getter/setter
@@ -92,8 +92,8 @@ public class UseCaseNodeInstance extends SiteNodeInstance {
     }
 
     @Override
-    public UseCaseNode getSiteNode() {
-        return (UseCaseNode) super.getSiteNode();
+    public CrudNode getSiteNode() {
+        return (CrudNode) super.getSiteNode();
     }
 
     @Override
@@ -105,8 +105,8 @@ public class UseCaseNodeInstance extends SiteNodeInstance {
         }
     }
 
-    public UseCase getUseCase() {
-        return useCase;
+    public Crud getCrud() {
+        return crud;
     }
 
     public ClassAccessor getClassAccessor() {

@@ -33,7 +33,7 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
-import com.manydesigns.portofino.dispatcher.UseCaseNodeInstance;
+import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import org.jetbrains.annotations.NotNull;
@@ -71,9 +71,9 @@ public class Breadcrumbs implements XhtmlFragment {
                     sb.toString(), siteNode.getTitle(),
                     siteNode.getDescription());
             items.add(item);
-            if (current instanceof UseCaseNodeInstance) {
-                UseCaseNodeInstance instance =
-                        (UseCaseNodeInstance) current;
+            if (current instanceof CrudNodeInstance) {
+                CrudNodeInstance instance =
+                        (CrudNodeInstance) current;
                 if (instance.getPk() != null) {
                     sb.append("/");
                     sb.append(instance.getPk());

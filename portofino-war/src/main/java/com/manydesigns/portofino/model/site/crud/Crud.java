@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.model.site.usecases;
+package com.manydesigns.portofino.model.site.crud;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.Annotation;
@@ -47,7 +47,7 @@ import java.util.List;
 */
 
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class UseCase {
+public class Crud {
     public static final String copyright =
             "Copyright (c) 2005-2010, ManyDesigns srl";
     
@@ -56,12 +56,12 @@ public class UseCase {
     // Fields
     //**************************************************************************
 
-    protected final UseCase parentUseCase;
-    protected final List<UseCaseProperty> properties;
+    protected final Crud parentCrud;
+    protected final List<CrudProperty> properties;
     protected final List<ModelSelectionProvider> selectionProviders;
     protected final List<Annotation> annotations;
     protected final List<Button> buttons;
-    protected final List<UseCase> subUseCases;
+    protected final List<Crud> subCruds;
 
     protected String name;
     protected String table;
@@ -82,24 +82,24 @@ public class UseCase {
     // Constructors
     //**************************************************************************
 
-    public UseCase() {
+    public Crud() {
         this(null);
     }
 
-    public UseCase(UseCase parentUseCase) {
-        this.parentUseCase = parentUseCase;
-        properties = new ArrayList<UseCaseProperty>();
+    public Crud(Crud parentCrud) {
+        this.parentCrud = parentCrud;
+        properties = new ArrayList<CrudProperty>();
         selectionProviders = new ArrayList<ModelSelectionProvider>();
         annotations = new ArrayList<Annotation>();
         buttons = new ArrayList<Button>();
-        subUseCases = new ArrayList<UseCase>();
+        subCruds = new ArrayList<Crud>();
     }
 
-    public UseCase(UseCase parentUseCase,
-                   String name, String table, String query,
-                   String searchTitle, String createTitle,
-                   String readTitle, String editTitle) {
-        this(parentUseCase);
+    public Crud(Crud parentCrud,
+                String name, String table, String query,
+                String searchTitle, String createTitle,
+                String readTitle, String editTitle) {
+        this(parentCrud);
         this.name = name;
         this.table = table;
         this.query = query;
@@ -116,7 +116,7 @@ public class UseCase {
     public void reset() {
         actualTable = null;
 
-        for (UseCaseProperty property : properties) {
+        for (CrudProperty property : properties) {
             property.reset();
         }
 
@@ -132,15 +132,15 @@ public class UseCase {
             button.reset();
         }
 
-        for (UseCase subUseCase : subUseCases) {
-            subUseCase.reset();
+        for (Crud subCrud : subCruds) {
+            subCrud.reset();
         }
     }
 
     public void init(Model model) {
         actualTable = model.findTableByQualifiedName(table);
 
-        for (UseCaseProperty property : properties) {
+        for (CrudProperty property : properties) {
             property.init(model);
         }
 
@@ -156,17 +156,17 @@ public class UseCase {
             button.init(model);
         }
 
-        for (UseCase subUseCase : subUseCases) {
-            subUseCase.init(model);
+        for (Crud subCrud : subCruds) {
+            subCrud.init(model);
         }
     }
 
     public String getQualifiedName() {
-        if (parentUseCase == null) {
+        if (parentCrud == null) {
             return name;
         } else {
             return MessageFormat.format("{0}.{1}",
-                    parentUseCase.getQualifiedName(), name);
+                    parentCrud.getQualifiedName(), name);
         }
     }
 
@@ -175,13 +175,13 @@ public class UseCase {
     // Getters/setters
     //**************************************************************************
 
-    public UseCase getParentUseCase() {
-        return parentUseCase;
+    public Crud getParentCrud() {
+        return parentCrud;
     }
 
     @XmlElementWrapper(name="properties")
-    @XmlElement(name="property",type=UseCaseProperty.class)
-    public List<UseCaseProperty> getProperties() {
+    @XmlElement(name="property",type=CrudProperty.class)
+    public List<CrudProperty> getProperties() {
         return properties;
     }
 
@@ -204,10 +204,10 @@ public class UseCase {
     }
 
 
-    @XmlElementWrapper(name="subUseCases")
-    @XmlElement(name="useCase",type=UseCase.class)
-    public List<UseCase> getSubUseCases() {
-        return subUseCases;
+    @XmlElementWrapper(name="subCruds")
+    @XmlElement(name="crud",type=Crud.class)
+    public List<Crud> getSubCruds() {
+        return subCruds;
     }
 
     @Identifier

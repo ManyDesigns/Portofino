@@ -345,7 +345,7 @@ public class RoundtripTest extends AbstractPortofinoTest {
         //TODO ripristinare
         //assertTrue(targetModel.getPortlets().isEmpty());
         //assertTrue(targetModel.getSiteNodes().isEmpty());
-        //assertTrue(targetModel.getUseCases().isEmpty());
+        //assertTrue(targetModel.getCrud().isEmpty());
 
         // check the database
         assertEquals(1, targetModel.getDatabases().size());

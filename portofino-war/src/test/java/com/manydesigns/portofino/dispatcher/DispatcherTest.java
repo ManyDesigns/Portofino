@@ -31,7 +31,7 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.site.UseCaseNode;
+import com.manydesigns.portofino.model.site.CrudNode;
 import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.navigation.NavigationNode;
 
@@ -46,7 +46,7 @@ import java.util.List;
 */
 public class DispatcherTest extends AbstractPortofinoTest {
 
-    public static final String USE_CASE_ACTION = "/UseCase.action";
+    public static final String CRUD_ACTION = "/Crud.action";
 
     Dispatcher dispatcher;
 
@@ -70,16 +70,16 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNotNull(dispatch);
 
         assertEquals(originalPath, dispatch.getOriginalPath());
-        assertEquals(USE_CASE_ACTION, dispatch.getRewrittenPath());
+        assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
 
         SiteNodeInstance[] siteNodeInstancePath =
                 dispatch.getSiteNodeInstancePath();
         assertEquals(1, siteNodeInstancePath.length);
 
-        UseCaseNodeInstance siteNodeInstance = (UseCaseNodeInstance) siteNodeInstancePath[0];
+        CrudNodeInstance siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[0];
         SiteNode siteNode = model.getRootNode().getChildNodes().get(0);
         assertEquals(siteNode, siteNodeInstance.getSiteNode());
-        assertEquals(UseCaseNode.MODE_SEARCH, siteNodeInstance.getMode());
+        assertEquals(CrudNode.MODE_SEARCH, siteNodeInstance.getMode());
         assertNull(siteNodeInstance.getPk());
 
         Navigation navigation =
@@ -113,16 +113,16 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNotNull(dispatch);
 
         assertEquals(originalPath, dispatch.getOriginalPath());
-        assertEquals(USE_CASE_ACTION, dispatch.getRewrittenPath());
+        assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
 
         SiteNodeInstance[] siteNodeInstancePath =
                 dispatch.getSiteNodeInstancePath();
         assertEquals(1, siteNodeInstancePath.length);
 
-        UseCaseNodeInstance siteNodeInstance = (UseCaseNodeInstance) siteNodeInstancePath[0];
+        CrudNodeInstance siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[0];
         SiteNode siteNode = model.getRootNode().getChildNodes().get(0);
         assertEquals(siteNode, siteNodeInstance.getSiteNode());
-        assertEquals(UseCaseNode.MODE_NEW, siteNodeInstance.getMode());
+        assertEquals(CrudNode.MODE_NEW, siteNodeInstance.getMode());
         assertNull(siteNodeInstance.getPk());
         
         Navigation navigation =
@@ -152,16 +152,16 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNotNull(dispatch);
 
         assertEquals(originalPath, dispatch.getOriginalPath());
-        assertEquals(USE_CASE_ACTION, dispatch.getRewrittenPath());
+        assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
 
         SiteNodeInstance[] siteNodeInstancePath =
                 dispatch.getSiteNodeInstancePath();
         assertEquals(1, siteNodeInstancePath.length);
 
-        UseCaseNodeInstance siteNodeInstance = (UseCaseNodeInstance) siteNodeInstancePath[0];
+        CrudNodeInstance siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[0];
         SiteNode siteNode = model.getRootNode().getChildNodes().get(0);
         assertEquals(siteNode, siteNodeInstance.getSiteNode());
-        assertEquals(UseCaseNode.MODE_DETAIL, siteNodeInstance.getMode());
+        assertEquals(CrudNode.MODE_DETAIL, siteNodeInstance.getMode());
         assertEquals("10", siteNodeInstance.getPk());
 
         Navigation navigation =
@@ -198,7 +198,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNotNull(dispatch);
 
         assertEquals(originalPath, dispatch.getOriginalPath());
-        assertEquals(USE_CASE_ACTION, dispatch.getRewrittenPath());
+        assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
 
         SiteNodeInstance[] siteNodeInstancePath =
                 dispatch.getSiteNodeInstancePath();
@@ -209,10 +209,10 @@ public class DispatcherTest extends AbstractPortofinoTest {
         List<NavigationNode> rootNodes = navigation.getRootNodes();
 
         // SiteNode e NavigationNode per /projects
-        UseCaseNodeInstance siteNodeInstance = (UseCaseNodeInstance) siteNodeInstancePath[0];
+        CrudNodeInstance siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[0];
         SiteNode siteNode = model.getRootNode().getChildNodes().get(0);
         assertEquals(siteNode, siteNodeInstance.getSiteNode());
-        assertEquals(UseCaseNode.MODE_DETAIL, siteNodeInstance.getMode());
+        assertEquals(CrudNode.MODE_DETAIL, siteNodeInstance.getMode());
         assertEquals("10", siteNodeInstance.getPk());
 
         assertEquals(1, rootNodes.size());
@@ -221,10 +221,10 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(siteNode, navigationNode.getSiteNode());
         assertTrue(navigationNode.isEnabled());
 
-        siteNodeInstance = (UseCaseNodeInstance) siteNodeInstancePath[1];
+        siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[1];
         siteNode = siteNode.getChildNodes().get(0);
         assertEquals(siteNode, siteNodeInstance.getSiteNode());
-        assertEquals(UseCaseNode.MODE_SEARCH, siteNodeInstance.getMode());
+        assertEquals(CrudNode.MODE_SEARCH, siteNodeInstance.getMode());
         assertNull(siteNodeInstance.getPk());
 
         // SiteNode e NavigationNode per /projects/tickets
@@ -250,22 +250,22 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNotNull(dispatch);
 
         assertEquals(originalPath, dispatch.getOriginalPath());
-        assertEquals(USE_CASE_ACTION, dispatch.getRewrittenPath());
+        assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
 
         SiteNodeInstance[] siteNodeInstancePath =
                 dispatch.getSiteNodeInstancePath();
         assertEquals(2, siteNodeInstancePath.length);
 
-        UseCaseNodeInstance siteNodeInstance = (UseCaseNodeInstance) siteNodeInstancePath[0];
+        CrudNodeInstance siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[0];
         SiteNode expected = model.getRootNode().getChildNodes().get(0);
         assertEquals(expected, siteNodeInstance.getSiteNode());
-        assertEquals(UseCaseNode.MODE_DETAIL, siteNodeInstance.getMode());
+        assertEquals(CrudNode.MODE_DETAIL, siteNodeInstance.getMode());
         assertEquals("10", siteNodeInstance.getPk());
 
-        siteNodeInstance = (UseCaseNodeInstance) siteNodeInstancePath[1];
+        siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[1];
         expected = expected.getChildNodes().get(0);
         assertEquals(expected, siteNodeInstance.getSiteNode());
-        assertEquals(UseCaseNode.MODE_DETAIL, siteNodeInstance.getMode());
+        assertEquals(CrudNode.MODE_DETAIL, siteNodeInstance.getMode());
         assertEquals("20", siteNodeInstance.getPk());
     }
 

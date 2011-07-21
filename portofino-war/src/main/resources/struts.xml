@@ -89,7 +89,7 @@
             <result name="success">/layouts/document.jsp</result>
         </action>
         <action name="UseCase"
-                class="com.manydesigns.portofino.actions.UseCaseAction">
+                class="com.manydesigns.portofino.actions.CrudAction">
             <result name="search">/skins/default/crud/search.jsp</result>
 
             <result name="read">/skins/default/crud/read.jsp</result>

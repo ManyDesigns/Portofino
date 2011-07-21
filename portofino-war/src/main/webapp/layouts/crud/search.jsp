@@ -4,6 +4,7 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><stripes:layout-render name="/skins/${skin}/crud/common.jsp">
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
     <stripes:layout-component name="buttons">
         <c:if test="${not empty actionBean.returnToSearchTarget}">
             <stripes:submit id="Table_returnToSearch" name="returnToSearch" value="<< Return to ${actionBean.returnToSearchTarget}"/>
@@ -18,7 +19,7 @@
         <!-- TODO custom buttons -->
     </stripes:layout-component>
     <stripes:layout-component name="innerContent">
-        <h1><c:out value="${actionBean.useCase.searchTitle}"/></h1>
+        <h1><c:out value="${actionBean.crud.searchTitle}"/></h1>
         <div class="yui-ge">
             <div class="yui-u first">
                 <div class="search_results">

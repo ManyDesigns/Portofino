@@ -31,8 +31,8 @@ package com.manydesigns.portofino.reflection;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.model.site.usecases.UseCase;
-import com.manydesigns.portofino.model.site.usecases.UseCaseProperty;
+import com.manydesigns.portofino.model.site.crud.Crud;
+import com.manydesigns.portofino.model.site.crud.CrudProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ import java.util.List;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCaseAccessor
+public class CrudAccessor
         extends AbstractAnnotatedAccessor
         implements ClassAccessor {
     public static final String copyright =
@@ -54,37 +54,37 @@ public class UseCaseAccessor
     // Fields
     //**************************************************************************
 
-    protected final UseCase useCase;
+    protected final Crud crud;
     protected final ClassAccessor tableAccessor;
-    protected final UseCasePropertyAccessor[] propertyAccessors;
-    protected final UseCasePropertyAccessor[] keyPropertyAccessors;
+    protected final CrudPropertyAccessor[] propertyAccessors;
+    protected final CrudPropertyAccessor[] keyPropertyAccessors;
 
     public final static Logger logger =
-            LoggerFactory.getLogger(UseCaseAccessor.class);
+            LoggerFactory.getLogger(CrudAccessor.class);
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public UseCaseAccessor(UseCase useCase, TableAccessor tableAccessor) {
-        super(useCase.getModelAnnotations());
-        this.useCase = useCase;
+    public CrudAccessor(Crud crud, TableAccessor tableAccessor) {
+        super(crud.getModelAnnotations());
+        this.crud = crud;
         this.tableAccessor = tableAccessor;
-        List<UseCaseProperty> properties = useCase.getProperties();
+        List<CrudProperty> properties = crud.getProperties();
         PropertyAccessor[] keyColumnAccessors = tableAccessor.getKeyProperties();
 
-        propertyAccessors = new UseCasePropertyAccessor[properties.size()];
+        propertyAccessors = new CrudPropertyAccessor[properties.size()];
         keyPropertyAccessors =
-                new UseCasePropertyAccessor[keyColumnAccessors.length];
+                new CrudPropertyAccessor[keyColumnAccessors.length];
 
         int i = 0;
-        for (UseCaseProperty property : properties) {
+        for (CrudProperty property : properties) {
             String propertyName = property.getName();
             try {
                 PropertyAccessor columnAccessor =
                         tableAccessor.getProperty(propertyName);
-                UseCasePropertyAccessor propertyAccessor =
-                        new UseCasePropertyAccessor(property, columnAccessor);
+                CrudPropertyAccessor propertyAccessor =
+                        new CrudPropertyAccessor(property, columnAccessor);
                 propertyAccessors[i] = propertyAccessor;
             } catch (NoSuchFieldException e) {
                 logger.error("Could not access table property: " +
@@ -97,7 +97,7 @@ public class UseCaseAccessor
         for (PropertyAccessor keyColumnAccessor : keyColumnAccessors) {
             String propertyName = keyColumnAccessor.getName();
             try {
-                UseCasePropertyAccessor keyPropertyAccessor =
+                CrudPropertyAccessor keyPropertyAccessor =
                         getProperty(keyColumnAccessor.getName());
                 keyPropertyAccessors[i] = keyPropertyAccessor;
             } catch (NoSuchFieldException e) {
@@ -113,11 +113,11 @@ public class UseCaseAccessor
     //**************************************************************************
 
     public String getName() {
-        return useCase.getName();
+        return crud.getName();
     }
 
-    public UseCasePropertyAccessor getProperty(String propertyName) throws NoSuchFieldException {
-        for (UseCasePropertyAccessor current : propertyAccessors) {
+    public CrudPropertyAccessor getProperty(String propertyName) throws NoSuchFieldException {
+        for (CrudPropertyAccessor current : propertyAccessors) {
             if (current.getName().equals(propertyName)) {
                 return current;
             }
@@ -143,8 +143,8 @@ public class UseCaseAccessor
     // Getters/setters
     //**************************************************************************
 
-    public UseCase getUseCase() {
-        return useCase;
+    public Crud getCrud() {
+        return crud;
     }
 
 }
