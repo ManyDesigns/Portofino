@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlElement;
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
-public class UseCaseNode extends SiteNode{
+public class UseCaseNode extends SiteNode implements EmbeddableNode {
     //**************************************************************************
     // Constants
     //**************************************************************************

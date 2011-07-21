@@ -87,11 +87,7 @@
         </div>
         <div id="ft">
             <div id="responseTime">
-                Page response time:
-                <c:out value="${stopWatch.time}"/>
-                ms. DB time:
-                <c:out value="${context.dbTime}"/>
-                ms.
+                Page response time: <c:out value="${stopWatch.time}"/> ms.
             </div>
             Powered by <a href="http://www.manydesigns.com/">ManyDesigns Portofino</a>
             <c:out value="${portofinoProperties['portofino.version']}"/>

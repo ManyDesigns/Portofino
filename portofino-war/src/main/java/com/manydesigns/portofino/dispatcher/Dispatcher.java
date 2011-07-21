@@ -34,6 +34,8 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.*;
 import net.sourceforge.stripes.controller.StripesConstants;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -52,6 +54,8 @@ public class Dispatcher {
 
     public final static String KEY = Dispatcher.class.getName();
 
+    public static final Logger logger =
+            LoggerFactory.getLogger(Dispatcher.class);
 
     protected final Application application;
 
@@ -60,12 +64,19 @@ public class Dispatcher {
     }
 
     public Dispatch createDispatch(HttpServletRequest request) {
-        String originalPath = (String) request.getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH);
+        String originalPath =
+                (String) request.getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH);
         if(originalPath == null) { originalPath = request.getServletPath(); }
 
         List<SiteNodeInstance> siteNodePath = new ArrayList<SiteNodeInstance>();
 
         Model model = application.getModel();
+
+        if (model == null) {
+            logger.error("Model is null");
+            throw new Error("Model is null");
+        }
+
         SiteNode rootNode = model.getRootNode();
         List<SiteNode> nodeList = rootNode.getChildNodes();
         String[] fragments = StringUtils.split(originalPath, '/');

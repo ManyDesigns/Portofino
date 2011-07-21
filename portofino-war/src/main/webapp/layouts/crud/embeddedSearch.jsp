@@ -9,6 +9,6 @@
     <h1><c:out value="${actionBean.useCase.searchTitle}"/></h1>
     <div class="search_results">
         <mde:write name="actionBean" property="tableForm"/>
-        &gt;&gt; Advanced search
+        <stripes:link href="${actionBean.dispatch.originalPath}">&gt;&gt; Advanced search</stripes:link>
     </div>
 </div>

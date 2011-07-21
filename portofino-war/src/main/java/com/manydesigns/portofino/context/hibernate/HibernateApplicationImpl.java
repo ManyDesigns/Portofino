@@ -56,7 +56,6 @@ import com.manydesigns.portofino.xml.diff.DiffUtil;
 import com.manydesigns.portofino.xml.diff.MergeDiffer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.transaction.file.FileResourceManager;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
@@ -102,7 +101,6 @@ public class HibernateApplicationImpl implements Application {
     protected FileManager fm;
     protected Model model;
     protected Map<String, HibernateDatabaseSetup> setups;
-    protected final ThreadLocal<StopWatch> stopWatches;
     protected final List<SiteNode> siteNodes;
     protected File xmlModelFile;
 
@@ -115,7 +113,6 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
 
     public HibernateApplicationImpl() {
-        stopWatches = new ThreadLocal<StopWatch>();
         siteNodes = new ArrayList<SiteNode>();
     }
 
@@ -329,17 +326,12 @@ public class HibernateApplicationImpl implements Application {
         PropertyAccessor[] keyProperties = table.getKeyProperties();
         int size = keyProperties.length;
         if (size > 1) {
-            startTimer();
-
             result = session.load(actualEntityName, pk);
-            stopTimer();
             return result;
         }
-        startTimer();
         PropertyAccessor propertyAccessor = keyProperties[0];
         Serializable key = (Serializable) propertyAccessor.get(pk);
         result = session.load(actualEntityName, key);
-        stopTimer();
         return result;
     }
 
@@ -380,10 +372,8 @@ public class HibernateApplicationImpl implements Application {
         String actualEntityName = table.getActualEntityName();
 
         hibernateCriteria = session.createCriteria(actualEntityName);
-        startTimer();
         //noinspection unchecked
         List<Object> result = hibernateCriteria.list();
-        stopTimer();
         return result;
     }
 
@@ -660,10 +650,8 @@ public class HibernateApplicationImpl implements Application {
             query.setParameter(i, parameters[i]);
         }
 
-        startTimer();
         //noinspection unchecked
         List<Object> result = query.list();
-        stopTimer();
         return result;
     }
 
@@ -676,14 +664,11 @@ public class HibernateApplicationImpl implements Application {
         String actualEntityName = table.getActualEntityName();
 
         try {
-            startTimer();
             session.save(actualEntityName, obj);
             //session.getTransaction().commit();
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
-        } finally {
-            stopTimer();
         }
     }
 
@@ -695,14 +680,11 @@ public class HibernateApplicationImpl implements Application {
         String actualEntityName = table.getActualEntityName();
 
         try {
-            startTimer();
             session.update(actualEntityName, obj);
             //session.getTransaction().commit();
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
-        } finally {
-            stopTimer();
         }
     }
 
@@ -713,13 +695,10 @@ public class HibernateApplicationImpl implements Application {
         String actualEntityName = table.getActualEntityName();
         try {
             Object obj2 = getObjectByPk(qualifiedTableName, (Serializable) obj);
-            startTimer();
             session.delete(actualEntityName, obj2);
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
-        } finally {
-            stopTimer();
         }
     }
 
@@ -734,10 +713,8 @@ public class HibernateApplicationImpl implements Application {
             query.setParameter(i, parameters[i]);
         }
 
-        startTimer();
         //noinspection unchecked
         List<Object[]> result = query.list();
-        stopTimer();
 
         return result;
     }
@@ -834,10 +811,8 @@ public class HibernateApplicationImpl implements Application {
                 criteria.add(Restrictions.eq(fromColumn.getActualPropertyName(),
                         toValue));
             }
-            startTimer();
             //noinspection unchecked
             List<Object> result = criteria.list();
-            stopTimer();
             return result;
         } catch (Throwable e) {
             String msg = String.format(
@@ -923,11 +898,9 @@ public class HibernateApplicationImpl implements Application {
         org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
         criteria.add(Restrictions.eq(UserUtils.USERNAME, username));
         criteria.add(Restrictions.eq(UserUtils.PASSWORD, password));
-        startTimer();
 
         @SuppressWarnings({"unchecked"})
         List<Object> result = (List<Object>) criteria.list();
-        stopTimer();
 
         if (result.size() == 1) {
             return (User) result.get(0);
@@ -941,10 +914,8 @@ public class HibernateApplicationImpl implements Application {
         Session session = getSession(qualifiedTableName);
         org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
         criteria.add(Restrictions.eq("email", email));
-        startTimer();
         @SuppressWarnings({"unchecked"})
         List<Object> result = (List<Object>) criteria.list();
-        stopTimer();
 
         if (result.size() == 1) {
             return (User) result.get(0);
@@ -958,10 +929,8 @@ public class HibernateApplicationImpl implements Application {
         Session session = getSession(qualifiedTableName);
         org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
         criteria.add(Restrictions.eq(UserUtils.USERNAME, username));
-        startTimer();
         @SuppressWarnings({"unchecked"})
         List<Object> result = (List<Object>) criteria.list();
-        stopTimer();
 
         if (result.size() == 1) {
             return (User) result.get(0);
@@ -975,10 +944,8 @@ public class HibernateApplicationImpl implements Application {
         Session session = getSession(qualifiedTableName);
         org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
         criteria.add(Restrictions.eq("token", token));
-        startTimer();
         @SuppressWarnings({"unchecked"})
         List<Object> result = (List<Object>) criteria.list();
-        stopTimer();
 
         if (result.size() == 1) {
             return (User) result.get(0);
@@ -987,39 +954,6 @@ public class HibernateApplicationImpl implements Application {
         }
     }
 
-
-    //**************************************************************************
-    // Timers
-    //**************************************************************************
-    public void resetDbTimer() {
-        stopWatches.set(null);
-    }
-
-    public long getDbTime() {
-        StopWatch stopWatch = stopWatches.get();
-        if (stopWatch != null) {
-            return stopWatch.getTime();
-        }
-        return 0L;
-    }
-
-    private void startTimer() {
-        StopWatch stopWatch = stopWatches.get();
-        if (stopWatch == null) {
-            stopWatch = new StopWatch();
-            stopWatches.set(stopWatch);
-            stopWatch.start();
-        } else {
-            stopWatch.resume();
-        }
-    }
-
-    private void stopTimer() {
-        StopWatch stopWatch = stopWatches.get();
-        if (stopWatch != null) {
-            stopWatch.suspend();
-        }
-    }
 
     //**************************************************************************
     // File Access

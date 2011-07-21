@@ -141,10 +141,6 @@ public interface Application {
     List<Object> getRelatedObjects(String qualifiedTableName,
             Object obj, String oneToManyRelationshipName);
 
-    void resetDbTimer();
-
-    long getDbTime();
-
     List<String> getDDLCreate();
 
     List<String> getDDLUpdate();

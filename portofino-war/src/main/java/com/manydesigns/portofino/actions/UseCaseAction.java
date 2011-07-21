@@ -57,6 +57,8 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
+import com.manydesigns.portofino.model.site.EmbeddableNode;
+import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.site.UseCaseNode;
 import com.manydesigns.portofino.model.site.usecases.Button;
 import com.manydesigns.portofino.model.site.usecases.UseCase;
@@ -119,6 +121,7 @@ public class UseCaseAction extends AbstractActionBean {
 
     public UseCaseNode useCaseNode;
     public UseCase useCase;
+    public List<String> embeddedChildren;
 
     public ClassAccessor classAccessor;
     public Table baseTable;
@@ -292,7 +295,6 @@ public class UseCaseAction extends AbstractActionBean {
                 Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
                 .addParameter("searchString", searchString)
                 .toString();
-//        cancelReturnUrl = pkHelper.generateSearchUrl(searchString);
         return new ForwardResolution("/layouts/crud/search.jsp");
     }
 
@@ -300,6 +302,7 @@ public class UseCaseAction extends AbstractActionBean {
 //        setupSearchForm();
         loadObjects();
         setupTableForm(Mode.VIEW);
+        tableForm.setSelectable(false);
         return new ForwardResolution("/layouts/crud/embeddedSearch.jsp");
     }
 
@@ -341,64 +344,9 @@ public class UseCaseAction extends AbstractActionBean {
 
         setupReturnToSearchTarget();
 
+        setupEmbeddedChildren();
+
         return new ForwardResolution("/layouts/crud/read.jsp");
-    }
-
-    private void setupReturnToSearchTarget() {
-        SiteNodeInstance[] siteNodeInstancePath =
-                dispatch.getSiteNodeInstancePath();
-        int previousPos = siteNodeInstancePath.length - 2;
-        returnToSearchTarget = null;
-        if (previousPos >= 0) {
-            SiteNodeInstance previousNode = siteNodeInstancePath[previousPos];
-            if (previousNode instanceof UseCaseNodeInstance) {
-                UseCaseNodeInstance useCaseNodeInstance =
-                        (UseCaseNodeInstance) previousNode;
-                Object previousNodeObject = useCaseNodeInstance.getObject();
-                ClassAccessor previousNodeClassAccessor =
-                        useCaseNodeInstance.getClassAccessor();
-                returnToSearchTarget = ShortNameUtils.getName(
-                        previousNodeClassAccessor, previousNodeObject);
-            }
-        }
-
-    }
-
-    protected void setupPagination() {
-        position = objects.indexOf(object);
-        size = objects.size();
-        String baseUrl = calculateBaseSearchUrl();
-        if(position >= 0) {
-            if(position > 0) {
-                firstUrl = generateObjectUrl(baseUrl, 0);
-                previousUrl = generateObjectUrl(baseUrl, position - 1);
-            }
-            if(position < size - 1) {
-                lastUrl = generateObjectUrl(baseUrl, size - 1);
-                nextUrl = generateObjectUrl(baseUrl, position + 1);
-            }
-        }
-    }
-
-    protected String calculateBaseSearchUrl() {
-        assert pk != null; //Ha senso solo in modalità read/detail
-        String baseUrl = dispatch.getAbsoluteOriginalPath();
-        int lastSlashIndex = baseUrl.lastIndexOf('/');
-        baseUrl = baseUrl.substring(0, lastSlashIndex);
-        return baseUrl;
-    }
-
-    protected String generateObjectUrl(String baseUrl, int index) {
-        Object o = objects.get(index);
-        return generateObjectUrl(baseUrl, o);
-    }
-
-    protected String generateObjectUrl(String baseUrl, Object o) {
-        String objPk = pkHelper.generatePkString(o);
-        return new UrlBuilder(
-                Locale.getDefault(), baseUrl + "/" + objPk, false)
-                .addParameter("searchString", searchString)
-                .toString();
     }
 
     protected void refreshBlobDownloadHref() {
@@ -692,6 +640,72 @@ public class UseCaseAction extends AbstractActionBean {
     // Setup methods
     //**************************************************************************
 
+    protected void setupReturnToSearchTarget() {
+        SiteNodeInstance[] siteNodeInstancePath =
+                dispatch.getSiteNodeInstancePath();
+        int previousPos = siteNodeInstancePath.length - 2;
+        returnToSearchTarget = null;
+        if (previousPos >= 0) {
+            SiteNodeInstance previousNode = siteNodeInstancePath[previousPos];
+            if (previousNode instanceof UseCaseNodeInstance) {
+                UseCaseNodeInstance useCaseNodeInstance =
+                        (UseCaseNodeInstance) previousNode;
+                Object previousNodeObject = useCaseNodeInstance.getObject();
+                ClassAccessor previousNodeClassAccessor =
+                        useCaseNodeInstance.getClassAccessor();
+                returnToSearchTarget = ShortNameUtils.getName(
+                        previousNodeClassAccessor, previousNodeObject);
+            }
+        }
+
+    }
+
+    protected void setupPagination() {
+        position = objects.indexOf(object);
+        size = objects.size();
+        String baseUrl = calculateBaseSearchUrl();
+        if(position >= 0) {
+            if(position > 0) {
+                firstUrl = generateObjectUrl(baseUrl, 0);
+                previousUrl = generateObjectUrl(baseUrl, position - 1);
+            }
+            if(position < size - 1) {
+                lastUrl = generateObjectUrl(baseUrl, size - 1);
+                nextUrl = generateObjectUrl(baseUrl, position + 1);
+            }
+        }
+    }
+
+    protected String calculateBaseSearchUrl() {
+        assert pk != null; //Ha senso solo in modalità read/detail
+        String baseUrl = dispatch.getAbsoluteOriginalPath();
+        int lastSlashIndex = baseUrl.lastIndexOf('/');
+        baseUrl = baseUrl.substring(0, lastSlashIndex);
+        return baseUrl;
+    }
+
+    protected String generateObjectUrl(String baseUrl, int index) {
+        Object o = objects.get(index);
+        return generateObjectUrl(baseUrl, o);
+    }
+
+    protected String generateObjectUrl(String baseUrl, Object o) {
+        String objPk = pkHelper.generatePkString(o);
+        return new UrlBuilder(
+                Locale.getDefault(), baseUrl + "/" + objPk, false)
+                .addParameter("searchString", searchString)
+                .toString();
+    }
+
+    protected void setupEmbeddedChildren() {
+        embeddedChildren = new ArrayList<String>();
+        for(SiteNode node : useCaseNode.getChildNodes()) {
+            if(node instanceof EmbeddableNode) {
+                embeddedChildren.add(dispatch.getOriginalPath() + "/" + node.getId());
+            }
+        }
+    }
+
     protected void setupSearchForm() {
         SearchFormBuilder searchFormBuilder =
                 new SearchFormBuilder(classAccessor);
@@ -831,8 +845,6 @@ public class UseCaseAction extends AbstractActionBean {
         Serializable pkObject = pkHelper.parsePkString(pk);
         object = application.getObjectByPk(baseTable.getQualifiedName(), pkObject);
     }
-
-
 
     //**************************************************************************
     // ExportSearch
@@ -1475,5 +1487,9 @@ public class UseCaseAction extends AbstractActionBean {
 
     public void setReturnToSearchTarget(String returnToSearchTarget) {
         this.returnToSearchTarget = returnToSearchTarget;
+    }
+
+    public List<String> getEmbeddedChildren() {
+        return embeddedChildren;
     }
 }

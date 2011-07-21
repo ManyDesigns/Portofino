@@ -39,6 +39,7 @@ import net.sourceforge.stripes.controller.LifecycleStage;
 import org.slf4j.MDC;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -54,12 +55,14 @@ public class CleanUpInterceptor implements Interceptor  {
     public Resolution intercept(ExecutionContext context) throws Exception {
         ActionBeanContext actionContext = context.getActionBeanContext();
         ServletContext servletContext = actionContext.getServletContext();
+        HttpServletRequest req = actionContext.getRequest();
+
         Application application = (Application)servletContext.getAttribute(Application.KEY);
 
         MDC.clear();
-        if (application !=null && application.getModel() != null)
+        if (application !=null && application.getModel() != null) {
             application.closeSession();
-
+        }
 
         return context.proceed();
     }

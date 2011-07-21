@@ -97,14 +97,16 @@ public class PortofinoInterceptor implements Interceptor {
             return context.proceed();
         }
 
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
-
         HttpSession session = req.getSession(false);
         ServletContext servletContext = actionContext.getServletContext();
         Application application = (Application)servletContext.getAttribute(Application.KEY);
+
+        logger.debug("Starting page response timer");
+        StopWatch stopWatch = new StopWatch();
+        // Non è necessario stopparlo
+        stopWatch.start();
         req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
+
         if(req.getAttribute("skin") == null) {
             req.setAttribute("skin", "default");
         }
@@ -122,11 +124,6 @@ public class PortofinoInterceptor implements Interceptor {
         MDC.put(UserUtils.USERID, userIdString);
         MDC.put(UserUtils.USERNAME, userName);
 
-        if (application == null || application.getModel() == null) {
-            logger.debug("Model not found");
-            return new ForwardResolution("/errors/model-not-found.jsp");
-        }
-        application.resetDbTimer();
         application.openSession();
         Model model = application.getModel();
 
@@ -161,22 +158,13 @@ public class PortofinoInterceptor implements Interceptor {
         injectAnnotatedFields(action, InjectHttpRequest.class, req);
         injectAnnotatedFields(action, InjectHttpSession.class, session);
 
-
-        //2. Se è fuori dall'albero di navigazione e non ho permessi
-        if (siteNodeInstance == null ) {
-            stopWatch.stop();
-            return context.proceed();
-        }
-
         SiteNode node = siteNodeInstance.getSiteNode();
         //3. Ho i permessi necessari vado alla pagina
         if(node.isAllowed(groups)){
-            stopWatch.stop();
             return context.proceed();
         } else {
             //4. Non ho i permessi, ma non sono loggato, vado alla pagina di login
             if (userId==null){
-                stopWatch.stop();
                 String returnUrl=req.getServletPath();
                 Map parameters = req.getParameterMap();
                 if (parameters.size()!=0){
@@ -194,7 +182,6 @@ public class PortofinoInterceptor implements Interceptor {
                 return new ForwardResolution("/skins/default/user/login.jsp");
             } else {
                 //5. Non ho i permessi, ma sono loggato, errore 401
-                stopWatch.stop();
                 return new ErrorResolution(UNAUTHORIZED);
             }
         }
