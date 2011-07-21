@@ -295,6 +295,9 @@ public class UseCaseAction extends AbstractActionBean {
                 Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
                 .addParameter("searchString", searchString)
                 .toString();
+
+        setupReturnToSearchTarget();
+
         return new ForwardResolution("/layouts/crud/search.jsp");
     }
 

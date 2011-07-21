@@ -5,6 +5,9 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><stripes:layout-render name="/skins/${skin}/crud/common.jsp">
     <stripes:layout-component name="buttons">
+        <c:if test="${not empty actionBean.returnToSearchTarget}">
+            <stripes:submit id="Table_returnToSearch" name="returnToSearch" value="<< Return to ${actionBean.returnToSearchTarget}"/>
+        </c:if>
         <stripes:submit id="Table_create" name="create" value="Create new"/>
         <stripes:submit id="Table_bulkEdit" name="bulkEdit" value="Edit"/>
         <stripes:submit id="Table_bulkDelete" name="bulkDelete" value="Delete"
