@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.portofino.annotations.*;
+import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -76,6 +77,7 @@ public class PortofinoInterceptor implements Interceptor {
 
     public final static String STOP_WATCH_ATTRIBUTE = "stopWatch";
     public final static String NAVIGATION_ATTRIBUTE = "navigation";
+    public final static String BREADCRUMBS_ATTRIBUTE = "breadcrumbs";
     private static final String LOGIN_ACTION = "login";
     private static final int UNAUTHORIZED = 401;
 
@@ -86,14 +88,19 @@ public class PortofinoInterceptor implements Interceptor {
             new ConcurrentHashMap<Class, Map<Class<? extends Annotation>, Field[]>>();
 
     public Resolution intercept(ExecutionContext context) throws Exception {
+        Object action = context.getActionBean();
+        ActionBeanContext actionContext = context.getActionBeanContext();
+        HttpServletRequest req = actionContext.getRequest();
+
+        Dispatch dispatch = (Dispatch) req.getAttribute(Dispatch.KEY);
+        if (dispatch == null) {
+            return context.proceed();
+        }
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
 
-        Object action = context.getActionBean();
-        ActionBeanContext actionContext = context.getActionBeanContext();
-        HttpServletRequest req = actionContext.getRequest();
         HttpSession session = req.getSession(false);
         ServletContext servletContext = actionContext.getServletContext();
         Application application = (Application)servletContext.getAttribute(Application.KEY);
@@ -115,8 +122,8 @@ public class PortofinoInterceptor implements Interceptor {
         MDC.put(UserUtils.USERID, userIdString);
         MDC.put(UserUtils.USERNAME, userName);
 
-        //1. Non ho modello
         if (application == null || application.getModel() == null) {
+            logger.debug("Model not found");
             return new ForwardResolution("/errors/model-not-found.jsp");
         }
         application.resetDbTimer();
@@ -125,29 +132,30 @@ public class PortofinoInterceptor implements Interceptor {
 
         List<String> groups=UserUtils.manageGroups(application, userId);
 
-        Dispatch dispatch = (Dispatch) req.getAttribute(Dispatch.KEY);
+        logger.debug("Creating navigation");
         Navigation navigation = new Navigation(application, dispatch, groups);
         req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
 
         ServerInfo serverInfo =
-                (ServerInfo) servletContext.getAttribute(ServerInfo.KEY);
+        (ServerInfo) servletContext.getAttribute(ServerInfo.KEY);
 
-        /* injections */
+        SiteNodeInstance[] siteNodeInstances = dispatch.getSiteNodeInstancePath();
+        for(SiteNodeInstance node : siteNodeInstances) {
+            node.realize();
+        }
+        SiteNodeInstance siteNodeInstance =
+                siteNodeInstances[siteNodeInstances.length-1];
+
+        logger.debug("Creating breadcrumbs");
+        Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
+        req.setAttribute(BREADCRUMBS_ATTRIBUTE, breadcrumbs);
+
+        logger.debug("Injections");
         injectAnnotatedFields(action, InjectApplication.class, application);
         injectAnnotatedFields(action, InjectModel.class, model);
         injectAnnotatedFields(action, InjectDispatch.class, dispatch);
-        SiteNodeInstance siteNodeInstance;
-        if(dispatch != null) {
-            SiteNodeInstance[] siteNodeInstances = dispatch.getSiteNodeInstancePath();
-            for(SiteNodeInstance node : siteNodeInstances) {
-                node.realize();
-            }
-            siteNodeInstance =  siteNodeInstances[siteNodeInstances.length-1];
-            injectAnnotatedFields(action, InjectSiteNodeInstance.class,
-                    siteNodeInstance);
-        } else {
-            siteNodeInstance = null;
-        }
+        injectAnnotatedFields(action, InjectSiteNodeInstance.class,
+                siteNodeInstance);
         injectAnnotatedFields(action, InjectNavigation.class, navigation);
         injectAnnotatedFields(action, InjectServerInfo.class, serverInfo);
         injectAnnotatedFields(action, InjectHttpRequest.class, req);

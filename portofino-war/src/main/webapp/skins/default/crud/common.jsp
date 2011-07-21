@@ -12,6 +12,9 @@
                 <div class="buttons-bar-top">
                     <stripes:layout-component name="buttons" />
                 </div>
+                <div class="breadcrumbs">
+                    <mde:write name="breadcrumbs"/>
+                </div>
                 <div id="inner-content">
                     <stripes:layout-component name="innerContent" />
                 </div>

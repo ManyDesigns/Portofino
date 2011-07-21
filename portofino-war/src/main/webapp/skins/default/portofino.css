@@ -47,6 +47,10 @@ Body and content layout
     border: 3px solid #65a7db;
 }
 
+div.breadcrumbs {
+    padding: 0.5em 1em;
+}
+
 div#inner-content {
     padding: 0 1em;
 }
