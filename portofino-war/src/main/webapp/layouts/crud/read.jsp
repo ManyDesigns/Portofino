@@ -42,11 +42,11 @@
     <stripes:layout-component name="innerContent">
         <h1><c:out value="${actionBean.crud.readTitle}"/></h1>
         <mde:write name="actionBean" property="form"/>
-        <stripes:hidden name="pk" value="${actionBean.pk}"/>
+        <input type="hidden" name="pk" value="<c:out value="${actionBean.pk}"/>"/>
         <c:if test="${not empty actionBean.searchString}">
-            <stripes:hidden name="searchString" value="${actionBean.searchString}"/>
+            <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
         </c:if>
-        <stripes:hidden name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
+        <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
 
         <c:forEach var="embeddedChild" items="${actionBean.embeddedChildren}">
             <jsp:include page="${embeddedChild}" />

@@ -15,8 +15,8 @@
         <mde:write name="actionBean" property="form"/>
         <stripes:hidden name="selection"/>
         <c:if test="${not empty actionBean.searchString}">
-            <stripes:hidden name="searchString" value="${actionBean.searchString}"/>
+            <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
         </c:if>
-        <stripes:hidden name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
+        <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
 </stripes:layout-render>

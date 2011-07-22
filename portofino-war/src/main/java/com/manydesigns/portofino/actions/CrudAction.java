@@ -458,7 +458,7 @@ public class CrudAction extends AbstractActionBean {
             pk = selection[0];
             String url = dispatch.getOriginalPath() + "/" + pk;
             return new RedirectResolution(url)
-                    .addParameter(SEARCH_STRING_PARAM, searchString)
+                    .addParameter("cancelReturnUrl", cancelReturnUrl)
                     .addParameter("edit");
         }
 
@@ -567,7 +567,12 @@ public class CrudAction extends AbstractActionBean {
     //**************************************************************************
 
     public Resolution cancel() {
-        return new RedirectResolution(cancelReturnUrl, false);
+        if (StringUtils.isEmpty(cancelReturnUrl)) {
+            String url = dispatch.getOriginalPath();
+            return new RedirectResolution(url);
+        } else {
+            return new RedirectResolution(cancelReturnUrl, false);
+        }
     }
 
     public Resolution returnToSearch() {

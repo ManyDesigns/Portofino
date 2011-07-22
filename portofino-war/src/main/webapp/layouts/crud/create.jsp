@@ -15,7 +15,7 @@
             Fields marked with a "*" are required.
         </c:if>
         <mde:write name="actionBean" property="form"/>
-        <stripes:hidden name="pk" value="${actionBean.pk}"/>
-        <stripes:hidden name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
+        <input type="hidden" name="pk" value="<c:out value="${actionBean.pk}"/>"/>
+        <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
 </stripes:layout-render>

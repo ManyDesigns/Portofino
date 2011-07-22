@@ -36,6 +36,6 @@
                 </c:if>
             </div>
         </div>
-        <stripes:hidden name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
+        <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
 </stripes:layout-render>
