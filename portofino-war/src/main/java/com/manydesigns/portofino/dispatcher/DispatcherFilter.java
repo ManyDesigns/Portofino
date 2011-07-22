@@ -65,63 +65,75 @@ public class DispatcherFilter implements Filter {
         // cast to http type
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        // invoke the dispatcher to create a dispatch
+        logger.debug("Invoking the dispatcher to create a dispatch");
         Dispatcher dispatcher =
                 (Dispatcher) servletContext.getAttribute(Dispatcher.KEY);
         Dispatch dispatch = dispatcher.createDispatch(httpRequest);
+
         if (dispatch == null) {
-            // we can't handle this path. Let's do the normal filter chain
+            logger.debug("We can't handle this path ({})." +
+                    " Let's do the normal filter chain",
+                    httpRequest.getServletPath());
             chain.doFilter(request, response);
-        } else {
-            // forward
-            String rewrittenPath = dispatch.getRewrittenPath();
-            RequestDispatcher requestDispatcher =
-                    servletContext.getRequestDispatcher(rewrittenPath);
+            return;
+        }
+
+        String rewrittenPath = dispatch.getRewrittenPath();
+        RequestDispatcher requestDispatcher =
+                servletContext.getRequestDispatcher(rewrittenPath);
+
+        Map<String, Object> savedAttributes =
+                saveAndResetRequestAttributes(request);
+        request.setAttribute(Dispatch.KEY, dispatch);
+        try {
             if(request.getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) == null) {
                 logger.debug("Forwarding '{}' to '{}'",
                     dispatch.getOriginalPath(),
                     rewrittenPath);
-                request.setAttribute(Dispatch.KEY, dispatch);
-                requestDispatcher.forward(request, response);
+                    requestDispatcher.forward(request, response);
             } else {
                 logger.debug("Including '{}' to '{}'",
                     dispatch.getOriginalPath(),
                     rewrittenPath);
+                requestDispatcher.include(request, response);
+            }
+        } finally {
+            restoreRequestAttributes(request, savedAttributes);
+        }
+    }
 
-                Map<String,Object> savedAttributes = new HashMap<String, Object>();
-                System.out.println("--- req dump ---");
-                Enumeration attrNames = request.getAttributeNames();
-                while(attrNames.hasMoreElements()) {
-                    String attrName = (String) attrNames.nextElement();
-                    Object attrValue = request.getAttribute(attrName);
-                    System.out.println(attrName + " = " + attrValue);
-                    savedAttributes.put(attrName, attrValue);
-                }
-                for(String attrName : savedAttributes.keySet()) {
-                    if(!attrName.startsWith("javax.servlet")) {
-                        request.removeAttribute(attrName);
-                    }
-                }
-                System.out.println("--- end req dump ---");
+    private void restoreRequestAttributes(ServletRequest request,
+                                          Map<String, Object> savedAttributes) {
+        List<String> attrNamesToRemove = new ArrayList<String>();
+        Enumeration attrNames = request.getAttributeNames();
+        while(attrNames.hasMoreElements()) {
+            attrNamesToRemove.add((String) attrNames.nextElement());
+        }
+        for(String attrName : attrNamesToRemove) {
+            request.removeAttribute(attrName);
+        }
+        for(Map.Entry<String, Object> entry : savedAttributes.entrySet()) {
+            request.setAttribute(entry.getKey(), entry.getValue());
+        }
+    }
 
-                try {
-                    request.setAttribute(Dispatch.KEY, dispatch);
-                    requestDispatcher.include(request, response);
-                } finally {
-                    List<String> attrNamesToRemove = new ArrayList<String>();
-                    attrNames = request.getAttributeNames();
-                    while(attrNames.hasMoreElements()) {
-                        attrNamesToRemove.add((String) attrNames.nextElement());
-                    }
-                    for(String attrName : attrNamesToRemove) {
-                        request.removeAttribute(attrName);
-                    }
-                    for(Map.Entry<String, Object> entry : savedAttributes.entrySet()) {
-                        request.setAttribute(entry.getKey(), entry.getValue());
-                    }
-                }
+    private Map<String, Object> saveAndResetRequestAttributes(ServletRequest request) {
+        Map<String,Object> savedAttributes = new HashMap<String, Object>();
+        logger.debug("--- start req dump ---");
+        Enumeration attrNames = request.getAttributeNames();
+        while(attrNames.hasMoreElements()) {
+            String attrName = (String) attrNames.nextElement();
+            Object attrValue = request.getAttribute(attrName);
+            logger.debug("{} = {}", attrName, attrValue);
+            savedAttributes.put(attrName, attrValue);
+        }
+        for(String attrName : savedAttributes.keySet()) {
+            if(!attrName.startsWith("javax.servlet")) {
+                request.removeAttribute(attrName);
             }
         }
+        logger.debug("--- end req dump ---");
+        return savedAttributes;
     }
 
     public void destroy() {
