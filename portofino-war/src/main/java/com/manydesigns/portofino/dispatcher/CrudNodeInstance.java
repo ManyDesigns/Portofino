@@ -34,11 +34,14 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.site.CrudNode;
+import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.site.crud.Crud;
 import com.manydesigns.portofino.util.PkHelper;
 import ognl.OgnlContext;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -123,5 +126,16 @@ public class CrudNodeInstance extends SiteNodeInstance {
 
     public Object getObject() {
         return object;
+    }
+
+    @Override
+    public List<SiteNode> getChildNodes() {
+        if (CrudNode.MODE_SEARCH.equals(mode)) {
+            return siteNode.getChildNodes();
+        } else if (CrudNode.MODE_DETAIL.equals(mode)) {
+            return getSiteNode().getDetailChildNodes();
+        } else {
+            return Collections.EMPTY_LIST;
+        }
     }
 }

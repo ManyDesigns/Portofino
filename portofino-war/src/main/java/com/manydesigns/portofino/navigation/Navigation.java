@@ -29,21 +29,16 @@
 
 package com.manydesigns.portofino.navigation;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
-import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.site.CrudNode;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -62,8 +57,6 @@ public class Navigation implements XhtmlFragment {
 
     protected final Application application;
     protected final Dispatch dispatch;
-    protected final SiteNodeInstance[] siteNodeInstancePath;
-    protected final List<NavigationNode> rootNodes;
     protected final List<String> groups;
 
     public static final Logger logger =
@@ -76,63 +69,8 @@ public class Navigation implements XhtmlFragment {
     public Navigation(Application application, Dispatch dispatch, List<String> groups) {
         this.application = application;
         this.dispatch = dispatch;
-        if(dispatch != null) {
-            siteNodeInstancePath = dispatch.getSiteNodeInstancePath();
-        } else {
-            siteNodeInstancePath = null;
-        }
         this.groups = groups;
-        rootNodes = new ArrayList<NavigationNode>();
-        final List<SiteNode> rootChildNodes =
-                application.getModel().getRootNode().getChildNodes();
-        HttpServletRequest req =
-                ElementsThreadLocals.getHttpServletRequest();
         //TODO gestire deploy sotto ROOT
-        generateNavigationNodes(rootChildNodes, rootNodes, req.getContextPath(), true);
-    }
-
-    protected void generateNavigationNodes(List<SiteNode> siteNodes,
-                                           List<NavigationNode> navigationNodes,
-                                           String prefixUrl, boolean crudEnabled) {
-        for (SiteNode siteNode : siteNodes) {
-            String url = String.format("%s/%s", prefixUrl, siteNode.getId());
-            String title = siteNode.getTitle();
-            String description = siteNode.getDescription();
-            boolean allowed = siteNode.isAllowed(groups);
-
-            boolean ownEnabled;
-            boolean childCrudEnabled;
-            String childUrl;
-
-            if (siteNode instanceof CrudNode) {
-                ownEnabled = crudEnabled;
-                SiteNodeInstance siteNodeInstance = findInPath(siteNode);
-                if (siteNodeInstance instanceof CrudNodeInstance) {
-                    String mode = siteNodeInstance.getMode();
-                    if (CrudNode.MODE_DETAIL.equals(mode)) {
-                        childCrudEnabled = crudEnabled;
-                        childUrl = url + "/" + ((CrudNodeInstance) siteNodeInstance).getPk();
-                    } else {
-                        childCrudEnabled = false;
-                        childUrl = url;
-                    }
-                } else {
-                    childCrudEnabled = false;
-                    childUrl = url;
-                }
-            } else {
-                ownEnabled = true;
-                childCrudEnabled = crudEnabled;
-                childUrl = url;
-            }
-
-            NavigationNode navigationNode =
-                    new NavigationNode(siteNode, url, title, description,
-                            allowed, ownEnabled);
-            generateNavigationNodes(siteNode.getChildNodes(),
-                    navigationNode.getChildNodes(), childUrl, childCrudEnabled);
-            navigationNodes.add(navigationNode);
-        }
     }
 
     //**************************************************************************
@@ -140,59 +78,55 @@ public class Navigation implements XhtmlFragment {
     //**************************************************************************
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
-        print(rootNodes, xb, false);
+        print("", dispatch.getNavigationNodeInstances(), xb, false);
     }
 
-    private void print(List<NavigationNode> nodes, XhtmlBuffer xb, boolean recursive) {
+    private void print(String path, List<SiteNodeInstance> nodes, XhtmlBuffer xb, boolean recursive) {
         if (nodes == null) {
             return;
         }
         boolean first = true;
-        List<NavigationNode> expand = null;
-        for (NavigationNode current : nodes) {
-            if(!current.isAllowed() || !current.isEnabled()){
-                continue;
-            }
+        SiteNodeInstance expand = null;
+        for (SiteNodeInstance current : nodes) {
+            // gestire permessi
             if(first) {
                 if(recursive) { xb.writeHr(); }
                 xb.openElement("ul");
                 first = false;
             }
             xb.openElement("li");
-            SiteNode siteNode = current.getSiteNode();
-            if (isSelected(siteNode)) {
+            if (isSelected(current)) {
                 xb.addAttribute("class", "selected");
-                expand = current.getChildNodes();
-            } else if (isInPath(siteNode)) {
+                expand = current;
+            } else if (isInPath(current)) {
                 xb.addAttribute("class", "path");
-                expand = current.getChildNodes();
+                expand = current;
             }
-            xb.writeAnchor(current.getUrl(), current.getTitle(), null, current.getDescription());
+            SiteNode siteNode = current.getSiteNode();
+            String url = path + "/" + siteNode.getId();
+            xb.writeAnchor(url, siteNode.getTitle(), null, siteNode.getDescription());
             xb.closeElement("li");
         }
         if(!first) {
             xb.closeElement("ul");
         }
         if (expand != null) {
-            print(expand, xb, true);
+            path = path + "/" + expand.getUrlFragment();
+            print(path, expand.getChildNodeInstances(), xb, true);
         }
     }
 
-    protected boolean isSelected(SiteNode siteNode) {
-        if(siteNodeInstancePath == null) { return false; }
-        SiteNodeInstance last =
-                siteNodeInstancePath[siteNodeInstancePath.length - 1];
-        return siteNode == last.getSiteNode();
+    protected boolean isSelected(SiteNodeInstance siteNodeInstance) {
+        return siteNodeInstance == dispatch.getLastSiteNodeInstance();
     }
 
-    protected boolean isInPath(SiteNode siteNode) {
-        return findInPath(siteNode) != null;
+    protected boolean isInPath(SiteNodeInstance siteNodeInstance) {
+        return findInPath(siteNodeInstance) != null;
     }
 
-    protected SiteNodeInstance findInPath(SiteNode siteNode) {
-        if(siteNodeInstancePath == null) { return null; }
-        for (SiteNodeInstance current : siteNodeInstancePath) {
-            if (siteNode == current.getSiteNode()) {
+    protected SiteNodeInstance findInPath(SiteNodeInstance siteNodeInstance) {
+        for (SiteNodeInstance current : dispatch.getSiteNodeInstancePath()) {
+            if (siteNodeInstance == current) {
                 return current;
             }
         }
@@ -207,7 +141,11 @@ public class Navigation implements XhtmlFragment {
         return application;
     }
 
-    public List<NavigationNode> getRootNodes() {
-        return rootNodes;
+    public Dispatch getDispatch() {
+        return dispatch;
+    }
+
+    public List<String> getGroups() {
+        return groups;
     }
 }

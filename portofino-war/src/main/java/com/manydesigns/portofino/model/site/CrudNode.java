@@ -32,6 +32,9 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.crud.Crud;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
+import java.util.ArrayList;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -54,9 +57,11 @@ public class CrudNode extends SiteNode implements EmbeddableNode {
     //**************************************************************************
 
     protected Crud crud;
+    protected final ArrayList<SiteNode> detailChildNodes;
 
     public CrudNode() {
         super();
+        detailChildNodes = new ArrayList<SiteNode>();
     }
 
     @XmlElement()
@@ -74,4 +79,16 @@ public class CrudNode extends SiteNode implements EmbeddableNode {
         crud.init(model);
     }
 
+    @XmlElementWrapper(name="detailChildNodes")
+    @XmlElements({
+          @XmlElement(name="documentNode",type=DocumentNode.class),
+          @XmlElement(name="folderNode",type=FolderNode.class),
+          @XmlElement(name="customNode",type=CustomNode.class),
+          @XmlElement(name="customFolderNode",type=CustomFolderNode.class),
+          @XmlElement(name="crudNode",type=CrudNode.class),
+          @XmlElement(name="portletNode",type=PortletNode.class)
+    })
+    public ArrayList<SiteNode> getDetailChildNodes() {
+        return detailChildNodes;
+    }
 }

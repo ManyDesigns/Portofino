@@ -30,13 +30,11 @@
 package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
-import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.site.CrudNode;
+import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.navigation.Navigation;
-import com.manydesigns.portofino.navigation.NavigationNode;
 
 import java.util.Collections;
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -84,6 +82,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
 
         Navigation navigation =
                 new Navigation(application, dispatch, Collections.EMPTY_LIST);
+        /*
         List<NavigationNode> rootNodes = navigation.getRootNodes();
 
         // Navigation node per /projects
@@ -100,7 +99,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         siteNode = siteNode.getChildNodes().get(0);
         assertEquals(siteNode, navigationNode.getSiteNode());
         assertFalse(navigationNode.isEnabled());
-
+*/
         String htmlOutput = elementToString(navigation);
         assertEquals("<ul><li class=\"selected\"><a href=\"/projects\" title=\"projects\">projects</a></li></ul>",
                      htmlOutput);
@@ -127,6 +126,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         
         Navigation navigation =
                 new Navigation(application, dispatch, Collections.EMPTY_LIST);
+        /*
         List<NavigationNode> rootNodes = navigation.getRootNodes();
 
         // Navigation node per /projects
@@ -143,6 +143,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         siteNode = siteNode.getChildNodes().get(0);
         assertEquals(siteNode, navigationNode.getSiteNode());
         assertFalse(navigationNode.isEnabled());
+        */
     }
 
     public void testProjectDetail() {
@@ -166,6 +167,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
 
         Navigation navigation =
                 new Navigation(application, dispatch, Collections.EMPTY_LIST);
+        /*
         List<NavigationNode> rootNodes = navigation.getRootNodes();
 
         // Navigation node per /projects
@@ -174,6 +176,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals("/projects", navigationNode.getUrl());
         assertEquals(siteNode, navigationNode.getSiteNode());
         assertTrue(navigationNode.isEnabled());
+        */
 
         String htmlOutput = elementToString(navigation);
         assertEquals("<ul><li class=\"selected\">" +
@@ -181,6 +184,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
                 "<hr /><ul><li><a href=\"/projects/10/tickets\" title=\"tickets\">tickets</a></li></ul>",
                 htmlOutput);
 
+        /*
         // Navigation node per /projects/tickets
         assertEquals(1, navigationNode.getChildNodes().size());
         navigationNode = navigationNode.getChildNodes().get(0);
@@ -188,6 +192,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         siteNode = siteNode.getChildNodes().get(0);
         assertEquals(siteNode, navigationNode.getSiteNode());
         assertTrue(navigationNode.isEnabled());
+        */
     }
 
 
@@ -206,7 +211,9 @@ public class DispatcherTest extends AbstractPortofinoTest {
 
         Navigation navigation =
                 new Navigation(application, dispatch, Collections.EMPTY_LIST);
+        /*
         List<NavigationNode> rootNodes = navigation.getRootNodes();
+        */
 
         // SiteNode e NavigationNode per /projects
         CrudNodeInstance siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[0];
@@ -215,25 +222,28 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(CrudNode.MODE_DETAIL, siteNodeInstance.getMode());
         assertEquals("10", siteNodeInstance.getPk());
 
+        /*
         assertEquals(1, rootNodes.size());
         NavigationNode navigationNode = rootNodes.get(0);
         assertEquals("/projects", navigationNode.getUrl());
         assertEquals(siteNode, navigationNode.getSiteNode());
         assertTrue(navigationNode.isEnabled());
+        */
 
         siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[1];
-        siteNode = siteNode.getChildNodes().get(0);
+        siteNode = ((CrudNode)siteNode).getDetailChildNodes().get(0);
         assertEquals(siteNode, siteNodeInstance.getSiteNode());
         assertEquals(CrudNode.MODE_SEARCH, siteNodeInstance.getMode());
         assertNull(siteNodeInstance.getPk());
 
+        /*
         // SiteNode e NavigationNode per /projects/tickets
         assertEquals(1, navigationNode.getChildNodes().size());
         navigationNode = navigationNode.getChildNodes().get(0);
         assertEquals("/projects/10/tickets", navigationNode.getUrl());
         assertEquals(siteNode, navigationNode.getSiteNode());
         assertTrue(navigationNode.isEnabled());
-
+*/
 
         String htmlOutput = elementToString(navigation);
         assertEquals("<ul><li class=\"path\">" +
@@ -263,7 +273,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals("10", siteNodeInstance.getPk());
 
         siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[1];
-        expected = expected.getChildNodes().get(0);
+        expected = ((CrudNode)expected).getChildNodes().get(0);
         assertEquals(expected, siteNodeInstance.getSiteNode());
         assertEquals(CrudNode.MODE_DETAIL, siteNodeInstance.getMode());
         assertEquals("20", siteNodeInstance.getPk());

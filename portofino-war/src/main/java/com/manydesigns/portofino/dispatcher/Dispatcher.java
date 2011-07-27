@@ -39,9 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.ListIterator;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -65,11 +63,14 @@ public class Dispatcher {
     }
 
     public Dispatch createDispatch(HttpServletRequest request) {
-        String originalPath =
-                (String) request.getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH);
-        if(originalPath == null) { originalPath = request.getServletPath(); }
+        String originalPath = (String) request.getAttribute(
+                StripesConstants.REQ_ATTR_INCLUDE_PATH);
+        if (originalPath == null) {
+            originalPath = request.getServletPath();
+        }
 
-        List<SiteNodeInstance> siteNodePath = new ArrayList<SiteNodeInstance>();
+        List<SiteNodeInstance> path = new ArrayList<SiteNodeInstance>();
+        List<SiteNodeInstance> tree = new ArrayList<SiteNodeInstance>();
 
         Model model = application.getModel();
 
@@ -81,31 +82,15 @@ public class Dispatcher {
         SiteNode rootNode = model.getRootNode();
         List<SiteNode> nodeList = rootNode.getChildNodes();
         String[] fragments = StringUtils.split(originalPath, '/');
-        List<String> fragmentList = Arrays.asList(fragments);
-        ListIterator<String> iterator = fragmentList.listIterator();
-        while (iterator.hasNext()) {
-            String fragment = iterator.next();
-            SiteNodeInstance foundNodeInstance = null;
-            for (SiteNode node : nodeList) {
-                if (fragment.equals(node.getId())) {
-                    foundNodeInstance = createSiteNodeInstance(iterator, node);
-                    break;
-                }
-            }
-            if (foundNodeInstance == null) {
-                return null;
-            } else {
-                siteNodePath.add(foundNodeInstance);
-                nodeList = foundNodeInstance.getSiteNode().getChildNodes();
-            }
-        }
 
-        if (siteNodePath.isEmpty()) {
+        visitNodesInPath(path, tree, nodeList, fragments, 0);
+
+        if (path.isEmpty()) {
             return null;
         }
 
         SiteNodeInstance siteNodeInstance =
-                siteNodePath.get(siteNodePath.size() - 1);
+                path.get(path.size() - 1);
         SiteNode siteNode = siteNodeInstance.getSiteNode();
         String rewrittenPath = siteNode.getUrl();
         if (rewrittenPath == null) {
@@ -124,44 +109,103 @@ public class Dispatcher {
         }
 
         SiteNodeInstance[] siteNodeArray =
-                new SiteNodeInstance[siteNodePath.size()];
-        siteNodePath.toArray(siteNodeArray);
+                new SiteNodeInstance[path.size()];
+        path.toArray(siteNodeArray);
 
-        return new Dispatch(request, originalPath, rewrittenPath, siteNodeArray);
+        return new Dispatch(request, originalPath, rewrittenPath, siteNodeArray, tree);
     }
 
-    private SiteNodeInstance createSiteNodeInstance(
-            ListIterator<String> iterator, SiteNode foundNode) {
-        SiteNodeInstance result;
-        if (foundNode instanceof CrudNode) {
+    private void visitNodesInPath(List<SiteNodeInstance> path,
+                                  List<SiteNodeInstance> tree,
+                                  List<SiteNode> siteNodes,
+                                  String[] fragments,
+                                  int fragmentIndex) {
+        if (fragmentIndex >= fragments.length) {
+            logger.debug("Stopping recursion.");
+            return;
+        }
+
+        String fragment = fragments[fragmentIndex];
+
+        for (SiteNode siteNode : siteNodes) {
+            // Wrap SiteNode in SiteNodeInstance
+            SiteNodeInstance siteNodeInstance;
+            if (fragment.equals(siteNode.getId())) {
+                siteNodeInstance = visitNodeInPath(path, fragments, fragmentIndex, siteNode);
+            } else {
+                siteNodeInstance = visitNodeOutsidePath(siteNode);
+            }
+            tree.add(siteNodeInstance);
+        }
+    }
+
+    private SiteNodeInstance visitNodeInPath(List<SiteNodeInstance> path,
+                                 String[] fragments,
+                                 int fragmentIndex,
+                                 SiteNode siteNode) {
+        SiteNodeInstance siteNodeInstance;
+        int recursiveFragmentIndex = fragmentIndex + 1;
+        if (siteNode instanceof CrudNode) {
+            CrudNode crudNode = (CrudNode) siteNode;
             String mode;
             String param;
-            if (iterator.hasNext()) {
-                String peek = iterator.next();
+            if (fragmentIndex < fragments.length -1) {
+                String peek = fragments[fragmentIndex + 1];
                 if (CrudNode.MODE_NEW.equals(peek)) {
                     mode = CrudNode.MODE_NEW;
                     param = null;
-                    if (iterator.hasNext()) {
-                        return null;
-                    }
-//                } else if(CrudNode.MODE_EMBEDDED_SEARCH.equals(peek)) {
-//                    mode = CrudNode.MODE_EMBEDDED_SEARCH;
-//                    param = null;
-//                    if (iterator.hasNext()) {
-//                        return null;
-//                    }
                 } else {
                     mode = CrudNode.MODE_DETAIL;
                     param = peek;
+                    recursiveFragmentIndex = fragmentIndex + 2;
                 }
             } else {
                 mode = CrudNode.MODE_SEARCH;
                 param = null;
             }
-            result = new CrudNodeInstance(application, (CrudNode) foundNode, mode, param);
+            siteNodeInstance = new CrudNodeInstance(
+                    application, crudNode, mode, param);
         } else {
-            result = new SiteNodeInstance(application, foundNode, null);
+            siteNodeInstance =
+                    new SiteNodeInstance(application, siteNode, null);
         }
-        return result;
+
+        // add to path
+        path.add(siteNodeInstance);
+
+        // visit recursively
+        visitNodesInPath(path, siteNodeInstance.getChildNodeInstances(),
+                siteNodeInstance.getChildNodes(), fragments,
+                recursiveFragmentIndex);
+
+        return siteNodeInstance;
+    }
+
+
+    private SiteNodeInstance visitNodeOutsidePath(SiteNode siteNode) {
+        SiteNodeInstance siteNodeInstance;
+        if (siteNode instanceof CrudNode) {
+            CrudNode crudNode = (CrudNode) siteNode;
+            siteNodeInstance = new CrudNodeInstance(
+                    application, crudNode, CrudNode.MODE_SEARCH, null);
+        } else {
+            siteNodeInstance =
+                    new SiteNodeInstance(application, siteNode, null);
+        }
+
+        // visit recursively
+        visitNodesOutsidePath(siteNodeInstance.getChildNodeInstances(),
+                siteNodeInstance.getChildNodes());
+
+        return siteNodeInstance;
+    }
+
+    private void visitNodesOutsidePath(List<SiteNodeInstance> tree,
+                                       List<SiteNode> siteNodes) {
+        for (SiteNode siteNode : siteNodes) {
+            // Wrap SiteNode in SiteNodeInstance
+            SiteNodeInstance siteNodeInstance = visitNodeOutsidePath(siteNode);
+            tree.add(siteNodeInstance);
+        }
     }
 }

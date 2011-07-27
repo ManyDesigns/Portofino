@@ -75,7 +75,7 @@
                         <property name="description"/>
                     </properties>
                 </crud>
-                <childNodes>
+                <detailChildNodes>
                     <crudNode description="tickets" id="tickets" title="tickets">
                         <crud name="tickets"
                                  table="test-database.public.tickets"
@@ -88,7 +88,7 @@
                             </properties>
                         </crud>
                     </crudNode>
-                </childNodes>
+                </detailChildNodes>
             </crudNode>
         </childNodes>
     </rootNode>

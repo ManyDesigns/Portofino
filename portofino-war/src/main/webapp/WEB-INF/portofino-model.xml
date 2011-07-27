@@ -1228,7 +1228,7 @@ Struttura dell'XML:
                         </property>
                     </properties>
                 </crud>
-                <childNodes>
+                <detailChildNodes>
                     <crudNode id="issues" title="Issues" description="Issues">
                         <embedInParent order="1"
                                          inSearch="false"
@@ -1299,7 +1299,7 @@ Struttura dell'XML:
                             </properties>
                         </crud>
                     </crudNode>
-                </childNodes>
+                </detailChildNodes>
             </crudNode>
         </childNodes>
     </rootNode>

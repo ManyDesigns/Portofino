@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.dispatcher;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,15 +50,18 @@ public class Dispatch {
     protected final String originalPath;
     protected final String rewrittenPath;
     protected final SiteNodeInstance[] siteNodeInstancePath;
+    protected final List<SiteNodeInstance> navigationNodeInstances;
 
     public Dispatch(HttpServletRequest request,
                     String originalPath,
                     String rewrittenPath,
-                    SiteNodeInstance[] siteNodeInstancePath) {
+                    SiteNodeInstance[] siteNodeInstancePath,
+                    List<SiteNodeInstance> navigationNodeInstances) {
         this.request = request;
         this.originalPath = originalPath;
         this.rewrittenPath = rewrittenPath;
         this.siteNodeInstancePath = siteNodeInstancePath;
+        this.navigationNodeInstances = navigationNodeInstances;
 
         String pathUrl = getPathUrl();
         assert pathUrl.equals(originalPath);
@@ -74,6 +78,10 @@ public class Dispatch {
 
     public SiteNodeInstance[] getSiteNodeInstancePath() {
         return siteNodeInstancePath;
+    }
+
+    public List<SiteNodeInstance> getNavigationNodeInstances() {
+        return navigationNodeInstances;
     }
 
     public SiteNodeInstance getLastSiteNodeInstance() {

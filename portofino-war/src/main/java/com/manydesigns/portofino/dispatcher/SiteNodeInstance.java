@@ -32,6 +32,9 @@ package com.manydesigns.portofino.dispatcher;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.model.site.SiteNode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -43,11 +46,13 @@ public class SiteNodeInstance {
     protected final Application application;
     protected final SiteNode siteNode;
     protected final String mode;
+    protected final List<SiteNodeInstance> childNodeInstances;
 
     public SiteNodeInstance(Application application, SiteNode siteNode, String mode) {
         this.application = application;
         this.siteNode = siteNode;
         this.mode = mode;
+        childNodeInstances = new ArrayList<SiteNodeInstance>();
     }
 
     public SiteNode getSiteNode() {
@@ -67,5 +72,13 @@ public class SiteNodeInstance {
 
     public String getUrlFragment() {
         return siteNode.getId();
+    }
+
+    public List<SiteNodeInstance> getChildNodeInstances() {
+        return childNodeInstances;
+    }
+
+    public List<SiteNode> getChildNodes() {
+        return siteNode.getChildNodes();
     }
 }
