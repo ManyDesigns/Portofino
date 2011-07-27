@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -48,10 +48,11 @@ import java.util.Collection;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class TableForm implements Element {
     public static final String copyright =
-            "Copyright (c) 2005-2009, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     protected String selectInputName = "select";
 
@@ -239,7 +240,7 @@ public class TableForm implements Element {
 
     public class Row implements Element {
         public static final String copyright =
-                "Copyright (c) 2005-2010, ManyDesigns srl";
+                "Copyright (c) 2005-2011, ManyDesigns srl";
 
         protected String key;
         protected final Field[] fields;
@@ -334,7 +335,7 @@ public class TableForm implements Element {
 
     public class Column {
         public static final String copyright =
-                "Copyright (c) 2005-2009, ManyDesigns srl";
+                "Copyright (c) 2005-2011, ManyDesigns srl";
 
         protected final PropertyAccessor propertyAccessor;
 

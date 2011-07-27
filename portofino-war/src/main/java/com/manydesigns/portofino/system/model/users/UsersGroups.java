@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -36,10 +36,11 @@ import java.sql.Timestamp;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class UsersGroups implements Serializable {
     public static final String copyright
-            = "Copyright (c) 2005-2010, ManyDesigns srl";
+            = "Copyright (c) 2005-2011, ManyDesigns srl";
     Group group;
     User user;
     Timestamp creationDate;

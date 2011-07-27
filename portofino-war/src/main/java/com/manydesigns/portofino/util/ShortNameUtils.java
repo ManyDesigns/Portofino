@@ -42,7 +42,7 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 */
 public class ShortNameUtils {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public static final String PK_ELEMENT_SEPARATOR = " ";
 
