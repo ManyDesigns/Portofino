@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.actions.RequestAttributes;
 import net.sourceforge.stripes.controller.StripesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +70,8 @@ public class DispatcherFilter implements Filter {
 
         logger.debug("Invoking the dispatcher to create a dispatch");
         Dispatcher dispatcher =
-                (Dispatcher) servletContext.getAttribute(Dispatcher.KEY);
+                (Dispatcher) servletContext.getAttribute(
+                        ApplicationAttributes.DISPATCHER);
         Dispatch dispatch = dispatcher.createDispatch(httpRequest);
 
         if (dispatch == null) {
@@ -85,7 +88,7 @@ public class DispatcherFilter implements Filter {
 
         Map<String, Object> savedAttributes =
                 saveAndResetRequestAttributes(request);
-        request.setAttribute(Dispatch.KEY, dispatch);
+        request.setAttribute(RequestAttributes.DISPATCH, dispatch);
         try {
             if(request.getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) == null) {
                 logger.debug("Forwarding '{}' to '{}'",

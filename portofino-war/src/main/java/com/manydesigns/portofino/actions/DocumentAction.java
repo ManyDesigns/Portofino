@@ -47,7 +47,7 @@ import java.text.MessageFormat;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@UrlBinding("/Document.action")
+@UrlBinding("/document.action")
 public class DocumentAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

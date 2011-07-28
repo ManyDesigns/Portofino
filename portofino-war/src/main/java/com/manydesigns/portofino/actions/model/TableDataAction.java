@@ -120,7 +120,7 @@ public class TableDataAction extends AbstractCrudAction {
         for (ForeignKey foreignKey : table.getOneToManyRelationships()) {
             CrudUnit subCrudUnit =
                     createSubCrudUnit(foreignKey, index);
-            result.subCrudUnits.add(subCrudUnit);
+//            result.subCrudUnits.add(subCrudUnit);
 
             index++;
         }

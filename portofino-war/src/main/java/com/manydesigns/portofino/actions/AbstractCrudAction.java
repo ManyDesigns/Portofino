@@ -45,8 +45,6 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.TransformerException;
 import java.io.*;
-import java.lang.reflect.Method;
-import java.util.Enumeration;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -145,7 +143,7 @@ public abstract class  AbstractCrudAction {
         if (qualifiedName == null) {
             return redirectToFirst();
         }
-
+/*
         Enumeration enumeration = req.getParameterNames();
         while (enumeration.hasMoreElements()) {
             String current = (String) enumeration.nextElement();
@@ -169,6 +167,8 @@ public abstract class  AbstractCrudAction {
             }
         }
         return rootCrudUnit.execute();
+        */
+        return null;
     }
 
     public abstract String redirectToFirst();

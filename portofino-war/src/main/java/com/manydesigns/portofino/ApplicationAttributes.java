@@ -27,20 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.interceptors;
-
-import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.context.Application;
-import net.sourceforge.stripes.action.ActionBeanContext;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.controller.ExecutionContext;
-import net.sourceforge.stripes.controller.Interceptor;
-import net.sourceforge.stripes.controller.Intercepts;
-import net.sourceforge.stripes.controller.LifecycleStage;
-import org.slf4j.MDC;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
+package com.manydesigns.portofino;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -48,25 +35,14 @@ import javax.servlet.http.HttpServletRequest;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@Intercepts(LifecycleStage.RequestComplete)
-public class CleanUpInterceptor implements Interceptor  {
+public class ApplicationAttributes {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public Resolution intercept(ExecutionContext context) throws Exception {
-        ActionBeanContext actionContext = context.getActionBeanContext();
-        ServletContext servletContext = actionContext.getServletContext();
-        HttpServletRequest req = actionContext.getRequest();
+    public final static String APPLICATION = "context";
+    public final static String ELEMENTS_PROPERTIES = "elementsProperties";
+    public final static String PORTOFINO_PROPERTIES = "portofinoProperties";
+    public final static String DISPATCHER = "dispatcher";
+    public final static String SERVER_INFO = "serverInfo";
 
-        Application application =
-                (Application)servletContext.getAttribute(
-                        ApplicationAttributes.APPLICATION);
-
-        MDC.clear();
-        if (application !=null && application.getModel() != null) {
-            application.closeSession();
-        }
-
-        return context.proceed();
-    }
 }

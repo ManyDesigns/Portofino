@@ -53,13 +53,6 @@ public interface Application {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
-    // KEY (for application scope attribute)
-    //**************************************************************************
-
-//    public final static String KEY = Application.class.getName();
-    public final static String KEY = "context";
-
-    //**************************************************************************
     // Model loading
     //**************************************************************************
 

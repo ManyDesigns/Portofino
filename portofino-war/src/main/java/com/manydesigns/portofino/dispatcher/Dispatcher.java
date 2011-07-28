@@ -50,8 +50,6 @@ public class Dispatcher {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public final static String KEY = Dispatcher.class.getName();
-
     public static final Logger logger =
             LoggerFactory.getLogger(Dispatcher.class);
 
@@ -102,13 +100,13 @@ public class Dispatcher {
         String rewrittenPath = siteNode.getUrl();
         if (rewrittenPath == null) {
             if (siteNode instanceof DocumentNode) {
-                rewrittenPath = "/Document.action";
+                rewrittenPath = "/document.action";
             } else if (siteNode instanceof ChartNode) {
-                rewrittenPath = "/Chart.action";
+                rewrittenPath = "/chart.action";
             } else if (siteNode instanceof FolderNode) {
-                rewrittenPath = "/Index.action";
+                rewrittenPath = "/index.action";
             } else if (siteNode instanceof CrudNode) {
-                rewrittenPath = "/Crud.action";
+                rewrittenPath = "/crud.action";
 //                rewrittenPath = "/Crud/" + originalPath + ".action";
             } else {
                 throw new Error("Unrecognized node type");

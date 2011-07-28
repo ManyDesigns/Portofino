@@ -42,10 +42,6 @@ public class Dispatch {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-//    public final static String KEY = Dispatch.class.getName();
-    public final static String KEY = "dispatch";
-
-
     protected final HttpServletRequest request;
     protected final String originalPath;
     protected final String rewrittenPath;

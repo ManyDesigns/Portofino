@@ -32,6 +32,7 @@ package com.manydesigns.portofino.servlets;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.InstanceBuilder;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.ServerInfo;
@@ -130,12 +131,12 @@ public class PortofinoListener
                 }
         );
 
-        servletContext.setAttribute(ServerInfo.KEY,serverInfo);
+        servletContext.setAttribute(ApplicationAttributes.SERVER_INFO, serverInfo);
 
         servletContext.setAttribute(
-                ElementsProperties.KEY, elementsProperties);
+                ApplicationAttributes.ELEMENTS_PROPERTIES, elementsProperties);
         servletContext.setAttribute(
-                PortofinoProperties.KEY, portofinoProperties);
+                ApplicationAttributes.PORTOFINO_PROPERTIES, portofinoProperties);
 
         boolean success = true;
 
@@ -193,7 +194,7 @@ public class PortofinoListener
 
     public void createDispatcher() {
         dispatcher = new Dispatcher(application);
-        servletContext.setAttribute(Dispatcher.KEY, dispatcher);
+        servletContext.setAttribute(ApplicationAttributes.DISPATCHER, dispatcher);
     }
 
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
@@ -321,7 +322,7 @@ public class PortofinoListener
                             HibernateApplicationImpl.class,
                             logger);
             application = builder.createInstance(managerClassName);
-            servletContext.setAttribute(Application.KEY, application);
+            servletContext.setAttribute(ApplicationAttributes.APPLICATION, application);
 
             String storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
                 PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));

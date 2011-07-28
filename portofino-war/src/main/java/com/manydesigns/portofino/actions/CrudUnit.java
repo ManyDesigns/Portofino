@@ -70,7 +70,6 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -100,7 +99,6 @@ public class CrudUnit {
     public final String readTitle;
     public final String editTitle;
     public final PkHelper pkHelper;
-    public final List<CrudUnit> subCrudUnits;
     public final List<CrudButton> crudButtons;
     public final List<CrudSelectionProvider> crudSelectionProviders;
     private final boolean first;
@@ -174,7 +172,6 @@ public class CrudUnit {
         this.prefix = prefix;
         this.first = first;
         pkHelper = new PkHelper(classAccessor);
-        subCrudUnits = new ArrayList<CrudUnit>();
         crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
     }
 
@@ -662,6 +659,7 @@ public class CrudUnit {
             i++;
         }
 
+        /*
         //Aggiungo le relazioni/sheet
         WritableCellFormat formatCell = headerExcel();
         for (CrudUnit subCrudUnit: subCrudUnits) {
@@ -687,6 +685,7 @@ public class CrudUnit {
                 k++;
             }
         }
+        */
         workbook.write();
     }
 
@@ -904,6 +903,7 @@ public class CrudUnit {
             xb.closeElement("tableData");
         }
 
+        /*
         //Aggiungo le relazioni
         for (CrudUnit subCrudUnit: subCrudUnits) {
             xb.openElement("tablerel");
@@ -937,6 +937,7 @@ public class CrudUnit {
             }
             xb.closeElement("tablerel");
         }
+        */
 
         xb.closeElement("class");
         return xb;

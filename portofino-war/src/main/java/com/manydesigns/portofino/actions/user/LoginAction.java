@@ -28,20 +28,22 @@
  */
 package com.manydesigns.portofino.actions.user;
 
-import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.annotations.InjectApplication;
+import com.manydesigns.portofino.annotations.InjectHttpRequest;
 import com.manydesigns.portofino.annotations.InjectHttpSession;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
+import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
@@ -53,7 +55,8 @@ import java.util.Date;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class LoginAction extends AbstractActionBean implements LoginUnAware {
+@UrlBinding("/user/login.action")
+public class LoginAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -64,78 +67,81 @@ public class LoginAction extends AbstractActionBean implements LoginUnAware {
     @InjectApplication
     public Application application;
 
+    @InjectHttpRequest
+    public HttpServletRequest request;
+
     @InjectHttpSession
     public HttpSession session;
 
     //**************************************************************************
+    // Request parameters
+    //**************************************************************************
+
+    public String userName;
+    public String pwd;
+
+    //**************************************************************************
     // Presentation elements
     //**************************************************************************
-    public Form form;
     public boolean recoverPwd;
 
     public String returnUrl;
-    //public Map parameters;
-    
+
     private static final String home = "/";
     public static final Logger logger =
             LoggerFactory.getLogger(LoginAction.class);
 
     public LoginAction(){
-        FormBuilder builder =
-            new FormBuilder(User.class);
-        builder.configFields("userName", "pwd");
 
-        form = builder.build();
+    }
+
+    @DefaultHandler
+    public Resolution execute () {
+        if (session != null && session.getAttribute(SessionAttributes.USER_ID) != null) {
+            return new ForwardResolution("/layouts/user/alreadyLoggedIn.jsp");
+        }
+
         recoverPwd = Boolean.parseBoolean(PortofinoProperties.getProperties().
                 getProperty(PortofinoProperties.MAIL_ENABLED, "false"));
-
+        
+        return new ForwardResolution("/layouts/user/login.jsp");
     }
 
-    public String execute () {
-        session.removeAttribute(UserUtils.USERID);
-        session.removeAttribute(UserUtils.USERNAME);
-        return "INPUT";
-    }
-
-    public String login (){
-        form.readFromRequest(context.getRequest());
-        User user = new User();
-        form.writeToObject(user);
+    public Resolution login () {
         Boolean enc = Boolean.parseBoolean(PortofinoProperties.getProperties()
                 .getProperty(PortofinoProperties.PWD_ENCRYPTED, "false"));
 
         if (enc) {
-            user.encryptPwd();
+            pwd = UserUtils.encryptPassword(pwd);
         }
-        String username = user.getUserName();
-        String password = user.getPwd();
-        user = application.login(username, password);
+        User user = application.login(userName, pwd);
 
         if (user==null) {
             String errMsg = MessageFormat.format("FAILED AUTH for user {0}",
-                    username);
+                    userName);
             SessionMessages.addInfoMessage(errMsg);
             logger.warn(errMsg);
-            updateFailedUser(username);
-            return "INPUT";
+            updateFailedUser(userName);
+            return new ForwardResolution("/layouts/user/login.jsp");
         }
 
         if (!user.getState().equals(UserUtils.ACTIVE)) {
             String errMsg = MessageFormat.format("User {0} is not active. " +
-                    "Please contact the administrator", username);
+                    "Please contact the administrator", userName);
             SessionMessages.addInfoMessage(errMsg);
             logger.warn(errMsg);
-            return "INPUT";
+            return new ForwardResolution("/layouts/user/login.jsp");
         }
 
         logger.info("User {} login", user.getUserName());
-        session.setAttribute(UserUtils.USERID, user.getUserId());
-        session.setAttribute(UserUtils.USERNAME, user.getUserName());
+        session = request.getSession(true);
+        session.setAttribute(SessionAttributes.USER_ID, user.getUserId());
+        session.setAttribute(SessionAttributes.USER_NAME, user.getUserName());
         updateUser(user);
         returnUrl = StringUtils.trimToNull(returnUrl);
         returnUrl=(returnUrl!=null)?returnUrl:home;
 
-        return "SUCCESS";
+        return new RedirectResolution(returnUrl);
     }
 
     private void updateFailedUser(String username) {
@@ -160,7 +166,7 @@ public class LoginAction extends AbstractActionBean implements LoginUnAware {
     }
 
     public String logout(){
-        session.removeAttribute(UserUtils.USERID);
+        session.invalidate();
         SessionMessages.addInfoMessage("User disconnetected");
 
         return "logout";

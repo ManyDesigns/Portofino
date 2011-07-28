@@ -43,32 +43,23 @@
     <body>
     <div id="doc3" class="yui-t2">
         <stripes:url var="profileUrl" value="/Profile.action"/>
-        <stripes:url var="loginUrl" value="/user/Login.action"/>
-        <stripes:url var="logoutUrl" value="/user/Login.action?logout="/>
         <jsp:useBean id="portofinoProperties" scope="application" type="java.util.Properties"/>
+        <jsp:useBean id="stopWatch" scope="request" type="org.apache.commons.lang.time.StopWatch"/>
         <div id="hd">
             <div id="globalLinks">
-
-                <!--
-                <s:if test="#application.portofinoProperties['user.enabled'].equals('true')
-                && #session.get('userId') != null">
-                    Welcome, <s:a href="%{#profileUrl}">
-                    <s:property value="#session.get('userName')"/></s:a> -
-                </s:if>
-                -->
-                <stripes:link href="/user/Settings.action">Settings</stripes:link> -
-                <stripes:link href="/user/Help.action">Help</stripes:link> -
-                <!--
-                <s:if test="#application.portofinoProperties['user.enabled'].equals('true')
-                && #session.get('userId') == null">
-                  - <s:a href="%{#loginUrl}">Log in</s:a>
-                </s:if>
-                <s:if test="#application.portofinoProperties['user.enabled'].equals('true')
-                && #session.get('userId') != null">
-                    - <s:a href="%{#logoutUrl}">Log out</s:a>
-                </s:if>
-                -->
-
+                <c:if test="${portofinoProperties['user.enabled'] == 'true'}">
+                    <c:if test="${not empty userId}">
+                        <stripes:link href="/profile.action"><c:out value="${userName}"/></stripes:link> -
+                        <stripes:link href="/user/settings.action">Settings</stripes:link> -
+                        <stripes:link href="/user/help.action">Help</stripes:link> -
+                        <stripes:link href="/user/login.action?logout=">Log out</stripes:link>
+                    </c:if><c:if test="${empty userId}">
+                        <stripes:link href="/user/help.action">Help</stripes:link> -
+                        <stripes:link href="/user/login.action">Log in</stripes:link>
+                    </c:if>
+                </c:if><c:if test="${portofinoProperties['user.enabled'] != 'true'}">
+                    <stripes:link href="/user/Help.action">Help</stripes:link>
+                </c:if>
             </div>
             <div style="position: absolute; left: 20em;">
                 <mde:sessionMessages/>

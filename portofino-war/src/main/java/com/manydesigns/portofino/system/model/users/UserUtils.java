@@ -29,7 +29,9 @@
 package com.manydesigns.portofino.system.model.users;
 
 import com.manydesigns.portofino.context.Application;
+import sun.misc.BASE64Encoder;
 
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,8 +48,6 @@ public class UserUtils {
     public static final String USERTABLE = "portofino.public.users";
     public static final String GROUPTABLE = "portofino.public.groups";
 
-    public static final String USERID = "userId";
-    public static final String USERNAME = "userName";
     public static final String PASSWORD = "pwd";
     public static final String GROUPS = "groups";
 
@@ -74,4 +74,17 @@ public class UserUtils {
         }
         return groups;
     }
+
+    public static String encryptPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+            md.update(password.getBytes("UTF-8"));
+            byte raw[] = md.digest();
+            return (new BASE64Encoder()).encode(raw);
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
+
+
 }

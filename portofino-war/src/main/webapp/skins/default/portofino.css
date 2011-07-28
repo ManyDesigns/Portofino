@@ -332,7 +332,7 @@ div#content-login table {
 div#content-login h1 {
     text-align: center;
 }
-div#content-login table tr td, div#login table tr th {
+div#content-login table tr td, div#content-login table tr th {
     border: 0pt;
     background-color: #65a7db;
 }

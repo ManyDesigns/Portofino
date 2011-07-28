@@ -62,7 +62,6 @@ public class Crud {
     protected final List<ModelSelectionProvider> selectionProviders;
     protected final List<Annotation> annotations;
     protected final List<Button> buttons;
-    protected final List<Crud> subCruds;
 
     protected String name;
     protected String table;
@@ -93,7 +92,6 @@ public class Crud {
         selectionProviders = new ArrayList<ModelSelectionProvider>();
         annotations = new ArrayList<Annotation>();
         buttons = new ArrayList<Button>();
-        subCruds = new ArrayList<Crud>();
     }
 
     public Crud(Crud parentCrud,
@@ -132,10 +130,6 @@ public class Crud {
         for (Button button : buttons) {
             button.reset();
         }
-
-        for (Crud subCrud : subCruds) {
-            subCrud.reset();
-        }
     }
 
     public void init(Model model) {
@@ -155,10 +149,6 @@ public class Crud {
 
         for (Button button : buttons) {
             button.init(model);
-        }
-
-        for (Crud subCrud : subCruds) {
-            subCrud.init(model);
         }
     }
 
@@ -202,13 +192,6 @@ public class Crud {
     @XmlElement(name="button",type=Button.class)
     public List<Button> getButtons() {
         return buttons;
-    }
-
-
-    @XmlElementWrapper(name="subCruds")
-    @XmlElement(name="crud",type=Crud.class)
-    public List<Crud> getSubCruds() {
-        return subCruds;
     }
 
     @Identifier

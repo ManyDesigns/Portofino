@@ -29,6 +29,9 @@
 
 package com.manydesigns.portofino.interceptors;
 
+import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.SessionAttributes;
+import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.annotations.*;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.context.Application;
@@ -75,9 +78,6 @@ public class PortofinoInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public final static String STOP_WATCH_ATTRIBUTE = "stopWatch";
-    public final static String NAVIGATION_ATTRIBUTE = "navigation";
-    public final static String BREADCRUMBS_ATTRIBUTE = "breadcrumbs";
     private static final String LOGIN_ACTION = "login";
     private static final int UNAUTHORIZED = 401;
 
@@ -92,20 +92,18 @@ public class PortofinoInterceptor implements Interceptor {
         ActionBeanContext actionContext = context.getActionBeanContext();
         HttpServletRequest req = actionContext.getRequest();
 
-        Dispatch dispatch = (Dispatch) req.getAttribute(Dispatch.KEY);
-        if (dispatch == null) {
-            return context.proceed();
-        }
 
         HttpSession session = req.getSession(false);
         ServletContext servletContext = actionContext.getServletContext();
-        Application application = (Application)servletContext.getAttribute(Application.KEY);
+        Application application =
+                (Application)servletContext.getAttribute(
+                        ApplicationAttributes.APPLICATION);
 
         logger.debug("Starting page response timer");
         StopWatch stopWatch = new StopWatch();
         // Non è necessario stopparlo
         stopWatch.start();
-        req.setAttribute(STOP_WATCH_ATTRIBUTE, stopWatch);
+        req.setAttribute(RequestAttributes.STOP_WATCH, stopWatch);
 
         if(req.getAttribute("skin") == null) {
             req.setAttribute("skin", "default");
@@ -114,76 +112,81 @@ public class PortofinoInterceptor implements Interceptor {
         Long userId = null;
         String userName = null;
         if (session != null) {
-            userId = (Long) session.getAttribute(UserUtils.USERID);
-            userName = (String) session.getAttribute(UserUtils.USERNAME);
+            userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
+            userName = (String) session.getAttribute(SessionAttributes.USER_NAME);
         }
 
         MDC.clear();
-        String userIdString =
-                (userId == null) ? null : Long.toString(userId);
-        MDC.put(UserUtils.USERID, userIdString);
-        MDC.put(UserUtils.USERNAME, userName);
+        MDC.put(SessionAttributes.USER_ID, ObjectUtils.toString(userId));
+        MDC.put(SessionAttributes.USER_NAME, userName);
 
         application.openSession();
         Model model = application.getModel();
 
         List<String> groups=UserUtils.manageGroups(application, userId);
 
-        logger.debug("Creating navigation");
-        Navigation navigation = new Navigation(application, dispatch, groups);
-        req.setAttribute(NAVIGATION_ATTRIBUTE, navigation);
-
         ServerInfo serverInfo =
-        (ServerInfo) servletContext.getAttribute(ServerInfo.KEY);
-
-        SiteNodeInstance[] siteNodeInstances = dispatch.getSiteNodeInstancePath();
-        for(SiteNodeInstance node : siteNodeInstances) {
-            node.realize();
-        }
-        SiteNodeInstance siteNodeInstance =
-                siteNodeInstances[siteNodeInstances.length-1];
-
-        logger.debug("Creating breadcrumbs");
-        Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
-        req.setAttribute(BREADCRUMBS_ATTRIBUTE, breadcrumbs);
+                (ServerInfo) servletContext.getAttribute(
+                        ApplicationAttributes.SERVER_INFO);
 
         logger.debug("Injections");
         injectAnnotatedFields(action, InjectApplication.class, application);
         injectAnnotatedFields(action, InjectModel.class, model);
-        injectAnnotatedFields(action, InjectDispatch.class, dispatch);
-        injectAnnotatedFields(action, InjectSiteNodeInstance.class,
-                siteNodeInstance);
-        injectAnnotatedFields(action, InjectNavigation.class, navigation);
         injectAnnotatedFields(action, InjectServerInfo.class, serverInfo);
         injectAnnotatedFields(action, InjectHttpRequest.class, req);
         injectAnnotatedFields(action, InjectHttpSession.class, session);
 
-        SiteNode node = siteNodeInstance.getSiteNode();
-        //3. Ho i permessi necessari vado alla pagina
-        if(node.isAllowed(groups)){
-            return context.proceed();
-        } else {
-            //4. Non ho i permessi, ma non sono loggato, vado alla pagina di login
-            if (userId==null){
-                String returnUrl=req.getServletPath();
-                Map parameters = req.getParameterMap();
-                if (parameters.size()!=0){
-                    List<String> params = new ArrayList<String>();
-                    for (Object key : parameters.keySet()){
-                        params.add(key+"="+((String[]) parameters.get(key))[0]);
-                    }
-                    returnUrl += "?"+ StringUtils.join(params, "&");
-                }
-                UrlBean bean = new UrlBean(returnUrl);
-                /*
-                actionContext.getValueStack().getRoot().push(bean);
-                invocation.getStack().push(bean);
-                */
-                return new ForwardResolution("/skins/default/user/login.jsp");
-            } else {
-                //5. Non ho i permessi, ma sono loggato, errore 401
-                return new ErrorResolution(UNAUTHORIZED);
+        Dispatch dispatch = (Dispatch) req.getAttribute(RequestAttributes.DISPATCH);
+        if (dispatch != null) {
+            logger.debug("Creating navigation");
+            Navigation navigation = new Navigation(application, dispatch, groups);
+            req.setAttribute(RequestAttributes.NAVIGATION, navigation);
+
+            SiteNodeInstance[] siteNodeInstances = dispatch.getSiteNodeInstancePath();
+            for(SiteNodeInstance node : siteNodeInstances) {
+                node.realize();
             }
+            SiteNodeInstance siteNodeInstance =
+                    siteNodeInstances[siteNodeInstances.length-1];
+
+            logger.debug("Creating breadcrumbs");
+            Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
+            req.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
+
+            injectAnnotatedFields(action, InjectDispatch.class, dispatch);
+            injectAnnotatedFields(action, InjectSiteNodeInstance.class,
+                    siteNodeInstance);
+            injectAnnotatedFields(action, InjectNavigation.class, navigation);
+
+            SiteNode node = siteNodeInstance.getSiteNode();
+            //3. Ho i permessi necessari vado alla pagina
+            if(node.isAllowed(groups)){
+                return context.proceed();
+            } else {
+                //4. Non ho i permessi, ma non sono loggato, vado alla pagina di login
+                if (userId==null){
+                    String returnUrl=req.getServletPath();
+                    Map parameters = req.getParameterMap();
+                    if (parameters.size()!=0){
+                        List<String> params = new ArrayList<String>();
+                        for (Object key : parameters.keySet()){
+                            params.add(key+"="+((String[]) parameters.get(key))[0]);
+                        }
+                        returnUrl += "?"+ StringUtils.join(params, "&");
+                    }
+                    UrlBean bean = new UrlBean(returnUrl);
+                    /*
+                    actionContext.getValueStack().getRoot().push(bean);
+                    invocation.getStack().push(bean);
+                    */
+                    return new ForwardResolution("/skins/default/user/login.jsp");
+                } else {
+                    //5. Non ho i permessi, ma sono loggato, errore 401
+                    return new ErrorResolution(UNAUTHORIZED);
+                }
+            }
+        } else {
+            return context.proceed();
         }
     }
 

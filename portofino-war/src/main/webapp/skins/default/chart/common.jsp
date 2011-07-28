@@ -4,7 +4,7 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><stripes:layout-definition>
-    <stripes:layout-render name="/skins/default/common.jsp">
+    <stripes:layout-render name="/skins/default/common-with-navigation.jsp">
         <stripes:layout-component name="content">
             <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.chart.ChartAction"/>
             <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post" enctype="application/x-www-form-urlencoded">

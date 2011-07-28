@@ -35,6 +35,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.annotations.InjectApplication;
@@ -107,7 +108,7 @@ public class ProfileAction extends AbstractActionBean {
             LoggerFactory.getLogger(ProfileAction.class);
 
     public String execute() {
-        userId = (Long) session.getAttribute(UserUtils.USERID);
+        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
         return read();
     }
 
@@ -133,7 +134,7 @@ public class ProfileAction extends AbstractActionBean {
     }
 
     public String edit() {
-        userId = (Long) session.getAttribute(UserUtils.USERID);
+        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 
@@ -149,7 +150,7 @@ public class ProfileAction extends AbstractActionBean {
     }
 
     public String update() {
-        userId = (Long) session.getAttribute(UserUtils.USERID);
+        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
         ClassAccessor accessor = application.getTableAccessor(UserUtils.USERTABLE);
@@ -175,7 +176,7 @@ public class ProfileAction extends AbstractActionBean {
     }
 
     public String changePwd() {
-        userId = (Long) session.getAttribute(UserUtils.USERID);
+        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)
                 .build();
@@ -183,7 +184,7 @@ public class ProfileAction extends AbstractActionBean {
     }
 
     public String updatePwd() {
-        userId = (Long) session.getAttribute(UserUtils.USERID);
+        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 
@@ -199,7 +200,9 @@ public class ProfileAction extends AbstractActionBean {
             if(bean.getEncOldPwd().equals(thisUser.getPwd())) {
                 thisUser.setPwd(bean.pwd);
                 if (enc) {
-                    thisUser.encryptPwd();
+                    thisUser.setPwd(UserUtils.encryptPassword(bean.pwd));
+                } else {
+                    thisUser.setPwd(bean.pwd);
                 }
                 thisUser.setPwdModDate(new Timestamp(new Date().getTime()));
                 application.updateObject(UserUtils.USERTABLE, thisUser);

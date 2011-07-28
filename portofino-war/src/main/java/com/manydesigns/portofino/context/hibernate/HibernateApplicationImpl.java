@@ -36,6 +36,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.connections.Connections;
 import com.manydesigns.portofino.context.Application;
@@ -901,7 +902,7 @@ public class HibernateApplicationImpl implements Application {
         String qualifiedTableName = PORTOFINO_PUBLIC_USERS;
         Session session = getSession(qualifiedTableName);
         org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
-        criteria.add(Restrictions.eq(UserUtils.USERNAME, username));
+        criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
         criteria.add(Restrictions.eq(UserUtils.PASSWORD, password));
 
         @SuppressWarnings({"unchecked"})
@@ -933,7 +934,7 @@ public class HibernateApplicationImpl implements Application {
         String qualifiedTableName = PORTOFINO_PUBLIC_USERS;
         Session session = getSession(qualifiedTableName);
         org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
-        criteria.add(Restrictions.eq(UserUtils.USERNAME, username));
+        criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
         @SuppressWarnings({"unchecked"})
         List<Object> result = (List<Object>) criteria.list();
 

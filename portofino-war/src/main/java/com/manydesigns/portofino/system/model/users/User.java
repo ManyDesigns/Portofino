@@ -331,17 +331,6 @@ public class User implements Serializable{
         this.oldPwds = oldPwds;
     }
 
-    public void encryptPwd() {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
-            md.update(pwd.getBytes("UTF-8"));
-            byte raw[] = md.digest();
-            setPwd((new BASE64Encoder()).encode(raw));
-        } catch (Exception e) {
-            throw new Error(e);
-        }
-    }
-
     public synchronized  void tokenGenerator() {
         setToken(RandomStringUtils.random(30, true, true));
     }

@@ -71,7 +71,7 @@ import java.io.InputStream;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@UrlBinding("/Chart.action")
+@UrlBinding("/chart.action")
 public class ChartAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

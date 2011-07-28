@@ -46,8 +46,8 @@ import java.util.List;
 */
 public class DispatcherTest extends AbstractPortofinoTest {
 
-    public static final String CRUD_ACTION = "/Crud.action";
-    public static final String PORTLET_ACTION = "/Portlet.action";
+    public static final String CRUD_ACTION = "/crud.action";
+    public static final String CHART_ACTION = "/chart.action";
 
     Dispatcher dispatcher;
 
@@ -159,7 +159,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNotNull(dispatch);
 
         assertEquals(originalPath, dispatch.getOriginalPath());
-        assertEquals(PORTLET_ACTION, dispatch.getRewrittenPath());
+        assertEquals(CHART_ACTION, dispatch.getRewrittenPath());
 
         SiteNodeInstance[] siteNodeInstancePath =
                 dispatch.getSiteNodeInstancePath();
