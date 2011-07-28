@@ -7,7 +7,7 @@
     <s:set var="buttonsBarBottom" value="true"/>
     <div class="buttons-bar-top">
 </s:else>
-    <s:submit id="ConnectionProviders_returnToSearch" method="returnToSearch" value="<< Return to list"/>
+    <s:submit id="ConnectionProviders_returnToParent" method="returnToParent" value="<< Return to list"/>
     <s:submit id="ConnectionProviders_test" method="test" value="Test"/>
     <s:submit id="ConnectionProviders_delete" method="delete" value="Delete"
               onclick="return confirm ('Are you sure?');"/>

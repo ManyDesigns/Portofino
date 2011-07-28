@@ -45,28 +45,25 @@ import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.annotations.InjectApplication;
-import com.manydesigns.portofino.annotations.InjectDispatch;
 import com.manydesigns.portofino.annotations.InjectModel;
 import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.TableCriteria;
-import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
+import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
+import com.manydesigns.portofino.model.site.CrudNode;
 import com.manydesigns.portofino.model.site.EmbeddableNode;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.site.CrudNode;
 import com.manydesigns.portofino.model.site.crud.Button;
 import com.manydesigns.portofino.model.site.crud.Crud;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
-import com.manydesigns.portofino.util.ShortNameUtils;
 import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
@@ -112,9 +109,6 @@ public class CrudAction extends AbstractActionBean {
 
     @InjectModel
     public Model model;
-
-    @InjectDispatch
-    public Dispatch dispatch;
 
     @InjectSiteNodeInstance
     public CrudNodeInstance siteNodeInstance;
@@ -166,12 +160,6 @@ public class CrudAction extends AbstractActionBean {
     public String previousUrl;
     public String nextUrl;
     public String lastUrl;
-
-    //--------------------------------------------------------------------------
-    // UI search parameterization
-    //--------------------------------------------------------------------------
-
-    public String returnToSearchTarget;
 
     //**************************************************************************
     // Logging
@@ -296,7 +284,7 @@ public class CrudAction extends AbstractActionBean {
                 .addParameter("searchString", searchString)
                 .toString();
 
-        setupReturnToSearchTarget();
+        setupReturnToParentTarget();
 
         setupEmbeddedChildren();
 
@@ -347,7 +335,7 @@ public class CrudAction extends AbstractActionBean {
 
         setupPagination();
 
-        setupReturnToSearchTarget();
+        setupReturnToParentTarget();
 
         setupEmbeddedChildren();
 
@@ -577,7 +565,7 @@ public class CrudAction extends AbstractActionBean {
         }
     }
 
-    public Resolution returnToSearch() {
+    public Resolution returnToParent() {
         SiteNodeInstance[] siteNodeInstancePath =
                 dispatch.getSiteNodeInstancePath();
         int previousPos = siteNodeInstancePath.length - 2;
@@ -649,26 +637,6 @@ public class CrudAction extends AbstractActionBean {
     //**************************************************************************
     // Setup methods
     //**************************************************************************
-
-    protected void setupReturnToSearchTarget() {
-        SiteNodeInstance[] siteNodeInstancePath =
-                dispatch.getSiteNodeInstancePath();
-        int previousPos = siteNodeInstancePath.length - 2;
-        returnToSearchTarget = null;
-        if (previousPos >= 0) {
-            SiteNodeInstance previousNode = siteNodeInstancePath[previousPos];
-            if (previousNode instanceof CrudNodeInstance) {
-                CrudNodeInstance crudNodeInstance =
-                        (CrudNodeInstance) previousNode;
-                Object previousNodeObject = crudNodeInstance.getObject();
-                ClassAccessor previousNodeClassAccessor =
-                        crudNodeInstance.getClassAccessor();
-                returnToSearchTarget = ShortNameUtils.getName(
-                        previousNodeClassAccessor, previousNodeObject);
-            }
-        }
-
-    }
 
     protected void setupPagination() {
         position = objects.indexOf(object);
@@ -1307,14 +1275,6 @@ public class CrudAction extends AbstractActionBean {
         this.model = model;
     }
 
-    public Dispatch getDispatch() {
-        return dispatch;
-    }
-
-    public void setDispatch(Dispatch dispatch) {
-        this.dispatch = dispatch;
-    }
-
     public CrudNodeInstance getSiteNodeInstance() {
         return siteNodeInstance;
     }
@@ -1489,14 +1449,6 @@ public class CrudAction extends AbstractActionBean {
 
     public String getMode() {
         return siteNodeInstance.getMode();
-    }
-
-    public String getReturnToSearchTarget() {
-        return returnToSearchTarget;
-    }
-
-    public void setReturnToSearchTarget(String returnToSearchTarget) {
-        this.returnToSearchTarget = returnToSearchTarget;
     }
 
     public List<String> getEmbeddedChildren() {

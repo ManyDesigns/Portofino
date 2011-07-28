@@ -29,6 +29,13 @@
 
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.portofino.annotations.InjectDispatch;
+import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
+import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
+import com.manydesigns.portofino.model.site.CrudNode;
+import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.controller.StripesConstants;
@@ -48,6 +55,12 @@ public abstract class AbstractActionBean implements ActionBean {
 
     protected ActionBeanContext context;
 
+    @InjectDispatch
+    public Dispatch dispatch;
+
+
+    public String returnToParentTarget;
+
     public void setContext(ActionBeanContext context) {
         this.context = context;
     }
@@ -58,6 +71,37 @@ public abstract class AbstractActionBean implements ActionBean {
 
     public boolean isEmbedded() {
         return context.getRequest().getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) != null;
+    }
+
+    protected void setupReturnToParentTarget() {
+        SiteNodeInstance[] siteNodeInstancePath =
+                dispatch.getSiteNodeInstancePath();
+        int previousPos = siteNodeInstancePath.length - 2;
+        returnToParentTarget = null;
+        if (previousPos >= 0) {
+            SiteNodeInstance previousNode = siteNodeInstancePath[previousPos];
+            if (previousNode instanceof CrudNodeInstance) {
+                CrudNodeInstance crudNodeInstance =
+                        (CrudNodeInstance) previousNode;
+                if (CrudNode.MODE_SEARCH.equals(crudNodeInstance.getMode())) {
+                    returnToParentTarget = crudNodeInstance.getCrud().getName();
+                } else if (CrudNode.MODE_DETAIL.equals(crudNodeInstance.getMode())) {
+                    Object previousNodeObject = crudNodeInstance.getObject();
+                    ClassAccessor previousNodeClassAccessor =
+                            crudNodeInstance.getClassAccessor();
+                    returnToParentTarget = ShortNameUtils.getName(
+                            previousNodeClassAccessor, previousNodeObject);
+                }
+            }
+        }
+    }
+
+    public Dispatch getDispatch() {
+        return dispatch;
+    }
+
+    public String getReturnToParentTarget() {
+        return returnToParentTarget;
     }
 
 }

@@ -6,16 +6,15 @@
 %><stripes:layout-render name="/skins/${skin}/crud/common.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
     <stripes:layout-component name="buttons">
-        <c:if test="${not empty actionBean.returnToSearchTarget}">
-            <stripes:submit id="Table_returnToSearch" name="returnToSearch" value="<< Return to ${actionBean.returnToSearchTarget}"/>
+        <c:if test="${not empty actionBean.returnToParentTarget}">
+            <stripes:submit id="Table_returnToParent" name="returnToParent" value="<< Return to ${actionBean.returnToParentTarget}"/>
         </c:if>
-        <stripes:submit id="Table_create" name="create" value="Create new"/>
-        <stripes:submit id="Table_bulkEdit" name="bulkEdit" value="Edit"/>
-        <stripes:submit id="Table_bulkDelete" name="bulkDelete" value="Delete"
-                  onclick="return confirm ('Are you sure?');"/>
-        <stripes:submit id="Table_print" name="print" value="Print" disabled="true"/>
-        <stripes:submit id="Table_exportExcel" name="exportSearchExcel" value="Excel" disabled="false"/>
-        <stripes:submit id="Table_exportPdf" name="exportSearchPdf" value="Pdf" disabled="false"/>
+        <stripes:submit name="create" value="Create new"/>
+        <stripes:submit name="bulkEdit" value="Edit"/>
+        <stripes:submit name="bulkDelete" value="Delete" onclick="return confirm ('Are you sure?');"/>
+        <stripes:submit name="print" value="Print" disabled="true"/>
+        <stripes:submit name="exportSearchExcel" value="Excel" disabled="false"/>
+        <stripes:submit name="exportSearchPdf" value="Pdf" disabled="false"/>
         <!-- TODO custom buttons -->
     </stripes:layout-component>
     <stripes:layout-component name="innerContent">

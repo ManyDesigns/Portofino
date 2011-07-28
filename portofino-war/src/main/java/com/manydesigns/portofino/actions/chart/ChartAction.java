@@ -36,7 +36,6 @@ import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.annotations.InjectApplication;
-import com.manydesigns.portofino.annotations.InjectHttpRequest;
 import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
@@ -60,7 +59,6 @@ import org.jfree.ui.VerticalAlignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
@@ -93,9 +91,6 @@ public class ChartAction extends AbstractActionBean {
 
     @InjectSiteNodeInstance
     public SiteNodeInstance siteNodeInstance;
-
-    @InjectHttpRequest
-    public HttpServletRequest request;
 
     //**************************************************************************
     // Web parameters
@@ -145,31 +140,12 @@ public class ChartAction extends AbstractActionBean {
     public Resolution execute() {
         chartNode = (ChartNode) siteNodeInstance.getSiteNode();
 
-        if (isEmbedded()) {
-
-        }
-
-        /*
-        form = new FormBuilder(PortletNode.class)
-                .configFields("name", "title", "legend", "database",
-                        "query", "urlExpression")
-                .configMode(Mode.VIEW)
-                .build();
-        form.readFromObject(portlet);
-
-        displayForm = new FormBuilder(PortletDesignAction.class)
-                .configFields("width", "height", "antiAlias", "borderVisible")
-                .configMode(Mode.EDIT)
-                .build();
-        displayForm.readFromObject(this);
-        */
-
         // Run/generate the chart
         generateChart();
 
         chartId = RandomUtil.createRandomCode();
 
-        String actionurl = request.getContextPath() + "/Chart.action";
+        String actionurl = dispatch.getAbsoluteOriginalPath();
         UrlBuilder chartResolution =
                 new UrlBuilder(actionurl, false)
                         .addParameter("chartId", chartId)
@@ -187,7 +163,12 @@ public class ChartAction extends AbstractActionBean {
             SessionMessages.addErrorMessage(e.getMessage());
         }
 
-        return new ForwardResolution("/layouts/chart/embeddedChart.jsp");
+        if (isEmbedded()) {
+            return new ForwardResolution("/layouts/chart/embeddedChart.jsp");
+        } else {
+            setupReturnToParentTarget();
+            return new ForwardResolution("/layouts/chart/chart.jsp");
+        }
     }
 
     private void generateChart() {
@@ -280,6 +261,39 @@ public class ChartAction extends AbstractActionBean {
         inputStream = new FileInputStream(file);
         return new StreamingResolution("image/png", inputStream);
     }
+
+
+    public void design() {
+        /*
+        form = new FormBuilder(PortletNode.class)
+                .configFields("name", "title", "legend", "database",
+                        "query", "urlExpression")
+                .configMode(Mode.VIEW)
+                .build();
+        form.readFromObject(portlet);
+
+        displayForm = new FormBuilder(PortletDesignAction.class)
+                .configFields("width", "height", "antiAlias", "borderVisible")
+                .configMode(Mode.EDIT)
+                .build();
+        displayForm.readFromObject(this);
+        */
+    }
+
+    public Resolution returnToParent() {
+        SiteNodeInstance[] siteNodeInstancePath =
+                dispatch.getSiteNodeInstancePath();
+        int previousPos = siteNodeInstancePath.length - 2;
+        RedirectResolution resolution;
+        if (previousPos >= 0) {
+            SiteNodeInstance previousNode = siteNodeInstancePath[previousPos];
+            String url = dispatch.getPathUrl(previousPos + 1);
+            return new RedirectResolution(url, true);
+        } else {
+            throw new Error("No parent for root node");
+        }
+    }
+
 
 
     //**************************************************************************
@@ -414,4 +428,5 @@ public class ChartAction extends AbstractActionBean {
     public void setInputStream(InputStream inputStream) {
         this.inputStream = inputStream;
     }
+
 }

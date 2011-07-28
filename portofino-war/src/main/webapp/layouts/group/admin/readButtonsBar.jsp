@@ -46,7 +46,7 @@
             </s:else>
         </div>
     </s:if>
-    <s:submit id="Table_returnToSearch" method="returnToSearch" value="<< Return to search"/>
+    <s:submit id="Table_returnToParent" method="returnToParent" value="<< Return to search"/>
     <s:submit id="Table_edit" method="edit" value="Edit"/>
     <s:submit id="Table_delete" method="delete" value="Delete"
               onclick="return confirm ('Are you sure?');"/>
