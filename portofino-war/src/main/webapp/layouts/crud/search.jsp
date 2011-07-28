@@ -37,5 +37,9 @@
             </div>
         </div>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+
+        <c:forEach var="embeddedChild" items="${actionBean.embeddedChildren}">
+            <jsp:include page="${embeddedChild}" />
+        </c:forEach>
     </stripes:layout-component>
 </stripes:layout-render>

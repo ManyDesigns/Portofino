@@ -168,7 +168,7 @@
 
         </action>
         <action name="Portlet"
-                class="com.manydesigns.portofino.actions.model.PortletDesignAction">
+                class="com.manydesigns.portofino.actions.chart.ChartAction">
             <result name="summary">/skins/default/model/portletDesign/summary.jsp</result>
 
             <result name="cancel" type="redirect">

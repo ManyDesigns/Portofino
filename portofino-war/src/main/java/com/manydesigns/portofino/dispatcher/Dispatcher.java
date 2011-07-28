@@ -103,8 +103,8 @@ public class Dispatcher {
         if (rewrittenPath == null) {
             if (siteNode instanceof DocumentNode) {
                 rewrittenPath = "/Document.action";
-            } else if (siteNode instanceof PortletNode) {
-                rewrittenPath = "/Portlet.action";
+            } else if (siteNode instanceof ChartNode) {
+                rewrittenPath = "/Chart.action";
             } else if (siteNode instanceof FolderNode) {
                 rewrittenPath = "/Index.action";
             } else if (siteNode instanceof CrudNode) {

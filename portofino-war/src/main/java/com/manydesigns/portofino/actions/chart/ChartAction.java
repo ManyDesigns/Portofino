@@ -27,25 +27,23 @@
  *
  */
 
-package com.manydesigns.portofino.actions.model;
+package com.manydesigns.portofino.actions.chart;
 
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.jfreechart.JBla;
+import com.manydesigns.elements.jfreechart.JFreeChartInstance;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.elements.util.RandomUtil;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.annotations.InjectApplication;
+import com.manydesigns.portofino.annotations.InjectHttpRequest;
 import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
 import com.manydesigns.portofino.context.Application;
-import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
-import com.manydesigns.portofino.model.site.PortletNode;
+import com.manydesigns.portofino.model.site.ChartNode;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
+import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.util.UrlBuilder;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.DrawingSupplier;
@@ -62,12 +60,12 @@ import org.jfree.ui.VerticalAlignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.HashMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -75,7 +73,8 @@ import java.util.HashMap;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class PortletDesignAction extends AbstractActionBean {
+@UrlBinding("/Chart.action")
+public class ChartAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -95,11 +94,13 @@ public class PortletDesignAction extends AbstractActionBean {
     @InjectSiteNodeInstance
     public SiteNodeInstance siteNodeInstance;
 
+    @InjectHttpRequest
+    public HttpServletRequest request;
+
     //**************************************************************************
     // Web parameters
     //**************************************************************************
 
-    public String portletName;
     public String cancelReturnUrl;
     public String chartId;
 
@@ -109,18 +110,10 @@ public class PortletDesignAction extends AbstractActionBean {
     public boolean borderVisible = true;
 
     //**************************************************************************
-    // Web parameters setters (for struts.xml inspections in IntelliJ)
-    //**************************************************************************
-
-    public void setPortletName(String portletName) {
-        this.portletName = portletName;
-    }
-
-    //**************************************************************************
     // Model metadata
     //**************************************************************************
 
-    public PortletNode portlet;
+    public ChartNode chartNode;
 
     //**************************************************************************
     // Presentation elements
@@ -129,7 +122,7 @@ public class PortletDesignAction extends AbstractActionBean {
     public Form form;
     public Form displayForm;
     public JFreeChart chart;
-    public JBla bla;
+    public JFreeChartInstance jfreeChartInstance;
     public String fileName;
     public InputStream inputStream;
 
@@ -142,20 +135,21 @@ public class PortletDesignAction extends AbstractActionBean {
     private final Color transparentColor = new Color(0, true);
 
     public static final Logger logger =
-            LoggerFactory.getLogger(PortletDesignAction.class);
+            LoggerFactory.getLogger(ChartAction.class);
 
     //**************************************************************************
     // Action default execute method
     //**************************************************************************
 
-    public String execute() {
-        /*if (portletName == null) {
-            portletName = model.getPortlets().get(0).getName();
-            return REDIRECT_TO_FIRST;
-        }*/
+    @DefaultHandler
+    public Resolution execute() {
+        chartNode = (ChartNode) siteNodeInstance.getSiteNode();
 
-        setupPortlet();
+        if (isEmbedded()) {
 
+        }
+
+        /*
         form = new FormBuilder(PortletNode.class)
                 .configFields("name", "title", "legend", "database",
                         "query", "urlExpression")
@@ -168,47 +162,53 @@ public class PortletDesignAction extends AbstractActionBean {
                 .configMode(Mode.EDIT)
                 .build();
         displayForm.readFromObject(this);
+        */
 
         // Run/generate the chart
         generateChart();
 
         chartId = RandomUtil.createRandomCode();
 
-        HashMap<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("chartId", chartId);
-        String portletUrl = Util.getAbsoluteUrl(Struts2Utils.buildActionUrl("chart", parameters));
+        String actionurl = request.getContextPath() + "/Chart.action";
+        UrlBuilder chartResolution =
+                new UrlBuilder(actionurl, false)
+                        .addParameter("chartId", chartId)
+                        .addParameter("chart", "");
+        String portletUrl = chartResolution.toString();
 
         try {
             File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
             fileName = file.getName();
 
-            bla = new JBla(chart, file, width, height, portletUrl);
+            jfreeChartInstance =
+                    new JFreeChartInstance(chart, file, width, height, portletUrl);
         } catch (java.io.IOException e) {
             logger.warn("Could not save portlet", e);
             SessionMessages.addErrorMessage(e.getMessage());
         }
 
-        return "summary";
+        return new ForwardResolution("/layouts/chart/embeddedChart.jsp");
     }
 
     private void generateChart() {
         DefaultPieDataset dataset = new DefaultPieDataset();
         java.util.List<Object[]> result;
+        String query = chartNode.getQuery();
         try {
-            result = application.runSql(portlet.getDatabase(), portlet.getQuery());
+            result = application.runSql(chartNode.getDatabase(), query);
             for (Object[] current : result) {
                 dataset.setValue((Comparable)current[0], (Number)current[1]);
             }
         } catch (Throwable e) {
-            logger.warn("Could not run portlet sql", e);
+            logger.warn("Could not run portlet query: " + query, e);
             while (e != null) {
                 SessionMessages.addErrorMessage(e.getMessage());
                 e = e.getCause();
             }
         }
 
-        chart = ChartFactory.createPieChart(portlet.getTitle(), dataset,
-                                true, true, true);
+        chart = ChartFactory.createPieChart(
+                chartNode.getTitle(), dataset, true, true, true);
 
         chart.setAntiAlias(antiAlias);
 
@@ -225,7 +225,7 @@ public class PortletDesignAction extends AbstractActionBean {
         PiePlot plot = (PiePlot) chart.getPlot();
 
         PieURLGenerator urlGenerator =
-                new PortletPieUrlGenerator(portlet.getUrlExpression());
+                new ChartPieUrlGenerator(chartNode.getUrlExpression());
         plot.setURLGenerator(urlGenerator);
 
 
@@ -253,7 +253,7 @@ public class PortletDesignAction extends AbstractActionBean {
         plot.setDrawingSupplier(supplier);
 
         // impostiamo il titolo della legenda
-        String legendString = portlet.getLegend();
+        String legendString = chartNode.getLegend();
         Title subtitle = new TextTitle(legendString, legendFont, Color.BLACK,
                 RectangleEdge.BOTTOM, HorizontalAlignment.CENTER,
                 VerticalAlignment.CENTER, new RectangleInsets(0, 0, 0, 0));
@@ -274,29 +274,13 @@ public class PortletDesignAction extends AbstractActionBean {
         chart.setBackgroundPaint(chartBgPaint);
     }
 
-    public String chart() {
+    public Resolution chart() throws FileNotFoundException {
         File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
 
-        try {
-            inputStream = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            logger.warn("Could not create chart input stream", e);
-        }
-
-        return "chart";
+        inputStream = new FileInputStream(file);
+        return new StreamingResolution("image/png", inputStream);
     }
 
-
-    //**************************************************************************
-    // Common methods
-    //**************************************************************************
-
-    public void setupPortlet() {
-        portlet = (PortletNode) siteNodeInstance.getSiteNode();
-        if (portlet == null) {
-            throw new ModelObjectNotFoundError(portletName);
-        }
-    }
 
     //**************************************************************************
     // Cancel
@@ -306,4 +290,128 @@ public class PortletDesignAction extends AbstractActionBean {
         return PortofinoAction.CANCEL;
     }
 
+    //**************************************************************************
+    // Getter/setter
+    //**************************************************************************
+
+
+    public Application getApplication() {
+        return application;
+    }
+
+    public void setApplication(Application application) {
+        this.application = application;
+    }
+
+    public SiteNodeInstance getSiteNodeInstance() {
+        return siteNodeInstance;
+    }
+
+    public void setSiteNodeInstance(SiteNodeInstance siteNodeInstance) {
+        this.siteNodeInstance = siteNodeInstance;
+    }
+
+    public String getCancelReturnUrl() {
+        return cancelReturnUrl;
+    }
+
+    public void setCancelReturnUrl(String cancelReturnUrl) {
+        this.cancelReturnUrl = cancelReturnUrl;
+    }
+
+    public String getChartId() {
+        return chartId;
+    }
+
+    public void setChartId(String chartId) {
+        this.chartId = chartId;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public boolean isAntiAlias() {
+        return antiAlias;
+    }
+
+    public void setAntiAlias(boolean antiAlias) {
+        this.antiAlias = antiAlias;
+    }
+
+    public boolean isBorderVisible() {
+        return borderVisible;
+    }
+
+    public void setBorderVisible(boolean borderVisible) {
+        this.borderVisible = borderVisible;
+    }
+
+    public ChartNode getChartNode() {
+        return chartNode;
+    }
+
+    public void setChartNode(ChartNode chartNode) {
+        this.chartNode = chartNode;
+    }
+
+    public Form getForm() {
+        return form;
+    }
+
+    public void setForm(Form form) {
+        this.form = form;
+    }
+
+    public Form getDisplayForm() {
+        return displayForm;
+    }
+
+    public void setDisplayForm(Form displayForm) {
+        this.displayForm = displayForm;
+    }
+
+    public JFreeChart getChart() {
+        return chart;
+    }
+
+    public void setChart(JFreeChart chart) {
+        this.chart = chart;
+    }
+
+    public JFreeChartInstance getJfreeChartInstance() {
+        return jfreeChartInstance;
+    }
+
+    public void setJfreeChartInstance(JFreeChartInstance jfreeChartInstance) {
+        this.jfreeChartInstance = jfreeChartInstance;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public InputStream getInputStream() {
+        return inputStream;
+    }
+
+    public void setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
+    }
 }

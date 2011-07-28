@@ -104,7 +104,7 @@ public class CrudNode extends SiteNode implements EmbeddableNode {
           @XmlElement(name="customNode",type=CustomNode.class),
           @XmlElement(name="customFolderNode",type=CustomFolderNode.class),
           @XmlElement(name="crudNode",type=CrudNode.class),
-          @XmlElement(name="portletNode",type=PortletNode.class)
+          @XmlElement(name="portletNode",type=ChartNode.class)
     })
     public ArrayList<SiteNode> getDetailChildNodes() {
         return detailChildNodes;

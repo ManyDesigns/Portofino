@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class PortletNode extends SiteNode implements EmbeddableNode {
+public class ChartNode extends SiteNode implements EmbeddableNode {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -67,7 +67,7 @@ public class PortletNode extends SiteNode implements EmbeddableNode {
     //**************************************************************************
 
 
-    public PortletNode() {
+    public ChartNode() {
         super();
     }
 

@@ -298,6 +298,8 @@ public class CrudAction extends AbstractActionBean {
 
         setupReturnToSearchTarget();
 
+        setupEmbeddedChildren();
+
         return new ForwardResolution("/layouts/crud/search.jsp");
     }
 

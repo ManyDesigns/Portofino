@@ -13,7 +13,9 @@
                     <stripes:layout-component name="buttons" />
                 </div>
                 <div class="breadcrumbs">
-                    <mde:write name="breadcrumbs"/>
+                    <div class="inner">
+                        <mde:write name="breadcrumbs"/>
+                    </div>
                 </div>
                 <div id="inner-content">
                     <stripes:layout-component name="innerContent" />

@@ -1228,12 +1228,19 @@ Struttura dell'XML:
                         </property>
                     </properties>
                 </crud>
+                <childNodes>
+                    <portletNode id="report"
+                                 title="report title"
+                                 description="report description"
+                                 name="report"
+                                 type=""
+                                 legend="report legend"
+                                 database="redmine"
+                                 query="select project_id, count(*) from issues group by project_id"
+                                 urlExpression="/projects/%{key}"/>
+                </childNodes>
                 <detailChildNodes>
                     <crudNode id="issues" title="Issues" description="Issues">
-                        <embedInParent order="1"
-                                         inSearch="false"
-                                         inDetails="true"
-                                />
                         <crud name="issue"
                                  variable="issue"
                                  table="redmine.redmine.issues"

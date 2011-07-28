@@ -704,7 +704,11 @@ public class HibernateApplicationImpl implements Application {
     }
 
     public List<Object[]> runSql(String databaseName, String sql) {
-        Session session = setups.get(databaseName).getThreadSession();
+        HibernateDatabaseSetup setup = setups.get(databaseName);
+        if (setup == null) {
+            throw new Error("No setup exists for database: " + databaseName);
+        }
+        Session session = setup.getThreadSession();
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
         String formatString = sqlFormat.getFormatString();
         Object[] parameters = sqlFormat.evaluateOgnlExpressions(null);

@@ -51,6 +51,16 @@ div.breadcrumbs {
     padding: 0.5em 1em;
 }
 
+a.breadcrumb-item {
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+span.breadcrumb-item {
+    color: #808080;
+    font-weight: bold;
+}
+
 div#inner-content {
     padding: 0 1em;
 }

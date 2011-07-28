@@ -27,20 +27,20 @@
  *
  */
 
-package com.manydesigns.portofino.actions.model;
+package com.manydesigns.portofino.actions.chart;
 
 import com.manydesigns.elements.text.OgnlTextFormat;
 import org.jfree.chart.urls.PieURLGenerator;
 import org.jfree.data.general.PieDataset;
 
-public class PortletPieUrlGenerator implements PieURLGenerator {
+public class ChartPieUrlGenerator implements PieURLGenerator {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     protected final OgnlTextFormat format;
     protected final PieURLGeneratorValue value;
 
-    PortletPieUrlGenerator(String expression) {
+    ChartPieUrlGenerator(String expression) {
         format = OgnlTextFormat.create(expression);
         format.setUrl(true);
         value = new PieURLGeneratorValue();

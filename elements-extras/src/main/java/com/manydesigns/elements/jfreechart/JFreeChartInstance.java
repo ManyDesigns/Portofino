@@ -47,7 +47,7 @@ import java.util.Iterator;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class JBla implements XhtmlFragment {
+public class JFreeChartInstance implements XhtmlFragment {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -62,8 +62,8 @@ public class JBla implements XhtmlFragment {
     protected final String alt = "alt";
     protected final String mapId = "mapId";
 
-    public JBla(JFreeChart chart, File file, int width, int height,
-                String chartUrl) throws IOException {
+    public JFreeChartInstance(JFreeChart chart, File file, int width, int height,
+                              String chartUrl) throws IOException {
         this.chart = chart;
         this.file = file;
         this.width = width;
