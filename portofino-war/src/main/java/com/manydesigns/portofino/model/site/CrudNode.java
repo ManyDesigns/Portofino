@@ -64,6 +64,8 @@ public class CrudNode extends SiteNode implements EmbeddableNode {
         detailChildNodes = new ArrayList<SiteNode>();
     }
 
+
+
     @XmlElement()
     public Crud getCrud() {
         return crud;
@@ -74,8 +76,24 @@ public class CrudNode extends SiteNode implements EmbeddableNode {
     }
 
     @Override
+    public void reset() {
+        super.reset();
+
+        for (SiteNode current : detailChildNodes) {
+            current.reset();
+        }
+
+        crud.reset();
+    }
+
+    @Override
     public void init(Model model) {
         super.init(model);
+
+        for (SiteNode current : detailChildNodes) {
+            current.init(model);
+        }
+
         crud.init(model);
     }
 

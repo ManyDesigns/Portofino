@@ -78,7 +78,8 @@ public class Navigation implements XhtmlFragment {
     //**************************************************************************
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
-        print("", dispatch.getNavigationNodeInstances(), xb, false);
+        print(dispatch.getRequest().getContextPath(),
+                dispatch.getNavigationNodeInstances(), xb, false);
     }
 
     private void print(String path, List<SiteNodeInstance> nodes, XhtmlBuffer xb, boolean recursive) {
@@ -88,6 +89,11 @@ public class Navigation implements XhtmlFragment {
         boolean first = true;
         SiteNodeInstance expand = null;
         for (SiteNodeInstance current : nodes) {
+            SiteNode siteNode = current.getSiteNode();
+            if (!siteNode.isAllowed(groups)) {
+                continue;
+            }
+
             // gestire permessi
             if(first) {
                 if(recursive) { xb.writeHr(); }
@@ -102,7 +108,6 @@ public class Navigation implements XhtmlFragment {
                 xb.addAttribute("class", "path");
                 expand = current;
             }
-            SiteNode siteNode = current.getSiteNode();
             String url = path + "/" + siteNode.getId();
             xb.writeAnchor(url, siteNode.getTitle(), null, siteNode.getDescription());
             xb.closeElement("li");

@@ -38,8 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -83,9 +82,17 @@ public class Dispatcher {
         List<SiteNode> nodeList = rootNode.getChildNodes();
         String[] fragments = StringUtils.split(originalPath, '/');
 
-        visitNodesInPath(path, tree, nodeList, fragments, 0);
+        List<String> fragmentsAsList = Arrays.asList(fragments);
+        ListIterator<String> fragmentsIterator = fragmentsAsList.listIterator();
+
+        visitNodesInPath(path, tree, nodeList, fragmentsIterator);
 
         if (path.isEmpty()) {
+            return null;
+        }
+
+        if (fragmentsIterator.hasNext()) {
+            logger.debug("Not all fragments matched");
             return null;
         }
 
@@ -118,46 +125,48 @@ public class Dispatcher {
     private void visitNodesInPath(List<SiteNodeInstance> path,
                                   List<SiteNodeInstance> tree,
                                   List<SiteNode> siteNodes,
-                                  String[] fragments,
-                                  int fragmentIndex) {
-        if (fragmentIndex >= fragments.length) {
-            logger.debug("Stopping recursion.");
+                                  ListIterator<String> fragmentsIterator) {
+        if (!fragmentsIterator.hasNext()) {
+            logger.debug("Beyond available fragments. Switching to visitNodesOutsidePath().");
+            visitNodesOutsidePath(tree, siteNodes);
             return;
         }
 
-        String fragment = fragments[fragmentIndex];
+        String fragment = fragmentsIterator.next();
 
+        boolean visitedInPath = false;
         for (SiteNode siteNode : siteNodes) {
             // Wrap SiteNode in SiteNodeInstance
             SiteNodeInstance siteNodeInstance;
             if (fragment.equals(siteNode.getId())) {
-                siteNodeInstance = visitNodeInPath(path, fragments, fragmentIndex, siteNode);
+                siteNodeInstance = visitNodeInPath(path, fragmentsIterator, siteNode);
+                visitedInPath = true;
             } else {
                 siteNodeInstance = visitNodeOutsidePath(siteNode);
             }
             tree.add(siteNodeInstance);
         }
+        if (!visitedInPath) {
+            fragmentsIterator.previous();
+        }
     }
 
     private SiteNodeInstance visitNodeInPath(List<SiteNodeInstance> path,
-                                 String[] fragments,
-                                 int fragmentIndex,
+                                 ListIterator<String> fragmentsIterator,
                                  SiteNode siteNode) {
         SiteNodeInstance siteNodeInstance;
-        int recursiveFragmentIndex = fragmentIndex + 1;
         if (siteNode instanceof CrudNode) {
             CrudNode crudNode = (CrudNode) siteNode;
             String mode;
             String param;
-            if (fragmentIndex < fragments.length -1) {
-                String peek = fragments[fragmentIndex + 1];
+            if (fragmentsIterator.hasNext()) {
+                String peek = fragmentsIterator.next();
                 if (CrudNode.MODE_NEW.equals(peek)) {
                     mode = CrudNode.MODE_NEW;
                     param = null;
                 } else {
                     mode = CrudNode.MODE_DETAIL;
                     param = peek;
-                    recursiveFragmentIndex = fragmentIndex + 2;
                 }
             } else {
                 mode = CrudNode.MODE_SEARCH;
@@ -175,8 +184,7 @@ public class Dispatcher {
 
         // visit recursively
         visitNodesInPath(path, siteNodeInstance.getChildNodeInstances(),
-                siteNodeInstance.getChildNodes(), fragments,
-                recursiveFragmentIndex);
+                siteNodeInstance.getChildNodes(), fragmentsIterator);
 
         return siteNodeInstance;
     }

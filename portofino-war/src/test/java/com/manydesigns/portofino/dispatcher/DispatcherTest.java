@@ -31,10 +31,12 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.model.site.CrudNode;
+import com.manydesigns.portofino.model.site.RootNode;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.navigation.Navigation;
 
 import java.util.Collections;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -159,11 +161,29 @@ public class DispatcherTest extends AbstractPortofinoTest {
                 dispatch.getSiteNodeInstancePath();
         assertEquals(1, siteNodeInstancePath.length);
 
-        CrudNodeInstance siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[0];
-        SiteNode siteNode = model.getRootNode().getChildNodes().get(0);
+        // nodo /project
+        List<SiteNodeInstance> tree = dispatch.getNavigationNodeInstances();
+        assertNotNull(tree);
+        assertEquals(1, tree.size());
+
+        CrudNodeInstance siteNodeInstance = (CrudNodeInstance) tree.get(0);
+        assertEquals(siteNodeInstancePath[0], siteNodeInstance);
+        RootNode rootNode = model.getRootNode();
+        CrudNode siteNode = (CrudNode) rootNode.getChildNodes().get(0);
         assertEquals(siteNode, siteNodeInstance.getSiteNode());
         assertEquals(CrudNode.MODE_DETAIL, siteNodeInstance.getMode());
         assertEquals("10", siteNodeInstance.getPk());
+
+        // nodo issues
+        tree = siteNodeInstance.getChildNodeInstances();
+        assertNotNull(tree);
+        assertEquals(1, tree.size());
+
+        siteNodeInstance = (CrudNodeInstance) tree.get(0);
+        siteNode = (CrudNode) siteNode.getDetailChildNodes().get(0);
+        assertEquals(siteNode, siteNodeInstance.getSiteNode());
+        assertEquals(CrudNode.MODE_SEARCH, siteNodeInstance.getMode());
+        assertNull(siteNodeInstance.getPk());
 
         Navigation navigation =
                 new Navigation(application, dispatch, Collections.EMPTY_LIST);
@@ -267,13 +287,13 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(2, siteNodeInstancePath.length);
 
         CrudNodeInstance siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[0];
-        SiteNode expected = model.getRootNode().getChildNodes().get(0);
+        CrudNode expected = (CrudNode) model.getRootNode().getChildNodes().get(0);
         assertEquals(expected, siteNodeInstance.getSiteNode());
         assertEquals(CrudNode.MODE_DETAIL, siteNodeInstance.getMode());
         assertEquals("10", siteNodeInstance.getPk());
 
         siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[1];
-        expected = ((CrudNode)expected).getChildNodes().get(0);
+        expected = (CrudNode) expected.getDetailChildNodes().get(0);
         assertEquals(expected, siteNodeInstance.getSiteNode());
         assertEquals(CrudNode.MODE_DETAIL, siteNodeInstance.getMode());
         assertEquals("20", siteNodeInstance.getPk());

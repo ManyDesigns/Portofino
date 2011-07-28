@@ -707,7 +707,7 @@ public class CrudAction extends AbstractActionBean {
 
     protected void setupEmbeddedChildren() {
         embeddedChildren = new ArrayList<String>();
-        for(SiteNode node : crudNode.getChildNodes()) {
+        for(SiteNode node : siteNodeInstance.getChildNodes()) {
             if(node instanceof EmbeddableNode) {
                 embeddedChildren.add(dispatch.getOriginalPath() + "/" + node.getId());
             }
