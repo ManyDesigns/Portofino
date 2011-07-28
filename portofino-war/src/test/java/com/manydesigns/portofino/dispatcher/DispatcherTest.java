@@ -47,6 +47,7 @@ import java.util.List;
 public class DispatcherTest extends AbstractPortofinoTest {
 
     public static final String CRUD_ACTION = "/Crud.action";
+    public static final String PORTLET_ACTION = "/Portlet.action";
 
     Dispatcher dispatcher;
 
@@ -103,8 +104,11 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertFalse(navigationNode.isEnabled());
 */
         String htmlOutput = elementToString(navigation);
-        assertEquals("<ul><li class=\"selected\"><a href=\"/projects\" title=\"projects\">projects</a></li></ul>",
-                     htmlOutput);
+        assertEquals("<ul><li class=\"selected\">" +
+                "<a href=\"/projects\" title=\"projects\">projects</a></li>" +
+                "</ul><hr /><ul><li><a href=\"/projects/report\" " +
+                "title=\"report description\">report title</a></li></ul>",
+                htmlOutput);
     }
 
     public void testProjectNew() {
@@ -128,6 +132,52 @@ public class DispatcherTest extends AbstractPortofinoTest {
         
         Navigation navigation =
                 new Navigation(application, dispatch, Collections.EMPTY_LIST);
+        /*
+        List<NavigationNode> rootNodes = navigation.getRootNodes();
+
+        // Navigation node per /projects
+        assertEquals(1, rootNodes.size());
+        NavigationNode navigationNode = rootNodes.get(0);
+        assertEquals("/projects", navigationNode.getUrl());
+        assertEquals(siteNode, navigationNode.getSiteNode());
+        assertTrue(navigationNode.isEnabled());
+
+        // Navigation node per /projects/tickets
+        assertEquals(1, navigationNode.getChildNodes().size());
+        navigationNode = navigationNode.getChildNodes().get(0);
+        assertEquals("/projects/tickets", navigationNode.getUrl());
+        siteNode = siteNode.getChildNodes().get(0);
+        assertEquals(siteNode, navigationNode.getSiteNode());
+        assertFalse(navigationNode.isEnabled());
+        */
+    }
+
+    public void testProjectReport() {
+        String originalPath = "/projects/report";
+        req.setServletPath(originalPath);
+        Dispatch dispatch = dispatcher.createDispatch(req);
+        assertNotNull(dispatch);
+
+        assertEquals(originalPath, dispatch.getOriginalPath());
+        assertEquals(PORTLET_ACTION, dispatch.getRewrittenPath());
+
+        SiteNodeInstance[] siteNodeInstancePath =
+                dispatch.getSiteNodeInstancePath();
+        assertEquals(2, siteNodeInstancePath.length);
+
+        CrudNodeInstance siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[0];
+        SiteNode siteNode = model.getRootNode().getChildNodes().get(0);
+        assertEquals(siteNode, siteNodeInstance.getSiteNode());
+        assertEquals(CrudNode.MODE_SEARCH, siteNodeInstance.getMode());
+        assertNull(siteNodeInstance.getPk());
+
+        SiteNodeInstance reportNodeInstance = siteNodeInstancePath[1];
+        SiteNode reportNode = siteNode.getChildNodes().get(0);
+        assertEquals("report", reportNode.getId());
+        assertEquals(reportNode, reportNodeInstance.getSiteNode());
+        assertNull(reportNodeInstance.getMode());
+        assertNull(siteNodeInstance.getPk());
+
         /*
         List<NavigationNode> rootNodes = navigation.getRootNodes();
 

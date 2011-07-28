@@ -164,6 +164,10 @@ public class Dispatcher {
                 if (CrudNode.MODE_NEW.equals(peek)) {
                     mode = CrudNode.MODE_NEW;
                     param = null;
+                } else if (matchSearchChildren(siteNode, peek)) {
+                    mode = CrudNode.MODE_SEARCH;
+                    param = null;
+                    fragmentsIterator.previous();
                 } else {
                     mode = CrudNode.MODE_DETAIL;
                     param = peek;
@@ -187,6 +191,15 @@ public class Dispatcher {
                 siteNodeInstance.getChildNodes(), fragmentsIterator);
 
         return siteNodeInstance;
+    }
+
+    private boolean matchSearchChildren(SiteNode siteNode, String peek) {
+        for (SiteNode current : siteNode.getChildNodes()) {
+            if (peek.equals(current.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

@@ -51,7 +51,6 @@ public class PortletNode extends SiteNode implements EmbeddableNode {
 
     protected String name;
     protected String type;
-    protected String title;
     protected String legend;
     protected String database;
     protected String query;
@@ -119,15 +118,6 @@ public class PortletNode extends SiteNode implements EmbeddableNode {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    @XmlAttribute(required = true)
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     @XmlAttribute(required = true)

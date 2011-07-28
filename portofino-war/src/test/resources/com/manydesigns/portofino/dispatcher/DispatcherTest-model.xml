@@ -75,6 +75,17 @@
                         <property name="description"/>
                     </properties>
                 </crud>
+                <childNodes>
+                    <portletNode id="report"
+                                 title="report title"
+                                 description="report description"
+                                 name="report"
+                                 type=""
+                                 legend="report legend"
+                                 database="test-database"
+                                 query="select project_id, count(*) from public.tickets group by project_id"
+                                 urlExpression="http://www.manydesigns.com/"/>
+                </childNodes>
                 <detailChildNodes>
                     <crudNode description="tickets" id="tickets" title="tickets">
                         <crud name="tickets"
