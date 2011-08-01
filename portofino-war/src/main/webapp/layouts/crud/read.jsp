@@ -36,13 +36,12 @@
                 </c:if>
             </div>
         </c:if>
-        <stripes:submit id="Table_edit" name="edit" value="Edit"/>
-        <stripes:submit id="Table_delete" name="delete" value="Delete"
-                  onclick="return confirm ('Are you sure?');"/>
-        <stripes:submit id="Table_duplicate" name="duplicate" value="Duplicate" disabled="true"/>
-        <stripes:submit id="Table_print" name="print" value="Print" disabled="true"/>
-        <stripes:submit id="Table_exportExcel" name="exportReadExcel" value="Excel" disabled="false"/>
-        <stripes:submit id="Table_exportPdf" name="exportReadPdf" value="Pdf" disabled="false"/>
+        <stripes:submit name="edit" value="Edit" class="portletButton"/>
+        <stripes:submit name="delete" value="Delete" onclick="return confirm ('Are you sure?');" class="portletButton"/>
+        <stripes:submit name="duplicate" value="Duplicate" disabled="true" class="portletButton"/>
+        <stripes:submit name="print" value="Print" disabled="true" class="portletButton"/>
+        <stripes:submit name="exportReadExcel" value="Excel" disabled="true" class="portletButton"/>
+        <stripes:submit name="exportReadPdf" value="Pdf" disabled="false" class="portletButton"/>
         <!-- TODO custom buttons -->
     </stripes:layout-component>
 </stripes:layout-render>

@@ -12,12 +12,26 @@ a:hover {
 }
 
 /*******************************************************************************
-Tables withon fieldsets have too much margin-bottom
+Tables within fieldsets have too much margin-bottom
 *******************************************************************************/
 
 fieldset table {
     margin-bottom: 0;
 }
+
+/*******************************************************************************
+jQuery ui smoothness theme overrides
+*******************************************************************************/
+
+.ui-widget { font-family: Arial,sans-serif; font-size: 1em; }
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Arial,sans-serif; font-size: 1em; }
+
+.ui-button-text-only .ui-button-text { padding: .1em .5em; }
+.ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { padding: 0; text-indent: -9999999px; }
+.ui-button-text-icon-primary .ui-button-text, .ui-button-text-icons .ui-button-text { padding: .1em 0.5em .1em 1.6em; }
+input.ui-button { padding: .1em .5em; }
+
+button.ui-button-icon-only { width: 1.6em; }
 
 
 /*******************************************************************************
@@ -127,20 +141,29 @@ Portlet
 .portletHeader {}
 
 /* page hader/footer buttons*/
-div.portletPageHeader input.ui-button, div.portletPageFooter input.ui-button {
+input.portletPageButton, input.portletPageButton, .portletHeaderButtons button {
     border: 1px solid #D6D6E6;
     background: #EEEEFF;
 }
-div.portletPageHeader input.ui-button.ui-state-hover, div.portletPageFooter input.ui-button.ui-state-hover {
+input.portletPageButton.ui-button.ui-state-hover, input.portletPageButton.ui-button.ui-state-hover, .portletHeaderButtons button.ui-state-hover {
     border: 1px solid #7171B0;
     background: #65a7db url(images/ui-bg_glass_75_a8a8e6_1x400.png) 50% 50% repeat-x;
     font-weight: normal; color: #212121;
 }
 
 .portletTitle {
+    float: left;
+}
+
+.portletTitle h1 {
     margin: 0;
     color: #166BBF;
 }
+
+.portletHeaderButtons {
+    float: right;
+}
+
 
 .portletBody {}
 

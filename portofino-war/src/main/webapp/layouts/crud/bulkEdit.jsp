@@ -5,8 +5,8 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><stripes:layout-render name="/layouts/portlet-page-definition.jsp">
     <stripes:layout-component name="portletPageHeader">
-        <stripes:submit name="bulkUpdate" value="Update"/>
-        <stripes:submit name="cancel" value="Cancel"/>
+        <stripes:submit name="bulkUpdate" value="Update" class="portletPageButton"/>
+        <stripes:submit name="cancel" value="Cancel" class="portletPageButton"/>
         <div class="breadcrumbs">
             <div class="inner">
                 <mde:write name="breadcrumbs"/>
@@ -33,7 +33,7 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="portletPageFooter">
-        <stripes:submit name="bulkUpdate" value="Update"/>
-        <stripes:submit name="cancel" value="Cancel"/>
+        <stripes:submit name="bulkUpdate" value="Update" class="portletPageButton"/>
+        <stripes:submit name="cancel" value="Cancel" class="portletPageButton"/>
     </stripes:layout-component>
 </stripes:layout-render>

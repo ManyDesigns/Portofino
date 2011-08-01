@@ -14,5 +14,14 @@ YAHOO.example.fixSideBar = function() {
 };
 
 $(function() {
-    $("input:submit, button").button();
+    $("input:submit.portletPageButton, button.portletPageButton").button();
+    
+    $("input:submit.portletButton, button.portletButton").button();
+
+    $("input:submit.wrench, button.wrench").button({
+            icons: {
+                primary: "ui-icon-wrench"
+            },
+            text: false
+        });
 });

@@ -12,6 +12,6 @@
         <mde:write name="actionBean" property="jfreeChartInstance"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
-        <input type="submit" name="pdf" value="Pdf"/>
+        <input class="portletButton" type="submit" name="pdf" value="Pdf"/>
     </stripes:layout-component>
 </stripes:layout-render>

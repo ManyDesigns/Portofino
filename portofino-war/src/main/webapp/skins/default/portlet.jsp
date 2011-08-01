@@ -7,11 +7,19 @@
     <div class="portlet">
         <div class="portletHeader">
             <stripes:layout-component name="portletHeader">
-                <h1 class="portletTitle">
-                    <stripes:layout-component name="portletTitle">
-                        portletTitle
-                    </stripes:layout-component>
-                </h1>
+                <div class="yui-g">
+                    <div class="portletTitle">
+                        <h1>
+                        <stripes:layout-component name="portletTitle">
+                            portletTitle
+                        </stripes:layout-component>
+                        </h1>
+                    </div>
+                    <div class="portletHeaderButtons">
+                        <button class="wrench">Prova</button>
+                    </div>
+                </div>
+
             </stripes:layout-component>
         </div>
         <div class="portletBody">
