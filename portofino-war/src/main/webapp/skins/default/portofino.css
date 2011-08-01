@@ -12,6 +12,15 @@ a:hover {
 }
 
 /*******************************************************************************
+Tables withon fieldsets have too much margin-bottom
+*******************************************************************************/
+
+fieldset table {
+    margin-bottom: 0;
+}
+
+
+/*******************************************************************************
 Header / footer
 *******************************************************************************/
 
@@ -47,6 +56,10 @@ Body and content layout
     border: 3px solid #65a7db;
 }
 
+/*******************************************************************************
+Breadcrumbs
+*******************************************************************************/
+
 div.breadcrumbs {
     padding: 0.5em 1em;
     display: inline;
@@ -62,7 +75,8 @@ a.breadcrumb-item {
 }
 
 span.breadcrumb-item {
-    color: #808080;
+/*    color: #808080; */
+    color: #333333;
     font-weight: bold;
 }
 
@@ -112,6 +126,17 @@ Portlet
 
 .portletHeader {}
 
+/* page hader/footer buttons*/
+div.portletPageHeader input.ui-button, div.portletPageFooter input.ui-button {
+    border: 1px solid #D6D6E6;
+    background: #EEEEFF;
+}
+div.portletPageHeader input.ui-button.ui-state-hover, div.portletPageFooter input.ui-button.ui-state-hover {
+    border: 1px solid #7171B0;
+    background: #65a7db url(images/ui-bg_glass_75_a8a8e6_1x400.png) 50% 50% repeat-x;
+    font-weight: normal; color: #212121;
+}
+
 .portletTitle {
     margin: 0;
     color: #166BBF;
@@ -120,6 +145,7 @@ Portlet
 .portletBody {}
 
 .portletFooter {}
+
 
 /*******************************************************************************
 Side bar

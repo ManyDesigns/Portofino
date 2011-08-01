@@ -12,3 +12,7 @@ YAHOO.example.fixSideBar = function() {
     }
     ;
 };
+
+$(function() {
+    $("input:submit, button").button();
+});
