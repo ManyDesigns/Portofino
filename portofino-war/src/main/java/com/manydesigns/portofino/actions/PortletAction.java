@@ -6,8 +6,12 @@ import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.CrudNode;
+import com.manydesigns.portofino.model.site.EmbeddableNode;
+import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.util.ShortNameUtils;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.StripesConstants;
 
 import java.util.ArrayList;
@@ -85,5 +89,19 @@ public class PortletAction extends AbstractActionBean {
 
     public void setResultSetNavigation(ResultSetNavigation resultSetNavigation) {
         this.resultSetNavigation = resultSetNavigation;
+    }
+
+    protected void setupPortlets(String myself, SiteNodeInstance siteNodeInstance) {
+        portlets.add(myself);
+        for(SiteNode node : siteNodeInstance.getChildNodes()) {
+            if(node instanceof EmbeddableNode) {
+                portlets.add(dispatch.getOriginalPath() + "/" + node.getId());
+            }
+        }
+    }
+
+    protected Resolution forwardToPortletPage(String nodeJsp, SiteNodeInstance siteNodeInstance) {
+        setupPortlets(nodeJsp, siteNodeInstance);
+        return new ForwardResolution("/layouts/portlet-page.jsp");
     }
 }

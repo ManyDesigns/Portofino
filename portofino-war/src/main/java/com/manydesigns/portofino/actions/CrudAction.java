@@ -56,8 +56,6 @@ import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
 import com.manydesigns.portofino.model.site.CrudNode;
-import com.manydesigns.portofino.model.site.EmbeddableNode;
-import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.site.crud.Button;
 import com.manydesigns.portofino.model.site.crud.Crud;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
@@ -273,9 +271,7 @@ public class CrudAction extends PortletAction {
 
         setupReturnToParentTarget();
 
-        setupPortlets("/layouts/crud/search.jsp");
-
-        return new ForwardResolution("/layouts/portlet-page.jsp");
+        return forwardToPortletPage("/layouts/crud/search.jsp", siteNodeInstance);
     }
 
     public Resolution embeddedSearch() {
@@ -324,9 +320,8 @@ public class CrudAction extends PortletAction {
 
         setupReturnToParentTarget();
 
-        setupPortlets("/layouts/crud/read.jsp");
-
-        return new ForwardResolution("/layouts/portlet-page.jsp");
+        String nodeJsp = "/layouts/crud/read.jsp";
+        return forwardToPortletPage(nodeJsp, siteNodeInstance);
     }
 
     protected void refreshBlobDownloadHref() {
@@ -666,15 +661,6 @@ public class CrudAction extends PortletAction {
                 Locale.getDefault(), baseUrl + "/" + objPk, false)
                 .addParameter("searchString", searchString)
                 .toString();
-    }
-
-    protected void setupPortlets(String myself) {
-        portlets.add(myself);
-        for(SiteNode node : siteNodeInstance.getChildNodes()) {
-            if(node instanceof EmbeddableNode) {
-                portlets.add(dispatch.getOriginalPath() + "/" + node.getId());
-            }
-        }
     }
 
     protected void setupSearchForm() {

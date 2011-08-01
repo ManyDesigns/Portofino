@@ -31,15 +31,15 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.DocumentNode;
+import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.text.MessageFormat;
+import java.io.InputStream;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -61,44 +61,43 @@ public class DocumentAction extends PortletAction {
     @InjectSiteNodeInstance
     public SiteNodeInstance siteNodeInstance;
 
+    public DocumentNode documentNode;
+
     public static final Logger logger =
             LoggerFactory.getLogger(DocumentAction.class);
 
+    //**************************************************************************
+    // Setup
+    //**************************************************************************
+
+    @Before
+    public void prepare() {
+        documentNode = (DocumentNode) siteNodeInstance.getSiteNode();
+    }
+
+    //**************************************************************************
+    // Handlers
+    //**************************************************************************
+
+
     @DefaultHandler
     public Resolution execute() throws Exception {
-        DocumentNode node = (DocumentNode) siteNodeInstance.getSiteNode();
-        String fileName = node.getFileName();
+        String fileName = documentNode.getFileName();
+        InputStream is = null;
         try {
-            content = convertStreamToString(
-                    context.getServletContext().getResourceAsStream(fileName));
-        } catch (IOException e) {
-            logger.warn(MessageFormat.format("IOException opening file {0}",
-                    fileName));
+            is = context.getServletContext().getResourceAsStream(fileName);
+            if (is != null) {
+                content = IOUtils.toString(is, "UTF-8");
+            } else {
+                logger.warn("Cannot get stream for file: {}", fileName);
+                content = "There was a problem loading this content.";
+            }
+        } finally {
+            IOUtils.closeQuietly(is);
         }
-        return new ForwardResolution("/layouts/document.jsp");
+        return forwardToPortletPage("/layouts/document.jsp", siteNodeInstance);
     }
 
-
-    private String convertStreamToString(InputStream is) throws IOException {
-        if (is != null) {
-            Writer writer = new StringWriter();
-            char[] buffer = new char[1024];
-            try {
-                Reader reader = new BufferedReader(
-                        new InputStreamReader(is, "UTF-8"));
-                int n;
-                while ((n = reader.read(buffer)) != -1) {
-                    writer.write(buffer, 0, n);
-                }
-            }
-            finally {
-                is.close();
-            }
-            return writer.toString();
-        } else {
-            return "";
-        }
-    }
 
     //**************************************************************************
     // Getters/setters
@@ -111,5 +110,9 @@ public class DocumentAction extends PortletAction {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public DocumentNode getDocumentNode() {
+        return documentNode;
     }
 }
