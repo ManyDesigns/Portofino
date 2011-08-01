@@ -6,6 +6,7 @@ import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.CrudNode;
+import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.controller.StripesConstants;
 
@@ -17,6 +18,12 @@ public class PortletAction extends AbstractActionBean {
     @InjectDispatch
     public Dispatch dispatch;
     public String returnToParentTarget;
+
+    //--------------------------------------------------------------------------
+    // Navigation
+    //--------------------------------------------------------------------------
+
+    protected ResultSetNavigation resultSetNavigation;
 
     public boolean isEmbedded() {
         return getContext().getRequest().getAttribute(
@@ -70,5 +77,13 @@ public class PortletAction extends AbstractActionBean {
 
     public boolean isMultipartRequest() {
         return false;
+    }
+
+    public ResultSetNavigation getResultSetNavigation() {
+        return resultSetNavigation;
+    }
+
+    public void setResultSetNavigation(ResultSetNavigation resultSetNavigation) {
+        this.resultSetNavigation = resultSetNavigation;
     }
 }

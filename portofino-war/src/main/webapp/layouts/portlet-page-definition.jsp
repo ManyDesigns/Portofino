@@ -6,7 +6,7 @@
 %><stripes:layout-definition><%--
 --%><stripes:layout-render name="/skins/${skin}/common-with-navigation.jsp">
         <stripes:layout-component name="content">
-            <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.AbstractActionBean"/>
+            <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
             <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post"
                           enctype="${actionBean.multipartRequest ? 'multipart/form-data' : 'application/x-www-form-urlencoded'}">
                     <div class="portletPageHeader">
@@ -19,6 +19,26 @@
                                     <mde:write name="breadcrumbs"/>
                                 </div>
                             </div>
+                            <c:set var="resultSetNavigation" scope="request" value="${actionBean.resultSetNavigation}"/>
+                            <c:if test="${not empty resultSetNavigation}">
+                                <div class="resultSetNavigation">
+                                    <c:if test="${not empty resultSetNavigation.firstUrl}">
+                                        <stripes:link id="first" href="${resultSetNavigation.firstUrl}">first</stripes:link>
+                                        <stripes:link id="previous" href="${resultSetNavigation.previousUrl}">previous</stripes:link>
+                                    </c:if>
+                                    <c:if test="${empty resultSetNavigation.firstUrl}">
+                                        <span class="disabled">first</span> <span class="disabled">previous</span>
+                                    </c:if>
+                                    <c:out value="${resultSetNavigation.position + 1}"/> of <c:out value="${resultSetNavigation.size}"/>
+                                    <c:if test="${not empty resultSetNavigation.lastUrl}">
+                                        <stripes:link id="next" href="${resultSetNavigation.nextUrl}">next</stripes:link>
+                                        <stripes:link id="last" href="${resultSetNavigation.lastUrl}">last</stripes:link>
+                                    </c:if>
+                                    <c:if test="${empty resultSetNavigation.lastUrl}">
+                                        <span class="disabled">next</span> <span class="disabled">last</span>
+                                    </c:if>
+                                </div>
+                            </c:if>
                         </stripes:layout-component>
                     </div>
                     <div id="portletPageBody">

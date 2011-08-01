@@ -163,6 +163,11 @@ input.portletPageButton.ui-button.ui-state-hover, input.portletPageButton.ui-but
     float: right;
 }
 
+.portletPageHeader .resultSetNavigation {
+    float: right;
+    padding: 0.2em 0;
+}
+
 
 .portletBody {}
 
@@ -198,36 +203,6 @@ div#sidebar ul li.path, div#sidebar ul li.path a {
     color: black;
     background-color: #eef;
     font-weight: bold;
-}
-
-
-/*******************************************************************************
-Tabs bar
-*******************************************************************************/
-
-.tabs-bar-top {
-    padding:0.5em 1em;
-    background-color: #ffe;
-    border-bottom: 1px solid gray;
-}
-
-ul.tabs {
-    display: block;
-    padding: 0.25em 0 0 0;
-    margin: 0;
-}
-
-ul.tabs li {
-    display: inline;
-    padding: 0.5em 0.5em;
-    margin: 0 1em 0 0;
-}
-
-ul.tabs li.selected {
-    font-weight: bold;
-    background-color: #eed;
-    border: 1px solid gray;
-    border-bottom-width: 0;
 }
 
 /*******************************************************************************

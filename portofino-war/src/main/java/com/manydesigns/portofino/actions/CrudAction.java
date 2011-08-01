@@ -60,6 +60,7 @@ import com.manydesigns.portofino.model.site.EmbeddableNode;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.site.crud.Button;
 import com.manydesigns.portofino.model.site.crud.Crud;
+import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
@@ -146,17 +147,6 @@ public class CrudAction extends PortletAction {
 
     public List objects;
     public Object object;
-
-    //--------------------------------------------------------------------------
-    // Pagination objects
-    //--------------------------------------------------------------------------
-
-    public int position;
-    public int size;
-    public String firstUrl;
-    public String previousUrl;
-    public String nextUrl;
-    public String lastUrl;
 
     //**************************************************************************
     // Logging
@@ -636,17 +626,23 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     protected void setupPagination() {
-        position = objects.indexOf(object);
-        size = objects.size();
+        resultSetNavigation = new ResultSetNavigation();
+        int position = objects.indexOf(object);
+        int size = objects.size();
+        resultSetNavigation.setPosition(position);
+        resultSetNavigation.setSize(size);
         String baseUrl = calculateBaseSearchUrl();
         if(position >= 0) {
             if(position > 0) {
-                firstUrl = generateObjectUrl(baseUrl, 0);
-                previousUrl = generateObjectUrl(baseUrl, position - 1);
+                resultSetNavigation.setFirstUrl(generateObjectUrl(baseUrl, 0));
+                resultSetNavigation.setPreviousUrl(
+                        generateObjectUrl(baseUrl, position - 1));
             }
             if(position < size - 1) {
-                lastUrl = generateObjectUrl(baseUrl, size - 1);
-                nextUrl = generateObjectUrl(baseUrl, position + 1);
+                resultSetNavigation.setLastUrl(
+                        generateObjectUrl(baseUrl, size - 1));
+                resultSetNavigation.setNextUrl(
+                        generateObjectUrl(baseUrl, position + 1));
             }
         }
     }
@@ -1414,30 +1410,6 @@ public class CrudAction extends PortletAction {
 
     public void setObject(Object object) {
         this.object = object;
-    }
-
-    public String getFirstUrl() {
-        return firstUrl;
-    }
-
-    public String getPreviousUrl() {
-        return previousUrl;
-    }
-
-    public String getNextUrl() {
-        return nextUrl;
-    }
-
-    public String getLastUrl() {
-        return lastUrl;
-    }
-
-    public int getPosition() {
-        return position;
-    }
-
-    public int getSize() {
-        return size;
     }
 
     public boolean isMultipartRequest() {
