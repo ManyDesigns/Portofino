@@ -11,9 +11,7 @@
                           enctype="${actionBean.multipartRequest ? 'multipart/form-data' : 'application/x-www-form-urlencoded'}">
                     <div class="portletPageHeader">
                         <stripes:layout-component name="portletPageHeader">
-                            <c:if test="${empty actionBean.returnToParentTarget}">
-                                <stripes:submit name="returnToParent" value="<< Return to search" class="portletPageButton"/>
-                            </c:if><c:if test="${not empty actionBean.returnToParentTarget}">
+                            <c:if test="${not empty actionBean.returnToParentTarget}">
                                 <stripes:submit name="returnToParent" value="<< Return to ${actionBean.returnToParentTarget}" class="portletPageButton"/>
                             </c:if>
                             <div class="breadcrumbs">

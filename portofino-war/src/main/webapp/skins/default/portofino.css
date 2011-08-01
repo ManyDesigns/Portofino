@@ -75,7 +75,6 @@ Breadcrumbs
 *******************************************************************************/
 
 div.breadcrumbs {
-    padding: 0.5em 1em;
     display: inline;
 }
 
@@ -104,7 +103,7 @@ div#portletPageBody {
 
 .portletPageHeader, .portletPageFooter {
     background-color: #eef;
-    padding: 0.5em;
+    padding: 0.5em 1em;
     clear: both;
 }
 

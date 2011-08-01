@@ -33,7 +33,7 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.jfreechart.JFreeChartInstance;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
-import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.actions.PortletAction;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
@@ -72,7 +72,7 @@ import java.io.InputStream;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @UrlBinding("/chart.action")
-public class ChartAction extends AbstractActionBean {
+public class ChartAction extends PortletAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -167,7 +167,7 @@ public class ChartAction extends AbstractActionBean {
             return new ForwardResolution("/layouts/chart/chart.jsp");
         } else {
             setupReturnToParentTarget();
-            portlets.add("/layouts/chart/chart.jsp");
+            getPortlets().add("/layouts/chart/chart.jsp");
             return new ForwardResolution("/layouts/portlet-page.jsp");
         }
     }
