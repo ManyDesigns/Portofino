@@ -5,10 +5,16 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
-<div class="embedded-content">
-    <h1><c:out value="${actionBean.crud.searchTitle}"/></h1>
-    <div class="search_results">
-        <mde:write name="actionBean" property="tableForm"/>
-        <stripes:link href="${actionBean.dispatch.originalPath}">&gt;&gt; Advanced search</stripes:link>
-    </div>
-</div>
+<stripes:layout-render name="/skins/${skin}/portlet.jsp">
+    <stripes:layout-component name="portletTitle">
+        <c:out value="${actionBean.crud.searchTitle}"/>
+    </stripes:layout-component>
+    <stripes:layout-component name="portletBody">
+        <div class="embedded-content">
+            <div class="search_results">
+                <mde:write name="actionBean" property="tableForm"/>
+                <stripes:link href="${actionBean.dispatch.originalPath}">&gt;&gt; Advanced search</stripes:link>
+            </div>
+        </div>
+    </stripes:layout-component>
+</stripes:layout-render>

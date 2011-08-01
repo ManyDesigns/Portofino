@@ -113,7 +113,6 @@ public class CrudAction extends AbstractActionBean {
 
     public CrudNode crudNode;
     public Crud crud;
-    public List<String> embeddedChildren;
 
     public ClassAccessor classAccessor;
     public Table baseTable;
@@ -284,9 +283,9 @@ public class CrudAction extends AbstractActionBean {
 
         setupReturnToParentTarget();
 
-        setupEmbeddedChildren();
+        setupPortlets("/layouts/crud/search.jsp");
 
-        return new ForwardResolution("/layouts/crud/search.jsp");
+        return new ForwardResolution("/layouts/portlet-page.jsp");
     }
 
     public Resolution embeddedSearch() {
@@ -335,9 +334,9 @@ public class CrudAction extends AbstractActionBean {
 
         setupReturnToParentTarget();
 
-        setupEmbeddedChildren();
+        setupPortlets("/layouts/crud/read.jsp");
 
-        return new ForwardResolution("/layouts/crud/read.jsp");
+        return new ForwardResolution("/layouts/portlet-page.jsp");
     }
 
     protected void refreshBlobDownloadHref() {
@@ -673,11 +672,11 @@ public class CrudAction extends AbstractActionBean {
                 .toString();
     }
 
-    protected void setupEmbeddedChildren() {
-        embeddedChildren = new ArrayList<String>();
+    protected void setupPortlets(String myself) {
+        portlets.add(myself);
         for(SiteNode node : siteNodeInstance.getChildNodes()) {
             if(node instanceof EmbeddableNode) {
-                embeddedChildren.add(dispatch.getOriginalPath() + "/" + node.getId());
+                portlets.add(dispatch.getOriginalPath() + "/" + node.getId());
             }
         }
     }
@@ -1447,9 +1446,5 @@ public class CrudAction extends AbstractActionBean {
 
     public String getMode() {
         return siteNodeInstance.getMode();
-    }
-
-    public List<String> getEmbeddedChildren() {
-        return embeddedChildren;
     }
 }

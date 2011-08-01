@@ -49,6 +49,11 @@ Body and content layout
 
 div.breadcrumbs {
     padding: 0.5em 1em;
+    display: inline;
+}
+
+div.breadcrumbs .inner {
+    display: inline;
 }
 
 a.breadcrumb-item {
@@ -61,10 +66,60 @@ span.breadcrumb-item {
     font-weight: bold;
 }
 
-div#inner-content {
-    padding: 0 1em;
+/*******************************************************************************
+Portlet page
+*******************************************************************************/
+
+div#portletPageBody {
+    padding: 1em;
 }
 
+.portletPageHeader, .portletPageFooter {
+    background-color: #eef;
+    padding: 0.5em;
+    clear: both;
+}
+
+.portletPageHeader {
+    border-bottom: 1px solid gray;
+}
+
+.portletPageFooter {
+    border-top: 1px solid gray;
+    margin-top: 1em;
+}
+
+/*******************************************************************************
+Portlet
+*******************************************************************************/
+
+.portletWrapper.first {
+    margin-top: 0;
+}
+
+.portletWrapper {
+    margin-top: 3em;
+}
+
+
+.portlet {}
+
+.portletHeader {
+    border-bottom: solid 3px #EEEEFF;
+    margin-bottom: 12px;
+    padding-bottom: 3px;
+}
+
+.portletHeader {}
+
+.portletTitle {
+    margin: 0;
+    color: #166BBF;
+}
+
+.portletBody {}
+
+.portletFooter {}
 
 /*******************************************************************************
 Side bar
@@ -126,26 +181,6 @@ ul.tabs li.selected {
     border: 1px solid gray;
     border-bottom-width: 0;
 }
-
-/*******************************************************************************
-Buttons bar
-*******************************************************************************/
-
-.buttons-bar-top, .buttons-bar-bottom {
-    background-color: #eef;
-    padding: 0.5em;
-    clear: both;
-}
-
-.buttons-bar-top {
-    border-bottom: 1px solid gray;
-}
-
-.buttons-bar-bottom {
-    border-top: 1px solid gray;
-    margin-top: 1em;
-}
-
 
 /*******************************************************************************
 Error/warning/info messages

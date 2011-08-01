@@ -1023,7 +1023,6 @@ Struttura dell'XML:
     </databases>
     <rootNode id="/" title="Portofino4" description="portofino 4" url="/">
         <childNodes>
-
             <documentNode id="homepage" title="Homepage" description="Homepage" fileName="skins/default/homepage.html" >
                 <permissions>
                     <allow>
@@ -1159,12 +1158,14 @@ Struttura dell'XML:
             <customNode id="Profile" title="Profile" description="Profile" url="/Profile.action">
                 <permissions>
                     <allow>
-
                         <group>registered</group>
                     </allow>
                 </permissions>
             </customNode>
-            <crudNode id="projects" title="Projects" description="Projects">
+            <crudNode id="projects"
+                      title="Projects"
+                      description="Projects"
+                      showInSideBar="true">
                 <crud name="projects"
                          variable="project"
                          table="redmine.redmine.projects"
@@ -1228,19 +1229,23 @@ Struttura dell'XML:
                         </property>
                     </properties>
                 </crud>
-                <childNodes>
+                <childNodes layoutContainer="1" layoutOrder="1">
                     <portletNode id="report"
                                  title="report title"
                                  description="report description"
+                                 showInSideBar="false"
                                  name="report"
                                  type=""
                                  legend="report legend"
                                  database="redmine"
                                  query="select project_id, count(*) from issues group by project_id"
-                                 urlExpression="/projects/%{key}"/>
+                                 urlExpression="/projects/%{key}"
+                                 layoutContainerInParent="1"
+                                 layoutOrderInParent="2"
+                            />
                 </childNodes>
-                <detailChildNodes>
-                    <crudNode id="issues" title="Issues" description="Issues">
+                <detailChildNodes layoutContainer="1" layoutOrder="1">
+                    <crudNode id="issues" title="Issues" description="Issues" showInSideBar="true">
                         <crud name="issue"
                                  variable="issue"
                                  table="redmine.redmine.issues"

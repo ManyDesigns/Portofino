@@ -62,7 +62,17 @@ public abstract class  SiteNode implements ModelObject {
     protected String title;
     protected String description;
     protected String url;
+    protected String layoutContainerInParent;
+    protected String layoutOrderInParent;
+    protected String layoutContainer;
+    protected String layoutOrder;
 
+    //**************************************************************************
+    // Actual fields
+    //**************************************************************************
+
+    protected Integer actualLayoutOrderInParent;
+    protected int actualLayoutOrder;
 
     //**************************************************************************
     // Constructors
@@ -84,6 +94,8 @@ public abstract class  SiteNode implements ModelObject {
         for (SiteNode childNode : childNodes) {
             childNode.reset();
         }
+        actualLayoutOrderInParent = null;
+        actualLayoutOrder = 0;
     }
 
     public void init(Model model) {
@@ -93,6 +105,12 @@ public abstract class  SiteNode implements ModelObject {
 
         for (SiteNode childNode : childNodes) {
             childNode.init(model);
+        }
+        if (layoutOrderInParent != null) {
+            actualLayoutOrderInParent = Integer.parseInt(layoutOrderInParent);
+        }
+        if(layoutOrder != null) {
+            actualLayoutOrder = Integer.parseInt(layoutOrder);
         }
     }
 
@@ -173,6 +191,45 @@ public abstract class  SiteNode implements ModelObject {
         this.url = url;
     }
 
+    @XmlAttribute(required = false)
+    public String getLayoutContainerInParent() {
+        return layoutContainerInParent;
+    }
+
+    public void setLayoutContainerInParent(String layoutContainerInParent) {
+        this.layoutContainerInParent = layoutContainerInParent;
+    }
+
+    @XmlAttribute(required = false)
+    public String getLayoutOrderInParent() {
+        return layoutOrderInParent;
+    }
+
+    public void setLayoutOrderInParent(String layoutOrderInParent) {
+        this.layoutOrderInParent = layoutOrderInParent;
+    }
+
+    @XmlAttribute(required = true)
+    public String getLayoutContainer() {
+        return layoutContainer;
+    }
+
+    public void setLayoutContainer(String layoutContainer) {
+        this.layoutContainer = layoutContainer;
+    }
+
+    @XmlAttribute(required = true)
+    public String getLayoutOrder() {
+        return layoutOrder;
+    }
+
+    public void setLayoutOrder(String layoutOrder) {
+        this.layoutOrder = layoutOrder;
+    }
+
+    /* TODO: spostare quaesto metodo nella classe che gestisce la logica
+    *  dei permessi. Lasciare le classi in in model il più possibile passive
+    **/
     public boolean isAllowed(List<String> groups) {
         boolean parentAllowed= true;
         if (parent != null){
@@ -187,5 +244,13 @@ public abstract class  SiteNode implements ModelObject {
             result = permissions.isAllowed(groups);
         }
         return result;
+    }
+
+    public Integer getActualLayoutOrderInParent() {
+        return actualLayoutOrderInParent;
+    }
+
+    public int getActualLayoutOrder() {
+        return actualLayoutOrder;
     }
 }

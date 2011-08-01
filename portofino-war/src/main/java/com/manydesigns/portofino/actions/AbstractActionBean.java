@@ -40,6 +40,9 @@ import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.controller.StripesConstants;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -54,6 +57,10 @@ public abstract class AbstractActionBean implements ActionBean {
     public final static String SUCCESS = "success";
 
     protected ActionBeanContext context;
+
+    //protected Map<String, List<String>> embeddedChildren
+
+    protected final List<String> portlets = new ArrayList<String>();
 
     @InjectDispatch
     public Dispatch dispatch;
@@ -104,4 +111,7 @@ public abstract class AbstractActionBean implements ActionBean {
         return returnToParentTarget;
     }
 
+    public List<String> getPortlets() {
+        return portlets;
+    }
 }

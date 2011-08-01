@@ -164,10 +164,11 @@ public class ChartAction extends AbstractActionBean {
         }
 
         if (isEmbedded()) {
-            return new ForwardResolution("/layouts/chart/embeddedChart.jsp");
+            return new ForwardResolution("/layouts/chart/chart.jsp");
         } else {
             setupReturnToParentTarget();
-            return new ForwardResolution("/layouts/chart/chart.jsp");
+            portlets.add("/layouts/chart/chart.jsp");
+            return new ForwardResolution("/layouts/portlet-page.jsp");
         }
     }
 

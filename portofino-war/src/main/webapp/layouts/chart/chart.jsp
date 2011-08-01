@@ -3,16 +3,15 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><stripes:layout-render name="/skins/${skin}/chart/common.jsp">
+%><stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.chart.ChartAction"/>
-    <stripes:layout-component name="buttons">
-        <c:if test="${not empty actionBean.returnToParentTarget}">
-            <stripes:submit name="returnToParent" value="<< Return to ${actionBean.returnToParentTarget}"/>
-        </c:if>
-        <stripes:submit name="pdf" value="Pdf"/>
+    <stripes:layout-component name="portletTitle">
+        <c:out value="${actionBean.chartNode.name}"/>
     </stripes:layout-component>
-    <stripes:layout-component name="innerContent">
-        <h1><c:out value="${actionBean.chartNode.name}"/></h1>
+    <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="jfreeChartInstance"/>
+    </stripes:layout-component>
+    <stripes:layout-component name="portletFooter">
+        <input type="submit" name="pdf" value="Pdf"/>
     </stripes:layout-component>
 </stripes:layout-render>

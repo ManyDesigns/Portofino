@@ -3,22 +3,12 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><stripes:layout-render name="/skins/${skin}/crud/common.jsp">
+%><stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
-    <stripes:layout-component name="buttons">
-        <c:if test="${not empty actionBean.returnToParentTarget}">
-            <stripes:submit id="Table_returnToParent" name="returnToParent" value="<< Return to ${actionBean.returnToParentTarget}"/>
-        </c:if>
-        <stripes:submit name="create" value="Create new"/>
-        <stripes:submit name="bulkEdit" value="Edit"/>
-        <stripes:submit name="bulkDelete" value="Delete" onclick="return confirm ('Are you sure?');"/>
-        <stripes:submit name="print" value="Print" disabled="true"/>
-        <stripes:submit name="exportSearchExcel" value="Excel" disabled="false"/>
-        <stripes:submit name="exportSearchPdf" value="Pdf" disabled="false"/>
-        <!-- TODO custom buttons -->
+    <stripes:layout-component name="portletTitle">
+        <c:out value="${actionBean.crud.searchTitle}"/>
     </stripes:layout-component>
-    <stripes:layout-component name="innerContent">
-        <h1><c:out value="${actionBean.crud.searchTitle}"/></h1>
+    <stripes:layout-component name="portletBody">
         <div class="yui-ge">
             <div class="yui-u first">
                 <div class="search_results">
@@ -36,9 +26,14 @@
             </div>
         </div>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
-
-        <c:forEach var="embeddedChild" items="${actionBean.embeddedChildren}">
-            <jsp:include page="${embeddedChild}" />
-        </c:forEach>
+    </stripes:layout-component>
+    <stripes:layout-component name="portletFooter">
+        <stripes:submit name="create" value="Create new"/>
+        <stripes:submit name="bulkEdit" value="Edit"/>
+        <stripes:submit name="bulkDelete" value="Delete" onclick="return confirm ('Are you sure?');"/>
+        <stripes:submit name="print" value="Print" disabled="true"/>
+        <stripes:submit name="exportSearchExcel" value="Excel" disabled="false"/>
+        <stripes:submit name="exportSearchPdf" value="Pdf" disabled="false"/>
+        <!-- TODO custom buttons -->
     </stripes:layout-component>
 </stripes:layout-render>
