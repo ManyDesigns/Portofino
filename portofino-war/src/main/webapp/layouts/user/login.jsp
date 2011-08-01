@@ -6,7 +6,7 @@
         %><stripes:layout-render name="/skins/default/common-simple.jsp">
     <stripes:layout-component name="content">
         <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
-        <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post">
+        <stripes:form action="${dispatch.absoluteOriginalPath}" method="post">
             <div id="content-login">
                 <h1>Login</h1>
                 <br/>

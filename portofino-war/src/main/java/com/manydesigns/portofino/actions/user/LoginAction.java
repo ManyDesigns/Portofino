@@ -165,10 +165,10 @@ public class LoginAction extends AbstractActionBean {
         application.commit("portofino");
     }
 
-    public String logout(){
+    public Resolution logout(){
         session.invalidate();
         SessionMessages.addInfoMessage("User disconnetected");
 
-        return "logout";
+        return new RedirectResolution("/");
     }
 }
