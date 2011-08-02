@@ -4,41 +4,36 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
-<div>
-    <c:set var="firstTop" value="${true}" />
+<div class="portletContainer">
     <c:forEach var="pageToInclude" items="${ actionBean.portlets['contentLayoutTop'] }">
-        <div class="portletWrapper ${firstTop ? 'first' : ''}">
+        <div class="portletWrapper">
             <jsp:include page="${pageToInclude}" />
         </div>
-        <c:set var="firstTop" value="${false}" />
     </c:forEach>
 </div>
 <div class="yui-g">
-    <div class="yui-u first">
-        <c:set var="firstLeft" value="${firstTop}" />
+    <div class="yui-u first portletContainer">
         <c:forEach var="pageToInclude" items="${ actionBean.portlets['contentLayoutLeft'] }">
-            <div class="portletWrapper ${firstLeft ? 'first' : ''}">
+            <div class="portletWrapper">
                 <jsp:include page="${pageToInclude}" />
             </div>
-            <c:set var="firstLeft" value="${false}" />
         </c:forEach>
     </div>
-    <div class="yui-u">
-        <c:set var="firstRight" value="${firstTop}" />
+    <div class="yui-u portletContainer">
         <c:forEach var="pageToInclude" items="${ actionBean.portlets['contentLayoutRight'] }">
-            <div class="portletWrapper ${firstRight ? 'first' : ''}">
+            <div class="portletWrapper">
                 <jsp:include page="${pageToInclude}" />
             </div>
-            <c:set var="firstRight" value="${false}" />
         </c:forEach>
     </div>
 </div>
-<div>
-    <c:set var="firstBottom" value="${firstLeft && firstRight}" />
+<div class="portletContainer">
     <c:forEach var="pageToInclude" items="${ actionBean.portlets['contentLayoutBottom'] }">
-        <div class="portletWrapper ${firstBottom ? 'first' : ''}">
+        <div class="portletWrapper">
             <jsp:include page="${pageToInclude}" />
         </div>
-        <c:set var="firstBottom" value="${false}" />
     </c:forEach>
 </div>
+<script type="text/javascript">
+    $(enablePortletDragAndDrop);
+</script>

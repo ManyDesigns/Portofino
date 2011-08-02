@@ -120,17 +120,9 @@ div#portletPageBody {
 Portlet
 *******************************************************************************/
 
-.portletWrapper.first {
-    margin-top: 0;
-}
-
 .portletWrapper {
-    margin-top: 3em;
+    margin-bottom: 3em;
     width: 100%;
-}
-
-.portletSeparator {
-    margin-top: 3em;
 }
 
 .portlet {}

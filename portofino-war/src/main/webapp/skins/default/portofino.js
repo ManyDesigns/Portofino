@@ -22,3 +22,9 @@ $(function() {
             text: false
         });
 });
+
+function enablePortletDragAndDrop() {
+    $("div.portletContainer").sortable({
+        connectWith: "div.portletContainer"
+    }).css('padding', '1em 0').css("border", "1px dashed grey").css("margin-bottom", "1em").css("min-height", "10em");
+}
