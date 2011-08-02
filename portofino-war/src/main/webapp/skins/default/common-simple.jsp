@@ -25,13 +25,9 @@
         <link rel="stylesheet" type="text/css"
               href="<stripes:url value="/skins/default/portofino.css"/>"/>
         <script type="text/javascript"
-                src="<stripes:url value="/yui-2.8.1/build/yuiloader-dom-event/yuiloader-dom-event.js"/>"></script>
-        <script type="text/javascript"
                 src="<stripes:url value="/jquery-ui-1.8.9/js/jquery-1.4.4.min.js"/>"></script>
         <script type="text/javascript"
                 src="<stripes:url value="/jquery-ui-1.8.9/js/jquery-ui-1.8.9.custom.min.js"/>"></script>
-        <script type="text/javascript"
-                src="<stripes:url value="/jquery-treetable-2.3.0/jquery.treeTable.min.js"/>"></script>
         <script type="text/javascript"
                 src="<stripes:url value="/elements.js"/>"></script>
         <script type="text/javascript"
@@ -50,10 +46,10 @@
                         <stripes:link href="/Profile.action"><c:out value="${userName}"/></stripes:link> -
                         <stripes:link href="/user/Settings.action">Settings</stripes:link> -
                         <stripes:link href="/user/Help.action">Help</stripes:link> -
-                        <stripes:link href="/user/Login.action?logout=">Log out</stripes:link>
+                        <stripes:link href="/user/login.action?logout=">Log out</stripes:link>
                     </c:if><c:if test="${empty userId}">
                         <stripes:link href="/user/Help.action">Help</stripes:link> -
-                        <stripes:link href="/user/Login.action">Log in</stripes:link>
+                        <stripes:link href="/user/login.action">Log in</stripes:link>
                     </c:if>
                 </c:if><c:if test="${portofinoProperties['user.enabled'] != 'true'}">
                     <stripes:link href="/user/Help.action">Help</stripes:link>
@@ -64,20 +60,17 @@
             </div>
             <h1><stripes:link href="/"><c:out value="${portofinoProperties['application.name']}"/></stripes:link></h1>
         </div>
-        <div id="content">
-            <stripes:layout-component name="content" />
+        <div id="bd">
+            <stripes:layout-component name="bd" />
         </div>
         <div id="ft">
             <div id="responseTime">
-                Page response time: XYZ ms.
+                Page response time: <c:out value="${stopWatch.time}"/> ms.
             </div>
             Powered by <a href="http://www.manydesigns.com/">ManyDesigns Portofino</a>
             <c:out value="${portofinoProperties['portofino.version']}"/>
         </div>
     </div>
-    <script type="text/javascript">
-        YAHOO.example.fixSideBar();
-    </script>
     </body>
     </html>
 </stripes:layout-definition>
