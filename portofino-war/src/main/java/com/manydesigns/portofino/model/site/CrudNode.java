@@ -31,6 +31,7 @@ package com.manydesigns.portofino.model.site;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.crud.Crud;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
@@ -59,12 +60,13 @@ public class CrudNode extends SiteNode implements EmbeddableNode {
     protected Crud crud;
     protected final ArrayList<SiteNode> detailChildNodes;
 
+    protected String detailLayoutContainer;
+    protected String detailLayoutOrder;
+
     public CrudNode() {
         super();
         detailChildNodes = new ArrayList<SiteNode>();
     }
-
-
 
     @XmlElement()
     public Crud getCrud() {
@@ -108,5 +110,23 @@ public class CrudNode extends SiteNode implements EmbeddableNode {
     })
     public ArrayList<SiteNode> getDetailChildNodes() {
         return detailChildNodes;
+    }
+
+    @XmlAttribute
+    public String getDetailLayoutContainer() {
+        return detailLayoutContainer;
+    }
+
+    public void setDetailLayoutContainer(String detailLayoutContainer) {
+        this.detailLayoutContainer = detailLayoutContainer;
+    }
+
+    @XmlAttribute
+    public String getDetailLayoutOrder() {
+        return detailLayoutOrder;
+    }
+
+    public void setDetailLayoutOrder(String detailLayoutOrder) {
+        this.detailLayoutOrder = detailLayoutOrder;
     }
 }

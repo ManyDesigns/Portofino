@@ -81,4 +81,8 @@ public class SiteNodeInstance {
     public List<SiteNode> getChildNodes() {
         return siteNode.getChildNodes();
     }
+
+    public String getLayoutContainer() {
+        return siteNode.getLayoutContainer();
+    }
 }

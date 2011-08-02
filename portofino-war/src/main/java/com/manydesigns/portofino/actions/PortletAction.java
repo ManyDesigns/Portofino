@@ -13,12 +13,12 @@ import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.StripesConstants;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.commons.collections.MultiHashMap;
+import org.apache.commons.collections.MultiMap;
 
 public class PortletAction extends AbstractActionBean {
-    public final List<String> portlets = new ArrayList<String>();
+
+    public final MultiMap portlets = new MultiHashMap();
     @InjectDispatch
     public Dispatch dispatch;
     public String returnToParentTarget;
@@ -75,7 +75,7 @@ public class PortletAction extends AbstractActionBean {
         return returnToParentTarget;
     }
 
-    public List<String> getPortlets() {
+    public MultiMap getPortlets() {
         return portlets;
     }
 
@@ -92,10 +92,10 @@ public class PortletAction extends AbstractActionBean {
     }
 
     protected void setupPortlets(String myself, SiteNodeInstance siteNodeInstance) {
-        portlets.add(myself);
+        portlets.put(siteNodeInstance.getLayoutContainer(), myself);
         for(SiteNode node : siteNodeInstance.getChildNodes()) {
-            if(node instanceof EmbeddableNode) {
-                portlets.add(dispatch.getOriginalPath() + "/" + node.getId());
+            if(node instanceof EmbeddableNode  && node.getLayoutContainerInParent() != null) {
+                portlets.put(node.getLayoutContainerInParent(), dispatch.getOriginalPath() + "/" + node.getId());
             }
         }
     }

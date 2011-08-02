@@ -138,4 +138,15 @@ public class CrudNodeInstance extends SiteNodeInstance {
             return Collections.EMPTY_LIST;
         }
     }
+
+    @Override
+    public String getLayoutContainer() {
+        if (CrudNode.MODE_SEARCH.equals(mode)) {
+            return siteNode.getLayoutContainer();
+        } else if (CrudNode.MODE_DETAIL.equals(mode)) {
+            return getSiteNode().getDetailLayoutContainer();
+        } else {
+            throw new IllegalStateException("Unsupported mode: " + mode);
+        }
+    }
 }

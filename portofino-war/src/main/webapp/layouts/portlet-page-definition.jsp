@@ -43,11 +43,7 @@
                     </div>
                     <div id="portletPageBody">
                         <stripes:layout-component name="portletPageBody">
-                            <c:forEach var="portlet" items="${actionBean.portlets}" varStatus="status">
-                                <div class="portletWrapper ${status.first ? 'first' : ''}">
-                                    <jsp:include page="${portlet}" />
-                                </div>
-                            </c:forEach>
+                            <jsp:include page="/layouts/content/1-2-1-symmetric.jsp" />
                         </stripes:layout-component>
                     </div>
                     <div class="portletPageFooter">

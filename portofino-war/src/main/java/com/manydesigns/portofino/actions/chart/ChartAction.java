@@ -167,7 +167,7 @@ public class ChartAction extends PortletAction {
             return new ForwardResolution("/layouts/chart/chart.jsp");
         } else {
             setupReturnToParentTarget();
-            getPortlets().add("/layouts/chart/chart.jsp");
+            getPortlets().put(siteNodeInstance.getSiteNode().getLayoutContainer(), "/layouts/chart/chart.jsp");
             return new ForwardResolution("/layouts/portlet-page.jsp");
         }
     }

@@ -126,8 +126,12 @@ Portlet
 
 .portletWrapper {
     margin-top: 3em;
+    width: 100%;
 }
 
+.portletSeparator {
+    margin-top: 3em;
+}
 
 .portlet {}
 
@@ -135,9 +139,9 @@ Portlet
     border-bottom: solid 3px #EEEEFF;
     margin-bottom: 12px;
     padding-bottom: 3px;
+    float: left;
+    width: 100%;
 }
-
-.portletHeader {}
 
 /* page hader/footer buttons*/
 input.portletPageButton, input.portletPageButton, .portletHeaderButtons button {
@@ -168,8 +172,9 @@ input.portletPageButton.ui-button.ui-state-hover, input.portletPageButton.ui-but
     padding: 0.2em 0;
 }
 
-
-.portletBody {}
+.portletBody {
+    clear: left;
+}
 
 .portletFooter {}
 
@@ -324,7 +329,7 @@ Search form
 }
 
 .search_results {
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 
 /*******************************************************************************
