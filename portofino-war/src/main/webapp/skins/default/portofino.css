@@ -116,6 +116,14 @@ div#portletPageBody {
     margin-top: 1em;
 }
 
+.sortablePlaceholder {
+    border: 1px solid #fcefa1;
+    background: #fbf9ee;
+    color: #363636;
+    height: 10em;
+
+}
+
 /*******************************************************************************
 Portlet
 *******************************************************************************/
