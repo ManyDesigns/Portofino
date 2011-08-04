@@ -69,8 +69,8 @@ public class FileBlobFieldTest extends AbstractElementsTest {
         super.setUp();
 
         // use plain servlet api
-        elementsProperties.setProperty(
-                ElementsProperties.WEB_FRAMEWORK_PROPERTY,
+        elementsConfiguration.setProperty(
+                ElementsProperties.WEB_FRAMEWORK,
                 com.manydesigns.elements.servlet.WebFramework.class.getName());
         setUpSingletons();
 

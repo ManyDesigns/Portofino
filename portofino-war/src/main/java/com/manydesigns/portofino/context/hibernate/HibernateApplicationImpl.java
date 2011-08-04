@@ -42,14 +42,14 @@ import com.manydesigns.portofino.connections.Connections;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.io.FileManager;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.model.site.crud.Crud;
-import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.CrudAccessor;
-import com.manydesigns.portofino.servlets.PortofinoListener;
+import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.xml.diff.DatabaseDiff;
@@ -99,6 +99,8 @@ public class HibernateApplicationImpl implements Application {
     // Fields
     //**************************************************************************
 
+    protected final org.apache.commons.configuration.Configuration portofinoConfiguration;
+    protected final DatabasePlatformsManager databasePlatformsManager;
     protected Connections connectionProviders;
     protected FileManager fm;
     protected Model model;
@@ -114,7 +116,10 @@ public class HibernateApplicationImpl implements Application {
     // Constructors
     //**************************************************************************
 
-    public HibernateApplicationImpl() {
+    public HibernateApplicationImpl(org.apache.commons.configuration.Configuration portofinoConfiguration,
+                                    DatabasePlatformsManager databasePlatformsManager) {
+        this.portofinoConfiguration = portofinoConfiguration;
+        this.databasePlatformsManager = databasePlatformsManager;
         siteNodes = new ArrayList<SiteNode>();
     }
 
@@ -135,13 +140,11 @@ public class HibernateApplicationImpl implements Application {
             Unmarshaller um = jc.createUnmarshaller();
             connectionProviders = (Connections) um.unmarshal(is);
             connectionProviders.reset();
-            connectionProviders.init();
+            connectionProviders.init(databasePlatformsManager);
 
             frm.commitTransaction(txId);
         } catch (Exception e) {
             logger.error("Cannot load/parse file: " + fileName, e);
-        } finally {
-            PortofinoListener.clearJaxb();
         }
     }
 
@@ -158,8 +161,6 @@ public class HibernateApplicationImpl implements Application {
             xmlModelFile = file;
         } catch (Exception e) {
             logger.error("Cannot load/parse model: " + file, e);
-        } finally {
-            PortofinoListener.clearJaxb();
         }
     }
 
@@ -172,8 +173,6 @@ public class HibernateApplicationImpl implements Application {
             logger.info("Saved xml model to file: {}", xmlModelFile);
         } catch (Throwable e) {
             logger.error("Cannot save xml model to file: " + xmlModelFile, e);
-        } finally {
-            PortofinoListener.clearJaxb();
         }
     }
 
@@ -281,6 +280,14 @@ public class HibernateApplicationImpl implements Application {
 
     public FileManager getFileManager () {
         return fm;
+    }
+
+    public org.apache.commons.configuration.Configuration getPortofinoProperties() {
+        return portofinoConfiguration;
+    }
+
+    public DatabasePlatformsManager getDatabasePlatformsManager() {
+        return databasePlatformsManager;
     }
 
     //**************************************************************************
@@ -966,8 +973,7 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
 
     private void writeToConnectionFile() {
-        final Properties portofinoProperties = PortofinoProperties.getProperties();
-        String fileName = portofinoProperties.getProperty(PortofinoProperties.CONNECTION_FILE_PROPERTY,
+        String fileName = portofinoConfiguration.getString(PortofinoProperties.CONNECTION_FILE,
                 "portofino-connections.xml");
         OutputStream os = null;
         try {
@@ -988,7 +994,6 @@ public class HibernateApplicationImpl implements Application {
             logger.error("Cannot save xml model to file: " + fileName, e);
         } finally {
             IOUtils.closeQuietly(os);
-            PortofinoListener.clearJaxb();
         }
     }
 

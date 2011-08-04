@@ -188,7 +188,7 @@
             <result name="success">/skins/default/system-admin/serverInfo.jsp</result>
         </action>
         <action name="system-admin/ConfigurationProperties"
-                class="com.manydesigns.portofino.actions.systemadmin.ConfigurationPropertiesAction">
+                class="com.manydesigns.portofino.actions.systemadmin.ConfigurationsAction">
             <result name="portofinoProperties">/skins/default/system-admin/portofinoProperties.jsp</result>
             <result name="elementsProperties">/skins/default/system-admin/elementsProperties.jsp</result>
             <result name="systemProperties">/skins/default/system-admin/systemProperties.jsp</result>

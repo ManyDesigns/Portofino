@@ -29,12 +29,11 @@
 
 package com.manydesigns.elements;
 
-import com.manydesigns.elements.util.ReflectionUtil;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.InputStream;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -50,7 +49,7 @@ public final class ElementsProperties {
     // Default and custom properties location
     //**************************************************************************
 
-    public final static String PROPERIES_RESOURCE =
+    public final static String PROPERTIES_RESOURCE =
             "elements.properties";
     public final static String CUSTOM_PROPERTIES_RESOURCE =
             "elements-custom.properties";
@@ -60,33 +59,33 @@ public final class ElementsProperties {
     // Property names
     //**************************************************************************
 
-    public static final String FIELDS_MANAGER_PROPERTY =
+    public static final String FIELDS_MANAGER =
             "fields.manager";
-    public static final String FIELDS_LIST_PROPERTY =
+    public static final String FIELDS_LIST =
             "fields.list";
 
-    public static final String ANNOTATIONS_MANAGER_PROPERTY =
+    public static final String ANNOTATIONS_MANAGER =
             "annotations.manager";
-    public static final String ANNOTATIONS_IMPLEMENTATION_LIST_PROPERTY =
+    public static final String ANNOTATIONS_IMPLEMENTATION_LIST =
             "annotations.implementation.list";
 
-    public static final String FIELDS_LABEL_CAPITALIZE_PROPERTY =
+    public static final String FIELDS_LABEL_CAPITALIZE =
             "fields.label.capitalize";
-    public static final String FIELDS_DATE_FORMAT_PROPERTY =
+    public static final String FIELDS_DATE_FORMAT =
             "fields.date.format";
-    public static final String RANDOM_CODE_LENGTH_PROPERTY =
+    public static final String RANDOM_CODE_LENGTH =
             "random.code.length";
 
-    public static final String BLOBS_MANAGER_PROPERTY =
+    public static final String BLOBS_MANAGER =
             "blobs.manager";
-    public static final String BLOBS_DIR_PROPERTY =
+    public static final String BLOBS_DIR =
             "blobs.dir";
-    public static final String BLOBS_META_FILENAME_PATTERN_PROPERTY =
+    public static final String BLOBS_META_FILENAME_PATTERN =
             "blobs.meta.filename.pattern";
-    public static final String BLOBS_DATA_FILENAME_PATTERN_PROPERTY =
+    public static final String BLOBS_DATA_FILENAME_PATTERN =
             "blobs.data.filename.pattern";
 
-    public static final String WEB_FRAMEWORK_PROPERTY =
+    public static final String WEB_FRAMEWORK =
             "web.framework";
 
 
@@ -94,39 +93,29 @@ public final class ElementsProperties {
     // Static fields, singleton initialization and retrieval
     //**************************************************************************
 
-    private static final Properties properties;
+    private static final CompositeConfiguration configuration;
 
     public static final Logger logger =
             LoggerFactory.getLogger(ElementsProperties.class);
 
     static {
-        properties = new Properties();
-        reloadProperties();
+        configuration = new CompositeConfiguration();
+        addConfiguration(CUSTOM_PROPERTIES_RESOURCE);
+        addConfiguration(PROPERTIES_RESOURCE);
     }
 
-    public static void reloadProperties() {
-        properties.clear();
-        loadProperties(PROPERIES_RESOURCE);
-        loadProperties(CUSTOM_PROPERTIES_RESOURCE);
-    }
-
-    public static void loadProperties(String resource) {
-        InputStream stream = ReflectionUtil.getResourceAsStream(resource);
-        if (stream == null) {
-            logger.info("Properties resource not found: {}", resource);
-            return;
-        }
+    public static void addConfiguration(String resource) {
         try {
-            properties.load(stream);
-            logger.info("Properties loaded from: {}", resource);
+            configuration.addConfiguration(
+                    new PropertiesConfiguration(resource));
         } catch (Throwable e) {
             logger.warn(String.format(
                     "Error loading properties from: %s", resource), e);
         }
     }
 
-    public static Properties getProperties() {
-        return properties;
+    public static Configuration getConfiguration() {
+        return configuration;
     }
 
     //**************************************************************************

@@ -41,16 +41,21 @@ import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectHttpRequest;
 import com.manydesigns.portofino.annotations.InjectHttpSession;
+import com.manydesigns.portofino.annotations.InjectPortofinoProperties;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
+import net.sourceforge.stripes.action.Before;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.security.MessageDigest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -82,21 +87,19 @@ public class ProfileAction extends AbstractActionBean {
     @InjectHttpSession
     public HttpSession session;
 
+    @InjectPortofinoProperties
+    public Configuration portofinoConfiguration;
+
     public List<Group> groups;
 
     private Boolean enc;
     private Long userId;
 
-    public ProfileAction() {
+    @Before
+    public void prepare() {
         groups = new ArrayList<Group>();
-        enc = Boolean.parseBoolean(PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.PWD_ENCRYPTED, "false"));
-
-    }
-
-
-    public void setServletRequest(HttpServletRequest req) {
-        this.req = req;
+        enc = portofinoConfiguration.getBoolean(
+                PortofinoProperties.PWD_ENCRYPTED, false);
     }
 
     //**************************************************************************
@@ -197,7 +200,21 @@ public class ProfileAction extends AbstractActionBean {
             ChangePasswordFormBean bean = new ChangePasswordFormBean();
             form.writeToObject(bean);
 
-            if(bean.getEncOldPwd().equals(thisUser.getPwd())) {
+            String encOldPwd;
+            if (portofinoConfiguration.getBoolean(PortofinoProperties.PWD_ENCRYPTED, false)){
+                try {
+                    MessageDigest md = MessageDigest.getInstance("SHA-1");
+                    md.update(bean.oldPwd.getBytes("UTF-8"));
+                    byte raw[] = md.digest();
+                    encOldPwd = (new BASE64Encoder()).encode(raw);
+                } catch (Exception e) {
+                    throw new Error(e);
+                }
+            } else {
+                encOldPwd = bean.oldPwd;
+            }
+
+            if(encOldPwd.equals(thisUser.getPwd())) {
                 thisUser.setPwd(bean.pwd);
                 if (enc) {
                     thisUser.setPwd(UserUtils.encryptPassword(bean.pwd));

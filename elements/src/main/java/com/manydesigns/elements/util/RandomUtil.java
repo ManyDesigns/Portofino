@@ -30,13 +30,13 @@
 package com.manydesigns.elements.util;
 
 import com.manydesigns.elements.ElementsProperties;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -57,10 +57,10 @@ public class RandomUtil {
     protected static final File tempDir;
 
     static {
-        Properties properties = ElementsProperties.getProperties();
+        Configuration configuration = ElementsProperties.getConfiguration();
         String stringValue =
-                properties.getProperty(
-                        ElementsProperties.RANDOM_CODE_LENGTH_PROPERTY);
+                configuration.getString(
+                        ElementsProperties.RANDOM_CODE_LENGTH);
         int tmp;
         try {
             tmp = Integer.parseInt(stringValue);

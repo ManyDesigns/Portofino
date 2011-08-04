@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.connections;
 
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,9 +74,9 @@ public class Connections {
         }
     }
 
-    public void init() {
+    public void init(DatabasePlatformsManager databasePlatformsManager) {
         for (ConnectionProvider connection : connections) {
-            connection.init();
+            connection.init(databasePlatformsManager);
         }
     }
 

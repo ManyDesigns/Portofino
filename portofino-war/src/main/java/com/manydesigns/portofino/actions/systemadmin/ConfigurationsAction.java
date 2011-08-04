@@ -34,11 +34,11 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertiesAccessor;
-import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.elements.reflection.CommonsConfigurationAccessor;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-
-import java.util.Properties;
+import com.manydesigns.portofino.annotations.InjectPortofinoProperties;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.SystemConfiguration;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -46,42 +46,41 @@ import java.util.Properties;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class ConfigurationPropertiesAction extends AbstractActionBean {
+public class ConfigurationsAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public Properties properties;
+    @InjectPortofinoProperties
+    public Configuration portofinoConfiguration;
+
     public Form form;
 
     public String execute() {
-        return portofinoProperties();
+        return portofinoConfiguration();
     }
 
-    public String portofinoProperties() {
-        properties = PortofinoProperties.getProperties();
-        form = configureForm(properties);
+    public String portofinoConfiguration() {
+        form = configureForm(portofinoConfiguration);
 
-        return "portofinoProperties";
+        return "portofinoConfiguration";
     }
 
-    public String elementsProperties() {
-        properties = ElementsProperties.getProperties();
-        form = configureForm(properties);
+    public String elementsConfiguration() {
+        form = configureForm(ElementsProperties.getConfiguration());
 
-        return "elementsProperties";
+        return "elementsConfiguration";
     }
 
-    public String systemProperties() {
-        properties = System.getProperties();
-        form = configureForm(properties);
+    public String systemConfiguration() {
+        form = configureForm(new SystemConfiguration());
 
-        return "systemProperties";
+        return "systemConfiguration";
     }
 
-    private Form configureForm(Properties properties) {
-        ClassAccessor accessor = new PropertiesAccessor(properties);
+    private Form configureForm(Configuration configuration) {
+        ClassAccessor accessor = new CommonsConfigurationAccessor(configuration);
         Form form = new FormBuilder(accessor).configMode(Mode.VIEW).build();
-        form.readFromObject(properties);
+        form.readFromObject(configuration);
         return form;
     }
 

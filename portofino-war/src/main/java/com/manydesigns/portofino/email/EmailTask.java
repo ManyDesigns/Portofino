@@ -36,6 +36,7 @@ import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,24 +76,21 @@ public class EmailTask extends TimerTask {
     public EmailTask(Application application) {
         this.application = application;
         //Setto il client smtp per il bouncing
-        String popHost = PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_POP3_HOST, "127.0.0.1");
-        String protocol = PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_POP3_PROTOCOL, "pop3");
-        int popPort = Integer.parseInt(PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_POP3_PORT, "25"));
-        String popLogin = PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_POP3_LOGIN);
-        String popPassword = PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_POP3_PASSWORD);
-        boolean bounceEnabled = Boolean.parseBoolean(
-                PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_BOUNCE_ENABLED,
-                "false"));
-        boolean sslEnabled = Boolean.parseBoolean(
-                PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_POP3_SSL_ENABLED,
-                "false"));
+        Configuration configuration = application.getPortofinoProperties();
+        String popHost = configuration.getString(
+                PortofinoProperties.MAIL_POP3_HOST, "127.0.0.1");
+        String protocol = configuration.getString(
+                PortofinoProperties.MAIL_POP3_PROTOCOL, "pop3");
+        int popPort = configuration.getInt(
+                PortofinoProperties.MAIL_POP3_PORT, 25);
+        String popLogin = configuration.getString(
+                PortofinoProperties.MAIL_POP3_LOGIN);
+        String popPassword = configuration.getString(
+                PortofinoProperties.MAIL_POP3_PASSWORD);
+        boolean bounceEnabled = configuration.getBoolean(
+                PortofinoProperties.MAIL_BOUNCE_ENABLED, false);
+        boolean sslEnabled = configuration.getBoolean(
+                PortofinoProperties.MAIL_POP3_SSL_ENABLED, false);
         if (bounceEnabled &&
                 popHost != null && protocol != null && popLogin != null
                 && popPassword != null) {

@@ -149,7 +149,7 @@ public abstract class ConnectionProvider {
         lastTested = null;
     }
 
-    public void init() {
+    public void init(DatabasePlatformsManager databasePlatformsManager) {
         if (includeSchemas == null) {
             includeSchemasPattern = null;
         } else {
@@ -206,9 +206,8 @@ public abstract class ConnectionProvider {
             }
             Collections.sort(types, new TypeComparator());
 
-            DatabasePlatformsManager manager =
-                    DatabasePlatformsManager.getManager();
-            databasePlatform = manager.findApplicableAbstraction(this);
+            databasePlatform =
+                    databasePlatformsManager.findApplicableAbstraction(this);
             if (databasePlatform == null) {
                 status = STATUS_ERROR;
                 errorMessage = MessageFormat.format(

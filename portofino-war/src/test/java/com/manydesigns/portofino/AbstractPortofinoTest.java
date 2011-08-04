@@ -29,12 +29,14 @@
 package com.manydesigns.portofino;
 
 import com.manydesigns.elements.AbstractElementsTest;
-import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.hibernate.HibernateApplicationImpl;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -55,14 +57,21 @@ import java.sql.Connection;
 */
 public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
+    // Long-lived Portofino objects
+    protected CompositeConfiguration portofinoConfiguration;
+    protected DatabasePlatformsManager databasePlatformsManager;
+    protected Application application;
+
+
     //Connessioni e context
     public Connection connPetStore;
     public Connection connPortofino;
     public Connection connDBTest;
-    public Application application = null;
     public Model model;
     public String storeDir;
 
+    public static final String PORTOFINO_TEST_PROPERTIES_RESOURCE =
+            "portofino-test.properties";
     public static final String PORTOFINO_CONNECTIONS_RESOURCE =
             "portofino-connections.xml";
     public static final String PORTOFINO_MODEL_RESOURCE =
@@ -77,7 +86,6 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
             "database/portofino4.sql";
     public static final String TEST_DB =
             "database/hibernatetest.sql";
-    private static final String PORTOFINO_PROPERTIES_RESOURCE = "portofino_test.properties";
 
     //--------------------------------------------------------------------------
     // Setup e teardown
@@ -86,11 +94,17 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        PortofinoProperties.loadProperties(getPortofinoPropertiesResource());
+        portofinoConfiguration = new CompositeConfiguration();
+        portofinoConfiguration.addConfiguration(
+                    new PropertiesConfiguration(
+                            PORTOFINO_TEST_PROPERTIES_RESOURCE));
+        portofinoConfiguration.addConfiguration(
+                    new PropertiesConfiguration(
+                            PortofinoProperties.PROPERTIES_RESOURCE));
 
         // crea store dir se non c'è
-        storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
-                PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));
+        storeDir = FilenameUtils.normalize(portofinoConfiguration.getString(
+                PortofinoProperties.PORTOFINO_STOREDIR));
         File file = new File(storeDir);
         if (!file.exists() && !file.mkdirs()) {
             throw new Error("Errore in creazione di: " + storeDir);
@@ -101,7 +115,10 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         copyResource(getPortofinoModelResource(),
                 PORTOFINO_MODEL_RESOURCE);
 
-        createContext();
+        databasePlatformsManager =
+                new DatabasePlatformsManager(portofinoConfiguration);
+
+        createApplication();
 
         ClassLoader cl = AbstractPortofinoTest.class.getClassLoader();
         connPortofino = application.getConnectionProvider("portofino").acquireConnection();
@@ -151,10 +168,6 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     // Parametrizzazione del test
     //--------------------------------------------------------------------------
 
-    public String getPortofinoPropertiesResource() {
-        return PORTOFINO_PROPERTIES_RESOURCE;
-    }
-
     public String getPortofinoConnectionsResource() {
         return getResource("-connections.xml", PORTOFINO_CONNECTIONS_RESOURCE);
     }
@@ -191,7 +204,7 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
 
 
-    protected void createContext() {
+    protected void createApplication() {
         Logger logger = LoggerFactory.getLogger(AbstractPortofinoTest.class);
         logger.info("Creating Context and " +
                 "registering on servlet context...");
@@ -200,27 +213,22 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         try {
             // ElementsThreadLocals è già stato impostato da AbstractElementsTest
 
-            String managerClassName =
-                    portofinoProperties.getProperty(
-                            PortofinoProperties.CONTEXT_CLASS_PROPERTY);
-            InstanceBuilder<Application> builder =
-                    new InstanceBuilder<Application>(
-                            Application.class,
-                            HibernateApplicationImpl.class,
-                            logger);
-            application = builder.createInstance(managerClassName);
+            application = new HibernateApplicationImpl(
+                    portofinoConfiguration, databasePlatformsManager);
 
-            String storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
-                PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));
-            String workDir = FilenameUtils.normalize(portofinoProperties.getProperty(
-                PortofinoProperties.PORTOFINO_WORKDIR_PROPERTY));
+            String storeDir = FilenameUtils.normalize(
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.PORTOFINO_STOREDIR));
+            String workDir = FilenameUtils.normalize(
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.PORTOFINO_WORKDIR));
 
             String connectionsFileName =
-                    portofinoProperties.getProperty(
-                            PortofinoProperties.CONNECTION_FILE_PROPERTY);
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.CONNECTION_FILE);
             String modelLocation =
-                    portofinoProperties.getProperty(
-                            PortofinoProperties.MODEL_LOCATION_PROPERTY);
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.MODEL_LOCATION);
 
             //String rootDirPath = ServletContext.getRealPath("/");
 
@@ -239,5 +247,4 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
         }
     }
-
 }

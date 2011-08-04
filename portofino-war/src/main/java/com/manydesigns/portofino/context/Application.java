@@ -30,12 +30,14 @@
 package com.manydesigns.portofino.context;
 
 import com.manydesigns.portofino.connections.ConnectionProvider;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.io.FileManager;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.crud.Crud;
-import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.CrudAccessor;
+import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.User;
+import org.apache.commons.configuration.Configuration;
 
 import java.io.File;
 import java.io.Serializable;
@@ -81,6 +83,18 @@ public interface Application {
     public void stopFileManager() throws Exception;
     public FileManager getFileManager ();
     
+    //**************************************************************************
+    // Configuration access
+    //**************************************************************************
+
+    Configuration getPortofinoProperties();
+
+    //**************************************************************************
+    // DatabasePlatformManager access
+    //**************************************************************************
+
+    DatabasePlatformsManager getDatabasePlatformsManager();
+
     //**************************************************************************
     // Model access
     //**************************************************************************

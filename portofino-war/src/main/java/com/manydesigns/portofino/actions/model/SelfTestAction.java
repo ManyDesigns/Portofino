@@ -37,7 +37,6 @@ import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.servlets.PortofinoListener;
 import com.manydesigns.portofino.xml.XmlDiffer;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -141,16 +140,12 @@ public class SelfTestAction extends AbstractActionBean {
         contentType= "text/xml";
         contentDisposition= MessageFormat.format("inline; filename={0}.xml",
                     "datamodel");
-        try {
-            File tempFile = File.createTempFile("portofino", ".xml");
-            JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
-            Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            m.marshal(model, tempFile);
-            inputStream = new FileInputStream(tempFile);
-        } finally {
-            PortofinoListener.clearJaxb();
-        }
+        File tempFile = File.createTempFile("portofino", ".xml");
+        JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
+        Marshaller m = jc.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        m.marshal(model, tempFile);
+        inputStream = new FileInputStream(tempFile);
         return "export";
     }
 

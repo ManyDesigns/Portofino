@@ -117,7 +117,8 @@ public class ConnectionProvidersAction extends AbstractActionBean {
         tableForm.readFromObject(connectionProviders);
 
         // database platforms
-        DatabasePlatformsManager manager = DatabasePlatformsManager.getManager();
+        DatabasePlatformsManager manager =
+                application.getDatabasePlatformsManager();
         databasePlatforms = manager.getDatabasePlatforms();
         databasePlatformsTableForm =
                 new TableFormBuilder(DatabasePlatform.class)
@@ -201,7 +202,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
 
     public String test() {
         connectionProvider = application.getConnectionProvider(databaseName);
-        connectionProvider.init();
+        connectionProvider.init(application.getDatabasePlatformsManager());
         String status = connectionProvider.getStatus();
         if (ConnectionProvider.STATUS_CONNECTED.equals(status)) {
             SessionMessages.addInfoMessage("Connection tested successfully");

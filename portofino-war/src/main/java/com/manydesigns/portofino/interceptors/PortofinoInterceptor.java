@@ -50,6 +50,7 @@ import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -59,6 +60,7 @@ import org.slf4j.MDC;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -88,59 +90,71 @@ public class PortofinoInterceptor implements Interceptor {
             new ConcurrentHashMap<Class, Map<Class<? extends Annotation>, Field[]>>();
 
     public Resolution intercept(ExecutionContext context) throws Exception {
+        logger.debug("Retrieving Stripes objects");
         Object action = context.getActionBean();
         ActionBeanContext actionContext = context.getActionBeanContext();
-        HttpServletRequest req = actionContext.getRequest();
 
-
-        HttpSession session = req.getSession(false);
+        logger.debug("Retrieving and injecting Servlet API objects");
+        HttpServletRequest request = actionContext.getRequest();
+        HttpServletResponse response = actionContext.getResponse();
         ServletContext servletContext = actionContext.getServletContext();
+        HttpSession session = request.getSession(false);
+        injectAnnotatedFields(action, InjectHttpRequest.class, request);
+        injectAnnotatedFields(action, InjectHttpResponse.class, response);
+        injectAnnotatedFields(action, InjectHttpSession.class, session);
+
+        logger.debug("Retrieving and injecting Portofino long-lived objects");
         Application application =
                 (Application)servletContext.getAttribute(
                         ApplicationAttributes.APPLICATION);
+        Model model = application.getModel();
+        ServerInfo serverInfo =
+                (ServerInfo) servletContext.getAttribute(
+                        ApplicationAttributes.SERVER_INFO);
+        Configuration portofinoConfiguration =
+                application.getPortofinoProperties();
+        injectAnnotatedFields(action, InjectApplication.class, application);
+        injectAnnotatedFields(action, InjectModel.class, model);
+        injectAnnotatedFields(action, InjectServerInfo.class, serverInfo);
+        injectAnnotatedFields(action, InjectPortofinoProperties.class,
+                portofinoConfiguration);
 
         logger.debug("Starting page response timer");
         StopWatch stopWatch = new StopWatch();
         // Non è necessario stopparlo
         stopWatch.start();
-        req.setAttribute(RequestAttributes.STOP_WATCH, stopWatch);
+        request.setAttribute(RequestAttributes.STOP_WATCH, stopWatch);
 
-        if(req.getAttribute("skin") == null) {
-            req.setAttribute("skin", "default");
-        }
-
+        logger.debug("Retrieving user");
         Long userId = null;
         String userName = null;
-        if (session != null) {
+        if (session == null) {
+            logger.debug("No session found");
+        } else {
             userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
             userName = (String) session.getAttribute(SessionAttributes.USER_NAME);
+            logger.debug("Retrieved userId={} userName={}", userId, userName);
         }
 
+        logger.debug("Setting up logging MDC");
         MDC.clear();
         MDC.put(SessionAttributes.USER_ID, ObjectUtils.toString(userId));
         MDC.put(SessionAttributes.USER_NAME, userName);
 
         application.openSession();
-        Model model = application.getModel();
 
         List<String> groups=UserUtils.manageGroups(application, userId);
 
-        ServerInfo serverInfo =
-                (ServerInfo) servletContext.getAttribute(
-                        ApplicationAttributes.SERVER_INFO);
+        logger.debug("Setting default skin");
+        if(request.getAttribute("skin") == null) {
+            request.setAttribute("skin", "default");
+        }
 
-        logger.debug("Injections");
-        injectAnnotatedFields(action, InjectApplication.class, application);
-        injectAnnotatedFields(action, InjectModel.class, model);
-        injectAnnotatedFields(action, InjectServerInfo.class, serverInfo);
-        injectAnnotatedFields(action, InjectHttpRequest.class, req);
-        injectAnnotatedFields(action, InjectHttpSession.class, session);
-
-        Dispatch dispatch = (Dispatch) req.getAttribute(RequestAttributes.DISPATCH);
+        Dispatch dispatch = (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
         if (dispatch != null) {
             logger.debug("Creating navigation");
             Navigation navigation = new Navigation(application, dispatch, groups);
-            req.setAttribute(RequestAttributes.NAVIGATION, navigation);
+            request.setAttribute(RequestAttributes.NAVIGATION, navigation);
 
             SiteNodeInstance[] siteNodeInstances = dispatch.getSiteNodeInstancePath();
             for(SiteNodeInstance node : siteNodeInstances) {
@@ -151,7 +165,7 @@ public class PortofinoInterceptor implements Interceptor {
 
             logger.debug("Creating breadcrumbs");
             Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
-            req.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
+            request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
 
             injectAnnotatedFields(action, InjectDispatch.class, dispatch);
             injectAnnotatedFields(action, InjectSiteNodeInstance.class,
@@ -165,8 +179,8 @@ public class PortofinoInterceptor implements Interceptor {
             } else {
                 //4. Non ho i permessi, ma non sono loggato, vado alla pagina di login
                 if (userId==null){
-                    String returnUrl=req.getServletPath();
-                    Map parameters = req.getParameterMap();
+                    String returnUrl=request.getServletPath();
+                    Map parameters = request.getParameterMap();
                     if (parameters.size()!=0){
                         List<String> params = new ArrayList<String>();
                         for (Object key : parameters.keySet()){

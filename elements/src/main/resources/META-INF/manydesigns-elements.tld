@@ -38,4 +38,59 @@
         <tag-class>com.manydesigns.elements.servlet.SessionMessagesTag</tag-class>
         <body-content>JSP</body-content>
     </tag>
+    <function>
+        <name>getString</name>
+        <function-class>com.manydesigns.elements.configuration.CommonsConfigurationFunctions</function-class>
+        <function-signature>java.lang.String getString(org.apache.commons.configuration.Configuration,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <name>getStrings</name>
+        <function-class>com.manydesigns.elements.configuration.CommonsConfigurationFunctions</function-class>
+        <function-signature>java.lang.String[] getStringArray(org.apache.commons.configuration.Configuration,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <name>getInt</name>
+        <function-class>com.manydesigns.elements.configuration.CommonsConfigurationFunctions</function-class>
+        <function-signature>int getInt(org.apache.commons.configuration.Configuration,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <name>getByte</name>
+        <function-class>com.manydesigns.elements.configuration.CommonsConfigurationFunctions</function-class>
+        <function-signature>byte getByte(org.apache.commons.configuration.Configuration,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <name>getShort</name>
+        <function-class>com.manydesigns.elements.configuration.CommonsConfigurationFunctions</function-class>
+        <function-signature>short getShort(org.apache.commons.configuration.Configuration,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <name>getLong</name>
+        <function-class>com.manydesigns.elements.configuration.CommonsConfigurationFunctions</function-class>
+        <function-signature>long getLong(org.apache.commons.configuration.Configuration,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <name>getBoolean</name>
+        <function-class>com.manydesigns.elements.configuration.CommonsConfigurationFunctions</function-class>
+        <function-signature>boolean getBoolean(org.apache.commons.configuration.Configuration,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <name>getDouble</name>
+        <function-class>com.manydesigns.elements.configuration.CommonsConfigurationFunctions</function-class>
+        <function-signature>double getDouble(org.apache.commons.configuration.Configuration,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <name>getFloat</name>
+        <function-class>com.manydesigns.elements.configuration.CommonsConfigurationFunctions</function-class>
+        <function-signature>float getFloat(org.apache.commons.configuration.Configuration,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <name>getBigDecimal</name>
+        <function-class>com.manydesigns.elements.configuration.CommonsConfigurationFunctions</function-class>
+        <function-signature>java.math.BigDecimal getBigDecimal(org.apache.commons.configuration.Configuration,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <name>getBigInteger</name>
+        <function-class>com.manydesigns.elements.configuration.CommonsConfigurationFunctions</function-class>
+        <function-signature>java.math.BigInteger getBigInteger(org.apache.commons.configuration.Configuration,java.lang.String)</function-signature>
+    </function>
 </taglib>

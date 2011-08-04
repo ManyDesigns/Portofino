@@ -33,16 +33,17 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectHttpRequest;
+import com.manydesigns.portofino.annotations.InjectPortofinoProperties;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.email.EmailUtils;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.User;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -63,6 +64,9 @@ public class PwdRecoveryAction extends AbstractActionBean implements LoginUnAwar
 
     @InjectHttpRequest
     HttpServletRequest req;
+
+    @InjectPortofinoProperties
+    public Configuration portofinoConfiguration;
 
     public static final Logger logger =
         LoggerFactory.getLogger(PwdRecoveryAction.class);
@@ -98,15 +102,13 @@ public class PwdRecoveryAction extends AbstractActionBean implements LoginUnAwar
 
 
         String url = MessageFormat.format("{0}://{1}{2}{3}?token={4}",
-                    req.getScheme(),
-                    req.getServerName(),
-                    port,
-                    com.manydesigns.elements.util.Util.getAbsoluteUrl(req,
-                            "user/LostPasswordChange.action"),
-                    user.getToken());
-        Properties properties = PortofinoProperties
-                .getProperties();
-        String from = properties.getProperty(
+                req.getScheme(),
+                req.getServerName(),
+                port,
+                com.manydesigns.elements.util.Util.getAbsoluteUrl(req,
+                        "user/LostPasswordChange.action"),
+                user.getToken());
+        String from = portofinoConfiguration.getString(
                 PortofinoProperties.MAIL_SMTP_SENDER);
         String subject = "Password recovery";
         String body = new StringBuilder().append("Someone has requested a reset of your password, ")

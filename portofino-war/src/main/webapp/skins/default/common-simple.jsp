@@ -38,10 +38,10 @@
     <body>
     <div id="doc3" class="yui-t2">
         <stripes:url var="profileUrl" value="/Profile.action"/>
-        <jsp:useBean id="portofinoProperties" scope="application" type="java.util.Properties"/>
+        <jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration"/>
         <div id="hd">
             <div id="globalLinks">
-                <c:if test="${portofinoProperties['user.enabled'] == 'true'}">
+                <c:if test="${mde:getBoolean(portofinoConfiguration, 'user.enabled')}">
                     <c:if test="${not empty userId}">
                         <stripes:link href="/Profile.action"><c:out value="${userName}"/></stripes:link> -
                         <stripes:link href="/user/Settings.action">Settings</stripes:link> -
@@ -51,14 +51,14 @@
                         <stripes:link href="/user/Help.action">Help</stripes:link> -
                         <stripes:link href="/user/login.action">Log in</stripes:link>
                     </c:if>
-                </c:if><c:if test="${portofinoProperties['user.enabled'] != 'true'}">
+                </c:if><c:if test="${not mde:getBoolean(portofinoConfiguration, 'user.enabled')}">
                     <stripes:link href="/user/Help.action">Help</stripes:link>
                 </c:if>
             </div>
             <div style="position: absolute; left: 20em;">
                 <mde:sessionMessages/>
             </div>
-            <h1><stripes:link href="/"><c:out value="${portofinoProperties['application.name']}"/></stripes:link></h1>
+            <h1><stripes:link href="/"><c:out value="${mde:getString(portofinoConfiguration, 'application.name')}"/></stripes:link></h1>
         </div>
         <div id="bd">
             <stripes:layout-component name="bd" />
@@ -68,7 +68,7 @@
                 Page response time: <c:out value="${stopWatch.time}"/> ms.
             </div>
             Powered by <a href="http://www.manydesigns.com/">ManyDesigns Portofino</a>
-            <c:out value="${portofinoProperties['portofino.version']}"/>
+            <c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
         </div>
     </div>
     </body>

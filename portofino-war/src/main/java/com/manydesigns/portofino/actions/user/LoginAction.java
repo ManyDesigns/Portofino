@@ -35,10 +35,12 @@ import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectHttpRequest;
 import com.manydesigns.portofino.annotations.InjectHttpSession;
+import com.manydesigns.portofino.annotations.InjectPortofinoProperties;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import net.sourceforge.stripes.action.*;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +75,9 @@ public class LoginAction extends AbstractActionBean {
     @InjectHttpSession
     public HttpSession session;
 
+    @InjectPortofinoProperties
+    public Configuration portofinoConfiguration;
+
     //**************************************************************************
     // Request parameters
     //**************************************************************************
@@ -101,15 +106,15 @@ public class LoginAction extends AbstractActionBean {
             return new ForwardResolution("/layouts/user/alreadyLoggedIn.jsp");
         }
 
-        recoverPwd = Boolean.parseBoolean(PortofinoProperties.getProperties().
-                getProperty(PortofinoProperties.MAIL_ENABLED, "false"));
+        recoverPwd = portofinoConfiguration.getBoolean(
+                PortofinoProperties.MAIL_ENABLED, false);
         
         return new ForwardResolution("/layouts/user/login.jsp");
     }
 
     public Resolution login () {
-        Boolean enc = Boolean.parseBoolean(PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.PWD_ENCRYPTED, "false"));
+        boolean enc = portofinoConfiguration.getBoolean(
+                PortofinoProperties.PWD_ENCRYPTED, true);
 
         if (enc) {
             pwd = UserUtils.encryptPassword(pwd);

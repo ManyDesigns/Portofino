@@ -31,7 +31,9 @@ package com.manydesigns.portofino.email;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.system.model.email.EmailBean;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.mail.*;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,52 +48,37 @@ public class EmailSender implements Runnable{
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    protected final boolean ssl;
-    protected final String login;
-    protected final String password;
-    protected final String server;
-    protected final int port;
     protected final EmailBean emailBean;
-    protected final Application application;
+    protected final @NotNull Application application;
     protected static final Logger logger =
             LoggerFactory.getLogger(EmailSender.class);
 
-
-
-    //Costruttore con proprietà da inserire
-    public EmailSender(Application application, EmailBean emailBean, String server, int port, boolean ssl,
-                       String login, String password) {
-        this.application = application;
-        this.emailBean = emailBean;
-        this.server = server;
-        this.port = port;
-        this.ssl = ssl;
-        this.login = login;
-        this.password = password;
-    }
-
     //Costruttore che prende le proprietà dal portofino.properties
-    public EmailSender(Application application, EmailBean emailBean) {
+    public EmailSender(@NotNull Application application, EmailBean emailBean) {
         this.application = application;
         this.emailBean = emailBean;
-        this.server = PortofinoProperties.getProperties()
-                    .getProperty(PortofinoProperties.MAIL_SMTP_HOST);
-        this.port = Integer.parseInt(PortofinoProperties.getProperties()
-                    .getProperty(PortofinoProperties.MAIL_SMTP_PORT, "25"));
-        this.ssl = Boolean.parseBoolean(PortofinoProperties.getProperties()
-                    .getProperty(PortofinoProperties.MAIL_SMTP_SSL_ENABLED));
-        this.login = PortofinoProperties.getProperties()
-                    .getProperty(PortofinoProperties.MAIL_SMTP_LOGIN);
-        this.password = PortofinoProperties.getProperties()
-                    .getProperty(PortofinoProperties.MAIL_SMTP_PASSWORD);
     }
 
     public void run() {
-
         try {
+            Configuration configuration = application.getPortofinoProperties();
+            String server = configuration
+                    .getString(PortofinoProperties.MAIL_SMTP_HOST);
+            int port = configuration.getInt(
+                    PortofinoProperties.MAIL_SMTP_PORT, 25);
+            boolean ssl = configuration.getBoolean(
+                    PortofinoProperties.MAIL_SMTP_SSL_ENABLED, false);
+            String login = configuration.getString(
+                    PortofinoProperties.MAIL_SMTP_LOGIN);
+            String password = configuration.getString(
+                    PortofinoProperties.MAIL_SMTP_PASSWORD);
+            boolean keepSent = configuration.getBoolean(
+                    PortofinoProperties.KEEP_SENT, false);
+
+
             Email email;
             if(null == emailBean.getAttachmentPath()) {
-                email = new SimpleEmail();                
+                email = new SimpleEmail();
             } else {
                 email =  new MultiPartEmail();
                 EmailAttachment attachment = new EmailAttachment();
@@ -101,7 +88,7 @@ public class EmailSender implements Runnable{
                 attachment.setName(emailBean.getAttachmentName());
                 ((MultiPartEmail) email).attach(attachment);
             }
-            
+
             if (null!=login && null!=password ) {
                 email.setAuthenticator(new DefaultAuthenticator(login, password));
             }
@@ -114,17 +101,14 @@ public class EmailSender implements Runnable{
             email.setTLS(ssl);
             email.send();
 
-            if (application != null) {
-                application.openSession();
-                if ("true".equals(PortofinoProperties.getProperties()
-                        .getProperty(PortofinoProperties.KEEP_SENT))) {
-                    emailBean.setState(EmailUtils.SENT);
-                    application.updateObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
-                } else {
-                    application.deleteObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
-                }
-                application.commit(EmailUtils.PORTOFINO);
+            application.openSession();
+            if (keepSent) {
+                emailBean.setState(EmailUtils.SENT);
+                application.updateObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
+            } else {
+                application.deleteObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
             }
+            application.commit(EmailUtils.PORTOFINO);
         } catch (Throwable e) {
             logger.warn("Cannot send email with id " + emailBean.getId(), e);
             emailBean.setState(EmailUtils.TOBESENT);

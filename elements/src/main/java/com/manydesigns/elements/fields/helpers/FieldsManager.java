@@ -37,11 +37,11 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -57,7 +57,7 @@ public class FieldsManager implements FieldHelper {
     // Static fields
     //**************************************************************************
 
-    protected static final Properties elementsProperties;
+    protected static final Configuration elementsConfiguration;
     protected static final FieldsManager manager;
 
     //**************************************************************************
@@ -79,10 +79,10 @@ public class FieldsManager implements FieldHelper {
     //**************************************************************************
 
     static {
-        elementsProperties = ElementsProperties.getProperties();
+        elementsConfiguration = ElementsProperties.getConfiguration();
         String managerClassName =
-                elementsProperties.getProperty(
-                        ElementsProperties.FIELDS_MANAGER_PROPERTY);
+                elementsConfiguration.getString(
+                        ElementsProperties.FIELDS_MANAGER);
         InstanceBuilder<FieldsManager> builder =
                 new InstanceBuilder<FieldsManager>(
                         FieldsManager.class,
@@ -102,15 +102,14 @@ public class FieldsManager implements FieldHelper {
 
     public FieldsManager() {
         helperList = new ArrayList<FieldHelper>();
-        String listString = elementsProperties.getProperty(
-                ElementsProperties.FIELDS_LIST_PROPERTY);
-        if (listString == null) {
+        String[] fields = elementsConfiguration.getStringArray(
+                ElementsProperties.FIELDS_LIST);
+        if (fields == null) {
             logger.debug("Empty list");
             return;
         }
 
-        String[] helperClassArray = listString.split(",");
-        for (String current : helperClassArray) {
+        for (String current : fields) {
             addFieldHelper(current);
         }
     }

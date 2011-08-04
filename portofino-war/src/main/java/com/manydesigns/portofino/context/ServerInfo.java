@@ -86,14 +86,14 @@ public class ServerInfo {
         logger.debug("Servlet API version: {}", servletApiVersion);
 
         String tmp = null;
-        if (servletApiMajor >= 2 && servletApiMinor >= 5) {
-            try {
-                Method method =
-                        servletContext.getClass().getMethod("getContextPath");
-                tmp = (String)method.invoke(servletContext);
-            } catch (Throwable e) {
-                logger.debug("Uncaught exception", e);
-            }
+        try {
+            Method method =
+                    servletContext.getClass().getMethod("getContextPath");
+            tmp = (String)method.invoke(servletContext);
+        } catch (NoSuchMethodException e) {
+            logger.debug("Cannot invoke getContextPath(). Required Servlet API >= 2.5");
+        } catch (Exception e) {
+            logger.debug("Uncaught exception", e);
         }
         contextPath = tmp;
         logger.debug("Context path: {}", contextPath);

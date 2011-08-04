@@ -31,16 +31,17 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.context.hibernate.HibernateApplicationImpl;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.email.EmailTask;
-import com.sun.xml.bind.v2.ClassFactory;
-import com.sun.xml.bind.v2.runtime.Coordinator;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -55,12 +56,6 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.io.File;
-import java.lang.reflect.Field;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.Properties;
 import java.util.Timer;
 
 
@@ -82,24 +77,31 @@ public class PortofinoListener
     public static final String SEPARATOR =
             "----------------------------------------" +
             "----------------------------------------";
+    public static final int PERIOD = 10000;
+    public static final int DELAY = 5000;
+    public static final int DELAY2 = 5300;
 
     //**************************************************************************
     // Fields
     //**************************************************************************
 
-    protected Properties elementsProperties;
-    protected Properties portofinoProperties;
+    protected Configuration elementsConfiguration;
+    protected CompositeConfiguration portofinoConfiguration;
+
     protected ServletContext servletContext;
     protected ServerInfo serverInfo;
+
+    protected DatabasePlatformsManager databasePlatformsManager;
     protected Application application;
     protected Dispatcher dispatcher;
     protected Timer scheduler;
 
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
+
     public static final Logger logger =
             LoggerFactory.getLogger(PortofinoListener.class);
-    private static final int PERIOD = 10000;
-    private static final int DELAY = 5000;
-    private static final int DELAY2 = 5300;
 
     //**************************************************************************
     // ServletContextListener implementation
@@ -112,11 +114,20 @@ public class PortofinoListener
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        elementsProperties = ElementsProperties.getProperties();
-        portofinoProperties = PortofinoProperties.getProperties();
-
         servletContext = servletContextEvent.getServletContext();
+
+        elementsConfiguration = ElementsProperties.getConfiguration();
+        servletContext.setAttribute(
+                ApplicationAttributes.ELEMENTS_PROPERTIES, elementsConfiguration);
+
+        portofinoConfiguration = new CompositeConfiguration();
+        addConfiguration(PortofinoProperties.CUSTOM_PROPERTIES_RESOURCE);
+        addConfiguration(PortofinoProperties.PROPERTIES_RESOURCE);
+        servletContext.setAttribute(
+                ApplicationAttributes.PORTOFINO_PROPERTIES, portofinoConfiguration);
+
         serverInfo = new ServerInfo(servletContext);
+        servletContext.setAttribute(ApplicationAttributes.SERVER_INFO, serverInfo);
 
         logger.info("\n" + SEPARATOR +
                 "\n--- ManyDesigns Portofino {} starting..." +
@@ -124,19 +135,12 @@ public class PortofinoListener
                 "\n--- Real path: {}" +
                 "\n" + SEPARATOR,
                 new String[] {
-                        portofinoProperties.getProperty(
-                                PortofinoProperties.PORTOFINO_VERSION_PROPERTY),
+                        portofinoConfiguration.getString(
+                                PortofinoProperties.PORTOFINO_VERSION),
                         serverInfo.getContextPath(),
                         serverInfo.getRealPath()
                 }
         );
-
-        servletContext.setAttribute(ApplicationAttributes.SERVER_INFO, serverInfo);
-
-        servletContext.setAttribute(
-                ApplicationAttributes.ELEMENTS_PROPERTIES, elementsProperties);
-        servletContext.setAttribute(
-                ApplicationAttributes.PORTOFINO_PROPERTIES, portofinoProperties);
 
         boolean success = true;
 
@@ -150,39 +154,25 @@ public class PortofinoListener
         }
 
         if (success) {
-            createContext();
-            createDispatcher();
+            success = setupDatabasePlatformsManager();
         }
 
         if (success) {
-            String securityType = portofinoProperties
-                    .getProperty(PortofinoProperties.SECURITY_TYPE_PROPERTY, "application");
-            String mailHost = portofinoProperties
-                    .getProperty(PortofinoProperties.MAIL_SMTP_HOST);
-            String mailSender = portofinoProperties
-                    .getProperty(PortofinoProperties.MAIL_SMTP_SENDER);
-            Boolean mailEnabled = Boolean.parseBoolean(portofinoProperties
-                    .getProperty(PortofinoProperties.MAIL_ENABLED, "false"));
-            if ("application".equals(securityType)&&mailEnabled)
-            {
-                if (null==mailSender
-                        || null == mailHost ) {
-                    logger.info("User admin email or smtp server not set in" +
-                            " portofino-custom.properties");
-                } else {
-                    scheduler = new java.util.Timer(true);
-                    try {
-
-                        //Invio mail
-                        scheduler.schedule(new EmailTask(application),
-                                DELAY2, PERIOD);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        logger.error("Problems in starting schedulers", e);
-                    }
-                }
-            }
+            success = setupApplication();
+            servletContext.setAttribute(
+                    ApplicationAttributes.APPLICATION, application);
         }
+
+        if (success) {
+            success = setupDispatcher();
+            servletContext.setAttribute(
+                    ApplicationAttributes.DISPATCHER, dispatcher);
+        }
+
+        if (success) {
+            success = setupEmailScheduler();
+        }
+
         stopWatch.stop();
         if (success) {
             logger.info("ManyDesigns Portofino successfully started in {} ms.",
@@ -192,9 +182,14 @@ public class PortofinoListener
         }
     }
 
-    public void createDispatcher() {
-        dispatcher = new Dispatcher(application);
-        servletContext.setAttribute(ApplicationAttributes.DISPATCHER, dispatcher);
+    public void addConfiguration(String resource) {
+        try {
+            portofinoConfiguration.addConfiguration(
+                    new PropertiesConfiguration(resource));
+        } catch (Throwable e) {
+            logger.warn(String.format(
+                    "Error loading properties from: %s", resource), e);
+        }
     }
 
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
@@ -209,24 +204,7 @@ public class PortofinoListener
             EmailTask.stop();
         }
 
-        // clean up ThreadLocals and possible memory leaks
-
-
-        clearJaxbThreadLocal();
-
-        Enumeration<Driver> en = DriverManager.getDrivers();
-        while ( en.hasMoreElements() )
-            try {
-                Driver driver = en.nextElement();
-                if ( driver.getClass().getClassLoader() == getClass().getClassLoader() )
-                    DriverManager.deregisterDriver(driver);
-            } catch ( SQLException e1 ) {
-                
-            }
-
         ElementsThreadLocals.destroy();
-        System.gc();
-
 
         try {
             application.stopFileManager();
@@ -237,60 +215,6 @@ public class PortofinoListener
         logger.info("ManyDesigns Portofino stopped.");
     }
 
-    public static void clearJaxbThreadLocal() {
-        try {
-            Field f = ClassFactory.class.getDeclaredField( "tls" );
-            f.setAccessible( true );
-            ( (ThreadLocal<?>) f.get( null ) ).set( null );
-            f = Coordinator.class.getDeclaredField( "activeTable" );
-            f.setAccessible( true );
-            ( (ThreadLocal<?>) f.get( null ) ).set( null );
-        } catch ( Throwable e ) {
-            logger.error( "Failed to plug thread local leaks of jaxb." );
-            logger.trace( "Stack trace:", e );
-        }
-    }
-
-    public static void clearJaxb() {
-        try {
-            Field f = ClassFactory.class.getDeclaredField( "tls" );
-            f.setAccessible( true );
-            ( (ThreadLocal<?>) f.get( null ) ).remove();
-            f = Coordinator.class.getDeclaredField( "activeTable" );
-            f.setAccessible( true );
-            ( (ThreadLocal<?>) f.get( null ) ).remove();
-        } catch ( Throwable e ) {
-            logger.error( "Failed to plug thread local leaks of jaxb." );
-            logger.trace( "Stack trace:", e );
-        }
-    }
-
-    public void setFieldValue(String className, String fieldName, Object obj, Object fieldValue) {
-        Field field = getFieldByReflection(className, fieldName);
-        if (field == null) {
-            return;
-        }
-        try {
-            field.set(null, fieldValue);
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-    }
-
-    public Field getFieldByReflection(String className, String fieldName) {
-        try {
-            ClassLoader cl = getClass().getClassLoader();
-            Class aClass = cl.loadClass(className);
-            Field field = aClass.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    
     //**************************************************************************
     // HttpSessionListener implementation
     //**************************************************************************
@@ -305,36 +229,36 @@ public class PortofinoListener
         logger.info("Session destroyed: id={}", session.getId());
     }
 
-    protected void createContext() {
-        logger.info("Creating Context and " +
-                "registering on servlet context...");
-        // create and register the container first, without exceptions
+    //**************************************************************************
+    // Overridable setups
+    //**************************************************************************
+
+    public boolean setupDatabasePlatformsManager() {
+        databasePlatformsManager =
+                new DatabasePlatformsManager(portofinoConfiguration);
+        return true;
+    }
+
+    public boolean setupApplication() {
+        logger.info("Creating application instance...");
+        application = new HibernateApplicationImpl(
+        portofinoConfiguration, databasePlatformsManager);
 
         try {
             ElementsThreadLocals.setupDefaultElementsContext();
 
-            String managerClassName =
-                    portofinoProperties.getProperty(
-                            PortofinoProperties.CONTEXT_CLASS_PROPERTY);
-            InstanceBuilder<Application> builder =
-                    new InstanceBuilder<Application>(
-                            Application.class,
-                            HibernateApplicationImpl.class,
-                            logger);
-            application = builder.createInstance(managerClassName);
-            servletContext.setAttribute(ApplicationAttributes.APPLICATION, application);
 
-            String storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
-                PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));
-            String workDir = FilenameUtils.normalize(portofinoProperties.getProperty(
-                PortofinoProperties.PORTOFINO_WORKDIR_PROPERTY));
+            String storeDir = FilenameUtils.normalize(portofinoConfiguration.getString(
+            PortofinoProperties.PORTOFINO_STOREDIR));
+            String workDir = FilenameUtils.normalize(portofinoConfiguration.getString(
+            PortofinoProperties.PORTOFINO_WORKDIR));
 
             String connectionsFileName =
-                    portofinoProperties.getProperty(
-                            PortofinoProperties.CONNECTION_FILE_PROPERTY);
+            portofinoConfiguration.getString(
+            PortofinoProperties.CONNECTION_FILE);
             String modelLocation =
-                    portofinoProperties.getProperty(
-                            PortofinoProperties.MODEL_LOCATION_PROPERTY);
+            portofinoConfiguration.getString(
+            PortofinoProperties.MODEL_LOCATION);
 
             String rootDirPath = servletContext.getRealPath("/");
             File modelFile;
@@ -346,11 +270,11 @@ public class PortofinoListener
             }
 
             if(FilenameUtils.getPrefixLength(storeDir)==-1
-                    || FilenameUtils.getPrefixLength(storeDir)==0){
+            || FilenameUtils.getPrefixLength(storeDir)==0){
                 storeDir = FilenameUtils.concat(rootDirPath, storeDir);
             }
             if(FilenameUtils.getPrefixLength(workDir)==-1
-                    || FilenameUtils.getPrefixLength(storeDir)==0){
+            || FilenameUtils.getPrefixLength(storeDir)==0){
                 workDir = FilenameUtils.concat(rootDirPath, workDir);
             }
             logger.info("Storing directory:" + storeDir);
@@ -359,16 +283,48 @@ public class PortofinoListener
 
             application.startFileManager();
 
-
-
             application.loadConnections(connectionsFileName);
             application.loadXmlModel(modelFile);
-
-
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
+            return false;
         } finally {
             ElementsThreadLocals.removeElementsContext();
         }
+        return true;
+    }
+
+    public boolean setupDispatcher() {
+        dispatcher = new Dispatcher(application);
+        return true;
+    }
+
+    public boolean setupEmailScheduler() {
+        String securityType = portofinoConfiguration
+                .getString(PortofinoProperties.SECURITY_TYPE, "application");
+        boolean mailEnabled = portofinoConfiguration.getBoolean(
+                PortofinoProperties.MAIL_ENABLED, false);
+        if ("application".equals(securityType) && mailEnabled) {
+            String mailHost = portofinoConfiguration
+                    .getString(PortofinoProperties.MAIL_SMTP_HOST);
+            String mailSender = portofinoConfiguration
+                    .getString(PortofinoProperties.MAIL_SMTP_SENDER);
+            if (null == mailSender || null == mailHost ) {
+                logger.info("User admin email or smtp server not set in" +
+                        " portofino-custom.properties");
+            } else {
+                scheduler = new Timer(true);
+                try {
+
+                    //Invio mail
+                    scheduler.schedule(new EmailTask(application),
+                            DELAY2, PERIOD);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("Problems in starting schedulers", e);
+                }
+            }
+        }
+        return true;
     }
 }

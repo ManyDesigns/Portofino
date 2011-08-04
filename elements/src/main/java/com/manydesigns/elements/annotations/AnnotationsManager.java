@@ -32,6 +32,7 @@ package com.manydesigns.elements.annotations;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +52,7 @@ public class AnnotationsManager {
     // Static fields
     //**************************************************************************
 
-    protected static final Properties elementsProperties;
+    protected static final Configuration elementsConfiguration;
     protected static final AnnotationsManager manager;
 
     public static final Logger logger =
@@ -69,10 +70,10 @@ public class AnnotationsManager {
     //**************************************************************************
 
     static {
-        elementsProperties = ElementsProperties.getProperties();
+        elementsConfiguration = ElementsProperties.getConfiguration();
         String managerClassName =
-                elementsProperties.getProperty(
-                        ElementsProperties.ANNOTATIONS_MANAGER_PROPERTY);
+                elementsConfiguration.getString(
+                        ElementsProperties.ANNOTATIONS_MANAGER);
         InstanceBuilder<AnnotationsManager> builder =
                 new InstanceBuilder<AnnotationsManager>(
                         AnnotationsManager.class,
@@ -92,28 +93,22 @@ public class AnnotationsManager {
 
     public AnnotationsManager() {
         annotationClassMap = new HashMap<Class, Class>();
-        String listString = elementsProperties.getProperty(
-                ElementsProperties.ANNOTATIONS_IMPLEMENTATION_LIST_PROPERTY);
-        if (listString == null) {
+        Properties mappings = elementsConfiguration.getProperties(
+                ElementsProperties.ANNOTATIONS_IMPLEMENTATION_LIST);
+        if (mappings == null) {
             logger.debug("Empty list");
             return;
         }
 
-        String[] mappingsArray = listString.split(",");
-        for (String mapping : mappingsArray) {
-            addAnnotationMapping(mapping);
+        for (Map.Entry<Object, Object> mapping : mappings.entrySet()) {
+            String annotationName = (String) mapping.getKey();
+            String annotationImplName = (String) mapping.getValue();
+
+            addAnnotationMapping(annotationName, annotationImplName);
         }
     }
 
-    public void addAnnotationMapping(String mapping) {
-        String[] split = mapping.split(":");
-        if (split.length != 2) {
-            logger.warn("Incorrect annotation mapping syntax: {}", mapping);
-            return;
-        }
-        String annotationName = split[0].trim();
-        String annotationImplName = split[1].trim();
-
+    public void addAnnotationMapping(String annotationName, String annotationImplName) {
         logger.debug("Mapping annotation {} to implemetation {}",
                 annotationName, annotationImplName);
         Class annotationClass = ReflectionUtil.loadClass(annotationName);

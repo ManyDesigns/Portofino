@@ -27,22 +27,22 @@
  *
  */
 
-package com.manydesigns.portofino;
+package com.manydesigns.portofino.annotations;
 
-/**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Alessio Stalla       - alessio.stalla@manydesigns.com
- */
-public class ApplicationAttributes {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/*
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface InjectPortofinoProperties {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
-
-    public final static String APPLICATION = "context";
-    public final static String ELEMENTS_PROPERTIES = "elementsConfiguration";
-    public final static String PORTOFINO_PROPERTIES = "portofinoConfiguration";
-    public final static String DISPATCHER = "dispatcher";
-    public final static String SERVER_INFO = "serverInfo";
-
 }

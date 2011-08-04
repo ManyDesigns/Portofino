@@ -31,6 +31,7 @@ package com.manydesigns.elements.servlet;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.util.InstanceBuilder;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -39,7 +40,6 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -61,7 +61,7 @@ public class WebFramework {
     // Static fields
     //**************************************************************************
 
-    protected static final Properties elementsProperties;
+    protected static final Configuration elementsConfiguration;
     protected static WebFramework webFramework;
 
     //**************************************************************************
@@ -76,14 +76,14 @@ public class WebFramework {
     //**************************************************************************
 
     static {
-        elementsProperties = ElementsProperties.getProperties();
+        elementsConfiguration = ElementsProperties.getConfiguration();
         resetSingleton();
     }
 
     public static void resetSingleton() {
         String managerClassName =
-                elementsProperties.getProperty(
-                        ElementsProperties.WEB_FRAMEWORK_PROPERTY);
+                elementsConfiguration.getString(
+                        ElementsProperties.WEB_FRAMEWORK);
         InstanceBuilder<WebFramework> builder =
                 new InstanceBuilder<WebFramework>(
                         WebFramework.class,

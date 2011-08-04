@@ -54,7 +54,6 @@ public class EmailTest extends AbstractPortofinoTest {
     public void setUp() throws Exception {
         super.setUp();
         server = SimpleSmtpServer.start(SMTP_PORT);
-        PortofinoProperties.loadProperties("portofino_test.properties");
         application.openSession();
     }
 
@@ -66,8 +65,8 @@ public class EmailTest extends AbstractPortofinoTest {
         myEmail.setSubject("subj");
         myEmail.setBody("body");
         myEmail.setCreateDate(new Date());
-        EmailSender sender = new EmailSender(null, myEmail, "127.0.0.1", SMTP_PORT,
-                false, null, null);
+        EmailSender sender = new EmailSender(null, myEmail
+        );
         //lancio il run del sender
         sender.run();
         assertEquals(1, server.getReceivedEmailSize());
@@ -87,8 +86,8 @@ public class EmailTest extends AbstractPortofinoTest {
         myEmail.setSubject("subj");
         myEmail.setBody("body");
         myEmail.setCreateDate(new Date());
-        EmailSender sender = new EmailSender(null, myEmail, "127.0.0.1", SMTP_PORT - 1,
-                false, null, null);
+        EmailSender sender = new EmailSender(null, myEmail
+        );
 
         //lancio il run del sender
         sender.run();
@@ -112,8 +111,8 @@ public class EmailTest extends AbstractPortofinoTest {
         myEmail.setAttachmentName("piuma");
         myEmail.setAttachmentDescription("piuma dell'apache");
 
-        EmailSender sender = new EmailSender(null, myEmail, "127.0.0.1", SMTP_PORT,
-                false, null, null);
+        EmailSender sender = new EmailSender(null, myEmail
+        );
         //lancio il run del sender
         sender.run();
         assertEquals(1, server.getReceivedEmailSize());
@@ -166,8 +165,8 @@ public class EmailTest extends AbstractPortofinoTest {
     }
 
     public void testEmailTaskErrSmtp() {
-        PortofinoProperties.loadProperties
-                ("portofino_smtpsbagliato.properties");
+        // imposta stmp port sbagliato
+        portofinoConfiguration.setProperty(PortofinoProperties.MAIL_SMTP_PORT, 2025);
         Timer scheduler = new Timer(true);
         for (int i = 1; i <= 10; i++) {
             EmailUtils.addEmail(application, "subj:" + i,

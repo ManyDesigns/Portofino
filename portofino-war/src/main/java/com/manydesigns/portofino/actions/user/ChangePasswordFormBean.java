@@ -30,10 +30,6 @@
 package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.portofino.PortofinoProperties;
-import sun.misc.BASE64Encoder;
-
-import java.security.MessageDigest;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -53,19 +49,4 @@ public class ChangePasswordFormBean {
     @com.manydesigns.elements.annotations.Password(confirmationRequired = false)
     public String pwd;
 
-    public String getEncOldPwd(){
-        if (PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.PWD_ENCRYPTED, "false").equals("false")){
-            return oldPwd;
-        }
-
-    try {
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
-            md.update(oldPwd.getBytes("UTF-8"));
-            byte raw[] = md.digest();
-            return (new BASE64Encoder()).encode(raw);
-        } catch (Exception e) {
-            throw new Error(e);
-        }
-    }
 }

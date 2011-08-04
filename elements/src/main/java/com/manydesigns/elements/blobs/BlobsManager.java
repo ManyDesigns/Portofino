@@ -32,12 +32,12 @@ package com.manydesigns.elements.blobs;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.RandomUtil;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -53,7 +53,7 @@ public class BlobsManager {
     // Static fields
     //**************************************************************************
 
-    protected static final Properties elementsProperties;
+    protected static final Configuration elementsConfiguration;
     protected static final BlobsManager manager;
 
     //**************************************************************************
@@ -68,10 +68,10 @@ public class BlobsManager {
     //**************************************************************************
 
     static {
-        elementsProperties = ElementsProperties.getProperties();
+        elementsConfiguration = ElementsProperties.getConfiguration();
         String managerClassName =
-                elementsProperties.getProperty(
-                        ElementsProperties.BLOBS_MANAGER_PROPERTY);
+                elementsConfiguration.getString(
+                        ElementsProperties.BLOBS_MANAGER);
         InstanceBuilder<BlobsManager> builder =
                 new InstanceBuilder<BlobsManager>(
                         BlobsManager.class,
@@ -100,20 +100,20 @@ public class BlobsManager {
 
     public BlobsManager() {
         String blobsDirPath =
-                elementsProperties.getProperty(
-                        ElementsProperties.BLOBS_DIR_PROPERTY);
+                elementsConfiguration.getString(
+                        ElementsProperties.BLOBS_DIR);
         if (blobsDirPath == null) {
             blobsDirPath = System.getProperty("java.io.tmpdir");
             logger.warn("Blobs dir property '{}' not set. " +
                     "Falling back to ''java.io.tmpdir'': {}",
-                    ElementsProperties.BLOBS_DIR_PROPERTY,
+                    ElementsProperties.BLOBS_DIR,
                     blobsDirPath);
         }
         blobsDir = new File(blobsDirPath);
-        metaFileNamePattern = elementsProperties.getProperty(
-                ElementsProperties.BLOBS_META_FILENAME_PATTERN_PROPERTY);
-        dataFileNamePattern = elementsProperties.getProperty(
-                ElementsProperties.BLOBS_DATA_FILENAME_PATTERN_PROPERTY);
+        metaFileNamePattern = elementsConfiguration.getString(
+                ElementsProperties.BLOBS_META_FILENAME_PATTERN);
+        dataFileNamePattern = elementsConfiguration.getString(
+                ElementsProperties.BLOBS_DATA_FILENAME_PATTERN);
     }
 
     //**************************************************************************

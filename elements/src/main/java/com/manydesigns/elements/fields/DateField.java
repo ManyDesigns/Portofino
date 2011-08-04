@@ -34,6 +34,7 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.DateFormat;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -42,7 +43,6 @@ import org.joda.time.format.DateTimeFormatter;
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -83,10 +83,10 @@ public class DateField extends AbstractTextField {
         if (dateFormatAnnotation != null) {
             datePattern = dateFormatAnnotation.value();
         } else {
-            Properties elementsProperties =
-                    ElementsProperties.getProperties();
-            datePattern = elementsProperties.getProperty(
-                    ElementsProperties.FIELDS_DATE_FORMAT_PROPERTY);
+            Configuration elementsConfiguration =
+                    ElementsProperties.getConfiguration();
+            datePattern = elementsConfiguration.getString(
+                    ElementsProperties.FIELDS_DATE_FORMAT);
         }
         dateTimeFormatter = DateTimeFormat.forPattern(datePattern);
         setMaxLength(dateTimeFormatter.getParser().estimateParsedLength());
