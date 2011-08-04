@@ -187,8 +187,9 @@ public class PortofinoListener
             portofinoConfiguration.addConfiguration(
                     new PropertiesConfiguration(resource));
         } catch (Throwable e) {
-            logger.warn(String.format(
-                    "Error loading properties from: %s", resource), e);
+            String errorMessage = ExceptionUtils.getRootCauseMessage(e);
+            logger.warn(errorMessage);
+            logger.debug("Error loading configuration", e);
         }
     }
 
