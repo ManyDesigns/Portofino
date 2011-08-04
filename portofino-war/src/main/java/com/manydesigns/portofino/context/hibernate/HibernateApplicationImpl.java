@@ -43,7 +43,6 @@ import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
-import com.manydesigns.portofino.io.FileManager;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.site.SiteNode;
@@ -55,9 +54,9 @@ import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.xml.diff.DatabaseDiff;
 import com.manydesigns.portofino.xml.diff.DiffUtil;
 import com.manydesigns.portofino.xml.diff.MergeDiffer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.transaction.file.FileResourceManager;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
@@ -70,10 +69,7 @@ import org.slf4j.LoggerFactory;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
@@ -102,7 +98,6 @@ public class HibernateApplicationImpl implements Application {
     protected final org.apache.commons.configuration.Configuration portofinoConfiguration;
     protected final DatabasePlatformsManager databasePlatformsManager;
     protected Connections connectionProviders;
-    protected FileManager fm;
     protected Model model;
     protected Map<String, HibernateDatabaseSetup> setups;
     protected final List<SiteNode> siteNodes;
@@ -127,24 +122,18 @@ public class HibernateApplicationImpl implements Application {
     // Model loading
     //**************************************************************************
 
-    public void loadConnections(String fileName) {
+    public void loadConnections(File file) {
+        logger.info("Loading connections from file: {}",
+                file.getAbsolutePath());
         try {
-            FileResourceManager frm = fm.getFrm();
-            String txId = frm.generatedUniqueTxId();
-            frm.startTransaction(txId);
-
-            InputStream is = frm.readResource(txId, fileName);
-
             JAXBContext jc = JAXBContext.newInstance(
                     Connections.JAXB_CONNECTIONS_PACKAGES);
             Unmarshaller um = jc.createUnmarshaller();
-            connectionProviders = (Connections) um.unmarshal(is);
+            connectionProviders = (Connections) um.unmarshal(file);
             connectionProviders.reset();
             connectionProviders.init(databasePlatformsManager);
-
-            frm.commitTransaction(txId);
         } catch (Exception e) {
-            logger.error("Cannot load/parse file: " + fileName, e);
+            logger.error("Cannot load/parse file: " + file, e);
         }
     }
 
@@ -262,26 +251,6 @@ public class HibernateApplicationImpl implements Application {
         writeToConnectionFile();
     }
     
-    //**************************************************************************
-    // FileManager
-    //**************************************************************************
-
-    public void createFileManager(String storeDir, String workDir) throws Exception {
-        this.fm = new FileManager(storeDir, workDir);
-    }
-
-    public void startFileManager() throws Exception {
-        this.fm.start();
-    }
-
-    public void stopFileManager() throws Exception {
-        this.fm.stop();
-    }
-
-    public FileManager getFileManager () {
-        return fm;
-    }
-
     public org.apache.commons.configuration.Configuration getPortofinoProperties() {
         return portofinoConfiguration;
     }
@@ -973,22 +942,20 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
 
     private void writeToConnectionFile() {
-        String fileName = portofinoConfiguration.getString(PortofinoProperties.CONNECTION_FILE,
-                "portofino-connections.xml");
+        String fileName = portofinoConfiguration.getString(PortofinoProperties.CONNECTIONS_LOCATION);
         OutputStream os = null;
         try {
-            FileResourceManager frm = fm.getFrm();
-            String txId = frm.generatedUniqueTxId();
-            frm.startTransaction(txId);
-            frm.createResource(txId, fileName);
-            os = frm.writeResource(txId, fileName);
+            File tempFile = File.createTempFile("portofino", "connections.xml");
+            os = new FileOutputStream(tempFile);
 
             JAXBContext jc = JAXBContext.newInstance(Connections.JAXB_CONNECTIONS_PACKAGES);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             m.marshal(connectionProviders, xmlModelFile);
             os.flush();
-            frm.commitTransaction(txId);
+
+            FileUtils.moveFile(tempFile, new File(fileName));
+
             logger.info("Saved connection to file: {}", fileName);
         } catch (Throwable e) {
             logger.error("Cannot save xml model to file: " + fileName, e);

@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
+import java.io.File;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 
@@ -161,4 +162,14 @@ public class ServerInfo {
         return runTime.availableProcessors();
     }
 
+    public File getWebAppFile(String filename) {
+        File modelFile = new File(filename);
+        if(modelFile.isAbsolute()) {
+            return modelFile;
+        } else if (realPath == null) {
+            return modelFile;
+        } else {
+            return new File (realPath, filename);
+        }
+    }
 }

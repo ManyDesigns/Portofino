@@ -37,7 +37,6 @@ import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -68,7 +67,6 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     public Connection connPortofino;
     public Connection connDBTest;
     public Model model;
-    public String storeDir;
 
     public static final String PORTOFINO_TEST_PROPERTIES_RESOURCE =
             "portofino-test.properties";
@@ -102,18 +100,12 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
                     new PropertiesConfiguration(
                             PortofinoProperties.PROPERTIES_RESOURCE));
 
-        // crea store dir se non c'è
-        storeDir = FilenameUtils.normalize(portofinoConfiguration.getString(
-                PortofinoProperties.PORTOFINO_STOREDIR));
-        File file = new File(storeDir);
-        if (!file.exists() && !file.mkdirs()) {
-            throw new Error("Errore in creazione di: " + storeDir);
-        }
-
-        copyResource(getPortofinoConnectionsResource(),
-                PORTOFINO_CONNECTIONS_RESOURCE);
-        copyResource(getPortofinoModelResource(),
-                PORTOFINO_MODEL_RESOURCE);
+        File portofinoConnectionsFile = copyResourceToTempFile(getPortofinoConnectionsResource());
+        portofinoConfiguration.setProperty(
+                PortofinoProperties.CONNECTIONS_LOCATION, portofinoConnectionsFile.getAbsolutePath());
+        File portofinoModelFile = copyResourceToTempFile(getPortofinoModelResource());
+        portofinoConfiguration.setProperty(
+                PortofinoProperties.MODEL_LOCATION, portofinoModelFile.getAbsolutePath());
 
         databasePlatformsManager =
                 new DatabasePlatformsManager(portofinoConfiguration);
@@ -160,7 +152,6 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
     @Override
     public void tearDown() throws Exception {
-        application.stopFileManager();
         super.tearDown();
     }
 
@@ -193,13 +184,14 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     // utilità
     //--------------------------------------------------------------------------
 
-    protected void copyResource(String resourceName, String fileName) throws IOException {
+    protected File copyResourceToTempFile(String resourceName) throws IOException {
         InputStream is =
                 ReflectionUtil.getResourceAsStream(resourceName);
-        File tempFile = new File(storeDir+"/"+fileName);
+        File tempFile = File.createTempFile("", resourceName);
         Writer writer = new FileWriter(tempFile);
         IOUtils.copy(is, writer);
         IOUtils.closeQuietly(writer);
+        return tempFile;
     }
 
 
@@ -216,29 +208,19 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
             application = new HibernateApplicationImpl(
                     portofinoConfiguration, databasePlatformsManager);
 
-            String storeDir = FilenameUtils.normalize(
-                    portofinoConfiguration.getString(
-                            PortofinoProperties.PORTOFINO_STOREDIR));
-            String workDir = FilenameUtils.normalize(
-                    portofinoConfiguration.getString(
-                            PortofinoProperties.PORTOFINO_WORKDIR));
-
             String connectionsFileName =
                     portofinoConfiguration.getString(
-                            PortofinoProperties.CONNECTION_FILE);
+                            PortofinoProperties.CONNECTIONS_LOCATION);
             String modelLocation =
                     portofinoConfiguration.getString(
                             PortofinoProperties.MODEL_LOCATION);
 
             //String rootDirPath = ServletContext.getRealPath("/");
 
-            File modelFile = new File(storeDir+"/"+modelLocation);
+            File modelFile = new File(modelLocation);
+            File connectionsFile = new File(connectionsFileName);
 
-            logger.info("Storing directory:" + storeDir);
-            logger.info("Working directory:" + workDir);
-            application.createFileManager(storeDir, workDir);
-            application.startFileManager();
-            application.loadConnections(connectionsFileName);
+            application.loadConnections(connectionsFile);
             application.loadXmlModel(modelFile);
             model = application.getModel();
 

@@ -65,12 +65,6 @@ public final class PortofinoProperties {
             "database.platforms.list";
     public static final String SECURITY_TYPE =
             "security.type";
-    public static final String PORTOFINO_STOREDIR =
-            "portofino.store.dir";
-    public static final String PORTOFINO_WORKDIR =
-            "portofino.work.dir";
-    public static final String CONNECTION_FILE =
-            "connection.file";
 
     //Email properties
     public static final String MAIL_ENABLED = "mail.enabled";

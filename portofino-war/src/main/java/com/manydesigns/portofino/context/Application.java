@@ -31,7 +31,6 @@ package com.manydesigns.portofino.context;
 
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
-import com.manydesigns.portofino.io.FileManager;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
@@ -58,8 +57,7 @@ public interface Application {
     // Model loading
     //**************************************************************************
 
-    void loadConnections(String fileName);
-
+    void loadConnections(File file);
     void loadXmlModel(File file);
     void saveXmlModel();
 
@@ -75,14 +73,6 @@ public interface Application {
     void deleteConnectionProvider(String connectionProvider);
     void updateConnectionProvider(ConnectionProvider connectionProvider);
 
-    //**************************************************************************
-    // FileManager
-    //**************************************************************************
-    void createFileManager(String storeDir, String workDir) throws Exception;
-    public void startFileManager() throws Exception;
-    public void stopFileManager() throws Exception;
-    public FileManager getFileManager ();
-    
     //**************************************************************************
     // Configuration access
     //**************************************************************************

@@ -42,7 +42,6 @@ import com.manydesigns.portofino.email.EmailTask;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
@@ -207,12 +206,6 @@ public class PortofinoListener
 
         ElementsThreadLocals.destroy();
 
-        try {
-            application.stopFileManager();
-        } catch (Exception e) {
-            logger.warn("cannot stop FileManager");
-        }
-
         logger.info("ManyDesigns Portofino stopped.");
     }
 
@@ -249,42 +242,17 @@ public class PortofinoListener
             ElementsThreadLocals.setupDefaultElementsContext();
 
 
-            String storeDir = FilenameUtils.normalize(portofinoConfiguration.getString(
-            PortofinoProperties.PORTOFINO_STOREDIR));
-            String workDir = FilenameUtils.normalize(portofinoConfiguration.getString(
-            PortofinoProperties.PORTOFINO_WORKDIR));
-
-            String connectionsFileName =
-            portofinoConfiguration.getString(
-            PortofinoProperties.CONNECTION_FILE);
+            String connectionsLocation =
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.CONNECTIONS_LOCATION);
             String modelLocation =
-            portofinoConfiguration.getString(
-            PortofinoProperties.MODEL_LOCATION);
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.MODEL_LOCATION);
 
-            String rootDirPath = servletContext.getRealPath("/");
-            File modelFile;
-            if (rootDirPath == null) {
-                modelFile = new File(modelLocation);
-            } else {
+            File connectionsFile = serverInfo.getWebAppFile(connectionsLocation);
+            File modelFile = serverInfo.getWebAppFile(modelLocation);
 
-                modelFile = new File (rootDirPath, modelLocation);
-            }
-
-            if(FilenameUtils.getPrefixLength(storeDir)==-1
-            || FilenameUtils.getPrefixLength(storeDir)==0){
-                storeDir = FilenameUtils.concat(rootDirPath, storeDir);
-            }
-            if(FilenameUtils.getPrefixLength(workDir)==-1
-            || FilenameUtils.getPrefixLength(storeDir)==0){
-                workDir = FilenameUtils.concat(rootDirPath, workDir);
-            }
-            logger.info("Storing directory:" + storeDir);
-            logger.info("Working directory:" + workDir);
-            application.createFileManager(storeDir, workDir);
-
-            application.startFileManager();
-
-            application.loadConnections(connectionsFileName);
+            application.loadConnections(connectionsFile);
             application.loadXmlModel(modelFile);
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
