@@ -49,7 +49,7 @@ function enablePortletDragAndDrop(button) {
             .css("margin-bottom", "1em")
             .css("min-height", "12em");
     var container = $(button).parent();
-    container.empty();
+    $(button).remove();
     container.append('<button name="updateLayout">Save</button>');
     container.append('<button>Cancel</button>');
 }

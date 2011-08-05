@@ -19,9 +19,12 @@
                                     <mde:write name="breadcrumbs"/>
                                 </div>
                             </div>
+                            <!-- Admin buttons -->
                             <div style="float: right;">
                                 <button onclick="enablePortletDragAndDrop(this); return false;">Edit page layout</button>
+                                <button name="reloadModel">Reload model</button>
                             </div>
+                            <!-- End admin buttons -->
                             <c:set var="resultSetNavigation" scope="request" value="${actionBean.resultSetNavigation}"/>
                             <c:if test="${not empty resultSetNavigation}">
                                 <div class="resultSetNavigation">

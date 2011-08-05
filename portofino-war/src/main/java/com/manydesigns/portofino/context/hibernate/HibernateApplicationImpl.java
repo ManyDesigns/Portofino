@@ -137,7 +137,7 @@ public class HibernateApplicationImpl implements Application {
         }
     }
 
-    public void loadXmlModel(File file) {
+    public synchronized void loadXmlModel(File file) {
         logger.info("Loading xml model from file: {}",
                 file.getAbsolutePath());
 
@@ -151,6 +151,10 @@ public class HibernateApplicationImpl implements Application {
         } catch (Exception e) {
             logger.error("Cannot load/parse model: " + file, e);
         }
+    }
+
+    public synchronized void reloadXmlModel() {
+        loadXmlModel(xmlModelFile);
     }
 
     public void saveXmlModel() {

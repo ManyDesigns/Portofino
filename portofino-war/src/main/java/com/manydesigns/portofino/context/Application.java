@@ -60,6 +60,7 @@ public interface Application {
     void loadConnections(File file);
     void loadXmlModel(File file);
     void saveXmlModel();
+    void reloadXmlModel();
 
 
     //**************************************************************************

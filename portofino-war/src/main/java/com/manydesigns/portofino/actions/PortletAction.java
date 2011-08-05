@@ -82,6 +82,10 @@ public class PortletAction extends AbstractActionBean {
         }
     }
 
+    //--------------------------------------------------------------------------
+    // Admin methods
+    //--------------------------------------------------------------------------
+
     public Resolution updateLayout() {
         synchronized (application) {
             Enumeration parameters = request.getParameterNames();
@@ -96,6 +100,11 @@ public class PortletAction extends AbstractActionBean {
             application.getModel().init();
             application.saveXmlModel();
         }
+        return new RedirectResolution(dispatch.getOriginalPath());
+    }
+
+    public Resolution reloadModel() {
+        application.reloadXmlModel();
         return new RedirectResolution(dispatch.getOriginalPath());
     }
 
@@ -115,6 +124,10 @@ public class PortletAction extends AbstractActionBean {
             }
         }
     }
+
+    //--------------------------------------------------------------------------
+    // Getters/Setters
+    //--------------------------------------------------------------------------
 
     public Dispatch getDispatch() {
         return dispatch;
