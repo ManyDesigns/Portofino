@@ -6,7 +6,8 @@
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
 <div id="contentLayoutTop" class="portletContainer">
     <c:forEach var="portletInstance" items="${ actionBean.portlets['contentLayoutTop'] }">
-        <div class="portletWrapper" id="pw_<c:out value='${portletInstance.id}' />">
+        <input type="hidden" class="updateLayout" name="portletWrapper_contentLayoutTop" value="<c:out value='${portletInstance.id}' />" />
+        <div class="portletWrapper" id="portletWrapper_<c:out value='${portletInstance.id}' />">
             <jsp:include page="${portletInstance.jsp}" />
         </div>
     </c:forEach>
@@ -14,14 +15,16 @@
 <div class="yui-g">
     <div id="contentLayoutLeft" class="yui-u first portletContainer">
         <c:forEach var="portletInstance" items="${ actionBean.portlets['contentLayoutLeft'] }">
-            <div class="portletWrapper" id="pw_<c:out value='${portletInstance.id}' />">
+            <input type="hidden" class="updateLayout" name="portletWrapper_contentLayoutLeft" value="<c:out value='${portletInstance.id}' />" />
+            <div class="portletWrapper" id="portletWrapper_<c:out value='${portletInstance.id}' />">
                 <jsp:include page="${portletInstance.jsp}" />
             </div>
         </c:forEach>
     </div>
     <div id="contentLayoutRight" class="yui-u portletContainer">
         <c:forEach var="portletInstance" items="${ actionBean.portlets['contentLayoutRight'] }">
-            <div class="portletWrapper" id="pw_<c:out value='${portletInstance.id}' />">
+            <input type="hidden" class="updateLayout" name="portletWrapper_contentLayoutRight" value="<c:out value='${portletInstance.id}' />" />
+            <div class="portletWrapper" id="portletWrapper_<c:out value='${portletInstance.id}' />">
                 <jsp:include page="${portletInstance.jsp}" />
             </div>
         </c:forEach>
@@ -29,11 +32,9 @@
 </div>
 <div id="contentLayoutBottom" class="portletContainer">
     <c:forEach var="portletInstance" items="${ actionBean.portlets['contentLayoutBottom'] }">
-        <div class="portletWrapper" id="pw_<c:out value='${portletInstance.id}' />">
+        <input type="hidden" class="updateLayout" name="portletWrapper_contentLayoutBottom" value="<c:out value='${portletInstance.id}' />" />
+        <div class="portletWrapper" id="portletWrapper_<c:out value='${portletInstance.id}' />">
             <jsp:include page="${portletInstance.jsp}" />
         </div>
     </c:forEach>
 </div>
-<script type="text/javascript">
-    $(enablePortletDragAndDrop);
-</script>

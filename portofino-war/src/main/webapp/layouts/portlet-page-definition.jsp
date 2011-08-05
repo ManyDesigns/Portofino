@@ -19,6 +19,9 @@
                                     <mde:write name="breadcrumbs"/>
                                 </div>
                             </div>
+                            <div style="float: right;">
+                                <button onclick="enablePortletDragAndDrop(this); return false;">Edit page layout</button>
+                            </div>
                             <c:set var="resultSetNavigation" scope="request" value="${actionBean.resultSetNavigation}"/>
                             <c:if test="${not empty resultSetNavigation}">
                                 <div class="resultSetNavigation">

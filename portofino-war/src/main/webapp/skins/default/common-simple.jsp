@@ -33,7 +33,7 @@
         <script type="text/javascript"
                 src="<stripes:url value="/skins/default/portofino.js"/>"></script>
         <stripes:layout-component name="customScripts" />
-        <title><c:out value="pageTitle"/></title>
+        <title><c:out value="${dispatch.lastSiteNodeInstance.siteNode.description}"/></title>
     </head>
     <body>
     <div id="doc3" class="yui-t2">

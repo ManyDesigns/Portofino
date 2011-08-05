@@ -3,6 +3,7 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectDispatch;
+import com.manydesigns.portofino.annotations.InjectHttpRequest;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -13,12 +14,15 @@ import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.StripesConstants;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -31,10 +35,8 @@ public class PortletAction extends AbstractActionBean {
     @InjectApplication
     public Application application;
 
-    //Layout
-
-    public String[] pw;
-    public String layoutContainer;
+    @InjectHttpRequest
+    public HttpServletRequest request;
 
     //--------------------------------------------------------------------------
     // Navigation
@@ -81,28 +83,37 @@ public class PortletAction extends AbstractActionBean {
     }
 
     public Resolution updateLayout() {
-        if(pw == null) {
-            return null;
-        }
         synchronized (application) {
-            SiteNodeInstance myself = dispatch.getLastSiteNodeInstance();
-            for(int i = 0; i < pw.length; i++) {
-                String current = pw[i];
-                if("p".equals(current)) {
-                    myself.setLayoutContainer(layoutContainer);
-                    myself.setLayoutOrder(i);
-                } else {
-                    String nodeId = current.substring(1); //current = c...
-                    SiteNodeInstance childNodeInstance = myself.findChildNode(nodeId);
-                    SiteNode childNode = childNodeInstance.getSiteNode();
-                    childNode.setLayoutContainerInParent(layoutContainer);
-                    childNode.setLayoutOrderInParent(i + "");
+            Enumeration parameters = request.getParameterNames();
+            while(parameters.hasMoreElements()) {
+                String parameter = (String) parameters.nextElement();
+                if(parameter.startsWith("portletWrapper_")) {
+                    String layoutContainer = parameter.substring("portletWrapper_".length());
+                    String[] portletWrapperIds = request.getParameterValues(parameter);
+                    updateLayout(layoutContainer, portletWrapperIds);
                 }
             }
             application.getModel().init();
             application.saveXmlModel();
         }
-        return null;
+        return new RedirectResolution(dispatch.getOriginalPath());
+    }
+
+    protected void updateLayout(String layoutContainer, String[] portletWrapperIds) {
+        SiteNodeInstance myself = dispatch.getLastSiteNodeInstance();
+        for(int i = 0; i < portletWrapperIds.length; i++) {
+            String current = portletWrapperIds[i];
+            if("p".equals(current)) {
+                myself.setLayoutContainer(layoutContainer);
+                myself.setLayoutOrder(i);
+            } else {
+                String nodeId = current.substring(1); //current = c...
+                SiteNodeInstance childNodeInstance = myself.findChildNode(nodeId);
+                SiteNode childNode = childNodeInstance.getSiteNode();
+                childNode.setLayoutContainerInParent(layoutContainer);
+                childNode.setLayoutOrderInParent(i + "");
+            }
+        }
     }
 
     public Dispatch getDispatch() {
@@ -127,22 +138,6 @@ public class PortletAction extends AbstractActionBean {
 
     public void setResultSetNavigation(ResultSetNavigation resultSetNavigation) {
         this.resultSetNavigation = resultSetNavigation;
-    }
-
-    public String[] getPw() {
-        return pw;
-    }
-
-    public void setPw(String[] pw) {
-        this.pw = pw;
-    }
-
-    public String getLayoutContainer() {
-        return layoutContainer;
-    }
-
-    public void setLayoutContainer(String layoutContainer) {
-        this.layoutContainer = layoutContainer;
     }
 
     protected void setupPortlets(SiteNodeInstance siteNodeInstance, String myself) {
