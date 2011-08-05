@@ -31,10 +31,7 @@ package com.manydesigns.portofino.model.site;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.crud.Crud;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 
 /*
@@ -43,6 +40,7 @@ import java.util.ArrayList;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@XmlAccessorType(XmlAccessType.NONE)
 public class CrudNode extends SiteNode implements EmbeddableNode {
     //**************************************************************************
     // Constants
@@ -62,6 +60,8 @@ public class CrudNode extends SiteNode implements EmbeddableNode {
 
     protected String detailLayoutContainer;
     protected String detailLayoutOrder;
+
+    protected int actualDetailLayoutOrder;
 
     public CrudNode() {
         super();
@@ -91,6 +91,10 @@ public class CrudNode extends SiteNode implements EmbeddableNode {
     @Override
     public void init(Model model) {
         super.init(model);
+
+        if(detailLayoutOrder != null) {
+            actualDetailLayoutOrder = Integer.parseInt(detailLayoutOrder);
+        }
 
         for (SiteNode current : detailChildNodes) {
             current.init(model);
@@ -128,5 +132,9 @@ public class CrudNode extends SiteNode implements EmbeddableNode {
 
     public void setDetailLayoutOrder(String detailLayoutOrder) {
         this.detailLayoutOrder = detailLayoutOrder;
+    }
+
+    public int getActualDetailLayoutOrder() {
+        return actualDetailLayoutOrder;
     }
 }

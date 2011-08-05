@@ -149,4 +149,37 @@ public class CrudNodeInstance extends SiteNodeInstance {
             throw new IllegalStateException("Unsupported mode: " + mode);
         }
     }
+
+    @Override
+    public void setLayoutContainer(String layoutContainer) {
+        if (CrudNode.MODE_SEARCH.equals(mode)) {
+            siteNode.setLayoutContainer(layoutContainer);
+        } else if (CrudNode.MODE_DETAIL.equals(mode)) {
+            getSiteNode().setDetailLayoutContainer(layoutContainer);
+        } else {
+            throw new IllegalStateException("Unsupported mode: " + mode);
+        }
+    }
+
+    @Override
+    public void setLayoutOrder(int order) {
+        if (CrudNode.MODE_SEARCH.equals(mode)) {
+            siteNode.setLayoutOrder(Integer.toString(order));
+        } else if (CrudNode.MODE_DETAIL.equals(mode)) {
+            getSiteNode().setDetailLayoutOrder(Integer.toString(order));
+        } else {
+            throw new IllegalStateException("Unsupported mode: " + mode);
+        }
+    }
+
+    @Override
+    public int getLayoutOrder() {
+        if (CrudNode.MODE_SEARCH.equals(mode)) {
+            return siteNode.getActualLayoutOrder();
+        } else if (CrudNode.MODE_DETAIL.equals(mode)) {
+            return getSiteNode().getActualDetailLayoutOrder();
+        } else {
+            throw new IllegalStateException("Unsupported mode: " + mode);
+        }
+    }
 }

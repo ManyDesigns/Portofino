@@ -32,6 +32,8 @@ package com.manydesigns.portofino.model.site;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.Identifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
@@ -74,6 +76,12 @@ public abstract class  SiteNode implements ModelObject {
     protected int actualLayoutOrder;
 
     //**************************************************************************
+    // Logging
+    //**************************************************************************
+
+    public static final Logger logger = LoggerFactory.getLogger(SiteNode.class);
+
+    //**************************************************************************
     // Constructors
     //**************************************************************************
 
@@ -106,6 +114,7 @@ public abstract class  SiteNode implements ModelObject {
             childNode.init(model);
         }
         if (layoutOrderInParent != null) {
+            //TODO controllare che sia non-null anche layoutContainerInParent
             actualLayoutOrderInParent = Integer.parseInt(layoutOrderInParent);
         }
         if(layoutOrder != null) {
@@ -114,6 +123,20 @@ public abstract class  SiteNode implements ModelObject {
     }
 
     public String getQualifiedName() {
+        return null;
+    }
+
+    //**************************************************************************
+    // Utility Methods
+    //**************************************************************************
+
+    public SiteNode findChildNode(String id) {
+        for(SiteNode node : getChildNodes()) {
+            if(id.equals(node.getId())) {
+                return node;
+            }
+        }
+        logger.debug("Child node not found: {}", id);
         return null;
     }
 

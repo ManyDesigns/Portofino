@@ -1,7 +1,9 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectDispatch;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
@@ -16,12 +18,23 @@ import net.sourceforge.stripes.controller.StripesConstants;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 public class PortletAction extends AbstractActionBean {
 
     public final MultiMap portlets = new MultiHashMap();
     @InjectDispatch
     public Dispatch dispatch;
     public String returnToParentTarget;
+    @InjectApplication
+    public Application application;
+
+    //Layout
+
+    public String[] pw;
+    public String layoutContainer;
 
     //--------------------------------------------------------------------------
     // Navigation
@@ -67,6 +80,31 @@ public class PortletAction extends AbstractActionBean {
         }
     }
 
+    public Resolution updateLayout() {
+        if(pw == null) {
+            return null;
+        }
+        synchronized (application) {
+            SiteNodeInstance myself = dispatch.getLastSiteNodeInstance();
+            for(int i = 0; i < pw.length; i++) {
+                String current = pw[i];
+                if("p".equals(current)) {
+                    myself.setLayoutContainer(layoutContainer);
+                    myself.setLayoutOrder(i);
+                } else {
+                    String nodeId = current.substring(1); //current = c...
+                    SiteNodeInstance childNodeInstance = myself.findChildNode(nodeId);
+                    SiteNode childNode = childNodeInstance.getSiteNode();
+                    childNode.setLayoutContainerInParent(layoutContainer);
+                    childNode.setLayoutOrderInParent(i + "");
+                }
+            }
+            application.getModel().init();
+            application.saveXmlModel();
+        }
+        return null;
+    }
+
     public Dispatch getDispatch() {
         return dispatch;
     }
@@ -91,17 +129,44 @@ public class PortletAction extends AbstractActionBean {
         this.resultSetNavigation = resultSetNavigation;
     }
 
-    protected void setupPortlets(String myself, SiteNodeInstance siteNodeInstance) {
-        portlets.put(siteNodeInstance.getLayoutContainer(), myself);
+    public String[] getPw() {
+        return pw;
+    }
+
+    public void setPw(String[] pw) {
+        this.pw = pw;
+    }
+
+    public String getLayoutContainer() {
+        return layoutContainer;
+    }
+
+    public void setLayoutContainer(String layoutContainer) {
+        this.layoutContainer = layoutContainer;
+    }
+
+    protected void setupPortlets(SiteNodeInstance siteNodeInstance, String myself) {
+        PortletInstance myPortletInstance = new PortletInstance("p", siteNodeInstance.getLayoutOrder(), myself);
+        portlets.put(siteNodeInstance.getLayoutContainer(), myPortletInstance);
         for(SiteNode node : siteNodeInstance.getChildNodes()) {
-            if(node instanceof EmbeddableNode  && node.getLayoutContainerInParent() != null) {
-                portlets.put(node.getLayoutContainerInParent(), dispatch.getOriginalPath() + "/" + node.getId());
+            if(node instanceof EmbeddableNode && node.getLayoutContainerInParent() != null) {
+                PortletInstance portletInstance =
+                        new PortletInstance(
+                                "c" + node.getId(),
+                                node.getActualLayoutOrderInParent(),
+                                dispatch.getOriginalPath() + "/" + node.getId());
+                portlets.put(node.getLayoutContainerInParent(), portletInstance);
             }
+        }
+        for(Object entryObj : portlets.entrySet()) {
+            Map.Entry entry = (Map.Entry) entryObj;
+            List portletContainer = (List) entry.getValue();
+            Collections.sort(portletContainer);
         }
     }
 
     protected Resolution forwardToPortletPage(String nodeJsp, SiteNodeInstance siteNodeInstance) {
-        setupPortlets(nodeJsp, siteNodeInstance);
+        setupPortlets(siteNodeInstance, nodeJsp);
         return new ForwardResolution("/layouts/portlet-page.jsp");
     }
 }

@@ -49,7 +49,6 @@ import java.util.List;
 */
 
 @XmlAccessorType(value = XmlAccessType.NONE)
-
 public class PrimaryKey implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

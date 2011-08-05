@@ -4,33 +4,33 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
-<div class="portletContainer">
-    <c:forEach var="pageToInclude" items="${ actionBean.portlets['contentLayoutTop'] }">
-        <div class="portletWrapper">
-            <jsp:include page="${pageToInclude}" />
+<div id="contentLayoutTop" class="portletContainer">
+    <c:forEach var="portletInstance" items="${ actionBean.portlets['contentLayoutTop'] }">
+        <div class="portletWrapper" id="pw_<c:out value='${portletInstance.id}' />">
+            <jsp:include page="${portletInstance.jsp}" />
         </div>
     </c:forEach>
 </div>
 <div class="yui-g">
-    <div class="yui-u first portletContainer">
-        <c:forEach var="pageToInclude" items="${ actionBean.portlets['contentLayoutLeft'] }">
-            <div class="portletWrapper">
-                <jsp:include page="${pageToInclude}" />
+    <div id="contentLayoutLeft" class="yui-u first portletContainer">
+        <c:forEach var="portletInstance" items="${ actionBean.portlets['contentLayoutLeft'] }">
+            <div class="portletWrapper" id="pw_<c:out value='${portletInstance.id}' />">
+                <jsp:include page="${portletInstance.jsp}" />
             </div>
         </c:forEach>
     </div>
-    <div class="yui-u portletContainer">
-        <c:forEach var="pageToInclude" items="${ actionBean.portlets['contentLayoutRight'] }">
-            <div class="portletWrapper">
-                <jsp:include page="${pageToInclude}" />
+    <div id="contentLayoutRight" class="yui-u portletContainer">
+        <c:forEach var="portletInstance" items="${ actionBean.portlets['contentLayoutRight'] }">
+            <div class="portletWrapper" id="pw_<c:out value='${portletInstance.id}' />">
+                <jsp:include page="${portletInstance.jsp}" />
             </div>
         </c:forEach>
     </div>
 </div>
-<div class="portletContainer">
-    <c:forEach var="pageToInclude" items="${ actionBean.portlets['contentLayoutBottom'] }">
-        <div class="portletWrapper">
-            <jsp:include page="${pageToInclude}" />
+<div id="contentLayoutBottom" class="portletContainer">
+    <c:forEach var="portletInstance" items="${ actionBean.portlets['contentLayoutBottom'] }">
+        <div class="portletWrapper" id="pw_<c:out value='${portletInstance.id}' />">
+            <jsp:include page="${portletInstance.jsp}" />
         </div>
     </c:forEach>
 </div>

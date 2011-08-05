@@ -29,6 +29,8 @@
 package com.manydesigns.portofino.model.site;
 
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
 /*
@@ -37,6 +39,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@XmlAccessorType(XmlAccessType.NONE)
 public class CustomFolderNode extends SiteNode{
 
     //**************************************************************************

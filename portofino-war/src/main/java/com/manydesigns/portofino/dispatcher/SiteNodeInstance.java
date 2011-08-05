@@ -31,6 +31,8 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.model.site.SiteNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +49,12 @@ public class SiteNodeInstance {
     protected final SiteNode siteNode;
     protected final String mode;
     protected final List<SiteNodeInstance> childNodeInstances;
+
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
+
+    public static final Logger logger = LoggerFactory.getLogger(SiteNodeInstance.class);
 
     public SiteNodeInstance(Application application, SiteNode siteNode, String mode) {
         this.application = application;
@@ -70,6 +78,20 @@ public class SiteNodeInstance {
     public void realize() {
     }
 
+    //**************************************************************************
+    // Utility Methods
+    //**************************************************************************
+
+    public SiteNodeInstance findChildNode(String id) {
+        for(SiteNodeInstance node : getChildNodeInstances()) {
+            if(id.equals(node.getSiteNode().getId())) {
+                return node;
+            }
+        }
+        logger.debug("Child node not found: {}", id);
+        return null;
+    }
+
     public String getUrlFragment() {
         return siteNode.getId();
     }
@@ -84,5 +106,17 @@ public class SiteNodeInstance {
 
     public String getLayoutContainer() {
         return siteNode.getLayoutContainer();
+    }
+
+    public void setLayoutContainer(String layoutContainer) {
+        siteNode.setLayoutContainer(layoutContainer);
+    }
+
+    public int getLayoutOrder() {
+        return siteNode.getActualLayoutOrder();
+    }
+
+    public void setLayoutOrder(int order) {
+        siteNode.setLayoutOrder(Integer.toString(order));
     }
 }

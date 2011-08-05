@@ -29,7 +29,14 @@ function enablePortletDragAndDrop() {
         placeholder: "sortablePlaceholder",
         cursor: "move", // cursor image
         revert: true, // moves the portlet to its new position with a smooth transition
-        tolerance: "pointer" // mouse pointer overlaps the droppable
+        tolerance: "pointer", // mouse pointer overlaps the droppable
+        update: function(event, ui) {
+            $.ajax({
+                type: 'POST',
+                url: window.location.href,
+                data: 'updateLayout=&layoutContainer=' + encodeURIComponent(this.id) + "&" + $(this).sortable("serialize")
+            });
+        }
     }).disableSelection()
             .css('padding', '1em 0')
             .css("border", "1px dashed grey")
