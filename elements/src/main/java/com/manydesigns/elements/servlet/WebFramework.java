@@ -33,10 +33,12 @@ import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.util.InstanceBuilder;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
@@ -130,4 +132,13 @@ public class WebFramework {
         }
     }
 
+    public HttpServletRequest wrapRequest(HttpServletRequest request)
+            throws ServletException {
+        try {
+            return new MultipartRequestWrapper(request);
+        } catch (FileUploadException e) {
+            throw new ServletException(e);
+        }
+
+    }
 }

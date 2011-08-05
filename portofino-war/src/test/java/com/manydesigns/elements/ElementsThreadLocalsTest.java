@@ -63,7 +63,8 @@ public class ElementsThreadLocalsTest extends TestCase {
         composite.readFromRequest(null);
         composite.readFromObject(null);
         composite.validate();
-        composite.toXhtml(null);
+        XhtmlBuffer xb = new XhtmlBuffer();
+        composite.toXhtml(xb);
     }
 
     public void testCompositeId() {

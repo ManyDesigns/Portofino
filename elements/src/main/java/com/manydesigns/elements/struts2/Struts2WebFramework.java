@@ -34,6 +34,7 @@ import com.manydesigns.elements.servlet.WebFramework;
 import org.apache.struts2.dispatcher.StrutsRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
@@ -99,5 +100,11 @@ public class Struts2WebFramework extends WebFramework {
             logger.warn("Cannot read upload file: {}", file.getAbsolutePath());
             return null;
         }
+    }
+
+    @Override
+    public HttpServletRequest wrapRequest(HttpServletRequest request)
+            throws ServletException {
+        return request;
     }
 }
