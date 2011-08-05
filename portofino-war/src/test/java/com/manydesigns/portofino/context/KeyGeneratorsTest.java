@@ -52,11 +52,10 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        application.openSession();
     }
 
     public void tearDown() {
-        application.closeSession();
+        application.closeSessions();
     }
 
     public void testAutoIncrementGenerator(){

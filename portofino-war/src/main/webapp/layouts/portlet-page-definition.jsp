@@ -20,9 +20,9 @@
                                 </div>
                             </div>
                             <!-- Admin buttons -->
-                            <div style="float: right;">
-                                <button onclick="enablePortletDragAndDrop(this); return false;">Edit page layout</button>
-                                <button name="reloadModel">Reload model</button>
+                            <div class="portletHeaderButtons" style="float: right;">
+                                <button onclick="enablePortletDragAndDrop(this); return false;" class="arrow-4">Edit page layout</button>
+                                <button name="reloadModel" class="refresh">Reload model</button>
                             </div>
                             <!-- End admin buttons -->
                             <c:set var="resultSetNavigation" scope="request" value="${actionBean.resultSetNavigation}"/>

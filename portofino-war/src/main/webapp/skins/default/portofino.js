@@ -21,6 +21,19 @@ $(function() {
             },
             text: false
         });
+    $("input:submit.arrow-4, button.arrow-4").button({
+            icons: {
+                primary: "ui-icon-arrow-4"
+            },
+            text: false
+        });
+
+    $("input:submit.refresh, button.refresh").button({
+            icons: {
+                primary: "ui-icon-refresh"
+            },
+            text: false
+        });
 });
 
 function enablePortletDragAndDrop(button) {
@@ -31,7 +44,6 @@ function enablePortletDragAndDrop(button) {
         revert: true, // moves the portlet to its new position with a smooth transition
         tolerance: "pointer", // mouse pointer overlaps the droppable
         update: function(event, ui) {
-            console.log($(this).find("hidden"));
             $(this).find(".updateLayout").remove();
             var elements = $(this).sortable('toArray');
             for(var index in elements) {
@@ -50,6 +62,6 @@ function enablePortletDragAndDrop(button) {
             .css("min-height", "12em");
     var container = $(button).parent();
     $(button).remove();
-    container.append('<button name="updateLayout">Save</button>');
-    container.append('<button>Cancel</button>');
+    container.prepend('<button name="cancelLayout">Cancel</button> ');
+    container.prepend('<button name="updateLayout">Save</button>');
 }

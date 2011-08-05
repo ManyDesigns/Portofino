@@ -141,8 +141,6 @@ public class PortofinoInterceptor implements Interceptor {
         MDC.put(SessionAttributes.USER_ID, ObjectUtils.toString(userId));
         MDC.put(SessionAttributes.USER_NAME, userName);
 
-        application.openSession();
-
         List<String> groups=UserUtils.manageGroups(application, userId);
 
         logger.debug("Setting default skin");

@@ -101,7 +101,6 @@ public class EmailSender implements Runnable{
             email.setTLS(ssl);
             email.send();
 
-            application.openSession();
             if (keepSent) {
                 emailBean.setState(EmailUtils.SENT);
                 application.updateObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
@@ -118,7 +117,7 @@ public class EmailSender implements Runnable{
             }
         }finally {
             if (application != null)
-            application.closeSession();
+            application.closeSessions();
         }
     }
 

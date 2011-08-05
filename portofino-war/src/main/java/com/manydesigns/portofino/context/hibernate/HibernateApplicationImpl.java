@@ -159,10 +159,15 @@ public class HibernateApplicationImpl implements Application {
 
     public void saveXmlModel() {
         try {
+            File tempFile = File.createTempFile(xmlModelFile.getName(), "");
+
             JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            m.marshal(model, xmlModelFile);
+            m.marshal(model, tempFile);
+
+            moveFileSafely(tempFile, xmlModelFile.getAbsolutePath());
+
             logger.info("Saved xml model to file: {}", xmlModelFile);
         } catch (Throwable e) {
             logger.error("Cannot save xml model to file: " + xmlModelFile, e);
@@ -705,18 +710,9 @@ public class HibernateApplicationImpl implements Application {
         return result;
     }
 
-    public void openSession() {
+    public void closeSessions() {
         for (HibernateDatabaseSetup current : setups.values()) {
-            SessionFactory sessionFactory = current.getSessionFactory();
-            Session session = sessionFactory.openSession();
-            current.setThreadSession(session);
-        }
-    }
-
-
-    public void closeSession() {
-        for (HibernateDatabaseSetup current : setups.values()) {
-            Session session = current.getThreadSession();
+            Session session = current.getThreadSession(false);
             if (session != null) {
                 try {
                     session.close();
@@ -955,16 +951,29 @@ public class HibernateApplicationImpl implements Application {
             JAXBContext jc = JAXBContext.newInstance(Connections.JAXB_CONNECTIONS_PACKAGES);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            m.marshal(connectionProviders, xmlModelFile);
+            m.marshal(connectionProviders, tempFile);
             os.flush();
 
-            FileUtils.moveFile(tempFile, new File(fileName));
+            moveFileSafely(tempFile, fileName);
 
-            logger.info("Saved connection to file: {}", fileName);
+            logger.info("Saved connections to file: {}", fileName);
         } catch (Throwable e) {
-            logger.error("Cannot save xml model to file: " + fileName, e);
+            logger.error("Cannot save connections to file: " + fileName, e);
         } finally {
             IOUtils.closeQuietly(os);
+        }
+    }
+
+    protected void moveFileSafely(File tempFile, String fileName) throws IOException {
+        File destination = new File(fileName);
+        if(!destination.exists()) {
+            FileUtils.moveFile(tempFile, destination);
+        } else {
+            File backup = File.createTempFile(destination.getName(), ".backup");
+            backup.delete();
+            FileUtils.moveFile(destination, backup);
+            FileUtils.moveFile(tempFile, destination);
+            backup.delete();
         }
     }
 

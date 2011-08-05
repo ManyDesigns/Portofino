@@ -72,9 +72,9 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
         assertEquals(4, connectionProviders.size());
         InputStream is = null;
         try {
-            is = new FileInputStream(PORTOFINO_CONNECTIONS_RESOURCE);
+            is = new FileInputStream(connectionsFile);
             String file = convertStreamToString(is);
-            assertTrue(file.contains("<jdbcConnection databaseName=\"test\" driver=\"org.h2.Driver\" url=\"jdbc:h2:mem:test\" username=\"manydesigns\" password=\"manydesigns\"/>"));
+            assertTrue(file.contains("<jdbcConnection driver=\"org.h2.Driver\" password=\"manydesigns\" url=\"jdbc:h2:mem:test\" username=\"manydesigns\" databaseName=\"test\"/>"));
         } finally {
             IOUtils.closeQuietly(is);
         }
@@ -90,9 +90,9 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
         assertEquals(4, connectionProviders.size());
         is = null;
         try {
-            is = new FileInputStream(PORTOFINO_CONNECTIONS_RESOURCE);
+            is = new FileInputStream(connectionsFile);
             String file = convertStreamToString(is);
-            assertTrue(file.contains("<jdbcConnection databaseName=\"test\" driver=\"org.h2.Driver\" url=\"jdbc:h2:mem:test2\" username=\"manydesigns2\" password=\"manydesigns2\"/>"));
+            assertTrue(file.contains("<jdbcConnection driver=\"org.h2.Driver\" password=\"manydesigns2\" url=\"jdbc:h2:mem:test2\" username=\"manydesigns2\" databaseName=\"test\"/>"));
         } finally {
             IOUtils.closeQuietly(is);
         }
@@ -101,9 +101,9 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
         assertEquals(3, connectionProviders.size());
         is = null;
         try {
-            is = new FileInputStream(PORTOFINO_CONNECTIONS_RESOURCE);
+            is = new FileInputStream(connectionsFile);
             String file = convertStreamToString(is);
-            assertFalse(file.contains("<jdbcConnection databaseName=\"test\" driver=\"org.h2.Driver\" url=\"jdbc:h2:mem:test\" username=\"manydesigns\" password=\"manydesigns\"/>"));
+            assertFalse(file.contains("<jdbcConnection driver=\"org.h2.Driver\" password=\"manydesigns\" url=\"jdbc:h2:mem:test\" username=\"manydesigns\" databaseName=\"test\"/>"));
         } finally {
             IOUtils.closeQuietly(is);
         }

@@ -123,9 +123,7 @@ public interface Application {
 
     List<Object[]> runSql(String databaseName, String sql);
 
-    void openSession();
-
-    void closeSession();
+    void closeSessions();
 
     void commit(String databaseName);
 

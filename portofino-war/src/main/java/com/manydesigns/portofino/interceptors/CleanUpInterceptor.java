@@ -64,7 +64,7 @@ public class CleanUpInterceptor implements Interceptor  {
 
         MDC.clear();
         if (application !=null && application.getModel() != null) {
-            application.closeSession();
+            application.closeSessions();
         }
 
         return context.proceed();

@@ -54,7 +54,6 @@ public class EmailTest extends AbstractPortofinoTest {
     public void setUp() throws Exception {
         super.setUp();
         server = SimpleSmtpServer.start(SMTP_PORT);
-        application.openSession();
     }
 
     public void testSimple() {
@@ -205,7 +204,7 @@ public class EmailTest extends AbstractPortofinoTest {
 
     public void tearDown() {
         server.stop();
-        application.closeSession();
+        application.closeSessions();
         Runtime r = Runtime.getRuntime();
         r.gc();
         r.runFinalization();

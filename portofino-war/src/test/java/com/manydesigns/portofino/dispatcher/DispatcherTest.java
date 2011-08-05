@@ -55,13 +55,12 @@ public class DispatcherTest extends AbstractPortofinoTest {
     public void setUp() throws Exception {
         super.setUp();
         dispatcher = new Dispatcher(application);
-        application.openSession();
     }
 
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
-        application.closeSession();
+        application.closeSessions();
     }
 
     public void testProjectSearch() {

@@ -51,11 +51,10 @@ public class HibernateTest extends AbstractPortofinoTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        application.openSession();
     }
 
     public void tearDown() {
-        application.closeSession();
+        application.closeSessions();
     }
 
     public void testReadProdotti() {
@@ -136,7 +135,6 @@ public class HibernateTest extends AbstractPortofinoTest {
     }
 
     public void testSearchAndUpdateCategorie() {
-        application.openSession();
         Table table = application.getModel()
                 .findTableByQualifiedName("jpetstore.PUBLIC.category");
         TableAccessor tableAccessor = new TableAccessor(table);
@@ -152,10 +150,9 @@ public class HibernateTest extends AbstractPortofinoTest {
         categoria0.put("name", "Pesciu");
         application.updateObject("jpetstore.PUBLIC.category", categoria0);
         application.commit("jpetstore");
-        application.closeSession();
+        application.closeSessions();
 
         //Controllo l'aggiornamento e riporto le cose come stavano
-        application.openSession();
         criteria = new TableCriteria(table);
         categoria0 =  findCategory(tableAccessor, criteria);
         assertEquals("jpetstore_public_category", categoria0.get("$type$"));
@@ -163,11 +160,10 @@ public class HibernateTest extends AbstractPortofinoTest {
         categoria0.put("name", "Fish");
         application.updateObject("jpetstore.PUBLIC.category", categoria0);
         application.commit("jpetstore");
-        application.closeSession();
+        application.closeSessions();
     }
 
     public void testSaveCategoria() {
-        application.openSession();
         Map<String, Object> worms = new HashMap<String, Object>();
         worms.put("$type$", "jpetstore.PUBLIC.category");
         worms.put("catid", "VERMI");
@@ -180,7 +176,6 @@ public class HibernateTest extends AbstractPortofinoTest {
     }
 
     public void testSaveLineItem() {
-        application.openSession();
         Map<String, Object> lineItem = new HashMap<String, Object>();
         lineItem.put("$type$", "jpetstore.PUBLIC.lineitem");
         lineItem.put("orderid", 2);
@@ -192,10 +187,9 @@ public class HibernateTest extends AbstractPortofinoTest {
 
         application.saveObject("jpetstore.PUBLIC.lineitem", lineItem);
         application.commit("jpetstore");
-        application.closeSession();
+        application.closeSessions();
 
         //e ora cancello
-        application.openSession();
         try {
             application.deleteObject("jpetstore.PUBLIC.lineitem", lineItem);
             application.commit("jpetstore");
@@ -203,13 +197,12 @@ public class HibernateTest extends AbstractPortofinoTest {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             fail();
         }
-        application.closeSession();
+        application.closeSessions();
     }
 
 
     public void testSaveTestElement() {
         try {
-            application.openSession();
             Map<String, Object> testItem = new HashMap<String, Object>();
             testItem.put("$type$", "hibernatetest.PUBLIC.table1");
             testItem.put("testo", "esempio");
@@ -225,7 +218,6 @@ public class HibernateTest extends AbstractPortofinoTest {
 
     public void testDeleteCategoria() {
         try {
-            application.openSession();
             Map<String, Object> worms = new HashMap<String, Object>();
             worms.put("$type$", "jpetstore.PUBLIC.category");
             worms.put("catid", "VERMI");
@@ -247,7 +239,6 @@ public class HibernateTest extends AbstractPortofinoTest {
 
     public void testDeleteCategoriaAndCascadedProducys() {
         try {
-            application.openSession();
             HashMap birdsPk = new HashMap();
             birdsPk.put("catid", "BIRDS");
             Map<String, Object> birdCat = (Map<String, Object>) application.getObjectByPk("jpetstore.PUBLIC.category", birdsPk);
@@ -269,7 +260,6 @@ public class HibernateTest extends AbstractPortofinoTest {
     }
 
         public void testSpaccaSession(){
-        application.openSession();
 
         try {
             //Inserisco un valore troppo grande per email
@@ -305,8 +295,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         } catch (Exception e) {
             //corretto
         }
-        application.closeSession();
-        application.openSession();
+        application.closeSessions();
 
         //Faccio una seconda operazione
         try{

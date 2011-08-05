@@ -103,6 +103,10 @@ public class PortletAction extends AbstractActionBean {
         return new RedirectResolution(dispatch.getOriginalPath());
     }
 
+    public Resolution cancelLayout() {
+        return new RedirectResolution(dispatch.getOriginalPath());
+    }
+
     public Resolution reloadModel() {
         application.reloadXmlModel();
         return new RedirectResolution(dispatch.getOriginalPath());

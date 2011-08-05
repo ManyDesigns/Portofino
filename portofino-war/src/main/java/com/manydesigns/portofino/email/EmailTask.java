@@ -113,11 +113,10 @@ public class EmailTask extends TimerTask {
 
     public void run() {
         try {
-            application.openSession();
             createQueue();
             checkBounce();
         } finally {
-            application.closeSession();
+            application.closeSessions();
         }
     }
 

@@ -68,6 +68,9 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     public Connection connDBTest;
     public Model model;
 
+    public File modelFile;
+    public File connectionsFile;
+
     public static final String PORTOFINO_TEST_PROPERTIES_RESOURCE =
             "portofino-test.properties";
     public static final String PORTOFINO_CONNECTIONS_RESOURCE =
@@ -187,7 +190,7 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     protected File copyResourceToTempFile(String resourceName) throws IOException {
         InputStream is =
                 ReflectionUtil.getResourceAsStream(resourceName);
-        File tempFile = File.createTempFile("", resourceName);
+        File tempFile = File.createTempFile("portofino", "");
         Writer writer = new FileWriter(tempFile);
         IOUtils.copy(is, writer);
         IOUtils.closeQuietly(writer);
@@ -217,8 +220,8 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
             //String rootDirPath = ServletContext.getRealPath("/");
 
-            File modelFile = new File(modelLocation);
-            File connectionsFile = new File(connectionsFileName);
+            modelFile = new File(modelLocation);
+            connectionsFile = new File(connectionsFileName);
 
             application.loadConnections(connectionsFile);
             application.loadXmlModel(modelFile);
