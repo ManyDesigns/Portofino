@@ -85,9 +85,8 @@ public class ElementsFilter implements Filter {
         ServletContext context = config.getServletContext();
 
         try {
-            // TODO: la seguente riga dà fastidio a Stripes ma serve per
-            // usi di Elements senza framework (servlet-api only)
-//            req = new MultipartRequestWrapper(req);
+            WebFramework webFramework = WebFramework.getWebFramework();
+            req = webFramework.wrapRequest(req);
 
             ElementsThreadLocals.setupDefaultElementsContext();
 
@@ -96,9 +95,6 @@ public class ElementsFilter implements Filter {
             ElementsThreadLocals.setServletContext(context);
 
             filterChain.doFilter(req, res);
-//        } catch (FileUploadException e) {
-//            logger.error("FileUploadException caught", e);
-//            throw new ServletException(e);
         } finally {
             ElementsThreadLocals.removeElementsContext();
         }
