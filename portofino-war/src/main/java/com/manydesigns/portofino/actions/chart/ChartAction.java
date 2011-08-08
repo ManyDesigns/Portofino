@@ -30,11 +30,15 @@
 package com.manydesigns.portofino.actions.chart;
 
 import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.jfreechart.JFreeChartInstance;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.actions.PortletAction;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
+import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.site.ChartNode;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
 import net.sourceforge.stripes.action.*;
@@ -117,13 +121,18 @@ public class ChartAction extends PortletAction {
     public static final Logger logger =
             LoggerFactory.getLogger(ChartAction.class);
 
+
+    @Before
+    public void prepare() {
+        chartNode = (ChartNode) siteNodeInstance.getSiteNode();
+    }
+
     //**************************************************************************
     // Action default execute method
     //**************************************************************************
 
     @DefaultHandler
     public Resolution execute() {
-        chartNode = (ChartNode) siteNodeInstance.getSiteNode();
 
         // Run/generate the chart
         generateChart();
@@ -161,17 +170,9 @@ public class ChartAction extends PortletAction {
         DefaultPieDataset dataset = new DefaultPieDataset();
         java.util.List<Object[]> result;
         String query = chartNode.getQuery();
-        try {
-            result = application.runSql(chartNode.getDatabase(), query);
-            for (Object[] current : result) {
-                dataset.setValue((Comparable)current[0], (Number)current[1]);
-            }
-        } catch (Throwable e) {
-            logger.warn("Could not run portlet query: " + query, e);
-            while (e != null) {
-                SessionMessages.addErrorMessage(e.getMessage());
-                e = e.getCause();
-            }
+        result = application.runSql(chartNode.getDatabase(), query);
+        for (Object[] current : result) {
+            dataset.setValue((Comparable)current[0], (Number)current[1]);
         }
 
         chart = ChartFactory.createPieChart(
@@ -249,23 +250,6 @@ public class ChartAction extends PortletAction {
     }
 
 
-    public void design() {
-        /*
-        form = new FormBuilder(PortletNode.class)
-                .configFields("name", "title", "legend", "database",
-                        "query", "urlExpression")
-                .configMode(Mode.VIEW)
-                .build();
-        form.readFromObject(portlet);
-
-        displayForm = new FormBuilder(PortletDesignAction.class)
-                .configFields("width", "height", "antiAlias", "borderVisible")
-                .configMode(Mode.EDIT)
-                .build();
-        displayForm.readFromObject(this);
-        */
-    }
-
     public Resolution returnToParent() {
         SiteNodeInstance[] siteNodeInstancePath =
                 dispatch.getSiteNodeInstancePath();
@@ -286,8 +270,41 @@ public class ChartAction extends PortletAction {
     // Configuration
     //**************************************************************************
 
+    public static final String[] CONFIGURATION_FIELDS =
+            {"name", "legend", "database", "query", "urlExpression"};
+
     public Resolution configure() {
+        prepareForm();
+        form.readFromObject(chartNode);
+
         return new ForwardResolution("/layouts/chart/configure.jsp");
+    }
+
+    private void prepareForm() {
+        SelectionProvider databaseSelectionProvider =
+                DefaultSelectionProvider.create("database",
+                        model.getDatabases(),
+                        Database.class,
+                        null,
+                        "databaseName");
+        form = new FormBuilder(ChartNode.class)
+                .configFields(CONFIGURATION_FIELDS)
+                .configSelectionProvider(databaseSelectionProvider, "database")
+                .build();
+    }
+
+    public Resolution updateConfiguration() {
+        prepareForm();
+        form.readFromObject(chartNode);
+        form.readFromRequest(request);
+        if (form.validate()) {
+            form.writeToObject(chartNode);
+            saveModel();
+            SessionMessages.addInfoMessage("Configuration updated successfully");
+            return cancel();
+        } else {
+            return new ForwardResolution("/layouts/chart/configure.jsp");
+        }
     }
 
     //**************************************************************************

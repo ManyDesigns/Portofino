@@ -7,10 +7,7 @@
     <div class="portlet">
         <jsp:useBean id="actionBean" scope="request"
                      type="com.manydesigns.portofino.actions.PortletAction"/>
-        <stripes:form
-                action="${actionBean.dispatch.absoluteOriginalPath}"
-                method="post"
-                enctype="${actionBean.multipartRequest ? 'multipart/form-data' : 'application/x-www-form-urlencoded'}">
+        <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post">
             <div class="portletHeader">
                 <stripes:layout-component name="portletHeader">
                     <div class="yui-g">
@@ -37,6 +34,7 @@
                     Portlet footer
                 </stripes:layout-component>
             </div>
+            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
         </stripes:form>
     </div>
 </stripes:layout-definition>

@@ -28,12 +28,7 @@
         <div id="bd">
             <div id="yui-main">
                 <div id="content" class="yui-b">
-                    <jsp:useBean id="actionBean" scope="request"
-                                 type="com.manydesigns.portofino.actions.PortletAction"/>
-                    <stripes:form
-                            action="${actionBean.dispatch.absoluteOriginalPath}"
-                            method="post"
-                            enctype="${actionBean.multipartRequest ? 'multipart/form-data' : 'application/x-www-form-urlencoded'}">
+                    <stripes:form action="${dispatch.absoluteOriginalPath}" method="post" enctype="multipart/form-data">
                         <div class="contentHeader">
                             <stripes:layout-component name="contentHeader">
                                 Portlet page header

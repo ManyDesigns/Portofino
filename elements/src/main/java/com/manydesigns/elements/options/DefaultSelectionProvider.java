@@ -36,6 +36,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,7 +146,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
     public static DefaultSelectionProvider create(String name,
                                                   Collection objects,
                                                   Class objectClass,
-                                                  TextFormat textFormat,
+                                                  @Nullable TextFormat textFormat,
                                                   String propertyName) {
         return create(name, objects, objectClass,
                 new TextFormat[] {textFormat},

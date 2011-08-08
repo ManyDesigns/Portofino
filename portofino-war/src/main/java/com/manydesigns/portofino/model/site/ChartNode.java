@@ -30,6 +30,8 @@
 package com.manydesigns.portofino.model.site;
 
 import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.Multiline;
+import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Database;
 
@@ -105,6 +107,7 @@ public class ChartNode extends SiteNode {
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
+    @Required
     @XmlAttribute(required = true)
     public String getName() {
         return name;
@@ -114,6 +117,7 @@ public class ChartNode extends SiteNode {
         this.name = name;
     }
 
+    @Required
     @XmlAttribute(required = true)
     public String getType() {
         return type;
@@ -123,6 +127,7 @@ public class ChartNode extends SiteNode {
         this.type = type;
     }
 
+    @Required
     @XmlAttribute(required = true)
     public String getLegend() {
         return legend;
@@ -132,6 +137,7 @@ public class ChartNode extends SiteNode {
         this.legend = legend;
     }
 
+    @Required
     @XmlAttribute(required = true)
     public String getDatabase() {
         return database;
@@ -141,7 +147,9 @@ public class ChartNode extends SiteNode {
         this.database = database;
     }
 
-    @Label("SQL")
+    @Required
+    @Label("SQL Query")
+    @Multiline
     @XmlAttribute(required = true)
     public String getQuery() {
         return query;

@@ -115,10 +115,14 @@ public class PortletAction extends AbstractActionBean {
                     updateLayout(layoutContainer, portletWrapperIds);
                 }
             }
-            application.getModel().init();
-            application.saveXmlModel();
+            saveModel();
         }
         return new RedirectResolution(dispatch.getOriginalPath());
+    }
+
+    protected void saveModel() {
+        application.getModel().init();
+        application.saveXmlModel();
     }
 
     public Resolution cancelLayout() {
