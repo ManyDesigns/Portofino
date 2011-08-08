@@ -279,7 +279,7 @@ public class CrudAction extends PortletAction {
         loadObjects();
         setupTableForm(Mode.VIEW);
         tableForm.setSelectable(false);
-        return new ForwardResolution("/layouts/crud/embeddedSearch.jsp");
+        return new ForwardResolution("/layouts/crud/embedded-search.jsp");
     }
 
     public Resolution resetSearch() {
@@ -436,7 +436,7 @@ public class CrudAction extends PortletAction {
 
         setupForm(Mode.BULK_EDIT);
 
-        return new ForwardResolution("/layouts/crud/bulkEdit.jsp");
+        return new ForwardResolution("/layouts/crud/bulk-edit.jsp");
     }
 
     public Resolution bulkUpdate() {
@@ -455,7 +455,7 @@ public class CrudAction extends PortletAction {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
                 SessionMessages.addErrorMessage(rootCauseMessage);
-                return new ForwardResolution("/layouts/crud/bulkEdit.jsp");
+                return new ForwardResolution("/layouts/crud/bulk-edit.jsp");
             }
             SessionMessages.addInfoMessage(MessageFormat.format(
                     "UPDATE di {0} oggetti avvenuto con successo",
@@ -463,7 +463,7 @@ public class CrudAction extends PortletAction {
             return new RedirectResolution(dispatch.getOriginalPath())
                     .addParameter(SEARCH_STRING_PARAM, searchString);
         } else {
-            return new ForwardResolution("/layouts/crud/bulkEdit.jsp");
+            return new ForwardResolution("/layouts/crud/bulk-edit.jsp");
         }
     }
 

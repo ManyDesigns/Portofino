@@ -19,14 +19,17 @@
                         <button class="wrench">Prova</button>
                     </div>
                 </div>
-
             </stripes:layout-component>
         </div>
         <div class="portletBody">
-            <stripes:layout-component name="portletBody"></stripes:layout-component>
+            <stripes:layout-component name="portletBody">
+                Portlet body
+            </stripes:layout-component>
         </div>
         <div class="portletFooter">
-            <stripes:layout-component name="portletFooter"></stripes:layout-component>
+            <stripes:layout-component name="portletFooter">
+                Portlet footer
+            </stripes:layout-component>
         </div>
     </div>
 </stripes:layout-definition>
