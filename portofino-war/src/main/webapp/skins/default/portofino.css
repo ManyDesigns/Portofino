@@ -111,17 +111,25 @@ div#portletPageBody {
     border-bottom: 1px solid gray;
 }
 
+.portletPageHeader .portletPageBarRight {
+    float: right;
+    padding: 0.2em 0;
+}
+
+.portletPageHeader .portletPageBarLeft {
+    float: left;
+    padding: 0.2em 0;
+}
+
+
 .portletPageFooter {
     border-top: 1px solid gray;
     margin-top: 1em;
 }
 
-.sortablePlaceholder {
-    border: 1px solid #fcefa1;
-    background: #fbf9ee;
-    color: #363636;
-    height: 10em;
-
+.portletPageBarButtons, .resultSetNavigation {
+    display: inline;
+    margin-left: 1em;
 }
 
 /*******************************************************************************
@@ -154,6 +162,11 @@ input.portletPageButton.ui-button.ui-state-hover, input.portletPageButton.ui-but
     font-weight: normal; color: #212121;
 }
 
+.portletHeaderButtons {
+    float:right;
+}
+
+
 .portletTitle {
     float: left;
 }
@@ -163,20 +176,18 @@ input.portletPageButton.ui-button.ui-state-hover, input.portletPageButton.ui-but
     color: #166BBF;
 }
 
-.portletHeaderButtons {
-    float: right;
-}
-
-.portletPageHeader .resultSetNavigation {
-    float: right;
-    padding: 0.2em 0;
-}
-
 .portletBody {
     clear: left;
 }
 
 .portletFooter {}
+
+.sortablePlaceholder {
+    border: 1px solid #fcefa1;
+    background: #fbf9ee;
+    color: #363636;
+    height: 10em;
+}
 
 
 /*******************************************************************************
