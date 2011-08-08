@@ -34,10 +34,6 @@ import com.manydesigns.elements.jfreechart.JFreeChartInstance;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.actions.PortletAction;
-import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.annotations.InjectApplication;
-import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
-import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.ChartNode;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
@@ -83,20 +79,9 @@ public class ChartAction extends PortletAction {
     public static final String CHART_FILENAME_FORMAT = "chart-{0}.png";
 
     //**************************************************************************
-    // Injections
-    //**************************************************************************
-
-    @InjectApplication
-    public Application application;
-
-    @InjectSiteNodeInstance
-    public SiteNodeInstance siteNodeInstance;
-
-    //**************************************************************************
     // Web parameters
     //**************************************************************************
 
-    public String cancelReturnUrl;
     public String chartId;
 
     public int width = 400;
@@ -167,8 +152,8 @@ public class ChartAction extends PortletAction {
             return new ForwardResolution("/layouts/chart/chart.jsp");
         } else {
             setupReturnToParentTarget();
-            setupPortlets(siteNodeInstance, "/layouts/chart/chart.jsp");
-            return new ForwardResolution("/layouts/portlet-page.jsp");
+
+            return forwardToPortletPage("/layouts/chart/chart.jsp");
         }
     }
 
@@ -298,41 +283,17 @@ public class ChartAction extends PortletAction {
 
 
     //**************************************************************************
-    // Cancel
+    // Configuration
     //**************************************************************************
 
-    public String cancel() {
-        return PortofinoAction.CANCEL;
+    public Resolution configure() {
+        return new ForwardResolution("/layouts/chart/configure.jsp");
     }
 
     //**************************************************************************
     // Getter/setter
     //**************************************************************************
 
-
-    public Application getApplication() {
-        return application;
-    }
-
-    public void setApplication(Application application) {
-        this.application = application;
-    }
-
-    public SiteNodeInstance getSiteNodeInstance() {
-        return siteNodeInstance;
-    }
-
-    public void setSiteNodeInstance(SiteNodeInstance siteNodeInstance) {
-        this.siteNodeInstance = siteNodeInstance;
-    }
-
-    public String getCancelReturnUrl() {
-        return cancelReturnUrl;
-    }
-
-    public void setCancelReturnUrl(String cancelReturnUrl) {
-        this.cancelReturnUrl = cancelReturnUrl;
-    }
 
     public String getChartId() {
         return chartId;

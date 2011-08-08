@@ -95,7 +95,7 @@ public class DocumentAction extends PortletAction {
         } finally {
             IOUtils.closeQuietly(is);
         }
-        return forwardToPortletPage("/layouts/document.jsp", siteNodeInstance);
+        return forwardToPortletPage("/layouts/document.jsp");
     }
 
 

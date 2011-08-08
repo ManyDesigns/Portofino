@@ -44,14 +44,9 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
-import com.manydesigns.portofino.annotations.InjectApplication;
-import com.manydesigns.portofino.annotations.InjectModel;
-import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
-import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
-import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
@@ -101,15 +96,6 @@ public class CrudAction extends PortletAction {
 
     public final static String SEARCH_STRING_PARAM = "searchString";
 
-    @InjectApplication
-    public Application application;
-
-    @InjectModel
-    public Model model;
-
-    @InjectSiteNodeInstance
-    public CrudNodeInstance siteNodeInstance;
-
     public CrudNode crudNode;
     public Crud crud;
 
@@ -128,7 +114,6 @@ public class CrudAction extends PortletAction {
 
     public String[] selection;
     public String searchString;
-    public String cancelReturnUrl;
     public String successReturnUrl;
 
     //--------------------------------------------------------------------------
@@ -166,15 +151,16 @@ public class CrudAction extends PortletAction {
 
     @Before
     public void prepare() {
-        pk = siteNodeInstance.getPk();
-        crudNode = siteNodeInstance.getSiteNode();
+        CrudNodeInstance crudNodeInstance = getSiteNodeInstance();
+        pk = crudNodeInstance.getPk();
+        crudNode = getSiteNodeInstance().getSiteNode();
         crud = crudNode.getCrud();
-        classAccessor = siteNodeInstance.getClassAccessor();
-        baseTable = siteNodeInstance.getBaseTable();
-        pkHelper = siteNodeInstance.getPkHelper();
+        classAccessor = crudNodeInstance.getClassAccessor();
+        baseTable = crudNodeInstance.getBaseTable();
+        pkHelper = crudNodeInstance.getPkHelper();
         crudButtons = new ArrayList<CrudButton>();
         crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
-        object = siteNodeInstance.getObject();
+        object = crudNodeInstance.getObject();
 
         setupSelectionProviders();
     }
@@ -271,7 +257,7 @@ public class CrudAction extends PortletAction {
 
         setupReturnToParentTarget();
 
-        return forwardToPortletPage("/layouts/crud/search.jsp", siteNodeInstance);
+        return forwardToPortletPage("/layouts/crud/search.jsp");
     }
 
     public Resolution embeddedSearch() {
@@ -320,8 +306,7 @@ public class CrudAction extends PortletAction {
 
         setupReturnToParentTarget();
 
-        String nodeJsp = "/layouts/crud/read.jsp";
-        return forwardToPortletPage(nodeJsp, siteNodeInstance);
+        return forwardToPortletPage("/layouts/crud/read.jsp");
     }
 
     protected void refreshBlobDownloadHref() {
@@ -535,17 +520,8 @@ public class CrudAction extends PortletAction {
     }
 
     //**************************************************************************
-    // Cancel
+    // Return to parent
     //**************************************************************************
-
-    public Resolution cancel() {
-        if (StringUtils.isEmpty(cancelReturnUrl)) {
-            String url = dispatch.getOriginalPath();
-            return new RedirectResolution(url);
-        } else {
-            return new RedirectResolution(cancelReturnUrl, false);
-        }
-    }
 
     public Resolution returnToParent() {
         SiteNodeInstance[] siteNodeInstancePath =
@@ -1238,28 +1214,8 @@ public class CrudAction extends PortletAction {
         return form.isRequiredFieldsPresent();
     }
 
-    public Application getApplication() {
-        return application;
-    }
-
-    public void setApplication(Application application) {
-        this.application = application;
-    }
-
-    public Model getModel() {
-        return model;
-    }
-
-    public void setModel(Model model) {
-        this.model = model;
-    }
-
     public CrudNodeInstance getSiteNodeInstance() {
-        return siteNodeInstance;
-    }
-
-    public void setSiteNodeInstance(CrudNodeInstance siteNodeInstance) {
-        this.siteNodeInstance = siteNodeInstance;
+        return (CrudNodeInstance) siteNodeInstance;
     }
 
     public CrudNode getCrudNode() {
@@ -1340,14 +1296,6 @@ public class CrudAction extends PortletAction {
 
     public void setSearchString(String searchString) {
         this.searchString = searchString;
-    }
-
-    public String getCancelReturnUrl() {
-        return cancelReturnUrl;
-    }
-
-    public void setCancelReturnUrl(String cancelReturnUrl) {
-        this.cancelReturnUrl = cancelReturnUrl;
     }
 
     public String getSuccessReturnUrl() {

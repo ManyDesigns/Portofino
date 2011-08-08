@@ -3,7 +3,7 @@
         %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
         %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
         %><%@taglib prefix="mde" uri="/manydesigns-elements"
-        %><stripes:layout-render name="/skins/default/common-simple.jsp">
+        %><stripes:layout-render name="/skins/default/common-simple-page.jsp">
     <stripes:layout-component name="bd">
         <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
         <stripes:form action="${dispatch.absoluteOriginalPath}" method="post">

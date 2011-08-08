@@ -11,7 +11,7 @@ function fixSideBar() {
 }
 
 $(function() {
-    $("input:submit.portletPageButton, button.portletPageButton").button();
+    $("input:submit.contentButton, button.contentButton").button();
     
     $("input:submit.portletButton, button.portletButton").button();
 

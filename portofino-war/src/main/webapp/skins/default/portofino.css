@@ -94,40 +94,40 @@ span.breadcrumb-item {
 }
 
 /*******************************************************************************
-Portlet page
+Content
 *******************************************************************************/
 
-div#portletPageBody {
+div#contentBody {
     padding: 1em;
 }
 
-.portletPageHeader, .portletPageFooter {
+.contentHeader, .contentFooter {
     background-color: #eef;
     padding: 0.5em 1em;
     clear: both;
 }
 
-.portletPageHeader {
+.contentHeader {
     border-bottom: 1px solid gray;
 }
 
-.portletPageHeader .portletPageBarRight {
+.contentHeader .contentBarRight {
     float: right;
     padding: 0.2em 0;
 }
 
-.portletPageHeader .portletPageBarLeft {
+.contentHeader .contentBarLeft {
     float: left;
     padding: 0.2em 0;
 }
 
 
-.portletPageFooter {
+.contentFooter {
     border-top: 1px solid gray;
     margin-top: 1em;
 }
 
-.portletPageBarButtons, .resultSetNavigation {
+.contentBarButtons, .resultSetNavigation {
     display: inline;
     margin-left: 1em;
 }
@@ -152,11 +152,11 @@ Portlet
 }
 
 /* page hader/footer buttons*/
-input.portletPageButton, input.portletPageButton, .portletHeaderButtons button {
+input.contentButton, input.contentButton, .portletHeaderButtons button {
     border: 1px solid #D6D6E6;
     background: #EEEEFF;
 }
-input.portletPageButton.ui-button.ui-state-hover, input.portletPageButton.ui-button.ui-state-hover, .portletHeaderButtons button.ui-state-hover {
+input.contentButton.ui-button.ui-state-hover, input.contentButton.ui-button.ui-state-hover, .portletHeaderButtons button.ui-state-hover {
     border: 1px solid #7171B0;
     background: #65a7db url(images/ui-bg_glass_75_a8a8e6_1x400.png) 50% 50% repeat-x;
     font-weight: normal; color: #212121;

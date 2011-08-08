@@ -34,12 +34,12 @@
                             action="${actionBean.dispatch.absoluteOriginalPath}"
                             method="post"
                             enctype="${actionBean.multipartRequest ? 'multipart/form-data' : 'application/x-www-form-urlencoded'}">
-                        <div class="portletPageHeader">
-                            <stripes:layout-component name="portletPageHeader">
+                        <div class="contentHeader">
+                            <stripes:layout-component name="contentHeader">
                                 Portlet page header
                             </stripes:layout-component>
                         </div>
-                        <div id="portletPageBody">
+                        <div id="contentBody">
                             <div class="portletWrapper">
                                 <div class="portlet">
                                     <div class="portletHeader">
@@ -71,8 +71,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="portletPageFooter">
-                            <stripes:layout-component name="portletPageFooter">
+                        <div class="contentFooter">
+                            <stripes:layout-component name="contentFooter">
                                 Portlet page footer
                             </stripes:layout-component>
                         </div>

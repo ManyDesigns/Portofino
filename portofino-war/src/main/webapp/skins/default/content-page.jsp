@@ -28,28 +28,21 @@
         <div id="bd">
             <div id="yui-main">
                 <div id="content" class="yui-b">
-                    <jsp:useBean id="actionBean" scope="request"
-                                 type="com.manydesigns.portofino.actions.PortletAction"/>
-                    <stripes:form
-                            action="${actionBean.dispatch.absoluteOriginalPath}"
-                            method="post"
-                            enctype="${actionBean.multipartRequest ? 'multipart/form-data' : 'application/x-www-form-urlencoded'}">
-                        <div class="portletPageHeader">
-                            <stripes:layout-component name="portletPageHeader">
-                                Portlet page header
-                            </stripes:layout-component>
-                        </div>
-                        <div id="portletPageBody">
-                            <stripes:layout-component name="portletPageBody">
-                                Portlet page body
-                            </stripes:layout-component>
-                        </div>
-                        <div class="portletPageFooter">
-                            <stripes:layout-component name="portletPageFooter">
-                                Portlet page footer
-                            </stripes:layout-component>
-                        </div>
-                    </stripes:form>
+                    <div class="contentHeader">
+                        <stripes:layout-component name="contentHeader">
+                            Content header
+                        </stripes:layout-component>
+                    </div>
+                    <div id="contentBody">
+                        <stripes:layout-component name="contentBody">
+                            Content body
+                        </stripes:layout-component>
+                    </div>
+                    <div class="contentFooter">
+                        <stripes:layout-component name="contentFooter">
+                            Content footer
+                        </stripes:layout-component>
+                    </div>
                 </div>
             </div>
             <div id="sidebar" class="yui-b">

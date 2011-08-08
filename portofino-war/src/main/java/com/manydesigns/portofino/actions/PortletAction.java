@@ -1,13 +1,12 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.portofino.annotations.InjectApplication;
-import com.manydesigns.portofino.annotations.InjectDispatch;
-import com.manydesigns.portofino.annotations.InjectHttpRequest;
+import com.manydesigns.portofino.annotations.*;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.CrudNode;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
@@ -18,6 +17,7 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.StripesConstants;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
+import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
@@ -27,21 +27,40 @@ import java.util.Map;
 
 public class PortletAction extends AbstractActionBean {
 
-    public final MultiMap portlets = new MultiHashMap();
+    //--------------------------------------------------------------------------
+    // Properties
+    //--------------------------------------------------------------------------
+
     @InjectDispatch
     public Dispatch dispatch;
-    public String returnToParentTarget;
+
+    @InjectSiteNodeInstance
+    public SiteNodeInstance siteNodeInstance;
+
+    public SiteNode siteNode;
+
     @InjectApplication
     public Application application;
 
+    @InjectModel
+    public Model model;
+
     @InjectHttpRequest
     public HttpServletRequest request;
+
+    //--------------------------------------------------------------------------
+    // UI
+    //--------------------------------------------------------------------------
+
+    public final MultiMap portlets = new MultiHashMap();
+    public String returnToParentTarget;
 
     //--------------------------------------------------------------------------
     // Navigation
     //--------------------------------------------------------------------------
 
     protected ResultSetNavigation resultSetNavigation;
+    public String cancelReturnUrl;
 
     public boolean isEmbedded() {
         return getContext().getRequest().getAttribute(
@@ -176,8 +195,49 @@ public class PortletAction extends AbstractActionBean {
         }
     }
 
-    protected Resolution forwardToPortletPage(String nodeJsp, SiteNodeInstance siteNodeInstance) {
+    protected Resolution forwardToPortletPage(String nodeJsp) {
         setupPortlets(siteNodeInstance, nodeJsp);
         return new ForwardResolution("/layouts/portlet-page.jsp");
+    }
+
+    public Resolution cancel() {
+        if (StringUtils.isEmpty(cancelReturnUrl)) {
+            String url = dispatch.getOriginalPath();
+            return new RedirectResolution(url);
+        } else {
+            return new RedirectResolution(cancelReturnUrl, false);
+        }
+    }
+
+    public SiteNodeInstance getSiteNodeInstance() {
+        return siteNodeInstance;
+    }
+
+    public void setSiteNodeInstance(SiteNodeInstance siteNodeInstance) {
+        this.siteNodeInstance = siteNodeInstance;
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+    public void setApplication(Application application) {
+        this.application = application;
+    }
+
+    public HttpServletRequest getRequest() {
+        return request;
+    }
+
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
+    }
+
+    public String getCancelReturnUrl() {
+        return cancelReturnUrl;
+    }
+
+    public void setCancelReturnUrl(String cancelReturnUrl) {
+        this.cancelReturnUrl = cancelReturnUrl;
     }
 }
