@@ -22,36 +22,8 @@
     </head>
     <body>
     <div id="doc3" class="yui-t2">
-        <stripes:url var="profileUrl" value="/Profile.action"/>
-        <jsp:useBean id="portofinoConfiguration" scope="application"
-                     type="org.apache.commons.configuration.Configuration"/>
         <div id="hd">
-            <div id="globalLinks">
-                <c:if test="${mde:getBoolean(portofinoConfiguration, 'user.enabled')}">
-                    <c:if test="${not empty userId}">
-                        <stripes:link href="/Profile.action"><c:out
-                                value="${userName}"/></stripes:link> -
-                        <stripes:link
-                                href="/user/Settings.action">Settings</stripes:link> -
-                        <stripes:link
-                                href="/user/Help.action">Help</stripes:link> -
-                        <stripes:link
-                                href="/user/login.action?logout=">Log out</stripes:link>
-                    </c:if><c:if test="${empty userId}">
-                    <stripes:link href="/user/Help.action">Help</stripes:link> -
-                    <stripes:link
-                            href="/user/login.action">Log in</stripes:link>
-                </c:if>
-                </c:if><c:if
-                    test="${not mde:getBoolean(portofinoConfiguration, 'user.enabled')}">
-                <stripes:link href="/user/Help.action">Help</stripes:link>
-            </c:if>
-            </div>
-            <div style="position: absolute; left: 20em;">
-                <mde:sessionMessages/>
-            </div>
-            <h1><stripes:link href="/"><c:out
-                    value="${mde:getString(portofinoConfiguration, 'application.name')}"/></stripes:link></h1>
+            <jsp:include page="header.jsp"/>
         </div>
         <div id="bd">
             <div id="yui-main">
