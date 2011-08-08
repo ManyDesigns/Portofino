@@ -26,6 +26,7 @@
         </c:if>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
+    <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="portletPageFooter">
         <stripes:submit name="bulkUpdate" value="Update" class="portletPageButton"/>
         <stripes:submit name="cancel" value="Cancel" class="portletPageButton"/>

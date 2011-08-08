@@ -25,6 +25,7 @@
         <input type="hidden" name="pk" value="<c:out value="${actionBean.pk}"/>"/>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
+    <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="portletPageFooter">
         <stripes:submit name="save" value="Save" class="portletPageButton"/>
         <stripes:submit name="cancel" value="Cancel" class="portletPageButton"/>

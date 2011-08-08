@@ -44,7 +44,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public class ChartNode extends SiteNode implements EmbeddableNode {
+public class ChartNode extends SiteNode {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 

@@ -9,7 +9,6 @@ import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.CrudNode;
-import com.manydesigns.portofino.model.site.EmbeddableNode;
 import com.manydesigns.portofino.model.site.SiteNode;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.util.ShortNameUtils;
@@ -161,7 +160,7 @@ public class PortletAction extends AbstractActionBean {
         PortletInstance myPortletInstance = new PortletInstance("p", siteNodeInstance.getLayoutOrder(), myself);
         portlets.put(siteNodeInstance.getLayoutContainer(), myPortletInstance);
         for(SiteNode node : siteNodeInstance.getChildNodes()) {
-            if(node instanceof EmbeddableNode && node.getLayoutContainerInParent() != null) {
+            if(node.getLayoutContainerInParent() != null) {
                 PortletInstance portletInstance =
                         new PortletInstance(
                                 "c" + node.getId(),

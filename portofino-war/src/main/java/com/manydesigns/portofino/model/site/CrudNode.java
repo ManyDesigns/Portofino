@@ -41,7 +41,7 @@ import java.util.ArrayList;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public class CrudNode extends SiteNode implements EmbeddableNode {
+public class CrudNode extends SiteNode {
     //**************************************************************************
     // Constants
     //**************************************************************************
