@@ -139,7 +139,7 @@ public class ChartAction extends PortletAction {
 
         chartId = RandomUtil.createRandomCode();
 
-        String actionurl = dispatch.getAbsoluteOriginalPath();
+        String actionurl = dispatch.getAbsolutePagePath();
         UrlBuilder chartResolution =
                 new UrlBuilder(actionurl, false)
                         .addParameter("chartId", chartId)

@@ -28,7 +28,7 @@
         <div id="bd">
             <div id="yui-main">
                 <div id="content" class="yui-b">
-                    <stripes:form action="${dispatch.absoluteOriginalPath}" method="post" enctype="multipart/form-data">
+                    <stripes:form action="${dispatch.absolutePagePath}" method="post" enctype="multipart/form-data">
                         <div class="contentHeader">
                             <stripes:layout-component name="contentHeader">
                                 Portlet page header

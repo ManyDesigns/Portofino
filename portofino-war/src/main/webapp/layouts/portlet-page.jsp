@@ -7,7 +7,7 @@
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.PortletAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post">
+        <stripes:form action="${actionBean.dispatch.absolutePagePath}" method="post">
             <div class="yui-g">
                 <div class="contentBarLeft">
                     <c:if test="${not empty actionBean.returnToParentTarget}">

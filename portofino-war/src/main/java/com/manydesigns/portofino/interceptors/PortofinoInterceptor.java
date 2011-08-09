@@ -151,7 +151,7 @@ public class PortofinoInterceptor implements Interceptor {
         Dispatch dispatch = (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
         if (dispatch != null) {
             logger.debug("Creating navigation");
-            Navigation navigation = new Navigation(application, dispatch, groups);
+            Navigation navigation = new Navigation(dispatch, groups);
             request.setAttribute(RequestAttributes.NAVIGATION, navigation);
 
             SiteNodeInstance[] siteNodeInstances = dispatch.getSiteNodeInstancePath();

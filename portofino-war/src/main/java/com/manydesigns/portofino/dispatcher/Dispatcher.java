@@ -32,13 +32,15 @@ package com.manydesigns.portofino.dispatcher;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.site.*;
-import net.sourceforge.stripes.controller.StripesConstants;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -59,13 +61,7 @@ public class Dispatcher {
         this.application = application;
     }
 
-    public Dispatch createDispatch(HttpServletRequest request) {
-        String originalPath = (String) request.getAttribute(
-                StripesConstants.REQ_ATTR_INCLUDE_PATH);
-        if (originalPath == null) {
-            originalPath = request.getServletPath();
-        }
-
+    public Dispatch createDispatch(String originalPath) {
         List<SiteNodeInstance> path = new ArrayList<SiteNodeInstance>();
         List<SiteNodeInstance> tree = new ArrayList<SiteNodeInstance>();
 

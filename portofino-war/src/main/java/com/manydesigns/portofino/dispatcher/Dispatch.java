@@ -42,18 +42,18 @@ public class Dispatch {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    protected final HttpServletRequest request;
+    protected final String contextPath;
     protected final String originalPath;
     protected final String rewrittenPath;
     protected final SiteNodeInstance[] siteNodeInstancePath;
     protected final List<SiteNodeInstance> navigationNodeInstances;
 
-    public Dispatch(HttpServletRequest request,
+    public Dispatch(String contextPath,
                     String originalPath,
                     String rewrittenPath,
                     SiteNodeInstance[] siteNodeInstancePath,
                     List<SiteNodeInstance> navigationNodeInstances) {
-        this.request = request;
+        this.contextPath = contextPath;
         this.originalPath = originalPath;
         this.rewrittenPath = rewrittenPath;
         this.siteNodeInstancePath = siteNodeInstancePath;
@@ -62,10 +62,6 @@ public class Dispatch {
         String pathUrl = getPathUrl();
         assert pathUrl.equals(originalPath);
 
-    }
-
-    public HttpServletRequest getRequest() {
-        return request;
     }
 
     public String getRewrittenPath() {
@@ -88,7 +84,7 @@ public class Dispatch {
         return originalPath;
     }
 
-    public String getAbsoluteOriginalPath() {
+    public String getAbsolutePagePath() {
         String contextPath = request.getContextPath();
         if ("/".equals(contextPath)) {
             return getOriginalPath();

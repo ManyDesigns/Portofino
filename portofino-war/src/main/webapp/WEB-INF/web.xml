@@ -29,19 +29,6 @@
     </filter-mapping>
 
     <filter>
-        <filter-name>portofino-dispatcher</filter-name>
-        <filter-class>
-            com.manydesigns.portofino.dispatcher.DispatcherFilter
-        </filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>portofino-dispatcher</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
-    </filter-mapping>
-
-    <filter>
 		<display-name>Stripes Filter</display-name>
 		<filter-name>StripesFilter</filter-name>
 		<filter-class>net.sourceforge.stripes.controller.StripesFilter</filter-class>
@@ -70,11 +57,19 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
-	<servlet-mapping>
-		<servlet-name>StripesDispatcher</servlet-name>
-		<url-pattern>*.action</url-pattern>
-	</servlet-mapping>
-    
+    <servlet-mapping>
+        <servlet-name>StripesDispatcher</servlet-name>
+        <url-pattern>*.action</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StripesDispatcher</servlet-name>
+        <url-pattern>/pages/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StripesDispatcher</servlet-name>
+        <url-pattern>/portlets/*</url-pattern>
+    </servlet-mapping>
+
 <!--
     <filter>
         <filter-name>struts2</filter-name>

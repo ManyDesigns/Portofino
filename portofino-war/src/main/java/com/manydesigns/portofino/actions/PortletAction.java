@@ -179,7 +179,7 @@ public class PortletAction extends AbstractActionBean {
         this.resultSetNavigation = resultSetNavigation;
     }
 
-    protected void setupPortlets(SiteNodeInstance siteNodeInstance, String myself) {
+    protected void setupPortlets(String myself) {
         PortletInstance myPortletInstance = new PortletInstance("p", siteNodeInstance.getLayoutOrder(), myself);
         portlets.put(siteNodeInstance.getLayoutContainer(), myPortletInstance);
         for(SiteNode node : siteNodeInstance.getChildNodes()) {
@@ -200,7 +200,7 @@ public class PortletAction extends AbstractActionBean {
     }
 
     protected Resolution forwardToPortletPage(String nodeJsp) {
-        setupPortlets(siteNodeInstance, nodeJsp);
+        setupPortlets(nodeJsp);
         return new ForwardResolution("/layouts/portlet-page.jsp");
     }
 

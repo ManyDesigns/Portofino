@@ -251,7 +251,7 @@ public class CrudAction extends PortletAction {
         loadObjects();
         setupTableForm(Mode.VIEW);
         cancelReturnUrl = new UrlBuilder(
-                Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
+                Locale.getDefault(), dispatch.getAbsolutePagePath(), false)
                 .addParameter("searchString", searchString)
                 .toString();
 
@@ -298,7 +298,7 @@ public class CrudAction extends PortletAction {
         }
 
         cancelReturnUrl = new UrlBuilder(
-                Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
+                Locale.getDefault(), dispatch.getAbsolutePagePath(), false)
                 .addParameter("searchString", searchString)
                 .toString();
 
@@ -620,7 +620,7 @@ public class CrudAction extends PortletAction {
 
     protected String calculateBaseSearchUrl() {
         assert pk != null; //Ha senso solo in modalità read/detail
-        String baseUrl = dispatch.getAbsoluteOriginalPath();
+        String baseUrl = dispatch.getAbsolutePagePath();
         int lastSlashIndex = baseUrl.lastIndexOf('/');
         baseUrl = baseUrl.substring(0, lastSlashIndex);
         return baseUrl;

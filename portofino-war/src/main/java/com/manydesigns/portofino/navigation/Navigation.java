@@ -31,7 +31,6 @@ package com.manydesigns.portofino.navigation;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
-import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.SiteNode;
@@ -55,7 +54,6 @@ public class Navigation implements XhtmlFragment {
     // Fields
     //**************************************************************************
 
-    protected final Application application;
     protected final Dispatch dispatch;
     protected final List<String> groups;
 
@@ -66,11 +64,9 @@ public class Navigation implements XhtmlFragment {
     // Constructors
     //**************************************************************************
 
-    public Navigation(Application application, Dispatch dispatch, List<String> groups) {
-        this.application = application;
+    public Navigation(Dispatch dispatch, List<String> groups) {
         this.dispatch = dispatch;
         this.groups = groups;
-        //TODO gestire deploy sotto ROOT
     }
 
     //**************************************************************************
@@ -141,10 +137,6 @@ public class Navigation implements XhtmlFragment {
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
-
-    public Application getApplication() {
-        return application;
-    }
 
     public Dispatch getDispatch() {
         return dispatch;
