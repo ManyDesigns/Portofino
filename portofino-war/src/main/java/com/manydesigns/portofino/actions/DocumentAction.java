@@ -28,18 +28,18 @@
  */
 package com.manydesigns.portofino.actions;
 
-import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
-import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
+import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.annotations.InjectServerInfo;
+import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.model.site.DocumentNode;
-import net.sourceforge.stripes.action.Before;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import org.apache.commons.io.IOUtils;
+import net.sourceforge.stripes.action.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
+import java.io.File;
+import java.io.IOException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -51,15 +51,17 @@ import java.io.InputStream;
 public class DocumentAction extends PortletAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
+    public static final String CONTENT_ENCODING = "UTF-8";
 
+    public String title;
     public String content;
 
     //**************************************************************************
     // Injections
     //**************************************************************************
 
-    @InjectSiteNodeInstance
-    public SiteNodeInstance siteNodeInstance;
+    @InjectServerInfo
+    public ServerInfo serverInfo;
 
     public DocumentNode documentNode;
 
@@ -81,28 +83,61 @@ public class DocumentAction extends PortletAction {
 
 
     @DefaultHandler
-    public Resolution execute() throws Exception {
-        String fileName = documentNode.getFileName();
-        InputStream is = null;
-        try {
-            is = context.getServletContext().getResourceAsStream(fileName);
-            if (is != null) {
-                content = IOUtils.toString(is, "UTF-8");
-            } else {
-                logger.warn("Cannot get stream for file: {}", fileName);
-                content = "There was a problem loading this content.";
-            }
-        } finally {
-            IOUtils.closeQuietly(is);
-        }
-        return forwardToPortletPage("/layouts/document.jsp");
+    public Resolution execute() throws IOException {
+        loadContent();
+        return forwardToPortletPage("/layouts/document/read.jsp");
     }
 
+    protected void loadContent() throws IOException {
+        String fileName = documentNode.getFileName();
+        File file = serverInfo.getWebAppFile(fileName);
+        content = FileUtils.readFileToString(file, CONTENT_ENCODING);
+    }
 
+    protected void saveContent() throws IOException {
+        String fileName = documentNode.getFileName();
+        File file = serverInfo.getWebAppFile(fileName);
+        FileUtils.writeStringToFile(file, content, CONTENT_ENCODING);
+    }
+
+    public Resolution configure() throws IOException {
+        title = documentNode.getTitle();
+        loadContent();
+        return new ForwardResolution("/layouts/document/configure.jsp");
+    }
+
+    public Resolution updateConfiguration() throws IOException {
+        synchronized (application) {
+            title = StringUtils.trimToNull(title);
+            boolean valid = true;
+            if (title == null) {
+                SessionMessages.addErrorMessage("Title cannot be empty");
+                valid = false;
+            }
+            if (valid) {
+                documentNode.setTitle(title);
+                saveModel();
+                saveContent();
+                SessionMessages.addInfoMessage("Configuration updated successfully");
+                return cancel();
+            } else {
+                return new ForwardResolution("/layouts/document/configure.jsp");
+            }
+        }
+
+    }
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
 
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getContent() {
         return content;
