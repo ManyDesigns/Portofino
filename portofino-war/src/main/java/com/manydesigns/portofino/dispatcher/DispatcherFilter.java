@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -29,22 +29,26 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.actions.RequestAttributes;
+import net.sourceforge.stripes.controller.StripesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class DispatcherFilter implements Filter {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public final static Logger logger =
             LoggerFactory.getLogger(DispatcherFilter.class);
@@ -64,31 +68,76 @@ public class DispatcherFilter implements Filter {
         // cast to http type
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        // invoke the dispatcher to create a dispatch
+        logger.debug("Invoking the dispatcher to create a dispatch");
         Dispatcher dispatcher =
-                (Dispatcher) servletContext.getAttribute(Dispatcher.KEY);
-        Dispatch dispatch;
-        try {
-            ElementsThreadLocals.setupDefaultElementsContext();
-            dispatch = dispatcher.createDispatch(httpRequest);
-        } finally {
-            ElementsThreadLocals.removeElementsContext();
-        }
-        if (dispatch == null) {
-            // we can't handle this path. Let's do the normal filter chain
-            chain.doFilter(request, response);
-        } else {
-            request.setAttribute(Dispatch.KEY, dispatch);
+                (Dispatcher) servletContext.getAttribute(
+                        ApplicationAttributes.DISPATCHER);
+        Dispatch dispatch = dispatcher.createDispatch(httpRequest);
 
-            // forward
-            String rewrittenPath = dispatch.getRewrittenPath();
-            logger.debug("Forwarding '{}' to '{}'",
+        if (dispatch == null) {
+            logger.debug("We can't handle this path ({})." +
+                    " Let's do the normal filter chain",
+                    httpRequest.getServletPath());
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String rewrittenPath = dispatch.getRewrittenPath();
+        RequestDispatcher requestDispatcher =
+                servletContext.getRequestDispatcher(rewrittenPath);
+
+        Map<String, Object> savedAttributes =
+                saveAndResetRequestAttributes(request);
+        request.setAttribute(RequestAttributes.DISPATCH, dispatch);
+        try {
+            if(request.getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) == null) {
+                logger.debug("Forwarding '{}' to '{}'",
                     dispatch.getOriginalPath(),
                     rewrittenPath);
-            RequestDispatcher requestDispatcher =
-                    servletContext.getRequestDispatcher(rewrittenPath);
-            requestDispatcher.forward(request, response);
+                    requestDispatcher.forward(request, response);
+            } else {
+                logger.debug("Including '{}' to '{}'",
+                    dispatch.getOriginalPath(),
+                    rewrittenPath);
+                requestDispatcher.include(request, response);
+            }
+        } finally {
+            restoreRequestAttributes(request, savedAttributes);
         }
+    }
+
+    private void restoreRequestAttributes(ServletRequest request,
+                                          Map<String, Object> savedAttributes) {
+        List<String> attrNamesToRemove = new ArrayList<String>();
+        Enumeration attrNames = request.getAttributeNames();
+        while(attrNames.hasMoreElements()) {
+            attrNamesToRemove.add((String) attrNames.nextElement());
+        }
+        for(String attrName : attrNamesToRemove) {
+            request.removeAttribute(attrName);
+        }
+        for(Map.Entry<String, Object> entry : savedAttributes.entrySet()) {
+            request.setAttribute(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private Map<String, Object> saveAndResetRequestAttributes(ServletRequest request) {
+        Map<String,Object> savedAttributes = new HashMap<String, Object>();
+        logger.debug("--- start req dump ---");
+        Enumeration attrNames = request.getAttributeNames();
+        while(attrNames.hasMoreElements()) {
+            String attrName = (String) attrNames.nextElement();
+            Object attrValue = request.getAttribute(attrName);
+            logger.debug("{} = {}", attrName, attrValue);
+            savedAttributes.put(attrName, attrValue);
+        }
+        for(String attrName : savedAttributes.keySet()) {
+            if(!attrName.startsWith("javax.servlet")) {
+                request.removeAttribute(attrName);
+            }
+        }
+        logger.debug("--- end req dump ---");
+        return savedAttributes;
     }
 
     public void destroy() {

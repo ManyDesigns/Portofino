@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -45,11 +45,12 @@ import java.text.MessageFormat;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
 public class JdbcConnectionProvider extends ConnectionProvider {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Fields (configured values)

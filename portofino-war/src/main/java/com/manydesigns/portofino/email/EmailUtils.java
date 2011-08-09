@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -28,13 +28,14 @@
  */
 package com.manydesigns.portofino.email;
 
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class EmailUtils {
 
@@ -61,11 +62,11 @@ public class EmailUtils {
 
 
 
-    public static synchronized void addEmail(Context context, String subject, String body,
+    public static synchronized void addEmail(Application application, String subject, String body,
     String to, String from) {
         EmailBean email = new EmailBean(subject, body, to,
                 from);
-        context.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
+        application.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
     }
 
 }

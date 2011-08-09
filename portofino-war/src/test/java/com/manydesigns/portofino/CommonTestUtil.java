@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -42,10 +42,11 @@ import java.util.Hashtable;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public abstract class CommonTestUtil extends AbstractPortofinoTest{
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     protected ServletRunner servletRunner;
     private static final String FILECONFIGURATION = "portofino.properties";
@@ -62,7 +63,9 @@ public abstract class CommonTestUtil extends AbstractPortofinoTest{
     }
 
     private void setupPortofinoProperties() throws IOException{
-        PortofinoProperties.loadProperties("portofino_webtest.properties");    }
+        portofinoConfiguration.setProperty(PortofinoProperties.MODEL_LOCATION,
+                "portofino-war/src/test/resources/portofino-model.xml");
+    }
 
     private void setUpWorkingDirectory() {
         try {

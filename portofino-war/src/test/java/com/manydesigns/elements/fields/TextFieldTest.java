@@ -13,10 +13,11 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class TextFieldTest extends AbstractElementsTest {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public String myText;
 

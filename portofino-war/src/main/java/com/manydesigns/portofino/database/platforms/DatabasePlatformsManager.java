@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -29,73 +29,54 @@
 
 package com.manydesigns.portofino.database.platforms;
 
-import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.connections.ConnectionProvider;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class DatabasePlatformsManager {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Fields
     //**************************************************************************
 
-    protected static final Properties portofinoProperties;
-    protected static final DatabasePlatformsManager manager;
-
-    public static final Logger logger =
-            LoggerFactory.getLogger(DatabasePlatformsManager.class);
-
+    protected final Configuration portofinoConfiguration;
     protected ArrayList<DatabasePlatform> databasePlatformList;
 
     //**************************************************************************
-    // Static initializer
+    // Logging
     //**************************************************************************
 
-    static {
-        portofinoProperties = PortofinoProperties.getProperties();
-        String managerClassName =
-                portofinoProperties.getProperty(
-                        PortofinoProperties.DATABASE_PLATFORMS_MANAGER_PROPERTY);
-        InstanceBuilder<DatabasePlatformsManager> builder =
-                new InstanceBuilder<DatabasePlatformsManager>(
-                        DatabasePlatformsManager.class,
-                        DatabasePlatformsManager.class,
-                        logger);
-        manager = builder.createInstance(managerClassName);
-    }
-
-    public static DatabasePlatformsManager getManager() {
-        return manager;
-    }
+    public static final Logger logger =
+            LoggerFactory.getLogger(DatabasePlatformsManager.class);
 
     //**************************************************************************
     // Constructors / building
     //**************************************************************************
 
-    public DatabasePlatformsManager() {
+    public DatabasePlatformsManager(Configuration portofinoConfiguration) {
+        this.portofinoConfiguration = portofinoConfiguration;
         databasePlatformList = new ArrayList<DatabasePlatform>();
-        String listString = portofinoProperties.getProperty(
-                PortofinoProperties.DATABASE_PLATFORMS_LIST_PROPERTY);
-        if (listString == null) {
+        String[] platformNames = portofinoConfiguration.getStringArray(
+                PortofinoProperties.DATABASE_PLATFORMS_LIST);
+        if (platformNames == null) {
             logger.debug("Empty list");
             return;
         }
 
-        String[] helperClassArray = listString.split(",");
-        for (String current : helperClassArray) {
+        for (String current : platformNames) {
             addDatabasePlatform(current);
         }
     }

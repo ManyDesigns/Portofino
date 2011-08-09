@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -33,11 +33,11 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectHttpRequest;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.system.model.users.User;
-import com.opensymphony.xwork2.ActionSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,17 +49,18 @@ import java.util.Date;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class LostPwdChangeAction extends ActionSupport implements LoginUnAware {
+public class LostPwdChangeAction extends AbstractActionBean implements LoginUnAware {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Injections
     //**************************************************************************
 
-    @InjectContext
-    public Context context;
+    @InjectApplication
+    public Application application;
 
     @InjectHttpRequest
     public HttpServletRequest req;
@@ -88,11 +89,11 @@ public class LostPwdChangeAction extends ActionSupport implements LoginUnAware {
             form.writeToObject(pwd);
 
             if(form.validate()){
-                User user = context.findUserByToken(token);
+                User user = application.findUserByToken(token);
                 user.setPwd(pwd.pwd);
                 user.setPwdModDate(new Timestamp(new Date().getTime()));
-                context.updateObject("portofino.public.users", user);
-                context.commit("portofino");
+                application.updateObject("portofino.public.users", user);
+                application.commit("portofino");
                 logger.debug("User {} updated", user.getEmail());
                 SessionMessages.addInfoMessage("Password updated");
                 return SUCCESS;

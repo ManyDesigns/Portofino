@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -31,11 +31,12 @@ package com.manydesigns.portofino.email;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,12 +51,13 @@ import java.util.concurrent.Executors;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 
 
 public class EmailTask extends TimerTask {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     protected static final int N_THREADS = 5;
     protected static ExecutorService outbox = Executors.newFixedThreadPool
@@ -67,31 +69,28 @@ public class EmailTask extends TimerTask {
     protected final POP3Client client;
     protected static final Logger logger =
             LoggerFactory.getLogger(TimerTask.class);
-    protected final Context context;
+    protected final Application application;
     private static final String USERTABLE = UserUtils.USERTABLE;
 
 
-    public EmailTask(Context context) {
-        this.context = context;
+    public EmailTask(Application application) {
+        this.application = application;
         //Setto il client smtp per il bouncing
-        String popHost = PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_POP3_HOST, "127.0.0.1");
-        String protocol = PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_POP3_PROTOCOL, "pop3");
-        int popPort = Integer.parseInt(PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_POP3_PORT, "25"));
-        String popLogin = PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_POP3_LOGIN);
-        String popPassword = PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_POP3_PASSWORD);
-        boolean bounceEnabled = Boolean.parseBoolean(
-                PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_BOUNCE_ENABLED,
-                "false"));
-        boolean sslEnabled = Boolean.parseBoolean(
-                PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.MAIL_POP3_SSL_ENABLED,
-                "false"));
+        Configuration configuration = application.getPortofinoProperties();
+        String popHost = configuration.getString(
+                PortofinoProperties.MAIL_POP3_HOST, "127.0.0.1");
+        String protocol = configuration.getString(
+                PortofinoProperties.MAIL_POP3_PROTOCOL, "pop3");
+        int popPort = configuration.getInt(
+                PortofinoProperties.MAIL_POP3_PORT, 25);
+        String popLogin = configuration.getString(
+                PortofinoProperties.MAIL_POP3_LOGIN);
+        String popPassword = configuration.getString(
+                PortofinoProperties.MAIL_POP3_PASSWORD);
+        boolean bounceEnabled = configuration.getBoolean(
+                PortofinoProperties.MAIL_BOUNCE_ENABLED, false);
+        boolean sslEnabled = configuration.getBoolean(
+                PortofinoProperties.MAIL_POP3_SSL_ENABLED, false);
         if (bounceEnabled &&
                 popHost != null && protocol != null && popLogin != null
                 && popPassword != null) {
@@ -114,33 +113,32 @@ public class EmailTask extends TimerTask {
 
     public void run() {
         try {
-            context.openSession();
             createQueue();
             checkBounce();
         } finally {
-            context.closeSession();
+            application.closeSessions();
         }
     }
 
     public synchronized void createQueue() {
         try {
-            ClassAccessor accessor = context.getTableAccessor(
+            ClassAccessor accessor = application.getTableAccessor(
                     EmailUtils.EMAILQUEUE_TABLE);
-            Table table = context.getModel()
+            Table table = application.getModel()
                     .findTableByQualifiedName(EmailUtils.EMAILQUEUE_TABLE);
             TableCriteria criteria = new TableCriteria(table);
             criteria.eq(accessor.getProperty("state"), EmailUtils.TOBESENT);
-            List<Object> emails = context.getObjects(
+            List<Object> emails = application.getObjects(
                     criteria.eq(accessor.getProperty("state"),
                             EmailUtils.TOBESENT));
             for (Object obj : emails) {
-                EmailSender emailSender = new EmailSender(context,
+                EmailSender emailSender = new EmailSender(application,
                         (EmailBean) obj);
                 EmailBean email = emailSender.getEmailBean();
                 try {
                     email.setState(EmailUtils.SENDING);
-                    context.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
-                    context.commit(EmailUtils.PORTOFINO);
+                    application.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
+                    application.commit(EmailUtils.PORTOFINO);
                 } catch (Throwable e) {
                     logger.warn("cannot store email state", e);
                 }
@@ -163,12 +161,12 @@ public class EmailTask extends TimerTask {
 
     private void incrementBounce(String email) {
         try {
-            Table table = context.getModel()
+            Table table = application.getModel()
                     .findTableByQualifiedName(EmailUtils.EMAILQUEUE_TABLE);
             TableCriteria criteria = new TableCriteria(table);
 
-            ClassAccessor accessor = context.getTableAccessor(USERTABLE);
-            List<Object> users = context.getObjects(
+            ClassAccessor accessor = application.getTableAccessor(USERTABLE);
+            List<Object> users = application.getObjects(
                     criteria.gt(accessor.getProperty("email"), email));
             if (users.size() == 0) {
                 logger.warn("no user found for email {}", email);
@@ -182,7 +180,7 @@ public class EmailTask extends TimerTask {
                 value++;
             }
             user.setBounced(value);
-            context.saveObject(USERTABLE, user);
+            application.saveObject(USERTABLE, user);
         } catch (NoSuchFieldException e) {
             logger.warn("cannot increment bounce for user", e);
         }

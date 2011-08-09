@@ -12,6 +12,29 @@ a:hover {
 }
 
 /*******************************************************************************
+Tables within fieldsets have too much margin-bottom
+*******************************************************************************/
+
+fieldset table {
+    margin-bottom: 0;
+}
+
+/*******************************************************************************
+jQuery ui smoothness theme overrides
+*******************************************************************************/
+
+.ui-widget { font-family: Arial,sans-serif; font-size: 1em; }
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Arial,sans-serif; font-size: 1em; }
+
+.ui-button-text-only .ui-button-text { padding: .1em .5em; }
+.ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { padding: 0; text-indent: -9999999px; }
+.ui-button-text-icon-primary .ui-button-text, .ui-button-text-icons .ui-button-text { padding: .1em 0.5em .1em 1.6em; }
+input.ui-button { padding: .1em .5em; }
+
+button.ui-button-icon-only { width: 1.6em; }
+
+
+/*******************************************************************************
 Header / footer
 *******************************************************************************/
 
@@ -47,8 +70,123 @@ Body and content layout
     border: 3px solid #65a7db;
 }
 
-div#inner-content {
-    padding: 0 1em;
+/*******************************************************************************
+Breadcrumbs
+*******************************************************************************/
+
+div.breadcrumbs {
+    display: inline;
+}
+
+div.breadcrumbs .inner {
+    display: inline;
+}
+
+a.breadcrumb-item {
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+span.breadcrumb-item {
+/*    color: #808080; */
+    color: #333333;
+    font-weight: bold;
+}
+
+/*******************************************************************************
+Content
+*******************************************************************************/
+
+div#contentBody {
+    padding: 1em;
+}
+
+.contentHeader, .contentFooter {
+    background-color: #eef;
+    padding: 0.5em 1em;
+    clear: both;
+}
+
+.contentHeader {
+    border-bottom: 1px solid gray;
+}
+
+.contentHeader .contentBarRight {
+    float: right;
+    padding: 0.2em 0;
+}
+
+.contentHeader .contentBarLeft {
+    float: left;
+    padding: 0.2em 0;
+}
+
+
+.contentFooter {
+    border-top: 1px solid gray;
+    margin-top: 1em;
+}
+
+.contentBarButtons, .resultSetNavigation {
+    display: inline;
+    margin-left: 1em;
+}
+
+/*******************************************************************************
+Portlet
+*******************************************************************************/
+
+.portletWrapper {
+    margin-bottom: 3em;
+    width: 100%;
+}
+
+.portlet {}
+
+.portletHeader {
+    border-bottom: solid 3px #EEEEFF;
+    margin-bottom: 12px;
+    padding-bottom: 3px;
+    float: left;
+    width: 100%;
+}
+
+/* page hader/footer buttons*/
+input.contentButton, input.contentButton, .portletHeaderButtons button {
+    border: 1px solid #D6D6E6;
+    background: #EEEEFF;
+}
+input.contentButton.ui-button.ui-state-hover, input.contentButton.ui-button.ui-state-hover, .portletHeaderButtons button.ui-state-hover {
+    border: 1px solid #7171B0;
+    background: #65a7db url(images/ui-bg_glass_75_a8a8e6_1x400.png) 50% 50% repeat-x;
+    font-weight: normal; color: #212121;
+}
+
+.portletHeaderButtons {
+    float:right;
+}
+
+
+.portletTitle {
+    float: left;
+}
+
+.portletTitle h1 {
+    margin: 0;
+    color: #166BBF;
+}
+
+.portletBody {
+    clear: left;
+}
+
+.portletFooter {}
+
+.sortablePlaceholder {
+    border: 1px solid #fcefa1;
+    background: #fbf9ee;
+    color: #363636;
+    height: 10em;
 }
 
 
@@ -82,56 +220,6 @@ div#sidebar ul li.path, div#sidebar ul li.path a {
     background-color: #eef;
     font-weight: bold;
 }
-
-
-/*******************************************************************************
-Tabs bar
-*******************************************************************************/
-
-.tabs-bar-top {
-    padding:0.5em 1em;
-    background-color: #ffe;
-    border-bottom: 1px solid gray;
-}
-
-ul.tabs {
-    display: block;
-    padding: 0.25em 0 0 0;
-    margin: 0;
-}
-
-ul.tabs li {
-    display: inline;
-    padding: 0.5em 0.5em;
-    margin: 0 1em 0 0;
-}
-
-ul.tabs li.selected {
-    font-weight: bold;
-    background-color: #eed;
-    border: 1px solid gray;
-    border-bottom-width: 0;
-}
-
-/*******************************************************************************
-Buttons bar
-*******************************************************************************/
-
-.buttons-bar-top, .buttons-bar-bottom {
-    background-color: #eef;
-    padding: 0.5em;
-    clear: both;
-}
-
-.buttons-bar-top {
-    border-bottom: 1px solid gray;
-}
-
-.buttons-bar-bottom {
-    border-top: 1px solid gray;
-    margin-top: 1em;
-}
-
 
 /*******************************************************************************
 Error/warning/info messages
@@ -252,7 +340,7 @@ Search form
 }
 
 .search_results {
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 
 /*******************************************************************************
@@ -318,7 +406,7 @@ div#content-login table {
 div#content-login h1 {
     text-align: center;
 }
-div#content-login table tr td, div#login table tr th {
+div#content-login table tr td, div#content-login table tr th {
     border: 0pt;
     background-color: #65a7db;
 }

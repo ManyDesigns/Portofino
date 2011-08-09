@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -32,26 +32,23 @@ package com.manydesigns.portofino.util;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
-import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class PkHelper {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -123,22 +120,6 @@ public class PkHelper {
             sb.append(stringValue);
         }
         return sb.toString();
-    }
-
-    public String generateUrl(Object object, String searchString) {
-        String pkString = generatePkString(object);
-        Map<String,Object> params = new HashMap<String,Object>();
-        params.put("pk", pkString);
-        params.put("searchString", searchString);
-        String url = Struts2Utils.buildActionUrl(null, params);
-        return Util.getAbsoluteUrl(url);
-    }
-
-    public String generateSearchUrl(String searchString) {
-        Map<String,Object> params = new HashMap<String,Object>();
-        params.put("searchString", searchString);
-        String url = Struts2Utils.buildActionUrl(null, params);
-        return Util.getAbsoluteUrl(url);
     }
 
 }

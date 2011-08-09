@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -37,10 +37,11 @@ import org.jetbrains.annotations.NotNull;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - a@manydesigns.com
 */
 public class Sequence extends AbstractReflectiveCompositeElement {
     public static final String copyright =
-            "Copyright (c) 2005-2009, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Costruttori

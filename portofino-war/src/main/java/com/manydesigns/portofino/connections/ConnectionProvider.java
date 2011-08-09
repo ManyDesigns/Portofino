@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -52,10 +52,11 @@ import java.util.regex.Pattern;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public abstract class ConnectionProvider {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Constants
@@ -148,7 +149,7 @@ public abstract class ConnectionProvider {
         lastTested = null;
     }
 
-    public void init() {
+    public void init(DatabasePlatformsManager databasePlatformsManager) {
         if (includeSchemas == null) {
             includeSchemasPattern = null;
         } else {
@@ -205,9 +206,8 @@ public abstract class ConnectionProvider {
             }
             Collections.sort(types, new TypeComparator());
 
-            DatabasePlatformsManager manager =
-                    DatabasePlatformsManager.getManager();
-            databasePlatform = manager.findApplicableAbstraction(this);
+            databasePlatform =
+                    databasePlatformsManager.findApplicableAbstraction(this);
             if (databasePlatform == null) {
                 status = STATUS_ERROR;
                 errorMessage = MessageFormat.format(

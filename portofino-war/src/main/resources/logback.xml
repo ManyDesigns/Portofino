@@ -6,7 +6,8 @@
     </appender>
 
     <logger name="org.hibernate" level="warn"/>
-    <logger name="com.manydesigns.portofino.dispatcher" level="debug"/>
+    <!--<logger name="com.manydesigns.portofino.dispatcher" level="debug"/>-->
+    <logger name="net.sourceforge.stripes.tag.FormTag" level="off"/>
 
     <root level="info">
         <appender-ref ref="STDOUT"/>

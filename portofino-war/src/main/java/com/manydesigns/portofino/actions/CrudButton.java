@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -31,10 +31,7 @@ package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
-import com.manydesigns.elements.struts2.Struts2Utils;
-import com.manydesigns.portofino.model.site.usecases.Button;
-import com.opensymphony.xwork2.util.CompoundRoot;
-import com.opensymphony.xwork2.util.ValueStack;
+import com.manydesigns.portofino.model.site.crud.Button;
 import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -44,10 +41,11 @@ import org.slf4j.LoggerFactory;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class CrudButton {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //--------------------------------------------------------------------------
     // Fields
@@ -77,7 +75,7 @@ public class CrudButton {
     // Guard management
     //--------------------------------------------------------------------------
 
-    public void runGuard() {
+    public void runGuard(Object root) {
         String guard = button.getGuard();
         if (StringUtils.isBlank(guard)) {
             enabled = true;
@@ -86,10 +84,6 @@ public class CrudButton {
 
         // Ognl context
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-
-        // Ognl root
-        ValueStack valueStack = Struts2Utils.getValueStack();
-        CompoundRoot root = valueStack.getRoot();
 
         Object result = OgnlUtils.getValueQuietly(guard, ognlContext, root);
 

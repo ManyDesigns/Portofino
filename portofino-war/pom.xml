@@ -72,22 +72,37 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>commons-transaction</groupId>
-            <artifactId>commons-transaction</artifactId>
-            <version>${commons.transaction.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>${servlet.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>${jstl.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!--
+        <dependency>
             <groupId>org.apache.struts</groupId>
             <artifactId>struts2-core</artifactId>
             <version>${struts2.version}</version>
             <scope>compile</scope>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>net.sourceforge.stripes</groupId>
+            <artifactId>stripes</artifactId>
+            <version>${stripes.version}</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>jfree</groupId>
@@ -209,12 +224,24 @@
             <artifactId>naming-factory</artifactId>
             <version>5.5.23</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>tomcat</groupId>
             <artifactId>naming-resources</artifactId>
             <version>5.5.23</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
@@ -226,11 +253,13 @@
             <groupId>rhino</groupId>
             <artifactId>js</artifactId>
             <version>1.6R5</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.mockrunner</groupId>
             <artifactId>mockrunner</artifactId>
             <version>0.3.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>dumbster</groupId>
@@ -238,12 +267,14 @@
             <version>1.5</version>
             <scope>test</scope>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
             <version>2.0.0</version>
             <scope>compile</scope>
         </dependency>
+        -->
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>fop</artifactId>

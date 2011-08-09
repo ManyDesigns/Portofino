@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -35,21 +35,27 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.SessionAttributes;
+import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectHttpRequest;
 import com.manydesigns.portofino.annotations.InjectHttpSession;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.annotations.InjectPortofinoProperties;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
-import com.opensymphony.xwork2.ActionSupport;
+import net.sourceforge.stripes.action.Before;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.security.MessageDigest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,10 +65,11 @@ import java.util.List;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class ProfileAction extends ActionSupport {
+public class ProfileAction extends AbstractActionBean {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public static final String CHANGE_PWD = "changePwd";
     public static final String UPDATE_PWD = "updatePwd";
@@ -71,8 +78,8 @@ public class ProfileAction extends ActionSupport {
     // Injections
     //**************************************************************************
 
-    @InjectContext
-    public Context context;
+    @InjectApplication
+    public Application application;
 
     @InjectHttpRequest
     public HttpServletRequest req;
@@ -80,21 +87,19 @@ public class ProfileAction extends ActionSupport {
     @InjectHttpSession
     public HttpSession session;
 
+    @InjectPortofinoProperties
+    public Configuration portofinoConfiguration;
+
     public List<Group> groups;
 
     private Boolean enc;
     private Long userId;
 
-    public ProfileAction() {
+    @Before
+    public void prepare() {
         groups = new ArrayList<Group>();
-        enc = Boolean.parseBoolean(PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.PWD_ENCRYPTED, "false"));
-
-    }
-
-
-    public void setServletRequest(HttpServletRequest req) {
-        this.req = req;
+        enc = portofinoConfiguration.getBoolean(
+                PortofinoProperties.PWD_ENCRYPTED, false);
     }
 
     //**************************************************************************
@@ -106,14 +111,14 @@ public class ProfileAction extends ActionSupport {
             LoggerFactory.getLogger(ProfileAction.class);
 
     public String execute() {
-        userId = (Long) session.getAttribute(UserUtils.USERID);
+        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
         return read();
     }
 
     private String read() {
         User thisUser =
-            (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
-        ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
+            (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
+        ClassAccessor accessor = application.getTableAccessor(UserUtils.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         formBuilder.configFields("email", "userName", "firstName",
                 "middleName", "lastName", "creationDate");
@@ -132,11 +137,11 @@ public class ProfileAction extends ActionSupport {
     }
 
     public String edit() {
-        userId = (Long) session.getAttribute(UserUtils.USERID);
+        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
         User thisUser =
-            (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
+            (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 
-        ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
+        ClassAccessor accessor = application.getTableAccessor(UserUtils.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
                 .configFields("email", "userName", "firstName",
@@ -148,10 +153,10 @@ public class ProfileAction extends ActionSupport {
     }
 
     public String update() {
-        userId = (Long) session.getAttribute(UserUtils.USERID);
+        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
         User thisUser =
-            (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
-        ClassAccessor accessor = context.getTableAccessor(UserUtils.USERTABLE);
+            (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
+        ClassAccessor accessor = application.getTableAccessor(UserUtils.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
                 .configFields("email", "userName", "firstName",
@@ -163,8 +168,8 @@ public class ProfileAction extends ActionSupport {
         
         if(form.validate()){
             form.writeToObject(thisUser);
-            context.updateObject(UserUtils.USERTABLE, thisUser);
-            context.commit("portofino");
+            application.updateObject(UserUtils.USERTABLE, thisUser);
+            application.commit("portofino");
             logger.debug("User {} updated", thisUser.getEmail());
             SessionMessages.addInfoMessage("Utente aggiornato correttamente");
             return PortofinoAction.UPDATE;
@@ -174,7 +179,7 @@ public class ProfileAction extends ActionSupport {
     }
 
     public String changePwd() {
-        userId = (Long) session.getAttribute(UserUtils.USERID);
+        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)
                 .build();
@@ -182,9 +187,9 @@ public class ProfileAction extends ActionSupport {
     }
 
     public String updatePwd() {
-        userId = (Long) session.getAttribute(UserUtils.USERID);
+        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
         User thisUser =
-            (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
+            (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)
@@ -195,14 +200,30 @@ public class ProfileAction extends ActionSupport {
             ChangePasswordFormBean bean = new ChangePasswordFormBean();
             form.writeToObject(bean);
 
-            if(bean.getEncOldPwd().equals(thisUser.getPwd())) {
+            String encOldPwd;
+            if (portofinoConfiguration.getBoolean(PortofinoProperties.PWD_ENCRYPTED, false)){
+                try {
+                    MessageDigest md = MessageDigest.getInstance("SHA-1");
+                    md.update(bean.oldPwd.getBytes("UTF-8"));
+                    byte raw[] = md.digest();
+                    encOldPwd = (new BASE64Encoder()).encode(raw);
+                } catch (Exception e) {
+                    throw new Error(e);
+                }
+            } else {
+                encOldPwd = bean.oldPwd;
+            }
+
+            if(encOldPwd.equals(thisUser.getPwd())) {
                 thisUser.setPwd(bean.pwd);
                 if (enc) {
-                    thisUser.encryptPwd();
+                    thisUser.setPwd(UserUtils.encryptPassword(bean.pwd));
+                } else {
+                    thisUser.setPwd(bean.pwd);
                 }
                 thisUser.setPwdModDate(new Timestamp(new Date().getTime()));
-                context.updateObject(UserUtils.USERTABLE, thisUser);
-                context.commit("portofino");
+                application.updateObject(UserUtils.USERTABLE, thisUser);
+                application.commit("portofino");
 
                 logger.debug("User {} updated", thisUser.getEmail());
                 SessionMessages.addInfoMessage("Password correctely updated");

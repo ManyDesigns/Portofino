@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -30,22 +30,23 @@
 package com.manydesigns.elements.util;
 
 import com.manydesigns.elements.ElementsProperties;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class RandomUtil {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public final static int DEFAULT_RANDOM_CODE_LENGTH = 20;
 
@@ -56,10 +57,10 @@ public class RandomUtil {
     protected static final File tempDir;
 
     static {
-        Properties properties = ElementsProperties.getProperties();
+        Configuration configuration = ElementsProperties.getConfiguration();
         String stringValue =
-                properties.getProperty(
-                        ElementsProperties.RANDOM_CODE_LENGTH_PROPERTY);
+                configuration.getString(
+                        ElementsProperties.RANDOM_CODE_LENGTH);
         int tmp;
         try {
             tmp = Integer.parseInt(stringValue);

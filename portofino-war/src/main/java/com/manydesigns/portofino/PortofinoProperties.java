@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -29,27 +29,15 @@
 
 package com.manydesigns.portofino;
 
-import com.manydesigns.elements.util.ReflectionUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.InputStream;
-import java.util.Properties;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class PortofinoProperties {
+public final class PortofinoProperties {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
-
-    //**************************************************************************
-    // KEY (for aplication scope attribute)
-    //**************************************************************************
-
-    public final static String KEY = "portofinoProperties";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Default and custom properties location
@@ -65,28 +53,18 @@ public class PortofinoProperties {
     // Property names
     //**************************************************************************
 
-    public static final String PORTOFINO_VERSION_PROPERTY =
+    public static final String PORTOFINO_VERSION =
             "portofino.version";
-    public static final String CONNECTIONS_LOCATION_PROPERTY =
+    public static final String CONNECTIONS_LOCATION =
             "connections.location";
-    public static final String MODEL_LOCATION_PROPERTY =
+    public static final String MODEL_LOCATION =
             "model.location";
-    public static final String CONTEXT_CLASS_PROPERTY =
-            "context.class";
-    public static final String APPLICATION_NAME_PROPERTY =
+    public static final String APPLICATION_NAME =
             "application.name";
-    public static final String DATABASE_PLATFORMS_MANAGER_PROPERTY =
-            "database.platforms.manager";
-    public static final String DATABASE_PLATFORMS_LIST_PROPERTY =
+    public static final String DATABASE_PLATFORMS_LIST =
             "database.platforms.list";
-    public static final String SECURITY_TYPE_PROPERTY =
+    public static final String SECURITY_TYPE =
             "security.type";
-    public static final String PORTOFINO_STOREDIR_PROPERTY =
-            "portofino.store.dir";
-    public static final String PORTOFINO_WORKDIR_PROPERTY =
-            "portofino.work.dir";
-    public static final String CONNECTION_FILE_PROPERTY =
-            "connection.file";
 
     //Email properties
     public static final String MAIL_ENABLED = "mail.enabled";
@@ -108,52 +86,5 @@ public class PortofinoProperties {
     //Password properties
     public static final String PWD_ENCRYPTED = "pwd.encrypted";
 
-    
-
-    //**************************************************************************
-    // Static fields, singleton initialization and retrieval
-    //**************************************************************************
-
-    private static final Properties properties;
-    public static final Logger logger =
-            LoggerFactory.getLogger(PortofinoProperties.class);
-
-
-    static {
-        properties = new Properties();
-        reloadProperties();
-    }
-
-    public static void reloadProperties() {
-        properties.clear();
-
-        loadProperties(PROPERTIES_RESOURCE);
-        loadProperties(CUSTOM_PROPERTIES_RESOURCE);
-    }
-
-    public static void loadProperties(String resource) {
-        InputStream stream = ReflectionUtil.getResourceAsStream(resource);
-        if (stream == null) {
-            logger.info("Properties resource not found: {}", resource);
-            return;
-        }
-        try {
-            properties.load(stream);
-            logger.info("Properties loaded from: {}", resource);
-        } catch (Throwable e) {
-            logger.warn(String.format(
-                    "Error loading properties from: %s", resource), e);
-        }
-    }
-
-    public static Properties getProperties() {
-        return properties;
-    }
-
-    //**************************************************************************
-    // Dummy constructor
-    //**************************************************************************
-
     private PortofinoProperties() {}
-
 }

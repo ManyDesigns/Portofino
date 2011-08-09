@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -32,6 +32,7 @@ package com.manydesigns.elements.annotations;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,16 +42,17 @@ import java.util.*;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class AnnotationsManager {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Static fields
     //**************************************************************************
 
-    protected static final Properties elementsProperties;
+    protected static final Configuration elementsConfiguration;
     protected static final AnnotationsManager manager;
 
     public static final Logger logger =
@@ -68,10 +70,10 @@ public class AnnotationsManager {
     //**************************************************************************
 
     static {
-        elementsProperties = ElementsProperties.getProperties();
+        elementsConfiguration = ElementsProperties.getConfiguration();
         String managerClassName =
-                elementsProperties.getProperty(
-                        ElementsProperties.ANNOTATIONS_MANAGER_PROPERTY);
+                elementsConfiguration.getString(
+                        ElementsProperties.ANNOTATIONS_MANAGER);
         InstanceBuilder<AnnotationsManager> builder =
                 new InstanceBuilder<AnnotationsManager>(
                         AnnotationsManager.class,
@@ -91,28 +93,22 @@ public class AnnotationsManager {
 
     public AnnotationsManager() {
         annotationClassMap = new HashMap<Class, Class>();
-        String listString = elementsProperties.getProperty(
-                ElementsProperties.ANNOTATIONS_IMPLEMENTATION_LIST_PROPERTY);
-        if (listString == null) {
+        Properties mappings = elementsConfiguration.getProperties(
+                ElementsProperties.ANNOTATIONS_IMPLEMENTATION_LIST);
+        if (mappings == null) {
             logger.debug("Empty list");
             return;
         }
 
-        String[] mappingsArray = listString.split(",");
-        for (String mapping : mappingsArray) {
-            addAnnotationMapping(mapping);
+        for (Map.Entry<Object, Object> mapping : mappings.entrySet()) {
+            String annotationName = (String) mapping.getKey();
+            String annotationImplName = (String) mapping.getValue();
+
+            addAnnotationMapping(annotationName, annotationImplName);
         }
     }
 
-    public void addAnnotationMapping(String mapping) {
-        String[] split = mapping.split(":");
-        if (split.length != 2) {
-            logger.warn("Incorrect annotation mapping syntax: {}", mapping);
-            return;
-        }
-        String annotationName = split[0].trim();
-        String annotationImplName = split[1].trim();
-
+    public void addAnnotationMapping(String annotationName, String annotationImplName) {
         logger.debug("Mapping annotation {} to implemetation {}",
                 annotationName, annotationImplName);
         Class annotationClass = ReflectionUtil.loadClass(annotationName);

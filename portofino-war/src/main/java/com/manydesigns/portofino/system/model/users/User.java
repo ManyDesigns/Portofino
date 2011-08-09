@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -44,10 +44,11 @@ import java.util.List;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class User implements Serializable{
     public static final String copyright
-            = "Copyright (c) 2005-2010, ManyDesigns srl";
+            = "Copyright (c) 2005-2011, ManyDesigns srl";
     //Dati
     Long userId;
     Long state;
@@ -328,17 +329,6 @@ public class User implements Serializable{
 
     public void setOldPwds(List<OldPassword> oldPwds) {
         this.oldPwds = oldPwds;
-    }
-
-    public void encryptPwd() {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
-            md.update(pwd.getBytes("UTF-8"));
-            byte raw[] = md.digest();
-            setPwd((new BASE64Encoder()).encode(raw));
-        } catch (Exception e) {
-            throw new Error(e);
-        }
     }
 
     public synchronized  void tokenGenerator() {

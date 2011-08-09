@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -29,13 +29,14 @@
 package com.manydesigns.portofino;
 
 import com.manydesigns.elements.AbstractElementsTest;
-import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.context.Context;
-import com.manydesigns.portofino.context.hibernate.HibernateContextImpl;
+import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.context.hibernate.HibernateApplicationImpl;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
-import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -51,17 +52,27 @@ import java.sql.Connection;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public abstract class AbstractPortofinoTest extends AbstractElementsTest {
+
+    // Long-lived Portofino objects
+    protected CompositeConfiguration portofinoConfiguration;
+    protected DatabasePlatformsManager databasePlatformsManager;
+    protected Application application;
+
 
     //Connessioni e context
     public Connection connPetStore;
     public Connection connPortofino;
     public Connection connDBTest;
-    public Context context = null;
     public Model model;
-    public String storeDir;
 
+    public File modelFile;
+    public File connectionsFile;
+
+    public static final String PORTOFINO_TEST_PROPERTIES_RESOURCE =
+            "portofino-test.properties";
     public static final String PORTOFINO_CONNECTIONS_RESOURCE =
             "portofino-connections.xml";
     public static final String PORTOFINO_MODEL_RESOURCE =
@@ -76,7 +87,6 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
             "database/portofino4.sql";
     public static final String TEST_DB =
             "database/hibernatetest.sql";
-    private static final String PORTOFINO_PROPERTIES_RESOURCE = "portofino_test.properties";
 
     //--------------------------------------------------------------------------
     // Setup e teardown
@@ -85,27 +95,30 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        PortofinoProperties.loadProperties(getPortofinoPropertiesResource());
+        portofinoConfiguration = new CompositeConfiguration();
+        portofinoConfiguration.addConfiguration(
+                    new PropertiesConfiguration(
+                            PORTOFINO_TEST_PROPERTIES_RESOURCE));
+        portofinoConfiguration.addConfiguration(
+                    new PropertiesConfiguration(
+                            PortofinoProperties.PROPERTIES_RESOURCE));
 
-        // crea store dir se non c'è
-        storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
-                PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));
-        File file = new File(storeDir);
-        if (!file.exists() && !file.mkdirs()) {
-            throw new Error("Errore in creazione di: " + storeDir);
-        }
+        File portofinoConnectionsFile = copyResourceToTempFile(getPortofinoConnectionsResource());
+        portofinoConfiguration.setProperty(
+                PortofinoProperties.CONNECTIONS_LOCATION, portofinoConnectionsFile.getAbsolutePath());
+        File portofinoModelFile = copyResourceToTempFile(getPortofinoModelResource());
+        portofinoConfiguration.setProperty(
+                PortofinoProperties.MODEL_LOCATION, portofinoModelFile.getAbsolutePath());
 
-        copyResource(getPortofinoConnectionsResource(),
-                PORTOFINO_CONNECTIONS_RESOURCE);
-        copyResource(getPortofinoModelResource(),
-                PORTOFINO_MODEL_RESOURCE);
+        databasePlatformsManager =
+                new DatabasePlatformsManager(portofinoConfiguration);
 
-        createContext();
+        createApplication();
 
         ClassLoader cl = AbstractPortofinoTest.class.getClassLoader();
-        connPortofino = context.getConnectionProvider("portofino").acquireConnection();
-        connPetStore = context.getConnectionProvider("jpetstore").acquireConnection();
-        connDBTest = context.getConnectionProvider("hibernatetest").acquireConnection();
+        connPortofino = application.getConnectionProvider("portofino").acquireConnection();
+        connPetStore = application.getConnectionProvider("jpetstore").acquireConnection();
+        connDBTest = application.getConnectionProvider("hibernatetest").acquireConnection();
 
         RunScript.execute(connPortofino,
                 new InputStreamReader(
@@ -125,7 +138,7 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
     private void setupAdditionalDatabases(String... excludes) throws Exception {
         ClassLoader cl = getClass().getClassLoader();
-        for(ConnectionProvider cp : context.getConnectionProviders()) {
+        for(ConnectionProvider cp : application.getConnectionProviders()) {
             if(!ArrayUtils.contains(excludes, cp.getDatabaseName())) {
                 Connection conn = cp.acquireConnection();
                 String schemaResource = getResource("-schema.sql", null);
@@ -142,17 +155,12 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
     @Override
     public void tearDown() throws Exception {
-        context.stopFileManager();
         super.tearDown();
     }
 
     //--------------------------------------------------------------------------
     // Parametrizzazione del test
     //--------------------------------------------------------------------------
-
-    public String getPortofinoPropertiesResource() {
-        return PORTOFINO_PROPERTIES_RESOURCE;
-    }
 
     public String getPortofinoConnectionsResource() {
         return getResource("-connections.xml", PORTOFINO_CONNECTIONS_RESOURCE);
@@ -179,18 +187,19 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     // utilità
     //--------------------------------------------------------------------------
 
-    protected void copyResource(String resourceName, String fileName) throws IOException {
+    protected File copyResourceToTempFile(String resourceName) throws IOException {
         InputStream is =
                 ReflectionUtil.getResourceAsStream(resourceName);
-        File tempFile = new File(storeDir+"/"+fileName);
+        File tempFile = File.createTempFile("portofino", "");
         Writer writer = new FileWriter(tempFile);
         IOUtils.copy(is, writer);
         IOUtils.closeQuietly(writer);
+        return tempFile;
     }
 
 
 
-    protected void createContext() {
+    protected void createApplication() {
         Logger logger = LoggerFactory.getLogger(AbstractPortofinoTest.class);
         logger.info("Creating Context and " +
                 "registering on servlet context...");
@@ -199,44 +208,28 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         try {
             // ElementsThreadLocals è già stato impostato da AbstractElementsTest
 
-            String managerClassName =
-                    portofinoProperties.getProperty(
-                            PortofinoProperties.CONTEXT_CLASS_PROPERTY);
-            InstanceBuilder<Context> builder =
-                    new InstanceBuilder<Context>(
-                            Context.class,
-                            HibernateContextImpl.class,
-                            logger);
-            context = builder.createInstance(managerClassName);
-
-            String storeDir = FilenameUtils.normalize(portofinoProperties.getProperty(
-                PortofinoProperties.PORTOFINO_STOREDIR_PROPERTY));
-            String workDir = FilenameUtils.normalize(portofinoProperties.getProperty(
-                PortofinoProperties.PORTOFINO_WORKDIR_PROPERTY));
+            application = new HibernateApplicationImpl(
+                    portofinoConfiguration, databasePlatformsManager);
 
             String connectionsFileName =
-                    portofinoProperties.getProperty(
-                            PortofinoProperties.CONNECTION_FILE_PROPERTY);
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.CONNECTIONS_LOCATION);
             String modelLocation =
-                    portofinoProperties.getProperty(
-                            PortofinoProperties.MODEL_LOCATION_PROPERTY);
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.MODEL_LOCATION);
 
             //String rootDirPath = ServletContext.getRealPath("/");
 
-            File modelFile = new File(storeDir+"/"+modelLocation);
+            modelFile = new File(modelLocation);
+            connectionsFile = new File(connectionsFileName);
 
-            logger.info("Storing directory:" + storeDir);
-            logger.info("Working directory:" + workDir);
-            context.createFileManager(storeDir, workDir);
-            context.startFileManager();
-            context.loadConnections(connectionsFileName);
-            context.loadXmlModel(modelFile);
-            model = context.getModel();
+            application.loadConnections(connectionsFile);
+            application.loadXmlModel(modelFile);
+            model = application.getModel();
 
 
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
         }
     }
-
 }

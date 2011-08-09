@@ -65,8 +65,8 @@
     </databases>
     <rootNode title="Portofino4" description="portofino 4" id="/">
         <childNodes>
-            <useCaseNode description="projects" id="projects" title="projects">
-                <useCase name="projects"
+            <crudNode description="projects" id="projects" title="projects">
+                <crud name="projects"
                          table="test-database.public.projects"
                          query="projects-query">
                     <properties>
@@ -74,22 +74,33 @@
                         <property name="name"/>
                         <property name="description"/>
                     </properties>
-                </useCase>
+                </crud>
                 <childNodes>
-                    <useCaseNode description="tickets" id="tickets" title="tickets">
-                        <useCase name="tickets"
+                    <portletNode id="report"
+                                 title="report title"
+                                 description="report description"
+                                 name="report"
+                                 type=""
+                                 legend="report legend"
+                                 database="test-database"
+                                 query="select project_id, count(*) from public.tickets group by project_id"
+                                 urlExpression="http://www.manydesigns.com/"/>
+                </childNodes>
+                <detailChildNodes>
+                    <crudNode description="tickets" id="tickets" title="tickets">
+                        <crud name="tickets"
                                  table="test-database.public.tickets"
                                  query="tickets-query">
                             <properties>
                                 <property name="id"/>
                                 <property name="subject"/>
                                 <property name="description"/>
-                                <property name="projectId"/>
+                                <property name="project_id"/>
                             </properties>
-                        </useCase>
-                    </useCaseNode>
-                </childNodes>
-            </useCaseNode>
+                        </crud>
+                    </crudNode>
+                </detailChildNodes>
+            </crudNode>
         </childNodes>
     </rootNode>
 </model>

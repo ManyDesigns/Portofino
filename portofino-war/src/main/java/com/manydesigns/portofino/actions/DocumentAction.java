@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -31,23 +31,26 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.DocumentNode;
-import com.opensymphony.xwork2.ActionSupport;
-import org.apache.struts2.util.ServletContextAware;
+import net.sourceforge.stripes.action.Before;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
-import java.io.*;
-import java.text.MessageFormat;
+import java.io.InputStream;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class DocumentAction extends ActionSupport implements ServletContextAware{
+@UrlBinding("/document.action")
+public class DocumentAction extends PortletAction {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public String content;
 
@@ -58,49 +61,58 @@ public class DocumentAction extends ActionSupport implements ServletContextAware
     @InjectSiteNodeInstance
     public SiteNodeInstance siteNodeInstance;
 
+    public DocumentNode documentNode;
+
     public static final Logger logger =
             LoggerFactory.getLogger(DocumentAction.class);
 
-    ServletContext servletContext;
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
+    //**************************************************************************
+    // Setup
+    //**************************************************************************
+
+    @Before
+    public void prepare() {
+        documentNode = (DocumentNode) siteNodeInstance.getSiteNode();
     }
 
-    @Override
-    public String execute() throws Exception {
-        DocumentNode node = (DocumentNode) siteNodeInstance.getSiteNode();
-        String fileName = node.getFileName();
+    //**************************************************************************
+    // Handlers
+    //**************************************************************************
+
+
+    @DefaultHandler
+    public Resolution execute() throws Exception {
+        String fileName = documentNode.getFileName();
+        InputStream is = null;
         try {
-            content = convertStreamToString(
-                    servletContext.getResourceAsStream(fileName));
-        } catch (IOException e) {
-            logger.warn(MessageFormat.format("IOException opening file {0}",
-                    fileName));
+            is = context.getServletContext().getResourceAsStream(fileName);
+            if (is != null) {
+                content = IOUtils.toString(is, "UTF-8");
+            } else {
+                logger.warn("Cannot get stream for file: {}", fileName);
+                content = "There was a problem loading this content.";
+            }
+        } finally {
+            IOUtils.closeQuietly(is);
         }
-        return SUCCESS;
+        return forwardToPortletPage("/layouts/document.jsp");
     }
 
 
-    private String convertStreamToString(InputStream is) throws IOException {
-        if (is != null) {
-            Writer writer = new StringWriter();
-            char[] buffer = new char[1024];
-            try {
-                Reader reader = new BufferedReader(
-                        new InputStreamReader(is, "UTF-8"));
-                int n;
-                while ((n = reader.read(buffer)) != -1) {
-                    writer.write(buffer, 0, n);
-                }
-            }
-            finally {
-                is.close();
-            }
-            return writer.toString();
-        } else {
-            return "";
-        }
-    }
-    
+    //**************************************************************************
+    // Getters/setters
+    //**************************************************************************
 
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public DocumentNode getDocumentNode() {
+        return documentNode;
+    }
 }

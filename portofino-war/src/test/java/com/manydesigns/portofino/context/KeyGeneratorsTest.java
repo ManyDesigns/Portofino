@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -44,6 +44,7 @@ import java.util.Map;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class KeyGeneratorsTest extends AbstractPortofinoTest {
     private static final String PORTOFINO_PUBLIC_USER = "portofino.PUBLIC.users";
@@ -51,11 +52,10 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        context.openSession();
     }
 
     public void tearDown() {
-        context.closeSession();
+        application.closeSessions();
     }
 
     public void testAutoIncrementGenerator(){
@@ -65,16 +65,16 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         supplier.put("$type$", supplierEntity);
         supplier.put("status", "99");
         supplier.put("name", "Giampiero");
-        context.saveObject(supplierTable,supplier);
-        context.commit("jpetstore");
-        Table table = context.getModel()
+        application.saveObject(supplierTable,supplier);
+        application.commit("jpetstore");
+        Table table = application.getModel()
                 .findTableByQualifiedName(supplierTable);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         final int expectedId = 3;
         try {
             criteria.eq(tableAccessor.getProperty("suppid"), expectedId);
-            List listObjs = context.getObjects(criteria);
+            List listObjs = application.getObjects(criteria);
             assertEquals(1, listObjs.size());
             Map<String,String> supp = (Map<String, String>) listObjs.get(0);
             String name = supp.get("name");
@@ -90,16 +90,16 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         final String testTable = "hibernatetest.PUBLIC.test";
         final String testEntity = "hibernatetest_public_test";
         supplier.put("$type$", testEntity);
-        context.saveObject(testTable,supplier);
-        context.commit("hibernatetest");
-        Table table = context.getModel()
+        application.saveObject(testTable,supplier);
+        application.commit("hibernatetest");
+        Table table = application.getModel()
                 .findTableByQualifiedName(testTable);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         final long expectedId = 1;
         try {
             criteria.eq(tableAccessor.getProperty("id"), expectedId);
-            List listObjs = context.getObjects(criteria);
+            List listObjs = application.getObjects(criteria);
             assertEquals(1, listObjs.size());
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
@@ -137,15 +137,15 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         order.put("exprdate", "99");
         order.put("cardtype", "99");
         order.put("locale", "99");
-        context.saveObject(ordersTable,order);
-        context.commit("jpetstore");
-        Table table = context.getModel()
+        application.saveObject(ordersTable,order);
+        application.commit("jpetstore");
+        Table table = application.getModel()
                 .findTableByQualifiedName(ordersTable);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         try {
             criteria.eq(tableAccessor.getProperty("orderid"), expectedId);
-            List listObjs = context.getObjects(criteria);
+            List listObjs = application.getObjects(criteria);
             assertEquals(1, listObjs.size());
             Map<String,String> supp = (Map<String, String>) listObjs.get(0);
             String name = supp.get("userid");
@@ -162,16 +162,16 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         myGroup.setCreationDate(new Timestamp(new Date().getTime()));
         myGroup.setName("testGroup");
         myGroup.setDescription("this is a description");
-        context.saveObject("portofino.public.groups", myGroup);
-        context.commit("portofino");
-        Table table = context.getModel()
+        application.saveObject("portofino.public.groups", myGroup);
+        application.commit("portofino");
+        Table table = application.getModel()
                 .findTableByQualifiedName("portofino.public.groups");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         final long expectedId = 3L;
         try {
             criteria.eq(tableAccessor.getProperty("groupId"), expectedId);
-            List<Object> listObjs = context.getObjects(criteria);
+            List<Object> listObjs = application.getObjects(criteria);
             assertEquals(1, listObjs.size());
             myGroup = (Group) listObjs.get(0);
             String name = myGroup.getName();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -39,6 +39,7 @@ import java.util.List;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class VirtualRelationshipsTest  extends AbstractPortofinoTest {
     private static final String PORTOFINO_PUBLIC_USER = "portofino.PUBLIC.users";
@@ -46,15 +47,14 @@ public class VirtualRelationshipsTest  extends AbstractPortofinoTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        context.openSession();
     }
 
     public void tearDown() {
-        context.closeSession();
+        application.closeSessions();
     }
 
     public void testModel(){
-        Model model = context.getModel();
+        Model model = application.getModel();
         List<ForeignKey> list = model.getAllForeignKeys();
         boolean test = false;
 
@@ -73,10 +73,10 @@ public class VirtualRelationshipsTest  extends AbstractPortofinoTest {
         pk.put("comune", "genova");
         pk.put("provincia", "genova");
         pk.put("regione", "liguria");
-        Object comune = context.getObjectByPk
+        Object comune = application.getObjectByPk
                 ("hibernatetest.PUBLIC.comune", pk);
 
-        List objs = context.getRelatedObjects("hibernatetest.PUBLIC.comune",
+        List objs = application.getRelatedObjects("hibernatetest.PUBLIC.comune",
                 comune, "fk_delibera_1");
         assertEquals(1, objs.size());
 
@@ -86,9 +86,9 @@ public class VirtualRelationshipsTest  extends AbstractPortofinoTest {
         //Relazione virtuale fra database
         HashMap<String, Object> pkCat = new HashMap<String, Object>();
         pkCat.put("catid", "FISH");
-        Object catObj = context.getObjectByPk
+        Object catObj = application.getObjectByPk
                 ("jpetstore.PUBLIC.category", pkCat);
-        List cats = context.getRelatedObjects("jpetstore.PUBLIC.category",
+        List cats = application.getRelatedObjects("jpetstore.PUBLIC.category",
                 catObj, "fk_delibera_2");
         assertNotNull(cats);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -30,19 +30,16 @@
 package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.portofino.PortofinoProperties;
-import sun.misc.BASE64Encoder;
-
-import java.security.MessageDigest;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class ChangePasswordFormBean {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     @Required
     @com.manydesigns.elements.annotations.Password(confirmationRequired = false)
@@ -52,19 +49,4 @@ public class ChangePasswordFormBean {
     @com.manydesigns.elements.annotations.Password(confirmationRequired = false)
     public String pwd;
 
-    public String getEncOldPwd(){
-        if (PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.PWD_ENCRYPTED, "false").equals("false")){
-            return oldPwd;
-        }
-
-    try {
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
-            md.update(oldPwd.getBytes("UTF-8"));
-            byte raw[] = md.digest();
-            return (new BASE64Encoder()).encode(raw);
-        } catch (Exception e) {
-            throw new Error(e);
-        }
-    }
 }

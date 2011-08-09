@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -41,16 +41,16 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertiesAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectHttpRequest;
 import com.manydesigns.portofino.annotations.InjectModel;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -72,10 +72,11 @@ import java.util.Set;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class TableDesignAction extends ActionSupport {
+public class TableDesignAction extends AbstractActionBean {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Injections
@@ -84,8 +85,8 @@ public class TableDesignAction extends ActionSupport {
     @InjectModel
     public Model model;
 
-    @InjectContext
-    public Context context;
+    @InjectApplication
+    public Application application;
 
     @InjectHttpRequest
     private HttpServletRequest req;
@@ -736,7 +737,7 @@ public class TableDesignAction extends ActionSupport {
     // Json output per i corretti types per una piattaforma
     //**************************************************************************
     public String jsonTypes() throws Exception {
-        Type[] types = context.getConnectionProvider(table_databaseName).getTypes();
+        Type[] types = application.getConnectionProvider(table_databaseName).getTypes();
         List<String> typesString = new ArrayList<String>();
 
         for(Type currentType : types){
@@ -756,7 +757,7 @@ public class TableDesignAction extends ActionSupport {
     // Json output per i corretti Java types per una piattaforma
     //**************************************************************************
     public String jsonJavaTypes() throws Exception {
-        Type[] types = context.getConnectionProvider(table_databaseName).getTypes();
+        Type[] types = application.getConnectionProvider(table_databaseName).getTypes();
         List<String> javaTypesString = new ArrayList<String>();
 
         for(Type currentType : types){
@@ -780,7 +781,7 @@ public class TableDesignAction extends ActionSupport {
     // Json output per vedere se richiesta Precision, Scale, ...
     //**************************************************************************
     public String jsonTypeInfo() throws Exception {
-        Type[] types = context.getConnectionProvider(table_databaseName).getTypes();
+        Type[] types = application.getConnectionProvider(table_databaseName).getTypes();
         List<String> info = new ArrayList<String>();
 
         for(Type currentType : types){

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -39,29 +39,28 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.connections.JdbcConnectionProvider;
 import com.manydesigns.portofino.connections.JndiConnectionProvider;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
-import com.opensymphony.xwork2.ActionSupport;
-import org.apache.struts2.interceptor.ServletRequestAware;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class ConnectionProvidersAction extends ActionSupport implements ServletRequestAware{
+public class ConnectionProvidersAction extends AbstractActionBean {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public List<ConnectionProvider> connectionProviders;
     public ConnectionProvider connectionProvider;
@@ -86,16 +85,8 @@ public class ConnectionProvidersAction extends ActionSupport implements ServletR
     // Injections
     //**************************************************************************
 
-    @InjectContext
-    public Context context;
-
-    //**************************************************************************
-    // Request aware
-    //**************************************************************************
-    private HttpServletRequest req;
-    public void setServletRequest(HttpServletRequest req) {
-        this.req = req;
-    }
+    @InjectApplication
+    public Application application;
 
     public String execute() {
         if (databaseName == null) {
@@ -106,7 +97,7 @@ public class ConnectionProvidersAction extends ActionSupport implements ServletR
     }
 
     public String search() {
-        connectionProviders = context.getConnectionProviders();
+        connectionProviders = application.getConnectionProviders();
 
         OgnlTextFormat hrefFormat =
                 OgnlTextFormat.create(
@@ -126,7 +117,8 @@ public class ConnectionProvidersAction extends ActionSupport implements ServletR
         tableForm.readFromObject(connectionProviders);
 
         // database platforms
-        DatabasePlatformsManager manager = DatabasePlatformsManager.getManager();
+        DatabasePlatformsManager manager =
+                application.getDatabasePlatformsManager();
         databasePlatforms = manager.getDatabasePlatforms();
         databasePlatformsTableForm =
                 new TableFormBuilder(DatabasePlatform.class)
@@ -142,7 +134,7 @@ public class ConnectionProvidersAction extends ActionSupport implements ServletR
     }
 
     public String read() {
-        connectionProvider = context.getConnectionProvider(databaseName);
+        connectionProvider = application.getConnectionProvider(databaseName);
         databasePlatform = connectionProvider.getDatabasePlatform();
         types = connectionProvider.getTypes();
 
@@ -209,8 +201,8 @@ public class ConnectionProvidersAction extends ActionSupport implements ServletR
     }
 
     public String test() {
-        connectionProvider = context.getConnectionProvider(databaseName);
-        connectionProvider.init();
+        connectionProvider = application.getConnectionProvider(databaseName);
+        connectionProvider.init(application.getDatabasePlatformsManager());
         String status = connectionProvider.getStatus();
         if (ConnectionProvider.STATUS_CONNECTED.equals(status)) {
             SessionMessages.addInfoMessage("Connection tested successfully");
@@ -256,11 +248,11 @@ public class ConnectionProvidersAction extends ActionSupport implements ServletR
             return PortofinoAction.CREATE;
         }
         
-        form.readFromRequest(req);
+        form.readFromRequest(context.getRequest());
         if (form.validate()) {
             ConnectionProvider object = (ConnectionProvider) accessor.newInstance();
             form.writeToObject(object);
-            context.addConnectionProvider(object);
+            application.addConnectionProvider(object);
             SessionMessages.addInfoMessage("Connection provider created");
             return PortofinoAction.SAVE;
         } else {
@@ -272,7 +264,7 @@ public class ConnectionProvidersAction extends ActionSupport implements ServletR
         ClassAccessor accessor;
         FormBuilder formBuilder;
         ConnectionProvider connectionProvider =
-                context.getConnectionProvider(databaseName);
+                application.getConnectionProvider(databaseName);
 
         if (connectionProvider instanceof JdbcConnectionProvider){
             accessor = JavaClassAccessor.getClassAccessor(JdbcConnectionProvider.class);
@@ -301,7 +293,7 @@ public class ConnectionProvidersAction extends ActionSupport implements ServletR
         FormBuilder formBuilder;
         Form form;
         ConnectionProvider connectionProvider =
-                context.getConnectionProvider(databaseName);
+                application.getConnectionProvider(databaseName);
         ConnectionProvider object;
 
 
@@ -326,10 +318,10 @@ public class ConnectionProvidersAction extends ActionSupport implements ServletR
             object = (ConnectionProvider) accessor.newInstance();
         }
 
-        form.readFromRequest(req);
+        form.readFromRequest(context.getRequest());
         if (form.validate()) {            
             form.writeToObject(object);
-            context.updateConnectionProvider(object);
+            application.updateConnectionProvider(object);
             SessionMessages.addInfoMessage("Connection provider updated");
             return PortofinoAction.RETURN_TO_LIST;
         } else {
@@ -339,7 +331,7 @@ public class ConnectionProvidersAction extends ActionSupport implements ServletR
 
     public String delete(){
         if(null!=databaseName){
-            context.deleteConnectionProvider(databaseName);
+            application.deleteConnectionProvider(databaseName);
             SessionMessages.addInfoMessage("Connection providers deleted");
         } 
         return PortofinoAction.RETURN_TO_LIST;
@@ -348,7 +340,7 @@ public class ConnectionProvidersAction extends ActionSupport implements ServletR
     public String bulkDelete(){
 
         if(null!=selection && 0!=selection.length){
-            context.deleteConnectionProvider(selection);
+            application.deleteConnectionProvider(selection);
             SessionMessages.addInfoMessage("Connection providers deleted");
         } else {
             SessionMessages.addInfoMessage("No Connection providers selected");

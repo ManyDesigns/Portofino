@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -34,6 +34,7 @@ import com.manydesigns.elements.servlet.WebFramework;
 import org.apache.struts2.dispatcher.StrutsRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,10 +45,11 @@ import java.io.InputStream;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class Struts2WebFramework extends WebFramework {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // CONSTANTS
@@ -98,5 +100,11 @@ public class Struts2WebFramework extends WebFramework {
             logger.warn("Cannot read upload file: {}", file.getAbsolutePath());
             return null;
         }
+    }
+
+    @Override
+    public HttpServletRequest wrapRequest(HttpServletRequest request)
+            throws ServletException {
+        return request;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -29,40 +29,34 @@
 
 package com.manydesigns.portofino.navigation;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
-import com.manydesigns.portofino.dispatcher.UseCaseNodeInstance;
 import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.site.UseCaseNode;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class Navigation implements XhtmlFragment {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Fields
     //**************************************************************************
 
-    protected final Context context;
+    protected final Application application;
     protected final Dispatch dispatch;
-    protected final SiteNodeInstance[] siteNodeInstancePath;
-    protected final List<NavigationNode> rootNodes;
     protected final List<String> groups;
 
     public static final Logger logger =
@@ -72,66 +66,11 @@ public class Navigation implements XhtmlFragment {
     // Constructors
     //**************************************************************************
 
-    public Navigation(Context context, Dispatch dispatch, List<String> groups) {
-        this.context = context;
+    public Navigation(Application application, Dispatch dispatch, List<String> groups) {
+        this.application = application;
         this.dispatch = dispatch;
-        if(dispatch != null) {
-            siteNodeInstancePath = dispatch.getSiteNodeInstancePath();
-        } else {
-            siteNodeInstancePath = null;
-        }
         this.groups = groups;
-        rootNodes = new ArrayList<NavigationNode>();
-        final List<SiteNode> rootChildNodes =
-                context.getModel().getRootNode().getChildNodes();
-        HttpServletRequest req =
-                ElementsThreadLocals.getHttpServletRequest();
         //TODO gestire deploy sotto ROOT
-        generateNavigationNodes(rootChildNodes, rootNodes, req.getContextPath(), true);
-    }
-
-    protected void generateNavigationNodes(List<SiteNode> siteNodes,
-                                           List<NavigationNode> navigationNodes,
-                                           String prefixUrl, boolean useCaseEnabled) {
-        for (SiteNode siteNode : siteNodes) {
-            String url = String.format("%s/%s", prefixUrl, siteNode.getId());
-            String title = siteNode.getTitle();
-            String description = siteNode.getDescription();
-            boolean allowed = siteNode.isAllowed(groups);
-
-            boolean ownEnabled;
-            boolean childUseCaseEnabled;
-            String childUrl;
-
-            if (siteNode instanceof UseCaseNode) {
-                ownEnabled = useCaseEnabled;
-                SiteNodeInstance siteNodeInstance = findInPath(siteNode);
-                if (siteNodeInstance instanceof UseCaseNodeInstance) {
-                    String mode = siteNodeInstance.getMode();
-                    if (UseCaseNode.MODE_DETAIL.equals(mode)) {
-                        childUseCaseEnabled = useCaseEnabled;
-                        childUrl = url + "/" + ((UseCaseNodeInstance) siteNodeInstance).getPk();
-                    } else {
-                        childUseCaseEnabled = false;
-                        childUrl = url;
-                    }
-                } else {
-                    childUseCaseEnabled = false;
-                    childUrl = url;
-                }
-            } else {
-                ownEnabled = true;
-                childUseCaseEnabled = useCaseEnabled;
-                childUrl = url;
-            }
-
-            NavigationNode navigationNode =
-                    new NavigationNode(siteNode, url, title, description,
-                            allowed, ownEnabled);
-            generateNavigationNodes(siteNode.getChildNodes(),
-                    navigationNode.getChildNodes(), childUrl, childUseCaseEnabled);
-            navigationNodes.add(navigationNode);
-        }
     }
 
     //**************************************************************************
@@ -139,59 +78,60 @@ public class Navigation implements XhtmlFragment {
     //**************************************************************************
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
-        print(rootNodes, xb, false);
+        print(dispatch.getRequest().getContextPath(),
+                dispatch.getNavigationNodeInstances(), xb, false);
     }
 
-    private void print(List<NavigationNode> nodes, XhtmlBuffer xb, boolean recursive) {
+    private void print(String path, List<SiteNodeInstance> nodes, XhtmlBuffer xb, boolean recursive) {
         if (nodes == null) {
             return;
         }
         boolean first = true;
-        List<NavigationNode> expand = null;
-        for (NavigationNode current : nodes) {
-            if(!current.isAllowed() || !current.isEnabled()){
+        SiteNodeInstance expand = null;
+        for (SiteNodeInstance current : nodes) {
+            SiteNode siteNode = current.getSiteNode();
+            if (!siteNode.isAllowed(groups)) {
                 continue;
             }
+
+            // gestire permessi
             if(first) {
                 if(recursive) { xb.writeHr(); }
                 xb.openElement("ul");
                 first = false;
             }
             xb.openElement("li");
-            SiteNode siteNode = current.getSiteNode();
-            if (isSelected(siteNode)) {
+            if (isSelected(current)) {
                 xb.addAttribute("class", "selected");
-                expand = current.getChildNodes();
-            } else if (isInPath(siteNode)) {
+                expand = current;
+            } else if (isInPath(current)) {
                 xb.addAttribute("class", "path");
-                expand = current.getChildNodes();
+                expand = current;
             }
-            xb.writeAnchor(current.getUrl(), current.getTitle(), null, current.getDescription());
+            String url = path + "/" + siteNode.getId();
+            xb.writeAnchor(url, siteNode.getTitle(), null, siteNode.getDescription());
             xb.closeElement("li");
         }
         if(!first) {
             xb.closeElement("ul");
         }
         if (expand != null) {
-            print(expand, xb, true);
+            path = path + "/" + expand.getUrlFragment();
+            print(path, expand.getChildNodeInstances(), xb, true);
         }
     }
 
-    protected boolean isSelected(SiteNode siteNode) {
-        if(siteNodeInstancePath == null) { return false; }
-        SiteNodeInstance last =
-                siteNodeInstancePath[siteNodeInstancePath.length - 1];
-        return siteNode == last.getSiteNode();
+    protected boolean isSelected(SiteNodeInstance siteNodeInstance) {
+        return siteNodeInstance == dispatch.getLastSiteNodeInstance();
     }
 
-    protected boolean isInPath(SiteNode siteNode) {
-        return findInPath(siteNode) != null;
+    protected boolean isInPath(SiteNodeInstance siteNodeInstance) {
+        return findInPath(siteNodeInstance) != null;
     }
 
-    protected SiteNodeInstance findInPath(SiteNode siteNode) {
-        if(siteNodeInstancePath == null) { return null; }
-        for (SiteNodeInstance current : siteNodeInstancePath) {
-            if (siteNode == current.getSiteNode()) {
+    protected SiteNodeInstance findInPath(SiteNodeInstance siteNodeInstance) {
+        for (SiteNodeInstance current : dispatch.getSiteNodeInstancePath()) {
+            if (siteNodeInstance == current) {
                 return current;
             }
         }
@@ -202,11 +142,15 @@ public class Navigation implements XhtmlFragment {
     // Getters/setters
     //**************************************************************************
 
-    public Context getContext() {
-        return context;
+    public Application getApplication() {
+        return application;
     }
 
-    public List<NavigationNode> getRootNodes() {
-        return rootNodes;
+    public Dispatch getDispatch() {
+        return dispatch;
+    }
+
+    public List<String> getGroups() {
+        return groups;
     }
 }

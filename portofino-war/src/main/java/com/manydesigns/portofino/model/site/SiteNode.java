@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -32,6 +32,8 @@ package com.manydesigns.portofino.model.site;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.Identifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
@@ -42,12 +44,12 @@ import java.util.List;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
 public abstract class  SiteNode implements ModelObject {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
-
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -61,7 +63,23 @@ public abstract class  SiteNode implements ModelObject {
     protected String title;
     protected String description;
     protected String url;
+    protected String layoutContainerInParent;
+    protected String layoutOrderInParent;
+    protected String layoutContainer;
+    protected String layoutOrder;
 
+    //**************************************************************************
+    // Actual fields
+    //**************************************************************************
+
+    protected Integer actualLayoutOrderInParent;
+    protected int actualLayoutOrder;
+
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
+
+    public static final Logger logger = LoggerFactory.getLogger(SiteNode.class);
 
     //**************************************************************************
     // Constructors
@@ -83,6 +101,8 @@ public abstract class  SiteNode implements ModelObject {
         for (SiteNode childNode : childNodes) {
             childNode.reset();
         }
+        actualLayoutOrderInParent = null;
+        actualLayoutOrder = 0;
     }
 
     public void init(Model model) {
@@ -93,9 +113,30 @@ public abstract class  SiteNode implements ModelObject {
         for (SiteNode childNode : childNodes) {
             childNode.init(model);
         }
+        if (layoutOrderInParent != null) {
+            //TODO controllare che sia non-null anche layoutContainerInParent
+            actualLayoutOrderInParent = Integer.parseInt(layoutOrderInParent);
+        }
+        if(layoutOrder != null) {
+            actualLayoutOrder = Integer.parseInt(layoutOrder);
+        }
     }
 
     public String getQualifiedName() {
+        return null;
+    }
+
+    //**************************************************************************
+    // Utility Methods
+    //**************************************************************************
+
+    public SiteNode findChildNode(String id) {
+        for(SiteNode node : getChildNodes()) {
+            if(id.equals(node.getId())) {
+                return node;
+            }
+        }
+        logger.debug("Child node not found: {}", id);
         return null;
     }
 
@@ -148,8 +189,8 @@ public abstract class  SiteNode implements ModelObject {
           @XmlElement(name="folderNode",type=FolderNode.class),
           @XmlElement(name="customNode",type=CustomNode.class),
           @XmlElement(name="customFolderNode",type=CustomFolderNode.class),
-          @XmlElement(name="useCaseNode",type=UseCaseNode.class),
-          @XmlElement(name="portletNode",type=PortletNode.class)
+          @XmlElement(name="crudNode",type=CrudNode.class),
+          @XmlElement(name="portletNode",type=ChartNode.class)
     })
     public List<SiteNode> getChildNodes() {
         return childNodes;
@@ -172,6 +213,45 @@ public abstract class  SiteNode implements ModelObject {
         this.url = url;
     }
 
+    @XmlAttribute(required = false)
+    public String getLayoutContainerInParent() {
+        return layoutContainerInParent;
+    }
+
+    public void setLayoutContainerInParent(String layoutContainerInParent) {
+        this.layoutContainerInParent = layoutContainerInParent;
+    }
+
+    @XmlAttribute(required = false)
+    public String getLayoutOrderInParent() {
+        return layoutOrderInParent;
+    }
+
+    public void setLayoutOrderInParent(String layoutOrderInParent) {
+        this.layoutOrderInParent = layoutOrderInParent;
+    }
+
+    @XmlAttribute(required = true)
+    public String getLayoutContainer() {
+        return layoutContainer;
+    }
+
+    public void setLayoutContainer(String layoutContainer) {
+        this.layoutContainer = layoutContainer;
+    }
+
+    @XmlAttribute(required = true)
+    public String getLayoutOrder() {
+        return layoutOrder;
+    }
+
+    public void setLayoutOrder(String layoutOrder) {
+        this.layoutOrder = layoutOrder;
+    }
+
+    /* TODO: spostare quaesto metodo nella classe che gestisce la logica
+    *  dei permessi. Lasciare le classi in in model il più possibile passive
+    **/
     public boolean isAllowed(List<String> groups) {
         boolean parentAllowed= true;
         if (parent != null){
@@ -186,5 +266,13 @@ public abstract class  SiteNode implements ModelObject {
             result = permissions.isAllowed(groups);
         }
         return result;
+    }
+
+    public Integer getActualLayoutOrderInParent() {
+        return actualLayoutOrderInParent;
+    }
+
+    public int getActualLayoutOrder() {
+        return actualLayoutOrder;
     }
 }

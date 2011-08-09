@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -29,33 +29,43 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla - alessio.stalle@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class Dispatch {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public final static String KEY = Dispatch.class.getName();
-
-
+    protected final HttpServletRequest request;
     protected final String originalPath;
     protected final String rewrittenPath;
     protected final SiteNodeInstance[] siteNodeInstancePath;
+    protected final List<SiteNodeInstance> navigationNodeInstances;
 
-    public Dispatch(String originalPath,
+    public Dispatch(HttpServletRequest request,
+                    String originalPath,
                     String rewrittenPath,
-                    SiteNodeInstance[] siteNodeInstancePath) {
+                    SiteNodeInstance[] siteNodeInstancePath,
+                    List<SiteNodeInstance> navigationNodeInstances) {
+        this.request = request;
         this.originalPath = originalPath;
         this.rewrittenPath = rewrittenPath;
         this.siteNodeInstancePath = siteNodeInstancePath;
+        this.navigationNodeInstances = navigationNodeInstances;
+
+        String pathUrl = getPathUrl();
+        assert pathUrl.equals(originalPath);
+
     }
 
-    public String getOriginalPath() {
-        return originalPath;
+    public HttpServletRequest getRequest() {
+        return request;
     }
 
     public String getRewrittenPath() {
@@ -64,5 +74,47 @@ public class Dispatch {
 
     public SiteNodeInstance[] getSiteNodeInstancePath() {
         return siteNodeInstancePath;
+    }
+
+    public List<SiteNodeInstance> getNavigationNodeInstances() {
+        return navigationNodeInstances;
+    }
+
+    public SiteNodeInstance getLastSiteNodeInstance() {
+        return siteNodeInstancePath[siteNodeInstancePath.length - 1];
+    }
+
+    public String getOriginalPath() {
+        return originalPath;
+    }
+
+    public String getAbsoluteOriginalPath() {
+        String contextPath = request.getContextPath();
+        if ("/".equals(contextPath)) {
+            return getOriginalPath();
+        } else {
+            return contextPath + getOriginalPath();
+        }
+    }
+
+    public String getPathUrl() {
+        return getPathUrl(siteNodeInstancePath.length);
+    }
+
+    public String getPathUrl(int length) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("/");
+        boolean first = true;
+        for (int i = 0; i < length; i++) {
+            SiteNodeInstance current = siteNodeInstancePath[i];
+            String fragment = current.getUrlFragment();
+            if (first) {
+                first = false;
+            } else {
+                sb.append("/");
+            }
+            sb.append(fragment);
+        }
+        return sb.toString();
     }
 }

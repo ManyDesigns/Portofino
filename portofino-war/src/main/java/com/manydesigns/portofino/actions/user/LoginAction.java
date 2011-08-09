@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -28,19 +28,19 @@
  */
 package com.manydesigns.portofino.actions.user;
 
-import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.SessionAttributes;
+import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectHttpRequest;
 import com.manydesigns.portofino.annotations.InjectHttpSession;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.annotations.InjectPortofinoProperties;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
-import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.ActionSupport;
-import com.opensymphony.xwork2.util.ValueStack;
+import net.sourceforge.stripes.action.*;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,122 +55,125 @@ import java.util.Date;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class LoginAction extends ActionSupport implements LoginUnAware {
+@UrlBinding("/user/login.action")
+public class LoginAction extends AbstractActionBean {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Injections
     //**************************************************************************
 
-    @InjectContext
-    public Context context;
+    @InjectApplication
+    public Application application;
 
     @InjectHttpRequest
-    public HttpServletRequest req;
+    public HttpServletRequest request;
 
     @InjectHttpSession
     public HttpSession session;
 
+    @InjectPortofinoProperties
+    public Configuration portofinoConfiguration;
+
+    //**************************************************************************
+    // Request parameters
+    //**************************************************************************
+
+    public String userName;
+    public String pwd;
+
     //**************************************************************************
     // Presentation elements
     //**************************************************************************
-    public Form form;
     public boolean recoverPwd;
 
     public String returnUrl;
-    //public Map parameters;
-    
+
     private static final String home = "/";
     public static final Logger logger =
             LoggerFactory.getLogger(LoginAction.class);
 
     public LoginAction(){
-        FormBuilder builder =
-            new FormBuilder(User.class);
-        builder.configFields("userName", "pwd");
-
-        form = builder.build();
-        recoverPwd = Boolean.parseBoolean(PortofinoProperties.getProperties().
-                getProperty(PortofinoProperties.MAIL_ENABLED, "false"));
 
     }
 
-    public String execute () {
-        session.removeAttribute(UserUtils.USERID);
-        session.removeAttribute(UserUtils.USERNAME);
-        return INPUT;
+    @DefaultHandler
+    public Resolution execute () {
+        if (session != null && session.getAttribute(SessionAttributes.USER_ID) != null) {
+            return new ForwardResolution("/layouts/user/alreadyLoggedIn.jsp");
+        }
+
+        recoverPwd = portofinoConfiguration.getBoolean(
+                PortofinoProperties.MAIL_ENABLED, false);
+        
+        return new ForwardResolution("/layouts/user/login.jsp");
     }
 
-    public String login (){
-        form.readFromRequest(req);
-        User user = new User();
-        form.writeToObject(user);
-        Boolean enc = Boolean.parseBoolean(PortofinoProperties.getProperties()
-                .getProperty(PortofinoProperties.PWD_ENCRYPTED, "false"));
+    public Resolution login () {
+        boolean enc = portofinoConfiguration.getBoolean(
+                PortofinoProperties.PWD_ENCRYPTED, true);
 
         if (enc) {
-            user.encryptPwd();
+            pwd = UserUtils.encryptPassword(pwd);
         }
-        String username = user.getUserName();
-        String password = user.getPwd();
-        user = context.login(username, password);
+        User user = application.login(userName, pwd);
 
         if (user==null) {
             String errMsg = MessageFormat.format("FAILED AUTH for user {0}",
-                    username);
+                    userName);
             SessionMessages.addInfoMessage(errMsg);
             logger.warn(errMsg);
-            updateFailedUser(username);
-            return INPUT;
+            updateFailedUser(userName);
+            return new ForwardResolution("/layouts/user/login.jsp");
         }
 
         if (!user.getState().equals(UserUtils.ACTIVE)) {
             String errMsg = MessageFormat.format("User {0} is not active. " +
-                    "Please contact the administrator", username);
+                    "Please contact the administrator", userName);
             SessionMessages.addInfoMessage(errMsg);
             logger.warn(errMsg);
-            return INPUT;
+            return new ForwardResolution("/layouts/user/login.jsp");
         }
 
-        ValueStack vs = ActionContext.getContext().getValueStack();
-
         logger.info("User {} login", user.getUserName());
-        session.setAttribute(UserUtils.USERID, user.getUserId());
-        session.setAttribute(UserUtils.USERNAME, user.getUserName());
+        session = request.getSession(true);
+        session.setAttribute(SessionAttributes.USER_ID, user.getUserId());
+        session.setAttribute(SessionAttributes.USER_NAME, user.getUserName());
         updateUser(user);
         returnUrl = StringUtils.trimToNull(returnUrl);
         returnUrl=(returnUrl!=null)?returnUrl:home;
 
-        return SUCCESS;
+        return new RedirectResolution(returnUrl);
     }
 
     private void updateFailedUser(String username) {
         User user;
-        user = context.findUserByUserName(username);
+        user = application.findUserByUserName(username);
         if (user == null) {
             return;
         }
         user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
         int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
         user.setFailedLoginAttempts(failedAttempts+1);
-        context.updateObject(UserUtils.USERTABLE, user);
-        context.commit("portofino");
+        application.updateObject(UserUtils.USERTABLE, user);
+        application.commit("portofino");
     }
 
     private void updateUser(User user) {
         user.setFailedLoginAttempts(0);
         user.setLastLoginDate(new Timestamp(new Date().getTime()));
         user.setToken(null);
-        context.updateObject(UserUtils.USERTABLE, user);
-        context.commit("portofino");
+        application.updateObject(UserUtils.USERTABLE, user);
+        application.commit("portofino");
     }
 
-    public String logout(){
-        session.removeAttribute(UserUtils.USERID);
+    public Resolution logout(){
+        session.invalidate();
         SessionMessages.addInfoMessage("User disconnetected");
 
-        return "logout";
+        return new RedirectResolution("/");
     }
 }

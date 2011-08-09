@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -39,9 +39,9 @@ import com.manydesigns.portofino.actions.AbstractCrudAction;
 import com.manydesigns.portofino.actions.CrudSelectionProvider;
 import com.manydesigns.portofino.actions.CrudUnit;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.annotations.InjectContext;
+import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.annotations.InjectModel;
-import com.manydesigns.portofino.context.Context;
+import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Column;
@@ -56,10 +56,11 @@ import java.util.List;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class TableDataAction extends AbstractCrudAction {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Injections
@@ -68,8 +69,8 @@ public class TableDataAction extends AbstractCrudAction {
     @InjectModel
     public Model model;
 
-    @InjectContext
-    public Context context;
+    @InjectApplication
+    public Application application;
 
     //**************************************************************************
     // Setup
@@ -89,7 +90,7 @@ public class TableDataAction extends AbstractCrudAction {
     protected CrudUnit createRootCrudUnit(Table table) {
         String qualifiedTableName = table.getQualifiedName();
         ClassAccessor classAccessor =
-                    context.getTableAccessor(qualifiedTableName);
+                    application.getTableAccessor(qualifiedTableName);
         String query = MessageFormat.format(
                 "FROM {0}", table.getActualEntityName());
         String searchTitle = MessageFormat.format(
@@ -119,7 +120,7 @@ public class TableDataAction extends AbstractCrudAction {
         for (ForeignKey foreignKey : table.getOneToManyRelationships()) {
             CrudUnit subCrudUnit =
                     createSubCrudUnit(foreignKey, index);
-            result.subCrudUnits.add(subCrudUnit);
+//            result.subCrudUnits.add(subCrudUnit);
 
             index++;
         }
@@ -128,7 +129,7 @@ public class TableDataAction extends AbstractCrudAction {
     }
 
     protected void injectValues(CrudUnit crudUnit) {
-        crudUnit.context = context;
+        crudUnit.application = application;
         crudUnit.model = model;
         crudUnit.req = req;
     }
@@ -137,9 +138,9 @@ public class TableDataAction extends AbstractCrudAction {
         // retrieve the related objects
         Table relatedTable = foreignKey.getActualToTable();
         ClassAccessor classAccessor =
-                context.getTableAccessor(relatedTable.getQualifiedName());
+                application.getTableAccessor(relatedTable.getQualifiedName());
         List<Object> relatedObjects =
-                context.getAllObjects(relatedTable.getQualifiedName());
+                application.getAllObjects(relatedTable.getQualifiedName());
 
         // Create selection provider
         ShortName shortNameAnnotation =
@@ -171,7 +172,7 @@ public class TableDataAction extends AbstractCrudAction {
                                          int index) {
         Table subTable = foreignKey.getFromTable();
         ClassAccessor subClassAccessor =
-                context.getTableAccessor(subTable.getQualifiedName());
+                application.getTableAccessor(subTable.getQualifiedName());
         StringBuilder sb = new StringBuilder();
         sb.append("FROM ");
         sb.append(subTable.getActualEntityName());

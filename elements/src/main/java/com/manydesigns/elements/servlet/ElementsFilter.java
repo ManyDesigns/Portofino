@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -30,7 +30,6 @@
 package com.manydesigns.elements.servlet;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import org.apache.commons.fileupload.FileUploadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +42,7 @@ import java.io.IOException;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class ElementsFilter implements Filter {
     //--------------------------------------------------------------------------
@@ -85,19 +85,16 @@ public class ElementsFilter implements Filter {
         ServletContext context = config.getServletContext();
 
         try {
-            MultipartRequestWrapper wrappedRequest =
-                    new MultipartRequestWrapper(req);
+            WebFramework webFramework = WebFramework.getWebFramework();
+            req = webFramework.wrapRequest(req);
 
             ElementsThreadLocals.setupDefaultElementsContext();
 
-            ElementsThreadLocals.setHttpServletRequest(wrappedRequest);
+            ElementsThreadLocals.setHttpServletRequest(req);
             ElementsThreadLocals.setHttpServletResponse(res);
             ElementsThreadLocals.setServletContext(context);
 
             filterChain.doFilter(req, res);
-        } catch (FileUploadException e) {
-            logger.error("FileUploadException caught", e);
-            throw new ServletException(e);
         } finally {
             ElementsThreadLocals.removeElementsContext();
         }

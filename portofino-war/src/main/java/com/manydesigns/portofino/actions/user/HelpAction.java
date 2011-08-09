@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -29,19 +29,19 @@
 
 package com.manydesigns.portofino.actions.user;
 
-import com.opensymphony.xwork2.ActionSupport;
+import com.manydesigns.portofino.actions.AbstractActionBean;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class HelpAction extends ActionSupport {
+public class HelpAction extends AbstractActionBean {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    @Override
     public String execute() {
-        return SUCCESS;
+        return "SUCCESS";
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -31,24 +31,27 @@ package com.manydesigns.elements.servlet;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.util.InstanceBuilder;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class WebFramework {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // CONSTANTS
@@ -60,7 +63,7 @@ public class WebFramework {
     // Static fields
     //**************************************************************************
 
-    protected static final Properties elementsProperties;
+    protected static final Configuration elementsConfiguration;
     protected static WebFramework webFramework;
 
     //**************************************************************************
@@ -75,14 +78,14 @@ public class WebFramework {
     //**************************************************************************
 
     static {
-        elementsProperties = ElementsProperties.getProperties();
+        elementsConfiguration = ElementsProperties.getConfiguration();
         resetSingleton();
     }
 
     public static void resetSingleton() {
         String managerClassName =
-                elementsProperties.getProperty(
-                        ElementsProperties.WEB_FRAMEWORK_PROPERTY);
+                elementsConfiguration.getString(
+                        ElementsProperties.WEB_FRAMEWORK);
         InstanceBuilder<WebFramework> builder =
                 new InstanceBuilder<WebFramework>(
                         WebFramework.class,
@@ -129,4 +132,13 @@ public class WebFramework {
         }
     }
 
+    public HttpServletRequest wrapRequest(HttpServletRequest request)
+            throws ServletException {
+        try {
+            return new MultipartRequestWrapper(request);
+        } catch (FileUploadException e) {
+            throw new ServletException(e);
+        }
+
+    }
 }

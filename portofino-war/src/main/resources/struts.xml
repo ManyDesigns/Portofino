@@ -86,22 +86,22 @@
         </action>
         <action name="Document"
                 class="com.manydesigns.portofino.actions.DocumentAction">
-            <result name="success">/skins/default/document.jsp</result>
+            <result name="success">/layouts/document.jsp</result>
         </action>
         <action name="UseCase"
-                class="com.manydesigns.portofino.actions.UseCaseAction">
+                class="com.manydesigns.portofino.actions.CrudAction">
             <result name="search">/skins/default/crud/search.jsp</result>
 
             <result name="read">/skins/default/crud/read.jsp</result>
 
-            <result name="create">/skins/default/crud/create.jsp</result>
+            <result name="create">/layouts/crud/create.jsp</result>
 
             <result name="save" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/UseCase</param>
                 <param name="pk">%{pk}</param>
             </result>
 
-            <result name="edit">/skins/default/crud/edit.jsp</result>
+            <result name="edit">/layouts/crud/edit.jsp</result>
 
             <result name="redirectToEdit" type="redirect">
                 <param name="location">%{dispatch.originalPath}/%{pk}?method%3Aedit</param>
@@ -113,7 +113,7 @@
                 <param name="searchString">%{searchString}</param>
             </result>
 
-            <result name="bulkEdit">/skins/default/crud/bulkEdit.jsp</result>
+            <result name="bulkEdit">/layouts/crud/bulkEdit.jsp</result>
 
             <result name="bulkUpdate" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/UseCase</param>
@@ -168,7 +168,7 @@
 
         </action>
         <action name="Portlet"
-                class="com.manydesigns.portofino.actions.model.PortletDesignAction">
+                class="com.manydesigns.portofino.actions.chart.ChartAction">
             <result name="summary">/skins/default/model/portletDesign/summary.jsp</result>
 
             <result name="cancel" type="redirect">
@@ -188,7 +188,7 @@
             <result name="success">/skins/default/system-admin/serverInfo.jsp</result>
         </action>
         <action name="system-admin/ConfigurationProperties"
-                class="com.manydesigns.portofino.actions.systemadmin.ConfigurationPropertiesAction">
+                class="com.manydesigns.portofino.actions.systemadmin.ConfigurationsAction">
             <result name="portofinoProperties">/skins/default/system-admin/portofinoProperties.jsp</result>
             <result name="elementsProperties">/skins/default/system-admin/elementsProperties.jsp</result>
             <result name="systemProperties">/skins/default/system-admin/systemProperties.jsp</result>
@@ -249,14 +249,14 @@
 
             <result name="read">/skins/default/crud/read.jsp</result>
 
-            <result name="create">/skins/default/crud/create.jsp</result>
+            <result name="create">/layouts/crud/create.jsp</result>
 
             <result name="save" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>
                 <param name="pk">%{pk}</param>
             </result>
 
-            <result name="edit">/skins/default/crud/edit.jsp</result>
+            <result name="edit">/layouts/crud/edit.jsp</result>
 
             <result name="update" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>
@@ -264,7 +264,7 @@
                 <param name="searchString">%{searchString}</param>
             </result>
 
-            <result name="bulkEdit">/skins/default/crud/bulkEdit.jsp</result>
+            <result name="bulkEdit">/layouts/crud/bulkEdit.jsp</result>
 
             <result name="bulkUpdate" type="redirectAction">
                 <param name="actionName">%{qualifiedName}/TableData</param>
@@ -450,14 +450,14 @@
 
             <result name="read">/skins/default/crud/read.jsp</result>
 
-            <result name="create">/skins/default/crud/create.jsp</result>
+            <result name="create">/layouts/crud/create.jsp</result>
 
             <result name="save" type="redirectAction">
                 <param name="actionName">Users</param>
                 <param name="pk">%{pk}</param>
             </result>
 
-            <result name="edit">/skins/default/crud/edit.jsp</result>
+            <result name="edit">/layouts/crud/edit.jsp</result>
 
             <result name="update" type="redirectAction">
                 <param name="actionName">Users</param>
@@ -465,7 +465,7 @@
                 <param name="searchString">%{searchString}</param>
             </result>
 
-            <result name="bulkEdit">/skins/default/crud/bulkEdit.jsp</result>
+            <result name="bulkEdit">/layouts/crud/bulkEdit.jsp</result>
 
             <result name="bulkUpdate" type="redirectAction">
                 <param name="actionName">Users</param>
@@ -510,14 +510,14 @@
 
             <result name="read">/skins/default/crud/read.jsp</result>
 
-            <result name="create">/skins/default/crud/create.jsp</result>
+            <result name="create">/layouts/crud/create.jsp</result>
 
             <result name="save" type="redirectAction">
                 <param name="actionName">Groups</param>
                 <param name="pk">%{pk}</param>
             </result>
 
-            <result name="edit">/skins/default/crud/edit.jsp</result>
+            <result name="edit">/layouts/crud/edit.jsp</result>
 
             <result name="update" type="redirectAction">
                 <param name="actionName">Groups</param>
@@ -525,7 +525,7 @@
                 <param name="searchString">%{searchString}</param>
             </result>
 
-            <result name="bulkEdit">/skins/default/crud/bulkEdit.jsp</result>
+            <result name="bulkEdit">/layouts/crud/bulkEdit.jsp</result>
 
             <result name="bulkUpdate" type="redirectAction">
                 <param name="actionName">Groups</param>

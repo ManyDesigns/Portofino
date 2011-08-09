@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.connections;
 
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,13 +39,14 @@ import java.util.List;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 
 @XmlRootElement(name = "connections")
 @XmlAccessorType(XmlAccessType.NONE)
 public class Connections {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
     public static final String JAXB_CONNECTIONS_PACKAGES = "com.manydesigns.portofino.connections";
 
 
@@ -71,9 +74,9 @@ public class Connections {
         }
     }
 
-    public void init() {
+    public void init(DatabasePlatformsManager databasePlatformsManager) {
         for (ConnectionProvider connection : connections) {
-            connection.init();
+            connection.init(databasePlatformsManager);
         }
     }
 

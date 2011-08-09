@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -31,9 +31,6 @@ package com.manydesigns.portofino.scripting;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
-import com.manydesigns.elements.struts2.Struts2Utils;
-import com.opensymphony.xwork2.util.CompoundRoot;
-import com.opensymphony.xwork2.util.ValueStack;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import ognl.OgnlContext;
@@ -42,16 +39,17 @@ import ognl.OgnlContext;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class ScriptingUtil {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public static Object runScript(String script, String scriptLanguage)
+    public static Object runScript(String script,
+                                   String scriptLanguage,
+                                   Object root)
             throws Exception {
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        ValueStack valueStack = Struts2Utils.getValueStack();
-        CompoundRoot root = valueStack.getRoot();
         if ("ognl".equals(scriptLanguage)) {
             return OgnlUtils.getValueQuietly(script, ognlContext, root);
         } else if ("groovy".equals(scriptLanguage)) {

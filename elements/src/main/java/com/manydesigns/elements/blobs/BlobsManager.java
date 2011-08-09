@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -32,27 +32,28 @@ package com.manydesigns.elements.blobs;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.RandomUtil;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class BlobsManager {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Static fields
     //**************************************************************************
 
-    protected static final Properties elementsProperties;
+    protected static final Configuration elementsConfiguration;
     protected static final BlobsManager manager;
 
     //**************************************************************************
@@ -67,10 +68,10 @@ public class BlobsManager {
     //**************************************************************************
 
     static {
-        elementsProperties = ElementsProperties.getProperties();
+        elementsConfiguration = ElementsProperties.getConfiguration();
         String managerClassName =
-                elementsProperties.getProperty(
-                        ElementsProperties.BLOBS_MANAGER_PROPERTY);
+                elementsConfiguration.getString(
+                        ElementsProperties.BLOBS_MANAGER);
         InstanceBuilder<BlobsManager> builder =
                 new InstanceBuilder<BlobsManager>(
                         BlobsManager.class,
@@ -99,20 +100,20 @@ public class BlobsManager {
 
     public BlobsManager() {
         String blobsDirPath =
-                elementsProperties.getProperty(
-                        ElementsProperties.BLOBS_DIR_PROPERTY);
+                elementsConfiguration.getString(
+                        ElementsProperties.BLOBS_DIR);
         if (blobsDirPath == null) {
             blobsDirPath = System.getProperty("java.io.tmpdir");
             logger.warn("Blobs dir property '{}' not set. " +
                     "Falling back to ''java.io.tmpdir'': {}",
-                    ElementsProperties.BLOBS_DIR_PROPERTY,
+                    ElementsProperties.BLOBS_DIR,
                     blobsDirPath);
         }
         blobsDir = new File(blobsDirPath);
-        metaFileNamePattern = elementsProperties.getProperty(
-                ElementsProperties.BLOBS_META_FILENAME_PATTERN_PROPERTY);
-        dataFileNamePattern = elementsProperties.getProperty(
-                ElementsProperties.BLOBS_DATA_FILENAME_PATTERN_PROPERTY);
+        metaFileNamePattern = elementsConfiguration.getString(
+                ElementsProperties.BLOBS_META_FILENAME_PATTERN);
+        dataFileNamePattern = elementsConfiguration.getString(
+                ElementsProperties.BLOBS_DATA_FILENAME_PATTERN);
     }
 
     //**************************************************************************

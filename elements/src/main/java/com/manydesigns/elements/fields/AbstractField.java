@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -37,6 +37,7 @@ import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,20 +48,20 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public abstract class AbstractField implements Field {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public final static String BULK_SUFFIX = "_bulk";
 
-    protected final Properties elementsProperties;
+    protected final Configuration elementsConfiguration;
 
     protected final PropertyAccessor accessor;
     protected final Mode mode;
@@ -97,7 +98,7 @@ public abstract class AbstractField implements Field {
     public AbstractField(@NotNull PropertyAccessor accessor,
                          @NotNull Mode mode,
                          @Nullable String prefix) {
-        elementsProperties = ElementsProperties.getProperties();
+        elementsConfiguration = ElementsProperties.getConfiguration();
         this.accessor = accessor;
         this.mode = mode;
 
@@ -247,10 +248,8 @@ public abstract class AbstractField implements Field {
             xb.writeNbsp();
         }
         String actualLabel;
-        boolean capitalize =
-                Boolean.parseBoolean(
-                        elementsProperties.getProperty(
-                                ElementsProperties.FIELDS_LABEL_CAPITALIZE_PROPERTY));
+        boolean capitalize = elementsConfiguration.getBoolean(
+                ElementsProperties.FIELDS_LABEL_CAPITALIZE);
         if (capitalize) {
             actualLabel = StringUtils.capitalize(label + ":");
         } else {

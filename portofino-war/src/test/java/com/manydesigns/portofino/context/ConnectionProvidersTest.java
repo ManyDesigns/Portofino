@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -31,8 +31,7 @@ package com.manydesigns.portofino.context;
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.connections.JdbcConnectionProvider;
-import com.manydesigns.portofino.io.FileManager;
-import org.apache.commons.transaction.file.FileResourceManager;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.util.List;
@@ -41,10 +40,11 @@ import java.util.List;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class ConnectionProvidersTest extends AbstractPortofinoTest {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     @Override
     public void setUp() throws Exception {
@@ -56,8 +56,8 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
         super.tearDown();    //To change body of overridden methods use File | Settings | File Templates.
     }
 
-    public void testConnectionProvider() {
-        List<ConnectionProvider> connectionProviders = context.getConnectionProviders();
+    public void testConnectionProvider() throws IOException {
+        List<ConnectionProvider> connectionProviders = application.getConnectionProviders();
         assertEquals(3, connectionProviders.size());
 
         JdbcConnectionProvider conn = new JdbcConnectionProvider();
@@ -68,20 +68,15 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
         conn.setPassword("manydesigns");
 
 
-        context.addConnectionProvider(conn);
+        application.addConnectionProvider(conn);
         assertEquals(4, connectionProviders.size());
-        FileManager fm = context.getFileManager();
-        FileResourceManager frm = fm.getFrm();
+        InputStream is = null;
         try {
-            String id = frm.generatedUniqueTxId();
-            frm.startTransaction(id);
-            InputStream is = frm.readResource(id, PORTOFINO_CONNECTIONS_RESOURCE);
+            is = new FileInputStream(connectionsFile);
             String file = convertStreamToString(is);
-            frm.commitTransaction(id);
-            assertTrue(file.contains("<jdbcConnection databaseName=\"test\" driver=\"org.h2.Driver\" url=\"jdbc:h2:mem:test\" username=\"manydesigns\" password=\"manydesigns\"/>"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
+            assertTrue(file.contains("<jdbcConnection driver=\"org.h2.Driver\" password=\"manydesigns\" url=\"jdbc:h2:mem:test\" username=\"manydesigns\" databaseName=\"test\"/>"));
+        } finally {
+            IOUtils.closeQuietly(is);
         }
 
         conn = new JdbcConnectionProvider();
@@ -91,32 +86,26 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
         conn.setUsername("manydesigns2");
         conn.setPassword("manydesigns2");
 
-        context.updateConnectionProvider(conn);
+        application.updateConnectionProvider(conn);
         assertEquals(4, connectionProviders.size());
+        is = null;
         try {
-            String id = frm.generatedUniqueTxId();
-            frm.startTransaction(id);
-            InputStream is = frm.readResource(id, PORTOFINO_CONNECTIONS_RESOURCE);
+            is = new FileInputStream(connectionsFile);
             String file = convertStreamToString(is);
-            frm.commitTransaction(id);
-            assertTrue(file.contains("<jdbcConnection databaseName=\"test\" driver=\"org.h2.Driver\" url=\"jdbc:h2:mem:test2\" username=\"manydesigns2\" password=\"manydesigns2\"/>"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
+            assertTrue(file.contains("<jdbcConnection driver=\"org.h2.Driver\" password=\"manydesigns2\" url=\"jdbc:h2:mem:test2\" username=\"manydesigns2\" databaseName=\"test\"/>"));
+        } finally {
+            IOUtils.closeQuietly(is);
         }
 
-        context.deleteConnectionProvider("test");
+        application.deleteConnectionProvider("test");
         assertEquals(3, connectionProviders.size());
+        is = null;
         try {
-            String id = frm.generatedUniqueTxId();
-            frm.startTransaction(id);
-            InputStream is = frm.readResource(id, PORTOFINO_CONNECTIONS_RESOURCE);
+            is = new FileInputStream(connectionsFile);
             String file = convertStreamToString(is);
-            frm.commitTransaction(id);
-            assertFalse(file.contains("<jdbcConnection databaseName=\"test\" driver=\"org.h2.Driver\" url=\"jdbc:h2:mem:test\" username=\"manydesigns\" password=\"manydesigns\"/>"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
+            assertFalse(file.contains("<jdbcConnection driver=\"org.h2.Driver\" password=\"manydesigns\" url=\"jdbc:h2:mem:test\" username=\"manydesigns\" databaseName=\"test\"/>"));
+        } finally {
+            IOUtils.closeQuietly(is);
         }
     }
 

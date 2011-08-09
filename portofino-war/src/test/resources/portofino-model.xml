@@ -1205,7 +1205,7 @@
     </databases>
     <rootNode title="Portofino4" description="portofino 4" id="/">
         <childNodes>
-        <documentNode id="homepage" title="Homepage" description="Homepage" url="Document.action" fileName="skins/default/homepage.html">
+        <documentNode id="homepage" title="Homepage" description="Homepage" url="Document.action" fileName="misc/homepage.html">
             <permissions>
                 <allow>
                     <group>anonymous</group>
@@ -1261,10 +1261,10 @@
         </customNode>
         <folderNode id="usersAdmin" description="User admin" title="admin user">
             <childNodes>
-            <useCaseNode title="userAdmin"
+            <crudNode title="userAdmin"
                          id="userAdmin"
                          description="user administration" url="/usersAdmin/Users.action">
-                <useCase name = "users"
+                <crud name = "users"
                          table="portofino.PUBLIC.users"
                          query="FROM portofino.PUBLIC.users"
                          searchTitle="Users"
@@ -1303,8 +1303,8 @@
                                 method="resetPassword"
                                 guard=""/>
                     </buttons>
-                    <subUseCases>
-                        <useCase name="active"
+                    <subCruds>
+                        <crud name="active"
                                  table="portofino.PUBLIC.groups"
                                  query="FROM portofino.PUBLIC.groups groups WHERE groups.groupId NOT IN (SELECT groups2.groupId FROM portofino.PUBLIC.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
                                  searchTitle="Active groups">
@@ -1313,8 +1313,8 @@
                                 <property name="name"/>
                                 <property name="description"/>
                             </properties>
-                        </useCase>
-                        <useCase name="current"
+                        </crud>
+                        <crud name="current"
                                  table="portofino.PUBLIC.groups"
                                  query="FROM portofino.PUBLIC.groups groups WHERE groups.groupId in (SELECT groups2.groupId FROM portofino.PUBLIC.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
                                  searchTitle="Current groups">
@@ -1323,9 +1323,9 @@
                                 <property name="name"/>
                                 <property name="description"/>
                             </properties>
-                        </useCase>
+                        </crud>
 
-                        <useCase name="past"
+                        <crud name="past"
                                  table="portofino.PUBLIC.users_groups"
                                  query="FROM portofino.PUBLIC.users_groups ug WHERE ug.userid=%{userId} AND ug.deletionDate IS NOT null"
                                  searchTitle="Past groups">
@@ -1335,14 +1335,14 @@
                                 <property name="creationDate"/>
                                 <property name="deletionDate"/>
                             </properties>
-                        </useCase>
-                    </subUseCases>
-                </useCase>
-            </useCaseNode>
-            <useCaseNode title="groupAdmin"
+                        </crud>
+                    </subCruds>
+                </crud>
+            </crudNode>
+            <crudNode title="groupAdmin"
                          id="groupAdmin"
                          description="groups administration" url="/usersAdmin/Groups.action">
-                <useCase name="groupAdmin"
+                <crud name="groupAdmin"
                          table="portofino.PUBLIC.groups"
                          query="from portofino.PUBLIC.groups"
                          searchTitle="Groups"
@@ -1366,8 +1366,8 @@
                             </selectionProperties>
                         </selectionProvider>
                     </selectionProviders>
-                </useCase>
-            </useCaseNode>
+                </crud>
+            </crudNode>
             </childNodes>
             <permissions>
                 <allow>
@@ -1379,8 +1379,8 @@
         <folderNode id="usecases" title="Use cases"
                   description="Use cases">
             <childNodes>
-            <useCaseNode description="uc1" id="uc1" title="uc1">
-                <useCase name="usecase1"
+            <crudNode description="uc1" id="uc1" title="uc1">
+                <crud name="usecase1"
                  table="jpetstore.PUBLIC.product"
                  query="FROM jpetstore.PUBLIC.product product where product.category = %{'FISH'}"
                  searchTitle="Products in category FISH"
@@ -1457,10 +1457,10 @@
                             </annotations>
                         </property>
                     </properties>
-                </useCase>
-            </useCaseNode>
-            <useCaseNode description="uc2" id="uc2" title="uc2">
-                <useCase name="usecase2"
+                </crud>
+            </crudNode>
+            <crudNode description="uc2" id="uc2" title="uc2">
+                <crud name="usecase2"
                          table="jpetstore.PUBLIC.category"
                          query="FROM jpetstore.PUBLIC.category"
                          searchTitle="Categories"
@@ -1480,8 +1480,8 @@
                                 scriptLanguage="groovy"
                                 guard=""/>
                     </buttons>
-                    <subUseCases>
-                        <useCase name="usecase3"
+                    <subCruds>
+                        <crud name="usecase3"
                                  table="jpetstore.PUBLIC.product"
                                  query="FROM jpetstore.PUBLIC.product product WHERE product.category = %{catid}"
                                  searchTitle="Products in category">
@@ -1491,12 +1491,12 @@
                                 <property name="name"/>
                                 <property name="descn"/>
                             </properties>
-                        </useCase>
-                    </subUseCases>
-                </useCase>
-            </useCaseNode>
-            <useCaseNode description="rimborsi" title="rimborsi" id="rimborsi">
-                <useCase name="rimborsi"
+                        </crud>
+                    </subCruds>
+                </crud>
+            </crudNode>
+            <crudNode description="rimborsi" title="rimborsi" id="rimborsi">
+                <crud name="rimborsi"
                  table="hibernatetest.PUBLIC.rimborso"
                  query="FROM hibernatetest.PUBLIC.rimborso rimborso"
                  searchTitle="Rimborsi"
@@ -1570,8 +1570,8 @@
                     </selectionProperties>
                 </selectionProvider>
             </selectionProviders>
-        </useCase>
-            </useCaseNode>
+        </crud>
+            </crudNode>
             <portletNode name="portlet1"
                          id="portlet1"
                          description="portlet 1"

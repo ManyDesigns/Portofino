@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
+import java.io.File;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 
@@ -42,16 +43,11 @@ import java.text.MessageFormat;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class ServerInfo {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
-
-    //**************************************************************************
-    // KEY (for application scope attribute)
-    //**************************************************************************
-
-    public final static String KEY = ServerInfo.class.getName();
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -91,14 +87,14 @@ public class ServerInfo {
         logger.debug("Servlet API version: {}", servletApiVersion);
 
         String tmp = null;
-        if (servletApiMajor >= 2 && servletApiMinor >= 5) {
-            try {
-                Method method =
-                        servletContext.getClass().getMethod("getContextPath");
-                tmp = (String)method.invoke(servletContext);
-            } catch (Throwable e) {
-                logger.debug("Uncaught exception", e);
-            }
+        try {
+            Method method =
+                    servletContext.getClass().getMethod("getContextPath");
+            tmp = (String)method.invoke(servletContext);
+        } catch (NoSuchMethodException e) {
+            logger.debug("Cannot invoke getContextPath(). Required Servlet API >= 2.5");
+        } catch (Exception e) {
+            logger.debug("Uncaught exception", e);
         }
         contextPath = tmp;
         logger.debug("Context path: {}", contextPath);
@@ -166,4 +162,14 @@ public class ServerInfo {
         return runTime.availableProcessors();
     }
 
+    public File getWebAppFile(String filename) {
+        File modelFile = new File(filename);
+        if(modelFile.isAbsolute()) {
+            return modelFile;
+        } else if (realPath == null) {
+            return modelFile;
+        } else {
+            return new File (realPath, filename);
+        }
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -36,6 +36,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +49,11 @@ import java.util.Map;
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class DefaultSelectionProvider implements SelectionProvider {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -144,7 +146,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
     public static DefaultSelectionProvider create(String name,
                                                   Collection objects,
                                                   Class objectClass,
-                                                  TextFormat textFormat,
+                                                  @Nullable TextFormat textFormat,
                                                   String propertyName) {
         return create(name, objects, objectClass,
                 new TextFormat[] {textFormat},
@@ -257,7 +259,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
     class DefaultSelectionModel implements SelectionModel {
         public static final String copyright =
-                "Copyright (c) 2005-2010, ManyDesigns srl";
+                "Copyright (c) 2005-2011, ManyDesigns srl";
 
         private final Object[] values;
         private final String[] labelSearches;

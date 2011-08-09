@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -32,19 +32,25 @@ package com.manydesigns.portofino.context.hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class HibernateDatabaseSetup {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     protected final Configuration configuration;
     protected final SessionFactory sessionFactory;
     protected final ThreadLocal<Session> threadSessions;
+
+        public static final Logger logger =
+            LoggerFactory.getLogger(HibernateDatabaseSetup.class);
 
     public HibernateDatabaseSetup(Configuration configuration,
                                   SessionFactory sessionFactory) {
@@ -66,7 +72,19 @@ public class HibernateDatabaseSetup {
     }
 
     public Session getThreadSession() {
-        return threadSessions.get();
+        return getThreadSession(true);
+    }
+
+    public Session getThreadSession(boolean create) {
+        Session session = threadSessions.get();
+        if(session == null && create) {
+            if(logger.isDebugEnabled()) {
+                logger.debug("Creating thread-local session for {}", Thread.currentThread());
+            }
+            session = sessionFactory.openSession();
+            threadSessions.set(session);
+        }
+        return session;
     }
 
     public void setThreadSession(Session session) {

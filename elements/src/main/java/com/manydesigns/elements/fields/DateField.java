@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -34,6 +34,7 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.DateFormat;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -42,16 +43,16 @@ import org.joda.time.format.DateTimeFormatter;
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class DateField extends AbstractTextField {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -82,10 +83,10 @@ public class DateField extends AbstractTextField {
         if (dateFormatAnnotation != null) {
             datePattern = dateFormatAnnotation.value();
         } else {
-            Properties elementsProperties =
-                    ElementsProperties.getProperties();
-            datePattern = elementsProperties.getProperty(
-                    ElementsProperties.FIELDS_DATE_FORMAT_PROPERTY);
+            Configuration elementsConfiguration =
+                    ElementsProperties.getConfiguration();
+            datePattern = elementsConfiguration.getString(
+                    ElementsProperties.FIELDS_DATE_FORMAT);
         }
         dateTimeFormatter = DateTimeFormat.forPattern(datePattern);
         setMaxLength(dateTimeFormatter.getParser().estimateParsedLength());

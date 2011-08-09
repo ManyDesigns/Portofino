@@ -7,23 +7,21 @@ import com.manydesigns.elements.servlet.WebFramework;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.elements.xml.XmlBuffer;
-import com.manydesigns.portofino.PortofinoProperties;
 import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.LoggerFactory;
-
-import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public abstract class AbstractElementsTest extends TestCase {
     public static final String copyright =
-            "Copyright (c) 2005-2010, ManyDesigns srl";
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public Properties elementsProperties;
-    public Properties portofinoProperties;
+    public Configuration elementsConfiguration;
 
     public MutableHttpServletRequest req;
 
@@ -50,12 +48,7 @@ public abstract class AbstractElementsTest extends TestCase {
     }
 
     public void setUpProperties() {
-        // restore default properties
-        ElementsProperties.reloadProperties();
-        PortofinoProperties.reloadProperties();
-
-        elementsProperties = ElementsProperties.getProperties();
-        portofinoProperties = PortofinoProperties.getProperties();
+        elementsConfiguration = ElementsProperties.getConfiguration();
     }
 
     public void setUpSingletons() {
