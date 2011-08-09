@@ -132,9 +132,13 @@ public class DispatcherFilter implements Filter {
             savedAttributes.put(attrName, attrValue);
         }
         for(String attrName : savedAttributes.keySet()) {
-            if(!attrName.startsWith("javax.servlet")) {
-                request.removeAttribute(attrName);
+            if(attrName.startsWith("javax.servlet")) {
+                continue;
             }
+            if(attrName.equals("cancelReturnUrl")) {
+                continue;
+            }
+            request.removeAttribute(attrName);
         }
         logger.debug("--- end req dump ---");
         return savedAttributes;

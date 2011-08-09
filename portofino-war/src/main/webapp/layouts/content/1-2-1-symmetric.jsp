@@ -8,17 +8,7 @@
     <c:forEach var="portletInstance" items="${ actionBean.portlets['contentLayoutTop'] }">
         <input type="hidden" class="updateLayout" name="portletWrapper_contentLayoutTop" value="<c:out value='${portletInstance.id}' />" />
         <div class="portletWrapper" id="portletWrapper_<c:out value='${portletInstance.id}' />">
-            <%
-                try {
-            %>
             <jsp:include page="${portletInstance.jsp}" />
-            <%
-                } catch (Throwable e) {
-            %>
-            Portlet generates exception.
-            <%
-                }
-            %>
         </div>
     </c:forEach>
 </div>
@@ -27,17 +17,7 @@
         <c:forEach var="portletInstance" items="${ actionBean.portlets['contentLayoutLeft'] }">
             <input type="hidden" class="updateLayout" name="portletWrapper_contentLayoutLeft" value="<c:out value='${portletInstance.id}' />" />
             <div class="portletWrapper" id="portletWrapper_<c:out value='${portletInstance.id}' />">
-                <%
-                    try {
-                %>
                 <jsp:include page="${portletInstance.jsp}" />
-                <%
-                    } catch (Throwable e) {
-                %>
-                Portlet generates exception.
-                <%
-                    }
-                %>
             </div>
         </c:forEach>
     </div>
@@ -45,17 +25,7 @@
         <c:forEach var="portletInstance" items="${ actionBean.portlets['contentLayoutRight'] }">
             <input type="hidden" class="updateLayout" name="portletWrapper_contentLayoutRight" value="<c:out value='${portletInstance.id}' />" />
             <div class="portletWrapper" id="portletWrapper_<c:out value='${portletInstance.id}' />">
-                <%
-                    try {
-                %>
                 <jsp:include page="${portletInstance.jsp}" />
-                <%
-                    } catch (Throwable e) {
-                %>
-                Portlet generates exception.
-                <%
-                    }
-                %>
             </div>
         </c:forEach>
     </div>
@@ -64,17 +34,7 @@
     <c:forEach var="portletInstance" items="${ actionBean.portlets['contentLayoutBottom'] }">
         <input type="hidden" class="updateLayout" name="portletWrapper_contentLayoutBottom" value="<c:out value='${portletInstance.id}' />" />
         <div class="portletWrapper" id="portletWrapper_<c:out value='${portletInstance.id}' />">
-            <%
-                try {
-            %>
             <jsp:include page="${portletInstance.jsp}" />
-            <%
-                } catch (Throwable e) {
-            %>
-            Portlet generates exception.
-            <%
-                }
-            %>
         </div>
     </c:forEach>
 </div>

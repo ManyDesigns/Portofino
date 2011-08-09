@@ -134,27 +134,27 @@ public class ChartAction extends PortletAction {
     @DefaultHandler
     public Resolution execute() {
 
-        // Run/generate the chart
-        generateChart();
-
-        chartId = RandomUtil.createRandomCode();
-
-        String actionurl = dispatch.getAbsoluteOriginalPath();
-        UrlBuilder chartResolution =
-                new UrlBuilder(actionurl, false)
-                        .addParameter("chartId", chartId)
-                        .addParameter("chart", "");
-        String portletUrl = chartResolution.toString();
-
         try {
+            // Run/generate the chart
+            generateChart();
+
+            chartId = RandomUtil.createRandomCode();
+
+            String actionurl = dispatch.getAbsoluteOriginalPath();
+            UrlBuilder chartResolution =
+                    new UrlBuilder(actionurl, false)
+                            .addParameter("chartId", chartId)
+                            .addParameter("chart", "");
+            String portletUrl = chartResolution.toString();
+
             File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
             fileName = file.getName();
 
             jfreeChartInstance =
                     new JFreeChartInstance(chart, file, width, height, portletUrl);
-        } catch (java.io.IOException e) {
-            logger.warn("Could not save portlet", e);
-            SessionMessages.addErrorMessage(e.getMessage());
+        } catch (Throwable e) {
+            logger.error("Portlet exception", e);
+            return new ForwardResolution("/layouts/portlet-error.jsp");
         }
 
         if (isEmbedded()) {
@@ -294,16 +294,18 @@ public class ChartAction extends PortletAction {
     }
 
     public Resolution updateConfiguration() {
-        prepareForm();
-        form.readFromObject(chartNode);
-        form.readFromRequest(request);
-        if (form.validate()) {
-            form.writeToObject(chartNode);
-            saveModel();
-            SessionMessages.addInfoMessage("Configuration updated successfully");
-            return cancel();
-        } else {
-            return new ForwardResolution("/layouts/chart/configure.jsp");
+        synchronized (application) {
+            prepareForm();
+            form.readFromObject(chartNode);
+            form.readFromRequest(context.getRequest());
+            if (form.validate()) {
+                form.writeToObject(chartNode);
+                saveModel();
+                SessionMessages.addInfoMessage("Configuration updated successfully");
+                return cancel();
+            } else {
+                return new ForwardResolution("/layouts/chart/configure.jsp");
+            }
         }
     }
 

@@ -13,5 +13,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
         <input class="portletButton" type="submit" name="pdf" value="Pdf"/>
+        <input type="hidden" name="cancelReturnUrl"
+               value="<c:out value="${actionBean.cancelReturnUrl}"/> "/>
     </stripes:layout-component>
 </stripes:layout-render>

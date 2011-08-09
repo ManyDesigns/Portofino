@@ -34,7 +34,6 @@
                     Portlet footer
                 </stripes:layout-component>
             </div>
-            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
         </stripes:form>
     </div>
 </stripes:layout-definition>

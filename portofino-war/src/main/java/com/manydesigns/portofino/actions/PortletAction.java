@@ -45,9 +45,6 @@ public class PortletAction extends AbstractActionBean {
     @InjectModel
     public Model model;
 
-    @InjectHttpRequest
-    public HttpServletRequest request;
-
     //--------------------------------------------------------------------------
     // UI
     //--------------------------------------------------------------------------
@@ -106,6 +103,7 @@ public class PortletAction extends AbstractActionBean {
 
     public Resolution updateLayout() {
         synchronized (application) {
+            HttpServletRequest request = context.getRequest();
             Enumeration parameters = request.getParameterNames();
             while(parameters.hasMoreElements()) {
                 String parameter = (String) parameters.nextElement();
@@ -201,6 +199,8 @@ public class PortletAction extends AbstractActionBean {
 
     protected Resolution forwardToPortletPage(String nodeJsp) {
         setupPortlets(siteNodeInstance, nodeJsp);
+        HttpServletRequest request = context.getRequest();
+        request.setAttribute("cancelReturnUrl", cancelReturnUrl);
         return new ForwardResolution("/layouts/portlet-page.jsp");
     }
 
@@ -229,16 +229,12 @@ public class PortletAction extends AbstractActionBean {
         this.application = application;
     }
 
-    public HttpServletRequest getRequest() {
-        return request;
-    }
-
-    public void setRequest(HttpServletRequest request) {
-        this.request = request;
-    }
-
     public String getCancelReturnUrl() {
-        return cancelReturnUrl;
+        if (cancelReturnUrl == null) {
+            return (String) context.getRequest().getAttribute("cancelReturnUrl");
+        } else {
+            return cancelReturnUrl;
+        }
     }
 
     public void setCancelReturnUrl(String cancelReturnUrl) {
