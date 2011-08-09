@@ -63,11 +63,15 @@ Body and content layout
 .yui-t2 #yui-main div#content {
     margin-left: 13.8461em;
     border: 3px solid #65a7db;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
 }
 
 .yui-t3 #yui-main div#content {
     margin-left: 23.0769em;
     border: 3px solid #65a7db;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
 }
 
 /*******************************************************************************
@@ -109,6 +113,8 @@ div#contentBody {
 
 .contentHeader {
     border-bottom: 1px solid gray;
+    -moz-border-radius: 3px 3px 0 0;
+    border-radius: 3px 3px 0 0;
 }
 
 .contentHeader .contentBarRight {
@@ -125,6 +131,8 @@ div#contentBody {
 .contentFooter {
     border-top: 1px solid gray;
     margin-top: 1em;
+    -moz-border-radius: 0 0 3px 3px;
+    border-radius: 0 0 3px 3px;
 }
 
 .contentBarButtons, .resultSetNavigation {
