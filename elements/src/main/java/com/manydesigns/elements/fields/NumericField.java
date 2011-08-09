@@ -50,6 +50,8 @@ public class NumericField extends AbstractTextField {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
+    public static final String DEFAULT_FIELD_CSS_CLASS = "mde-numeric-field";
+
     protected BigDecimal decimalValue;
 
     protected DecimalFormat decimalFormat;
@@ -64,6 +66,8 @@ public class NumericField extends AbstractTextField {
     //**************************************************************************
     public NumericField(PropertyAccessor accessor, Mode mode, String prefix) {
         super(accessor, mode, prefix);
+        fieldCssClass = DEFAULT_FIELD_CSS_CLASS;
+
         Class type = accessor.getType();
         if (type == Byte.class || type == Byte.TYPE) {
             minValue = new BigDecimal(Byte.MIN_VALUE);

@@ -1210,6 +1210,67 @@ public class CrudAction extends PortletAction {
         }
     }
 
+    //**************************************************************************
+    // Configuration
+    //**************************************************************************
+
+    public static final String[][] CRUD_NODE_CONFIGURATION_FIELDS =
+            {{"title", "description"}};
+    public static final String[][] CRUD_CONFIGURATION_FIELDS =
+            {{"name", "table", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable"}};
+
+    public Form crudConfigurationForm;
+
+    public Resolution configure() {
+        prepareConfigurationForms();
+        form.readFromObject(crudNode);
+        crudConfigurationForm.readFromObject(crudNode.getCrud());
+
+        return new ForwardResolution("/layouts/crud/configure.jsp");
+    }
+
+    private void prepareConfigurationForms() {
+        form = new FormBuilder(CrudNode.class)
+                .configFields(CRUD_NODE_CONFIGURATION_FIELDS)
+                .configFieldSetNames("Crud node")
+                .build();
+
+        SelectionProvider tableSelectionProvider =
+                DefaultSelectionProvider.create("table",
+                        model.getAllTables(),
+                        Table.class,
+                        null,
+                        "qualifiedName");
+        crudConfigurationForm = new FormBuilder(Crud.class)
+                .configFields(CRUD_CONFIGURATION_FIELDS)
+                .configFieldSetNames("Crud")
+                .configSelectionProvider(tableSelectionProvider, "table")
+                .build();
+    }
+
+    public Resolution updateConfiguration() {
+        synchronized (application) {
+            prepareConfigurationForms();
+            form.readFromObject(crudNode);
+            crudConfigurationForm.readFromObject(crudNode.getCrud());
+            form.readFromRequest(context.getRequest());
+            crudConfigurationForm.readFromRequest(context.getRequest());
+            boolean valid = form.validate();
+            valid = crudConfigurationForm.validate() && valid;
+            if (valid) {
+                form.writeToObject(crudNode);
+                crudConfigurationForm.writeToObject(crudNode.getCrud());
+                saveModel();
+                SessionMessages.addInfoMessage("Configuration updated successfully");
+                return cancel();
+            } else {
+                return new ForwardResolution("/layouts/crud/configure.jsp");
+            }
+        }
+    }
+
+
+
     public boolean isRequiredFieldsPresent() {
         return form.isRequiredFieldsPresent();
     }
@@ -1352,5 +1413,13 @@ public class CrudAction extends PortletAction {
 
     public String getMode() {
         return siteNodeInstance.getMode();
+    }
+
+    public Form getCrudConfigurationForm() {
+        return crudConfigurationForm;
+    }
+
+    public void setCrudConfigurationForm(Form crudConfigurationForm) {
+        this.crudConfigurationForm = crudConfigurationForm;
     }
 }

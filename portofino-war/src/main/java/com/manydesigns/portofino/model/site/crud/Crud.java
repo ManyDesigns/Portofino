@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.model.site.crud;
 
+import com.manydesigns.elements.annotations.Multiline;
+import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.Table;
@@ -221,6 +223,8 @@ public class Crud {
         this.actualTable = actualTable;
     }
 
+    @Required
+    @Multiline
     @XmlAttribute(required = true)
     public String getQuery() {
         return query;

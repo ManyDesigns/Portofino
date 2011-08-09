@@ -430,3 +430,32 @@ div#content-login table tr td, div#content-login table tr th {
 }
 
 
+/*******************************************************************************
+Forms
+*******************************************************************************/
+
+fieldset.mde-form-fieldset {
+    border: 0 none;
+    border-top: 1px solid #bbb;
+    padding: 0 0 0 10px;
+    margin: 0;
+}
+
+fieldset.mde-form-fieldset.mde-no-legend {
+    border: 0 none;
+}
+
+fieldset.mde-form-fieldset legend {
+    padding: .1em .3em;
+    font-size: 1.2em;
+    color: #333;
+}
+
+table.mde-form-table td {
+    border: 0 none;
+}
+
+table.mde-form-table th {
+    border: 0 none;
+    text-align: right;
+}

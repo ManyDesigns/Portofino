@@ -68,12 +68,13 @@ public class FieldSet extends AbstractCompositeElement<Field> {
         } else {
             xb.openElement("fieldset");
             if (name == null) {
-                xb.addAttribute("class", "nolegend");
+                xb.addAttribute("class", "mde-form-fieldset mde-no-legend");
             } else {
+                xb.addAttribute("class", "mde-form-fieldset");
                 xb.writeLegend(name, null);
             }
             xb.openElement("table");
-            xb.addAttribute("class", "details");
+            xb.addAttribute("class", "mde-form-table");
 
             currentColumn = 0;
             trOpened = false;

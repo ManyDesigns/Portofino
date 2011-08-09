@@ -110,7 +110,7 @@ public abstract class AbstractTextField extends AbstractField {
                     : maxLength;
         }
         xb.writeInputText(id, inputName, stringValue,
-                "text", textInputSize, maxLength);
+                fieldCssClass, textInputSize, maxLength);
     }
 
     protected void valueToXhtmlPreview(XhtmlBuffer xb) {
@@ -120,7 +120,7 @@ public abstract class AbstractTextField extends AbstractField {
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
         xb.openElement("div");
-        xb.addAttribute("class", "value");
+        xb.addAttribute("class", fieldCssClass);
         xb.addAttribute("id", id);
         if (href == null) {
             xb.write(stringValue);

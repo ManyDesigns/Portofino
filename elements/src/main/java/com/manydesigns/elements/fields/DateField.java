@@ -54,6 +54,8 @@ public class DateField extends AbstractTextField {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
+    public static final String DEFAULT_FIELD_CSS_CLASS = "mde-date-field";
+
     //**************************************************************************
     // Fields
     //**************************************************************************
@@ -77,6 +79,7 @@ public class DateField extends AbstractTextField {
 
     public DateField(PropertyAccessor accessor, Mode mode, String prefix) {
         super(accessor, mode, prefix);
+        fieldCssClass = DEFAULT_FIELD_CSS_CLASS;
 
         DateFormat dateFormatAnnotation =
                 accessor.getAnnotation(DateFormat.class);
