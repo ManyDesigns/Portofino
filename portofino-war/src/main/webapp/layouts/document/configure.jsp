@@ -6,6 +6,7 @@
 %><stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <stripes:layout-component name="customScripts">
         <script type="text/javascript" src="<stripes:url value="/ckeditor/ckeditor.js"/>"></script>
+        <script type="text/javascript" src="<stripes:url value="/ckeditor/adapters/jquery.js"/>"></script>
     </stripes:layout-component>
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.DocumentAction"/>
     <stripes:layout-component name="contentHeader">
@@ -21,12 +22,17 @@
         <stripes:text name="title" value="${actionBean.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:textarea id="documentContent" name="content" value="${actionBean.content}"/>
+        <stripes:textarea class="editor" name="content" value="${actionBean.content}"/>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
         <script type="text/javascript">
-            CKEDITOR.replace("documentContent");
+            $('textarea.editor').ckeditor({
+                toolbar: 'Full',
+                toolbarCanCollapse: false,
+                filebrowserBrowseUrl : '<c:out value="${dispatch.absoluteOriginalPath}"/>?browse=',
+                filebrowserUploadUrl : '<c:out value="${dispatch.absoluteOriginalPath}"/>?uploadAttachment='
+            });
         </script>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">

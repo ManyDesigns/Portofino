@@ -37,8 +37,6 @@ public class PortletAction extends AbstractActionBean {
     @InjectSiteNodeInstance
     public SiteNodeInstance siteNodeInstance;
 
-    public SiteNode siteNode;
-
     @InjectApplication
     public Application application;
 

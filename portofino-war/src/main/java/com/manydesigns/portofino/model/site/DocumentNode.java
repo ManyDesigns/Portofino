@@ -28,9 +28,14 @@
  */
 package com.manydesigns.portofino.model.site;
 
+import com.manydesigns.portofino.model.Model;
+
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -39,20 +44,51 @@ import javax.xml.bind.annotation.XmlAttribute;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public class DocumentNode extends SiteNode{
+public class DocumentNode extends SiteNode {
 
+    protected final List<Attachment> attachments;
     private String fileName;
 
     public DocumentNode() {
         super();
+        attachments = new ArrayList<Attachment>();
     }
 
-    @XmlAttribute(required = false)
+    //**************************************************************************
+    // ModelObject implementation
+    //**************************************************************************
+
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        this.parent = (SiteNode) parent;
+    }
+
+    public void reset() {
+        super.reset();
+
+        for (Attachment attachment : attachments) {
+            attachment.reset();
+        }
+    }
+
+    public void init(Model model) {
+        super.init(model);
+
+        for (Attachment attachment : attachments) {
+            attachment.init(model);
+        }
+    }
+
+
+    @XmlAttribute(required = true)
     public String getFileName() {
         return fileName;
     }
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public List<Attachment> getAttachments() {
+        return attachments;
     }
 }

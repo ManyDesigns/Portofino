@@ -28,9 +28,12 @@
  */
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.elements.blobs.Blob;
+import com.manydesigns.elements.blobs.BlobsManager;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.annotations.InjectServerInfo;
 import com.manydesigns.portofino.context.ServerInfo;
+import com.manydesigns.portofino.model.site.Attachment;
 import com.manydesigns.portofino.model.site.DocumentNode;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.FileUtils;
@@ -38,8 +41,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -55,6 +57,18 @@ public class DocumentAction extends PortletAction {
 
     public String title;
     public String content;
+
+    //**************************************************************************
+    // File upload with CKEditor
+    //**************************************************************************
+
+    public FileBean upload;
+    public String CKEditor;
+    public Integer CKEditorFuncNum;
+    public String langCode;
+    public String code;
+    public String downloadAttachmentUrl;
+    public String message;
 
     //**************************************************************************
     // Injections
@@ -116,8 +130,8 @@ public class DocumentAction extends PortletAction {
             }
             if (valid) {
                 documentNode.setTitle(title);
-                saveModel();
                 saveContent();
+                saveModel();
                 SessionMessages.addInfoMessage("Configuration updated successfully");
                 return cancel();
             } else {
@@ -126,6 +140,65 @@ public class DocumentAction extends PortletAction {
         }
 
     }
+
+    public Resolution uploadAttachment() {
+        synchronized (application) {
+            logger.info("Uploading attachment");
+            BlobsManager blobsManager = BlobsManager.getManager();
+            try {
+                Blob blob = blobsManager.saveBlob(
+                        upload.getInputStream(),
+                        upload.getFileName(),
+                        upload.getContentType());
+                downloadAttachmentUrl =
+                        String.format("%s?downloadAttachment=&code=%s",
+                                dispatch.getAbsoluteOriginalPath(),
+                                blob.getCode());
+                message = "File uploaded successfully.";
+                Attachment attachment =
+                        new Attachment(documentNode, blob.getCode());
+                documentNode.getAttachments().add(attachment);
+                saveModel();
+            } catch (IOException e) {
+                downloadAttachmentUrl = null;
+                message = "File upload failed!";
+                logger.error("Upload failed", e);
+            }
+            return new ForwardResolution(
+                    "/layouts/document/upload-attachment.jsp");
+        }
+    }
+
+    public Resolution downloadAttachment() {
+        // find the attachment
+        Attachment attachment = null;
+        for (Attachment current : documentNode.getAttachments()) {
+            if (current.getCode().equals(code)) {
+                attachment = current;
+                break;
+            }
+        }
+        if (attachment == null) {
+            return new ErrorResolution(404, "Attachment not found");
+        }
+        BlobsManager blobsManager = BlobsManager.getManager();
+        try {
+            Blob blob = blobsManager.loadBlob(code);
+            File file = blob.getDataFile();
+            InputStream is = new FileInputStream(file);
+            return new StreamingResolution(blob.getContentType(), is)
+                    .setLength(blob.getSize());
+        } catch (IOException e) {
+            logger.error("Download failed", e);
+            return new ErrorResolution(500, "Attachment error");
+        }
+    }
+
+    public Resolution browse() {
+        logger.info("Browse");
+        return null;
+    }
+
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
@@ -149,5 +222,61 @@ public class DocumentAction extends PortletAction {
 
     public DocumentNode getDocumentNode() {
         return documentNode;
+    }
+
+    public FileBean getUpload() {
+        return upload;
+    }
+
+    public void setUpload(FileBean upload) {
+        this.upload = upload;
+    }
+
+    public String getCKEditor() {
+        return CKEditor;
+    }
+
+    public void setCKEditor(String CKEditor) {
+        this.CKEditor = CKEditor;
+    }
+
+    public Integer getCKEditorFuncNum() {
+        return CKEditorFuncNum;
+    }
+
+    public void setCKEditorFuncNum(Integer CKEditorFuncNum) {
+        this.CKEditorFuncNum = CKEditorFuncNum;
+    }
+
+    public String getLangCode() {
+        return langCode;
+    }
+
+    public void setLangCode(String langCode) {
+        this.langCode = langCode;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getDownloadAttachmentUrl() {
+        return downloadAttachmentUrl;
+    }
+
+    public void setDownloadAttachmentUrl(String downloadAttachmentUrl) {
+        this.downloadAttachmentUrl = downloadAttachmentUrl;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
