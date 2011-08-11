@@ -30,6 +30,7 @@
 package com.manydesigns.elements.blobs;
 
 import com.manydesigns.elements.AbstractElementsTest;
+import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.util.RandomUtil;
 import org.apache.commons.io.IOUtils;
 
@@ -60,8 +61,18 @@ public class BlobTest extends AbstractElementsTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        manager = BlobsManager.getManager();
-        blobsDir = manager.getBlobsDir();
+        String storageDir =
+                elementsConfiguration.getString(
+                        ElementsProperties.BLOBS_DIR);
+        String metaFilenamePattern =
+                elementsConfiguration.getString(
+                        ElementsProperties.BLOBS_META_FILENAME_PATTERN);
+        String dataFilenamePattern =
+                elementsConfiguration.getString(
+                        ElementsProperties.BLOBS_DATA_FILENAME_PATTERN);
+        manager = new BlobsManager(
+                storageDir, metaFilenamePattern, dataFilenamePattern);
+        blobsDir = manager.getBlobsDirFile();
     }
 
     public void testManager1() {

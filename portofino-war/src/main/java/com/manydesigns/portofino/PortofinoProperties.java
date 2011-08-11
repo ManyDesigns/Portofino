@@ -57,6 +57,8 @@ public final class PortofinoProperties {
             "portofino.version";
     public static final String CONNECTIONS_LOCATION =
             "connections.location";
+    public static final String STORAGE_DIRECTORY =
+            "storage.directory";
     public static final String MODEL_LOCATION =
             "model.location";
     public static final String APPLICATION_NAME =

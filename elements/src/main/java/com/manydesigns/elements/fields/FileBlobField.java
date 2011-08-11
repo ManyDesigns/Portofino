@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.fields;
 
+import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobsManager;
@@ -37,6 +38,7 @@ import com.manydesigns.elements.servlet.Upload;
 import com.manydesigns.elements.servlet.WebFramework;
 import com.manydesigns.elements.util.MemoryUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -82,11 +84,28 @@ public class FileBlobField extends AbstractField
                          @NotNull Mode mode,
                          @Nullable String prefix) {
         super(accessor, mode, prefix);
-        blobsManager = BlobsManager.getManager();
+
+        blobsManager = createBlobsManager();
 
         innerId = id + INNER_SUFFIX;
         operationInputName = inputName + OPERATION_SUFFIX;
         codeInputName = inputName + CODE_SUFFIX;
+    }
+
+    public static BlobsManager createBlobsManager() {
+        Configuration elementsConfiguration =
+                ElementsProperties.getConfiguration();
+        String storageDir =
+                elementsConfiguration.getString(
+                        ElementsProperties.BLOBS_DIR);
+        String metaFilenamePattern =
+                elementsConfiguration.getString(
+                        ElementsProperties.BLOBS_META_FILENAME_PATTERN);
+        String dataFilenamePattern =
+                elementsConfiguration.getString(
+                        ElementsProperties.BLOBS_DATA_FILENAME_PATTERN);
+        return new BlobsManager(
+                storageDir, metaFilenamePattern, dataFilenamePattern);
     }
 
     //**************************************************************************

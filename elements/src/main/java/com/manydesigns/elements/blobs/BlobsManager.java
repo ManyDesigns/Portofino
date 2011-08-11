@@ -29,10 +29,7 @@
 
 package com.manydesigns.elements.blobs;
 
-import com.manydesigns.elements.ElementsProperties;
-import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.RandomUtil;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,13 +47,6 @@ public class BlobsManager {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
-    // Static fields
-    //**************************************************************************
-
-    protected static final Configuration elementsConfiguration;
-    protected static final BlobsManager manager;
-
-    //**************************************************************************
     // Logging
     //**************************************************************************
 
@@ -64,56 +54,23 @@ public class BlobsManager {
             LoggerFactory.getLogger(BlobsManager.class);
 
     //**************************************************************************
-    // Static initialization and methods
-    //**************************************************************************
-
-    static {
-        elementsConfiguration = ElementsProperties.getConfiguration();
-        String managerClassName =
-                elementsConfiguration.getString(
-                        ElementsProperties.BLOBS_MANAGER);
-        InstanceBuilder<BlobsManager> builder =
-                new InstanceBuilder<BlobsManager>(
-                        BlobsManager.class,
-                        BlobsManager.class,
-                        logger);
-        manager = builder.createInstance(managerClassName);
-    }
-
-    public static BlobsManager getManager() {
-        return manager;
-    }
-
-
-    //**************************************************************************
     // Fields
     //**************************************************************************
 
-    protected final File blobsDir;
+    protected final File blobsDirFile;
     protected final String metaFileNamePattern;
     protected final String dataFileNamePattern;
 
-    
     //**************************************************************************
     // Constructors and initialization
     //**************************************************************************
 
-    public BlobsManager() {
-        String blobsDirPath =
-                elementsConfiguration.getString(
-                        ElementsProperties.BLOBS_DIR);
-        if (blobsDirPath == null) {
-            blobsDirPath = System.getProperty("java.io.tmpdir");
-            logger.warn("Blobs dir property '{}' not set. " +
-                    "Falling back to ''java.io.tmpdir'': {}",
-                    ElementsProperties.BLOBS_DIR,
-                    blobsDirPath);
-        }
-        blobsDir = new File(blobsDirPath);
-        metaFileNamePattern = elementsConfiguration.getString(
-                ElementsProperties.BLOBS_META_FILENAME_PATTERN);
-        dataFileNamePattern = elementsConfiguration.getString(
-                ElementsProperties.BLOBS_DATA_FILENAME_PATTERN);
+    public BlobsManager(String blobsDir,
+                        String metaFileNamePattern,
+                        String dataFileNamePattern) {
+        blobsDirFile = new File(blobsDir);
+        this.metaFileNamePattern = metaFileNamePattern;
+        this.dataFileNamePattern = dataFileNamePattern;
     }
 
     //**************************************************************************
@@ -143,9 +100,9 @@ public class BlobsManager {
         String code = RandomUtil.createRandomCode();
 
         File metaFile =
-                RandomUtil.getCodeFile(blobsDir, metaFileNamePattern, code);
+                RandomUtil.getCodeFile(blobsDirFile, metaFileNamePattern, code);
         File dataFile =
-                RandomUtil.getCodeFile(blobsDir, dataFileNamePattern, code);
+                RandomUtil.getCodeFile(blobsDirFile, dataFileNamePattern, code);
         Blob blob = new Blob(metaFile, dataFile);
 
         // copy the data
@@ -164,9 +121,9 @@ public class BlobsManager {
 
     public Blob loadBlob(String code) throws IOException {
         File metaFile =
-                RandomUtil.getCodeFile(blobsDir, metaFileNamePattern, code);
+                RandomUtil.getCodeFile(blobsDirFile, metaFileNamePattern, code);
         File dataFile =
-                RandomUtil.getCodeFile(blobsDir, dataFileNamePattern, code);
+                RandomUtil.getCodeFile(blobsDirFile, dataFileNamePattern, code);
         Blob blob = new Blob(metaFile, dataFile);
 
         blob.loadMetaProperties();
@@ -178,8 +135,8 @@ public class BlobsManager {
     // Getters
     //**************************************************************************
 
-    public File getBlobsDir() {
-        return blobsDir;
+    public File getBlobsDirFile() {
+        return blobsDirFile;
     }
 
     public String getMetaFileNamePattern() {

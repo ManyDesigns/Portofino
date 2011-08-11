@@ -32,6 +32,7 @@ import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobsManager;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.DocumentLogic;
@@ -86,6 +87,8 @@ public class DocumentAction extends PortletAction {
     public ServerInfo serverInfo;
 
     public DocumentNode documentNode;
+    public BlobsManager documentManager;
+    public BlobsManager attachmentManager;
 
     public static final Logger logger =
             LoggerFactory.getLogger(DocumentAction.class);
@@ -97,6 +100,13 @@ public class DocumentAction extends PortletAction {
     @Before
     public void prepare() {
         documentNode = (DocumentNode) siteNodeInstance.getSiteNode();
+        String storageDirectory =
+                portofinoConfiguration.getString(
+                        PortofinoProperties.STORAGE_DIRECTORY);
+        documentManager = new BlobsManager(
+                storageDirectory, "document-{0}.properties", "document-{0}.data");
+        attachmentManager = new BlobsManager(
+                storageDirectory, "attachment-{0}.properties", "attachment-{0}.data");
     }
 
     //**************************************************************************
@@ -111,24 +121,29 @@ public class DocumentAction extends PortletAction {
         return forwardToPortletPage("/layouts/document/read.jsp");
     }
 
-    public void setupBlobs() throws IOException {
-        BlobsManager blobsManager = BlobsManager.getManager();
+    public void setupBlobs() {
         blobs = new ArrayList<Blob>();
         for (Attachment attachment : documentNode.getAttachments()) {
-            Blob blob = blobsManager.loadBlob(attachment.getCode());
-            blobs.add(blob);
+            Blob blob;
+            try {
+                blob = attachmentManager.loadBlob(attachment.getCode());
+                blobs.add(blob);
+            } catch (IOException e) {
+                logger.warn("Cannot load attachment", e);
+            }
         }
     }
 
     protected void loadContent() throws IOException {
-        String fileName = documentNode.getFileName();
-        File file = serverInfo.getWebAppFile(fileName);
+        String documentCode = documentNode.getFileName();
+        Blob documentBlob = documentManager.loadBlob(documentCode);
+        File file = documentBlob.getDataFile();
         content = FileUtils.readFileToString(file, CONTENT_ENCODING);
     }
 
     protected void saveContent() throws IOException {
         String fileName = documentNode.getFileName();
-        File file = serverInfo.getWebAppFile(fileName);
+        File file = new File(fileName);
         FileUtils.writeStringToFile(file, content, CONTENT_ENCODING);
     }
 
@@ -162,9 +177,8 @@ public class DocumentAction extends PortletAction {
     public Resolution uploadAttachment() {
         synchronized (application) {
             logger.info("Uploading attachment");
-            BlobsManager blobsManager = BlobsManager.getManager();
             try {
-                Blob blob = blobsManager.saveBlob(
+                Blob blob = attachmentManager.saveBlob(
                         upload.getInputStream(),
                         upload.getFileName(),
                         upload.getContentType());
@@ -194,9 +208,8 @@ public class DocumentAction extends PortletAction {
             return new ErrorResolution(404, "Attachment not found");
         }
 
-        BlobsManager blobsManager = BlobsManager.getManager();
         try {
-            Blob blob = blobsManager.loadBlob(code);
+            Blob blob = attachmentManager.loadBlob(code);
             File file = blob.getDataFile();
             InputStream is = new FileInputStream(file);
             return new StreamingResolution(blob.getContentType(), is)

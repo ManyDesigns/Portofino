@@ -31,6 +31,7 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.Application;
@@ -42,6 +43,7 @@ import com.manydesigns.portofino.email.EmailTask;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
@@ -115,6 +117,11 @@ public class PortofinoListener
 
         servletContext = servletContextEvent.getServletContext();
 
+        serverInfo = new ServerInfo(servletContext);
+        servletContext.setAttribute(ApplicationAttributes.SERVER_INFO, serverInfo);
+
+        boolean success = setupCommonsConfiguration();
+
         elementsConfiguration = ElementsProperties.getConfiguration();
         servletContext.setAttribute(
                 ApplicationAttributes.ELEMENTS_CONFIGURATION, elementsConfiguration);
@@ -124,9 +131,6 @@ public class PortofinoListener
         addConfiguration(PortofinoProperties.PROPERTIES_RESOURCE);
         servletContext.setAttribute(
                 ApplicationAttributes.PORTOFINO_CONFIGURATION, portofinoConfiguration);
-
-        serverInfo = new ServerInfo(servletContext);
-        servletContext.setAttribute(ApplicationAttributes.SERVER_INFO, serverInfo);
 
         logger.info("\n" + SEPARATOR +
                 "\n--- ManyDesigns Portofino {} starting..." +
@@ -141,8 +145,6 @@ public class PortofinoListener
                 }
         );
 
-        boolean success = true;
-
         // check servlet API version
         if (serverInfo.getServletApiMajor() < 2 ||
                 (serverInfo.getServletApiMajor() == 2 &&
@@ -150,6 +152,10 @@ public class PortofinoListener
             logger.error("Servlet API version must be >= 2.3. Found: {}.",
                     serverInfo.getServletApiVersion());
             success = false;
+        }
+
+        if (success) {
+            success = setupDirectories();
         }
 
         if (success) {
@@ -228,6 +234,7 @@ public class PortofinoListener
     //**************************************************************************
 
     public boolean setupDatabasePlatformsManager() {
+        logger.info("Creating database platform...");
         databasePlatformsManager =
                 new DatabasePlatformsManager(portofinoConfiguration);
         return true;
@@ -249,8 +256,8 @@ public class PortofinoListener
                     portofinoConfiguration.getString(
                             PortofinoProperties.MODEL_LOCATION);
 
-            File connectionsFile = serverInfo.getWebAppFile(connectionsLocation);
-            File modelFile = serverInfo.getWebAppFile(modelLocation);
+            File connectionsFile = new File(connectionsLocation);
+            File modelFile = new File(modelLocation);
 
             application.loadConnections(connectionsFile);
             application.loadXmlModel(modelFile);
@@ -293,6 +300,41 @@ public class PortofinoListener
                     logger.error("Problems in starting schedulers", e);
                 }
             }
+        }
+        return true;
+    }
+
+    public boolean setupCommonsConfiguration() {
+        logger.info("Setting up commons-configuration lookups...");
+        BeanLookup serverInfoLookup = new BeanLookup(serverInfo);
+        ConfigurationInterpolator.registerGlobalLookup(
+                ApplicationAttributes.SERVER_INFO,
+                serverInfoLookup);
+        return true;
+    }
+
+    public boolean setupDirectories() {
+        String storageDirectory =
+                portofinoConfiguration.getString(
+                        PortofinoProperties.STORAGE_DIRECTORY);
+        File file = new File(storageDirectory);
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                logger.info("Storage directory: {}", file);
+            } else {
+                logger.error("Storage location is not a directory: {}", file);
+                return false;
+            }
+        } else {
+            if (file.mkdirs()) {
+                logger.info("Storage directory created successfully: {}", file);
+            } else {
+                logger.error("Cannot create storage directory: {}", file);
+                return false;
+            }
+        }
+        if (!file.canWrite()) {
+            logger.warn("Cannot write to storage directory: {}", file);
         }
         return true;
     }

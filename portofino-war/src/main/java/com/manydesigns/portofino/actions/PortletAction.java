@@ -18,6 +18,7 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.StripesConstants;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,6 +44,9 @@ public class PortletAction extends AbstractActionBean {
 
     @Inject(RequestAttributes.MODEL)
     public Model model;
+
+    @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
+    public Configuration portofinoConfiguration;
 
     //--------------------------------------------------------------------------
     // UI
