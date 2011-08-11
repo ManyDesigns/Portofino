@@ -112,9 +112,10 @@ public class Struts1WebFramework extends WebFramework {
 
         String fileName = formFile.getFileName();
         String contentType = formFile.getContentType();
+        String characterEncoding = null;
         try {
             InputStream is = formFile.getInputStream();
-            return new Upload(is, fileName, contentType);
+            return new Upload(is, fileName, contentType, null);
         } catch (IOException e) {
             logger.warn("Cannot read upload file: {}", fileName);
             return null;

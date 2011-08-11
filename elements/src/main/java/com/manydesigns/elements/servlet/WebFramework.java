@@ -124,7 +124,8 @@ public class WebFramework {
                 InputStream fis = fileItem.getInputStream();
                 String fileName = FilenameUtils.getName(fileItem.getName());
                 String contentType = fileItem.getContentType();
-                return new Upload(fis, fileName, contentType);
+                String characterEncoding = null;
+                return new Upload(fis, fileName, contentType, characterEncoding);
             } catch (IOException e) {
                 logger.warn("Cannot read upload file.");
                 return null;

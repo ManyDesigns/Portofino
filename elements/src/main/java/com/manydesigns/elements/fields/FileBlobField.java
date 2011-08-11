@@ -254,7 +254,8 @@ public class FileBlobField extends AbstractField
                 blob = blobManager.saveBlob(
                         upload.getInputStream(), 
                         upload.getFilename(),
-                        upload.getContentType());
+                        upload.getContentType(),
+                        upload.getCharacterEncoding());
             }
         } catch (Throwable e) {
             logger.warn("Cannot save upload", e);

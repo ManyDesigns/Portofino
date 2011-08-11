@@ -93,9 +93,10 @@ public class Struts2WebFramework extends WebFramework {
         File file = files[0];
         String fileName = fileNames[0];
         String contentType = contentTypes[0];
+        String characterEncoding = null;
         try {
             InputStream is = new FileInputStream(file);
-            return new Upload(is, fileName, contentType);
+            return new Upload(is, fileName, contentType, characterEncoding);
         } catch (FileNotFoundException e) {
             logger.warn("Cannot read upload file: {}", file.getAbsolutePath());
             return null;

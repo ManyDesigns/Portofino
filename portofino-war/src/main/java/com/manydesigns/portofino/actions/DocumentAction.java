@@ -183,7 +183,8 @@ public class DocumentAction extends PortletAction {
                 Blob blob = attachmentManager.saveBlob(
                         upload.getInputStream(),
                         upload.getFileName(),
-                        upload.getContentType());
+                        upload.getContentType(),
+                        null);
                 DocumentLogic.createAttachment(documentNode, blob.getCode());
                 downloadAttachmentUrl =
                         String.format("%s?downloadAttachment=&code=%s",
@@ -214,8 +215,10 @@ public class DocumentAction extends PortletAction {
             Blob blob = attachmentManager.loadBlob(code);
             File file = blob.getDataFile();
             InputStream is = new FileInputStream(file);
-            return new StreamingResolution(blob.getContentType(), is)
+            Resolution resolution =
+                    new StreamingResolution(blob.getContentType(), is)
                     .setLength(blob.getSize());
+            return resolution;
         } catch (IOException e) {
             logger.error("Download failed", e);
             return new ErrorResolution(500, "Attachment error");

@@ -44,15 +44,18 @@ public class Upload {
     protected InputStream inputStream;
     protected String filename;
     protected String contentType;
+    protected String characterEncoding;
 
     public Upload() {}
 
     public Upload(InputStream inputStream,
                   String filename,
-                  String contentType) {
+                  String contentType,
+                  String characterEncoding) {
         this.filename = filename;
         this.contentType = contentType;
         this.inputStream = inputStream;
+        this.characterEncoding = characterEncoding;
     }
 
     public InputStream getInputStream() {
@@ -77,5 +80,13 @@ public class Upload {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public String getCharacterEncoding() {
+        return characterEncoding;
+    }
+
+    public void setCharacterEncoding(String characterEncoding) {
+        this.characterEncoding = characterEncoding;
     }
 }

@@ -31,6 +31,7 @@ package com.manydesigns.elements.blobs;
 
 import com.manydesigns.elements.util.RandomUtil;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,23 +80,26 @@ public class BlobManager {
 
     public Blob saveBlob(File sourceFile,
                          String fileName,
-                         String contentType
+                         String contentType,
+                         String characterEncoding
     ) throws IOException {
         InputStream sourceStream = new FileInputStream(sourceFile);
-        return saveBlob(sourceStream, fileName, contentType);
+        return saveBlob(sourceStream, fileName, contentType, characterEncoding);
     }
 
     public Blob saveBlob(byte[] sourceBytes,
                          String fileName,
-                         String contentType
+                         String contentType,
+                         String characterEncoding
     ) throws IOException {
         InputStream sourceStream = new ByteArrayInputStream(sourceBytes);
-        return saveBlob(sourceStream, fileName, contentType);
+        return saveBlob(sourceStream, fileName, contentType, characterEncoding);
     }
 
     public Blob saveBlob(InputStream sourceStream,
                          String fileName,
-                         String contentType
+                         String contentType,
+                         @Nullable String characterEncoding
     ) throws IOException {
         String code = RandomUtil.createRandomCode();
 
@@ -119,8 +123,10 @@ public class BlobManager {
         return blob;
     }
 
-    public Blob updateBlob(String code, byte[] sourceBytes, String characterEncoding)
-            throws IOException {
+    public Blob updateBlob(String code,
+                           byte[] sourceBytes,
+                           String characterEncoding
+    ) throws IOException {
         InputStream sourceStream = new ByteArrayInputStream(sourceBytes);
         return updateBlob(code, sourceStream, characterEncoding);
     }

@@ -88,7 +88,7 @@ public class BlobTest extends AbstractElementsTest {
     public void testBlob1() throws IOException {
         byte[] contentBytes = sampleContent.getBytes();
         Blob blob = manager.saveBlob(
-                contentBytes, sampleFilename, sampleContentType);
+                contentBytes, sampleFilename, sampleContentType, null);
         assertNotNull(blob);
 
         String code = blob.getCode();
