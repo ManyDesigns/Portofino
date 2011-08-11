@@ -42,7 +42,7 @@ import java.io.*;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class BlobsManager {
+public class BlobManager {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -51,7 +51,7 @@ public class BlobsManager {
     //**************************************************************************
 
     public static final Logger logger =
-            LoggerFactory.getLogger(BlobsManager.class);
+            LoggerFactory.getLogger(BlobManager.class);
 
     //**************************************************************************
     // Fields
@@ -65,9 +65,9 @@ public class BlobsManager {
     // Constructors and initialization
     //**************************************************************************
 
-    public BlobsManager(String blobsDir,
-                        String metaFileNamePattern,
-                        String dataFileNamePattern) {
+    public BlobManager(String blobsDir,
+                       String metaFileNamePattern,
+                       String dataFileNamePattern) {
         blobsDirFile = new File(blobsDir);
         this.metaFileNamePattern = metaFileNamePattern;
         this.dataFileNamePattern = dataFileNamePattern;
@@ -114,6 +114,29 @@ public class BlobsManager {
         blob.setFilename(fileName);
         blob.setContentType(contentType);
         blob.setSize(size);
+        blob.saveMetaProperties();
+
+        return blob;
+    }
+
+    public Blob updateBlob(String code, byte[] sourceBytes, String characterEncoding)
+            throws IOException {
+        InputStream sourceStream = new ByteArrayInputStream(sourceBytes);
+        return updateBlob(code, sourceStream, characterEncoding);
+    }
+
+    public Blob updateBlob(String code, InputStream sourceStream, String characterEncoding)
+            throws IOException {
+        Blob blob = loadBlob(code);
+        File dataFile = blob.getDataFile();
+
+        // copy the data
+        long size = IOUtils.copyLarge(
+                sourceStream, new FileOutputStream(dataFile));
+
+        // set and save the metadata
+        blob.setSize(size);
+        blob.setCharacterEncoding(characterEncoding);
         blob.saveMetaProperties();
 
         return blob;

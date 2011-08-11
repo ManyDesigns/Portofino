@@ -32,7 +32,7 @@ package com.manydesigns.elements.fields;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.blobs.Blob;
-import com.manydesigns.elements.blobs.BlobsManager;
+import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.Upload;
 import com.manydesigns.elements.servlet.WebFramework;
@@ -69,7 +69,7 @@ public class FileBlobField extends AbstractField
     protected String operationInputName;
     protected String codeInputName;
 
-    protected final BlobsManager blobsManager;
+    protected final BlobManager blobManager;
     protected Blob blob;
     protected String blobError;
 
@@ -85,14 +85,14 @@ public class FileBlobField extends AbstractField
                          @Nullable String prefix) {
         super(accessor, mode, prefix);
 
-        blobsManager = createBlobsManager();
+        blobManager = createBlobsManager();
 
         innerId = id + INNER_SUFFIX;
         operationInputName = inputName + OPERATION_SUFFIX;
         codeInputName = inputName + CODE_SUFFIX;
     }
 
-    public static BlobsManager createBlobsManager() {
+    public static BlobManager createBlobsManager() {
         Configuration elementsConfiguration =
                 ElementsProperties.getConfiguration();
         String storageDir =
@@ -104,7 +104,7 @@ public class FileBlobField extends AbstractField
         String dataFilenamePattern =
                 elementsConfiguration.getString(
                         ElementsProperties.BLOBS_DATA_FILENAME_PATTERN);
-        return new BlobsManager(
+        return new BlobManager(
                 storageDir, metaFilenamePattern, dataFilenamePattern);
     }
 
@@ -251,7 +251,7 @@ public class FileBlobField extends AbstractField
             if (upload == null) {
                 blob = null;
             } else {
-                blob = blobsManager.saveBlob(
+                blob = blobManager.saveBlob(
                         upload.getInputStream(), 
                         upload.getFilename(),
                         upload.getContentType());
@@ -290,7 +290,7 @@ public class FileBlobField extends AbstractField
             blob = null;
         } else {
             try {
-                blob = blobsManager.loadBlob(code);
+                blob = blobManager.loadBlob(code);
             } catch (IOException e) {
                 blob = null;
                 blobError = "Cannot load blob";

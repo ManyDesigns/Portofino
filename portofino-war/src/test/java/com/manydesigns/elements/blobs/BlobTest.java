@@ -50,7 +50,7 @@ public class BlobTest extends AbstractElementsTest {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    BlobsManager manager;
+    BlobManager manager;
     File blobsDir;
 
     String sampleContent = "This is some content";
@@ -70,7 +70,7 @@ public class BlobTest extends AbstractElementsTest {
         String dataFilenamePattern =
                 elementsConfiguration.getString(
                         ElementsProperties.BLOBS_DATA_FILENAME_PATTERN);
-        manager = new BlobsManager(
+        manager = new BlobManager(
                 storageDir, metaFilenamePattern, dataFilenamePattern);
         blobsDir = manager.getBlobsDirFile();
     }

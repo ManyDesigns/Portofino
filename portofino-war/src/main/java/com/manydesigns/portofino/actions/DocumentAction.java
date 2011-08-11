@@ -29,7 +29,7 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.blobs.Blob;
-import com.manydesigns.elements.blobs.BlobsManager;
+import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
@@ -87,8 +87,9 @@ public class DocumentAction extends PortletAction {
     public ServerInfo serverInfo;
 
     public DocumentNode documentNode;
-    public BlobsManager documentManager;
-    public BlobsManager attachmentManager;
+    public BlobManager documentManager;
+    public BlobManager attachmentManager;
+    public Blob documentBlob;
 
     public static final Logger logger =
             LoggerFactory.getLogger(DocumentAction.class);
@@ -103,9 +104,9 @@ public class DocumentAction extends PortletAction {
         String storageDirectory =
                 portofinoConfiguration.getString(
                         PortofinoProperties.STORAGE_DIRECTORY);
-        documentManager = new BlobsManager(
+        documentManager = new BlobManager(
                 storageDirectory, "document-{0}.properties", "document-{0}.data");
-        attachmentManager = new BlobsManager(
+        attachmentManager = new BlobManager(
                 storageDirectory, "attachment-{0}.properties", "attachment-{0}.data");
     }
 
@@ -136,15 +137,16 @@ public class DocumentAction extends PortletAction {
 
     protected void loadContent() throws IOException {
         String documentCode = documentNode.getFileName();
-        Blob documentBlob = documentManager.loadBlob(documentCode);
+        documentBlob = documentManager.loadBlob(documentCode);
         File file = documentBlob.getDataFile();
-        content = FileUtils.readFileToString(file, CONTENT_ENCODING);
+        String characterEncoding = documentBlob.getCharacterEncoding();
+        content = FileUtils.readFileToString(file, characterEncoding);
     }
 
     protected void saveContent() throws IOException {
-        String fileName = documentNode.getFileName();
-        File file = new File(fileName);
-        FileUtils.writeStringToFile(file, content, CONTENT_ENCODING);
+        String documentCode = documentNode.getFileName();
+        byte[] contentByteArray = content.getBytes(CONTENT_ENCODING);
+        documentManager.updateBlob(documentCode, contentByteArray, CONTENT_ENCODING);
     }
 
     public Resolution configure() throws IOException {
@@ -313,5 +315,13 @@ public class DocumentAction extends PortletAction {
 
     public void setBlobs(List<Blob> blobs) {
         this.blobs = blobs;
+    }
+
+    public Blob getDocumentBlob() {
+        return documentBlob;
+    }
+
+    public void setDocumentBlob(Blob documentBlob) {
+        this.documentBlob = documentBlob;
     }
 }

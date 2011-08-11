@@ -59,7 +59,8 @@ public class Blob {
     public final static String CONTENT_TYPE_PROPERTY = "content.type";
     public final static String SIZE_PROPERTY = "size";
     public final static String CREATE_TIMESTAMP_PROPERTY = "create.timestamp";
-    
+    public final static String CHARACTER_ENCODING_PROPERTY = "character.encoding";
+
     public final static String COMMENT  = "Blob metadata";
 
     
@@ -78,6 +79,7 @@ public class Blob {
     protected String filename;
     protected long size;
     protected DateTime createTimestamp;
+    protected String characterEncoding;
 
     //**************************************************************************
     // Logging
@@ -122,6 +124,7 @@ public class Blob {
         metaProperties.setProperty(SIZE_PROPERTY, Long.toString(size));
         metaProperties.setProperty(CREATE_TIMESTAMP_PROPERTY,
                 formatter.print(createTimestamp));
+        metaProperties.setProperty(CHARACTER_ENCODING_PROPERTY, characterEncoding);
 
         OutputStream metaStream = null;
         try {
@@ -147,6 +150,8 @@ public class Blob {
             size = Long.parseLong(metaProperties.getProperty(SIZE_PROPERTY));
             createTimestamp = formatter.parseDateTime(
                     metaProperties.getProperty(CREATE_TIMESTAMP_PROPERTY));
+            characterEncoding =
+                    metaProperties.getProperty(CHARACTER_ENCODING_PROPERTY);
         } finally {
             IOUtils.closeQuietly(metaStream);
         }
@@ -200,41 +205,55 @@ public class Blob {
         this.contentType = contentType;
     }
 
+    public String getCharacterEncoding() {
+        return characterEncoding;
+    }
+
+    public void setCharacterEncoding(String characterEncoding) {
+        this.characterEncoding = characterEncoding;
+    }
+
     //**************************************************************************
     // Overrides
     //**************************************************************************
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Blob)) return false;
 
         Blob blob = (Blob) o;
 
         if (size != blob.size) return false;
+        if (characterEncoding != null ? !characterEncoding.equals(blob.characterEncoding) : blob.characterEncoding != null)
+            return false;
         if (code != null ? !code.equals(blob.code) : blob.code != null)
             return false;
         if (contentType != null ? !contentType.equals(blob.contentType) : blob.contentType != null)
             return false;
         if (createTimestamp != null ? !createTimestamp.equals(blob.createTimestamp) : blob.createTimestamp != null)
             return false;
-        if (!dataFile.equals(blob.dataFile)) return false;
+        if (dataFile != null ? !dataFile.equals(blob.dataFile) : blob.dataFile != null)
+            return false;
         if (filename != null ? !filename.equals(blob.filename) : blob.filename != null)
             return false;
-        if (!metaFile.equals(blob.metaFile)) return false;
+        if (metaFile != null ? !metaFile.equals(blob.metaFile) : blob.metaFile != null)
+            return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = metaFile.hashCode();
-        result = 31 * result + dataFile.hashCode();
+        int result = metaFile != null ? metaFile.hashCode() : 0;
+        result = 31 * result + (dataFile != null ? dataFile.hashCode() : 0);
         result = 31 * result + (code != null ? code.hashCode() : 0);
         result = 31 * result + (contentType != null ? contentType.hashCode() : 0);
         result = 31 * result + (filename != null ? filename.hashCode() : 0);
         result = 31 * result + (int) (size ^ (size >>> 32));
         result = 31 * result + (createTimestamp != null ? createTimestamp.hashCode() : 0);
+        result = 31 * result + (characterEncoding != null ? characterEncoding.hashCode() : 0);
         return result;
     }
 }

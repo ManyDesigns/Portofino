@@ -33,7 +33,7 @@ import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.annotations.FileBlob;
 import com.manydesigns.elements.blobs.Blob;
-import com.manydesigns.elements.blobs.BlobsManager;
+import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.util.RandomUtil;
@@ -56,7 +56,7 @@ public class FileBlobFieldTest extends AbstractElementsTest {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    BlobsManager manager;
+    BlobManager manager;
 
     String sampleContent = "This is some content";
     String sampleFilename = "sample.txt";

@@ -23,6 +23,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <stripes:textarea class="editor" name="content" value="${actionBean.content}"/>
+        This document is stored here: <c:out value="${actionBean.documentBlob.dataFile.absolutePath}"/>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
