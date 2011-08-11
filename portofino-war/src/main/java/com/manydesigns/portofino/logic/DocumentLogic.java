@@ -27,7 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.logic;
+
+import com.manydesigns.portofino.model.site.Attachment;
+import com.manydesigns.portofino.model.site.DocumentNode;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -35,14 +38,24 @@ package com.manydesigns.portofino.actions;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class RequestAttributes {
+public class DocumentLogic {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public final static String DISPATCH = "dispatch";
-    public final static String STOP_WATCH = "stopWatch";
-    public final static String NAVIGATION = "navigation";
-    public final static String BREADCRUMBS = "breadcrumbs";
-    public static final String MODEL = "model";
-    public static final String SITE_NODE_INSTANCE = "siteNodeInstance";
+    public static Attachment createAttachment(DocumentNode documentNode,
+                                              String attachmentCode) {
+        Attachment attachment = new Attachment(documentNode, attachmentCode);
+        documentNode.getAttachments().add(attachment);
+        return attachment;
+    }
+
+    public static Attachment findAttachmentByCode(
+            DocumentNode documentNode, String code) {
+        for (Attachment current : documentNode.getAttachments()) {
+            if (current.getCode().equals(code)) {
+                return current;
+            }
+        }
+        return null;
+    }
 }

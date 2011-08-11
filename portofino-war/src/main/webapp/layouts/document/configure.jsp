@@ -30,6 +30,8 @@
             $('textarea.editor').ckeditor({
                 toolbar: 'Full',
                 toolbarCanCollapse: false,
+                filebrowserWindowWidth : '640',
+                filebrowserWindowHeight : '480',
                 filebrowserBrowseUrl : '<c:out value="${dispatch.absoluteOriginalPath}"/>?browse=',
                 filebrowserUploadUrl : '<c:out value="${dispatch.absoluteOriginalPath}"/>?uploadAttachment='
             });

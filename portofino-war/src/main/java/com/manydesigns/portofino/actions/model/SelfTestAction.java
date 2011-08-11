@@ -30,11 +30,13 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.annotations.InjectApplication;
-import com.manydesigns.portofino.annotations.InjectModel;
+import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.xml.XmlDiffer;
@@ -64,10 +66,10 @@ public class SelfTestAction extends AbstractActionBean {
     // Injections
     //**************************************************************************
 
-    @InjectApplication
+    @Inject(ApplicationAttributes.APPLICATION)
     public Application application;
 
-    @InjectModel
+    @Inject(RequestAttributes.MODEL)
     public Model model;
 
     //--------------------------------------------------------------------------
@@ -88,7 +90,6 @@ public class SelfTestAction extends AbstractActionBean {
     public boolean showDifferent = true;
 
     public boolean expandTree = true;
-
 
     //--------------------------------------------------------------------------
     // Logging
@@ -114,7 +115,8 @@ public class SelfTestAction extends AbstractActionBean {
         for (ConnectionProvider current : application.getConnectionProviders()) {
             Database sourceDatabase = current.readModel();
             Database targetDatabase =
-                    model.findDatabaseByName(current.getDatabaseName());
+                    DataModelLogic.findDatabaseByName(
+                            model, current.getDatabaseName());
             XmlDiffer.ElementDiffer rootDiffer =
                     xmlDiffer.diff("database", sourceDatabase, targetDatabase);
             treeTableDiffer.run(rootDiffer);

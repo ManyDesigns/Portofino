@@ -41,14 +41,15 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertiesAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.annotations.InjectApplication;
-import com.manydesigns.portofino.annotations.InjectHttpRequest;
-import com.manydesigns.portofino.annotations.InjectModel;
+import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
 import com.manydesigns.portofino.database.Type;
+import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import org.apache.commons.lang.ArrayUtils;
@@ -82,14 +83,11 @@ public class TableDesignAction extends AbstractActionBean {
     // Injections
     //**************************************************************************
 
-    @InjectModel
+    @Inject(RequestAttributes.MODEL)
     public Model model;
 
-    @InjectApplication
+    @Inject(ApplicationAttributes.APPLICATION)
     public Application application;
-
-    @InjectHttpRequest
-    private HttpServletRequest req;
 
     //**************************************************************************
     // STEP del wizard
@@ -206,7 +204,7 @@ public class TableDesignAction extends AbstractActionBean {
 
     public String execute() {
         if (qualifiedTableName == null) {
-            qualifiedTableName = model.getAllTables().get(0).getQualifiedName();
+            qualifiedTableName = DataModelLogic.getAllTables(model).get(0).getQualifiedName();
             return PortofinoAction.REDIRECT_TO_FIRST;
         }
 
@@ -232,7 +230,8 @@ public class TableDesignAction extends AbstractActionBean {
     //**************************************************************************
 
     public Table setupTable() {
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        Table table = DataModelLogic.findTableByQualifiedName(
+                model, qualifiedTableName);
         if (table == null) {
             throw new ModelObjectNotFoundError(qualifiedTableName);
         }
@@ -290,7 +289,7 @@ public class TableDesignAction extends AbstractActionBean {
         readFromRequest();
         Column col = new Column();
         col.setTable(table);
-        columnForm.readFromRequest(req);
+        columnForm.readFromRequest(context.getRequest());
         if(!columnForm.validate()){
             return PortofinoAction.CREATE;
         }      
@@ -607,14 +606,15 @@ public class TableDesignAction extends AbstractActionBean {
             return false;
         }
 
-        tableForm.readFromRequest(req);
+        tableForm.readFromRequest(context.getRequest());
 
         if(!tableForm.validate()){
             return false;
         }
         //Gestione tabella
         Database database = new Database();
-        database.setDatabaseName(model.findDatabaseByName(table_databaseName)
+        database.setDatabaseName(
+                DataModelLogic.findDatabaseByName(model, table_databaseName)
                     .getDatabaseName());
         Schema schema = new Schema();
         schema.setDatabase(database);
@@ -630,6 +630,7 @@ public class TableDesignAction extends AbstractActionBean {
             return false;
         }
 
+        HttpServletRequest req = context.getRequest();
         //Gestione colonne
         columnTableForm = new TableFormBuilder(Column.class)
             .configFields("columnName", "columnType", "nullable",
@@ -762,7 +763,7 @@ public class TableDesignAction extends AbstractActionBean {
 
         for(Type currentType : types){
             if(StringUtils.equalsIgnoreCase(currentType.getTypeName(),
-                    req.getParameter("column_columnType"))){
+                    context.getRequest().getParameter("column_columnType"))){
                 String defJavaType;
                 try{
                     defJavaType= currentType.getDefaultJavaType().getName();
@@ -786,7 +787,7 @@ public class TableDesignAction extends AbstractActionBean {
 
         for(Type currentType : types){
             if(StringUtils.equalsIgnoreCase(currentType.getTypeName(),
-                    req.getParameter("column_columnType"))){
+                    context.getRequest().getParameter("column_columnType"))){
 
                 info.add("\"precision\" : \""+
                         (currentType.isPrecisionRequired()?"true":"false")+"\"");

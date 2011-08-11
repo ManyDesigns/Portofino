@@ -27,7 +27,20 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.interceptors;
+
+import com.manydesigns.portofino.di.Injections;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.controller.ExecutionContext;
+import net.sourceforge.stripes.controller.Interceptor;
+import net.sourceforge.stripes.controller.Intercepts;
+import net.sourceforge.stripes.controller.LifecycleStage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -35,14 +48,25 @@ package com.manydesigns.portofino.actions;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class RequestAttributes {
+@Intercepts(LifecycleStage.CustomValidation)
+public class InjectionInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public final static String DISPATCH = "dispatch";
-    public final static String STOP_WATCH = "stopWatch";
-    public final static String NAVIGATION = "navigation";
-    public final static String BREADCRUMBS = "breadcrumbs";
-    public static final String MODEL = "model";
-    public static final String SITE_NODE_INSTANCE = "siteNodeInstance";
+    public final static Logger logger =
+            LoggerFactory.getLogger(InjectionInterceptor.class);
+
+    public Resolution intercept(ExecutionContext context) throws Exception {
+        logger.debug("Retrieving Stripes objects");
+        Object action = context.getActionBean();
+        ActionBeanContext actionContext = context.getActionBeanContext();
+
+        logger.debug("Retrieving Servlet API objects");
+        HttpServletRequest request = actionContext.getRequest();
+        ServletContext servletContext = actionContext.getServletContext();
+
+        Injections.inject(action, servletContext, request);
+
+        return context.proceed();
+    }
 }

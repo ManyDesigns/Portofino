@@ -31,6 +31,7 @@ package com.manydesigns.portofino.model.site.crud;
 
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
@@ -140,7 +141,7 @@ public class Crud implements ModelObject {
     }
 
     public void init(Model model) {
-        actualTable = model.findTableByQualifiedName(table);
+        actualTable = DataModelLogic.findTableByQualifiedName(model, table);
 
         for (CrudProperty property : properties) {
             property.init(model);

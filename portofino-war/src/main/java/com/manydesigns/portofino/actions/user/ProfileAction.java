@@ -34,15 +34,13 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.annotations.InjectApplication;
-import com.manydesigns.portofino.annotations.InjectHttpRequest;
-import com.manydesigns.portofino.annotations.InjectHttpSession;
-import com.manydesigns.portofino.annotations.InjectPortofinoProperties;
 import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
@@ -53,7 +51,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.BASE64Encoder;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.security.MessageDigest;
 import java.sql.Timestamp;
@@ -78,16 +75,10 @@ public class ProfileAction extends AbstractActionBean {
     // Injections
     //**************************************************************************
 
-    @InjectApplication
+    @Inject(ApplicationAttributes.APPLICATION)
     public Application application;
 
-    @InjectHttpRequest
-    public HttpServletRequest req;
-
-    @InjectHttpSession
-    public HttpSession session;
-
-    @InjectPortofinoProperties
+    @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
 
     public List<Group> groups;
@@ -111,6 +102,7 @@ public class ProfileAction extends AbstractActionBean {
             LoggerFactory.getLogger(ProfileAction.class);
 
     public String execute() {
+        HttpSession session = getSession();
         userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
         return read();
     }
@@ -137,7 +129,7 @@ public class ProfileAction extends AbstractActionBean {
     }
 
     public String edit() {
-        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
+        userId = (Long) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 
@@ -153,7 +145,7 @@ public class ProfileAction extends AbstractActionBean {
     }
 
     public String update() {
-        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
+        userId = (Long) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
         ClassAccessor accessor = application.getTableAccessor(UserUtils.USERTABLE);
@@ -164,7 +156,7 @@ public class ProfileAction extends AbstractActionBean {
                 .configMode(Mode.EDIT)
                 .build();
         form.readFromObject(thisUser);
-        form.readFromRequest(req);
+        form.readFromRequest(context.getRequest());
         
         if(form.validate()){
             form.writeToObject(thisUser);
@@ -179,7 +171,7 @@ public class ProfileAction extends AbstractActionBean {
     }
 
     public String changePwd() {
-        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
+        userId = (Long) getSession().getAttribute(SessionAttributes.USER_ID);
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)
                 .build();
@@ -187,14 +179,14 @@ public class ProfileAction extends AbstractActionBean {
     }
 
     public String updatePwd() {
-        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
+        userId = (Long) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)
                 .build();
-        form.readFromRequest(req);
+        form.readFromRequest(context.getRequest());
 
         if(form.validate()) {
             ChangePasswordFormBean bean = new ChangePasswordFormBean();

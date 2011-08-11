@@ -29,14 +29,12 @@
 package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.annotations.InjectApplication;
-import com.manydesigns.portofino.annotations.InjectHttpRequest;
-import com.manydesigns.portofino.annotations.InjectHttpSession;
-import com.manydesigns.portofino.annotations.InjectPortofinoProperties;
 import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import net.sourceforge.stripes.action.*;
@@ -45,7 +43,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
@@ -66,16 +63,10 @@ public class LoginAction extends AbstractActionBean {
     // Injections
     //**************************************************************************
 
-    @InjectApplication
+    @Inject(ApplicationAttributes.APPLICATION)
     public Application application;
 
-    @InjectHttpRequest
-    public HttpServletRequest request;
-
-    @InjectHttpSession
-    public HttpSession session;
-
-    @InjectPortofinoProperties
+    @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
 
     //**************************************************************************
@@ -102,6 +93,7 @@ public class LoginAction extends AbstractActionBean {
 
     @DefaultHandler
     public Resolution execute () {
+        HttpSession session = getSession();
         if (session != null && session.getAttribute(SessionAttributes.USER_ID) != null) {
             return new ForwardResolution("/layouts/user/alreadyLoggedIn.jsp");
         }
@@ -139,7 +131,7 @@ public class LoginAction extends AbstractActionBean {
         }
 
         logger.info("User {} login", user.getUserName());
-        session = request.getSession(true);
+        HttpSession session = context.getRequest().getSession(true);
         session.setAttribute(SessionAttributes.USER_ID, user.getUserId());
         session.setAttribute(SessionAttributes.USER_NAME, user.getUserName());
         updateUser(user);
@@ -170,8 +162,11 @@ public class LoginAction extends AbstractActionBean {
         application.commit("portofino");
     }
 
-    public Resolution logout(){
-        session.invalidate();
+    public Resolution logout() {
+        HttpSession session = getSession();
+        if (session != null) {
+            session.invalidate();
+        }
         SessionMessages.addInfoMessage("User disconnetected");
 
         return new RedirectResolution("/");

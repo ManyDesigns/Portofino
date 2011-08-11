@@ -32,10 +32,8 @@ package com.manydesigns.portofino.interceptors;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
-import com.manydesigns.portofino.annotations.*;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.context.Application;
-import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.Model;
@@ -50,7 +48,6 @@ import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -60,7 +57,6 @@ import org.slf4j.MDC;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -91,34 +87,20 @@ public class PortofinoInterceptor implements Interceptor {
 
     public Resolution intercept(ExecutionContext context) throws Exception {
         logger.debug("Retrieving Stripes objects");
-        Object action = context.getActionBean();
         ActionBeanContext actionContext = context.getActionBeanContext();
 
-        logger.debug("Retrieving and injecting Servlet API objects");
+        logger.debug("Retrieving Servlet API objects");
         HttpServletRequest request = actionContext.getRequest();
-        HttpServletResponse response = actionContext.getResponse();
         ServletContext servletContext = actionContext.getServletContext();
         HttpSession session = request.getSession(false);
-        injectAnnotatedFields(action, InjectHttpRequest.class, request);
-        injectAnnotatedFields(action, InjectHttpResponse.class, response);
-        injectAnnotatedFields(action, InjectHttpSession.class, session);
 
-        logger.debug("Retrieving and injecting Portofino long-lived objects");
+        logger.debug("Retrieving Portofino long-lived objects");
         Application application =
                 (Application)servletContext.getAttribute(
                         ApplicationAttributes.APPLICATION);
         Model model = application.getModel();
-        ServerInfo serverInfo =
-                (ServerInfo) servletContext.getAttribute(
-                        ApplicationAttributes.SERVER_INFO);
-        Configuration portofinoConfiguration =
-                application.getPortofinoProperties();
-        injectAnnotatedFields(action, InjectApplication.class, application);
-        injectAnnotatedFields(action, InjectModel.class, model);
-        injectAnnotatedFields(action, InjectServerInfo.class, serverInfo);
-        injectAnnotatedFields(action, InjectPortofinoProperties.class,
-                portofinoConfiguration);
-
+        request.setAttribute(RequestAttributes.MODEL, model);
+        
         logger.debug("Starting page response timer");
         StopWatch stopWatch = new StopWatch();
         // Non è necessario stopparlo
@@ -160,15 +142,11 @@ public class PortofinoInterceptor implements Interceptor {
             }
             SiteNodeInstance siteNodeInstance =
                     siteNodeInstances[siteNodeInstances.length-1];
+            request.setAttribute(RequestAttributes.SITE_NODE_INSTANCE, siteNodeInstance);
 
             logger.debug("Creating breadcrumbs");
             Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
             request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
-
-            injectAnnotatedFields(action, InjectDispatch.class, dispatch);
-            injectAnnotatedFields(action, InjectSiteNodeInstance.class,
-                    siteNodeInstance);
-            injectAnnotatedFields(action, InjectNavigation.class, navigation);
 
             SiteNode node = siteNodeInstance.getSiteNode();
             //3. Ho i permessi necessari vado alla pagina
@@ -201,53 +179,4 @@ public class PortofinoInterceptor implements Interceptor {
             return context.proceed();
         }
     }
-
-    public void injectAnnotatedFields(Object object,
-                                       Class<? extends Annotation> annotation,
-                                       Object value) {
-        Class clazz = object.getClass();
-        Field[] annotatedFields = findAnnotatedFields(clazz, annotation);
-        for (Field field : annotatedFields) {
-            try {
-                field.set(object, value);
-            } catch (IllegalAccessException e) {
-                String msg = String.format(
-                        "Cannot inject object %s, field %s, annotation %s with value %s",
-                        ObjectUtils.toString(object),
-                        field.getName(),
-                        annotation,
-                        ObjectUtils.toString(value));
-                logger.warn(msg, e);
-            }
-        }
-    }
-
-    public Field[] findAnnotatedFields(Class clazz,
-                                       Class<? extends Annotation> annotation) {
-        Map<Class<? extends Annotation>, Field[]> annotationMap =
-                annotationCache.get(clazz);
-        if (annotationMap == null) {
-            annotationMap = new ConcurrentHashMap<Class<? extends Annotation>, Field[]>();
-            annotationCache.put(clazz, annotationMap);
-        }
-
-        Field[] result = annotationMap.get(annotation);
-
-        if (result != null) {
-            return result;
-        }
-
-        List<Field> foundFields = new ArrayList<Field>();
-        for (Field field : clazz.getFields()) {
-            if (field.isAnnotationPresent(annotation)) {
-                field.setAccessible(true);
-                foundFields.add(field);
-            }
-        }
-        result = new Field[foundFields.size()];
-        foundFields.toArray(result);
-        return result;
-    }
-
-
 }

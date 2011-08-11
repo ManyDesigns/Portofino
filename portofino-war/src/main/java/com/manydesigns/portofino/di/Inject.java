@@ -27,7 +27,12 @@
  *
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.di;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -35,14 +40,11 @@ package com.manydesigns.portofino.actions;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class RequestAttributes {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD})
+public @interface Inject {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public final static String DISPATCH = "dispatch";
-    public final static String STOP_WATCH = "stopWatch";
-    public final static String NAVIGATION = "navigation";
-    public final static String BREADCRUMBS = "breadcrumbs";
-    public static final String MODEL = "model";
-    public static final String SITE_NODE_INSTANCE = "siteNodeInstance";
+    String value();
 }

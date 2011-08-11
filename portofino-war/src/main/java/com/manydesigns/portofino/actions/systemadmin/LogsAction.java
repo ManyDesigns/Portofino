@@ -29,9 +29,10 @@
 
 package com.manydesigns.portofino.actions.systemadmin;
 
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.annotations.InjectServerInfo;
 import com.manydesigns.portofino.context.ServerInfo;
+import com.manydesigns.portofino.di.Inject;
 
 import java.util.*;
 import java.util.logging.Handler;
@@ -70,7 +71,7 @@ public class LogsAction extends AbstractActionBean {
         return "SUCCESS";
     }
 
-    @InjectServerInfo
+    @Inject(ApplicationAttributes.SERVER_INFO)
     public ServerInfo serverInfo;
 
     public class LoggerComparator implements Comparator<Logger> {

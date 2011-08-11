@@ -29,6 +29,7 @@
 package com.manydesigns.portofino.context;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
+import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.Model;
 
@@ -55,7 +56,7 @@ public class VirtualRelationshipsTest  extends AbstractPortofinoTest {
 
     public void testModel(){
         Model model = application.getModel();
-        List<ForeignKey> list = model.getAllForeignKeys();
+        List<ForeignKey> list = DataModelLogic.getAllForeignKeys(model);
         boolean test = false;
 
         for(ForeignKey fk : list){

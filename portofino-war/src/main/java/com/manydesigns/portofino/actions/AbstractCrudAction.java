@@ -33,7 +33,6 @@ import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobsManager;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
-import com.manydesigns.portofino.annotations.InjectHttpRequest;
 import jxl.Workbook;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
@@ -42,7 +41,6 @@ import org.apache.fop.apps.FOPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.TransformerException;
 import java.io.*;
 
@@ -65,9 +63,6 @@ public abstract class  AbstractCrudAction {
     //**************************************************************************
     // Injections
     //**************************************************************************
-
-    @InjectHttpRequest
-    public HttpServletRequest req;
 
     //**************************************************************************
     // ModelDriven implementation

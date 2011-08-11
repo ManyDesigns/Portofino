@@ -31,9 +31,7 @@ package com.manydesigns.portofino.model.site;
 import com.manydesigns.portofino.model.Model;
 
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,6 +86,9 @@ public class DocumentNode extends SiteNode {
         this.fileName = fileName;
     }
 
+    @XmlElementWrapper(name="attachments")
+    @XmlElement(name = "attachment",
+            type = com.manydesigns.portofino.model.site.Attachment.class)
     public List<Attachment> getAttachments() {
         return attachments;
     }

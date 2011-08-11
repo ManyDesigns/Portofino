@@ -29,6 +29,7 @@
 package com.manydesigns.portofino.context;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
+import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.User;
@@ -105,8 +106,8 @@ public class HibernateTest extends AbstractPortofinoTest {
         List<Object> resultProd =
                 application.getAllObjects("jpetstore.PUBLIC.product");
 
-        Table table = application.getModel()
-                .findTableByQualifiedName("jpetstore.PUBLIC.category");
+        Table table = DataModelLogic.findTableByQualifiedName(
+                application.getModel(), "jpetstore.PUBLIC.category");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         HashMap<String, String> category= findCategory(tableAccessor, criteria);
@@ -135,8 +136,8 @@ public class HibernateTest extends AbstractPortofinoTest {
     }
 
     public void testSearchAndUpdateCategorie() {
-        Table table = application.getModel()
-                .findTableByQualifiedName("jpetstore.PUBLIC.category");
+        Table table = DataModelLogic.findTableByQualifiedName(
+                application.getModel(), "jpetstore.PUBLIC.category");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
 

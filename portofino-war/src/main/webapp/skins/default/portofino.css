@@ -467,3 +467,7 @@ table.mde-form-table th {
     border: 0 none;
     text-align: right;
 }
+
+.attachments {
+    border-top: 1px solid #666;
+}

@@ -35,8 +35,9 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.CommonsConfigurationAccessor;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.annotations.InjectPortofinoProperties;
+import com.manydesigns.portofino.di.Inject;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.SystemConfiguration;
 
@@ -50,7 +51,7 @@ public class ConfigurationsAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    @InjectPortofinoProperties
+    @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
 
     public Form form;

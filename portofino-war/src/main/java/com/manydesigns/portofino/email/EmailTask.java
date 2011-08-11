@@ -30,6 +30,8 @@ package com.manydesigns.portofino.email;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.logic.DataModelLogic;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.TableCriteria;
@@ -71,7 +73,6 @@ public class EmailTask extends TimerTask {
             LoggerFactory.getLogger(TimerTask.class);
     protected final Application application;
     private static final String USERTABLE = UserUtils.USERTABLE;
-
 
     public EmailTask(Application application) {
         this.application = application;
@@ -124,8 +125,9 @@ public class EmailTask extends TimerTask {
         try {
             ClassAccessor accessor = application.getTableAccessor(
                     EmailUtils.EMAILQUEUE_TABLE);
-            Table table = application.getModel()
-                    .findTableByQualifiedName(EmailUtils.EMAILQUEUE_TABLE);
+            Model model = application.getModel();
+            Table table = DataModelLogic.findTableByQualifiedName(
+                    model, EmailUtils.EMAILQUEUE_TABLE);
             TableCriteria criteria = new TableCriteria(table);
             criteria.eq(accessor.getProperty("state"), EmailUtils.TOBESENT);
             List<Object> emails = application.getObjects(
@@ -161,8 +163,9 @@ public class EmailTask extends TimerTask {
 
     private void incrementBounce(String email) {
         try {
-            Table table = application.getModel()
-                    .findTableByQualifiedName(EmailUtils.EMAILQUEUE_TABLE);
+            Model model = application.getModel();
+            Table table = DataModelLogic.findTableByQualifiedName(
+                    model, EmailUtils.EMAILQUEUE_TABLE);
             TableCriteria criteria = new TableCriteria(table);
 
             ClassAccessor accessor = application.getTableAccessor(USERTABLE);

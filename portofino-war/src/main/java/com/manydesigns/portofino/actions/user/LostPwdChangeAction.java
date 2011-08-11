@@ -33,15 +33,14 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.annotations.InjectApplication;
-import com.manydesigns.portofino.annotations.InjectHttpRequest;
 import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.system.model.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -59,11 +58,8 @@ public class LostPwdChangeAction extends AbstractActionBean implements LoginUnAw
     // Injections
     //**************************************************************************
 
-    @InjectApplication
+    @Inject(ApplicationAttributes.APPLICATION)
     public Application application;
-
-    @InjectHttpRequest
-    public HttpServletRequest req;
 
     public Form form;
     public String token;
@@ -85,7 +81,7 @@ public class LostPwdChangeAction extends AbstractActionBean implements LoginUnAw
             form =  new FormBuilder(LostPwdChangeFormBean.class)
                     .configMode(Mode.EDIT)
                     .build();
-            form.readFromRequest(req);
+            form.readFromRequest(context.getRequest());
             form.writeToObject(pwd);
 
             if(form.validate()){

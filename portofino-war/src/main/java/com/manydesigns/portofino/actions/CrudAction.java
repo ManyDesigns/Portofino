@@ -47,6 +47,7 @@ import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
+import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
@@ -1237,7 +1238,7 @@ public class CrudAction extends PortletAction {
 
         SelectionProvider tableSelectionProvider =
                 DefaultSelectionProvider.create("table",
-                        model.getAllTables(),
+                        DataModelLogic.getAllTables(model),
                         Table.class,
                         null,
                         "qualifiedName");

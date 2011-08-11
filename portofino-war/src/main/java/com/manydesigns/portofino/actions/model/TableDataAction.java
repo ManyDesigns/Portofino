@@ -35,14 +35,12 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
-import com.manydesigns.portofino.actions.AbstractCrudAction;
-import com.manydesigns.portofino.actions.CrudSelectionProvider;
-import com.manydesigns.portofino.actions.CrudUnit;
-import com.manydesigns.portofino.actions.PortofinoAction;
-import com.manydesigns.portofino.annotations.InjectApplication;
-import com.manydesigns.portofino.annotations.InjectModel;
+import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.actions.*;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
+import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
@@ -66,10 +64,10 @@ public class TableDataAction extends AbstractCrudAction {
     // Injections
     //**************************************************************************
 
-    @InjectModel
+    @Inject(RequestAttributes.MODEL)
     public Model model;
 
-    @InjectApplication
+    @Inject(ApplicationAttributes.APPLICATION)
     public Application application;
 
     //**************************************************************************
@@ -80,7 +78,9 @@ public class TableDataAction extends AbstractCrudAction {
         if (qualifiedName == null) {
             return;
         }
-        Table table = model.findTableByQualifiedName(qualifiedName);
+        Table table =
+                DataModelLogic.findTableByQualifiedName(
+                        model, qualifiedName);
         if (table == null) {
             throw new ModelObjectNotFoundError(qualifiedName);
         }
@@ -131,7 +131,6 @@ public class TableDataAction extends AbstractCrudAction {
     protected void injectValues(CrudUnit crudUnit) {
         crudUnit.application = application;
         crudUnit.model = model;
-        crudUnit.req = req;
     }
 
     protected CrudSelectionProvider createCrudSelectionProvider(ForeignKey foreignKey) {
@@ -212,7 +211,7 @@ public class TableDataAction extends AbstractCrudAction {
 
     @Override
     public String redirectToFirst() {
-        List<Table> tables = model.getAllTables();
+        List<Table> tables = DataModelLogic.getAllTables(model);
         if (tables.isEmpty()) {
             return PortofinoAction.NO_CLASSES;
         } else {

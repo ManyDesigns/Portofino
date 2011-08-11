@@ -32,9 +32,10 @@ package com.manydesigns.portofino.actions.systemadmin;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.annotations.InjectServerInfo;
 import com.manydesigns.portofino.context.ServerInfo;
+import com.manydesigns.portofino.di.Inject;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -63,7 +64,7 @@ public class ServerInfoAction extends AbstractActionBean {
         return "SUCCESS";
     }
 
-    @InjectServerInfo
+    @Inject(ApplicationAttributes.SERVER_INFO)
     public ServerInfo serverInfo;
 
     public Form form;

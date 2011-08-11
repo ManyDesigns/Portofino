@@ -29,9 +29,10 @@
 
 package com.manydesigns.portofino.actions.model;
 
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.annotations.InjectApplication;
 import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.di.Inject;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -56,7 +57,7 @@ public class DDLWriterAction extends AbstractActionBean {
     // Injections
     //**************************************************************************
 
-    @InjectApplication
+    @Inject(ApplicationAttributes.APPLICATION)
     public Application application;
 
     @DefaultHandler

@@ -1,8 +1,9 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.portofino.annotations.*;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
@@ -31,16 +32,16 @@ public class PortletAction extends AbstractActionBean {
     // Properties
     //--------------------------------------------------------------------------
 
-    @InjectDispatch
+    @Inject(RequestAttributes.DISPATCH)
     public Dispatch dispatch;
 
-    @InjectSiteNodeInstance
+    @Inject(RequestAttributes.SITE_NODE_INSTANCE)
     public SiteNodeInstance siteNodeInstance;
 
-    @InjectApplication
+    @Inject(ApplicationAttributes.APPLICATION)
     public Application application;
 
-    @InjectModel
+    @Inject(RequestAttributes.MODEL)
     public Model model;
 
     //--------------------------------------------------------------------------
@@ -49,6 +50,7 @@ public class PortletAction extends AbstractActionBean {
 
     public final MultiMap portlets = new MultiHashMap();
     public String returnToParentTarget;
+
 
     //--------------------------------------------------------------------------
     // Navigation

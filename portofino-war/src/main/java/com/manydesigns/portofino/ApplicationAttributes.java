@@ -40,8 +40,8 @@ public class ApplicationAttributes {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public final static String APPLICATION = "context";
-    public final static String ELEMENTS_PROPERTIES = "elementsConfiguration";
-    public final static String PORTOFINO_PROPERTIES = "portofinoConfiguration";
+    public final static String ELEMENTS_CONFIGURATION = "elementsConfiguration";
+    public final static String PORTOFINO_CONFIGURATION = "portofinoConfiguration";
     public final static String DISPATCHER = "dispatcher";
     public final static String SERVER_INFO = "serverInfo";
 

@@ -29,6 +29,8 @@
 package com.manydesigns.portofino.context;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
+import com.manydesigns.portofino.logic.DataModelLogic;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
@@ -49,9 +51,12 @@ import java.util.Map;
 public class KeyGeneratorsTest extends AbstractPortofinoTest {
     private static final String PORTOFINO_PUBLIC_USER = "portofino.PUBLIC.users";
 
+    Model model;
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        model = application.getModel();
     }
 
     public void tearDown() {
@@ -67,8 +72,8 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         supplier.put("name", "Giampiero");
         application.saveObject(supplierTable,supplier);
         application.commit("jpetstore");
-        Table table = application.getModel()
-                .findTableByQualifiedName(supplierTable);
+        Table table = DataModelLogic.findTableByQualifiedName(
+                model, supplierTable);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         final int expectedId = 3;
@@ -92,8 +97,8 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         supplier.put("$type$", testEntity);
         application.saveObject(testTable,supplier);
         application.commit("hibernatetest");
-        Table table = application.getModel()
-                .findTableByQualifiedName(testTable);
+        Table table = DataModelLogic.findTableByQualifiedName(
+                model, testTable);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         final long expectedId = 1;
@@ -139,8 +144,8 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         order.put("locale", "99");
         application.saveObject(ordersTable,order);
         application.commit("jpetstore");
-        Table table = application.getModel()
-                .findTableByQualifiedName(ordersTable);
+        Table table = DataModelLogic.findTableByQualifiedName(
+                model, ordersTable);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         try {
@@ -164,8 +169,8 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         myGroup.setDescription("this is a description");
         application.saveObject("portofino.public.groups", myGroup);
         application.commit("portofino");
-        Table table = application.getModel()
-                .findTableByQualifiedName("portofino.public.groups");
+        Table table = DataModelLogic.findTableByQualifiedName(
+                model, "portofino.public.groups");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         final long expectedId = 3L;

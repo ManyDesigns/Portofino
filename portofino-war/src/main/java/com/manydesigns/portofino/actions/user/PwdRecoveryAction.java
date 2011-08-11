@@ -29,12 +29,11 @@
 package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.annotations.InjectApplication;
-import com.manydesigns.portofino.annotations.InjectHttpRequest;
-import com.manydesigns.portofino.annotations.InjectPortofinoProperties;
 import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.email.EmailUtils;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.User;
@@ -59,13 +58,10 @@ public class PwdRecoveryAction extends AbstractActionBean implements LoginUnAwar
     // Injections
     //**************************************************************************
 
-    @InjectApplication
+    @Inject(ApplicationAttributes.APPLICATION)
     public Application application;
 
-    @InjectHttpRequest
-    HttpServletRequest req;
-
-    @InjectPortofinoProperties
+    @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
 
     public static final Logger logger =
@@ -98,6 +94,7 @@ public class PwdRecoveryAction extends AbstractActionBean implements LoginUnAwar
             return INPUT;
         }
 
+        HttpServletRequest req = context.getRequest();
         String port = (req.getServerPort()!=0)?":"+req.getServerPort():"";
 
 

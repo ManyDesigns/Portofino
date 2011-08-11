@@ -10,7 +10,7 @@
     window.parent.CKEDITOR.tools.callFunction(
             <c:out value="${actionBean.CKEditorFuncNum}"/>,
             '<c:out value="${actionBean.downloadAttachmentUrl}" escapeXml="false"/>',
-            'File uploaded successfully.'
+            '<c:out value="${actionBean.message}"/>'
     );
 </script>
 </body>

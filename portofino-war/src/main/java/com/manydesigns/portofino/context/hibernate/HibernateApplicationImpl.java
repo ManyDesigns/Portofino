@@ -43,6 +43,7 @@ import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.site.SiteNode;
@@ -287,7 +288,8 @@ public class HibernateApplicationImpl implements Application {
             Database sourceDatabase = current.readModel();
 
             Database targetDatabase =
-                    model.findDatabaseByName(current.getDatabaseName());
+                    DataModelLogic.findDatabaseByName(
+                            model, current.getDatabaseName());
 
             DatabaseDiff diff =
                     DiffUtil.diff(sourceDatabase, targetDatabase);
@@ -355,7 +357,8 @@ public class HibernateApplicationImpl implements Application {
         Session session = getSession(qualifiedTableName);
 
         org.hibernate.Criteria hibernateCriteria;
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        Table table = DataModelLogic.findTableByQualifiedName(
+                model, qualifiedTableName);
         String actualEntityName = table.getActualEntityName();
 
         hibernateCriteria = session.createCriteria(actualEntityName);
@@ -365,7 +368,8 @@ public class HibernateApplicationImpl implements Application {
     }
 
     protected Session getSession(String qualifiedTableName) {
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        Table table = DataModelLogic.findTableByQualifiedName(
+                model, qualifiedTableName);
         String databaseName = table.getDatabaseName();
         return setups.get(databaseName).getThreadSession();
     }
@@ -647,7 +651,8 @@ public class HibernateApplicationImpl implements Application {
         Session session = getSession(qualifiedTableName);
         session.beginTransaction();
 
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        Table table = DataModelLogic.findTableByQualifiedName(
+                model, qualifiedTableName);
         String actualEntityName = table.getActualEntityName();
 
         try {
@@ -663,7 +668,8 @@ public class HibernateApplicationImpl implements Application {
     public void updateObject(String qualifiedTableName, Object obj) {
         Session session = getSession(qualifiedTableName);
         session.beginTransaction();
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        Table table = DataModelLogic.findTableByQualifiedName(
+                model, qualifiedTableName);
         String actualEntityName = table.getActualEntityName();
 
         try {
@@ -678,7 +684,8 @@ public class HibernateApplicationImpl implements Application {
     public void deleteObject(String qualifiedTableName, Object obj) {
         Session session = getSession(qualifiedTableName);
         session.beginTransaction();
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        Table table = DataModelLogic.findTableByQualifiedName(
+                model, qualifiedTableName);
         String actualEntityName = table.getActualEntityName();
         try {
             Object obj2 = getObjectByPk(qualifiedTableName, (Serializable) obj);
@@ -773,7 +780,7 @@ public class HibernateApplicationImpl implements Application {
                                           Object obj,
                                           String oneToManyRelationshipName) {
         ForeignKey relationship =
-                model.findOneToManyRelationship(
+                DataModelLogic.findOneToManyRelationship(model,
                         qualifiedTableName, oneToManyRelationshipName);
         //Table toTable = relationship.getActualToTable();
         Table fromTable = relationship.getFromTable();
@@ -861,7 +868,8 @@ public class HibernateApplicationImpl implements Application {
     }
 
     public TableAccessor getTableAccessor(String qualifiedTableName) {
-        Table table = model.findTableByQualifiedName(qualifiedTableName);
+        Table table = DataModelLogic.findTableByQualifiedName(
+                model, qualifiedTableName);
         return new TableAccessor(table);
     }
 

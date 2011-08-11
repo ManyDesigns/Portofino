@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
+import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
@@ -150,9 +151,10 @@ public class ForeignKey implements ModelObject {
         // wire up ForeignKey.toTable
         String qualifiedToTableName =
                 Table.composeQualifiedName(toDatabase, toSchema, toTable);
-        actualToTable = model.findTableByQualifiedName(qualifiedToTableName);
+        actualToTable = DataModelLogic.findTableByQualifiedName(
+                model, qualifiedToTableName);
         if (actualToTable == null) {
-            logger.warn("Cannor wire '{}' to table '{}'",
+            logger.warn("Cannot wire '{}' to table '{}'",
                     this, qualifiedToTableName);
         } else {
             // wire up Table.oneToManyRelationships

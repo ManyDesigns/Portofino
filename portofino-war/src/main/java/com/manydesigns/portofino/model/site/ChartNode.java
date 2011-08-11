@@ -32,6 +32,7 @@ package com.manydesigns.portofino.model.site;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Database;
 
@@ -96,7 +97,7 @@ public class ChartNode extends SiteNode {
         assert query != null;
         assert urlExpression != null;
 
-        actualDatabase = model.findDatabaseByName(database);
+        actualDatabase = DataModelLogic.findDatabaseByName(model, database);
     }
 
 

@@ -29,8 +29,6 @@
 
 package com.manydesigns.portofino.actions;
 
-import com.manydesigns.portofino.annotations.InjectDispatch;
-import com.manydesigns.portofino.annotations.InjectSiteNodeInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
 import com.manydesigns.portofino.model.site.FolderNode;
@@ -52,15 +50,12 @@ public class FolderAction extends AbstractActionBean {
     // Injections
     //**************************************************************************
 
-    @InjectSiteNodeInstance
-    public SiteNodeInstance siteNodeInstance;
-
-    @InjectDispatch
     public Dispatch dispatch;
 
     public String redirectUrl;
 
     public String execute() {
+        SiteNodeInstance siteNodeInstance = dispatch.getLastSiteNodeInstance();
         FolderNode navigationNode = (FolderNode) siteNodeInstance.getSiteNode();
         List<SiteNode> childNodes = navigationNode.getChildNodes();
         if (childNodes.isEmpty()) {

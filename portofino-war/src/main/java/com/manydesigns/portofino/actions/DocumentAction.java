@@ -31,8 +31,10 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobsManager;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.annotations.InjectServerInfo;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.context.ServerInfo;
+import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.logic.DocumentLogic;
 import com.manydesigns.portofino.model.site.Attachment;
 import com.manydesigns.portofino.model.site.DocumentNode;
 import net.sourceforge.stripes.action.*;
@@ -41,7 +43,12 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -57,6 +64,7 @@ public class DocumentAction extends PortletAction {
 
     public String title;
     public String content;
+    public List<Blob> blobs;
 
     //**************************************************************************
     // File upload with CKEditor
@@ -74,7 +82,7 @@ public class DocumentAction extends PortletAction {
     // Injections
     //**************************************************************************
 
-    @InjectServerInfo
+    @Inject(ApplicationAttributes.SERVER_INFO)
     public ServerInfo serverInfo;
 
     public DocumentNode documentNode;
@@ -99,7 +107,17 @@ public class DocumentAction extends PortletAction {
     @DefaultHandler
     public Resolution execute() throws IOException {
         loadContent();
+        setupBlobs();
         return forwardToPortletPage("/layouts/document/read.jsp");
+    }
+
+    public void setupBlobs() throws IOException {
+        BlobsManager blobsManager = BlobsManager.getManager();
+        blobs = new ArrayList<Blob>();
+        for (Attachment attachment : documentNode.getAttachments()) {
+            Blob blob = blobsManager.loadBlob(attachment.getCode());
+            blobs.add(blob);
+        }
     }
 
     protected void loadContent() throws IOException {
@@ -150,14 +168,12 @@ public class DocumentAction extends PortletAction {
                         upload.getInputStream(),
                         upload.getFileName(),
                         upload.getContentType());
+                DocumentLogic.createAttachment(documentNode, blob.getCode());
                 downloadAttachmentUrl =
                         String.format("%s?downloadAttachment=&code=%s",
                                 dispatch.getAbsoluteOriginalPath(),
                                 blob.getCode());
-                message = "File uploaded successfully.";
-                Attachment attachment =
-                        new Attachment(documentNode, blob.getCode());
-                documentNode.getAttachments().add(attachment);
+                message = null;
                 saveModel();
             } catch (IOException e) {
                 downloadAttachmentUrl = null;
@@ -171,16 +187,13 @@ public class DocumentAction extends PortletAction {
 
     public Resolution downloadAttachment() {
         // find the attachment
-        Attachment attachment = null;
-        for (Attachment current : documentNode.getAttachments()) {
-            if (current.getCode().equals(code)) {
-                attachment = current;
-                break;
-            }
-        }
+        Attachment attachment =
+                DocumentLogic.findAttachmentByCode(documentNode, code);
+
         if (attachment == null) {
             return new ErrorResolution(404, "Attachment not found");
         }
+
         BlobsManager blobsManager = BlobsManager.getManager();
         try {
             Blob blob = blobsManager.loadBlob(code);
@@ -194,9 +207,10 @@ public class DocumentAction extends PortletAction {
         }
     }
 
-    public Resolution browse() {
+    public Resolution browse() throws IOException {
         logger.info("Browse");
-        return null;
+        setupBlobs();
+        return new ForwardResolution("/layouts/document/browse.jsp");
     }
 
     //**************************************************************************
@@ -278,5 +292,13 @@ public class DocumentAction extends PortletAction {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public List<Blob> getBlobs() {
+        return blobs;
+    }
+
+    public void setBlobs(List<Blob> blobs) {
+        this.blobs = blobs;
     }
 }

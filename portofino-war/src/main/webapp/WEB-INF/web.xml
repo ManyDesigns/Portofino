@@ -52,6 +52,7 @@
         <init-param>
             <param-name>Interceptor.Classes</param-name>
             <param-value>com.manydesigns.portofino.interceptors.PortofinoInterceptor,
+                com.manydesigns.portofino.interceptors.InjectionInterceptor,
                 com.manydesigns.portofino.interceptors.CleanUpInterceptor</param-value>
         </init-param>
  	</filter>

@@ -117,13 +117,13 @@ public class PortofinoListener
 
         elementsConfiguration = ElementsProperties.getConfiguration();
         servletContext.setAttribute(
-                ApplicationAttributes.ELEMENTS_PROPERTIES, elementsConfiguration);
+                ApplicationAttributes.ELEMENTS_CONFIGURATION, elementsConfiguration);
 
         portofinoConfiguration = new CompositeConfiguration();
         addConfiguration(PortofinoProperties.CUSTOM_PROPERTIES_RESOURCE);
         addConfiguration(PortofinoProperties.PROPERTIES_RESOURCE);
         servletContext.setAttribute(
-                ApplicationAttributes.PORTOFINO_PROPERTIES, portofinoConfiguration);
+                ApplicationAttributes.PORTOFINO_CONFIGURATION, portofinoConfiguration);
 
         serverInfo = new ServerInfo(servletContext);
         servletContext.setAttribute(ApplicationAttributes.SERVER_INFO, serverInfo);
