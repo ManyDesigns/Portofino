@@ -27,10 +27,15 @@ $(function() {
             },
             text: false
         });
-
     $("input:submit.refresh, button.refresh").button({
             icons: {
                 primary: "ui-icon-refresh"
+            },
+            text: false
+        });
+    $("input:submit.link, button.link").button({
+            icons: {
+                primary: "ui-icon-link"
             },
             text: false
         });

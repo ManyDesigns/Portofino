@@ -8,6 +8,9 @@
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.crud.readTitle}"/>
     </stripes:layout-component>
+    <stripes:layout-component name="portletHeaderButtons">
+        <button name="configure" class="wrench">Configure</button>
+    </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>
         <input type="hidden" name="pk" value="<c:out value="${actionBean.pk}"/>"/>

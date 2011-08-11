@@ -8,6 +8,9 @@
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.chartNode.name}"/>
     </stripes:layout-component>
+    <stripes:layout-component name="portletHeaderButtons">
+        <button name="configure" class="wrench">Configure</button>
+    </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="jfreeChartInstance"/>
     </stripes:layout-component>

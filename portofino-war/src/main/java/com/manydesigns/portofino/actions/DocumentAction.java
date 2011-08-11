@@ -231,6 +231,12 @@ public class DocumentAction extends PortletAction {
         return new ForwardResolution("/layouts/document/browse.jsp");
     }
 
+    public Resolution manageAttachments() {
+        logger.info("Manage attachments");
+        setupBlobs();
+        return new ForwardResolution("/layouts/document/manage-attachments.jsp");
+    }
+
     //**************************************************************************
     // Getters/setters
     //**************************************************************************

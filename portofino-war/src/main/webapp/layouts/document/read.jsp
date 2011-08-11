@@ -8,6 +8,10 @@
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.documentNode.title}"/>
     </stripes:layout-component>
+    <stripes:layout-component name="portletHeaderButtons">
+        <button name="configure" class="wrench">Configure</button>
+        <button name="manageAttachments" class="link">Manage attachments</button>
+    </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:out value="${actionBean.content}" escapeXml="false"/>
     </stripes:layout-component>

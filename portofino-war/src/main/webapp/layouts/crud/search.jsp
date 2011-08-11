@@ -8,6 +8,9 @@
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.crud.searchTitle}"/>
     </stripes:layout-component>
+    <stripes:layout-component name="portletHeaderButtons">
+        <button name="configure" class="wrench">Configure</button>
+    </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <div class="yui-ge">
             <div class="yui-u first">

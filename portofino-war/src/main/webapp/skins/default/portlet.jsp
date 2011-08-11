@@ -19,7 +19,7 @@
                             </h1>
                         </div>
                         <div class="portletHeaderButtons">
-                            <button name="configure" class="wrench">Configure</button>
+                            <stripes:layout-component name="portletHeaderButtons"/>
                         </div>
                     </div>
                 </stripes:layout-component>
@@ -31,7 +31,6 @@
             </div>
             <div class="portletFooter">
                 <stripes:layout-component name="portletFooter">
-                    Portlet footer
                 </stripes:layout-component>
             </div>
         </stripes:form>
