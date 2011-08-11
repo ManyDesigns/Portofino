@@ -118,13 +118,13 @@ public class Blob {
         Properties metaProperties = new Properties();
         createTimestamp = new DateTime();
 
-        metaProperties.setProperty(CODE_PROPERTY, code);
-        metaProperties.setProperty(FILENAME_PROPERTY, filename);
-        metaProperties.setProperty(CONTENT_TYPE_PROPERTY, contentType);
-        metaProperties.setProperty(SIZE_PROPERTY, Long.toString(size));
-        metaProperties.setProperty(CREATE_TIMESTAMP_PROPERTY,
+        safeSetProperty(metaProperties, CODE_PROPERTY, code);
+        safeSetProperty(metaProperties, FILENAME_PROPERTY, filename);
+        safeSetProperty(metaProperties, CONTENT_TYPE_PROPERTY, contentType);
+        safeSetProperty(metaProperties, SIZE_PROPERTY, Long.toString(size));
+        safeSetProperty(metaProperties, CREATE_TIMESTAMP_PROPERTY,
                 formatter.print(createTimestamp));
-        metaProperties.setProperty(CHARACTER_ENCODING_PROPERTY, characterEncoding);
+        safeSetProperty(metaProperties, CHARACTER_ENCODING_PROPERTY, characterEncoding);
 
         OutputStream metaStream = null;
         try {
@@ -132,6 +132,15 @@ public class Blob {
             metaProperties.store(metaStream, COMMENT);
         } finally {
             IOUtils.closeQuietly(metaStream);
+        }
+    }
+
+    protected void safeSetProperty(Properties metaProperties,
+                                   String key, String value) {
+        if (value == null) {
+            metaProperties.remove(key);
+        } else {
+            metaProperties.setProperty(key, value);
         }
     }
 

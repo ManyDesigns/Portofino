@@ -93,4 +93,14 @@
         <function-class>com.manydesigns.elements.configuration.CommonsConfigurationFunctions</function-class>
         <function-signature>java.math.BigInteger getBigInteger(org.apache.commons.configuration.Configuration,java.lang.String)</function-signature>
     </function>
+    <function>
+        <name>abbreviate</name>
+        <function-class>org.apache.commons.lang.StringUtils</function-class>
+        <function-signature>java.lang.String abbreviate(java.lang.String,int)</function-signature>
+    </function>
+    <function>
+        <name>abbreviateMiddle</name>
+        <function-class>org.apache.commons.lang.StringUtils</function-class>
+        <function-signature>java.lang.String abbreviateMiddle(java.lang.String,java.lang.String,int)</function-signature>
+    </function>
 </taglib>
