@@ -31,10 +31,10 @@ package com.manydesigns.portofino.breadcrumbs;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
+import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
-import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
-import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,24 +63,24 @@ public class Breadcrumbs implements XhtmlFragment {
 
         StringBuilder sb = new StringBuilder();
         sb.append(dispatch.getRequest().getContextPath());
-        for (SiteNodeInstance current : dispatch.getSiteNodeInstancePath()) {
+        for (PageInstance current : dispatch.getPageInstancePath()) {
             sb.append("/");
-            SiteNode siteNode = current.getSiteNode();
-            sb.append(siteNode.getId());
+            Page page = current.getPage();
+            sb.append(page.getId());
             BreadcrumbItem item = new BreadcrumbItem(
-                    sb.toString(), siteNode.getTitle(),
-                    siteNode.getDescription());
+                    sb.toString(), page.getTitle(),
+                    page.getDescription());
             items.add(item);
-            if (current instanceof CrudNodeInstance) {
-                CrudNodeInstance instance =
-                        (CrudNodeInstance) current;
+            if (current instanceof CrudPageInstance) {
+                CrudPageInstance instance =
+                        (CrudPageInstance) current;
                 if (instance.getPk() != null) {
                     sb.append("/");
                     sb.append(instance.getPk());
                     String name = ShortNameUtils.getName(
                             instance.getClassAccessor(), instance.getObject());
                     String title = String.format("%s (%s)",
-                            name, siteNode.getTitle());
+                            name, page.getTitle());
                     BreadcrumbItem item2 = new BreadcrumbItem(
                             sb.toString(), name, title);
                     items.add(item2);

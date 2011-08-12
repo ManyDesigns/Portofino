@@ -45,19 +45,19 @@ public class Dispatch {
     protected final HttpServletRequest request;
     protected final String originalPath;
     protected final String rewrittenPath;
-    protected final SiteNodeInstance[] siteNodeInstancePath;
-    protected final List<SiteNodeInstance> navigationNodeInstances;
+    protected final PageInstance[] pageInstancePath;
+    protected final List<PageInstance> navigationPageInstances;
 
     public Dispatch(HttpServletRequest request,
                     String originalPath,
                     String rewrittenPath,
-                    SiteNodeInstance[] siteNodeInstancePath,
-                    List<SiteNodeInstance> navigationNodeInstances) {
+                    PageInstance[] pageInstancePath,
+                    List<PageInstance> navigationPageInstances) {
         this.request = request;
         this.originalPath = originalPath;
         this.rewrittenPath = rewrittenPath;
-        this.siteNodeInstancePath = siteNodeInstancePath;
-        this.navigationNodeInstances = navigationNodeInstances;
+        this.pageInstancePath = pageInstancePath;
+        this.navigationPageInstances = navigationPageInstances;
 
         String pathUrl = getPathUrl();
         assert pathUrl.equals(originalPath);
@@ -72,16 +72,16 @@ public class Dispatch {
         return rewrittenPath;
     }
 
-    public SiteNodeInstance[] getSiteNodeInstancePath() {
-        return siteNodeInstancePath;
+    public PageInstance[] getPageInstancePath() {
+        return pageInstancePath;
     }
 
-    public List<SiteNodeInstance> getNavigationNodeInstances() {
-        return navigationNodeInstances;
+    public List<PageInstance> getNavigationPageInstances() {
+        return navigationPageInstances;
     }
 
-    public SiteNodeInstance getLastSiteNodeInstance() {
-        return siteNodeInstancePath[siteNodeInstancePath.length - 1];
+    public PageInstance getLastPageInstance() {
+        return pageInstancePath[pageInstancePath.length - 1];
     }
 
     public String getOriginalPath() {
@@ -98,7 +98,7 @@ public class Dispatch {
     }
 
     public String getPathUrl() {
-        return getPathUrl(siteNodeInstancePath.length);
+        return getPathUrl(pageInstancePath.length);
     }
 
     public String getPathUrl(int length) {
@@ -106,7 +106,7 @@ public class Dispatch {
         sb.append("/");
         boolean first = true;
         for (int i = 0; i < length; i++) {
-            SiteNodeInstance current = siteNodeInstancePath[i];
+            PageInstance current = pageInstancePath[i];
             String fragment = current.getUrlFragment();
             if (first) {
                 first = false;

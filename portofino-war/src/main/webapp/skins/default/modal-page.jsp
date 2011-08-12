@@ -18,7 +18,7 @@
         <stripes:layout-component name="customScripts"/>
         <jsp:useBean id="dispatch" scope="request"
                      type="com.manydesigns.portofino.dispatcher.Dispatch"/>
-        <title><c:out value="${dispatch.lastSiteNodeInstance.siteNode.description}"/></title>
+        <title><c:out value="${dispatch.lastPageInstance.page.description}"/></title>
     </head>
     <body>
     <div id="doc3" class="yui-t2">

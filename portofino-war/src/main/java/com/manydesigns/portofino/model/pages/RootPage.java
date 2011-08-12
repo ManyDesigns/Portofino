@@ -26,8 +26,11 @@
  * Boston, MA  02111-1307  USA
  *
  */
+package com.manydesigns.portofino.model.pages;
 
-package com.manydesigns.portofino.model.site.crud;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -35,30 +38,15 @@ package com.manydesigns.portofino.model.site.crud;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public enum Access {
-    NONE("none"),
-    READ("read"),
-    WRITE("write");
-
-    public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
-
-    private final String name;
-
-    Access(String name) {
-        this.name = name;
+@XmlAccessorType(XmlAccessType.NONE)
+public class RootPage extends Page {
+    public RootPage() {
+        super();
     }
 
-    public static Access parseAccess(String s) {
-        for (Access current : values()) {
-            if (current.getName().equals(s)) {
-                return current;
-            }
-        }
-        throw new IllegalArgumentException("Invalid access format: " + s);
+    @Override
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        // do nothing
     }
 
-    public String getName() {
-        return name;
-    }
 }

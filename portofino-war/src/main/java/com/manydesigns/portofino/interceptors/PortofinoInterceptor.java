@@ -35,9 +35,9 @@ import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -136,21 +136,21 @@ public class PortofinoInterceptor implements Interceptor {
             Navigation navigation = new Navigation(application, dispatch, groups);
             request.setAttribute(RequestAttributes.NAVIGATION, navigation);
 
-            SiteNodeInstance[] siteNodeInstances = dispatch.getSiteNodeInstancePath();
-            for(SiteNodeInstance node : siteNodeInstances) {
-                node.realize();
+            PageInstance[] pageInstances = dispatch.getPageInstancePath();
+            for(PageInstance page : pageInstances) {
+                page.realize();
             }
-            SiteNodeInstance siteNodeInstance =
-                    siteNodeInstances[siteNodeInstances.length-1];
-            request.setAttribute(RequestAttributes.SITE_NODE_INSTANCE, siteNodeInstance);
+            PageInstance pageInstance =
+                    pageInstances[pageInstances.length-1];
+            request.setAttribute(RequestAttributes.PAGE_INSTANCE, pageInstance);
 
             logger.debug("Creating breadcrumbs");
             Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
             request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
 
-            SiteNode node = siteNodeInstance.getSiteNode();
+            Page page = pageInstance.getPage();
             //3. Ho i permessi necessari vado alla pagina
-            if(node.isAllowed(groups)){
+            if(page.isAllowed(groups)){
                 return context.proceed();
             } else {
                 //4. Non ho i permessi, ma non sono loggato, vado alla pagina di login

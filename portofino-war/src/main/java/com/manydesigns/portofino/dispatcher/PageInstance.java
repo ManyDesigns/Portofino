@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.portofino.context.Application;
-import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.pages.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,28 +43,28 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla - alessio.stalla@manydesigns.com
 */
-public class SiteNodeInstance {
+public class PageInstance {
 
     protected final Application application;
-    protected final SiteNode siteNode;
+    protected final Page page;
     protected final String mode;
-    protected final List<SiteNodeInstance> childNodeInstances;
+    protected final List<PageInstance> childPageInstances;
 
     //**************************************************************************
     // Logging
     //**************************************************************************
 
-    public static final Logger logger = LoggerFactory.getLogger(SiteNodeInstance.class);
+    public static final Logger logger = LoggerFactory.getLogger(PageInstance.class);
 
-    public SiteNodeInstance(Application application, SiteNode siteNode, String mode) {
+    public PageInstance(Application application, Page page, String mode) {
         this.application = application;
-        this.siteNode = siteNode;
+        this.page = page;
         this.mode = mode;
-        childNodeInstances = new ArrayList<SiteNodeInstance>();
+        childPageInstances = new ArrayList<PageInstance>();
     }
 
-    public SiteNode getSiteNode() {
-        return siteNode;
+    public Page getPage() {
+        return page;
     }
 
     public String getMode() {
@@ -82,41 +82,41 @@ public class SiteNodeInstance {
     // Utility Methods
     //**************************************************************************
 
-    public SiteNodeInstance findChildNode(String id) {
-        for(SiteNodeInstance node : getChildNodeInstances()) {
-            if(id.equals(node.getSiteNode().getId())) {
-                return node;
+    public PageInstance findChildPage(String id) {
+        for(PageInstance page : getChildPageInstances()) {
+            if(id.equals(page.getPage().getId())) {
+                return page;
             }
         }
-        logger.debug("Child node not found: {}", id);
+        logger.debug("Child page not found: {}", id);
         return null;
     }
 
     public String getUrlFragment() {
-        return siteNode.getId();
+        return page.getId();
     }
 
-    public List<SiteNodeInstance> getChildNodeInstances() {
-        return childNodeInstances;
+    public List<PageInstance> getChildPageInstances() {
+        return childPageInstances;
     }
 
-    public List<SiteNode> getChildNodes() {
-        return siteNode.getChildNodes();
+    public List<Page> getChildPages() {
+        return page.getChildPages();
     }
 
     public String getLayoutContainer() {
-        return siteNode.getLayoutContainer();
+        return page.getLayoutContainer();
     }
 
     public void setLayoutContainer(String layoutContainer) {
-        siteNode.setLayoutContainer(layoutContainer);
+        page.setLayoutContainer(layoutContainer);
     }
 
     public int getLayoutOrder() {
-        return siteNode.getActualLayoutOrder();
+        return page.getActualLayoutOrder();
     }
 
     public void setLayoutOrder(int order) {
-        siteNode.setLayoutOrder(Integer.toString(order));
+        page.setLayoutOrder(Integer.toString(order));
     }
 }

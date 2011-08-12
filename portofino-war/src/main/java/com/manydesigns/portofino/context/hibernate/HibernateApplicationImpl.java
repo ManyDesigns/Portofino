@@ -46,8 +46,8 @@ import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.site.crud.Crud;
+import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.User;
@@ -101,7 +101,7 @@ public class HibernateApplicationImpl implements Application {
     protected Connections connectionProviders;
     protected Model model;
     protected Map<String, HibernateDatabaseSetup> setups;
-    protected final List<SiteNode> siteNodes;
+    protected final List<Page> pages;
     protected File xmlModelFile;
 
     public static final Logger logger =
@@ -116,7 +116,7 @@ public class HibernateApplicationImpl implements Application {
                                     DatabasePlatformsManager databasePlatformsManager) {
         this.portofinoConfiguration = portofinoConfiguration;
         this.databasePlatformsManager = databasePlatformsManager;
-        siteNodes = new ArrayList<SiteNode>();
+        pages = new ArrayList<Page>();
     }
 
     //**************************************************************************

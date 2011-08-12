@@ -63,9 +63,9 @@
             </schemas>
         </database>
     </databases>
-    <rootNode title="Portofino4" description="portofino 4" id="/">
-        <childNodes>
-            <crudNode description="projects" id="projects" title="projects">
+    <rootPage title="Portofino4" description="portofino 4" id="/">
+        <childPages>
+            <crudPage description="projects" id="projects" title="projects">
                 <crud name="projects"
                          table="test-database.public.projects"
                          query="projects-query">
@@ -75,8 +75,8 @@
                         <property name="description"/>
                     </properties>
                 </crud>
-                <childNodes>
-                    <portletNode id="report"
+                <childPages>
+                    <portletPage id="report"
                                  title="report title"
                                  description="report description"
                                  name="report"
@@ -85,9 +85,9 @@
                                  database="test-database"
                                  query="select project_id, count(*) from public.tickets group by project_id"
                                  urlExpression="http://www.manydesigns.com/"/>
-                </childNodes>
-                <detailChildNodes>
-                    <crudNode description="tickets" id="tickets" title="tickets">
+                </childPages>
+                <detailChildPages>
+                    <crudPage description="tickets" id="tickets" title="tickets">
                         <crud name="tickets"
                                  table="test-database.public.tickets"
                                  query="tickets-query">
@@ -98,9 +98,9 @@
                                 <property name="project_id"/>
                             </properties>
                         </crud>
-                    </crudNode>
-                </detailChildNodes>
-            </crudNode>
-        </childNodes>
-    </rootNode>
+                    </crudPage>
+                </detailChildPages>
+            </crudPage>
+        </childPages>
+    </rootPage>
 </model>

@@ -26,10 +26,10 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.model.site;
+package com.manydesigns.portofino.model.pages;
 
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.site.crud.Crud;
+import com.manydesigns.portofino.model.pages.crud.Crud;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ import java.util.ArrayList;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public class CrudNode extends SiteNode {
+public class CrudPage extends Page {
     //**************************************************************************
     // Constants
     //**************************************************************************
@@ -56,16 +56,16 @@ public class CrudNode extends SiteNode {
     //**************************************************************************
 
     protected Crud crud;
-    protected final ArrayList<SiteNode> detailChildNodes;
+    protected final ArrayList<Page> detailChildPages;
 
     protected String detailLayoutContainer;
     protected String detailLayoutOrder;
 
     protected int actualDetailLayoutOrder;
 
-    public CrudNode() {
+    public CrudPage() {
         super();
-        detailChildNodes = new ArrayList<SiteNode>();
+        detailChildPages = new ArrayList<Page>();
     }
 
     @XmlElement()
@@ -81,7 +81,7 @@ public class CrudNode extends SiteNode {
     public void reset() {
         super.reset();
 
-        for (SiteNode current : detailChildNodes) {
+        for (Page current : detailChildPages) {
             current.reset();
         }
 
@@ -96,24 +96,24 @@ public class CrudNode extends SiteNode {
             actualDetailLayoutOrder = Integer.parseInt(detailLayoutOrder);
         }
 
-        for (SiteNode current : detailChildNodes) {
+        for (Page current : detailChildPages) {
             current.init(model);
         }
 
         crud.init(model);
     }
 
-    @XmlElementWrapper(name="detailChildNodes")
+    @XmlElementWrapper(name="detailChildPages")
     @XmlElements({
-          @XmlElement(name="documentNode",type=DocumentNode.class),
-          @XmlElement(name="folderNode",type=FolderNode.class),
-          @XmlElement(name="customNode",type=CustomNode.class),
-          @XmlElement(name="customFolderNode",type=CustomFolderNode.class),
-          @XmlElement(name="crudNode",type=CrudNode.class),
-          @XmlElement(name="portletNode",type=ChartNode.class)
+          @XmlElement(name="textPage",type=TextPage.class),
+          @XmlElement(name="folderPage",type=FolderPage.class),
+          @XmlElement(name="customPage",type=CustomPage.class),
+          @XmlElement(name="customFolderPage",type=CustomFolderPage.class),
+          @XmlElement(name="crudPage",type=CrudPage.class),
+          @XmlElement(name="portletPage",type=ChartPage.class)
     })
-    public ArrayList<SiteNode> getDetailChildNodes() {
-        return detailChildNodes;
+    public ArrayList<Page> getDetailChildPages() {
+        return detailChildPages;
     }
 
     @XmlAttribute

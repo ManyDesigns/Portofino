@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.model.site.crud;
+package com.manydesigns.portofino.model.pages.crud;
 
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;

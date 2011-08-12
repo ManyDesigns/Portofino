@@ -30,9 +30,9 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
-import com.manydesigns.portofino.model.site.FolderNode;
-import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.model.pages.FolderPage;
+import com.manydesigns.portofino.model.pages.Page;
 
 import java.util.List;
 
@@ -55,14 +55,14 @@ public class FolderAction extends AbstractActionBean {
     public String redirectUrl;
 
     public String execute() {
-        SiteNodeInstance siteNodeInstance = dispatch.getLastSiteNodeInstance();
-        FolderNode navigationNode = (FolderNode) siteNodeInstance.getSiteNode();
-        List<SiteNode> childNodes = navigationNode.getChildNodes();
-        if (childNodes.isEmpty()) {
+        PageInstance pageInstance = dispatch.getLastPageInstance();
+        FolderPage navigationPage = (FolderPage) pageInstance.getPage();
+        List<Page> childPages = navigationPage.getChildPages();
+        if (childPages.isEmpty()) {
             // TODO: far restituire un valore che indica l'assenza di figli
             return null;
         } else {
-            SiteNode firstChild = childNodes.get(0);
+            Page firstChild = childPages.get(0);
             redirectUrl = dispatch.getOriginalPath() + "/" + firstChild.getId();
             return SUCCESS;
         }

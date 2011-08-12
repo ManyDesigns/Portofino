@@ -8,9 +8,9 @@
         <script type="text/javascript" src="<stripes:url value="/ckeditor/ckeditor.js"/>"></script>
         <script type="text/javascript" src="<stripes:url value="/ckeditor/adapters/jquery.js"/>"></script>
     </stripes:layout-component>
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.DocumentAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.TextAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:submit name="updateConfiguration" value="Save" class="contentButton"/>
+        <stripes:submit name="updateAttachments" value="Save" class="contentButton"/>
         <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
         <div class="breadcrumbs">
             <div class="inner">
@@ -19,28 +19,23 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <stripes:text name="title" value="${actionBean.title}"/>
+        Manage attachments for page <c:out value="${actionBean.textPage.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:textarea class="editor" name="content" value="${actionBean.content}"/>
-        <hr/>
-        This document is saved in the storage directory as: <c:out value="${actionBean.documentBlob.dataFile.name}"/>
-        <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletFooter">
-        <script type="text/javascript">
-            $('textarea.editor').ckeditor({
-                toolbar: 'Full',
-                toolbarCanCollapse: false,
-                filebrowserWindowWidth : '640',
-                filebrowserWindowHeight : '480',
-                filebrowserBrowseUrl : '<c:out value="${dispatch.absoluteOriginalPath}"/>?browse=',
-                filebrowserUploadUrl : '<c:out value="${dispatch.absoluteOriginalPath}"/>?uploadAttachment='
-            });
-        </script>
+        <c:if test="${not empty actionBean.blobs}">
+            Attachments:
+            <ul>
+                <c:forEach var="blob" items="${actionBean.blobs}">
+                    <li><c:out value="${blob.filename}"/></li>
+                </c:forEach>
+            </ul>
+        </c:if><c:if test="${empty actionBean.blobs}">
+            There are no attachments.
+        </c:if>
+        Upload a new file: <stripes:file name="upload"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <stripes:submit name="updateConfiguration" value="Save" class="contentButton"/>
+        <stripes:submit name="updateAttachments" value="Save" class="contentButton"/>
         <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
     </stripes:layout-component>
 </stripes:layout-render>

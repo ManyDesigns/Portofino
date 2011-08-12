@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.site.RootNode;
+import com.manydesigns.portofino.model.pages.RootPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,7 @@ public class Model {
     //**************************************************************************
 
     protected final ArrayList<Database> databases;
-    protected RootNode rootNode;
+    protected RootPage rootPage;
 
 
     public static final Logger logger = LoggerFactory.getLogger(Model.class);
@@ -79,9 +79,9 @@ public class Model {
             database.reset();
         }
 
-        // site nodes
-        if (rootNode != null) {
-            rootNode.reset();
+        // pages
+        if (rootPage != null) {
+            rootPage.reset();
         }
     }
 
@@ -93,9 +93,9 @@ public class Model {
             database.init(this);
         }
 
-        // site nodes
-        if (rootNode != null) {
-            rootNode.init(this);
+        // pages
+        if (rootPage != null) {
+            rootPage.init(this);
         }
     }
 
@@ -111,12 +111,12 @@ public class Model {
     }
 
     @XmlElement(required = false)
-    public RootNode getRootNode() {
-        return rootNode;
+    public RootPage getRootPage() {
+        return rootPage;
     }
 
-    public void setRootNode(RootNode rootNode) {
-        this.rootNode = rootNode;
+    public void setRootPage(RootPage rootPage) {
+        this.rootPage = rootPage;
     }
 
     public Table findTableByEntityName(String entityName) {

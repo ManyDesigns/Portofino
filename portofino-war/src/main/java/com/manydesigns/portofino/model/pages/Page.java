@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.model.site;
+package com.manydesigns.portofino.model.pages;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
@@ -47,7 +47,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
-public abstract class  SiteNode implements ModelObject {
+public abstract class Page implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -55,8 +55,8 @@ public abstract class  SiteNode implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected SiteNode parent;
-    protected final ArrayList<SiteNode> childNodes;
+    protected Page parent;
+    protected final ArrayList<Page> childPages;
 
     protected Permissions permissions;
     protected String id;
@@ -79,14 +79,14 @@ public abstract class  SiteNode implements ModelObject {
     // Logging
     //**************************************************************************
 
-    public static final Logger logger = LoggerFactory.getLogger(SiteNode.class);
+    public static final Logger logger = LoggerFactory.getLogger(Page.class);
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public SiteNode() {
-        this.childNodes = new ArrayList<SiteNode>();
+    public Page() {
+        this.childPages = new ArrayList<Page>();
     }
 
     //**************************************************************************
@@ -94,12 +94,12 @@ public abstract class  SiteNode implements ModelObject {
     //**************************************************************************
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
-        this.parent = (SiteNode) parent;
+        this.parent = (Page) parent;
     }
 
     public void reset() {
-        for (SiteNode childNode : childNodes) {
-            childNode.reset();
+        for (Page childPage : childPages) {
+            childPage.reset();
         }
         actualLayoutOrderInParent = null;
         actualLayoutOrder = 0;
@@ -110,8 +110,8 @@ public abstract class  SiteNode implements ModelObject {
         assert title != null;
         assert description != null;
 
-        for (SiteNode childNode : childNodes) {
-            childNode.init(model);
+        for (Page childPage : childPages) {
+            childPage.init(model);
         }
         if (layoutOrderInParent != null) {
             //TODO controllare che sia non-null anche layoutContainerInParent
@@ -130,13 +130,13 @@ public abstract class  SiteNode implements ModelObject {
     // Utility Methods
     //**************************************************************************
 
-    public SiteNode findChildNode(String id) {
-        for(SiteNode node : getChildNodes()) {
-            if(id.equals(node.getId())) {
-                return node;
+    public Page findChildPage(String id) {
+        for(Page page : getChildPages()) {
+            if(id.equals(page.getId())) {
+                return page;
             }
         }
-        logger.debug("Child node not found: {}", id);
+        logger.debug("Child page not found: {}", id);
         return null;
     }
 
@@ -183,24 +183,24 @@ public abstract class  SiteNode implements ModelObject {
         this.permissions = permissions;
     }
 
-    @XmlElementWrapper(name="childNodes")
+    @XmlElementWrapper(name="childPages")
     @XmlElements({
-          @XmlElement(name="documentNode",type=DocumentNode.class),
-          @XmlElement(name="folderNode",type=FolderNode.class),
-          @XmlElement(name="customNode",type=CustomNode.class),
-          @XmlElement(name="customFolderNode",type=CustomFolderNode.class),
-          @XmlElement(name="crudNode",type=CrudNode.class),
-          @XmlElement(name="portletNode",type=ChartNode.class)
+          @XmlElement(name="textPage",type=TextPage.class),
+          @XmlElement(name="folderPage",type=FolderPage.class),
+          @XmlElement(name="customPage",type=CustomPage.class),
+          @XmlElement(name="customFolderPage",type=CustomFolderPage.class),
+          @XmlElement(name="crudPage",type=CrudPage.class),
+          @XmlElement(name="portletPage",type=ChartPage.class)
     })
-    public List<SiteNode> getChildNodes() {
-        return childNodes;
+    public List<Page> getChildPages() {
+        return childPages;
     }
 
-    public SiteNode getParent() {
+    public Page getParent() {
         return parent;
     }
 
-    public void setParent(SiteNode parent) {
+    public void setParent(Page parent) {
         this.parent = parent;
     }
 

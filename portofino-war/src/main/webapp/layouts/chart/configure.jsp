@@ -15,7 +15,7 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Configure chart: <c:out value="${actionBean.chartNode.title}"/>
+        Configure chart: <c:out value="${actionBean.chartPage.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         Fields marked with a "*" are required.

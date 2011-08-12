@@ -33,8 +33,8 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
-import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.model.pages.Page;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,18 +79,18 @@ public class Navigation implements XhtmlFragment {
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         print(dispatch.getRequest().getContextPath(),
-                dispatch.getNavigationNodeInstances(), xb, false);
+                dispatch.getNavigationPageInstances(), xb, false);
     }
 
-    private void print(String path, List<SiteNodeInstance> nodes, XhtmlBuffer xb, boolean recursive) {
-        if (nodes == null) {
+    private void print(String path, List<PageInstance> pages, XhtmlBuffer xb, boolean recursive) {
+        if (pages == null) {
             return;
         }
         boolean first = true;
-        SiteNodeInstance expand = null;
-        for (SiteNodeInstance current : nodes) {
-            SiteNode siteNode = current.getSiteNode();
-            if (!siteNode.isAllowed(groups)) {
+        PageInstance expand = null;
+        for (PageInstance current : pages) {
+            Page page = current.getPage();
+            if (!page.isAllowed(groups)) {
                 continue;
             }
 
@@ -108,8 +108,8 @@ public class Navigation implements XhtmlFragment {
                 xb.addAttribute("class", "path");
                 expand = current;
             }
-            String url = path + "/" + siteNode.getId();
-            xb.writeAnchor(url, siteNode.getTitle(), null, siteNode.getDescription());
+            String url = path + "/" + page.getId();
+            xb.writeAnchor(url, page.getTitle(), null, page.getDescription());
             xb.closeElement("li");
         }
         if(!first) {
@@ -117,21 +117,21 @@ public class Navigation implements XhtmlFragment {
         }
         if (expand != null) {
             path = path + "/" + expand.getUrlFragment();
-            print(path, expand.getChildNodeInstances(), xb, true);
+            print(path, expand.getChildPageInstances(), xb, true);
         }
     }
 
-    protected boolean isSelected(SiteNodeInstance siteNodeInstance) {
-        return siteNodeInstance == dispatch.getLastSiteNodeInstance();
+    protected boolean isSelected(PageInstance pageInstance) {
+        return pageInstance == dispatch.getLastPageInstance();
     }
 
-    protected boolean isInPath(SiteNodeInstance siteNodeInstance) {
-        return findInPath(siteNodeInstance) != null;
+    protected boolean isInPath(PageInstance pageInstance) {
+        return findInPath(pageInstance) != null;
     }
 
-    protected SiteNodeInstance findInPath(SiteNodeInstance siteNodeInstance) {
-        for (SiteNodeInstance current : dispatch.getSiteNodeInstancePath()) {
-            if (siteNodeInstance == current) {
+    protected PageInstance findInPath(PageInstance pageInstance) {
+        for (PageInstance current : dispatch.getPageInstancePath()) {
+            if (pageInstance == current) {
                 return current;
             }
         }

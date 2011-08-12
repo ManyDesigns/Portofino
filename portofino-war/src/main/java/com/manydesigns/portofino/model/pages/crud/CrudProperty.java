@@ -27,17 +27,15 @@
  *
  */
 
-package com.manydesigns.portofino.model.site;
+package com.manydesigns.portofino.model.pages.crud;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import org.apache.commons.collections.CollectionUtils;
+import com.manydesigns.portofino.model.annotations.Annotation;
+import com.manydesigns.portofino.xml.Identifier;
 
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,71 +45,83 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@XmlAccessorType(XmlAccessType.NONE)
-public class Permissions implements ModelObject {
+
+@XmlAccessorType(value = XmlAccessType.NONE)
+public class CrudProperty implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
+
 
     //**************************************************************************
     // Fields
     //**************************************************************************
 
-    protected final List<String> allow;
-    protected final List<String> deny;
+    protected Crud crud;
+
+    protected String name;
+    protected final List<Annotation> annotations;
+
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public Permissions() {
-        allow = new ArrayList<String>();
-        deny = new ArrayList<String>();
+    public CrudProperty() {
+        annotations = new ArrayList<Annotation>();
     }
 
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
 
-    public void afterUnmarshal(Unmarshaller u, Object parent) {}
-
-    public void reset() {}
-
-    public void init(Model model) {}
-
-    public String getQualifiedName() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        crud = (Crud) parent;
     }
 
-    //**************************************************************************
-    // Permission verification
-    //**************************************************************************
-
-    public boolean isAllowed(List<String> groups) {
-        if (CollectionUtils.containsAny(deny, groups)) {
-            return false;
+    public void reset() {
+        for (Annotation annotation : annotations) {
+            annotation.reset();
         }
+    }
 
-        //noinspection SimplifiableIfStatement
-        if (allow.isEmpty()) {
-            return true;
+    public void init(Model model) {
+        assert crud != null;
+        assert name != null;
+        for (Annotation annotation : annotations) {
+            annotation.init(model);
         }
+    }
 
-        return CollectionUtils.containsAny(allow, groups);
+    public String getQualifiedName() {
+        return String.format("%s.%s", crud.getQualifiedName(), name);
     }
 
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
 
-    @XmlElementWrapper(name="allow")
-    @XmlElement(name = "group", type = java.lang.String.class)
-    public List<String> getAllow() {
-        return allow;
+
+    public Crud getCrud() {
+        return crud;
     }
 
-    @XmlElementWrapper(name="deny")
-    @XmlElement(name = "group", type = java.lang.String.class)
-    public List<String> getDeny() {
-        return deny;
+    public void setCrud(Crud crud) {
+        this.crud = crud;
+    }
+
+    @Identifier
+    @XmlAttribute(required = true)
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @XmlElementWrapper(name="annotations")
+    @XmlElement(name="annotaion",type=Annotation.class)
+    public List<Annotation> getAnnotations() {
+        return annotations;
     }
 }

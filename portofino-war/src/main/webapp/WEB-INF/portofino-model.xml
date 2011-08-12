@@ -30,25 +30,25 @@ Struttura dell'XML:
  |             +-annotation
  |               +-value
  |
- +-rootNode
-   +-childNodes (accetta i nodi figlio in qualunque ordine)
-   | +-folderNode
-   | | +-childNodes (come rootNode)
-   | | +-permissions (come rootNode)
+ +-rootPage
+   +-childPages (accetta i nodi figlio in qualunque ordine)
+   | +-folderPage
+   | | +-childPages (come rootPage)
+   | | +-permissions (come rootPage)
    | |
-   | +-documentNode
-   | | +-childNodes (come rootNode)
-   | | +-permissions (come rootNode)
+   | +-textPage
+   | | +-childPages (come rootPage)
+   | | +-permissions (come rootPage)
    | |
-   | +-customNode
-   | | +-childNodes (come rootNode)
-   | | +-permissions (come rootNode)
+   | +-customPage
+   | | +-childPages (come rootPage)
+   | | +-permissions (come rootPage)
    | |
-   | +-customFolderNode
-   | | +-childNodes (come rootNode)
-   | | +-permissions (come rootNode)
+   | +-customFolderPage
+   | | +-childPages (come rootPage)
+   | | +-permissions (come rootPage)
    | |
-   | +-crudNode
+   | +-crudPage
    | | +-crud
    | | | +-properties
    | | | | +-property
@@ -68,12 +68,12 @@ Struttura dell'XML:
    | | | +-buttons
    | | |   +-button
    | | |
-   | | +-childNodes (come rootNode)
-   | | +-permissions (come rootNode)
+   | | +-childPages (come rootPage)
+   | | +-permissions (come rootPage)
    | |
-   | +-portletNode
-   |   +-childNodes (come rootNode)
-   |   +-permissions (come rootNode)
+   | +-portletPage
+   |   +-childPages (come rootPage)
+   |   +-permissions (come rootPage)
    |
    |
    +-permissions
@@ -1021,57 +1021,57 @@ Struttura dell'XML:
             </schemas>
         </database>
     </databases>
-    <rootNode id="/" title="Portofino4" description="portofino 4" url="/">
-        <childNodes>
-            <documentNode id="homepage" title="Homepage" description="Homepage" fileName="misc/homepage.html" layoutContainer="contentLayoutTop">
+    <rootPage id="/" title="Portofino4" description="portofino 4" url="/">
+        <childPages>
+            <textPage id="homepage" title="Homepage" description="Homepage" fileName="misc/homepage.html" layoutContainer="contentLayoutTop">
                 <permissions>
                     <allow>
                         <group>anonymous</group>
                     </allow>
                 </permissions>
-            </documentNode>
-            <folderNode id="model" title="Model" description="Model">
+            </textPage>
+            <folderPage id="model" title="Model" description="Model">
 
-                <childNodes>
-                    <customNode id="ConnectionProviders" title="Connection providers" description="Connection providers" url="/model/ConnectionProviders.action"/>
-                    <customFolderNode id="TableData" title="Table data" description="Table data" url="/model/TableData.action" type="table-data"/>
-                    <customFolderNode id="TabelDesign" title="Table design" description="Table design" url="/model/TableDesign.action" type="table-design"/>
-                    <customNode id="SelfTest" title="Self test" description="Self test" url="/model/SelfTest.action"/>
-                    <customNode id="SiteMap" title="Site map" description="Site map" url="/model/SiteMap.action"/>
-                    <customNode id="DDLWriter" title="DDL Writer" description="DDL Writer" url="/model/DDLWriter.action"/>
-                </childNodes>
+                <childPages>
+                    <customPage id="ConnectionProviders" title="Connection providers" description="Connection providers" url="/model/ConnectionProviders.action"/>
+                    <customFolderPage id="TableData" title="Table data" description="Table data" url="/model/TableData.action" type="table-data"/>
+                    <customFolderPage id="TabelDesign" title="Table design" description="Table design" url="/model/TableDesign.action" type="table-design"/>
+                    <customPage id="SelfTest" title="Self test" description="Self test" url="/model/SelfTest.action"/>
+                    <customPage id="SiteMap" title="Site map" description="Site map" url="/model/SiteMap.action"/>
+                    <customPage id="DDLWriter" title="DDL Writer" description="DDL Writer" url="/model/DDLWriter.action"/>
+                </childPages>
                 <permissions>
 
                     <allow>
                         <group>admins</group>
                     </allow>
                 </permissions>
-            </folderNode>
-            <folderNode id="system-admin" title="System administration" description="System administration">
-                <childNodes>
-                    <customNode id="ServerInfo" title="Server info" description="Server info" url="/system-admin/ServerInfo.action"/>
+            </folderPage>
+            <folderPage id="system-admin" title="System administration" description="System administration">
+                <childPages>
+                    <customPage id="ServerInfo" title="Server info" description="Server info" url="/system-admin/ServerInfo.action"/>
 
-                    <customNode id="ConfigurationProperties" title="Configuration properties" description="Configuration properties" url="/system-admin/ConfigurationProperties.action"/>
-                    <customNode id="Logs" title="Logs" description="Logs" url="/system-admin/Logs.action"/>
-                    <folderNode id="application" title="application" description="application">
-                        <childNodes>
-                            <documentNode id="connectionManager" title="Connection Manager" description="Connection Manager" fileName="skins/default/tbd.html"/>
-                            <documentNode id="databaseObjects" title="Data base Objects" description="Data base Objects" fileName="skins/default/tbd.html"/>
-                            <documentNode id="navigation Manager" title="Navigation Manager" description="Navigation Manager" fileName="skins/default/tbd.html"/>
-                        </childNodes>
-                    </folderNode>
+                    <customPage id="ConfigurationProperties" title="Configuration properties" description="Configuration properties" url="/system-admin/ConfigurationProperties.action"/>
+                    <customPage id="Logs" title="Logs" description="Logs" url="/system-admin/Logs.action"/>
+                    <folderPage id="application" title="application" description="application">
+                        <childPages>
+                            <textPage id="connectionManager" title="Connection Manager" description="Connection Manager" fileName="skins/default/tbd.html"/>
+                            <textPage id="databaseObjects" title="Data base Objects" description="Data base Objects" fileName="skins/default/tbd.html"/>
+                            <textPage id="navigation Manager" title="Navigation Manager" description="Navigation Manager" fileName="skins/default/tbd.html"/>
+                        </childPages>
+                    </folderPage>
 
-                </childNodes>
+                </childPages>
                 <permissions>
                     <allow>
                         <group>admins</group>
                     </allow>
                 </permissions>
-            </folderNode>
-            <folderNode id="usersAdmin" title="User administration" description="User administration">
+            </folderPage>
+            <folderPage id="usersAdmin" title="User administration" description="User administration">
 
-                <childNodes>
-                    <crudNode id="userAdmin" title="userAdmin" description="user administration" url="/usersAdmin/Users.action">
+                <childPages>
+                    <crudPage id="userAdmin" title="userAdmin" description="user administration" url="/usersAdmin/Users.action">
                         <crud name="users" table="portofino.public.users" query="FROM portofino_public_users" searchTitle="Users" createTitle="Create new user" readTitle="User" editTitle="Edit user">
                             <properties>
                                 <property name="userId"/>
@@ -1125,8 +1125,8 @@ Struttura dell'XML:
                                 </crud>
                             </subCruds>
                         </crud>
-                    </crudNode>
-                    <crudNode id="groupAdmin" title="groupAdmin" description="groups administration" url="/usersAdmin/Groups.action">
+                    </crudPage>
+                    <crudPage id="groupAdmin" title="groupAdmin" description="groups administration" url="/usersAdmin/Groups.action">
                         <crud name="groupAdmin" table="portofino.public.groups" query="from portofino_public_groups" searchTitle="Groups" createTitle="Create new group" readTitle="Group" editTitle="Edit group">
                             <properties>
 
@@ -1146,23 +1146,23 @@ Struttura dell'XML:
                                 </selectionProvider>
                             </selectionProviders>
                         </crud>
-                    </crudNode>
-                </childNodes>
+                    </crudPage>
+                </childPages>
                 <permissions>
 
                     <allow>
                         <group>admins</group>
                     </allow>
                 </permissions>
-            </folderNode>
-            <customNode id="Profile" title="Profile" description="Profile" url="/Profile.action">
+            </folderPage>
+            <customPage id="Profile" title="Profile" description="Profile" url="/Profile.action">
                 <permissions>
                     <allow>
                         <group>registered</group>
                     </allow>
                 </permissions>
-            </customNode>
-            <crudNode id="projects"
+            </customPage>
+            <crudPage id="projects"
                       title="Projects"
                       description="Projects"
                       showInSideBar="true"
@@ -1232,8 +1232,8 @@ Struttura dell'XML:
                         </property>
                     </properties>
                 </crud>
-                <childNodes>
-                    <portletNode id="report"
+                <childPages>
+                    <portletPage id="report"
                                  title="report title"
                                  description="report description"
                                  showInSideBar="false"
@@ -1247,9 +1247,9 @@ Struttura dell'XML:
                                  layoutContainerInParent="contentLayoutLeft"
                                  layoutOrderInParent="1"
                             />
-                </childNodes>
-                <detailChildNodes>
-                    <crudNode id="issues" title="Issues" description="Issues" showInSideBar="true" layoutContainer="contentLayoutTop" layoutContainerInParent="contentLayoutRight">
+                </childPages>
+                <detailChildPages>
+                    <crudPage id="issues" title="Issues" description="Issues" showInSideBar="true" layoutContainer="contentLayoutTop" layoutContainerInParent="contentLayoutRight">
                         <crud name="issue"
                                  variable="issue"
                                  table="redmine.redmine.issues"
@@ -1314,9 +1314,9 @@ Struttura dell'XML:
                                 </property>
                             </properties>
                         </crud>
-                    </crudNode>
-                </detailChildNodes>
-            </crudNode>
-        </childNodes>
-    </rootNode>
+                    </crudPage>
+                </detailChildPages>
+            </crudPage>
+        </childPages>
+    </rootPage>
 </model>

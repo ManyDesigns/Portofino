@@ -37,9 +37,9 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.actions.PortletAction;
-import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.site.ChartNode;
+import com.manydesigns.portofino.model.pages.ChartPage;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
@@ -97,7 +97,7 @@ public class ChartAction extends PortletAction {
     // Model metadata
     //**************************************************************************
 
-    public ChartNode chartNode;
+    public ChartPage chartPage;
 
     //**************************************************************************
     // Presentation elements
@@ -124,7 +124,7 @@ public class ChartAction extends PortletAction {
 
     @Before
     public void prepare() {
-        chartNode = (ChartNode) siteNodeInstance.getSiteNode();
+        chartPage = (ChartPage) pageInstance.getPage();
     }
 
     //**************************************************************************
@@ -169,14 +169,14 @@ public class ChartAction extends PortletAction {
     private void generateChart() {
         DefaultPieDataset dataset = new DefaultPieDataset();
         java.util.List<Object[]> result;
-        String query = chartNode.getQuery();
-        result = application.runSql(chartNode.getDatabase(), query);
+        String query = chartPage.getQuery();
+        result = application.runSql(chartPage.getDatabase(), query);
         for (Object[] current : result) {
             dataset.setValue((Comparable)current[0], (Number)current[1]);
         }
 
         chart = ChartFactory.createPieChart(
-                chartNode.getTitle(), dataset, true, true, true);
+                chartPage.getTitle(), dataset, true, true, true);
 
         chart.setAntiAlias(antiAlias);
 
@@ -193,7 +193,7 @@ public class ChartAction extends PortletAction {
         PiePlot plot = (PiePlot) chart.getPlot();
 
         PieURLGenerator urlGenerator =
-                new ChartPieUrlGenerator(chartNode.getUrlExpression());
+                new ChartPieUrlGenerator(chartPage.getUrlExpression());
         plot.setURLGenerator(urlGenerator);
 
 
@@ -221,7 +221,7 @@ public class ChartAction extends PortletAction {
         plot.setDrawingSupplier(supplier);
 
         // impostiamo il titolo della legenda
-        String legendString = chartNode.getLegend();
+        String legendString = chartPage.getLegend();
         Title subtitle = new TextTitle(legendString, legendFont, Color.BLACK,
                 RectangleEdge.BOTTOM, HorizontalAlignment.CENTER,
                 VerticalAlignment.CENTER, new RectangleInsets(0, 0, 0, 0));
@@ -251,16 +251,16 @@ public class ChartAction extends PortletAction {
 
 
     public Resolution returnToParent() {
-        SiteNodeInstance[] siteNodeInstancePath =
-                dispatch.getSiteNodeInstancePath();
-        int previousPos = siteNodeInstancePath.length - 2;
+        PageInstance[] pageInstancePath =
+                dispatch.getPageInstancePath();
+        int previousPos = pageInstancePath.length - 2;
         RedirectResolution resolution;
         if (previousPos >= 0) {
-            SiteNodeInstance previousNode = siteNodeInstancePath[previousPos];
+            PageInstance previousPage = pageInstancePath[previousPos];
             String url = dispatch.getPathUrl(previousPos + 1);
             return new RedirectResolution(url, true);
         } else {
-            throw new Error("No parent for root node");
+            throw new Error("No parent for root page");
         }
     }
 
@@ -275,7 +275,7 @@ public class ChartAction extends PortletAction {
 
     public Resolution configure() {
         prepareForm();
-        form.readFromObject(chartNode);
+        form.readFromObject(chartPage);
 
         return new ForwardResolution("/layouts/chart/configure.jsp");
     }
@@ -287,7 +287,7 @@ public class ChartAction extends PortletAction {
                         Database.class,
                         null,
                         "databaseName");
-        form = new FormBuilder(ChartNode.class)
+        form = new FormBuilder(ChartPage.class)
                 .configFields(CONFIGURATION_FIELDS)
                 .configSelectionProvider(databaseSelectionProvider, "database")
                 .build();
@@ -296,10 +296,10 @@ public class ChartAction extends PortletAction {
     public Resolution updateConfiguration() {
         synchronized (application) {
             prepareForm();
-            form.readFromObject(chartNode);
+            form.readFromObject(chartPage);
             form.readFromRequest(context.getRequest());
             if (form.validate()) {
-                form.writeToObject(chartNode);
+                form.writeToObject(chartPage);
                 saveModel();
                 SessionMessages.addInfoMessage("Configuration updated successfully");
                 return cancel();
@@ -354,12 +354,12 @@ public class ChartAction extends PortletAction {
         this.borderVisible = borderVisible;
     }
 
-    public ChartNode getChartNode() {
-        return chartNode;
+    public ChartPage getChartPage() {
+        return chartPage;
     }
 
-    public void setChartNode(ChartNode chartNode) {
-        this.chartNode = chartNode;
+    public void setChartPage(ChartPage chartPage) {
+        this.chartPage = chartPage;
     }
 
     public Form getForm() {

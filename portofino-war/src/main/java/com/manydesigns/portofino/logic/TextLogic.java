@@ -26,37 +26,36 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.model.site;
 
+package com.manydesigns.portofino.logic;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import com.manydesigns.portofino.model.pages.Attachment;
+import com.manydesigns.portofino.model.pages.TextPage;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-@XmlAccessorType(XmlAccessType.NONE)
-public class CustomFolderNode extends SiteNode{
+/**
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public class TextLogic {
+    public static final String copyright =
+            "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-    protected String type;
-
-    public CustomFolderNode() {
-        super();
+    public static Attachment createAttachment(TextPage textPage,
+                                              String attachmentCode) {
+        Attachment attachment = new Attachment(textPage, attachmentCode);
+        textPage.getAttachments().add(attachment);
+        return attachment;
     }
 
-    @XmlAttribute(required = true)
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+    public static Attachment findAttachmentByCode(
+            TextPage textPage, String code) {
+        for (Attachment current : textPage.getAttachments()) {
+            if (current.getCode().equals(code)) {
+                return current;
+            }
+        }
+        return null;
     }
 }

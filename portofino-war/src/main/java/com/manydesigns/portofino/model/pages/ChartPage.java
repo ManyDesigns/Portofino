@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.model.site;
+package com.manydesigns.portofino.model.pages;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Multiline;
@@ -47,7 +47,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public class ChartNode extends SiteNode {
+public class ChartPage extends Page {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -73,7 +73,7 @@ public class ChartNode extends SiteNode {
     //**************************************************************************
 
 
-    public ChartNode() {
+    public ChartPage() {
         super();
     }
 

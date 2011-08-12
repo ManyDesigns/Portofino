@@ -6,7 +6,7 @@
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.siteNodeInstance.siteNode.title}"/>
+        <c:out value="${actionBean.pageInstance.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <div class=".ui-state-error">

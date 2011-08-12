@@ -26,7 +26,7 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.model.site;
+package com.manydesigns.portofino.model.pages;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -38,13 +38,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public class CustomNode extends SiteNode{
-
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-    public CustomNode() {
+public class FolderPage extends Page {
+    public FolderPage() {
         super();
     }
-
 }

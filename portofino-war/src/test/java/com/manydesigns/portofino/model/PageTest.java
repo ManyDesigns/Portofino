@@ -28,7 +28,7 @@
  */
 package com.manydesigns.portofino.model;
 
-import com.manydesigns.portofino.model.site.*;
+import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.system.model.users.Group;
 import junit.framework.TestCase;
 
@@ -41,17 +41,17 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class SiteNodeTest extends TestCase {
+public class PageTest extends TestCase {
 
     Model model;
-    RootNode root;
-    SiteNode n1_1;
-    SiteNode n1_2;
-    SiteNode n1_3;
-    SiteNode n1_4;
-    CustomFolderNode n1_2_1;
-    CustomFolderNode n1_2_2;
-    SiteNode n1_2_3;
+    RootPage root;
+    Page n1_1;
+    Page n1_2;
+    Page n1_3;
+    Page n1_4;
+    CustomFolderPage n1_2_1;
+    CustomFolderPage n1_2_2;
+    Page n1_2_3;
 
     Permissions n1_1_perm;
     Permissions n1_2_perm;
@@ -72,7 +72,7 @@ public class SiteNodeTest extends TestCase {
         super.setUp();
         model = new Model();
         //1. Radice
-        root = new RootNode();
+        root = new RootPage();
         root.setId("/");
         root.setTitle("portofino4");
         root.setDescription("portofino application");
@@ -80,7 +80,7 @@ public class SiteNodeTest extends TestCase {
         //Nessun permesso
 
         //1.1
-        n1_1 = new DocumentNode();
+        n1_1 = new TextPage();
         n1_1.setParent(root);
         n1_1_perm = new Permissions();
         n1_1.setPermissions(n1_1_perm);
@@ -91,7 +91,7 @@ public class SiteNodeTest extends TestCase {
         n1_1_perm.getAllow().add(Group.ANONYMOUS);
 
         //1.2
-        n1_2 = new FolderNode();
+        n1_2 = new FolderPage();
         n1_2.setParent(root);
         n1_2_perm = new Permissions();
         n1_2.setPermissions(n1_2_perm);
@@ -101,7 +101,7 @@ public class SiteNodeTest extends TestCase {
 
         n1_2_perm.getAllow().add(Group.REGISTERED);
 
-        n1_2_1 = new CustomFolderNode();
+        n1_2_1 = new CustomFolderPage();
         n1_2_1.setParent(n1_2);
         n1_2_1_perm = new Permissions();
         n1_2_1.setPermissions(n1_2_1_perm);
@@ -110,11 +110,11 @@ public class SiteNodeTest extends TestCase {
         n1_2_1.setTitle("TableData title");
         n1_2_1.setId("TableData");
         n1_2_1.setUrl("/model/TableData.action");
-        n1_2.getChildNodes().add(n1_2_1);
+        n1_2.getChildPages().add(n1_2_1);
 
         n1_2_1_perm.getAllow().add("admins");
 
-        n1_2_2 = new CustomFolderNode();
+        n1_2_2 = new CustomFolderPage();
         n1_2_2.setParent(n1_2);
         n1_2_2_perm = new Permissions();
         n1_2_2.setPermissions(n1_2_2_perm);
@@ -123,11 +123,11 @@ public class SiteNodeTest extends TestCase {
         n1_2_2.setTitle("TableData design title");
         n1_2_2.setId("TableDesign");
         n1_2_2.setUrl("/model/TableDesign.action");
-        n1_2.getChildNodes().add(n1_2_2);
+        n1_2.getChildPages().add(n1_2_2);
 
 
 
-        n1_2_3 = new CustomNode();
+        n1_2_3 = new CustomPage();
         n1_2_3.setParent(n1_2);
         n1_2_3_perm = new Permissions();
         n1_2_3.setPermissions(n1_2_3_perm);
@@ -135,12 +135,12 @@ public class SiteNodeTest extends TestCase {
         n1_2_3.setTitle("Somewhere");
         n1_2_3.setId("somewhere");
         n1_2_3.setUrl("http://www.manydesigns.com/");
-        n1_2.getChildNodes().add(n1_2_3);
+        n1_2.getChildPages().add(n1_2_3);
 
         n1_2_3_perm.getDeny().add("cattivi");
 
         //1.3
-        n1_3 = new CustomNode();
+        n1_3 = new CustomPage();
         n1_3.setParent(root);
         n1_3_perm = new Permissions();
         n1_3.setPermissions(n1_3_perm);
@@ -153,7 +153,7 @@ public class SiteNodeTest extends TestCase {
         n1_3_perm.getAllow().add("buoni");
 
         //1.4
-        n1_4 = new FolderNode();
+        n1_4 = new FolderPage();
         n1_4.setParent(root);
         n1_4_perm = new Permissions();
         n1_4.setPermissions(n1_4_perm);
@@ -161,12 +161,12 @@ public class SiteNodeTest extends TestCase {
         n1_4.setTitle("user admin");
         n1_4.setId("userAdmin");
         //Aggiungo i nodi alla radice
-        root.getChildNodes().add(n1_1);
-        root.getChildNodes().add(n1_2);
-        root.getChildNodes().add(n1_3);
-        root.getChildNodes().add(n1_4);
+        root.getChildPages().add(n1_1);
+        root.getChildPages().add(n1_2);
+        root.getChildPages().add(n1_3);
+        root.getChildPages().add(n1_4);
 
-        model.setRootNode(root);
+        model.setRootPage(root);
 
 
         root.reset();

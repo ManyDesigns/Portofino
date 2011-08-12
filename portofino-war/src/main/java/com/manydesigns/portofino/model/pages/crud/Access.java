@@ -27,35 +27,38 @@
  *
  */
 
-package com.manydesigns.portofino.logic;
+package com.manydesigns.portofino.model.pages.crud;
 
-import com.manydesigns.portofino.model.site.Attachment;
-import com.manydesigns.portofino.model.site.DocumentNode;
+/*
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+public enum Access {
+    NONE("none"),
+    READ("read"),
+    WRITE("write");
 
-/**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Alessio Stalla       - alessio.stalla@manydesigns.com
- */
-public class DocumentLogic {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public static Attachment createAttachment(DocumentNode documentNode,
-                                              String attachmentCode) {
-        Attachment attachment = new Attachment(documentNode, attachmentCode);
-        documentNode.getAttachments().add(attachment);
-        return attachment;
+    private final String name;
+
+    Access(String name) {
+        this.name = name;
     }
 
-    public static Attachment findAttachmentByCode(
-            DocumentNode documentNode, String code) {
-        for (Attachment current : documentNode.getAttachments()) {
-            if (current.getCode().equals(code)) {
+    public static Access parseAccess(String s) {
+        for (Access current : values()) {
+            if (current.getName().equals(s)) {
                 return current;
             }
         }
-        return null;
+        throw new IllegalArgumentException("Invalid access format: " + s);
+    }
+
+    public String getName() {
+        return name;
     }
 }

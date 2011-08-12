@@ -31,8 +31,8 @@ package com.manydesigns.portofino.reflection;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.model.site.crud.Crud;
-import com.manydesigns.portofino.model.site.crud.CrudProperty;
+import com.manydesigns.portofino.model.pages.crud.Crud;
+import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

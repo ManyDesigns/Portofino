@@ -35,9 +35,9 @@ import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.logic.DocumentLogic;
-import com.manydesigns.portofino.model.site.Attachment;
-import com.manydesigns.portofino.model.site.DocumentNode;
+import com.manydesigns.portofino.logic.TextLogic;
+import com.manydesigns.portofino.model.pages.Attachment;
+import com.manydesigns.portofino.model.pages.TextPage;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -57,8 +57,8 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@UrlBinding("/document.action")
-public class DocumentAction extends PortletAction {
+@UrlBinding("/text.action")
+public class TextAction extends PortletAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
     public static final String CONTENT_ENCODING = "UTF-8";
@@ -86,13 +86,13 @@ public class DocumentAction extends PortletAction {
     @Inject(ApplicationAttributes.SERVER_INFO)
     public ServerInfo serverInfo;
 
-    public DocumentNode documentNode;
-    public BlobManager documentManager;
+    public TextPage textPage;
+    public BlobManager textManager;
     public BlobManager attachmentManager;
-    public Blob documentBlob;
+    public Blob textBlob;
 
     public static final Logger logger =
-            LoggerFactory.getLogger(DocumentAction.class);
+            LoggerFactory.getLogger(TextAction.class);
 
     //**************************************************************************
     // Setup
@@ -100,12 +100,12 @@ public class DocumentAction extends PortletAction {
 
     @Before
     public void prepare() {
-        documentNode = (DocumentNode) siteNodeInstance.getSiteNode();
+        textPage = (TextPage) pageInstance.getPage();
         String storageDirectory =
                 portofinoConfiguration.getString(
                         PortofinoProperties.STORAGE_DIRECTORY);
-        documentManager = new BlobManager(
-                storageDirectory, "document-{0}.properties", "document-{0}.data");
+        textManager = new BlobManager(
+                storageDirectory, "text-{0}.properties", "text-{0}.data");
         attachmentManager = new BlobManager(
                 storageDirectory, "attachment-{0}.properties", "attachment-{0}.data");
     }
@@ -119,12 +119,12 @@ public class DocumentAction extends PortletAction {
     public Resolution execute() throws IOException {
         loadContent();
         setupBlobs();
-        return forwardToPortletPage("/layouts/document/read.jsp");
+        return forwardToPortletPage("/layouts/text/read.jsp");
     }
 
     public void setupBlobs() {
         blobs = new ArrayList<Blob>();
-        for (Attachment attachment : documentNode.getAttachments()) {
+        for (Attachment attachment : textPage.getAttachments()) {
             Blob blob;
             try {
                 blob = attachmentManager.loadBlob(attachment.getCode());
@@ -136,23 +136,23 @@ public class DocumentAction extends PortletAction {
     }
 
     protected void loadContent() throws IOException {
-        String documentCode = documentNode.getFileName();
-        documentBlob = documentManager.loadBlob(documentCode);
-        File file = documentBlob.getDataFile();
-        String characterEncoding = documentBlob.getCharacterEncoding();
+        String textCode = textPage.getFileName();
+        textBlob = textManager.loadBlob(textCode);
+        File file = textBlob.getDataFile();
+        String characterEncoding = textBlob.getCharacterEncoding();
         content = FileUtils.readFileToString(file, characterEncoding);
     }
 
     protected void saveContent() throws IOException {
-        String documentCode = documentNode.getFileName();
+        String textCode = textPage.getFileName();
         byte[] contentByteArray = content.getBytes(CONTENT_ENCODING);
-        documentManager.updateBlob(documentCode, contentByteArray, CONTENT_ENCODING);
+        textManager.updateBlob(textCode, contentByteArray, CONTENT_ENCODING);
     }
 
     public Resolution configure() throws IOException {
-        title = documentNode.getTitle();
+        title = textPage.getTitle();
         loadContent();
-        return new ForwardResolution("/layouts/document/configure.jsp");
+        return new ForwardResolution("/layouts/text/configure.jsp");
     }
 
     public Resolution updateConfiguration() throws IOException {
@@ -164,13 +164,13 @@ public class DocumentAction extends PortletAction {
                 valid = false;
             }
             if (valid) {
-                documentNode.setTitle(title);
+                textPage.setTitle(title);
                 saveContent();
                 saveModel();
                 SessionMessages.addInfoMessage("Configuration updated successfully");
                 return cancel();
             } else {
-                return new ForwardResolution("/layouts/document/configure.jsp");
+                return new ForwardResolution("/layouts/text/configure.jsp");
             }
         }
 
@@ -185,7 +185,7 @@ public class DocumentAction extends PortletAction {
                         upload.getFileName(),
                         upload.getContentType(),
                         null);
-                DocumentLogic.createAttachment(documentNode, blob.getCode());
+                TextLogic.createAttachment(textPage, blob.getCode());
                 downloadAttachmentUrl =
                         String.format("%s?downloadAttachment=&code=%s",
                                 dispatch.getAbsoluteOriginalPath(),
@@ -198,14 +198,14 @@ public class DocumentAction extends PortletAction {
                 logger.error("Upload failed", e);
             }
             return new ForwardResolution(
-                    "/layouts/document/upload-attachment.jsp");
+                    "/layouts/text/upload-attachment.jsp");
         }
     }
 
     public Resolution downloadAttachment() {
         // find the attachment
         Attachment attachment =
-                DocumentLogic.findAttachmentByCode(documentNode, code);
+                TextLogic.findAttachmentByCode(textPage, code);
 
         if (attachment == null) {
             return new ErrorResolution(404, "Attachment not found");
@@ -228,13 +228,13 @@ public class DocumentAction extends PortletAction {
     public Resolution browse() throws IOException {
         logger.info("Browse");
         setupBlobs();
-        return new ForwardResolution("/layouts/document/browse.jsp");
+        return new ForwardResolution("/layouts/text/browse.jsp");
     }
 
     public Resolution manageAttachments() {
         logger.info("Manage attachments");
         setupBlobs();
-        return new ForwardResolution("/layouts/document/manage-attachments.jsp");
+        return new ForwardResolution("/layouts/text/manage-attachments.jsp");
     }
 
     //**************************************************************************
@@ -258,8 +258,8 @@ public class DocumentAction extends PortletAction {
         this.content = content;
     }
 
-    public DocumentNode getDocumentNode() {
-        return documentNode;
+    public TextPage getTextPage() {
+        return textPage;
     }
 
     public FileBean getUpload() {
@@ -326,11 +326,11 @@ public class DocumentAction extends PortletAction {
         this.blobs = blobs;
     }
 
-    public Blob getDocumentBlob() {
-        return documentBlob;
+    public Blob getTextBlob() {
+        return textBlob;
     }
 
-    public void setDocumentBlob(Blob documentBlob) {
-        this.documentBlob = documentBlob;
+    public void setTextBlob(Blob textBlob) {
+        this.textBlob = textBlob;
     }
 }

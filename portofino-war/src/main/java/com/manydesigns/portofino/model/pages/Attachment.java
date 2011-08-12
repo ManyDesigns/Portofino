@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.model.site;
+package com.manydesigns.portofino.model.pages;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
@@ -56,7 +56,7 @@ public class Attachment implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected DocumentNode documentNode;
+    protected TextPage textPage;
     protected String code;
 
     //**************************************************************************
@@ -74,8 +74,8 @@ public class Attachment implements ModelObject {
         this(null, null);
     }
 
-    public Attachment(DocumentNode documentNode, @Nullable String code) {
-        this.documentNode = documentNode;
+    public Attachment(TextPage textPage, @Nullable String code) {
+        this.textPage = textPage;
         this.code = code;
     }
 
@@ -84,7 +84,7 @@ public class Attachment implements ModelObject {
     //**************************************************************************
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
-        this.documentNode = (DocumentNode) parent;
+        this.textPage = (TextPage) parent;
     }
 
     public void reset() {
@@ -103,12 +103,12 @@ public class Attachment implements ModelObject {
     //**************************************************************************
 
 
-    public DocumentNode getDocumentNode() {
-        return documentNode;
+    public TextPage getTextPage() {
+        return textPage;
     }
 
-    public void setDocumentNode(DocumentNode documentNode) {
-        this.documentNode = documentNode;
+    public void setTextPage(TextPage textPage) {
+        this.textPage = textPage;
     }
 
     @Identifier

@@ -342,10 +342,10 @@ public class RoundtripTest extends AbstractPortofinoTest {
         DatabaseDiff databaseDiff = DiffUtil.diff(sourceDatabase, targetDatabase);
 
 
-        // check empty protlets/sitenodes/use-cases
+        // check empty protlets/pages/use-cases
         //TODO ripristinare
         //assertTrue(targetModel.getPortlets().isEmpty());
-        //assertTrue(targetModel.getSiteNodes().isEmpty());
+        //assertTrue(targetModel.getPages().isEmpty());
         //assertTrue(targetModel.getCrud().isEmpty());
 
         // check the database

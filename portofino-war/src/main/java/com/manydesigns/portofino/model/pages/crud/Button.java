@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.model.site.crud;
+package com.manydesigns.portofino.model.pages.crud;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;

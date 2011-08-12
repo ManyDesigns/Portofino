@@ -1203,65 +1203,65 @@
             </schemas>
         </database>
     </databases>
-    <rootNode title="Portofino4" description="portofino 4" id="/">
-        <childNodes>
-        <documentNode id="homepage" title="Homepage" description="Homepage" url="Document.action" fileName="misc/homepage.html">
+    <rootPage title="Portofino4" description="portofino 4" id="/">
+        <childPages>
+        <textPage id="homepage" title="Homepage" description="Homepage" url="Document.action" fileName="misc/homepage.html">
             <permissions>
                 <allow>
                     <group>anonymous</group>
                 </allow>
             </permissions>
-        </documentNode>
-        <folderNode id="model" title="Model" description="Model">
-            <childNodes>
-                <customNode id="ConnectionProviders"
+        </textPage>
+        <folderPage id="model" title="Model" description="Model">
+            <childPages>
+                <customPage id="ConnectionProviders"
                           url="/model/ConnectionProviders.action"
                           title="Connection providers"
                           description="Connection providers"/>
-                <customFolderNode  id="TableData" url="/model/TableData.action" type="table-data"
+                <customFolderPage  id="TableData" url="/model/TableData.action" type="table-data"
                           title="Table data" description="Table data"/>
-                <customFolderNode id="TabelDesign" url="/model/TableDesign.action" type="table-design"
+                <customFolderPage id="TabelDesign" url="/model/TableDesign.action" type="table-design"
                           title="Table design" description="Table design"/>
-                <customNode  id="SelfTest" url="/model/SelfTest.action" title="Self test"
+                <customPage  id="SelfTest" url="/model/SelfTest.action" title="Self test"
                           description="Self test"/>
-                <customNode id="SiteMap" url="/model/SiteMap.action" title="Site map"
+                <customPage id="SiteMap" url="/model/SiteMap.action" title="Site map"
                           description="Site map"/>
-                <customNode id="DDLWriter" url="/model/DDLWriter.action" title="DDL Writer"
+                <customPage id="DDLWriter" url="/model/DDLWriter.action" title="DDL Writer"
                           description="DDL Writer"/>
-            </childNodes>
+            </childPages>
             <permissions>
                 <allow>
                     <group>admins</group>
                 </allow>
             </permissions>
-        </folderNode>
-        <folderNode id="system-admin" title="System administration"
+        </folderPage>
+        <folderPage id="system-admin" title="System administration"
                   description="System administration">
-            <childNodes>
-                <customNode id="ServerInfo" url="/system-admin/ServerInfo.action"
+            <childPages>
+                <customPage id="ServerInfo" url="/system-admin/ServerInfo.action"
                           title="Server info" description="Server info"/>
-                <customNode id="ConfigurationProperties" url="/system-admin/ConfigurationProperties.action"
+                <customPage id="ConfigurationProperties" url="/system-admin/ConfigurationProperties.action"
                           title="Configuration properties"
                           description="Configuration properties"/>
-                <customNode url="/system-admin/Logs.action" id="Logs" title="Logs"
+                <customPage url="/system-admin/Logs.action" id="Logs" title="Logs"
                           description="Logs"/>
-            </childNodes>
+            </childPages>
             <permissions>
                 <allow>
                     <group>admins</group>
                 </allow>
             </permissions>
-        </folderNode>
-        <customNode id="Profile" url="/Profile.action" title="Profile" description="Profile">
+        </folderPage>
+        <customPage id="Profile" url="/Profile.action" title="Profile" description="Profile">
             <permissions>
                 <allow>
                     <group>registered</group>
                 </allow>
             </permissions>
-        </customNode>
-        <folderNode id="usersAdmin" description="User admin" title="admin user">
-            <childNodes>
-            <crudNode title="userAdmin"
+        </customPage>
+        <folderPage id="usersAdmin" description="User admin" title="admin user">
+            <childPages>
+            <crudPage title="userAdmin"
                          id="userAdmin"
                          description="user administration" url="/usersAdmin/Users.action">
                 <crud name = "users"
@@ -1338,8 +1338,8 @@
                         </crud>
                     </subCruds>
                 </crud>
-            </crudNode>
-            <crudNode title="groupAdmin"
+            </crudPage>
+            <crudPage title="groupAdmin"
                          id="groupAdmin"
                          description="groups administration" url="/usersAdmin/Groups.action">
                 <crud name="groupAdmin"
@@ -1367,19 +1367,19 @@
                         </selectionProvider>
                     </selectionProviders>
                 </crud>
-            </crudNode>
-            </childNodes>
+            </crudPage>
+            </childPages>
             <permissions>
                 <allow>
                     <group>users</group>
                 </allow>
             </permissions>
 
-        </folderNode>
-        <folderNode id="usecases" title="Use cases"
+        </folderPage>
+        <folderPage id="usecases" title="Use cases"
                   description="Use cases">
-            <childNodes>
-            <crudNode description="uc1" id="uc1" title="uc1">
+            <childPages>
+            <crudPage description="uc1" id="uc1" title="uc1">
                 <crud name="usecase1"
                  table="jpetstore.PUBLIC.product"
                  query="FROM jpetstore.PUBLIC.product product where product.category = %{'FISH'}"
@@ -1458,8 +1458,8 @@
                         </property>
                     </properties>
                 </crud>
-            </crudNode>
-            <crudNode description="uc2" id="uc2" title="uc2">
+            </crudPage>
+            <crudPage description="uc2" id="uc2" title="uc2">
                 <crud name="usecase2"
                          table="jpetstore.PUBLIC.category"
                          query="FROM jpetstore.PUBLIC.category"
@@ -1494,8 +1494,8 @@
                         </crud>
                     </subCruds>
                 </crud>
-            </crudNode>
-            <crudNode description="rimborsi" title="rimborsi" id="rimborsi">
+            </crudPage>
+            <crudPage description="rimborsi" title="rimborsi" id="rimborsi">
                 <crud name="rimborsi"
                  table="hibernatetest.PUBLIC.rimborso"
                  query="FROM hibernatetest.PUBLIC.rimborso rimborso"
@@ -1571,8 +1571,8 @@
                 </selectionProvider>
             </selectionProviders>
         </crud>
-            </crudNode>
-            <portletNode name="portlet1"
+            </crudPage>
+            <portletPage name="portlet1"
                          id="portlet1"
                          description="portlet 1"
                          type="pieChart"
@@ -1582,18 +1582,18 @@
                          query="SELECT category, count(*) FROM product WHERE %{'pippo'} IS NOT NULL GROUP BY category ORDER BY category"
                          urlExpression="http://www.google.com/search?q=%{key}"
                         />
-            </childNodes>
+            </childPages>
             <permissions>
                 <allow>
                     <group>users</group>
                 </allow>
             </permissions>
-        </folderNode>
-        </childNodes>
+        </folderPage>
+        </childPages>
         <permissions>
             <allow>
                 <group>anonymous</group>
             </allow>
         </permissions>
-    </rootNode>
+    </rootPage>
 </model>

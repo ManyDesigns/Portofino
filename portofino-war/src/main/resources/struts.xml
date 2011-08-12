@@ -85,7 +85,7 @@
             </result>
         </action>
         <action name="Document"
-                class="com.manydesigns.portofino.actions.DocumentAction">
+                class="com.manydesigns.portofino.actions.TextAction">
             <result name="success">/layouts/document.jsp</result>
         </action>
         <action name="UseCase"

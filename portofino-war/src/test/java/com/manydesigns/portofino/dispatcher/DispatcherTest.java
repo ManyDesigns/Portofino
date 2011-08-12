@@ -30,9 +30,9 @@
 package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
-import com.manydesigns.portofino.model.site.CrudNode;
-import com.manydesigns.portofino.model.site.RootNode;
-import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.pages.CrudPage;
+import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.model.pages.RootPage;
 import com.manydesigns.portofino.navigation.Navigation;
 
 import java.util.Collections;
@@ -72,34 +72,34 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(originalPath, dispatch.getOriginalPath());
         assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
 
-        SiteNodeInstance[] siteNodeInstancePath =
-                dispatch.getSiteNodeInstancePath();
-        assertEquals(1, siteNodeInstancePath.length);
+        PageInstance[] pageInstancePath =
+                dispatch.getPageInstancePath();
+        assertEquals(1, pageInstancePath.length);
 
-        CrudNodeInstance siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[0];
-        SiteNode siteNode = model.getRootNode().getChildNodes().get(0);
-        assertEquals(siteNode, siteNodeInstance.getSiteNode());
-        assertEquals(CrudNode.MODE_SEARCH, siteNodeInstance.getMode());
-        assertNull(siteNodeInstance.getPk());
+        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[0];
+        Page page = model.getRootPage().getChildPages().get(0);
+        assertEquals(page, pageInstance.getPage());
+        assertEquals(CrudPage.MODE_SEARCH, pageInstance.getMode());
+        assertNull(pageInstance.getPk());
 
         Navigation navigation =
                 new Navigation(application, dispatch, Collections.EMPTY_LIST);
         /*
-        List<NavigationNode> rootNodes = navigation.getRootNodes();
+        List<NavigationNode> rootPages = navigation.getRootNodes();
 
         // Navigation node per /projects
-        assertEquals(1, rootNodes.size());
-        NavigationNode navigationNode = rootNodes.get(0);
+        assertEquals(1, rootPages.size());
+        NavigationNode navigationNode = rootPages.get(0);
         assertEquals("/projects", navigationNode.getUrl());
-        assertEquals(siteNode, navigationNode.getSiteNode());
+        assertEquals(page, navigationNode.getPage());
         assertTrue(navigationNode.isEnabled());
 
         // Navigation node per /projects/tickets
         assertEquals(1, navigationNode.getChildNodes().size());
         navigationNode = navigationNode.getChildNodes().get(0);
         assertEquals("/projects/tickets", navigationNode.getUrl());
-        siteNode = siteNode.getChildNodes().get(0);
-        assertEquals(siteNode, navigationNode.getSiteNode());
+        page = page.getChildNodes().get(0);
+        assertEquals(page, navigationNode.getPage());
         assertFalse(navigationNode.isEnabled());
 */
         String htmlOutput = elementToString(navigation);
@@ -119,34 +119,34 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(originalPath, dispatch.getOriginalPath());
         assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
 
-        SiteNodeInstance[] siteNodeInstancePath =
-                dispatch.getSiteNodeInstancePath();
-        assertEquals(1, siteNodeInstancePath.length);
+        PageInstance[] pageInstancePath =
+                dispatch.getPageInstancePath();
+        assertEquals(1, pageInstancePath.length);
 
-        CrudNodeInstance siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[0];
-        SiteNode siteNode = model.getRootNode().getChildNodes().get(0);
-        assertEquals(siteNode, siteNodeInstance.getSiteNode());
-        assertEquals(CrudNode.MODE_NEW, siteNodeInstance.getMode());
-        assertNull(siteNodeInstance.getPk());
+        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[0];
+        Page page = model.getRootPage().getChildPages().get(0);
+        assertEquals(page, pageInstance.getPage());
+        assertEquals(CrudPage.MODE_NEW, pageInstance.getMode());
+        assertNull(pageInstance.getPk());
         
         Navigation navigation =
                 new Navigation(application, dispatch, Collections.EMPTY_LIST);
         /*
-        List<NavigationNode> rootNodes = navigation.getRootNodes();
+        List<NavigationNode> rootPages = navigation.getRootNodes();
 
         // Navigation node per /projects
-        assertEquals(1, rootNodes.size());
-        NavigationNode navigationNode = rootNodes.get(0);
+        assertEquals(1, rootPages.size());
+        NavigationNode navigationNode = rootPages.get(0);
         assertEquals("/projects", navigationNode.getUrl());
-        assertEquals(siteNode, navigationNode.getSiteNode());
+        assertEquals(page, navigationNode.getPage());
         assertTrue(navigationNode.isEnabled());
 
         // Navigation node per /projects/tickets
         assertEquals(1, navigationNode.getChildNodes().size());
         navigationNode = navigationNode.getChildNodes().get(0);
         assertEquals("/projects/tickets", navigationNode.getUrl());
-        siteNode = siteNode.getChildNodes().get(0);
-        assertEquals(siteNode, navigationNode.getSiteNode());
+        page = page.getChildNodes().get(0);
+        assertEquals(page, navigationNode.getPage());
         assertFalse(navigationNode.isEnabled());
         */
     }
@@ -160,39 +160,39 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(originalPath, dispatch.getOriginalPath());
         assertEquals(CHART_ACTION, dispatch.getRewrittenPath());
 
-        SiteNodeInstance[] siteNodeInstancePath =
-                dispatch.getSiteNodeInstancePath();
-        assertEquals(2, siteNodeInstancePath.length);
+        PageInstance[] pageInstancePath =
+                dispatch.getPageInstancePath();
+        assertEquals(2, pageInstancePath.length);
 
-        CrudNodeInstance siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[0];
-        SiteNode siteNode = model.getRootNode().getChildNodes().get(0);
-        assertEquals(siteNode, siteNodeInstance.getSiteNode());
-        assertEquals(CrudNode.MODE_SEARCH, siteNodeInstance.getMode());
-        assertNull(siteNodeInstance.getPk());
+        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[0];
+        Page page = model.getRootPage().getChildPages().get(0);
+        assertEquals(page, pageInstance.getPage());
+        assertEquals(CrudPage.MODE_SEARCH, pageInstance.getMode());
+        assertNull(pageInstance.getPk());
 
-        SiteNodeInstance reportNodeInstance = siteNodeInstancePath[1];
-        SiteNode reportNode = siteNode.getChildNodes().get(0);
+        PageInstance reportNodeInstance = pageInstancePath[1];
+        Page reportNode = page.getChildPages().get(0);
         assertEquals("report", reportNode.getId());
-        assertEquals(reportNode, reportNodeInstance.getSiteNode());
+        assertEquals(reportNode, reportNodeInstance.getPage());
         assertNull(reportNodeInstance.getMode());
-        assertNull(siteNodeInstance.getPk());
+        assertNull(pageInstance.getPk());
 
         /*
-        List<NavigationNode> rootNodes = navigation.getRootNodes();
+        List<NavigationNode> rootPages = navigation.getRootNodes();
 
         // Navigation node per /projects
-        assertEquals(1, rootNodes.size());
-        NavigationNode navigationNode = rootNodes.get(0);
+        assertEquals(1, rootPages.size());
+        NavigationNode navigationNode = rootPages.get(0);
         assertEquals("/projects", navigationNode.getUrl());
-        assertEquals(siteNode, navigationNode.getSiteNode());
+        assertEquals(page, navigationNode.getPage());
         assertTrue(navigationNode.isEnabled());
 
         // Navigation node per /projects/tickets
         assertEquals(1, navigationNode.getChildNodes().size());
         navigationNode = navigationNode.getChildNodes().get(0);
         assertEquals("/projects/tickets", navigationNode.getUrl());
-        siteNode = siteNode.getChildNodes().get(0);
-        assertEquals(siteNode, navigationNode.getSiteNode());
+        page = page.getChildNodes().get(0);
+        assertEquals(page, navigationNode.getPage());
         assertFalse(navigationNode.isEnabled());
         */
     }
@@ -206,44 +206,44 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(originalPath, dispatch.getOriginalPath());
         assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
 
-        SiteNodeInstance[] siteNodeInstancePath =
-                dispatch.getSiteNodeInstancePath();
-        assertEquals(1, siteNodeInstancePath.length);
+        PageInstance[] pageInstancePath =
+                dispatch.getPageInstancePath();
+        assertEquals(1, pageInstancePath.length);
 
         // nodo /project
-        List<SiteNodeInstance> tree = dispatch.getNavigationNodeInstances();
+        List<PageInstance> tree = dispatch.getNavigationPageInstances();
         assertNotNull(tree);
         assertEquals(1, tree.size());
 
-        CrudNodeInstance siteNodeInstance = (CrudNodeInstance) tree.get(0);
-        assertEquals(siteNodeInstancePath[0], siteNodeInstance);
-        RootNode rootNode = model.getRootNode();
-        CrudNode siteNode = (CrudNode) rootNode.getChildNodes().get(0);
-        assertEquals(siteNode, siteNodeInstance.getSiteNode());
-        assertEquals(CrudNode.MODE_DETAIL, siteNodeInstance.getMode());
-        assertEquals("10", siteNodeInstance.getPk());
+        CrudPageInstance pageInstance = (CrudPageInstance) tree.get(0);
+        assertEquals(pageInstancePath[0], pageInstance);
+        RootPage rootPage = model.getRootPage();
+        CrudPage page = (CrudPage) rootPage.getChildPages().get(0);
+        assertEquals(page, pageInstance.getPage());
+        assertEquals(CrudPage.MODE_DETAIL, pageInstance.getMode());
+        assertEquals("10", pageInstance.getPk());
 
         // nodo issues
-        tree = siteNodeInstance.getChildNodeInstances();
+        tree = pageInstance.getChildPageInstances();
         assertNotNull(tree);
         assertEquals(1, tree.size());
 
-        siteNodeInstance = (CrudNodeInstance) tree.get(0);
-        siteNode = (CrudNode) siteNode.getDetailChildNodes().get(0);
-        assertEquals(siteNode, siteNodeInstance.getSiteNode());
-        assertEquals(CrudNode.MODE_SEARCH, siteNodeInstance.getMode());
-        assertNull(siteNodeInstance.getPk());
+        pageInstance = (CrudPageInstance) tree.get(0);
+        page = (CrudPage) page.getDetailChildPages().get(0);
+        assertEquals(page, pageInstance.getPage());
+        assertEquals(CrudPage.MODE_SEARCH, pageInstance.getMode());
+        assertNull(pageInstance.getPk());
 
         Navigation navigation =
                 new Navigation(application, dispatch, Collections.EMPTY_LIST);
         /*
-        List<NavigationNode> rootNodes = navigation.getRootNodes();
+        List<NavigationNode> rootPages = navigation.getRootNodes();
 
         // Navigation node per /projects
-        assertEquals(1, rootNodes.size());
-        NavigationNode navigationNode = rootNodes.get(0);
+        assertEquals(1, rootPages.size());
+        NavigationNode navigationNode = rootPages.get(0);
         assertEquals("/projects", navigationNode.getUrl());
-        assertEquals(siteNode, navigationNode.getSiteNode());
+        assertEquals(page, navigationNode.getPage());
         assertTrue(navigationNode.isEnabled());
         */
 
@@ -258,8 +258,8 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(1, navigationNode.getChildNodes().size());
         navigationNode = navigationNode.getChildNodes().get(0);
         assertEquals("/projects/10/tickets", navigationNode.getUrl());
-        siteNode = siteNode.getChildNodes().get(0);
-        assertEquals(siteNode, navigationNode.getSiteNode());
+        page = page.getChildNodes().get(0);
+        assertEquals(page, navigationNode.getPage());
         assertTrue(navigationNode.isEnabled());
         */
     }
@@ -274,43 +274,43 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(originalPath, dispatch.getOriginalPath());
         assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
 
-        SiteNodeInstance[] siteNodeInstancePath =
-                dispatch.getSiteNodeInstancePath();
-        assertEquals(2, siteNodeInstancePath.length);
+        PageInstance[] pageInstancePath =
+                dispatch.getPageInstancePath();
+        assertEquals(2, pageInstancePath.length);
 
         Navigation navigation =
                 new Navigation(application, dispatch, Collections.EMPTY_LIST);
         /*
-        List<NavigationNode> rootNodes = navigation.getRootNodes();
+        List<NavigationNode> rootPages = navigation.getRootNodes();
         */
 
-        // SiteNode e NavigationNode per /projects
-        CrudNodeInstance siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[0];
-        SiteNode siteNode = model.getRootNode().getChildNodes().get(0);
-        assertEquals(siteNode, siteNodeInstance.getSiteNode());
-        assertEquals(CrudNode.MODE_DETAIL, siteNodeInstance.getMode());
-        assertEquals("10", siteNodeInstance.getPk());
+        // Page e NavigationNode per /projects
+        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[0];
+        Page page = model.getRootPage().getChildPages().get(0);
+        assertEquals(page, pageInstance.getPage());
+        assertEquals(CrudPage.MODE_DETAIL, pageInstance.getMode());
+        assertEquals("10", pageInstance.getPk());
 
         /*
-        assertEquals(1, rootNodes.size());
-        NavigationNode navigationNode = rootNodes.get(0);
+        assertEquals(1, rootPages.size());
+        NavigationNode navigationNode = rootPages.get(0);
         assertEquals("/projects", navigationNode.getUrl());
-        assertEquals(siteNode, navigationNode.getSiteNode());
+        assertEquals(page, navigationNode.getPage());
         assertTrue(navigationNode.isEnabled());
         */
 
-        siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[1];
-        siteNode = ((CrudNode)siteNode).getDetailChildNodes().get(0);
-        assertEquals(siteNode, siteNodeInstance.getSiteNode());
-        assertEquals(CrudNode.MODE_SEARCH, siteNodeInstance.getMode());
-        assertNull(siteNodeInstance.getPk());
+        pageInstance = (CrudPageInstance) pageInstancePath[1];
+        page = ((CrudPage) page).getDetailChildPages().get(0);
+        assertEquals(page, pageInstance.getPage());
+        assertEquals(CrudPage.MODE_SEARCH, pageInstance.getMode());
+        assertNull(pageInstance.getPk());
 
         /*
-        // SiteNode e NavigationNode per /projects/tickets
+        // Page e NavigationNode per /projects/tickets
         assertEquals(1, navigationNode.getChildNodes().size());
         navigationNode = navigationNode.getChildNodes().get(0);
         assertEquals("/projects/10/tickets", navigationNode.getUrl());
-        assertEquals(siteNode, navigationNode.getSiteNode());
+        assertEquals(page, navigationNode.getPage());
         assertTrue(navigationNode.isEnabled());
 */
 
@@ -331,21 +331,21 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(originalPath, dispatch.getOriginalPath());
         assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
 
-        SiteNodeInstance[] siteNodeInstancePath =
-                dispatch.getSiteNodeInstancePath();
-        assertEquals(2, siteNodeInstancePath.length);
+        PageInstance[] pageInstancePath =
+                dispatch.getPageInstancePath();
+        assertEquals(2, pageInstancePath.length);
 
-        CrudNodeInstance siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[0];
-        CrudNode expected = (CrudNode) model.getRootNode().getChildNodes().get(0);
-        assertEquals(expected, siteNodeInstance.getSiteNode());
-        assertEquals(CrudNode.MODE_DETAIL, siteNodeInstance.getMode());
-        assertEquals("10", siteNodeInstance.getPk());
+        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[0];
+        CrudPage expected = (CrudPage) model.getRootPage().getChildPages().get(0);
+        assertEquals(expected, pageInstance.getPage());
+        assertEquals(CrudPage.MODE_DETAIL, pageInstance.getMode());
+        assertEquals("10", pageInstance.getPk());
 
-        siteNodeInstance = (CrudNodeInstance) siteNodeInstancePath[1];
-        expected = (CrudNode) expected.getDetailChildNodes().get(0);
-        assertEquals(expected, siteNodeInstance.getSiteNode());
-        assertEquals(CrudNode.MODE_DETAIL, siteNodeInstance.getMode());
-        assertEquals("20", siteNodeInstance.getPk());
+        pageInstance = (CrudPageInstance) pageInstancePath[1];
+        expected = (CrudPage) expected.getDetailChildPages().get(0);
+        assertEquals(expected, pageInstance.getPage());
+        assertEquals(CrudPage.MODE_DETAIL, pageInstance.getMode());
+        assertEquals("20", pageInstance.getPk());
     }
 
     public void testIllegal1() {

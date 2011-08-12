@@ -4,12 +4,12 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
+import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.site.CrudNode;
-import com.manydesigns.portofino.model.site.SiteNode;
+import com.manydesigns.portofino.model.pages.CrudPage;
+import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -36,8 +36,8 @@ public class PortletAction extends AbstractActionBean {
     @Inject(RequestAttributes.DISPATCH)
     public Dispatch dispatch;
 
-    @Inject(RequestAttributes.SITE_NODE_INSTANCE)
-    public SiteNodeInstance siteNodeInstance;
+    @Inject(RequestAttributes.PAGE_INSTANCE)
+    public PageInstance pageInstance;
 
     @Inject(ApplicationAttributes.APPLICATION)
     public Application application;
@@ -69,32 +69,32 @@ public class PortletAction extends AbstractActionBean {
     }
 
     public void setupReturnToParentTarget() {
-        SiteNodeInstance[] siteNodeInstancePath =
-                dispatch.getSiteNodeInstancePath();
-        SiteNodeInstance thisNodeInstance = dispatch.getLastSiteNodeInstance();
-        boolean hasPrevious = siteNodeInstancePath.length > 1;
+        PageInstance[] pageInstancePath =
+                dispatch.getPageInstancePath();
+        PageInstance thisPageInstance = dispatch.getLastPageInstance();
+        boolean hasPrevious = pageInstancePath.length > 1;
         returnToParentTarget = null;
         if (hasPrevious) {
-            int previousPos = siteNodeInstancePath.length - 2;
-            SiteNodeInstance previousNode = siteNodeInstancePath[previousPos];
-            if (previousNode instanceof CrudNodeInstance) {
-                CrudNodeInstance crudNodeInstance =
-                        (CrudNodeInstance) previousNode;
-                if (CrudNode.MODE_SEARCH.equals(crudNodeInstance.getMode())) {
-                    returnToParentTarget = crudNodeInstance.getCrud().getName();
-                } else if (CrudNode.MODE_DETAIL.equals(crudNodeInstance.getMode())) {
-                    Object previousNodeObject = crudNodeInstance.getObject();
-                    ClassAccessor previousNodeClassAccessor =
-                            crudNodeInstance.getClassAccessor();
+            int previousPos = pageInstancePath.length - 2;
+            PageInstance previousPageInstance = pageInstancePath[previousPos];
+            if (previousPageInstance instanceof CrudPageInstance) {
+                CrudPageInstance crudPageInstance =
+                        (CrudPageInstance) previousPageInstance;
+                if (CrudPage.MODE_SEARCH.equals(crudPageInstance.getMode())) {
+                    returnToParentTarget = crudPageInstance.getCrud().getName();
+                } else if (CrudPage.MODE_DETAIL.equals(crudPageInstance.getMode())) {
+                    Object previousPageObject = crudPageInstance.getObject();
+                    ClassAccessor previousPageClassAccessor =
+                            crudPageInstance.getClassAccessor();
                     returnToParentTarget = ShortNameUtils.getName(
-                            previousNodeClassAccessor, previousNodeObject);
+                            previousPageClassAccessor, previousPageObject);
                 }
             }
         } else {
-            if (thisNodeInstance instanceof CrudNodeInstance) {
-                CrudNodeInstance crudNodeInstance =
-                        (CrudNodeInstance) thisNodeInstance;
-                if (CrudNode.MODE_DETAIL.equals(crudNodeInstance.getMode())) {
+            if (thisPageInstance instanceof CrudPageInstance) {
+                CrudPageInstance crudPageInstance =
+                        (CrudPageInstance) thisPageInstance;
+                if (CrudPage.MODE_DETAIL.equals(crudPageInstance.getMode())) {
                     returnToParentTarget = "search";
                 }
             }
@@ -137,18 +137,18 @@ public class PortletAction extends AbstractActionBean {
     }
 
     protected void updateLayout(String layoutContainer, String[] portletWrapperIds) {
-        SiteNodeInstance myself = dispatch.getLastSiteNodeInstance();
+        PageInstance myself = dispatch.getLastPageInstance();
         for(int i = 0; i < portletWrapperIds.length; i++) {
             String current = portletWrapperIds[i];
             if("p".equals(current)) {
                 myself.setLayoutContainer(layoutContainer);
                 myself.setLayoutOrder(i);
             } else {
-                String nodeId = current.substring(1); //current = c...
-                SiteNodeInstance childNodeInstance = myself.findChildNode(nodeId);
-                SiteNode childNode = childNodeInstance.getSiteNode();
-                childNode.setLayoutContainerInParent(layoutContainer);
-                childNode.setLayoutOrderInParent(i + "");
+                String pageId = current.substring(1); //current = c...
+                PageInstance childPageInstance = myself.findChildPage(pageId);
+                Page childPage = childPageInstance.getPage();
+                childPage.setLayoutContainerInParent(layoutContainer);
+                childPage.setLayoutOrderInParent(i + "");
             }
         }
     }
@@ -181,17 +181,17 @@ public class PortletAction extends AbstractActionBean {
         this.resultSetNavigation = resultSetNavigation;
     }
 
-    protected void setupPortlets(SiteNodeInstance siteNodeInstance, String myself) {
-        PortletInstance myPortletInstance = new PortletInstance("p", siteNodeInstance.getLayoutOrder(), myself);
-        portlets.put(siteNodeInstance.getLayoutContainer(), myPortletInstance);
-        for(SiteNode node : siteNodeInstance.getChildNodes()) {
-            if(node.getLayoutContainerInParent() != null) {
+    protected void setupPortlets(PageInstance pageInstance, String myself) {
+        PortletInstance myPortletInstance = new PortletInstance("p", pageInstance.getLayoutOrder(), myself);
+        portlets.put(pageInstance.getLayoutContainer(), myPortletInstance);
+        for(Page page : pageInstance.getChildPages()) {
+            if(page.getLayoutContainerInParent() != null) {
                 PortletInstance portletInstance =
                         new PortletInstance(
-                                "c" + node.getId(),
-                                node.getActualLayoutOrderInParent(),
-                                dispatch.getOriginalPath() + "/" + node.getId());
-                portlets.put(node.getLayoutContainerInParent(), portletInstance);
+                                "c" + page.getId(),
+                                page.getActualLayoutOrderInParent(),
+                                dispatch.getOriginalPath() + "/" + page.getId());
+                portlets.put(page.getLayoutContainerInParent(), portletInstance);
             }
         }
         for(Object entryObj : portlets.entrySet()) {
@@ -201,8 +201,8 @@ public class PortletAction extends AbstractActionBean {
         }
     }
 
-    protected Resolution forwardToPortletPage(String nodeJsp) {
-        setupPortlets(siteNodeInstance, nodeJsp);
+    protected Resolution forwardToPortletPage(String pageJsp) {
+        setupPortlets(pageInstance, pageJsp);
         HttpServletRequest request = context.getRequest();
         request.setAttribute("cancelReturnUrl", cancelReturnUrl);
         return new ForwardResolution("/layouts/portlet-page.jsp");
@@ -217,12 +217,12 @@ public class PortletAction extends AbstractActionBean {
         }
     }
 
-    public SiteNodeInstance getSiteNodeInstance() {
-        return siteNodeInstance;
+    public PageInstance getPageInstance() {
+        return pageInstance;
     }
 
-    public void setSiteNodeInstance(SiteNodeInstance siteNodeInstance) {
-        this.siteNodeInstance = siteNodeInstance;
+    public void setPageInstance(PageInstance pageInstance) {
+        this.pageInstance = pageInstance;
     }
 
     public Application getApplication() {

@@ -26,10 +26,12 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.model.site;
+package com.manydesigns.portofino.model.pages;
+
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -38,8 +40,23 @@ import javax.xml.bind.annotation.XmlAccessorType;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public class FolderNode extends SiteNode{
-    public FolderNode() {
+public class CustomFolderPage extends Page {
+
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+    protected String type;
+
+    public CustomFolderPage() {
         super();
+    }
+
+    @XmlAttribute(required = true)
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

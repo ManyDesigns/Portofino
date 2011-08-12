@@ -32,7 +32,7 @@ package com.manydesigns.portofino.context;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.site.crud.Crud;
+import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.User;

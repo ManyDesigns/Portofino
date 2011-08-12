@@ -26,9 +26,8 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.model.site;
+package com.manydesigns.portofino.model.pages;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
@@ -39,14 +38,13 @@ import javax.xml.bind.annotation.XmlAccessorType;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public class RootNode extends SiteNode {
-    public RootNode() {
-        super();
-    }
+public class CustomPage extends Page {
 
-    @Override
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
-        // do nothing
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+    public CustomPage() {
+        super();
     }
 
 }

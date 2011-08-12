@@ -44,5 +44,5 @@ public class RequestAttributes {
     public final static String NAVIGATION = "navigation";
     public final static String BREADCRUMBS = "breadcrumbs";
     public static final String MODEL = "model";
-    public static final String SITE_NODE_INSTANCE = "siteNodeInstance";
+    public static final String PAGE_INSTANCE = "pageInstance";
 }

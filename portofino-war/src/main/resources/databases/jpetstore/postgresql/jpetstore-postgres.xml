@@ -135,38 +135,38 @@
             </schemas>
         </database>
     </databases>
-    <siteNodes>
-        <siteNode type="simple" url="/Homepage.action" title="Homepage" description="Homepage"/>
-        <siteNode type="use-cases" url="/Crud.action" title="Use cases" description="Use cases"/>
-        <siteNode url="/model/Index.action" title="Model" description="Model">
-            <childNodes>
-                <siteNode url="/model/ConnectionProviders.action" title="Connection providers" description="Connection providers"/>
-                <siteNode type="table-data" url="/model/TableData.action" title="Table data" description="Table data"/>
-                <siteNode type="table-design" url="/model/TableDesign.action" title="Table design" description="Table design"/>
-                <siteNode url="/model/PrintModel.action" title="Print model" description="Print model"/>
-                <siteNode url="/model/SelfTest.action" title="Self test" description="Self test"/>
-                <siteNode url="/model/SiteMap.action" title="Site map" description="Site map"/>
-                <siteNode url="/model/DDLWriter.action" title="DDL Writer" description="DDL Writer"/>
-                <siteNode type="portlet-design" url="/model/PortletDesign.action" title="Portlet design" description="Portlet design"/>
-            </childNodes>
-        </siteNode>
-        <siteNode url="/system-admin/Index.action" title="System administration" description="System administration">
-            <childNodes>
-                <siteNode url="/system-admin/ServerInfo.action" title="Server info" description="Server info"/>
-                <siteNode url="/system-admin/ConfigurationProperties.action" title="Configuration properties" description="Configuration properties"/>
-                <siteNode url="/system-admin/Logs.action" title="Logs" description="Logs"/>
-                <siteNode url="/system-admin/Logs.action" title="Users" description="Users">
-                </siteNode>
-            </childNodes>
-        </siteNode>
-        <siteNode url="/user/Index.action" title="Personal area" description="Personal area">
-            <childNodes>
-                <siteNode url="/user/Profile.action" title="Profile" description="Profile"/>
-                <siteNode url="/user/Settings.action" title="Settings" description="Settings"/>
-                <siteNode url="/user/Help.action" title="Help" description="Help"/>
-            </childNodes>
-        </siteNode>
-    </siteNodes>
+    <pages>
+        <page type="simple" url="/Homepage.action" title="Homepage" description="Homepage"/>
+        <page type="use-cases" url="/Crud.action" title="Use cases" description="Use cases"/>
+        <page url="/model/Index.action" title="Model" description="Model">
+            <childPages>
+                <page url="/model/ConnectionProviders.action" title="Connection providers" description="Connection providers"/>
+                <page type="table-data" url="/model/TableData.action" title="Table data" description="Table data"/>
+                <page type="table-design" url="/model/TableDesign.action" title="Table design" description="Table design"/>
+                <page url="/model/PrintModel.action" title="Print model" description="Print model"/>
+                <page url="/model/SelfTest.action" title="Self test" description="Self test"/>
+                <page url="/model/SiteMap.action" title="Site map" description="Site map"/>
+                <page url="/model/DDLWriter.action" title="DDL Writer" description="DDL Writer"/>
+                <page type="portlet-design" url="/model/PortletDesign.action" title="Portlet design" description="Portlet design"/>
+            </childPages>
+        </page>
+        <page url="/system-admin/Index.action" title="System administration" description="System administration">
+            <childPages>
+                <page url="/system-admin/ServerInfo.action" title="Server info" description="Server info"/>
+                <page url="/system-admin/ConfigurationProperties.action" title="Configuration properties" description="Configuration properties"/>
+                <page url="/system-admin/Logs.action" title="Logs" description="Logs"/>
+                <page url="/system-admin/Logs.action" title="Users" description="Users">
+                </page>
+            </childPages>
+        </page>
+        <page url="/user/Index.action" title="Personal area" description="Personal area">
+            <childPages>
+                <page url="/user/Profile.action" title="Profile" description="Profile"/>
+                <page url="/user/Settings.action" title="Settings" description="Settings"/>
+                <page url="/user/Help.action" title="Help" description="Help"/>
+            </childPages>
+        </page>
+    </pages>
     <portlets>
     </portlets>
 </model>

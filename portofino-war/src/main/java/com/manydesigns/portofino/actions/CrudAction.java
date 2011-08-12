@@ -45,15 +45,15 @@ import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.context.TableCriteria;
-import com.manydesigns.portofino.dispatcher.CrudNodeInstance;
-import com.manydesigns.portofino.dispatcher.SiteNodeInstance;
+import com.manydesigns.portofino.dispatcher.CrudPageInstance;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
-import com.manydesigns.portofino.model.site.CrudNode;
-import com.manydesigns.portofino.model.site.crud.Button;
-import com.manydesigns.portofino.model.site.crud.Crud;
+import com.manydesigns.portofino.model.pages.CrudPage;
+import com.manydesigns.portofino.model.pages.crud.Button;
+import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
@@ -97,7 +97,7 @@ public class CrudAction extends PortletAction {
 
     public final static String SEARCH_STRING_PARAM = "searchString";
 
-    public CrudNode crudNode;
+    public CrudPage crudPage;
     public Crud crud;
 
     public ClassAccessor classAccessor;
@@ -152,16 +152,16 @@ public class CrudAction extends PortletAction {
 
     @Before
     public void prepare() {
-        CrudNodeInstance crudNodeInstance = getSiteNodeInstance();
-        pk = crudNodeInstance.getPk();
-        crudNode = getSiteNodeInstance().getSiteNode();
-        crud = crudNode.getCrud();
-        classAccessor = crudNodeInstance.getClassAccessor();
-        baseTable = crudNodeInstance.getBaseTable();
-        pkHelper = crudNodeInstance.getPkHelper();
+        CrudPageInstance crudPageInstance = getPageInstance();
+        pk = crudPageInstance.getPk();
+        crudPage = getPageInstance().getPage();
+        crud = crudPage.getCrud();
+        classAccessor = crudPageInstance.getClassAccessor();
+        baseTable = crudPageInstance.getBaseTable();
+        pkHelper = crudPageInstance.getPkHelper();
         crudButtons = new ArrayList<CrudButton>();
         crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
-        object = crudNodeInstance.getObject();
+        object = crudPageInstance.getObject();
 
         setupSelectionProviders();
     }
@@ -525,13 +525,13 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     public Resolution returnToParent() {
-        SiteNodeInstance[] siteNodeInstancePath =
-                dispatch.getSiteNodeInstancePath();
-        int previousPos = siteNodeInstancePath.length - 2;
+        PageInstance[] pageInstancePath =
+                dispatch.getPageInstancePath();
+        int previousPos = pageInstancePath.length - 2;
         RedirectResolution resolution;
         if (previousPos >= 0) {
-            SiteNodeInstance previousNode = siteNodeInstancePath[previousPos];
-            if (previousNode instanceof CrudNodeInstance) {
+            PageInstance previousPageInstance = pageInstancePath[previousPos];
+            if (previousPageInstance instanceof CrudPageInstance) {
                 String url = dispatch.getPathUrl(previousPos + 1);
                 resolution = new RedirectResolution(url, true);
             } else {
@@ -1215,7 +1215,7 @@ public class CrudAction extends PortletAction {
     // Configuration
     //**************************************************************************
 
-    public static final String[][] CRUD_NODE_CONFIGURATION_FIELDS =
+    public static final String[][] CRUD_PAGE_CONFIGURATION_FIELDS =
             {{"title", "description"}};
     public static final String[][] CRUD_CONFIGURATION_FIELDS =
             {{"name", "table", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable"}};
@@ -1224,16 +1224,16 @@ public class CrudAction extends PortletAction {
 
     public Resolution configure() {
         prepareConfigurationForms();
-        form.readFromObject(crudNode);
-        crudConfigurationForm.readFromObject(crudNode.getCrud());
+        form.readFromObject(crudPage);
+        crudConfigurationForm.readFromObject(crudPage.getCrud());
 
         return new ForwardResolution("/layouts/crud/configure.jsp");
     }
 
     private void prepareConfigurationForms() {
-        form = new FormBuilder(CrudNode.class)
-                .configFields(CRUD_NODE_CONFIGURATION_FIELDS)
-                .configFieldSetNames("Crud node")
+        form = new FormBuilder(CrudPage.class)
+                .configFields(CRUD_PAGE_CONFIGURATION_FIELDS)
+                .configFieldSetNames("Crud page")
                 .build();
 
         SelectionProvider tableSelectionProvider =
@@ -1252,15 +1252,15 @@ public class CrudAction extends PortletAction {
     public Resolution updateConfiguration() {
         synchronized (application) {
             prepareConfigurationForms();
-            form.readFromObject(crudNode);
-            crudConfigurationForm.readFromObject(crudNode.getCrud());
+            form.readFromObject(crudPage);
+            crudConfigurationForm.readFromObject(crudPage.getCrud());
             form.readFromRequest(context.getRequest());
             crudConfigurationForm.readFromRequest(context.getRequest());
             boolean valid = form.validate();
             valid = crudConfigurationForm.validate() && valid;
             if (valid) {
-                form.writeToObject(crudNode);
-                crudConfigurationForm.writeToObject(crudNode.getCrud());
+                form.writeToObject(crudPage);
+                crudConfigurationForm.writeToObject(crudPage.getCrud());
                 saveModel();
                 SessionMessages.addInfoMessage("Configuration updated successfully");
                 return cancel();
@@ -1276,16 +1276,16 @@ public class CrudAction extends PortletAction {
         return form.isRequiredFieldsPresent();
     }
 
-    public CrudNodeInstance getSiteNodeInstance() {
-        return (CrudNodeInstance) siteNodeInstance;
+    public CrudPageInstance getPageInstance() {
+        return (CrudPageInstance) pageInstance;
     }
 
-    public CrudNode getCrudNode() {
-        return crudNode;
+    public CrudPage getCrudPage() {
+        return crudPage;
     }
 
-    public void setCrudNode(CrudNode crudNode) {
-        this.crudNode = crudNode;
+    public void setCrudPage(CrudPage crudPage) {
+        this.crudPage = crudPage;
     }
 
     public Crud getCrud() {
@@ -1413,7 +1413,7 @@ public class CrudAction extends PortletAction {
     }
 
     public String getMode() {
-        return siteNodeInstance.getMode();
+        return pageInstance.getMode();
     }
 
     public Form getCrudConfigurationForm() {

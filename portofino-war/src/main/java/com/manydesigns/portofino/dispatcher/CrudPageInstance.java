@@ -33,9 +33,9 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.model.site.CrudNode;
-import com.manydesigns.portofino.model.site.SiteNode;
-import com.manydesigns.portofino.model.site.crud.Crud;
+import com.manydesigns.portofino.model.pages.CrudPage;
+import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.util.PkHelper;
 import ognl.OgnlContext;
 
@@ -49,7 +49,7 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla - alessio.stalla@manydesigns.com
 */
-public class CrudNodeInstance extends SiteNodeInstance {
+public class CrudPageInstance extends PageInstance {
 
     protected final String pk;
     protected final Crud crud;
@@ -60,17 +60,17 @@ public class CrudNodeInstance extends SiteNodeInstance {
 
     protected Object object;
 
-    public CrudNodeInstance(Application application, CrudNode siteNode, String mode, String param) {
-        super(application, siteNode, mode);
+    public CrudPageInstance(Application application, CrudPage page, String mode, String param) {
+        super(application, page, mode);
         this.pk = param;
-        this.crud = siteNode.getCrud();
+        this.crud = page.getCrud();
         classAccessor = application.getCrudAccessor(crud);
         baseTable = crud.getActualTable();
         pkHelper = new PkHelper(classAccessor);
     }
 
     public void realize() {
-        if(CrudNode.MODE_DETAIL.equals(mode)) {
+        if(CrudPage.MODE_DETAIL.equals(mode)) {
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
             loadObject(pk);
             if(object != null) {
@@ -95,8 +95,8 @@ public class CrudNodeInstance extends SiteNodeInstance {
     }
 
     @Override
-    public CrudNode getSiteNode() {
-        return (CrudNode) super.getSiteNode();
+    public CrudPage getPage() {
+        return (CrudPage) super.getPage();
     }
 
     @Override
@@ -129,11 +129,11 @@ public class CrudNodeInstance extends SiteNodeInstance {
     }
 
     @Override
-    public List<SiteNode> getChildNodes() {
-        if (CrudNode.MODE_SEARCH.equals(mode)) {
-            return siteNode.getChildNodes();
-        } else if (CrudNode.MODE_DETAIL.equals(mode)) {
-            return getSiteNode().getDetailChildNodes();
+    public List<Page> getChildPages() {
+        if (CrudPage.MODE_SEARCH.equals(mode)) {
+            return page.getChildPages();
+        } else if (CrudPage.MODE_DETAIL.equals(mode)) {
+            return getPage().getDetailChildPages();
         } else {
             return Collections.EMPTY_LIST;
         }
@@ -141,10 +141,10 @@ public class CrudNodeInstance extends SiteNodeInstance {
 
     @Override
     public String getLayoutContainer() {
-        if (CrudNode.MODE_SEARCH.equals(mode)) {
-            return siteNode.getLayoutContainer();
-        } else if (CrudNode.MODE_DETAIL.equals(mode)) {
-            return getSiteNode().getDetailLayoutContainer();
+        if (CrudPage.MODE_SEARCH.equals(mode)) {
+            return page.getLayoutContainer();
+        } else if (CrudPage.MODE_DETAIL.equals(mode)) {
+            return getPage().getDetailLayoutContainer();
         } else {
             throw new IllegalStateException("Unsupported mode: " + mode);
         }
@@ -152,10 +152,10 @@ public class CrudNodeInstance extends SiteNodeInstance {
 
     @Override
     public void setLayoutContainer(String layoutContainer) {
-        if (CrudNode.MODE_SEARCH.equals(mode)) {
-            siteNode.setLayoutContainer(layoutContainer);
-        } else if (CrudNode.MODE_DETAIL.equals(mode)) {
-            getSiteNode().setDetailLayoutContainer(layoutContainer);
+        if (CrudPage.MODE_SEARCH.equals(mode)) {
+            page.setLayoutContainer(layoutContainer);
+        } else if (CrudPage.MODE_DETAIL.equals(mode)) {
+            getPage().setDetailLayoutContainer(layoutContainer);
         } else {
             throw new IllegalStateException("Unsupported mode: " + mode);
         }
@@ -163,10 +163,10 @@ public class CrudNodeInstance extends SiteNodeInstance {
 
     @Override
     public void setLayoutOrder(int order) {
-        if (CrudNode.MODE_SEARCH.equals(mode)) {
-            siteNode.setLayoutOrder(Integer.toString(order));
-        } else if (CrudNode.MODE_DETAIL.equals(mode)) {
-            getSiteNode().setDetailLayoutOrder(Integer.toString(order));
+        if (CrudPage.MODE_SEARCH.equals(mode)) {
+            page.setLayoutOrder(Integer.toString(order));
+        } else if (CrudPage.MODE_DETAIL.equals(mode)) {
+            getPage().setDetailLayoutOrder(Integer.toString(order));
         } else {
             throw new IllegalStateException("Unsupported mode: " + mode);
         }
@@ -174,10 +174,10 @@ public class CrudNodeInstance extends SiteNodeInstance {
 
     @Override
     public int getLayoutOrder() {
-        if (CrudNode.MODE_SEARCH.equals(mode)) {
-            return siteNode.getActualLayoutOrder();
-        } else if (CrudNode.MODE_DETAIL.equals(mode)) {
-            return getSiteNode().getActualDetailLayoutOrder();
+        if (CrudPage.MODE_SEARCH.equals(mode)) {
+            return page.getActualLayoutOrder();
+        } else if (CrudPage.MODE_DETAIL.equals(mode)) {
+            return getPage().getActualDetailLayoutOrder();
         } else {
             throw new IllegalStateException("Unsupported mode: " + mode);
         }
