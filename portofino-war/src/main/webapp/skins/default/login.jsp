@@ -23,14 +23,17 @@
     </head>
     <body>
     <div id="doc3">
-        <div style="position: absolute; left: 20em;">
-            <mde:sessionMessages/>
+        <div id="hd">
+            <div style="position: absolute; left: 20em;">
+                <mde:sessionMessages/>
+            </div>
         </div>
+        <div id="bd">
         <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
         <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction" method="post">
             <div id="content-login">
                 <div class="contentBody">
-                    <div class="portletWrapper noSpacing">
+                    <div class="portletWrapper">
                         <div class="portlet">
                             <div class="portletHeader">
                                 <div class="yui-g">
@@ -72,9 +75,8 @@
                                     </table>
                                 </stripes:layout-component>
                             </div>
-                            <div class="portletFooter">
-                                <stripes:layout-component name="portletFooter">
-                                </stripes:layout-component>
+                            <div class="portletFooter" style="border-top: 1px solid #ddd; padding-top: 0.5em">
+                                Powered by <a href="http://www.manydesigns.com/">ManyDesigns Portofino</a>
                             </div>
                         </div>
                     </div>
@@ -85,6 +87,7 @@
             </script>
             <stripes:hidden name="returnUrl"/>
         </stripes:form>
+        </div>
     </div>
  </body>
 </html>

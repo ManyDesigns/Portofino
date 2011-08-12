@@ -109,6 +109,7 @@ Content
 
 div.contentBody {
     padding: 1em;
+    margin-bottom: -3em;
 }
 
 .contentHeader, .contentFooter {
@@ -152,11 +153,6 @@ Portlet
 
 .portletWrapper {
     margin-bottom: 3em;
-    width: 100%;
-}
-
-.portletWrapper.noSpacing {
-    margin-bottom: 0;
     width: 100%;
 }
 
@@ -412,7 +408,7 @@ div#content-login {
     border: 3px solid #65A7DB;
     border-radius: 6px;
     -moz-border-radius: 6px;
-    margin: 12em auto 0 auto;
+    margin: 12em auto;
     width: 400px;
     background-color: white;
 }
