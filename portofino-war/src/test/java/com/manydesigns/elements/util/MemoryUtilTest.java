@@ -49,23 +49,23 @@ public class MemoryUtilTest extends AbstractElementsTest {
         assertEquals("100 bytes", MemoryUtil.bytesToHumanString(100));
         assertEquals("999 bytes", MemoryUtil.bytesToHumanString(999));
 
-        assertEquals("1.0 KB", MemoryUtil.bytesToHumanString(1000));
-        assertEquals("1.0 KB", MemoryUtil.bytesToHumanString(1001));
-        assertEquals("1.0 KB", MemoryUtil.bytesToHumanString(1049));
-        assertEquals("1.1 KB", MemoryUtil.bytesToHumanString(1050));
-        assertEquals("1.1 KB", MemoryUtil.bytesToHumanString(1100));
-        assertEquals("9.9 KB", MemoryUtil.bytesToHumanString(9949));
-        assertEquals("10 KB", MemoryUtil.bytesToHumanString(9950));
-        assertEquals("10 KB", MemoryUtil.bytesToHumanString(9951));
-        assertEquals("10 KB", MemoryUtil.bytesToHumanString(10000));
+        assertEquals("1.0K", MemoryUtil.bytesToHumanString(1000));
+        assertEquals("1.0K", MemoryUtil.bytesToHumanString(1001));
+        assertEquals("1.0K", MemoryUtil.bytesToHumanString(1049));
+        assertEquals("1.1K", MemoryUtil.bytesToHumanString(1050));
+        assertEquals("1.1K", MemoryUtil.bytesToHumanString(1100));
+        assertEquals("9.9K", MemoryUtil.bytesToHumanString(9949));
+        assertEquals("10K", MemoryUtil.bytesToHumanString(9950));
+        assertEquals("10K", MemoryUtil.bytesToHumanString(9951));
+        assertEquals("10K", MemoryUtil.bytesToHumanString(10000));
 
-        assertEquals("999 KB", MemoryUtil.bytesToHumanString(999499));
-        assertEquals("1.0 MB", MemoryUtil.bytesToHumanString(999500));
-        assertEquals("1.0 MB", MemoryUtil.bytesToHumanString(1049999));
-        assertEquals("1.1 MB", MemoryUtil.bytesToHumanString(1050000));
+        assertEquals("999K", MemoryUtil.bytesToHumanString(999499));
+        assertEquals("1.0M", MemoryUtil.bytesToHumanString(999500));
+        assertEquals("1.0M", MemoryUtil.bytesToHumanString(1049999));
+        assertEquals("1.1M", MemoryUtil.bytesToHumanString(1050000));
 
-        assertEquals("1.0 GB", MemoryUtil.bytesToHumanString(1000000000L));
-        assertEquals("1.0 TB", MemoryUtil.bytesToHumanString(1000000000000L));
-        assertEquals("1.0 PB", MemoryUtil.bytesToHumanString(1000000000000000L));
+        assertEquals("1.0G", MemoryUtil.bytesToHumanString(1000000000L));
+        assertEquals("1.0T", MemoryUtil.bytesToHumanString(1000000000000L));
+        assertEquals("1.0P", MemoryUtil.bytesToHumanString(1000000000000000L));
     }
 }

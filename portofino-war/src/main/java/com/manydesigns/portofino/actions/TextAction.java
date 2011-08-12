@@ -218,6 +218,30 @@ public class TextAction extends PortletAction {
         }
     }
 
+    public Resolution viewAttachment() {
+        // find the attachment
+        Attachment attachment =
+                TextLogic.findAttachmentByCode(textPage, code);
+
+        if (attachment == null) {
+            return new ErrorResolution(404, "Attachment not found");
+        }
+
+        try {
+            Blob blob = attachmentManager.loadBlob(code);
+            File file = blob.getDataFile();
+            InputStream is = new FileInputStream(file);
+            Resolution resolution =
+                    new StreamingResolution(blob.getContentType(), is)
+                    .setLength(blob.getSize())
+                    .setAttachment(false);
+            return resolution;
+        } catch (IOException e) {
+            logger.error("Download failed", e);
+            return new ErrorResolution(500, "Attachment error");
+        }
+    }
+
     public Resolution downloadAttachment() {
         // find the attachment
         Attachment attachment =
@@ -233,7 +257,9 @@ public class TextAction extends PortletAction {
             InputStream is = new FileInputStream(file);
             Resolution resolution =
                     new StreamingResolution(blob.getContentType(), is)
-                    .setLength(blob.getSize());
+                    .setLength(blob.getSize())
+                    .setFilename(blob.getFilename())
+                    .setAttachment(true);
             return resolution;
         } catch (IOException e) {
             logger.error("Download failed", e);

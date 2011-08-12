@@ -103,4 +103,9 @@
         <function-class>org.apache.commons.lang.StringUtils</function-class>
         <function-signature>java.lang.String abbreviateMiddle(java.lang.String,java.lang.String,int)</function-signature>
     </function>
+    <function>
+        <name>bytesToHumanString</name>
+        <function-class>com.manydesigns.elements.util.MemoryUtil</function-class>
+        <function-signature>java.lang.String bytesToHumanString(long)</function-signature>
+    </function>
 </taglib>

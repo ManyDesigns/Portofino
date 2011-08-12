@@ -9,7 +9,7 @@
 <script type="text/javascript">
     window.parent.CKEDITOR.tools.callFunction(
             <c:out value="${actionBean.CKEditorFuncNum}"/>,
-            '<c:out value="${actionBean.downloadAttachmentUrl}" escapeXml="false"/>',
+            '<c:out value="${actionBean.viewAttachmentUrl}" escapeXml="false"/>',
             '<c:out value="${actionBean.message}"/>'
     );
 </script>

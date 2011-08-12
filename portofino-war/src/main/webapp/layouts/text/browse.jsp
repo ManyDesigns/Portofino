@@ -26,7 +26,7 @@
             <li><a href="#"
                     onclick="window.opener.CKEDITOR.tools.callFunction(
                     <c:out value='${actionBean.CKEditorFuncNum}'/>,
-                    '<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&code=${blob.code}"/>'
+                    '<c:out value="${actionBean.dispatch.absoluteOriginalPath}?viewAttachment=&code=${blob.code}"/>'
                 ); window.close();">
                 <c:out value="${blob.filename}"/>
             </a></li>
