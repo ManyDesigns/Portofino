@@ -45,7 +45,7 @@ import java.util.List;
 public class TextPage extends Page {
 
     protected final List<Attachment> attachments;
-    private String fileName;
+    private String code;
 
     public TextPage() {
         super();
@@ -78,12 +78,12 @@ public class TextPage extends Page {
 
 
     @XmlAttribute(required = true)
-    public String getFileName() {
-        return fileName;
+    public String getCode() {
+        return code;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setCode(String code) {
+        this.code = code;
     }
 
     @XmlElementWrapper(name="attachments")

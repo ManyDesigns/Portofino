@@ -1,3 +1,7 @@
+html {
+    background-color: #f8f8ff;
+}
+
 /*******************************************************************************
 Links
 *******************************************************************************/
@@ -65,6 +69,7 @@ Body and content layout
     border: 3px solid #65a7db;
     -moz-border-radius: 6px;
     border-radius: 6px;
+    background-color: white;
 }
 
 .yui-t3 #yui-main div#content {
@@ -72,6 +77,7 @@ Body and content layout
     border: 3px solid #65a7db;
     -moz-border-radius: 6px;
     border-radius: 6px;
+    background-color: white;
 }
 
 /*******************************************************************************
@@ -101,7 +107,7 @@ span.breadcrumb-item {
 Content
 *******************************************************************************/
 
-div#contentBody {
+div.contentBody {
     padding: 1em;
 }
 
@@ -146,6 +152,11 @@ Portlet
 
 .portletWrapper {
     margin-bottom: 3em;
+    width: 100%;
+}
+
+.portletWrapper.noSpacing {
+    margin-bottom: 0;
     width: 100%;
 }
 
@@ -396,27 +407,18 @@ div.wizardContent {
 /*******************************************************************************
 Login
 *******************************************************************************/
+
 div#content-login {
-    margin-left: 0em;
-    border: 3px double #000;
-    background-color: #65a7db;
-    heigh: 180px;
+    border: 3px solid #65A7DB;
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    margin: 12em auto 0 auto;
     width: 400px;
-
+    background-color: white;
 }
 
-div#content-login table {
-    margin-left: auto;
-    margin-right: auto;
-    
-}
-
-div#content-login h1 {
-    text-align: center;
-}
-div#content-login table tr td, div#content-login table tr th {
-    border: 0pt;
-    background-color: #65a7db;
+.loginTable {
+    margin: 2em auto;
 }
 
 .treeTable {
@@ -468,6 +470,7 @@ table.mde-form-table th {
     text-align: right;
 }
 
-.attachments {
-    border-top: 1px solid #666;
+.horizontalSeparator {
+    border-top: 1px solid #eeeeee;
+    margin: 1.5em 0;
 }

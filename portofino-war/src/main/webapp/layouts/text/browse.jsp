@@ -25,7 +25,7 @@
         <c:forEach var="blob" items="${actionBean.blobs}">
             <li><a href="#"
                     onclick="window.opener.CKEDITOR.tools.callFunction(
-                    <c:out value="${actionBean.CKEditorFuncNum}"/>,
+                    <c:out value='${actionBean.CKEditorFuncNum}'/>,
                     '<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&code=${blob.code}"/>'
                 ); window.close();">
                 <c:out value="${blob.filename}"/>

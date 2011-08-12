@@ -31,10 +31,7 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.context.ServerInfo;
-import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.TextLogic;
 import com.manydesigns.portofino.model.pages.Attachment;
 import com.manydesigns.portofino.model.pages.TextPage;
@@ -66,6 +63,7 @@ public class TextAction extends PortletAction {
     public String title;
     public String content;
     public List<Blob> blobs;
+    public String[] selection;
 
     //**************************************************************************
     // File upload with CKEditor
@@ -82,9 +80,6 @@ public class TextAction extends PortletAction {
     //**************************************************************************
     // Injections
     //**************************************************************************
-
-    @Inject(ApplicationAttributes.SERVER_INFO)
-    public ServerInfo serverInfo;
 
     public TextPage textPage;
     public BlobManager textManager;
@@ -136,7 +131,7 @@ public class TextAction extends PortletAction {
     }
 
     protected void loadContent() throws IOException {
-        String textCode = textPage.getFileName();
+        String textCode = textPage.getCode();
         textBlob = textManager.loadBlob(textCode);
         File file = textBlob.getDataFile();
         String characterEncoding = textBlob.getCharacterEncoding();
@@ -144,7 +139,7 @@ public class TextAction extends PortletAction {
     }
 
     protected void saveContent() throws IOException {
-        String textCode = textPage.getFileName();
+        String textCode = textPage.getCode();
         byte[] contentByteArray = content.getBytes(CONTENT_ENCODING);
         textManager.updateBlob(textCode, contentByteArray, CONTENT_ENCODING);
     }
@@ -177,28 +172,49 @@ public class TextAction extends PortletAction {
     }
 
     public Resolution uploadAttachment() {
+        if (upload == null) {
+            SessionMessages.addWarningMessage("No file selected for upload");
+        } else {
+            try {
+                commonUploadAttachment();
+                SessionMessages.addInfoMessage("File uploaded successfully");
+            } catch (IOException e) {
+                logger.error("Upload failed", e);
+                SessionMessages.addErrorMessage("Upload failed!");
+            }
+        }
+        return new RedirectResolution(dispatch.getOriginalPath())
+                .addParameter("manageAttachments")
+                .addParameter("cancelReturnUrl", cancelReturnUrl);
+    }
+
+    public Resolution uploadAttachmentFromCKEditor() {
+        try {
+            commonUploadAttachment();
+            message = null;
+        } catch (IOException e) {
+            message = "File upload failed!";
+            logger.error("Upload failed", e);
+        }
+        return new ForwardResolution(
+                "/layouts/text/upload-attachment.jsp");
+    }
+
+    protected void commonUploadAttachment() throws IOException {
+        downloadAttachmentUrl = null;
         synchronized (application) {
             logger.info("Uploading attachment");
-            try {
-                Blob blob = attachmentManager.saveBlob(
-                        upload.getInputStream(),
-                        upload.getFileName(),
-                        upload.getContentType(),
-                        null);
-                TextLogic.createAttachment(textPage, blob.getCode());
-                downloadAttachmentUrl =
-                        String.format("%s?downloadAttachment=&code=%s",
-                                dispatch.getAbsoluteOriginalPath(),
-                                blob.getCode());
-                message = null;
-                saveModel();
-            } catch (IOException e) {
-                downloadAttachmentUrl = null;
-                message = "File upload failed!";
-                logger.error("Upload failed", e);
-            }
-            return new ForwardResolution(
-                    "/layouts/text/upload-attachment.jsp");
+            Blob blob = attachmentManager.saveBlob(
+                    upload.getInputStream(),
+                    upload.getFileName(),
+                    upload.getContentType(),
+                    null);
+            TextLogic.createAttachment(textPage, blob.getCode());
+            downloadAttachmentUrl =
+                    String.format("%s?downloadAttachment=&code=%s",
+                            dispatch.getAbsoluteOriginalPath(),
+                            blob.getCode());
+            saveModel();
         }
     }
 
@@ -235,6 +251,39 @@ public class TextAction extends PortletAction {
         logger.info("Manage attachments");
         setupBlobs();
         return new ForwardResolution("/layouts/text/manage-attachments.jsp");
+    }
+
+    public Resolution deleteAttachments() {
+        if (selection == null || selection.length == 0) {
+            SessionMessages.addWarningMessage("No attachments selected");
+        } else {
+            synchronized (application) {
+                int counter = 0;
+                for (String code : selection) {
+                    Attachment attachment =
+                            TextLogic.deleteAttachmentByCode(textPage, code);
+                    if (attachment == null) {
+                        logger.warn("Ignoring non-existing attachment with code: {}", code);
+                        continue;
+                    }
+                    attachmentManager.deleteBlob(code);
+
+                    counter++;
+                }
+                saveModel();
+                if (counter == 1) {
+                    SessionMessages.addInfoMessage("1 attachment deleted successfully");
+                } else if (counter > 1) {
+                    SessionMessages.addInfoMessage(
+                            String.format(
+                                    "%d attachments deleted successfully",
+                                    counter));
+                }
+            }
+        }
+        return new RedirectResolution(dispatch.getOriginalPath())
+                .addParameter("manageAttachments")
+                .addParameter("cancelReturnUrl", cancelReturnUrl);
     }
 
     //**************************************************************************

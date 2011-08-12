@@ -1205,7 +1205,7 @@
     </databases>
     <rootPage title="Portofino4" description="portofino 4" id="/">
         <childPages>
-        <textPage id="homepage" title="Homepage" description="Homepage" url="Document.action" fileName="misc/homepage.html">
+        <textPage id="homepage" title="Homepage" description="Homepage" code="zpAUFstfgEUSzsEX9HoO">
             <permissions>
                 <allow>
                     <group>anonymous</group>

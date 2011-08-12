@@ -4,14 +4,9 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><stripes:layout-render name="/skins/${skin}/modal-page.jsp">
-    <stripes:layout-component name="customScripts">
-        <script type="text/javascript" src="<stripes:url value="/ckeditor/ckeditor.js"/>"></script>
-        <script type="text/javascript" src="<stripes:url value="/ckeditor/adapters/jquery.js"/>"></script>
-    </stripes:layout-component>
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.TextAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:submit name="updateAttachments" value="Save" class="contentButton"/>
-        <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
+        <stripes:submit name="cancel" value="Ok" class="contentButton"/>
         <div class="breadcrumbs">
             <div class="inner">
                 <mde:write name="breadcrumbs"/>
@@ -24,18 +19,27 @@
     <stripes:layout-component name="portletBody">
         <c:if test="${not empty actionBean.blobs}">
             Attachments:
-            <ul>
+            <p>
                 <c:forEach var="blob" items="${actionBean.blobs}">
-                    <li><c:out value="${blob.filename}"/></li>
+                    <br/>
+                    <stripes:checkbox name="selection" value="${blob.code}"/>
+                    <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&code=${blob.code}"/>"
+                            ><c:out value="${blob.filename}"/></a>
                 </c:forEach>
-            </ul>
+            </p>
+            <br/>
+            <stripes:submit name="deleteAttachments" value="Delete selected attachments" class="portletButton"/>
         </c:if><c:if test="${empty actionBean.blobs}">
             There are no attachments.
         </c:if>
-        Upload a new file: <stripes:file name="upload"/>
+        <div class="horizontalSeparator"></div>
+        Upload a new file:
+        <stripes:file name="upload"/>
+        <br/>
+        <br/>
+        <stripes:submit name="uploadAttachment" value="Upload" class="portletButton"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <stripes:submit name="updateAttachments" value="Save" class="contentButton"/>
-        <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
+        <stripes:submit name="cancel" value="Ok" class="contentButton"/>
     </stripes:layout-component>
 </stripes:layout-render>

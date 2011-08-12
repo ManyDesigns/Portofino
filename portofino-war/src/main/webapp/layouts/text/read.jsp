@@ -14,16 +14,16 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:out value="${actionBean.content}" escapeXml="false"/>
+        <c:if test="${not empty actionBean.blobs}">
+            <div class="horizontalSeparator"></div>
+            Attachments:
+            <c:forEach var="blob" items="${actionBean.blobs}">
+                <br/>
+                <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&code=${blob.code}"/>"
+                        ><c:out value="${blob.filename}"/></a>
+            </c:forEach>
+        </c:if>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
-        <c:if test="${not empty actionBean.blobs}">
-            <div class="attachments">
-                Attachments:
-                <c:forEach var="blob" items="${actionBean.blobs}">
-                    <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&code=${blob.code}"/>"
-                            ><c:out value="${blob.filename}"/></a>
-                </c:forEach>
-            </div>
-        </c:if>
     </stripes:layout-component>
 </stripes:layout-render>

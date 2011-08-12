@@ -34,7 +34,7 @@
                                 Portlet page header
                             </stripes:layout-component>
                         </div>
-                        <div id="contentBody">
+                        <div class="contentBody">
                             <div class="portletWrapper">
                                 <div class="portlet">
                                     <div class="portletHeader">

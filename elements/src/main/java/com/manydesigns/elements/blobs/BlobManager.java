@@ -160,6 +160,27 @@ public class BlobManager {
         return blob;
     }
 
+    public boolean deleteBlob(String code) {
+        File metaFile =
+                RandomUtil.getCodeFile(blobsDirFile, metaFileNamePattern, code);
+        File dataFile =
+                RandomUtil.getCodeFile(blobsDirFile, dataFileNamePattern, code);
+        boolean success = true;
+        try {
+            success = metaFile.delete() && success;
+        } catch (Exception e) {
+            logger.warn("Cound not delete meta file", e);
+            success = false;
+        }
+        try {
+            success = dataFile.delete() && success;
+        } catch (Exception e) {
+            logger.warn("Cound not delete data file", e);
+            success = false;
+        }
+        return success;
+    }
+
     //**************************************************************************
     // Getters
     //**************************************************************************
@@ -175,4 +196,5 @@ public class BlobManager {
     public String getDataFileNamePattern() {
         return dataFileNamePattern;
     }
+
 }

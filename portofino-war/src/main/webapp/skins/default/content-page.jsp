@@ -33,7 +33,7 @@
                             Content header
                         </stripes:layout-component>
                     </div>
-                    <div id="contentBody">
+                    <div class="contentBody">
                         <stripes:layout-component name="contentBody">
                             Content body
                         </stripes:layout-component>

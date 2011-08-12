@@ -1023,7 +1023,7 @@ Struttura dell'XML:
     </databases>
     <rootPage id="/" title="Portofino4" description="portofino 4" url="/">
         <childPages>
-            <textPage id="homepage" title="Homepage" description="Homepage" fileName="misc/homepage.html" layoutContainer="contentLayoutTop">
+            <textPage id="homepage" title="Homepage" description="Homepage" code="zpAUFstfgEUSzsEX9HoO" layoutContainer="contentLayoutTop">
                 <permissions>
                     <allow>
                         <group>anonymous</group>
@@ -1055,9 +1055,9 @@ Struttura dell'XML:
                     <customPage id="Logs" title="Logs" description="Logs" url="/system-admin/Logs.action"/>
                     <folderPage id="application" title="application" description="application">
                         <childPages>
-                            <textPage id="connectionManager" title="Connection Manager" description="Connection Manager" fileName="skins/default/tbd.html"/>
-                            <textPage id="databaseObjects" title="Data base Objects" description="Data base Objects" fileName="skins/default/tbd.html"/>
-                            <textPage id="navigation Manager" title="Navigation Manager" description="Navigation Manager" fileName="skins/default/tbd.html"/>
+                            <textPage id="connectionManager" title="Connection Manager" description="Connection Manager" code="skins/default/tbd.html"/>
+                            <textPage id="databaseObjects" title="Data base Objects" description="Data base Objects" code="skins/default/tbd.html"/>
+                            <textPage id="navigation Manager" title="Navigation Manager" description="Navigation Manager" code="skins/default/tbd.html"/>
                         </childPages>
                     </folderPage>
 

@@ -58,4 +58,15 @@ public class TextLogic {
         }
         return null;
     }
+
+    public static Attachment deleteAttachmentByCode(TextPage textPage, String code) {
+        Attachment attachment = findAttachmentByCode(textPage, code);
+        if (attachment == null) {
+            return null;
+        } else {
+            textPage.getAttachments().remove(attachment);
+            attachment.setTextPage(null);
+            return attachment;
+        }
+    }
 }

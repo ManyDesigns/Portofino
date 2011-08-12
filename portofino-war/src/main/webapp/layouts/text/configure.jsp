@@ -35,7 +35,7 @@
                 filebrowserWindowWidth : '640',
                 filebrowserWindowHeight : '480',
                 filebrowserBrowseUrl : '<c:out value="${dispatch.absoluteOriginalPath}"/>?browse=',
-                filebrowserUploadUrl : '<c:out value="${dispatch.absoluteOriginalPath}"/>?uploadAttachment='
+                filebrowserUploadUrl : '<c:out value="${dispatch.absoluteOriginalPath}"/>?uploadAttachmentFromCKEditor='
             });
         </script>
     </stripes:layout-component>
