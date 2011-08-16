@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.model.pages;
 
+import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.Identifier;
@@ -148,6 +149,7 @@ public abstract class Page implements ModelObject {
 
     @Identifier
     @XmlAttribute(required = true)
+    @Required
     public String getId() {
         return id;
     }
@@ -157,6 +159,7 @@ public abstract class Page implements ModelObject {
     }
 
     @XmlAttribute(required = true)
+    @Required
     public String getTitle() {
         return title;
     }
@@ -166,6 +169,7 @@ public abstract class Page implements ModelObject {
     }
 
     @XmlAttribute(required = true)
+    @Required
     public String getDescription() {
         return description;
     }

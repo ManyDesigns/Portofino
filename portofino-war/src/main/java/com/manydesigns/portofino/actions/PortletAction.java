@@ -1,13 +1,21 @@
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.elements.fields.SelectField;
+import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.actions.model.NewPage;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.pages.ChartPage;
 import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
@@ -16,6 +24,7 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.StripesConstants;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
@@ -54,7 +63,6 @@ public class PortletAction extends AbstractActionBean {
 
     public final MultiMap portlets = new MultiHashMap();
     public String returnToParentTarget;
-
 
     //--------------------------------------------------------------------------
     // Navigation
@@ -253,5 +261,71 @@ public class PortletAction extends AbstractActionBean {
     // Page crud
     //--------------------------------------------------------------------------
 
+    public Resolution newPage() {
+        prepareNewPageForm();
+        return new ForwardResolution("/layouts/page-crud/new-page.jsp");
+    }
+
+    public Resolution createPage() {
+        prepareNewPageForm();
+        newPageForm.readFromRequest(context.getRequest());
+        if(newPageForm.validate()) {
+            NewPage newPage = new NewPage();
+            newPageForm.writeToObject(newPage);
+            newPage.init(model);
+            String pageClassName = newPage.getPageClassName();
+            Page page = (Page) ReflectionUtil.newInstance(pageClassName);
+            try {
+                BeanUtils.copyProperties(page, newPage);
+            } catch (Exception e) {
+                throw new RuntimeException(e); //TODO
+            }
+            System.out.println(page);
+            return new ForwardResolution("/layouts/page-crud/new-page.jsp");
+        } else {
+            return new ForwardResolution("/layouts/page-crud/new-page.jsp");
+        }
+    }
+
+    private void prepareNewPageForm() {
+        SelectionProvider classSelectionProvider =
+                DefaultSelectionProvider.create("pageClassName",
+                        new String[] { CrudPage.class.getName(), ChartPage.class.getName() },
+                        new String[] { "Crud", "Chart" });
+        boolean includeSiblingOption = dispatch.getPageInstancePath().length > 1;
+        int fieldCount = includeSiblingOption ? 3 : 2;
+        NewPage.InsertPosition[] insertPositions = new NewPage.InsertPosition[fieldCount];
+        String[] labels =  new String[fieldCount];
+        insertPositions[0] =  NewPage.InsertPosition.TOP;
+        labels[0] = "At the top level";
+        insertPositions[1] = NewPage.InsertPosition.CHILD;
+        labels[1] = "As a child of " + dispatch.getLastPageInstance().getPage().getTitle();
+        if(includeSiblingOption) {
+            insertPositions[2] = NewPage.InsertPosition.SIBLING;
+            labels[2] = "As a sibling of " + dispatch.getLastPageInstance().getPage().getTitle();
+        }
+        SelectionProvider insertPositionSelectionProvider =
+                DefaultSelectionProvider.create("insertPositionName", insertPositions, labels);
+        newPageForm = new FormBuilder(NewPage.class)
+                .configFields(NEW_PAGE_SETUP_FIELDS)
+                .configFieldSetNames("Page setup", "Page position")
+                .configSelectionProvider(classSelectionProvider, "pageClassName")
+                .configSelectionProvider(insertPositionSelectionProvider, "insertPositionName")
+                .build();
+        //((SelectField) newPageForm.findFieldByPropertyName("insertPositionName")).setValue(NewPage.InsertPosition.CHILD);
+    }
+
+    public Form getNewPageForm() {
+        return newPageForm;
+    }
+
+    //--------------------------------------------------------------------------
+    // Page crud fields
+    //--------------------------------------------------------------------------
+
+    protected static final String[][] NEW_PAGE_SETUP_FIELDS = {
+            {"pageClassName", "id", "title", "description"},
+            {"insertPositionName"}};
+    protected Form newPageForm;
 
 }
