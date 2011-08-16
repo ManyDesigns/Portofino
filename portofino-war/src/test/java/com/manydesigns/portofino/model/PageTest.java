@@ -88,7 +88,7 @@ public class PageTest extends TestCase {
         n1_1.setTitle("homepage title");
         n1_1.setId("homepage");
 
-        n1_1_perm.getAllow().add(Group.ANONYMOUS);
+        n1_1_perm.getAllow().add(Group.ANONYMOUS_GROUP.getName());
 
         //1.2
         n1_2 = new FolderPage();
@@ -99,7 +99,7 @@ public class PageTest extends TestCase {
         n1_2.setTitle("Model title");
         n1_2.setId("model");
 
-        n1_2_perm.getAllow().add(Group.REGISTERED);
+        n1_2_perm.getAllow().add(Group.REGISTERED_GROUP.getName());
 
         n1_2_1 = new CustomFolderPage();
         n1_2_1.setParent(n1_2);
@@ -189,7 +189,7 @@ public class PageTest extends TestCase {
 
 
     public void testAnonymous() {
-        groups.add(Group.ANONYMOUS);
+        groups.add(Group.ANONYMOUS_GROUP.getName());
 
         assertTrue(root.isAllowed(groups));
         assertTrue(n1_1.isAllowed(groups));
@@ -204,8 +204,8 @@ public class PageTest extends TestCase {
     }
 
     public void testRegistered() {
-        groups.add(Group.ANONYMOUS);
-        groups.add(Group.REGISTERED);
+        groups.add(Group.ANONYMOUS_GROUP.getName());
+        groups.add(Group.REGISTERED_GROUP.getName());
 
         assertTrue(root.isAllowed(groups));
         assertTrue(n1_1.isAllowed(groups));
@@ -220,8 +220,8 @@ public class PageTest extends TestCase {
     }
 
     public void testAdmins() {
-        groups.add(Group.ANONYMOUS);
-        groups.add(Group.REGISTERED);
+        groups.add(Group.ANONYMOUS_GROUP.getName());
+        groups.add(Group.REGISTERED_GROUP.getName());
         groups.add("admins");
 
         assertTrue(root.isAllowed(groups));
@@ -239,8 +239,8 @@ public class PageTest extends TestCase {
     }
 
     public void testCattivi() {
-        groups.add(Group.ANONYMOUS);
-        groups.add(Group.REGISTERED);
+        groups.add(Group.ANONYMOUS_GROUP.getName());
+        groups.add(Group.REGISTERED_GROUP.getName());
         groups.add("cattivi");
 
         assertTrue(root.isAllowed(groups));
@@ -258,8 +258,8 @@ public class PageTest extends TestCase {
     }
 
     public void testBuoni() {
-        groups.add(Group.ANONYMOUS);
-        groups.add(Group.REGISTERED);
+        groups.add(Group.ANONYMOUS_GROUP.getName());
+        groups.add(Group.REGISTERED_GROUP.getName());
         groups.add("buoni");
 
         assertTrue(root.isAllowed(groups));
@@ -276,8 +276,8 @@ public class PageTest extends TestCase {
     }
 
     public void testBuoniCattivi() {
-        groups.add(Group.ANONYMOUS);
-        groups.add(Group.REGISTERED);
+        groups.add(Group.ANONYMOUS_GROUP.getName());
+        groups.add(Group.REGISTERED_GROUP.getName());
         groups.add("buoni");
         groups.add("cattivi");
 

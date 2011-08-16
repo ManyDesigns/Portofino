@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.context.Application;
@@ -11,6 +12,8 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
+import com.manydesigns.portofino.system.model.users.Group;
+import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
@@ -19,13 +22,13 @@ import net.sourceforge.stripes.controller.StripesConstants;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PortletAction extends AbstractActionBean {
 
@@ -62,6 +65,13 @@ public class PortletAction extends AbstractActionBean {
 
     protected ResultSetNavigation resultSetNavigation;
     public String cancelReturnUrl;
+
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
+
+    public static final Logger logger =
+            LoggerFactory.getLogger(PortletAction.class);
 
     public boolean isEmbedded() {
         return getContext().getRequest().getAttribute(
@@ -156,6 +166,114 @@ public class PortletAction extends AbstractActionBean {
     //--------------------------------------------------------------------------
     // Page permisssions
     //--------------------------------------------------------------------------
+
+    List<Group> allowGroups;
+    List<Group> denyGroups;
+    List<Group> availableGroups;
+
+    String allowGroupNames;
+    String denyGroupNames;
+    String availableGroupNames;
+
+    public Resolution pagePermissions() {
+        List<Group> groups = new ArrayList<Group>();
+        groups.add(Group.ANONYMOUS_GROUP);
+        groups.add(Group.REGISTERED_GROUP);
+        groups.addAll(application.getAllObjects(UserUtils.GROUPTABLE));
+        allowGroups = new ArrayList<Group>();
+        denyGroups = new ArrayList<Group>();
+        availableGroups = new ArrayList<Group>();
+
+        List<String> allow = pageInstance.getPage().getPermissions().getAllow();
+        List<String> deny = pageInstance.getPage().getPermissions().getDeny();
+
+        for (Group group : groups) {
+            if (allow.contains(group.getName())) {
+                allowGroups.add(group);
+            } else if (deny.contains(group.getName())) {
+                denyGroups.add(group);
+            } else {
+                availableGroups.add(group);
+            }
+        }
+        return new ForwardResolution("/layouts/page/permissions.jsp");
+    }
+
+    static final String[] emptyStringArray = new String[0];
+
+    public Resolution updatePagePermissions() {
+        synchronized (application) {
+            String[] allowNameArray = StringUtils.split(allowGroupNames, ',');
+            if (allowNameArray == null) {
+                allowNameArray = emptyStringArray;
+            }
+            String[] denyNameArray = StringUtils.split(denyGroupNames, ',');
+            if (denyNameArray == null) {
+                denyNameArray = emptyStringArray;
+            }
+
+            // clean old lists
+            List<String> allow = pageInstance.getPage().getPermissions().getAllow();
+            List<String> deny = pageInstance.getPage().getPermissions().getDeny();
+            allow.clear();
+            deny.clear();
+
+            List<Group> groups = new ArrayList<Group>();
+            groups.add(Group.ANONYMOUS_GROUP);
+            groups.add(Group.REGISTERED_GROUP);
+            groups.addAll(application.getAllObjects(UserUtils.GROUPTABLE));
+
+            for (Group group : groups) {
+                String groupName = group.getName();
+                String comparableName = "group_" + groupName;
+                if (ArrayUtils.contains(allowNameArray, comparableName)) {
+                    allow.add(groupName);
+                } else if (ArrayUtils.contains(denyNameArray, comparableName)) {
+                    deny.add(groupName);
+                }
+            }
+            saveModel();
+            SessionMessages.addInfoMessage("Page permissions saved successfully.");
+        }
+
+        return new RedirectResolution(dispatch.getOriginalPath());
+    }
+
+    public List<Group> getAllowGroups() {
+        return allowGroups;
+    }
+
+    public List<Group> getDenyGroups() {
+        return denyGroups;
+    }
+
+    public List<Group> getAvailableGroups() {
+        return availableGroups;
+    }
+
+    public String getAllowGroupNames() {
+        return allowGroupNames;
+    }
+
+    public void setAllowGroupNames(String allowGroupNames) {
+        this.allowGroupNames = allowGroupNames;
+    }
+
+    public String getDenyGroupNames() {
+        return denyGroupNames;
+    }
+
+    public void setDenyGroupNames(String denyGroupNames) {
+        this.denyGroupNames = denyGroupNames;
+    }
+
+    public String getAvailableGroupNames() {
+        return availableGroupNames;
+    }
+
+    public void setAvailableGroupNames(String availableGroupNames) {
+        this.availableGroupNames = availableGroupNames;
+    }
 
     //--------------------------------------------------------------------------
     // Getters/Setters

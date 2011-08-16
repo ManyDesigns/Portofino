@@ -101,7 +101,7 @@ public interface Application {
 
     Object getObjectByPk(String qualifiedTableName, Serializable pk, String queryString, Object rootObject);
 
-    List<Object> getAllObjects(String qualifiedTableName);
+    List getAllObjects(String qualifiedTableName);
 
     List<Object> getObjects(TableCriteria criteria);
 
