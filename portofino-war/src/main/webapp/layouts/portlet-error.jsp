@@ -8,6 +8,9 @@
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.pageInstance.page.title}"/>
     </stripes:layout-component>
+    <stripes:layout-component name="portletHeaderButtons">
+        <button name="configure" class="wrench">Configure</button>
+    </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <div class=".ui-state-error">
             This portlet has thrown an exception.
