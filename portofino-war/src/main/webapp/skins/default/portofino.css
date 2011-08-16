@@ -522,4 +522,7 @@ li.group, li.groupPlaceholder {
     margin-bottom: 0.5em;
 }
 
+.inheritedPermission {
+    margin: 0.5em 0;
+}
 

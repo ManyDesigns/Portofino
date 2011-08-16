@@ -175,6 +175,8 @@ public class PortletAction extends AbstractActionBean {
     String denyGroupNames;
     String availableGroupNames;
 
+    List<Page> inheritedPages;
+
     public Resolution pagePermissions() {
         List<Group> groups = new ArrayList<Group>();
         groups.add(Group.ANONYMOUS_GROUP);
@@ -184,8 +186,9 @@ public class PortletAction extends AbstractActionBean {
         denyGroups = new ArrayList<Group>();
         availableGroups = new ArrayList<Group>();
 
-        List<String> allow = pageInstance.getPage().getPermissions().getAllow();
-        List<String> deny = pageInstance.getPage().getPermissions().getDeny();
+        Page page = pageInstance.getPage();
+        List<String> allow = page.getPermissions().getAllow();
+        List<String> deny = page.getPermissions().getDeny();
 
         for (Group group : groups) {
             if (allow.contains(group.getName())) {
@@ -196,6 +199,14 @@ public class PortletAction extends AbstractActionBean {
                 availableGroups.add(group);
             }
         }
+
+        inheritedPages = new ArrayList<Page>();
+        Page current = page.getParent();
+        while (current != null) {
+            inheritedPages.add(current);
+            current = current.getParent();
+        }
+        Collections.reverse(inheritedPages);
         return new ForwardResolution("/layouts/page/permissions.jsp");
     }
 
@@ -273,6 +284,10 @@ public class PortletAction extends AbstractActionBean {
 
     public void setAvailableGroupNames(String availableGroupNames) {
         this.availableGroupNames = availableGroupNames;
+    }
+
+    public List<Page> getInheritedPages() {
+        return inheritedPages;
     }
 
     //--------------------------------------------------------------------------

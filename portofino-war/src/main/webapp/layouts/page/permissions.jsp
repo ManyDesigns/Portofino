@@ -67,6 +67,19 @@
         </script>
         <div class="horizontalSeparator"></div>
         Inherited permissions:
+        <c:forEach var="currentPage" items="${actionBean.inheritedPages}">
+            <div class="inheritedPermission">
+                <b><c:out value="${currentPage.title}"/></b>
+                <br/>Allow groups:
+                <c:forEach var="group" varStatus="status" items="${currentPage.permissions.allow}">
+                    <c:out value="${group}"/><c:if test="${not status.last}">,</c:if>
+                </c:forEach>
+                <br/>Deny groups:
+                <c:forEach var="group" varStatus="status" items="${currentPage.permissions.deny}">
+                    <c:out value="${group}"/><c:if test="${not status.last}">,</c:if>
+                </c:forEach>
+            </div>
+        </c:forEach>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
