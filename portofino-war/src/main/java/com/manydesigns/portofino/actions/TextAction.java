@@ -74,7 +74,7 @@ public class TextAction extends PortletAction {
     public Integer CKEditorFuncNum;
     public String langCode;
     public String code;
-    public String downloadAttachmentUrl;
+    public String viewAttachmentUrl;
     public String message;
 
     //**************************************************************************
@@ -201,7 +201,7 @@ public class TextAction extends PortletAction {
     }
 
     protected void commonUploadAttachment() throws IOException {
-        downloadAttachmentUrl = null;
+        viewAttachmentUrl = null;
         synchronized (application) {
             logger.info("Uploading attachment");
             Blob blob = attachmentManager.saveBlob(
@@ -210,7 +210,7 @@ public class TextAction extends PortletAction {
                     upload.getContentType(),
                     null);
             TextLogic.createAttachment(textPage, blob.getCode());
-            downloadAttachmentUrl =
+            viewAttachmentUrl =
                     String.format("%s?downloadAttachment=&code=%s",
                             dispatch.getAbsoluteOriginalPath(),
                             blob.getCode());
@@ -377,12 +377,12 @@ public class TextAction extends PortletAction {
         this.code = code;
     }
 
-    public String getDownloadAttachmentUrl() {
-        return downloadAttachmentUrl;
+    public String getViewAttachmentUrl() {
+        return viewAttachmentUrl;
     }
 
-    public void setDownloadAttachmentUrl(String downloadAttachmentUrl) {
-        this.downloadAttachmentUrl = downloadAttachmentUrl;
+    public void setViewAttachmentUrl(String viewAttachmentUrl) {
+        this.viewAttachmentUrl = viewAttachmentUrl;
     }
 
     public String getMessage() {

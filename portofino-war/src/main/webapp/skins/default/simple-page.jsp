@@ -14,26 +14,10 @@
 --%><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
     <head>
-        <meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1"/>
-        <meta http-equiv="Content-Script-Type" content="text/javascript"/>
-        <meta http-equiv="Content-Style-Type" content="text/css"/>
-        <link rel="stylesheet" type="text/css"
-              href="<stripes:url value="/yui-2.8.1/build/reset-fonts-grids/reset-fonts-grids.css"/>"/>
-        <link rel="stylesheet" type="text/css"
-              href="<stripes:url value="/yui-2.8.1/build/base/base-min.css"/>"/>
-        <link rel="stylesheet" type="text/css"
-              href="<stripes:url value="/jquery-ui-1.8.9/css/smoothness/jquery-ui-1.8.9.custom.css"/>"/>
-        <link rel="stylesheet" type="text/css"
-              href="<stripes:url value="/skins/default/portofino.css"/>"/>
-        <script type="text/javascript"
-                src="<stripes:url value="/jquery-ui-1.8.9/js/jquery-1.4.4.min.js"/>"></script>
-        <script type="text/javascript"
-                src="<stripes:url value="/jquery-ui-1.8.9/js/jquery-ui-1.8.9.custom.min.js"/>"></script>
-        <script type="text/javascript"
-                src="<stripes:url value="/elements.js"/>"></script>
-        <script type="text/javascript"
-                src="<stripes:url value="/skins/default/portofino.js"/>"></script>
-        <stripes:layout-component name="customScripts" />
+        <jsp:include page="head.jsp"/>
+        <stripes:layout-component name="customScripts"/>
+        <jsp:useBean id="dispatch" scope="request"
+                     type="com.manydesigns.portofino.dispatcher.Dispatch"/>
         <title><c:out value="${dispatch.lastPageInstance.page.description}"/></title>
     </head>
     <body>
@@ -47,11 +31,7 @@
             <stripes:layout-component name="bd" />
         </div>
         <div id="ft">
-            <div id="responseTime">
-                Page response time: <c:out value="${stopWatch.time}"/> ms.
-            </div>
-            Powered by <a href="http://www.manydesigns.com/">ManyDesigns Portofino</a>
-            <c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
+            <jsp:include page="footer.jsp"/>
         </div>
     </div>
     </body>
