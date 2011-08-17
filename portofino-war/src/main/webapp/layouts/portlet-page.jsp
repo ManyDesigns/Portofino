@@ -7,7 +7,7 @@
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.PortletAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post">
+        <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post" id="contentHeaderForm">
             <div class="yui-g">
                 <div class="contentBarLeft">
                     <c:if test="${not empty actionBean.returnToParentTarget}">
@@ -29,7 +29,8 @@
                         <button name="reloadModel" class="refresh">Reload model</button>
                         <button name="pagePermissions" class="person">Page permissions</button>
                         <button name="newPage" class="plusthick">Add page</button>
-                        <button name="deletePage" class="minusthick">Delete page</button>
+                        <button id="deletePageButton" name="deletePage" class="minusthick">Delete page</button>
+                        <button name="movePage" class="minusthick">Move page</button>
                     </div>
                     <!-- End admin buttons -->
                     <c:set var="resultSetNavigation" scope="request"
@@ -64,6 +65,9 @@
                 </div>
             </div>
         </stripes:form>
+        <div id="dialog-confirm-delete-page" title="Really delete?" style="display: none;">
+            <p>Are you sure you want to delete this page?</p>
+        </div>
     </stripes:layout-component>
     <stripes:layout-component name="contentBody">
         <jsp:include page="/layouts/content/1-2-1-symmetric.jsp"/>
