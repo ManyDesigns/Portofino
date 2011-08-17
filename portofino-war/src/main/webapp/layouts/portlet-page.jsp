@@ -1,3 +1,5 @@
+<%@ page import="com.manydesigns.portofino.model.pages.Page" %>
+<%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
         %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -7,7 +9,7 @@
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.PortletAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post">
+        <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post" id="contentHeaderForm">
             <div class="yui-g">
                 <div class="contentBarLeft">
                     <c:if test="${not empty actionBean.returnToParentTarget}">
@@ -29,7 +31,8 @@
                         <button name="reloadModel" class="refresh">Reload model</button>
                         <button name="pagePermissions" class="person">Page permissions</button>
                         <button name="newPage" class="plusthick">Add page</button>
-                        <button name="deletePage" class="minusthick">Delete page</button>
+                        <button id="deletePageButton" name="deletePage" class="minusthick">Delete page</button>
+                        <button name="movePage" class="minusthick">Move page</button>
                     </div>
                     <!-- End admin buttons -->
                     <c:set var="resultSetNavigation" scope="request"
@@ -64,10 +67,38 @@
                 </div>
             </div>
         </stripes:form>
+        <div id="dialog-confirm-delete-page" title="Really delete?" style="display: none;">
+            <p>Are you sure you want to delete this page?</p>
+            <%
+                Page portofinoPage = actionBean.dispatch.getLastPageInstance().getPage();
+                if(!portofinoPage.getChildPages().isEmpty()) { %>
+                    <p>Deleting it will also delete its children:</p>
+                    <%= displayPageChildrenAsList(portofinoPage) %>
+            <%  } %>
+        </div>
     </stripes:layout-component>
     <stripes:layout-component name="contentBody">
         <jsp:include page="/layouts/content/1-2-1-symmetric.jsp"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
     </stripes:layout-component>
-</stripes:layout-render>
+</stripes:layout-render><%!
+    private void displayPageChildrenAsList(Page portofinoPage, XhtmlBuffer buf) {
+        if(!portofinoPage.getChildPages().isEmpty()) {
+            buf.openElement("ul");
+            for(Page page : portofinoPage.getChildPages()) {
+                buf.openElement("li");
+                buf.write(page.getTitle());
+                displayPageChildrenAsList(page, buf);
+                buf.closeElement("li");
+            }
+            buf.closeElement("ul");
+        }
+    }
+
+    private String displayPageChildrenAsList(Page portofinoPage) {
+        XhtmlBuffer buf = new XhtmlBuffer();
+        displayPageChildrenAsList(portofinoPage, buf);
+        return buf.toString();
+    }
+%>

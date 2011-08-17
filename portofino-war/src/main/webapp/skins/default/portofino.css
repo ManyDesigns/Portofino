@@ -37,6 +37,10 @@ input.ui-button { padding: .1em .5em; }
 
 button.ui-button-icon-only { width: 1.6em; }
 
+.ui-dialog-content {
+    text-align: center;
+}
+
 
 /*******************************************************************************
 Header / footer
