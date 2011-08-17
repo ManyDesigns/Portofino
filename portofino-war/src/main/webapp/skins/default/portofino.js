@@ -39,12 +39,18 @@ $(function() {
             },
             text: false
         });
+    $("input:submit.person, button.person").button({
+            icons: {
+                primary: "ui-icon-person"
+            },
+            text: false
+        });
 });
 
 function enablePortletDragAndDrop(button) {
     $("div.portletContainer").sortable({
         connectWith: "div.portletContainer",
-        placeholder: "sortablePlaceholder",
+        placeholder: "portletPlaceholder",
         cursor: "move", // cursor image
         revert: true, // moves the portlet to its new position with a smooth transition
         tolerance: "pointer", // mouse pointer overlaps the droppable
@@ -61,10 +67,7 @@ function enablePortletDragAndDrop(button) {
             }
         }
     }).disableSelection()
-            .css('padding', '1em 0')
-            .css("border", "1px dashed grey")
-            .css("margin-bottom", "1em")
-            .css("min-height", "12em");
+            .addClass("portletBox");
     var container = $(button).parent();
     $(button).remove();
     container.prepend('<button name="cancelLayout">Cancel</button> ');

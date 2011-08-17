@@ -353,7 +353,7 @@ public class HibernateApplicationImpl implements Application {
         }
     }
 
-    public List<Object> getAllObjects(String qualifiedTableName) {
+    public List getAllObjects(String qualifiedTableName) {
         Session session = getSession(qualifiedTableName);
 
         org.hibernate.Criteria hibernateCriteria;
@@ -363,7 +363,7 @@ public class HibernateApplicationImpl implements Application {
 
         hibernateCriteria = session.createCriteria(actualEntityName);
         //noinspection unchecked
-        List<Object> result = hibernateCriteria.list();
+        List result = hibernateCriteria.list();
         return result;
     }
 

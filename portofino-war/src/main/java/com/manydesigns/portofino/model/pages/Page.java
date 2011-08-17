@@ -87,7 +87,8 @@ public abstract class Page implements ModelObject {
     //**************************************************************************
 
     public Page() {
-        this.childPages = new ArrayList<Page>();
+        childPages = new ArrayList<Page>();
+        permissions = new Permissions();
     }
 
     //**************************************************************************

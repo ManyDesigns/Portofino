@@ -197,7 +197,7 @@ input.contentButton.ui-button.ui-state-hover, input.contentButton.ui-button.ui-s
 
 .portletFooter {}
 
-.sortablePlaceholder {
+.portletPlaceholder {
     border: 1px solid #fcefa1;
     background: #fbf9ee;
     color: #363636;
@@ -488,5 +488,41 @@ table.mde-form-table th {
 
 .attachmentName {
     font-weight: bold;
+}
+
+.portletBox {
+    padding: 1em 0;
+    border: 1px dashed gray;
+    margin-bottom: 1em;
+    min-height: 12em;
+}
+
+ul.groupBox {
+    list-style-type: none;
+    border: 1px dashed gray;
+    min-height: 12em;
+    margin: 0;
+}
+
+li.group, li.groupPlaceholder {
+    list-style-type: none;
+    margin: 0 0 5px 0;
+    padding: 5px;
+    height: 1.5em;
+}
+
+.groupPlaceholder {
+    border: 1px solid #fcefa1;
+    background: #fbf9ee;
+    color: #363636;
+}
+
+.groupBoxTitle {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+
+.inheritedPermission {
+    margin: 0.5em 0;
 }
 

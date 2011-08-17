@@ -59,12 +59,12 @@ public class UserUtils {
     public static List<String> manageGroups(Application application, Long userId) {
         List<String> groups = new ArrayList<String>();
         if (userId == null) {
-            groups.add(Group.ANONYMOUS);
+            groups.add(Group.ANONYMOUS_GROUP.getName());
         } else {
             User u = (User) application.getObjectByPk(UserUtils.USERTABLE,
                     new User(userId));
-            groups.add(Group.ANONYMOUS);
-            groups.add(Group.REGISTERED);
+            groups.add(Group.ANONYMOUS_GROUP.getName());
+            groups.add(Group.REGISTERED_GROUP.getName());
 
             for (UsersGroups ug : u.getGroups()) {
                 if (ug.getDeletionDate() == null) {

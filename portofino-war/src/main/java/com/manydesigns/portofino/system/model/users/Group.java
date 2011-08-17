@@ -50,10 +50,11 @@ public class Group implements Serializable{
     Timestamp deletionDate;
     Timestamp creationDate;
 
-    //META GROUPS
-    public static String ANONYMOUS = "anonymous";
-    public static String REGISTERED = "registered";
-    
+    public static Group ANONYMOUS_GROUP =
+            new Group(-1L, "anonymous", "anonymous", null, null, null);
+    public static Group REGISTERED_GROUP =
+            new Group(-1L, "registered", "registered", null, null, null);
+
     List<User> users = new ArrayList<User>();
 
     public Group() {
@@ -62,6 +63,16 @@ public class Group implements Serializable{
     
     public Group(Long groupId){
         this.groupId=groupId;
+    }
+
+    public Group(Long groupId, String name, String description,
+                 Long creatorId, Timestamp deletionDate, Timestamp creationDate) {
+        this.groupId = groupId;
+        this.name = name;
+        this.description = description;
+        this.creatorId = creatorId;
+        this.deletionDate = deletionDate;
+        this.creationDate = creationDate;
     }
 
     public Long getGroupId() {
