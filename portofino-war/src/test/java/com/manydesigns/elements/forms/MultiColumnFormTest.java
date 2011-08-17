@@ -30,6 +30,7 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.AbstractElementsTest;
+import com.manydesigns.elements.util.Util;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -53,7 +54,7 @@ public class MultiColumnFormTest extends AbstractElementsTest {
     public void testDefaultOneColumn() {
         Form form = formBuilder1.build();
 
-        String text = elementToString(form);
+        String text = Util.elementToString(form);
         assertEquals("<fieldset class=\"nolegend\">" +
                 "<table class=\"details\">" +
                 "<tr>" +
@@ -85,7 +86,7 @@ public class MultiColumnFormTest extends AbstractElementsTest {
     public void testTwoColumns() {
         Form form = formBuilder1.configNColumns(2).build();
 
-        String text = elementToString(form);
+        String text = Util.elementToString(form);
         assertEquals("<fieldset class=\"nolegend\">" +
                 "<table class=\"details\">" +
                 "<tr>" +
@@ -117,7 +118,7 @@ public class MultiColumnFormTest extends AbstractElementsTest {
     public void testThreeColumns() {
         Form form = formBuilder1.configNColumns(3).build();
 
-        String text = elementToString(form);
+        String text = Util.elementToString(form);
         assertEquals("<fieldset class=\"nolegend\">" +
                 "<table class=\"details\">" +
                 "<tr>" +

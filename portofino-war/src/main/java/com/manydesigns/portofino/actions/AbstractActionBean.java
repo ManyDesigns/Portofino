@@ -49,9 +49,6 @@ public abstract class AbstractActionBean implements ActionBean {
 
     protected ActionBeanContext context;
 
-    //protected Map<String, List<String>> embeddedChildren
-
-
     public void setContext(ActionBeanContext context) {
         this.context = context;
     }

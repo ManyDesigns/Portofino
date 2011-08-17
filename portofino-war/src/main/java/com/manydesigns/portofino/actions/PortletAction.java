@@ -3,9 +3,9 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class PortletAction extends AbstractActionBean {
@@ -400,6 +401,16 @@ public class PortletAction extends AbstractActionBean {
     }
 
     public Resolution createPage() {
+        try {
+            return doCreateNewPage();
+        } catch (Exception e) {
+            logger.error("Error creating page", e);
+            SessionMessages.addErrorMessage("Error creating page: " + e.getMessage() + " (see the logs for more details)");
+            return new ForwardResolution("/layouts/page-crud/new-page.jsp");
+        }
+    }
+
+    private Resolution doCreateNewPage() throws IllegalAccessException, InvocationTargetException {
         prepareNewPageForm();
         newPageForm.readFromRequest(context.getRequest());
         if(newPageForm.validate()) {
@@ -408,11 +419,7 @@ public class PortletAction extends AbstractActionBean {
             newPage.init(model);
             String pageClassName = newPage.getPageClassName();
             Page page = (Page) ReflectionUtil.newInstance(pageClassName);
-            try {
-                BeanUtils.copyProperties(page, newPage);
-            } catch (Exception e) {
-                throw new RuntimeException(e); //TODO
-            }
+            BeanUtils.copyProperties(page, newPage);
             page.reset();
             page.setLayoutContainer("default");
             page.setLayoutOrder("0");
@@ -433,6 +440,7 @@ public class PortletAction extends AbstractActionBean {
             }
             parent.addChildPage(page);
             saveModel();
+            SessionMessages.addInfoMessage("Page created successfully. You should now configure it.");
             return new RedirectResolution(getPagePath(page), false).addParameter("configure");
         } else {
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
@@ -450,15 +458,12 @@ public class PortletAction extends AbstractActionBean {
         return new RedirectResolution("");
     }
 
-    //TODO spostare?
-    private String getPagePath(Page page) {
-        String basePath;
-        if(page.getParent() instanceof RootPage) {
-            basePath = context.getRequest().getContextPath();
+    public String getPagePath(Page page) {
+        if(page instanceof RootPage) {
+            return context.getRequest().getContextPath();
         } else {
-            basePath = getPagePath(page.getParent());
+            return getPagePath(page.getParent()) + "/" + page.getId();
         }
-        return basePath + "/" + page.getId();
     }
 
     private void prepareNewPageForm() {
@@ -482,7 +487,7 @@ public class PortletAction extends AbstractActionBean {
                 DefaultSelectionProvider.create("insertPositionName", insertPositions, labels);
         newPageForm = new FormBuilder(NewPage.class)
                 .configFields(NEW_PAGE_SETUP_FIELDS)
-                .configFieldSetNames("Page setup", "Page position")
+                .configFieldSetNames("Page setup")
                 .configSelectionProvider(classSelectionProvider, "pageClassName")
                 .configSelectionProvider(insertPositionSelectionProvider, "insertPositionName")
                 .build();
@@ -498,8 +503,7 @@ public class PortletAction extends AbstractActionBean {
     //--------------------------------------------------------------------------
 
     protected static final String[][] NEW_PAGE_SETUP_FIELDS = {
-            {"pageClassName", "id", "title", "description"},
-            {"insertPositionName"}};
+            {"pageClassName", "id", "title", "description", "insertPositionName"}};
     protected Form newPageForm;
 
 }

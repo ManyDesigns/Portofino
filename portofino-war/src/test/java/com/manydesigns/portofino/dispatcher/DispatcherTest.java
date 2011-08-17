@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.Page;
@@ -102,7 +103,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(page, navigationNode.getPage());
         assertFalse(navigationNode.isEnabled());
 */
-        String htmlOutput = elementToString(navigation);
+        String htmlOutput = Util.elementToString(navigation);
         assertEquals("<ul><li class=\"selected\">" +
                 "<a href=\"/projects\" title=\"projects\">projects</a></li>" +
                 "</ul><hr /><ul><li><a href=\"/projects/report\" " +
@@ -247,7 +248,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertTrue(navigationNode.isEnabled());
         */
 
-        String htmlOutput = elementToString(navigation);
+        String htmlOutput = Util.elementToString(navigation);
         assertEquals("<ul><li class=\"selected\">" +
                 "<a href=\"/projects\" title=\"projects\">projects</a></li></ul>" +
                 "<hr /><ul><li><a href=\"/projects/10/tickets\" title=\"tickets\">tickets</a></li></ul>",
@@ -314,7 +315,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertTrue(navigationNode.isEnabled());
 */
 
-        String htmlOutput = elementToString(navigation);
+        String htmlOutput = Util.elementToString(navigation);
         assertEquals("<ul><li class=\"path\">" +
                 "<a href=\"/projects\" title=\"projects\">projects</a></li></ul>" +
                 "<hr /><ul><li class=\"selected\"><a href=\"/projects/10/tickets\" title=\"tickets\">tickets</a></li></ul>",

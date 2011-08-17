@@ -30,6 +30,8 @@
 package com.manydesigns.elements.util;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.xml.XhtmlBuffer;
+import com.manydesigns.elements.xml.XhtmlFragment;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,5 +151,11 @@ public class Util {
                 || type == Long.TYPE
                 || type == Float.TYPE
                 || type == Double.TYPE;
+    }
+
+    public static String elementToString(XhtmlFragment element) {
+        XhtmlBuffer xb = new XhtmlBuffer();
+        element.toXhtml(xb);
+        return xb.toString();
     }
 }

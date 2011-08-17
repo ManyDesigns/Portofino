@@ -32,6 +32,7 @@ package com.manydesigns.elements.forms;
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.fields.helpers.FieldsManager;
+import com.manydesigns.elements.util.Util;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -290,7 +291,7 @@ public class FormBuilderTest extends AbstractElementsTest {
     public void testToString() {
         Form form = formBuilder2.build();
 
-        String text = elementToString(form);
+        String text = Util.elementToString(form);
         assertEquals("<fieldset class=\"nolegend\"><table class=\"details\">" +
                 "<tr><th>" +
                 "<label for=\"boolean1\" class=\"field\">Boolean1:</label></th>" +
