@@ -64,9 +64,15 @@ public class CrudPageInstance extends PageInstance {
         super(application, page, mode);
         this.pk = param;
         this.crud = page.getCrud();
-        classAccessor = application.getCrudAccessor(crud);
-        baseTable = crud.getActualTable();
-        pkHelper = new PkHelper(classAccessor);
+        if(crud != null) {
+            classAccessor = application.getCrudAccessor(crud);
+            baseTable = crud.getActualTable();
+            pkHelper = new PkHelper(classAccessor);
+        } else {
+            classAccessor = null;
+            baseTable = null;
+            pkHelper = null;
+        }
     }
 
     public void realize() {

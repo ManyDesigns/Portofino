@@ -5,6 +5,12 @@
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
 <div id="contentLayoutTop" class="portletContainer">
+    <c:forEach var="portletInstance" items="${ actionBean.portlets['default'] }">
+        <input type="hidden" class="updateLayout" name="portletWrapper_contentLayoutTop" value="<c:out value='${portletInstance.id}' />" />
+        <div class="portletWrapper" id="portletWrapper_<c:out value='${portletInstance.id}' />">
+            <jsp:include page="${portletInstance.jsp}" />
+        </div>
+    </c:forEach>
     <c:forEach var="portletInstance" items="${ actionBean.portlets['contentLayoutTop'] }">
         <input type="hidden" class="updateLayout" name="portletWrapper_contentLayoutTop" value="<c:out value='${portletInstance.id}' />" />
         <div class="portletWrapper" id="portletWrapper_<c:out value='${portletInstance.id}' />">

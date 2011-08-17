@@ -280,4 +280,14 @@ public abstract class Page implements ModelObject {
     public int getActualLayoutOrder() {
         return actualLayoutOrder;
     }
+
+    public void addChildPage(Page page) {
+        for(Page child : getChildPages()) {
+            if(child.getId().equals(page.getId())) {
+                throw new IllegalArgumentException(this + " already has a child page with id " + page.getId());
+            }
+        }
+        page.setParent(this);
+        getChildPages().add(page);
+    }
 }

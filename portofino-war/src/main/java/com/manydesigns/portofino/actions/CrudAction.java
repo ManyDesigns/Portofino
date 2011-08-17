@@ -156,14 +156,16 @@ public class CrudAction extends PortletAction {
         pk = crudPageInstance.getPk();
         crudPage = getPageInstance().getPage();
         crud = crudPage.getCrud();
-        classAccessor = crudPageInstance.getClassAccessor();
-        baseTable = crudPageInstance.getBaseTable();
-        pkHelper = crudPageInstance.getPkHelper();
-        crudButtons = new ArrayList<CrudButton>();
-        crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
-        object = crudPageInstance.getObject();
+        if(crud != null) {
+            classAccessor = crudPageInstance.getClassAccessor();
+            baseTable = crudPageInstance.getBaseTable();
+            pkHelper = crudPageInstance.getPkHelper();
+            crudButtons = new ArrayList<CrudButton>();
+            crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
+            object = crudPageInstance.getObject();
 
-        setupSelectionProviders();
+            setupSelectionProviders();
+        }
     }
 
     private void setupSelectionProviders() {
@@ -248,17 +250,21 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     public Resolution search() {
-        setupSearchForm();
-        loadObjects();
-        setupTableForm(Mode.VIEW);
         cancelReturnUrl = new UrlBuilder(
-                Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
-                .addParameter("searchString", searchString)
-                .toString();
-
+                    Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
+                    .addParameter("searchString", searchString)
+                    .toString();
         setupReturnToParentTarget();
 
-        return forwardToPortletPage("/layouts/crud/search.jsp");
+        if(crud != null) {
+            setupSearchForm();
+            loadObjects();
+            setupTableForm(Mode.VIEW);
+
+            return forwardToPortletPage("/layouts/crud/search.jsp");
+        } else {
+            return new ForwardResolution("/layouts/portlet-not-configured.jsp");
+        }
     }
 
     public Resolution embeddedSearch() {
@@ -1253,6 +1259,9 @@ public class CrudAction extends PortletAction {
         synchronized (application) {
             prepareConfigurationForms();
             form.readFromObject(crudPage);
+            if(crudPage.getCrud() == null) {
+                crudPage.setCrud(new Crud());
+            }
             crudConfigurationForm.readFromObject(crudPage.getCrud());
             form.readFromRequest(context.getRequest());
             crudConfigurationForm.readFromRequest(context.getRequest());
