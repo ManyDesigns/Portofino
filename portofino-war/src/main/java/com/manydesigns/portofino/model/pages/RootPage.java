@@ -49,6 +49,7 @@ public class RootPage extends Page {
     //**************************************************************************
 
     protected String skin;
+    protected String landingPage;
 
     //**************************************************************************
     // Constructors
@@ -79,5 +80,15 @@ public class RootPage extends Page {
 
     public void setSkin(String skin) {
         this.skin = skin;
+    }
+
+    @Required
+    @XmlAttribute(required = false)
+    public String getLandingPage() {
+        return landingPage;
+    }
+
+    public void setLandingPage(String landingPage) {
+        this.landingPage = landingPage;
     }
 }

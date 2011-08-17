@@ -66,7 +66,7 @@ public class NewPage extends Page {
         this.pageClassName = pageClassName;
     }
 
-    @Label("Put the new page")
+    @Label("Where")
     @Select(displayMode = SelectField.DisplayMode.RADIO)
     @Required
     public String getInsertPositionName() {

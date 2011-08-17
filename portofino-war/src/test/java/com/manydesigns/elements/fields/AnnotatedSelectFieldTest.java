@@ -36,6 +36,7 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.util.Util;
 
 import java.util.Map;
 
@@ -85,7 +86,7 @@ public class AnnotatedSelectFieldTest extends AbstractElementsTest {
     public void testEditNull() throws Exception {
         setupField(Mode.EDIT);
 
-        String text = elementToString(selectField);
+        String text = Util.elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
                 "<option value=\"\" selected=\"selected\">-- Select my text --</option>" +
@@ -98,7 +99,7 @@ public class AnnotatedSelectFieldTest extends AbstractElementsTest {
         setupField(Mode.VIEW);
 
         selectField.setValue("v2");
-        String text = elementToString(selectField);
+        String text = Util.elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\">l2</div></td>", text);

@@ -37,6 +37,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.util.Util;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -93,7 +94,7 @@ public class SelectFieldTest3 extends AbstractElementsTest {
     public void testSimpleRadio() {
         setupSelectFields(Mode.EDIT);
 
-        String text = elementToString(selectField);
+        String text = Util.elementToString(selectField);
         assertEquals("<th><label for=\"longValue\" class=\"field\"><span class=\"required\">*</span>&nbsp;Long value:" +
                 "</label></th><td><fieldset id=\"longValue\" class=\"radio\">" +
                 "<input type=\"radio\" id=\"longValue_0\" name=\"longValue\" value=\"1000\" />&nbsp;<label for=\"longValue_0\">label1</label><br />" +

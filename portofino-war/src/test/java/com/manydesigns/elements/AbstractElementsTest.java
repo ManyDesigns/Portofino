@@ -4,8 +4,6 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.util.StatusPrinter;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.elements.servlet.WebFramework;
-import com.manydesigns.elements.xml.XhtmlBuffer;
-import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.elements.xml.XmlBuffer;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
@@ -71,9 +69,4 @@ public abstract class AbstractElementsTest extends TestCase {
         ElementsThreadLocals.removeElementsContext();
     }
 
-    public String elementToString(XhtmlFragment element) {
-        XhtmlBuffer xb = new XhtmlBuffer();
-        element.toXhtml(xb);
-        return xb.toString();
-    }
 }

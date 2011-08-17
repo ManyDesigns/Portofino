@@ -61,9 +61,9 @@
                         </ul>
                     </li>
                     <li>
-                        <div class="navigationHeader">Site settings</div>
+                        <div class="navigationHeader">Configuration</div>
                         <ul>
-                            <li class="navigationItem <c:if test="true">selected</c:if>"><stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction">General</stripes:link></li>
+                            <li class="navigationItem <c:if test="true">selected</c:if>"><stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction">Settings</stripes:link></li>
                             <li class="navigationItem">Email</li>
                             <li class="navigationItem">Permissions</li>
                         </ul>

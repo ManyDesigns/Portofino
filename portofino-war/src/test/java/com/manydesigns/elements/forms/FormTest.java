@@ -2,6 +2,7 @@ package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.fields.SelectBean1;
+import com.manydesigns.elements.util.Util;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -36,7 +37,7 @@ public class FormTest extends AbstractElementsTest {
 
     public void testNullPrefix() {
         assertNull(form.getId());
-        String text = elementToString(form);
+        String text = Util.elementToString(form);
         assertEquals("<fieldset class=\"nolegend\">" +
                 "<table class=\"details\"><tr><th>" +
                 "<label for=\"myValue\" class=\"field\">My value:</label>" +
@@ -52,7 +53,7 @@ public class FormTest extends AbstractElementsTest {
 
     public void testWithPrefix() {
         assertNull(formWithPrefix.getId());
-        String text = elementToString(formWithPrefix);
+        String text = Util.elementToString(formWithPrefix);
         assertEquals("<fieldset class=\"nolegend\">" +
                 "<table class=\"details\"><tr><th>" +
                 "<label for=\"prova.myValue\" class=\"field\">My value:</label>" +
@@ -68,7 +69,7 @@ public class FormTest extends AbstractElementsTest {
 
     public void testWithFieldNames() {
         assertNull(formWithFieldNames.getId());
-        String text = elementToString(formWithFieldNames);
+        String text = Util.elementToString(formWithFieldNames);
         assertEquals("<fieldset class=\"nolegend\">" +
                 "<table class=\"details\">" +
                 "<tr><th>" +

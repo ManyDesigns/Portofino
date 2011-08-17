@@ -56,14 +56,29 @@ public class Breadcrumbs implements XhtmlFragment {
     protected final Dispatch dispatch;
     protected final List<BreadcrumbItem> items;
     private String separator = " > ";
+    protected final boolean clickable;
 
     public Breadcrumbs(Dispatch dispatch) {
+        this(dispatch, dispatch.getPageInstancePath().length, true);
+    }
+
+    public Breadcrumbs(Dispatch dispatch, int upto) {
+        this(dispatch, upto, true);
+    }
+
+    public Breadcrumbs(Dispatch dispatch, boolean clickable) {
+        this(dispatch, dispatch.getPageInstancePath().length, clickable);
+    }
+
+    public Breadcrumbs(Dispatch dispatch, int upto, boolean clickable) {
         this.dispatch = dispatch;
+        this.clickable = clickable;
         items = new ArrayList<BreadcrumbItem>();
 
         StringBuilder sb = new StringBuilder();
         sb.append(dispatch.getRequest().getContextPath());
-        for (PageInstance current : dispatch.getPageInstancePath()) {
+        for (int i = 0; i < upto; i++) {
+            PageInstance current = dispatch.getPageInstancePath()[i];
             sb.append("/");
             Page page = current.getPage();
             sb.append(page.getId());
@@ -102,7 +117,7 @@ public class Breadcrumbs implements XhtmlFragment {
                 xb.write(separator);
                 xb.closeElement("span");
             }
-            if (i == items.size() - 1) {
+            if (!clickable || (i == items.size() - 1)) {
                 xb.openElement("span");
                 xb.addAttribute("class", ITEM_CSS_CLASS);
                 xb.addAttribute("title", current.getTitle());

@@ -101,6 +101,10 @@ public class Dispatch {
         return getPathUrl(pageInstancePath.length);
     }
 
+    public String getParentPathUrl() {
+        return getPathUrl(pageInstancePath.length - 1);
+    }
+
     public String getPathUrl(int length) {
         StringBuilder sb = new StringBuilder();
         sb.append("/");

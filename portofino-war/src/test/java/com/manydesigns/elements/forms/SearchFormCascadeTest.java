@@ -34,6 +34,7 @@ import com.manydesigns.elements.fields.SelectFieldTest2;
 import com.manydesigns.elements.fields.search.SelectSearchField;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionModel;
+import com.manydesigns.elements.util.Util;
 
 import java.util.Map;
 
@@ -84,7 +85,7 @@ public class SearchFormCascadeTest  extends AbstractElementsTest {
 
     public void testHtml() {
         assertNull(form.getId());
-        String text = elementToString(form);
+        String text = Util.elementToString(form);
         assertEquals("<ul class=\"searchform\">" +
                 "<li><fieldset><legend class=\"attr_name\">P1</legend>" +
                 "<select id=\"p1\" name=\"p1\">" +
@@ -98,7 +99,7 @@ public class SearchFormCascadeTest  extends AbstractElementsTest {
                 "</fieldset></li></ul>", text);
         req.addParameter("p1", "1");
         form.readFromRequest(req);
-        text = elementToString(form);
+        text = Util.elementToString(form);
         assertNotNull(selectField1.getValues());
         assertEquals(1, selectField1.getValues()[0]);
         assertNull(selectField2.getValues());

@@ -284,7 +284,7 @@ public abstract class Page implements ModelObject {
     public void addChildPage(Page page) {
         for(Page child : getChildPages()) {
             if(child.getId().equals(page.getId())) {
-                throw new IllegalArgumentException(this + " already has a child page with id " + page.getId());
+                throw new IllegalArgumentException("Page " + this.getTitle() + " already has a child page with id " + page.getId() + " and title " + child.getTitle());
             }
         }
         page.setParent(this);

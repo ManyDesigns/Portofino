@@ -34,6 +34,7 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 
 /*
@@ -76,7 +77,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
         assertTrue(booleanField.isRequired());
 
         assertNull(booleanField.getBooleanValue());
-        String text = elementToString(booleanField);
+        String text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<input id=\"myBoolean\" type=\"checkbox\" name=\"myBoolean\" value=\"true\" class=\"checkbox\" />" +
@@ -85,7 +86,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
 
         booleanField.setBooleanValue(false);
         assertFalse(booleanField.getBooleanValue());
-        text = elementToString(booleanField);
+        text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<input id=\"myBoolean\" type=\"checkbox\" name=\"myBoolean\" value=\"true\" class=\"checkbox\" />" +
@@ -94,7 +95,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
 
         booleanField.setBooleanValue(true);
         assertTrue(booleanField.getBooleanValue());
-        text = elementToString(booleanField);
+        text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<input id=\"myBoolean\" type=\"checkbox\" name=\"myBoolean\" value=\"true\" checked=\"checked\" class=\"checkbox\" />" +
@@ -161,7 +162,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
         assertFalse(booleanField.isRequired());
 
         assertNull(booleanField.getBooleanValue());
-        String text = elementToString(booleanField);
+        String text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<select id=\"myBoolean\" name=\"myBoolean\">" +
@@ -172,7 +173,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
 
         booleanField.setBooleanValue(false);
         assertFalse(booleanField.getBooleanValue());
-        text = elementToString(booleanField);
+        text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<select id=\"myBoolean\" name=\"myBoolean\">" +
@@ -183,7 +184,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
 
         booleanField.setBooleanValue(true);
         assertTrue(booleanField.getBooleanValue());
-        text = elementToString(booleanField);
+        text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<select id=\"myBoolean\" name=\"myBoolean\">" +
@@ -244,7 +245,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
 
     protected void checkPreview() {
         assertNull(booleanField.getBooleanValue());
-        String text = elementToString(booleanField);
+        String text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<div class=\"value\" id=\"myBoolean\"></div>" +
@@ -254,7 +255,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
 
         booleanField.setBooleanValue(false);
         assertFalse(booleanField.getBooleanValue());
-        text = elementToString(booleanField);
+        text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<div class=\"value\" id=\"myBoolean\">No</div>" +
@@ -264,7 +265,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
 
         booleanField.setBooleanValue(true);
         assertTrue(booleanField.getBooleanValue());
-        text = elementToString(booleanField);
+        text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
                 "<div class=\"value\" id=\"myBoolean\">Yes</div>" +

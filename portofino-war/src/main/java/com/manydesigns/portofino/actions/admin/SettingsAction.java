@@ -40,6 +40,7 @@ import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.ServerInfo;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.RootPage;
 import net.sourceforge.stripes.action.*;
@@ -93,29 +94,15 @@ public class SettingsAction extends AbstractActionBean {
     private void setupFormAndBean() {
         rootPage = model.getRootPage();
 
-        logger.debug("Looking for available skins");
-        File webAppDirFile = new File(serverInfo.getRealPath());
-        File skinDirFile = new File(webAppDirFile, "skins");
-        File[] skinFiles = skinDirFile.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-                return file.isDirectory();
-            }
-        });
-
-        String[] skins = new String[skinFiles.length];
-        for (int i = 0; i < skinFiles.length; i++) {
-            File current = skinFiles[i];
-            String skinName = current.getName();
-            skins[i] = skinName;
-            logger.debug("Found skin: {}", skinName);
-        }
-
         SelectionProvider skinSelectionProvider =
-                DefaultSelectionProvider.create("skins", skins, skins);
+                createSkinSelectionProvider();
+        SelectionProvider pagesSelectionProvider =
+                PageLogic.createPagesSelectionProvider(model.getRootPage());
 
         form = new FormBuilder(RootPage.class)
-                .configFields("title", "skin")
+                .configFields("title", "skin", "landingPage")
                 .configSelectionProvider(skinSelectionProvider, "skin")
+                .configSelectionProvider(pagesSelectionProvider, "landingPage")
                 .build();
         form.findFieldByPropertyName("title").setLabel("Application name");
         form.readFromObject(rootPage);
@@ -137,6 +124,34 @@ public class SettingsAction extends AbstractActionBean {
                 return new ForwardResolution("/layouts/admin/settings.jsp");
             }
         }
+    }
+
+    //--------------------------------------------------------------------------
+    // Utility methods
+    //--------------------------------------------------------------------------
+
+    public SelectionProvider createSkinSelectionProvider() {
+                logger.debug("Looking for available skins");
+        File webAppDirFile = new File(serverInfo.getRealPath());
+        File skinDirFile = new File(webAppDirFile, "skins");
+        File[] skinFiles = skinDirFile.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                return file.isDirectory();
+            }
+        });
+
+        String[] skins = new String[skinFiles.length];
+        for (int i = 0; i < skinFiles.length; i++) {
+            File current = skinFiles[i];
+            String skinName = current.getName();
+            skins[i] = skinName;
+            logger.debug("Found skin: {}", skinName);
+        }
+
+        SelectionProvider skinSelectionProvider =
+                DefaultSelectionProvider.create("skins", skins, skins);
+
+        return skinSelectionProvider;
     }
 
     //--------------------------------------------------------------------------
