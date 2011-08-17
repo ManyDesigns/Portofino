@@ -15,14 +15,20 @@
             <stripes:link
                     href="/user/Help.action">Help</stripes:link> -
             <stripes:link
+                    href="/admin/settings.action">Administration</stripes:link> -
+            <stripes:link
                     href="/user/login.action?logout=">Log out</stripes:link>
         </c:if><c:if test="${empty userId}">
         <stripes:link href="/user/Help.action">Help</stripes:link> -
         <stripes:link
-                href="/user/login.action">Log in</stripes:link>
+                href="/admin/settings.action">Administration</stripes:link> -
+        <stripes:link
+        href="/user/login.action">Log in</stripes:link>
     </c:if>
     </c:if><c:if
         test="${not mde:getBoolean(portofinoConfiguration, 'user.enabled')}">
+    <stripes:link
+            href="/admin/settings.action">Administration</stripes:link> -
     <stripes:link href="/user/Help.action">Help</stripes:link>
 </c:if>
 </div>

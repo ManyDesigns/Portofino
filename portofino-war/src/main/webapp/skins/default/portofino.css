@@ -109,7 +109,6 @@ Content
 
 div.contentBody {
     padding: 1em;
-    margin-bottom: -3em;
 }
 
 .contentHeader, .contentFooter {
@@ -137,7 +136,6 @@ div.contentBody {
 
 .contentFooter {
     border-top: 1px solid gray;
-    margin-top: 1em;
     -moz-border-radius: 0 0 3px 3px;
     border-radius: 0 0 3px 3px;
 }
@@ -509,6 +507,7 @@ li.group, li.groupPlaceholder {
     margin: 0 0 5px 0;
     padding: 5px;
     height: 1.5em;
+    font-weight: bold;
 }
 
 .groupPlaceholder {
@@ -518,11 +517,17 @@ li.group, li.groupPlaceholder {
 }
 
 .groupBoxTitle {
-    font-weight: bold;
+    font-weight: normal;
     margin-bottom: 0.5em;
 }
 
 .inheritedPermission {
-    margin: 0.5em 0;
+    margin: 1em 0;
+    border-left: 1px solid black;
+    padding-left: 1em;
 }
 
+.inheritedPermission .inheritedPageName {
+    font-weight: bold;
+    color: #555;
+}
