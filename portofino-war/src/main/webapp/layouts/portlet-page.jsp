@@ -29,6 +29,7 @@
                         <button name="reloadModel" class="refresh">Reload model</button>
                         <button name="pagePermissions" class="person">Page permissions</button>
                         <button name="newPage" class="plusthick">Add page</button>
+                        <button name="deletePage" class="minusthick">Delete page</button>
                     </div>
                     <!-- End admin buttons -->
                     <c:set var="resultSetNavigation" scope="request"

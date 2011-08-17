@@ -67,7 +67,7 @@ public class CrudAccessor
     // Constructors
     //**************************************************************************
 
-    public CrudAccessor(Crud crud, TableAccessor tableAccessor) {
+    public CrudAccessor(Crud crud, ClassAccessor tableAccessor) {
         super(crud.getModelAnnotations());
         this.crud = crud;
         this.tableAccessor = tableAccessor;

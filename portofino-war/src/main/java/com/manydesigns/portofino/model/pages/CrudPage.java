@@ -85,7 +85,9 @@ public class CrudPage extends Page {
             current.reset();
         }
 
-        crud.reset();
+        if(crud != null) {
+            crud.reset();
+        }
     }
 
     @Override
@@ -100,7 +102,9 @@ public class CrudPage extends Page {
             current.init(model);
         }
 
-        crud.init(model);
+        if(crud != null) {
+            crud.init(model);
+        }
     }
 
     @XmlElementWrapper(name="detailChildPages")

@@ -16,9 +16,7 @@ import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.pages.ChartPage;
-import com.manydesigns.portofino.model.pages.CrudPage;
-import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.UserUtils;
@@ -98,14 +96,16 @@ public class PortletAction extends AbstractActionBean {
             if (previousPageInstance instanceof CrudPageInstance) {
                 CrudPageInstance crudPageInstance =
                         (CrudPageInstance) previousPageInstance;
-                if (CrudPage.MODE_SEARCH.equals(crudPageInstance.getMode())) {
-                    returnToParentTarget = crudPageInstance.getCrud().getName();
-                } else if (CrudPage.MODE_DETAIL.equals(crudPageInstance.getMode())) {
-                    Object previousPageObject = crudPageInstance.getObject();
-                    ClassAccessor previousPageClassAccessor =
-                            crudPageInstance.getClassAccessor();
-                    returnToParentTarget = ShortNameUtils.getName(
-                            previousPageClassAccessor, previousPageObject);
+                if(crudPageInstance.getCrud() != null) {
+                    if (CrudPage.MODE_SEARCH.equals(crudPageInstance.getMode())) {
+                        returnToParentTarget = crudPageInstance.getCrud().getName();
+                    } else if (CrudPage.MODE_DETAIL.equals(crudPageInstance.getMode())) {
+                        Object previousPageObject = crudPageInstance.getObject();
+                        ClassAccessor previousPageClassAccessor =
+                                crudPageInstance.getClassAccessor();
+                        returnToParentTarget = ShortNameUtils.getName(
+                                previousPageClassAccessor, previousPageObject);
+                    }
                 }
             }
         } else {
@@ -414,6 +414,8 @@ public class PortletAction extends AbstractActionBean {
                 throw new RuntimeException(e); //TODO
             }
             page.reset();
+            page.setLayoutContainer("default");
+            page.setLayoutOrder("0");
             page.init(model);
             Page parent;
             switch (newPage.getInsertPosition()) {
@@ -429,30 +431,52 @@ public class PortletAction extends AbstractActionBean {
                 default:
                     throw new IllegalStateException("Don't know how to add page " + page + " at position " + newPage.getInsertPosition());
             }
-            page.setParent(parent);
-            parent.getChildPages().add(page);
-            return new ForwardResolution("/layouts/page-crud/new-page.jsp");
+            parent.addChildPage(page);
+            saveModel();
+            return new RedirectResolution(getPagePath(page), false).addParameter("configure");
         } else {
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
         }
     }
 
+    public Resolution deletePage() {
+        Page page = dispatch.getLastPageInstance().getPage();
+        if(page.getParent() != null) {
+            page.getParent().removeChild(page);
+            saveModel();
+        } else {
+            throw new RuntimeException("You can't delete the root page!");
+        }
+        return new RedirectResolution("");
+    }
+
+    //TODO spostare?
+    private String getPagePath(Page page) {
+        String basePath;
+        if(page.getParent() instanceof RootPage) {
+            basePath = context.getRequest().getContextPath();
+        } else {
+            basePath = getPagePath(page.getParent());
+        }
+        return basePath + "/" + page.getId();
+    }
+
     private void prepareNewPageForm() {
         SelectionProvider classSelectionProvider =
                 DefaultSelectionProvider.create("pageClassName",
-                        new String[] { CrudPage.class.getName(), ChartPage.class.getName() },
-                        new String[] { "Crud", "Chart" });
+                        new String[] { CrudPage.class.getName(), ChartPage.class.getName(), TextPage.class.getName() },
+                        new String[] { "Crud", "Chart", "Text" });
         boolean includeSiblingOption = dispatch.getPageInstancePath().length > 1;
         int fieldCount = includeSiblingOption ? 3 : 2;
         String[] insertPositions = new String[fieldCount];
         String[] labels =  new String[fieldCount];
         insertPositions[0] =  NewPage.InsertPosition.TOP.name();
-        labels[0] = "At the top level";
+        labels[0] = "at the top level";
         insertPositions[1] = NewPage.InsertPosition.CHILD.name();
-        labels[1] = "As a child of " + dispatch.getLastPageInstance().getPage().getTitle();
+        labels[1] = "as a child of " + dispatch.getLastPageInstance().getPage().getTitle();
         if(includeSiblingOption) {
             insertPositions[2] = NewPage.InsertPosition.SIBLING.name();
-            labels[2] = "As a sibling of " + dispatch.getLastPageInstance().getPage().getTitle();
+            labels[2] = "as a sibling of " + dispatch.getLastPageInstance().getPage().getTitle();
         }
         SelectionProvider insertPositionSelectionProvider =
                 DefaultSelectionProvider.create("insertPositionName", insertPositions, labels);
