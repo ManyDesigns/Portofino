@@ -280,7 +280,24 @@ public class PortletAction extends AbstractActionBean {
             } catch (Exception e) {
                 throw new RuntimeException(e); //TODO
             }
-            System.out.println(page);
+            page.reset();
+            page.init(model);
+            Page parent;
+            switch (newPage.getInsertPosition()) {
+                case TOP:
+                    parent = model.getRootPage();
+                    break;
+                case CHILD:
+                    parent = dispatch.getLastPageInstance().getPage();
+                    break;
+                case SIBLING:
+                    parent = dispatch.getLastPageInstance().getPage().getParent();
+                    break;
+                default:
+                    throw new IllegalStateException("Don't know how to add page " + page + " at position " + newPage.getInsertPosition());
+            }
+            page.setParent(parent);
+            parent.getChildPages().add(page);
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
         } else {
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
@@ -294,14 +311,14 @@ public class PortletAction extends AbstractActionBean {
                         new String[] { "Crud", "Chart" });
         boolean includeSiblingOption = dispatch.getPageInstancePath().length > 1;
         int fieldCount = includeSiblingOption ? 3 : 2;
-        NewPage.InsertPosition[] insertPositions = new NewPage.InsertPosition[fieldCount];
+        String[] insertPositions = new String[fieldCount];
         String[] labels =  new String[fieldCount];
-        insertPositions[0] =  NewPage.InsertPosition.TOP;
+        insertPositions[0] =  NewPage.InsertPosition.TOP.name();
         labels[0] = "At the top level";
-        insertPositions[1] = NewPage.InsertPosition.CHILD;
+        insertPositions[1] = NewPage.InsertPosition.CHILD.name();
         labels[1] = "As a child of " + dispatch.getLastPageInstance().getPage().getTitle();
         if(includeSiblingOption) {
-            insertPositions[2] = NewPage.InsertPosition.SIBLING;
+            insertPositions[2] = NewPage.InsertPosition.SIBLING.name();
             labels[2] = "As a sibling of " + dispatch.getLastPageInstance().getPage().getTitle();
         }
         SelectionProvider insertPositionSelectionProvider =
@@ -312,7 +329,7 @@ public class PortletAction extends AbstractActionBean {
                 .configSelectionProvider(classSelectionProvider, "pageClassName")
                 .configSelectionProvider(insertPositionSelectionProvider, "insertPositionName")
                 .build();
-        //((SelectField) newPageForm.findFieldByPropertyName("insertPositionName")).setValue(NewPage.InsertPosition.CHILD);
+        ((SelectField) newPageForm.findFieldByPropertyName("insertPositionName")).setValue(NewPage.InsertPosition.CHILD.name());
     }
 
     public Form getNewPageForm() {
