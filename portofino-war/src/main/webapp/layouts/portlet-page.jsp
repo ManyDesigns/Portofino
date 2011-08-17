@@ -1,3 +1,5 @@
+<%@ page import="com.manydesigns.portofino.model.pages.Page" %>
+<%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
         %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -67,6 +69,12 @@
         </stripes:form>
         <div id="dialog-confirm-delete-page" title="Really delete?" style="display: none;">
             <p>Are you sure you want to delete this page?</p>
+            <%
+                Page portofinoPage = actionBean.dispatch.getLastPageInstance().getPage();
+                if(!portofinoPage.getChildPages().isEmpty()) { %>
+                    <p>Deleting it will also delete its children:</p>
+                    <%= displayPageChildrenAsList(portofinoPage) %>
+            <%  } %>
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="contentBody">
@@ -74,4 +82,23 @@
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
     </stripes:layout-component>
-</stripes:layout-render>
+</stripes:layout-render><%!
+    private void displayPageChildrenAsList(Page portofinoPage, XhtmlBuffer buf) {
+        if(!portofinoPage.getChildPages().isEmpty()) {
+            buf.openElement("ul");
+            for(Page page : portofinoPage.getChildPages()) {
+                buf.openElement("li");
+                buf.write(page.getTitle());
+                displayPageChildrenAsList(page, buf);
+                buf.closeElement("li");
+            }
+            buf.closeElement("ul");
+        }
+    }
+
+    private String displayPageChildrenAsList(Page portofinoPage) {
+        XhtmlBuffer buf = new XhtmlBuffer();
+        displayPageChildrenAsList(portofinoPage, buf);
+        return buf.toString();
+    }
+%>
