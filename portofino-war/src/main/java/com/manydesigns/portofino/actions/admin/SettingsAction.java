@@ -29,11 +29,25 @@
 
 package com.manydesigns.portofino.actions.admin;
 
+import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
+import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.context.ServerInfo;
+import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.pages.RootPage;
+import net.sourceforge.stripes.action.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileFilter;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -46,12 +60,90 @@ public class SettingsAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
+    @Inject(ApplicationAttributes.APPLICATION)
+    Application application;
+
+    @Inject(ApplicationAttributes.SERVER_INFO)
+    ServerInfo serverInfo;
+
+    @Inject(RequestAttributes.MODEL)
+    Model model;
+
+    Form form;
+    RootPage rootPage;
+
     //--------------------------------------------------------------------------
-    // Crud operations
+    // Logging
+    //--------------------------------------------------------------------------
+
+    public final static Logger logger =
+            LoggerFactory.getLogger(SettingsAction.class);
+
+    //--------------------------------------------------------------------------
+    // Action events
     //--------------------------------------------------------------------------
 
     @DefaultHandler
     public Resolution execute() {
+        setupFormAndBean();
+
         return new ForwardResolution("/layouts/admin/settings.jsp");
+    }
+
+    private void setupFormAndBean() {
+        rootPage = model.getRootPage();
+
+        logger.debug("Looking for available skins");
+        File webAppDirFile = new File(serverInfo.getRealPath());
+        File skinDirFile = new File(webAppDirFile, "skins");
+        File[] skinFiles = skinDirFile.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                return file.isDirectory();
+            }
+        });
+
+        String[] skins = new String[skinFiles.length];
+        for (int i = 0; i < skinFiles.length; i++) {
+            File current = skinFiles[i];
+            String skinName = current.getName();
+            skins[i] = skinName;
+            logger.debug("Found skin: {}", skinName);
+        }
+
+        SelectionProvider skinSelectionProvider =
+                DefaultSelectionProvider.create("skins", skins, skins);
+
+        form = new FormBuilder(RootPage.class)
+                .configFields("title", "skin")
+                .configSelectionProvider(skinSelectionProvider, "skin")
+                .build();
+        form.findFieldByPropertyName("title").setLabel("Application name");
+        form.readFromObject(rootPage);
+    }
+
+    public Resolution update() {
+        synchronized (application) {
+            setupFormAndBean();
+            form.readFromRequest(context.getRequest());
+            if (form.validate()) {
+                logger.debug("Applying settings to model");
+                form.writeToObject(rootPage);
+
+                model.init();
+                application.saveXmlModel();
+                SessionMessages.addInfoMessage("Settings updated successfully");
+                return new RedirectResolution("/admin/settings.action");
+            } else {
+                return new ForwardResolution("/layouts/admin/settings.jsp");
+            }
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    // Getters/setters
+    //--------------------------------------------------------------------------
+
+    public Form getForm() {
+        return form;
     }
 }

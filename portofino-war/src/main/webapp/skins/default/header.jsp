@@ -5,6 +5,8 @@
 <stripes:url var="profileUrl" value="/Profile.action"/>
 <jsp:useBean id="portofinoConfiguration" scope="application"
              type="org.apache.commons.configuration.Configuration"/>
+<jsp:useBean id="model" scope="request"
+             type="com.manydesigns.portofino.model.Model"/>
 <div id="globalLinks">
     <c:if test="${mde:getBoolean(portofinoConfiguration, 'user.enabled')}">
         <c:if test="${not empty userId}">
@@ -36,4 +38,4 @@
     <mde:sessionMessages/>
 </div>
 <h1><stripes:link href="/"><c:out
-        value="${mde:getString(portofinoConfiguration, 'application.name')}"/></stripes:link></h1>
+        value="${model.rootPage.title}"/></stripes:link></h1>

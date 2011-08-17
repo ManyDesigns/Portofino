@@ -59,6 +59,7 @@ public class TextAction extends PortletAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
     public static final String CONTENT_ENCODING = "UTF-8";
+    public static final String EMPTY_STRING = "";
 
     public String title;
     public String content;
@@ -113,6 +114,9 @@ public class TextAction extends PortletAction {
     @DefaultHandler
     public Resolution execute() throws IOException {
         loadContent();
+        if (StringUtils.isEmpty(content)) {
+            content = "<em>Empty content. To add content, configure this page.</em>";
+        }
         setupBlobs();
         return forwardToPortletPage("/layouts/text/read.jsp");
     }
@@ -138,11 +142,14 @@ public class TextAction extends PortletAction {
             String characterEncoding = textBlob.getCharacterEncoding();
             content = FileUtils.readFileToString(file, characterEncoding);
         } else {
-            content = "";
+            content = EMPTY_STRING;
         }
     }
 
     protected void saveContent() throws IOException {
+        if (content == null) {
+            content = EMPTY_STRING;
+        }
         byte[] contentByteArray = content.getBytes(CONTENT_ENCODING);
         String textCode = textPage.getCode();
         if(textCode != null) {

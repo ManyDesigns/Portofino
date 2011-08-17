@@ -30,25 +30,45 @@
         <div id="bd">
             <div id="yui-main">
                 <div id="content" class="yui-b">
-                    <div class="contentHeader">
-                        <stripes:layout-component name="contentHeader">
-                            Content header
-                        </stripes:layout-component>
-                    </div>
-                    <div class="contentBody">
-                        <stripes:layout-component name="contentBody">
-                            Content body
-                        </stripes:layout-component>
-                    </div>
-                    <div class="contentFooter">
-                        <stripes:layout-component name="contentFooter">
-                            Content footer
-                        </stripes:layout-component>
-                    </div>
+                    <jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean"/>
+                    <stripes:form action="${requestScope.__stripes_resolved_action}" method="post" enctype="multipart/form-data">
+                        <div class="contentHeader">
+                            <stripes:layout-component name="contentHeader">
+                                Content header
+                            </stripes:layout-component>
+                        </div>
+                        <div class="contentBody">
+                            <stripes:layout-component name="contentBody">
+                                Content body
+                            </stripes:layout-component>
+                        </div>
+                        <div class="contentFooter">
+                            <stripes:layout-component name="contentFooter">
+                                Content footer
+                            </stripes:layout-component>
+                        </div>
+                    </stripes:form>
                 </div>
             </div>
             <div id="sidebar" class="yui-b">
-                <mde:write name="navigation"/>
+                <ul>
+                    <li>
+                        <div class="navigationHeader first">Site content</div>
+                        <ul>
+                            <li class="navigationItem">Recent site activity</li>
+                            <li class="navigationItem">Pages</li>
+                            <li class="navigationItem">Attachments</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <div class="navigationHeader">Site settings</div>
+                        <ul>
+                            <li class="navigationItem <c:if test="true">selected</c:if>"><stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction">General</stripes:link></li>
+                            <li class="navigationItem">Email</li>
+                            <li class="navigationItem">Permissions</li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
             <script type="text/javascript">
                 fixSideBar();

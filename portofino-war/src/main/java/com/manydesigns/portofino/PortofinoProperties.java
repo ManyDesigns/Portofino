@@ -61,8 +61,6 @@ public final class PortofinoProperties {
             "storage.directory";
     public static final String MODEL_LOCATION =
             "model.location";
-    public static final String APPLICATION_NAME =
-            "application.name";
     public static final String DATABASE_PLATFORMS_LIST =
             "database.platforms.list";
     public static final String SECURITY_TYPE =

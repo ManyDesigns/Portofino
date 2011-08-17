@@ -28,9 +28,12 @@
  */
 package com.manydesigns.portofino.model.pages;
 
+import com.manydesigns.elements.annotations.Required;
+
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -40,13 +43,41 @@ import javax.xml.bind.annotation.XmlAccessorType;
 */
 @XmlAccessorType(XmlAccessType.NONE)
 public class RootPage extends Page {
+
+    //**************************************************************************
+    // Fields
+    //**************************************************************************
+
+    protected String skin;
+
+    //**************************************************************************
+    // Constructors
+    //**************************************************************************
+
     public RootPage() {
         super();
     }
+
+    //**************************************************************************
+    // ModelObject implementation
+    //**************************************************************************
 
     @Override
     public void afterUnmarshal(Unmarshaller u, Object parent) {
         // do nothing
     }
 
+    //**************************************************************************
+    // Getters/Setters
+    //**************************************************************************
+
+    @Required
+    @XmlAttribute(required = true)
+    public String getSkin() {
+        return skin;
+    }
+
+    public void setSkin(String skin) {
+        this.skin = skin;
+    }
 }

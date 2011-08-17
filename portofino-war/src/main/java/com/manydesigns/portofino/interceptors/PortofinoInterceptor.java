@@ -125,9 +125,9 @@ public class PortofinoInterceptor implements Interceptor {
 
         List<String> groups=UserUtils.manageGroups(application, userId);
 
-        logger.debug("Setting default skin");
+        logger.debug("Setting skin");
         if(request.getAttribute("skin") == null) {
-            request.setAttribute("skin", "default");
+            request.setAttribute("skin", model.getRootPage().getSkin());
         }
 
         Dispatch dispatch = (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);

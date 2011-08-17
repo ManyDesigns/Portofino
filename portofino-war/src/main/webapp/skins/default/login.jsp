@@ -16,9 +16,9 @@
     <head>
         <jsp:include page="head.jsp"/>
         <stripes:layout-component name="customScripts"/>
-        <jsp:useBean id="portofinoConfiguration" scope="application"
-                     type="org.apache.commons.configuration.Configuration"/>
-        <c:set var="applicationName" value="${mde:getString(portofinoConfiguration, 'application.name')}"/>
+        <jsp:useBean id="model" scope="request"
+                     type="com.manydesigns.portofino.model.Model"/>
+        <c:set var="applicationName" value="${model.rootPage.title}"/>
         <title>Login to <c:out value="${applicationName}"/></title>
     </head>
     <body>
@@ -33,7 +33,7 @@
         <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction" method="post">
             <div id="content-login">
                 <div class="contentBody">
-                    <div class="portletWrapper">
+                    <div class="portletWrapper noSpacing">
                         <div class="portlet">
                             <div class="portletHeader">
                                 <div class="yui-g">

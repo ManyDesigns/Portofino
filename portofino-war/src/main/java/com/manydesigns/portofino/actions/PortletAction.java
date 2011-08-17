@@ -141,7 +141,7 @@ public class PortletAction extends AbstractActionBean {
     }
 
     protected void saveModel() {
-        application.getModel().init();
+        model.init();
         application.saveXmlModel();
     }
 

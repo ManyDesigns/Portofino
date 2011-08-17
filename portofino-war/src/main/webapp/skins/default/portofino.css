@@ -154,6 +154,10 @@ Portlet
     width: 100%;
 }
 
+.portletWrapper.noSpacing {
+    margin-bottom: 0;
+}
+
 .portlet {}
 
 .portletHeader {
@@ -207,8 +211,12 @@ input.contentButton.ui-button.ui-state-hover, input.contentButton.ui-button.ui-s
 Side bar
 *******************************************************************************/
 
+div#sidebar {
+    margin-top: 0.5em;
+}
+
 div#sidebar ul {
-    margin: 0.5em 0 0 0;
+    margin: 0;
     list-style-type: none;
 }
 
@@ -232,6 +240,20 @@ div#sidebar ul li.path, div#sidebar ul li.path a {
     color: black;
     background-color: #eef;
     font-weight: bold;
+}
+
+.navigationHeader {
+    margin-top: 0.5em;
+    padding-top: 0.5em;
+    border-top: 1px solid #eeeeee;
+    color: #555555;
+    font-weight: bold;
+}
+
+.navigationHeader.first {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0 none;
 }
 
 /*******************************************************************************

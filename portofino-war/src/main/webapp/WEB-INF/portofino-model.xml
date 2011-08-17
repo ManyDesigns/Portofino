@@ -1021,7 +1021,7 @@ Struttura dell'XML:
             </schemas>
         </database>
     </databases>
-    <rootPage id="/" title="Portofino4" description="portofino 4" url="/">
+    <rootPage id="/" title="Portofino4" description="portofino 4" skin="default">
         <childPages>
             <textPage id="homepage" title="Homepage" description="Homepage" code="zpAUFstfgEUSzsEX9HoO" layoutContainer="contentLayoutTop">
                 <permissions>
