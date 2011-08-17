@@ -256,23 +256,28 @@ public class CrudAction extends PortletAction {
                     .toString();
         setupReturnToParentTarget();
 
-        if(crud != null) {
+        try {
             setupSearchForm();
             loadObjects();
             setupTableForm(Mode.VIEW);
 
             return forwardToPortletPage("/layouts/crud/search.jsp");
-        } else {
-            return new ForwardResolution("/layouts/portlet-not-configured.jsp");
+        } catch(Exception e) {
+            logger.error("Crud not correctly configured", e);
+            return forwardToPortletPage("/layouts/portlet-not-configured.jsp");
         }
     }
 
     public Resolution embeddedSearch() {
-//        setupSearchForm();
-        loadObjects();
-        setupTableForm(Mode.VIEW);
-        tableForm.setSelectable(false);
-        return new ForwardResolution("/layouts/crud/embedded-search.jsp");
+        try {
+            loadObjects();
+            setupTableForm(Mode.VIEW);
+            tableForm.setSelectable(false);
+            return new ForwardResolution("/layouts/crud/embedded-search.jsp");
+        } catch(Exception e) {
+            logger.error("Crud not correctly configured", e);
+            return new ForwardResolution("/layouts/portlet-not-configured.jsp");
+        }
     }
 
     public Resolution resetSearch() {

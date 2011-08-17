@@ -132,16 +132,24 @@ public class TextAction extends PortletAction {
 
     protected void loadContent() throws IOException {
         String textCode = textPage.getCode();
-        textBlob = textManager.loadBlob(textCode);
-        File file = textBlob.getDataFile();
-        String characterEncoding = textBlob.getCharacterEncoding();
-        content = FileUtils.readFileToString(file, characterEncoding);
+        if(textCode != null) {
+            textBlob = textManager.loadBlob(textCode);
+            File file = textBlob.getDataFile();
+            String characterEncoding = textBlob.getCharacterEncoding();
+            content = FileUtils.readFileToString(file, characterEncoding);
+        } else {
+            content = "";
+        }
     }
 
     protected void saveContent() throws IOException {
-        String textCode = textPage.getCode();
         byte[] contentByteArray = content.getBytes(CONTENT_ENCODING);
-        textManager.updateBlob(textCode, contentByteArray, CONTENT_ENCODING);
+        String textCode = textPage.getCode();
+        if(textCode != null) {
+            textBlob = textManager.updateBlob(textCode, contentByteArray, CONTENT_ENCODING);
+        } else {
+            textBlob = textManager.saveBlob(contentByteArray, null, "text/html", CONTENT_ENCODING);
+        }
     }
 
     public Resolution configure() throws IOException {
@@ -161,6 +169,7 @@ public class TextAction extends PortletAction {
             if (valid) {
                 textPage.setTitle(title);
                 saveContent();
+                textPage.setCode(textBlob.getCode());
                 saveModel();
                 SessionMessages.addInfoMessage("Configuration updated successfully");
                 return cancel();

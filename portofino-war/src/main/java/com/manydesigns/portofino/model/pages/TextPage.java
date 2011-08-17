@@ -34,6 +34,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

@@ -154,7 +154,11 @@ public class ChartAction extends PortletAction {
                     new JFreeChartInstance(chart, file, width, height, portletUrl);
         } catch (Throwable e) {
             logger.error("Portlet exception", e);
-            return new ForwardResolution("/layouts/portlet-error.jsp");
+            if(isEmbedded()) {
+                return new ForwardResolution("/layouts/portlet-error.jsp");
+            } else {
+                return forwardToPortletPage("/layouts/portlet-error.jsp");
+            }
         }
 
         if (isEmbedded()) {

@@ -290,4 +290,14 @@ public abstract class Page implements ModelObject {
         page.setParent(this);
         getChildPages().add(page);
     }
+
+    public boolean removeChild(Page page) {
+        if(page.getParent() == this) {
+            page.setParent(null);
+            getChildPages().remove(page);
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
