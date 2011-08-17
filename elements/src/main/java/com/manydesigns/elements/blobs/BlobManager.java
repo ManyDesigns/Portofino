@@ -31,6 +31,7 @@ package com.manydesigns.elements.blobs;
 
 import com.manydesigns.elements.util.RandomUtil;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +103,7 @@ public class BlobManager {
                          @Nullable String characterEncoding
     ) throws IOException {
         String code = RandomUtil.createRandomCode();
+        ensureValidCode(code);
 
         File metaFile =
                 RandomUtil.getCodeFile(blobsDirFile, metaFileNamePattern, code);
@@ -133,6 +135,8 @@ public class BlobManager {
 
     public Blob updateBlob(String code, InputStream sourceStream, String characterEncoding)
             throws IOException {
+        ensureValidCode(code);
+
         Blob blob = loadBlob(code);
         File dataFile = blob.getDataFile();
 
@@ -148,7 +152,16 @@ public class BlobManager {
         return blob;
     }
 
+    public void ensureValidCode(String code) {
+        if (!StringUtils.isAlphanumeric(code)) {
+            throw new IllegalArgumentException(
+                    "Code is not alphanumeric: " + code);
+        }
+    }
+
     public Blob loadBlob(String code) throws IOException {
+        ensureValidCode(code);
+
         File metaFile =
                 RandomUtil.getCodeFile(blobsDirFile, metaFileNamePattern, code);
         File dataFile =
@@ -161,6 +174,8 @@ public class BlobManager {
     }
 
     public boolean deleteBlob(String code) {
+        ensureValidCode(code);
+
         File metaFile =
                 RandomUtil.getCodeFile(blobsDirFile, metaFileNamePattern, code);
         File dataFile =
