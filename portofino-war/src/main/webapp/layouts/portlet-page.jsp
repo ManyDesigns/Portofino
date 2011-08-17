@@ -28,7 +28,7 @@
                                 class="arrow-4">Edit page layout</button>
                         <button name="reloadModel" class="refresh">Reload model</button>
                         <button name="pagePermissions" class="person">Page permissions</button>
-                        <button name="newPage" class="person">Add page</button>
+                        <button name="newPage" class="plusthick">Add page</button>
                     </div>
                     <!-- End admin buttons -->
                     <c:set var="resultSetNavigation" scope="request"

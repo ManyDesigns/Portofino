@@ -45,6 +45,12 @@ $(function() {
             },
             text: false
         });
+    $("input:submit.plusthick, button.plusthick").button({
+            icons: {
+                primary: "ui-icon-plusthick"
+            },
+            text: false
+        });
 });
 
 function enablePortletDragAndDrop(button) {

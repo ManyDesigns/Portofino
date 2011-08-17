@@ -69,15 +69,17 @@
         Inherited permissions:
         <c:forEach var="currentPage" items="${actionBean.inheritedPages}">
             <div class="inheritedPermission">
-                <b><c:out value="${currentPage.title}"/></b>
+                <span class="inheritedPageName"><c:out value="${currentPage.title}"/></span>
                 <br/>Allow groups:
                 <c:forEach var="group" varStatus="status" items="${currentPage.permissions.allow}">
-                    <c:out value="${group}"/><c:if test="${not status.last}">,</c:if>
+                    <b></b><c:out value="${group}"/></b><c:if test="${not status.last}">,</c:if>
                 </c:forEach>
                 <br/>Deny groups:
                 <c:forEach var="group" varStatus="status" items="${currentPage.permissions.deny}">
-                    <c:out value="${group}"/><c:if test="${not status.last}">,</c:if>
+                    <b><c:out value="${group}"/></b><c:if test="${not status.last}">,</c:if>
                 </c:forEach>
+        </c:forEach>
+        <c:forEach var="currentPage" items="${actionBean.inheritedPages}">
             </div>
         </c:forEach>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
