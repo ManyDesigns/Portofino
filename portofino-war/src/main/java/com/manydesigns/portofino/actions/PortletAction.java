@@ -162,12 +162,14 @@ public class PortletAction extends AbstractActionBean {
             if("p".equals(current)) {
                 myself.setLayoutContainer(layoutContainer);
                 myself.setLayoutOrder(i);
-            } else {
+            } else if (current.startsWith("c")) {
                 String pageId = current.substring(1); //current = c...
                 PageInstance childPageInstance = myself.findChildPage(pageId);
                 Page childPage = childPageInstance.getPage();
                 childPage.setLayoutContainerInParent(layoutContainer);
                 childPage.setLayoutOrderInParent(i + "");
+            } else {
+                logger.debug("Ignoring: {}", current);
             }
         }
     }

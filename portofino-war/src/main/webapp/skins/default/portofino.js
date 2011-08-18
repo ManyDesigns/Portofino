@@ -101,6 +101,7 @@ function enablePortletDragAndDrop(button) {
         revert: true, // moves the portlet to its new position with a smooth transition
         tolerance: "pointer", // mouse pointer overlaps the droppable
         update: function(event, ui) {
+            /*
             $(this).find(".updateLayout").remove();
             var elements = $(this).sortable('toArray');
             for(var index in elements) {
@@ -111,6 +112,7 @@ function enablePortletDragAndDrop(button) {
                 hiddenField.setAttribute("class", "updateLayout");
                 $(this).append(hiddenField);
             }
+            */
         }
     }).disableSelection()
             .addClass("portletBox");
@@ -118,4 +120,21 @@ function enablePortletDragAndDrop(button) {
     $(button).remove();
     container.prepend('<button name="cancelLayout">Cancel</button> ');
     container.prepend('<button name="updateLayout">Save</button>');
+    $("button[name=updateLayout]").click(function() {
+        var theButton = $(this);
+        $('div.portletContainer').each( function(index, element) {
+            var wrapper = $(element);
+            var elements = wrapper.sortable('toArray');
+            for(var index in elements) {
+                var hiddenField = document.createElement("input");
+                hiddenField.setAttribute("type", "hidden");
+                hiddenField.setAttribute("name", "portletWrapper_" + element.id);
+                hiddenField.setAttribute("value", elements[index].substring("portletWrapper_".length));
+                hiddenField.setAttribute("class", "updateLayout");
+                theButton.after(hiddenField);
+            }
+        });
+        return true;
+    });
+
 }
