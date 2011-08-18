@@ -88,12 +88,12 @@ public class BlobTest extends AbstractElementsTest {
     public void testBlob1() throws IOException {
         byte[] contentBytes = sampleContent.getBytes();
         Blob blob = manager.saveBlob(
-                contentBytes, sampleFilename, sampleContentType, null);
+                RandomUtil.createRandomId(), contentBytes, sampleFilename, sampleContentType, null);
         assertNotNull(blob);
 
         String code = blob.getCode();
         assertNotNull(code);
-        assertEquals(RandomUtil.DEFAULT_RANDOM_CODE_LENGTH, code.length());
+        assertEquals(RandomUtil.RANDOM_CODE_LENGTH, code.length());
         assertEquals(sampleFilename, blob.getFilename());
         assertEquals(sampleContentType, blob.getContentType());
         assertEquals(contentBytes.length, blob.getSize());

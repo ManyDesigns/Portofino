@@ -37,6 +37,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.Upload;
 import com.manydesigns.elements.servlet.WebFramework;
 import com.manydesigns.elements.util.MemoryUtil;
+import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -251,7 +252,9 @@ public class FileBlobField extends AbstractField
             if (upload == null) {
                 blob = null;
             } else {
+                String code = RandomUtil.createRandomId();
                 blob = blobManager.saveBlob(
+                        code,
                         upload.getInputStream(), 
                         upload.getFilename(),
                         upload.getContentType(),

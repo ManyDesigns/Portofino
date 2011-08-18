@@ -32,6 +32,7 @@ package com.manydesigns.portofino.model.pages;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,7 @@ public abstract class Page implements ModelObject {
     // Fields
     //**************************************************************************
 
+    protected String id;
     protected Page parent;
     protected final ArrayList<Page> childPages;
 
@@ -144,6 +146,17 @@ public abstract class Page implements ModelObject {
     //**************************************************************************
     // Getters/Setters
     //**************************************************************************
+
+    @Identifier
+    @XmlAttribute(required = true)
+    @Required
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     @XmlAttribute(required = true)
     @Required

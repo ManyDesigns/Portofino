@@ -15,16 +15,16 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:out value="${actionBean.content}" escapeXml="false"/>
-        <c:if test="${not empty actionBean.blobs}">
+        <c:if test="${not empty actionBean.textPage.attachments}">
             <div class="horizontalSeparator"></div>
             Attachments:
             <div class="attachmentBox">
-                <c:forEach var="blob" items="${actionBean.blobs}">
-                    <div class="attachment <c:out value="mime-${fn:replace(blob.contentType,'/','-')}"/>">
-                        <div class="attachmentName"><c:out value="${blob.filename}"/></div>
-                        <c:out value="${mde:bytesToHumanString(blob.size)}"/>
-                        <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?viewAttachment=&code=${blob.code}"/>">view</a>
-                        <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&code=${blob.code}"/>">download</a>
+                <c:forEach var="attachment" items="${actionBean.textPage.attachments}">
+                    <div class="attachment <c:out value="mime-${fn:replace(attachment.contentType,'/','-')}"/>">
+                        <div class="attachmentName"><c:out value="${attachment.filename}"/></div>
+                        <c:out value="${mde:bytesToHumanString(attachment.size)}"/>
+                        <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?viewAttachment=&id=${attachment.id}"/>">view</a>
+                        <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&id=${attachment.id}"/>">download</a>
                     </div>
                 </c:forEach>
                 <div style="clear:both"></div>

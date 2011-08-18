@@ -19,20 +19,20 @@
     <title>Browse server</title>
 </head>
 <body>
-<c:if test="${not empty actionBean.blobs}">
+<c:if test="${not empty actionBean.textPage.attachments}">
     Attachments:
     <ul>
-        <c:forEach var="blob" items="${actionBean.blobs}">
+        <c:forEach var="attachment" items="${actionBean.textPage.attachments}">
             <li><a href="#"
                     onclick="window.opener.CKEDITOR.tools.callFunction(
                     <c:out value='${actionBean.CKEditorFuncNum}'/>,
-                    '<c:out value="${actionBean.dispatch.absoluteOriginalPath}?viewAttachment=&code=${blob.code}"/>'
+                    '<c:out value="${actionBean.dispatch.absoluteOriginalPath}?viewAttachment=&id=${attachment.id}"/>'
                 ); window.close();">
-                <c:out value="${blob.filename}"/>
+                <c:out value="${attachment.filename}"/>
             </a></li>
         </c:forEach>
     </ul>
-</c:if><c:if test="${empty actionBean.blobs}">
+</c:if><c:if test="${empty actionBean.textPage.attachments}">
     There are no attachments. <a href="#" onclick="window.close()">Close window</a>
 </c:if>
 </body>

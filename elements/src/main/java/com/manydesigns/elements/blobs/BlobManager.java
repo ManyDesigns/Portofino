@@ -79,30 +79,32 @@ public class BlobManager {
     // Methods
     //**************************************************************************
 
-    public Blob saveBlob(File sourceFile,
+    public Blob saveBlob(String code,
+                         File sourceFile,
                          String fileName,
                          String contentType,
                          String characterEncoding
     ) throws IOException {
         InputStream sourceStream = new FileInputStream(sourceFile);
-        return saveBlob(sourceStream, fileName, contentType, characterEncoding);
+        return saveBlob(code, sourceStream, fileName, contentType, characterEncoding);
     }
 
-    public Blob saveBlob(byte[] sourceBytes,
+    public Blob saveBlob(String code,
+                         byte[] sourceBytes,
                          String fileName,
                          String contentType,
                          String characterEncoding
     ) throws IOException {
         InputStream sourceStream = new ByteArrayInputStream(sourceBytes);
-        return saveBlob(sourceStream, fileName, contentType, characterEncoding);
+        return saveBlob(code, sourceStream, fileName, contentType, characterEncoding);
     }
 
-    public Blob saveBlob(InputStream sourceStream,
+    public Blob saveBlob(String code,
+                         InputStream sourceStream,
                          String fileName,
                          String contentType,
                          @Nullable String characterEncoding
     ) throws IOException {
-        String code = RandomUtil.createRandomCode();
         ensureValidCode(code);
 
         File metaFile =

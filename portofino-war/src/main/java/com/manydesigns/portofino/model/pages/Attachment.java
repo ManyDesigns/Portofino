@@ -57,7 +57,10 @@ public class Attachment implements ModelObject {
     //**************************************************************************
 
     protected TextPage textPage;
-    protected String code;
+    protected String id;
+    protected String contentType;
+    protected String filename;
+    protected long size;
 
     //**************************************************************************
     // Logging
@@ -74,9 +77,9 @@ public class Attachment implements ModelObject {
         this(null, null);
     }
 
-    public Attachment(TextPage textPage, @Nullable String code) {
+    public Attachment(TextPage textPage, @Nullable String id) {
         this.textPage = textPage;
-        this.code = code;
+        this.id = id;
     }
 
     //**************************************************************************
@@ -113,12 +116,38 @@ public class Attachment implements ModelObject {
 
     @Identifier
     @XmlAttribute(required = true)
-    public String getCode() {
-        return code;
+    public String getId() {
+        return id;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setId(String id) {
+        this.id = id;
     }
 
+    @XmlAttribute(required = true)
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    @XmlAttribute(required = true)
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    @XmlAttribute(required = true)
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
 }

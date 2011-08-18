@@ -42,17 +42,20 @@ public class TextLogic {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public static Attachment createAttachment(TextPage textPage,
-                                              String attachmentCode) {
-        Attachment attachment = new Attachment(textPage, attachmentCode);
+    public static Attachment createAttachment(TextPage textPage, String id, String fileName,
+                                              String contentType, long size) {
+        Attachment attachment = new Attachment(textPage, id);
+        attachment.setFilename(fileName);
+        attachment.setContentType(contentType);
+        attachment.setSize(size);
         textPage.getAttachments().add(attachment);
         return attachment;
     }
 
-    public static Attachment findAttachmentByCode(
+    public static Attachment findAttachmentById(
             TextPage textPage, String code) {
         for (Attachment current : textPage.getAttachments()) {
-            if (current.getCode().equals(code)) {
+            if (current.getId().equals(code)) {
                 return current;
             }
         }
@@ -60,7 +63,7 @@ public class TextLogic {
     }
 
     public static Attachment deleteAttachmentByCode(TextPage textPage, String code) {
-        Attachment attachment = findAttachmentByCode(textPage, code);
+        Attachment attachment = findAttachmentById(textPage, code);
         if (attachment == null) {
             return null;
         } else {

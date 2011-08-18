@@ -232,7 +232,7 @@ public abstract class  AbstractCrudAction {
     }
 
     private File createExportTempFile() {
-         String exportId = RandomUtil.createRandomCode();
+         String exportId = RandomUtil.createRandomId();
          return RandomUtil.getTempCodeFile(exportFilenameFormat, exportId);
      }
 

@@ -111,7 +111,7 @@ public class ChartGenerator {
                 throw new InternalError(ElementsThreadLocals.getText(
                         "Portlet_report_type_not_recognized"));
         }
-        String code = RandomUtil.createRandomCode();
+        String code = RandomUtil.createRandomId();
         try {
             File tempFile = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, code);
             ChartUtilities.saveChartAsPNG(tempFile, chart, width, height, info);

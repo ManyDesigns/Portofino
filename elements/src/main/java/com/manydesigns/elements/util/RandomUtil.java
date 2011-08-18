@@ -29,8 +29,6 @@
 
 package com.manydesigns.elements.util;
 
-import com.manydesigns.elements.ElementsProperties;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,29 +46,14 @@ public class RandomUtil {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public final static int DEFAULT_RANDOM_CODE_LENGTH = 20;
+    public final static int RANDOM_CODE_LENGTH = 25;
 
     public final static Logger logger =
             LoggerFactory.getLogger(RandomUtil.class);
 
-    protected static final int codeLength;
     protected static final File tempDir;
 
     static {
-        Configuration configuration = ElementsProperties.getConfiguration();
-        String stringValue =
-                configuration.getString(
-                        ElementsProperties.RANDOM_CODE_LENGTH);
-        int tmp;
-        try {
-            tmp = Integer.parseInt(stringValue);
-        } catch (Throwable e) {
-            tmp = DEFAULT_RANDOM_CODE_LENGTH;
-            logger.debug("Cannot use value '{}'. Using default: {}",
-                    stringValue, tmp);
-        }
-        codeLength = tmp;
-
         tempDir = new File(System.getProperty("java.io.tmpdir"));
     }
 
@@ -78,8 +61,8 @@ public class RandomUtil {
         return tempDir;
     }
 
-    public static String createRandomCode() {
-        return RandomStringUtils.randomAlphanumeric(codeLength);
+    public static String createRandomId() {
+        return RandomStringUtils.random(RANDOM_CODE_LENGTH, "abcdefghijklmnopqrstuvwxyz0123456789");
     }
 
     public static File getTempCodeFile(String fileNameFormat,

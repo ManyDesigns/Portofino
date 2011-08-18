@@ -28,25 +28,20 @@
  */
 package com.manydesigns.portofino.actions;
 
-import com.manydesigns.elements.blobs.Blob;
-import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.logic.TextLogic;
 import com.manydesigns.portofino.model.pages.Attachment;
 import com.manydesigns.portofino.model.pages.TextPage;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -60,10 +55,11 @@ public class TextAction extends PortletAction {
             "Copyright (c) 2005-2011, ManyDesigns srl";
     public static final String CONTENT_ENCODING = "UTF-8";
     public static final String EMPTY_STRING = "";
+    public static final String TEXT_FILE_NAME_PATTERN = "text-{0}.data";
+    public static final String ATTACHMENT_FILE_NAME_PATTERN = "attachment-{0}.data";
 
     public String title;
     public String content;
-    public List<Blob> blobs;
     public String[] selection;
 
     //**************************************************************************
@@ -74,7 +70,7 @@ public class TextAction extends PortletAction {
     public String CKEditor;
     public Integer CKEditorFuncNum;
     public String langCode;
-    public String code;
+    public String id;
     public String viewAttachmentUrl;
     public String message;
 
@@ -83,9 +79,8 @@ public class TextAction extends PortletAction {
     //**************************************************************************
 
     public TextPage textPage;
-    public BlobManager textManager;
-    public BlobManager attachmentManager;
-    public Blob textBlob;
+    public File storageDirFile;
+    public File textFile;
 
     public static final Logger logger =
             LoggerFactory.getLogger(TextAction.class);
@@ -97,13 +92,8 @@ public class TextAction extends PortletAction {
     @Before
     public void prepare() {
         textPage = (TextPage) pageInstance.getPage();
-        String storageDirectory =
-                portofinoConfiguration.getString(
-                        PortofinoProperties.STORAGE_DIRECTORY);
-        textManager = new BlobManager(
-                storageDirectory, "text-{0}.properties", "text-{0}.data");
-        attachmentManager = new BlobManager(
-                storageDirectory, "attachment-{0}.properties", "attachment-{0}.data");
+        String storageDirectory = portofinoConfiguration.getString(PortofinoProperties.STORAGE_DIRECTORY);
+        storageDirFile = new File(storageDirectory);
     }
 
     //**************************************************************************
@@ -117,33 +107,13 @@ public class TextAction extends PortletAction {
         if (StringUtils.isEmpty(content)) {
             content = "<em>Empty content. To add content, configure this page.</em>";
         }
-        setupBlobs();
         return forwardToPortletPage("/layouts/text/read.jsp");
     }
 
-    public void setupBlobs() {
-        blobs = new ArrayList<Blob>();
-        for (Attachment attachment : textPage.getAttachments()) {
-            Blob blob;
-            try {
-                blob = attachmentManager.loadBlob(attachment.getCode());
-                blobs.add(blob);
-            } catch (IOException e) {
-                logger.warn("Cannot load attachment", e);
-            }
-        }
-    }
-
     protected void loadContent() throws IOException {
-        String textCode = textPage.getCode();
-        if(textCode != null) {
-            textBlob = textManager.loadBlob(textCode);
-            File file = textBlob.getDataFile();
-            String characterEncoding = textBlob.getCharacterEncoding();
-            content = FileUtils.readFileToString(file, characterEncoding);
-        } else {
-            content = EMPTY_STRING;
-        }
+        String textCode = textPage.getId();
+        textFile = RandomUtil.getCodeFile(storageDirFile, TEXT_FILE_NAME_PATTERN, textCode);
+        content = FileUtils.readFileToString(textFile, CONTENT_ENCODING);
     }
 
     protected void saveContent() throws IOException {
@@ -151,12 +121,13 @@ public class TextAction extends PortletAction {
             content = EMPTY_STRING;
         }
         byte[] contentByteArray = content.getBytes(CONTENT_ENCODING);
-        String textCode = textPage.getCode();
-        if(textCode != null) {
-            textBlob = textManager.updateBlob(textCode, contentByteArray, CONTENT_ENCODING);
-        } else {
-            textBlob = textManager.saveBlob(contentByteArray, null, "text/html", CONTENT_ENCODING);
-        }
+        String textCode = textPage.getId();
+        File dataFile =
+                RandomUtil.getCodeFile(storageDirFile, TEXT_FILE_NAME_PATTERN, textCode);
+
+        // copy the data
+        long size = IOUtils.copyLarge(
+                new ByteArrayInputStream(contentByteArray), new FileOutputStream(dataFile));
     }
 
     public Resolution configure() throws IOException {
@@ -176,7 +147,6 @@ public class TextAction extends PortletAction {
             if (valid) {
                 textPage.setTitle(title);
                 saveContent();
-                textPage.setCode(textBlob.getCode());
                 saveModel();
                 SessionMessages.addInfoMessage("Configuration updated successfully");
                 return cancel();
@@ -220,16 +190,18 @@ public class TextAction extends PortletAction {
         viewAttachmentUrl = null;
         synchronized (application) {
             logger.info("Uploading attachment");
-            Blob blob = attachmentManager.saveBlob(
-                    upload.getInputStream(),
-                    upload.getFileName(),
-                    upload.getContentType(),
-                    null);
-            TextLogic.createAttachment(textPage, blob.getCode());
+            InputStream attachmentStream = upload.getInputStream();
+            String attachmentId = RandomUtil.createRandomId();
+            File dataFile =
+                RandomUtil.getCodeFile(storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
+
+            // copy the data
+            IOUtils.copyLarge(attachmentStream, new FileOutputStream(dataFile));
+            TextLogic.createAttachment(textPage, attachmentId, upload.getFileName(), upload.getContentType(), upload.getSize());
             viewAttachmentUrl =
-                    String.format("%s?downloadAttachment=&code=%s",
+                    String.format("%s?viewAttachment=&id=%s",
                             dispatch.getAbsoluteOriginalPath(),
-                            blob.getCode());
+                            attachmentId);
             saveModel();
         }
     }
@@ -237,19 +209,19 @@ public class TextAction extends PortletAction {
     public Resolution viewAttachment() {
         // find the attachment
         Attachment attachment =
-                TextLogic.findAttachmentByCode(textPage, code);
+                TextLogic.findAttachmentById(textPage, id);
 
         if (attachment == null) {
             return new ErrorResolution(404, "Attachment not found");
         }
 
         try {
-            Blob blob = attachmentManager.loadBlob(code);
-            File file = blob.getDataFile();
+            String attachmentId = attachment.getId();
+            File file = RandomUtil.getCodeFile(storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
             InputStream is = new FileInputStream(file);
             Resolution resolution =
-                    new StreamingResolution(blob.getContentType(), is)
-                    .setLength(blob.getSize())
+                    new StreamingResolution(attachment.getContentType(), is)
+                    .setLength(attachment.getSize())
                     .setAttachment(false);
             return resolution;
         } catch (IOException e) {
@@ -261,20 +233,20 @@ public class TextAction extends PortletAction {
     public Resolution downloadAttachment() {
         // find the attachment
         Attachment attachment =
-                TextLogic.findAttachmentByCode(textPage, code);
+                TextLogic.findAttachmentById(textPage, id);
 
         if (attachment == null) {
             return new ErrorResolution(404, "Attachment not found");
         }
 
         try {
-            Blob blob = attachmentManager.loadBlob(code);
-            File file = blob.getDataFile();
+            String attachmentId = attachment.getId();
+            File file = RandomUtil.getCodeFile(storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
             InputStream is = new FileInputStream(file);
             Resolution resolution =
-                    new StreamingResolution(blob.getContentType(), is)
-                    .setLength(blob.getSize())
-                    .setFilename(blob.getFilename())
+                    new StreamingResolution(attachment.getContentType(), is)
+                    .setLength(attachment.getSize())
+                    .setFilename(attachment.getFilename())
                     .setAttachment(true);
             return resolution;
         } catch (IOException e) {
@@ -285,13 +257,11 @@ public class TextAction extends PortletAction {
 
     public Resolution browse() throws IOException {
         logger.info("Browse");
-        setupBlobs();
         return new ForwardResolution("/layouts/text/browse.jsp");
     }
 
     public Resolution manageAttachments() {
         logger.info("Manage attachments");
-        setupBlobs();
         return new ForwardResolution("/layouts/text/manage-attachments.jsp");
     }
 
@@ -308,7 +278,10 @@ public class TextAction extends PortletAction {
                         logger.warn("Ignoring non-existing attachment with code: {}", code);
                         continue;
                     }
-                    attachmentManager.deleteBlob(code);
+                    File file = RandomUtil.getCodeFile(storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachment.getId());
+                    if(!FileUtils.deleteQuietly(file)) {
+                        logger.warn("File wasn't deleted: {}", file.getAbsolutePath());
+                    }
 
                     counter++;
                 }
@@ -385,12 +358,12 @@ public class TextAction extends PortletAction {
         this.langCode = langCode;
     }
 
-    public String getCode() {
-        return code;
+    public String getId() {
+        return id;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getViewAttachmentUrl() {
@@ -409,19 +382,11 @@ public class TextAction extends PortletAction {
         this.message = message;
     }
 
-    public List<Blob> getBlobs() {
-        return blobs;
+    public File getTextFile() {
+        return textFile;
     }
 
-    public void setBlobs(List<Blob> blobs) {
-        this.blobs = blobs;
-    }
-
-    public Blob getTextBlob() {
-        return textBlob;
-    }
-
-    public void setTextBlob(Blob textBlob) {
-        this.textBlob = textBlob;
+    public void setTextFile(File textFile) {
+        this.textFile = textFile;
     }
 }

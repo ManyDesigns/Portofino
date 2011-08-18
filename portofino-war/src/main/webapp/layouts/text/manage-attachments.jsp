@@ -17,19 +17,19 @@
         Manage attachments for page <c:out value="${actionBean.textPage.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <c:if test="${not empty actionBean.blobs}">
+        <c:if test="${not empty actionBean.textPage.attachments}">
             Attachments:
             <p>
-                <c:forEach var="blob" items="${actionBean.blobs}">
+                <c:forEach var="attachment" items="${actionBean.textPage.attachments}">
                     <br/>
-                    <stripes:checkbox name="selection" value="${blob.code}"/>
-                    <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&code=${blob.code}"/>"
-                            ><c:out value="${blob.filename}"/></a>
+                    <stripes:checkbox name="selection" value="${attachment.id}"/>
+                    <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&id=${attachment.id}"/>"
+                            ><c:out value="${attachment.filename}"/></a>
                 </c:forEach>
             </p>
             <br/>
             <stripes:submit name="deleteAttachments" value="Delete selected attachments" class="portletButton"/>
-        </c:if><c:if test="${empty actionBean.blobs}">
+        </c:if><c:if test="${empty actionBean.textPage.attachments}">
             There are no attachments.
         </c:if>
         <div class="horizontalSeparator"></div>
