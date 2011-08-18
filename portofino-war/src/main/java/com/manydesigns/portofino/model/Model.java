@@ -29,7 +29,9 @@
 
 package com.manydesigns.portofino.model;
 
-import com.manydesigns.portofino.model.datamodel.*;
+import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.datamodel.Schema;
+import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.pages.RootPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

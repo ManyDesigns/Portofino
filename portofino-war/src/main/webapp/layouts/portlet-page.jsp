@@ -30,7 +30,12 @@
                         <button name="pagePermissions" class="person">Page permissions</button>
                         <button name="newPage" class="plusthick">Add page</button>
                         <button name="deletePage" class="minusthick"
-                                onclick="confirmDeletePage('<%= request.getContextPath() %>'); return false;">Delete page</button>
+                                onclick="confirmDeletePage(
+                                            '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
+                                            '<%= request.getContextPath() %>');
+                                        return false;">
+                            Delete page
+                        </button>
                         <button name="movePage" class="minusthick"
                                 onclick="showMovePageDialog('<%= request.getContextPath() %>'); return false;">Move page</button>
                     </div>

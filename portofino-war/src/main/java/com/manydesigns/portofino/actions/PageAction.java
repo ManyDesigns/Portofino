@@ -58,8 +58,7 @@ public class PageAction extends AbstractActionBean {
 
     @Before
     public void prepare() {
-        page = model.getRootPage().getChildPages().get(0);
-        //TODO load page by id
+        page = model.getRootPage().findDescendantPageById(pageId);
     }
 
     public Resolution confirmDelete() {

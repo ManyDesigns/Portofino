@@ -12,9 +12,9 @@ function fixSideBar() {
     )
 }
 
-function confirmDeletePage(contextPath) {
+function confirmDeletePage(pageId, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/Page.action?confirmDelete", function() {
+    dialogDiv.load(contextPath + "/Page.action?confirmDelete&pageId=" + pageId, function() {
         dialogDiv.find("#dialog-confirm-delete-page").dialog({
             modal: true,
             buttons: {
