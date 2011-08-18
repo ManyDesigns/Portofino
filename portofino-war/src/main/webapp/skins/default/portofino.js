@@ -37,6 +37,26 @@ function confirmDeletePage(contextPath) {
     return false;
 }
 
+function showMovePageDialog(contextPath) {
+    var dialogDiv = $(document.createElement("div"));
+    dialogDiv.load(contextPath + "/Page.action?chooseNewLocation", function() {
+        dialogDiv.find("#dialog-move-page").dialog({
+            modal: true,
+            buttons: {
+                "Move": function() {
+                    alert("TODO");
+                    $(this).dialog("close");
+                },
+                Cancel: function() {
+                    $(this).dialog("close");
+                    dialogDiv.remove();
+                }
+            }
+        });
+    });
+    return false;
+}
+
 $(function() {
     $("input:submit.contentButton, button.contentButton").button();
     
@@ -92,23 +112,9 @@ function enablePortletDragAndDrop(button) {
         placeholder: "portletPlaceholder",
         cursor: "move", // cursor image
         revert: true, // moves the portlet to its new position with a smooth transition
-        tolerance: "pointer", // mouse pointer overlaps the droppable
-        update: function(event, ui) {
-            /*
-            $(this).find(".updateLayout").remove();
-            var elements = $(this).sortable('toArray');
-            for(var index in elements) {
-                var hiddenField = document.createElement("input");
-                hiddenField.setAttribute("type", "hidden");
-                hiddenField.setAttribute("name", "portletWrapper_" + this.id);
-                hiddenField.setAttribute("value", elements[index].substring("portletWrapper_".length));
-                hiddenField.setAttribute("class", "updateLayout");
-                $(this).append(hiddenField);
-            }
-            */
-        }
-    }).disableSelection()
-            .addClass("portletBox");
+        tolerance: "pointer" // mouse pointer overlaps the droppable
+    }).disableSelection().addClass("portletBox");
+
     var container = $(button).parent();
     $(button).remove();
     container.prepend('<button name="cancelLayout">Cancel</button> ');

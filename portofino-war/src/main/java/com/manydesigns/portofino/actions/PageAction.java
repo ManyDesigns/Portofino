@@ -56,11 +56,16 @@ public class PageAction extends AbstractActionBean {
 
     @Before
     public void prepare() {
+        page = model.getRootPage().getChildPages().get(0);
         //TODO load page by id
     }
 
     public Resolution confirmDelete() {
         return new ForwardResolution("/layouts/admin/deletePageDialog.jsp");
+    }
+
+    public Resolution chooseNewLocation() {
+        return new ForwardResolution("/layouts/admin/movePageDialog.jsp");
     }
 
     public String getPageId() {
