@@ -92,7 +92,9 @@ public class TextAction extends PortletAction {
     @Before
     public void prepare() {
         textPage = (TextPage) pageInstance.getPage();
-        String storageDirectory = portofinoConfiguration.getString(PortofinoProperties.STORAGE_DIRECTORY);
+        String storageDirectory =
+                portofinoConfiguration.getString(
+                        PortofinoProperties.STORAGE_DIRECTORY);
         storageDirFile = new File(storageDirectory);
     }
 
@@ -107,13 +109,22 @@ public class TextAction extends PortletAction {
         if (StringUtils.isEmpty(content)) {
             content = "<em>Empty content. To add content, configure this page.</em>";
         }
-        return forwardToPortletPage("/layouts/text/read.jsp");
+        if (isEmbedded()) {
+            return new ForwardResolution("/layouts/text/read.jsp");
+        } else {
+            return forwardToPortletPage("/layouts/text/read.jsp");
+        }
     }
 
     protected void loadContent() throws IOException {
         String textCode = textPage.getId();
         textFile = RandomUtil.getCodeFile(storageDirFile, TEXT_FILE_NAME_PATTERN, textCode);
-        content = FileUtils.readFileToString(textFile, CONTENT_ENCODING);
+        try {
+            content = FileUtils.readFileToString(textFile, CONTENT_ENCODING);
+        } catch (FileNotFoundException e) {
+            content = EMPTY_STRING;
+            logger.debug("Content file not found. Content set to empty.", e);
+        }
     }
 
     protected void saveContent() throws IOException {

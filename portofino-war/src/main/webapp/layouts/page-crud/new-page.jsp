@@ -58,7 +58,7 @@
 
             var urlField = $("#url");
             var breadcrumbsField = $("#breadcrumbs");
-            var idField = $("#id");
+            var fragmentField = $("#fragment");
             var titleField = $("#title");
 
             var position = $("input[name=insertPositionName][checked=checked]").val();
@@ -76,11 +76,11 @@
                     baseBreadcrumbs = parentBreadcrumbs;
                 }
 
-                urlField.html(basePath + "/" + idField.val());
+                urlField.html(basePath + "/" + fragmentField.val());
                 breadcrumbsField.html(baseBreadcrumbs + "<span class='breadcrumb-separator'> &gt; </span><span class='breadcrumb-item'>" + titleField.val() + "</span>");
             }
 
-            idField.change(recalculateUrlAndBreadcrumbs);
+            fragmentField.change(recalculateUrlAndBreadcrumbs);
             titleField.change(recalculateUrlAndBreadcrumbs);
             $("input[name=insertPositionName]").change(function() {
                 if($(this).attr('checked')) {

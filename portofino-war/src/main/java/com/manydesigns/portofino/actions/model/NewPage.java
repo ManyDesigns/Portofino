@@ -33,7 +33,6 @@ import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.fields.SelectField;
-import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.Page;
 
 /**
@@ -48,13 +47,6 @@ public class NewPage extends Page {
 
     protected String pageClassName;
     protected String insertPositionName;
-    protected InsertPosition insertPosition;
-
-    @Override
-    public void init(Model model) {
-        super.init(model);
-        insertPosition = InsertPosition.valueOf(insertPositionName);
-    }
 
     @Label("Page type")
     @Required
@@ -77,15 +69,4 @@ public class NewPage extends Page {
         this.insertPositionName = insertPositionName;
     }
 
-    public InsertPosition getInsertPosition() {
-        return insertPosition;
-    }
-
-    public void setInsertPosition(InsertPosition insertPosition) {
-        this.insertPosition = insertPosition;
-    }
-
-    public static enum InsertPosition {
-        TOP, CHILD, SIBLING;
-    }
 }

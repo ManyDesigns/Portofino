@@ -7,6 +7,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.model.NewPage;
@@ -413,22 +414,27 @@ public class PortletAction extends AbstractActionBean {
         }
     }
 
+    public static enum InsertPosition {
+        TOP, CHILD, SIBLING
+    }
+
     private Resolution doCreateNewPage() throws IllegalAccessException, InvocationTargetException {
         prepareNewPageForm();
         newPageForm.readFromRequest(context.getRequest());
         if(newPageForm.validate()) {
             NewPage newPage = new NewPage();
             newPageForm.writeToObject(newPage);
-            newPage.init(model);
+            InsertPosition insertPosition =
+                    InsertPosition.valueOf(newPage.getInsertPositionName());
             String pageClassName = newPage.getPageClassName();
             Page page = (Page) ReflectionUtil.newInstance(pageClassName);
             BeanUtils.copyProperties(page, newPage);
-            page.reset();
+            String pageId = RandomUtil.createRandomId();
+            page.setId(pageId);
             page.setLayoutContainer("default");
             page.setLayoutOrder("0");
-            page.init(model);
             Page parent;
-            switch (newPage.getInsertPosition()) {
+            switch (insertPosition) {
                 case TOP:
                     parent = model.getRootPage();
                     break;
@@ -439,7 +445,7 @@ public class PortletAction extends AbstractActionBean {
                     parent = dispatch.getLastPageInstance().getPage().getParent();
                     break;
                 default:
-                    throw new IllegalStateException("Don't know how to add page " + page + " at position " + newPage.getInsertPosition());
+                    throw new IllegalStateException("Don't know how to add page " + page + " at position " + insertPosition);
             }
             parent.addChildPage(page);
             saveModel();
@@ -473,12 +479,12 @@ public class PortletAction extends AbstractActionBean {
         int fieldCount = includeSiblingOption ? 3 : 2;
         String[] insertPositions = new String[fieldCount];
         String[] labels =  new String[fieldCount];
-        insertPositions[0] =  NewPage.InsertPosition.TOP.name();
+        insertPositions[0] =  InsertPosition.TOP.name();
         labels[0] = "at the top level";
-        insertPositions[1] = NewPage.InsertPosition.CHILD.name();
+        insertPositions[1] = InsertPosition.CHILD.name();
         labels[1] = "as a child of " + dispatch.getLastPageInstance().getPage().getTitle();
         if(includeSiblingOption) {
-            insertPositions[2] = NewPage.InsertPosition.SIBLING.name();
+            insertPositions[2] = InsertPosition.SIBLING.name();
             labels[2] = "as a sibling of " + dispatch.getLastPageInstance().getPage().getTitle();
         }
         SelectionProvider insertPositionSelectionProvider =
@@ -489,7 +495,7 @@ public class PortletAction extends AbstractActionBean {
                 .configSelectionProvider(classSelectionProvider, "pageClassName")
                 .configSelectionProvider(insertPositionSelectionProvider, "insertPositionName")
                 .build();
-        ((SelectField) newPageForm.findFieldByPropertyName("insertPositionName")).setValue(NewPage.InsertPosition.CHILD.name());
+        ((SelectField) newPageForm.findFieldByPropertyName("insertPositionName")).setValue(InsertPosition.CHILD.name());
     }
 
     public Form getNewPageForm() {
@@ -501,7 +507,7 @@ public class PortletAction extends AbstractActionBean {
     //--------------------------------------------------------------------------
 
     protected static final String[][] NEW_PAGE_SETUP_FIELDS = {
-            {"pageClassName", "id", "title", "description", "insertPositionName"}};
+            {"pageClassName", "fragment", "title", "description", "insertPositionName"}};
     protected Form newPageForm;
 
 }
