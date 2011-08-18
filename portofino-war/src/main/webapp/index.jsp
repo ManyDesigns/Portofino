@@ -10,7 +10,7 @@
     RootPage rootPage = model.getRootPage();
     String landingPage = rootPage.getLandingPage();
     if (landingPage == null) {
-        landingPage = "/" + rootPage.getChildPages().get(0).getId();
+        landingPage = "/" + rootPage.getChildPages().get(0).getFragment();
     }
     String redirectURL = request.getContextPath() + landingPage;
     response.sendRedirect(redirectURL);

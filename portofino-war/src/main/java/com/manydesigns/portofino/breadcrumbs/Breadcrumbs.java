@@ -81,7 +81,7 @@ public class Breadcrumbs implements XhtmlFragment {
             PageInstance current = dispatch.getPageInstancePath()[i];
             sb.append("/");
             Page page = current.getPage();
-            sb.append(page.getId());
+            sb.append(page.getFragment());
             BreadcrumbItem item = new BreadcrumbItem(
                     sb.toString(), page.getTitle(),
                     page.getDescription());

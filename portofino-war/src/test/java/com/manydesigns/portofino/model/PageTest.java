@@ -73,7 +73,7 @@ public class PageTest extends TestCase {
         model = new Model();
         //1. Radice
         root = new RootPage();
-        root.setId("/");
+        root.setFragment("/");
         root.setTitle("portofino4");
         root.setDescription("portofino application");
 
@@ -86,7 +86,7 @@ public class PageTest extends TestCase {
         n1_1.setPermissions(n1_1_perm);
         n1_1.setDescription("homepage description");
         n1_1.setTitle("homepage title");
-        n1_1.setId("homepage");
+        n1_1.setFragment("homepage");
 
         n1_1_perm.getAllow().add(Group.ANONYMOUS_GROUP.getName());
 
@@ -97,7 +97,7 @@ public class PageTest extends TestCase {
         n1_2.setPermissions(n1_2_perm);
         n1_2.setDescription("Model description");
         n1_2.setTitle("Model title");
-        n1_2.setId("model");
+        n1_2.setFragment("model");
 
         n1_2_perm.getAllow().add(Group.REGISTERED_GROUP.getName());
 
@@ -108,7 +108,7 @@ public class PageTest extends TestCase {
         n1_2_1.setType("table-data");
         n1_2_1.setDescription("TableData description");
         n1_2_1.setTitle("TableData title");
-        n1_2_1.setId("TableData");
+        n1_2_1.setFragment("TableData");
         n1_2_1.setUrl("/model/TableData.action");
         n1_2.getChildPages().add(n1_2_1);
 
@@ -121,7 +121,7 @@ public class PageTest extends TestCase {
         n1_2_2.setType("table-design");
         n1_2_2.setDescription("TableData design description");
         n1_2_2.setTitle("TableData design title");
-        n1_2_2.setId("TableDesign");
+        n1_2_2.setFragment("TableDesign");
         n1_2_2.setUrl("/model/TableDesign.action");
         n1_2.getChildPages().add(n1_2_2);
 
@@ -133,7 +133,7 @@ public class PageTest extends TestCase {
         n1_2_3.setPermissions(n1_2_3_perm);
         n1_2_3.setDescription("Somewhere description");
         n1_2_3.setTitle("Somewhere");
-        n1_2_3.setId("somewhere");
+        n1_2_3.setFragment("somewhere");
         n1_2_3.setUrl("http://www.manydesigns.com/");
         n1_2.getChildPages().add(n1_2_3);
 
@@ -146,7 +146,7 @@ public class PageTest extends TestCase {
         n1_3.setPermissions(n1_3_perm);
         n1_3.setDescription("Profile");
         n1_3.setTitle("Profile");
-        n1_3.setId("Profile");
+        n1_3.setFragment("Profile");
         n1_3.setUrl("/Profile.action");
 
         n1_3_perm.getDeny().add("cattivi");
@@ -159,7 +159,7 @@ public class PageTest extends TestCase {
         n1_4.setPermissions(n1_4_perm);
         n1_4.setDescription("user administration");
         n1_4.setTitle("user admin");
-        n1_4.setId("userAdmin");
+        n1_4.setFragment("userAdmin");
         //Aggiungo i nodi alla radice
         root.getChildPages().add(n1_1);
         root.getChildPages().add(n1_2);

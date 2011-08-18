@@ -173,7 +173,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
 
         PageInstance reportNodeInstance = pageInstancePath[1];
         Page reportNode = page.getChildPages().get(0);
-        assertEquals("report", reportNode.getId());
+        assertEquals("report", reportNode.getFragment());
         assertEquals(reportNode, reportNodeInstance.getPage());
         assertNull(reportNodeInstance.getMode());
         assertNull(pageInstance.getPk());

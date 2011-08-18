@@ -63,7 +63,7 @@ public class FolderAction extends AbstractActionBean {
             return null;
         } else {
             Page firstChild = childPages.get(0);
-            redirectUrl = dispatch.getOriginalPath() + "/" + firstChild.getId();
+            redirectUrl = dispatch.getOriginalPath() + "/" + firstChild.getFragment();
             return SUCCESS;
         }
     }

@@ -136,7 +136,7 @@ public class Dispatcher {
         for (Page page : pages) {
             // Wrap Page in PageInstance
             PageInstance pageInstance;
-            if (fragment.equals(page.getId())) {
+            if (fragment.equals(page.getFragment())) {
                 pageInstance = visitPageInPath(path, fragmentsIterator, page);
                 visitedInPath = true;
             } else {
@@ -193,7 +193,7 @@ public class Dispatcher {
 
     private boolean matchSearchChildren(Page page, String peek) {
         for (Page current : page.getChildPages()) {
-            if (peek.equals(current.getId())) {
+            if (peek.equals(current.getFragment())) {
                 return true;
             }
         }

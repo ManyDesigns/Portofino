@@ -108,7 +108,7 @@ public class Navigation implements XhtmlFragment {
                 xb.addAttribute("class", "path");
                 expand = current;
             }
-            String url = path + "/" + page.getId();
+            String url = path + "/" + page.getFragment();
             xb.writeAnchor(url, page.getTitle(), null, page.getDescription());
             xb.closeElement("li");
         }

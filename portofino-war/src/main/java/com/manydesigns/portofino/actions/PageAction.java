@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.elements.forms.Form;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.Page;
@@ -53,6 +54,7 @@ public class PageAction extends AbstractActionBean {
 
     protected String pageId;
     protected Page page;
+    protected Form moveForm;
 
     @Before
     public void prepare() {

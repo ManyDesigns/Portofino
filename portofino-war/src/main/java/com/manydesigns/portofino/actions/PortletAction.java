@@ -15,6 +15,7 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
@@ -336,9 +337,9 @@ public class PortletAction extends AbstractActionBean {
             if(page.getLayoutContainerInParent() != null) {
                 PortletInstance portletInstance =
                         new PortletInstance(
-                                "c" + page.getId(),
+                                "c" + page.getFragment(),
                                 page.getActualLayoutOrderInParent(),
-                                dispatch.getOriginalPath() + "/" + page.getId());
+                                dispatch.getOriginalPath() + "/" + page.getFragment());
                 portlets.put(page.getLayoutContainerInParent(), portletInstance);
             }
         }
@@ -443,7 +444,7 @@ public class PortletAction extends AbstractActionBean {
             parent.addChildPage(page);
             saveModel();
             SessionMessages.addInfoMessage("Page created successfully. You should now configure it.");
-            return new RedirectResolution(getPagePath(page), false).addParameter("configure");
+            return new RedirectResolution(PageLogic.getPagePath(page)).addParameter("configure");
         } else {
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
         }
@@ -451,21 +452,16 @@ public class PortletAction extends AbstractActionBean {
 
     public Resolution deletePage() {
         Page page = dispatch.getLastPageInstance().getPage();
-        if(page.getParent() != null) {
+        if(page.getParent() == null) {
+            SessionMessages.addErrorMessage("You can't delete the root page!");
+        }  else if(PageLogic.getPagePath(page).equals(model.getRootPage().getLandingPage())) { //TODO
+            SessionMessages.addErrorMessage("You can't delete the landing page!");
+        } else {
             page.getParent().removeChild(page);
             saveModel();
-        } else {
-            throw new RuntimeException("You can't delete the root page!");
+            return new RedirectResolution("/");
         }
-        return new RedirectResolution("");
-    }
-
-    public String getPagePath(Page page) {
-        if(page instanceof RootPage) {
-            return context.getRequest().getContextPath();
-        } else {
-            return getPagePath(page.getParent()) + "/" + page.getId();
-        }
+        return new RedirectResolution(dispatch.getOriginalPath());
     }
 
     private void prepareNewPageForm() {

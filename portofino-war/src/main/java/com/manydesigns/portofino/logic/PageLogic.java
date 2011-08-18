@@ -64,7 +64,7 @@ public class PageLogic {
 
     private static void recursive(Page page, String path, String breadcrumb,
                            List<String> valuesList, List<String> labelsList) {
-        String pagePath = String.format("%s/%s", path, page.getId());
+        String pagePath = String.format("%s/%s", path, page.getFragment());
         String pageBreadcrumb;
         if (breadcrumb == null) {
             pageBreadcrumb = page.getTitle();
@@ -78,5 +78,11 @@ public class PageLogic {
         }
     }
 
-
+    public static String getPagePath(Page page) {
+        if(page instanceof RootPage) {
+            return "";
+        } else {
+            return getPagePath(page.getParent()) + "/" + page.getFragment();
+        }
+    }
 }

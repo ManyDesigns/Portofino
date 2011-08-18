@@ -32,7 +32,6 @@ package com.manydesigns.portofino.model.pages;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +59,7 @@ public abstract class Page implements ModelObject {
     protected final ArrayList<Page> childPages;
 
     protected Permissions permissions;
-    protected String id;
+    protected String fragment;
     protected String title;
     protected String description;
     protected String url;
@@ -108,7 +107,7 @@ public abstract class Page implements ModelObject {
     }
 
     public void init(Model model) {
-        assert id != null;
+        assert fragment != null;
         assert title != null;
         assert description != null;
 
@@ -132,13 +131,13 @@ public abstract class Page implements ModelObject {
     // Utility Methods
     //**************************************************************************
 
-    public Page findChildPage(String id) {
+    public Page findChildPageByFragment(String fragment) {
         for(Page page : getChildPages()) {
-            if(id.equals(page.getId())) {
+            if(fragment.equals(page.getFragment())) {
                 return page;
             }
         }
-        logger.debug("Child page not found: {}", id);
+        logger.debug("Child page not found: {}", fragment);
         return null;
     }
 
@@ -146,17 +145,14 @@ public abstract class Page implements ModelObject {
     // Getters/Setters
     //**************************************************************************
 
-
-
-    @Identifier
     @XmlAttribute(required = true)
     @Required
-    public String getId() {
-        return id;
+    public String getFragment() {
+        return fragment;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setFragment(String fragment) {
+        this.fragment = fragment;
     }
 
     @XmlAttribute(required = true)
@@ -283,8 +279,10 @@ public abstract class Page implements ModelObject {
 
     public void addChildPage(Page page) {
         for(Page child : getChildPages()) {
-            if(child.getId().equals(page.getId())) {
-                throw new IllegalArgumentException("Page " + this.getTitle() + " already has a child page with id " + page.getId() + " and title " + child.getTitle());
+            if(child.getFragment().equals(page.getFragment())) {
+                throw new IllegalArgumentException(
+                        String.format("Page %s already has a child page with fragment %s and title %s",
+                                      this.getTitle(), page.getFragment(), child.getTitle()));
             }
         }
         page.setParent(this);

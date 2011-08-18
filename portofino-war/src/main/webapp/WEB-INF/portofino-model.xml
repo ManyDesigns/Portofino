@@ -1021,24 +1021,24 @@ Struttura dell'XML:
             </schemas>
         </database>
     </databases>
-    <rootPage id="/" title="Portofino4" description="portofino 4" skin="default">
+    <rootPage fragment="/" title="Portofino4" description="portofino 4" skin="default">
         <childPages>
-            <textPage id="homepage" title="Homepage" description="Homepage" code="zpAUFstfgEUSzsEX9HoO" layoutContainer="contentLayoutTop">
+            <textPage fragment="homepage" title="Homepage" description="Homepage" code="zpAUFstfgEUSzsEX9HoO" layoutContainer="contentLayoutTop">
                 <permissions>
                     <allow>
                         <group>anonymous</group>
                     </allow>
                 </permissions>
             </textPage>
-            <folderPage id="model" title="Model" description="Model">
+            <folderPage fragment="model" title="Model" description="Model">
 
                 <childPages>
-                    <customPage id="ConnectionProviders" title="Connection providers" description="Connection providers" url="/model/ConnectionProviders.action"/>
-                    <customFolderPage id="TableData" title="Table data" description="Table data" url="/model/TableData.action" type="table-data"/>
-                    <customFolderPage id="TabelDesign" title="Table design" description="Table design" url="/model/TableDesign.action" type="table-design"/>
-                    <customPage id="SelfTest" title="Self test" description="Self test" url="/model/SelfTest.action"/>
-                    <customPage id="SiteMap" title="Site map" description="Site map" url="/model/SiteMap.action"/>
-                    <customPage id="DDLWriter" title="DDL Writer" description="DDL Writer" url="/model/DDLWriter.action"/>
+                    <customPage fragment="ConnectionProviders" title="Connection providers" description="Connection providers" url="/model/ConnectionProviders.action"/>
+                    <customFolderPage fragment="TableData" title="Table data" description="Table data" url="/model/TableData.action" type="table-data"/>
+                    <customFolderPage fragment="TabelDesign" title="Table design" description="Table design" url="/model/TableDesign.action" type="table-design"/>
+                    <customPage fragment="SelfTest" title="Self test" description="Self test" url="/model/SelfTest.action"/>
+                    <customPage fragment="SiteMap" title="Site map" description="Site map" url="/model/SiteMap.action"/>
+                    <customPage fragment="DDLWriter" title="DDL Writer" description="DDL Writer" url="/model/DDLWriter.action"/>
                 </childPages>
                 <permissions>
 
@@ -1047,17 +1047,17 @@ Struttura dell'XML:
                     </allow>
                 </permissions>
             </folderPage>
-            <folderPage id="system-admin" title="System administration" description="System administration">
+            <folderPage fragment="system-admin" title="System administration" description="System administration">
                 <childPages>
-                    <customPage id="ServerInfo" title="Server info" description="Server info" url="/system-admin/ServerInfo.action"/>
+                    <customPage fragment="ServerInfo" title="Server info" description="Server info" url="/system-admin/ServerInfo.action"/>
 
-                    <customPage id="ConfigurationProperties" title="Configuration properties" description="Configuration properties" url="/system-admin/ConfigurationProperties.action"/>
-                    <customPage id="Logs" title="Logs" description="Logs" url="/system-admin/Logs.action"/>
-                    <folderPage id="application" title="application" description="application">
+                    <customPage fragment="ConfigurationProperties" title="Configuration properties" description="Configuration properties" url="/system-admin/ConfigurationProperties.action"/>
+                    <customPage fragment="Logs" title="Logs" description="Logs" url="/system-admin/Logs.action"/>
+                    <folderPage fragment="application" title="application" description="application">
                         <childPages>
-                            <textPage id="connectionManager" title="Connection Manager" description="Connection Manager" code="skins/default/tbd.html"/>
-                            <textPage id="databaseObjects" title="Data base Objects" description="Data base Objects" code="skins/default/tbd.html"/>
-                            <textPage id="navigation Manager" title="Navigation Manager" description="Navigation Manager" code="skins/default/tbd.html"/>
+                            <textPage fragment="connectionManager" title="Connection Manager" description="Connection Manager" code="skins/default/tbd.html"/>
+                            <textPage fragment="databaseObjects" title="Data base Objects" description="Data base Objects" code="skins/default/tbd.html"/>
+                            <textPage fragment="navigation Manager" title="Navigation Manager" description="Navigation Manager" code="skins/default/tbd.html"/>
                         </childPages>
                     </folderPage>
 
@@ -1068,10 +1068,10 @@ Struttura dell'XML:
                     </allow>
                 </permissions>
             </folderPage>
-            <folderPage id="usersAdmin" title="User administration" description="User administration">
+            <folderPage fragment="usersAdmin" title="User administration" description="User administration">
 
                 <childPages>
-                    <crudPage id="userAdmin" title="userAdmin" description="user administration" url="/usersAdmin/Users.action">
+                    <crudPage fragment="userAdmin" title="userAdmin" description="user administration" url="/usersAdmin/Users.action">
                         <crud name="users" table="portofino.public.users" query="FROM portofino_public_users" searchTitle="Users" createTitle="Create new user" readTitle="User" editTitle="Edit user">
                             <properties>
                                 <property name="userId"/>
@@ -1126,7 +1126,7 @@ Struttura dell'XML:
                             </subCruds>
                         </crud>
                     </crudPage>
-                    <crudPage id="groupAdmin" title="groupAdmin" description="groups administration" url="/usersAdmin/Groups.action">
+                    <crudPage fragment="groupAdmin" title="groupAdmin" description="groups administration" url="/usersAdmin/Groups.action">
                         <crud name="groupAdmin" table="portofino.public.groups" query="from portofino_public_groups" searchTitle="Groups" createTitle="Create new group" readTitle="Group" editTitle="Edit group">
                             <properties>
 
@@ -1155,14 +1155,14 @@ Struttura dell'XML:
                     </allow>
                 </permissions>
             </folderPage>
-            <customPage id="Profile" title="Profile" description="Profile" url="/Profile.action">
+            <customPage fragment="Profile" title="Profile" description="Profile" url="/Profile.action">
                 <permissions>
                     <allow>
                         <group>registered</group>
                     </allow>
                 </permissions>
             </customPage>
-            <crudPage id="projects"
+            <crudPage fragment="projects"
                       title="Projects"
                       description="Projects"
                       showInSideBar="true"
@@ -1233,7 +1233,7 @@ Struttura dell'XML:
                     </properties>
                 </crud>
                 <childPages>
-                    <portletPage id="report"
+                    <portletPage fragment="report"
                                  title="report title"
                                  description="report description"
                                  showInSideBar="false"
@@ -1249,7 +1249,7 @@ Struttura dell'XML:
                             />
                 </childPages>
                 <detailChildPages>
-                    <crudPage id="issues" title="Issues" description="Issues" showInSideBar="true" layoutContainer="contentLayoutTop" layoutContainerInParent="contentLayoutRight">
+                    <crudPage fragment="issues" title="Issues" description="Issues" showInSideBar="true" layoutContainer="contentLayoutTop" layoutContainerInParent="contentLayoutRight">
                         <crud name="issue"
                                  variable="issue"
                                  table="redmine.redmine.issues"

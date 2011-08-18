@@ -84,7 +84,7 @@ public class PageInstance {
 
     public PageInstance findChildPage(String id) {
         for(PageInstance page : getChildPageInstances()) {
-            if(id.equals(page.getPage().getId())) {
+            if(id.equals(page.getPage().getFragment())) {
                 return page;
             }
         }
@@ -93,7 +93,7 @@ public class PageInstance {
     }
 
     public String getUrlFragment() {
-        return page.getId();
+        return page.getFragment();
     }
 
     public List<PageInstance> getChildPageInstances() {
