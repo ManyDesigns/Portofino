@@ -10,11 +10,13 @@
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
         <stripes:submit name="update" value="Update" class="contentButton"/>
+        <stripes:submit name="returnToPages" value="Return to pages" class="contentButton"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentBody">
         <mde:write name="actionBean" property="form"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
         <stripes:submit name="update" value="Update" class="contentButton"/>
+        <stripes:submit name="returnToPages" value="Return to pages" class="contentButton"/>
     </stripes:layout-component>
 </stripes:layout-render>

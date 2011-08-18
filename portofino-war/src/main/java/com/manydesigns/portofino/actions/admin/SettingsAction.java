@@ -126,6 +126,10 @@ public class SettingsAction extends AbstractActionBean {
         }
     }
 
+    public Resolution returnToPages() {
+        return new RedirectResolution("/");
+    }
+
     //--------------------------------------------------------------------------
     // Utility methods
     //--------------------------------------------------------------------------
