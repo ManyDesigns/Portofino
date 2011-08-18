@@ -12,42 +12,35 @@ function fixSideBar() {
     )
 }
 
-function confirmDeletePage() {
-    var dialogDiv = $("#dialog-confirm-delete-page");
-    dialogDiv.css('display', 'block');
-    if(dialogDiv.dialog("isOpen")) {
-        return true;
-    } else {
-        dialogDiv.dialog("open");
-        return false;
-    }
+function confirmDeletePage(contextPath) {
+    var dialogDiv = $(document.createElement("div"));
+    dialogDiv.load(contextPath + "/Page.action?confirmDelete", function() {
+        dialogDiv.find("#dialog-confirm-delete-page").dialog({
+            modal: true,
+            buttons: {
+                "Delete": function() {
+                    var form = $("#contentHeaderForm");
+                    var hiddenField = document.createElement("input");
+                    hiddenField.setAttribute("type", "hidden");
+                    hiddenField.setAttribute("name", "deletePage");
+                    form.append(hiddenField);
+                    form.submit();
+                    $(this).dialog("close");
+                },
+                Cancel: function() {
+                    $(this).dialog("close");
+                    dialogDiv.remove();
+                }
+            }
+        });
+    });
+    return false;
 }
 
 $(function() {
     $("input:submit.contentButton, button.contentButton").button();
     
     $("input:submit.portletButton, button.portletButton").button();
-
-    $("#deletePageButton").click(confirmDeletePage);
-
-    $("#dialog-confirm-delete-page").dialog({
-        autoOpen: false,
-        modal: true,
-        buttons: {
-            "Delete": function() {
-                var form = $("#contentHeaderForm");
-                var hiddenField = document.createElement("input");
-                hiddenField.setAttribute("type", "hidden");
-                hiddenField.setAttribute("name", "deletePage");
-                form.append(hiddenField);
-                form.submit();
-                $(this).dialog("close");
-            },
-            Cancel: function() {
-                $(this).dialog("close");
-            }
-        }
-    });
 
     $("input:submit.wrench, button.wrench").button({
             icons: {
