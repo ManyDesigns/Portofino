@@ -30,7 +30,11 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.portofino.actions.forms.MovePage;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.Page;
 import net.sourceforge.stripes.action.Before;
@@ -66,6 +70,12 @@ public class PageAction extends AbstractActionBean {
     }
 
     public Resolution chooseNewLocation() {
+        SelectionProvider pagesSelectionProvider =
+                PageLogic.createPagesSelectionProvider(model.getRootPage()); //TODO exclude this
+        moveForm = new FormBuilder(MovePage.class)
+                .configReflectiveFields()
+                .configSelectionProvider(pagesSelectionProvider, "destinationPageId")
+                .build();
         return new ForwardResolution("/layouts/admin/movePageDialog.jsp");
     }
 
@@ -80,5 +90,8 @@ public class PageAction extends AbstractActionBean {
     public Page getPage() {
         return page;
     }
-    
+
+    public Form getMoveForm() {
+        return moveForm;
+    }
 }

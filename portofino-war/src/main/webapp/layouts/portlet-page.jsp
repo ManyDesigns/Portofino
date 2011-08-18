@@ -37,7 +37,12 @@
                             Delete page
                         </button>
                         <button name="movePage" class="minusthick"
-                                onclick="showMovePageDialog('<%= request.getContextPath() %>'); return false;">Move page</button>
+                                onclick="showMovePageDialog(
+                                            '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
+                                            '<%= request.getContextPath() %>');
+                                        return false;">
+                            Move page
+                        </button>
                     </div>
                     <!-- End admin buttons -->
                     <c:set var="resultSetNavigation" scope="request"

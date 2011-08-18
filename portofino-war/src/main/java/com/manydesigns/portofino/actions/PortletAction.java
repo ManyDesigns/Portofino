@@ -10,7 +10,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.actions.model.NewPage;
+import com.manydesigns.portofino.actions.forms.NewPage;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
@@ -470,6 +470,24 @@ public class PortletAction extends AbstractActionBean {
         return new RedirectResolution(dispatch.getOriginalPath());
     }
 
+    public Resolution movePage() {
+        Page page = dispatch.getLastPageInstance().getPage();
+        if(page.getParent() == null) {
+            SessionMessages.addErrorMessage("You can't move the root page!");
+        } else {
+            Page newParent = model.getRootPage().findDescendantPageById(movePageDestination);
+            if(newParent != null) {
+                page.getParent().removeChild(page);
+                newParent.addChildPage(page);
+                saveModel();
+                return new RedirectResolution("/");
+            } else {
+                SessionMessages.addErrorMessage("Invalid destination: " + movePageDestination);
+            }
+        }
+        return new RedirectResolution(dispatch.getOriginalPath());
+    }
+
     private void prepareNewPageForm() {
         SelectionProvider classSelectionProvider =
                 DefaultSelectionProvider.create("pageClassName",
@@ -502,6 +520,14 @@ public class PortletAction extends AbstractActionBean {
         return newPageForm;
     }
 
+    public String getMovePageDestination() {
+        return movePageDestination;
+    }
+
+    public void setMovePageDestination(String movePageDestination) {
+        this.movePageDestination = movePageDestination;
+    }
+
     //--------------------------------------------------------------------------
     // Page crud fields
     //--------------------------------------------------------------------------
@@ -509,5 +535,6 @@ public class PortletAction extends AbstractActionBean {
     protected static final String[][] NEW_PAGE_SETUP_FIELDS = {
             {"pageClassName", "fragment", "title", "description", "insertPositionName"}};
     protected Form newPageForm;
+    protected String movePageDestination;
 
 }

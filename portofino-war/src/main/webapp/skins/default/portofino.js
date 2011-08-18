@@ -37,14 +37,27 @@ function confirmDeletePage(pageId, contextPath) {
     return false;
 }
 
-function showMovePageDialog(contextPath) {
+function showMovePageDialog(pageId, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/Page.action?chooseNewLocation", function() {
+    dialogDiv.load(contextPath + "/Page.action?chooseNewLocation&pageId=" + pageId, function() {
         dialogDiv.find("#dialog-move-page").dialog({
             modal: true,
             buttons: {
                 "Move": function() {
-                    alert("TODO");
+                    var form = $("#contentHeaderForm");
+
+                    var hiddenField = document.createElement("input");
+                    hiddenField.setAttribute("type", "hidden");
+                    hiddenField.setAttribute("name", "movePage");
+                    form.append(hiddenField);
+
+                    hiddenField = document.createElement("input");
+                    hiddenField.setAttribute("type", "hidden");
+                    hiddenField.setAttribute("name", "pageMoveDestination");
+                    hiddenField.setAttribute("value", $(this).find("#destinationPageId").val());
+                    form.append(hiddenField);
+
+                    form.submit();
                     $(this).dialog("close");
                 },
                 Cancel: function() {

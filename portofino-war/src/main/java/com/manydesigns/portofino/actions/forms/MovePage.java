@@ -27,13 +27,10 @@
 *
 */
 
-package com.manydesigns.portofino.actions.model;
+package com.manydesigns.portofino.actions.forms;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.elements.annotations.Select;
-import com.manydesigns.elements.fields.SelectField;
-import com.manydesigns.portofino.model.pages.Page;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,32 +38,19 @@ import com.manydesigns.portofino.model.pages.Page;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class NewPage extends Page {
+public class MovePage {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    protected String pageClassName;
-    protected String insertPositionName;
+    private String destinationPageId;
 
-    @Label("Page type")
     @Required
-    public String getPageClassName() {
-        return pageClassName;
+    @Label("Move to")
+    public String getDestinationPageId() {
+        return destinationPageId;
     }
 
-    public void setPageClassName(String pageClassName) {
-        this.pageClassName = pageClassName;
+    public void setDestinationPageId(String destinationPageId) {
+        this.destinationPageId = destinationPageId;
     }
-
-    @Label("Where")
-    @Select(displayMode = SelectField.DisplayMode.RADIO)
-    @Required
-    public String getInsertPositionName() {
-        return insertPositionName;
-    }
-
-    public void setInsertPositionName(String insertPositionName) {
-        this.insertPositionName = insertPositionName;
-    }
-
 }
