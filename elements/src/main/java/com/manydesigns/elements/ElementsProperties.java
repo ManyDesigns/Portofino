@@ -73,11 +73,7 @@ public final class ElementsProperties {
             "fields.label.capitalize";
     public static final String FIELDS_DATE_FORMAT =
             "fields.date.format";
-    public static final String RANDOM_CODE_LENGTH =
-            "random.code.length";
 
-    public static final String BLOBS_MANAGER =
-            "blobs.manager";
     public static final String BLOBS_DIR =
             "blobs.dir";
     public static final String BLOBS_META_FILENAME_PATTERN =
