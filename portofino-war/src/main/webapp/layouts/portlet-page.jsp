@@ -79,7 +79,11 @@
         </stripes:form>
     </stripes:layout-component>
     <stripes:layout-component name="contentBody">
-        <jsp:include page="/layouts/content/1-2-1-symmetric.jsp"/>
+        <c:set var="pageLayout" value="${actionBean.pageInstance.page.layout}"/>
+        <c:if test="${empty pageLayout}">
+            <c:set var="pageLayout" value="1-2-1-symmetric.jsp"/>
+        </c:if>
+        <jsp:include page="/layouts/content/${pageLayout}"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
     </stripes:layout-component>

@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.actions.model;
 
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.connections.ConnectionProvider;
@@ -66,7 +65,7 @@ public class SelfTestAction extends AbstractActionBean {
     // Injections
     //**************************************************************************
 
-    @Inject(ApplicationAttributes.APPLICATION)
+    @Inject(RequestAttributes.APPLICATION)
     public Application application;
 
     @Inject(RequestAttributes.MODEL)

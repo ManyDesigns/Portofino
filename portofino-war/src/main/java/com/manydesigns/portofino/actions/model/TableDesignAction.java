@@ -41,7 +41,6 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertiesAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
@@ -86,7 +85,7 @@ public class TableDesignAction extends AbstractActionBean {
     @Inject(RequestAttributes.MODEL)
     public Model model;
 
-    @Inject(ApplicationAttributes.APPLICATION)
+    @Inject(RequestAttributes.APPLICATION)
     public Application application;
 
     //**************************************************************************

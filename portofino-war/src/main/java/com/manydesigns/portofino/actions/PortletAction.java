@@ -52,7 +52,7 @@ public class PortletAction extends AbstractActionBean {
     @Inject(RequestAttributes.PAGE_INSTANCE)
     public PageInstance pageInstance;
 
-    @Inject(ApplicationAttributes.APPLICATION)
+    @Inject(RequestAttributes.APPLICATION)
     public Application application;
 
     @Inject(RequestAttributes.MODEL)

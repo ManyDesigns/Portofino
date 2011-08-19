@@ -33,8 +33,8 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.system.model.users.User;
@@ -58,7 +58,7 @@ public class LostPwdChangeAction extends AbstractActionBean implements LoginUnAw
     // Injections
     //**************************************************************************
 
-    @Inject(ApplicationAttributes.APPLICATION)
+    @Inject(RequestAttributes.APPLICATION)
     public Application application;
 
     public Form form;

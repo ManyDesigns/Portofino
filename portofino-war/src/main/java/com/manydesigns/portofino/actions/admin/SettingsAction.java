@@ -61,7 +61,7 @@ public class SettingsAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    @Inject(ApplicationAttributes.APPLICATION)
+    @Inject(RequestAttributes.APPLICATION)
     Application application;
 
     @Inject(ApplicationAttributes.SERVER_INFO)
