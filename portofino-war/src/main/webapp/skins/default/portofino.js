@@ -42,6 +42,7 @@ function showMovePageDialog(pageId, contextPath) {
     dialogDiv.load(contextPath + "/Page.action?chooseNewLocation&pageId=" + pageId, function() {
         dialogDiv.find("#dialog-move-page").dialog({
             modal: true,
+            width: 500,
             buttons: {
                 "Move": function() {
                     var form = $("#contentHeaderForm");
@@ -53,7 +54,7 @@ function showMovePageDialog(pageId, contextPath) {
 
                     hiddenField = document.createElement("input");
                     hiddenField.setAttribute("type", "hidden");
-                    hiddenField.setAttribute("name", "pageMoveDestination");
+                    hiddenField.setAttribute("name", "movePageDestination");
                     hiddenField.setAttribute("value", $(this).find("#destinationPageId").val());
                     form.append(hiddenField);
 
@@ -114,6 +115,12 @@ $(function() {
     $("input:submit.minusthick, button.minusthick").button({
             icons: {
                 primary: "ui-icon-minusthick"
+            },
+            text: false
+        });
+    $("input:submit.transferthick-e-w, button.transferthick-e-w").button({
+            icons: {
+                primary: "ui-icon-transferthick-e-w"
             },
             text: false
         });

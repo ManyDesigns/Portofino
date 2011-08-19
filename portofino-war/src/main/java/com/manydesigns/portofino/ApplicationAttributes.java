@@ -39,7 +39,7 @@ public class ApplicationAttributes {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public final static String APPLICATION = "context";
+    public final static String APPLICATION = "application";
     public final static String ELEMENTS_CONFIGURATION = "elementsConfiguration";
     public final static String PORTOFINO_CONFIGURATION = "portofinoConfiguration";
     public final static String DISPATCHER = "dispatcher";

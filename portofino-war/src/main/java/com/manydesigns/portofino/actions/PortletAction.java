@@ -460,7 +460,7 @@ public class PortletAction extends AbstractActionBean {
         Page page = dispatch.getLastPageInstance().getPage();
         if(page.getParent() == null) {
             SessionMessages.addErrorMessage("You can't delete the root page!");
-        }  else if(PageLogic.getPagePath(page).equals(model.getRootPage().getLandingPage())) { //TODO
+        }  else if(PageLogic.isLandingPage(model.getRootPage(), page)) {
             SessionMessages.addErrorMessage("You can't delete the landing page!");
         } else {
             page.getParent().removeChild(page);
@@ -471,6 +471,10 @@ public class PortletAction extends AbstractActionBean {
     }
 
     public Resolution movePage() {
+        if(movePageDestination == null) {
+            SessionMessages.addErrorMessage("You must select a destination");
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
         Page page = dispatch.getLastPageInstance().getPage();
         if(page.getParent() == null) {
             SessionMessages.addErrorMessage("You can't move the root page!");
@@ -480,7 +484,7 @@ public class PortletAction extends AbstractActionBean {
                 page.getParent().removeChild(page);
                 newParent.addChildPage(page);
                 saveModel();
-                return new RedirectResolution("/");
+                return new RedirectResolution(PageLogic.getPagePath(page));
             } else {
                 SessionMessages.addErrorMessage("Invalid destination: " + movePageDestination);
             }

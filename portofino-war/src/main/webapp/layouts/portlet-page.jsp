@@ -36,7 +36,7 @@
                                         return false;">
                             Delete page
                         </button>
-                        <button name="movePage" class="minusthick"
+                        <button name="movePage" class="transferthick-e-w"
                                 onclick="showMovePageDialog(
                                             '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
                                             '<%= request.getContextPath() %>');

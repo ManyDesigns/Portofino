@@ -33,6 +33,7 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.RootPage;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,12 +48,20 @@ public class PageLogic {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public static SelectionProvider createPagesSelectionProvider(RootPage rootPage) {
+    public static SelectionProvider createPagesSelectionProvider(RootPage rootPage, Page... excludes) {
+        return createPagesSelectionProvider(rootPage, false);
+    }
+
+    public static SelectionProvider createPagesSelectionProvider(RootPage rootPage, boolean includeRoot, Page... excludes) {
         List<String> valuesList = new ArrayList<String>();
         List<String> labelsList = new ArrayList<String>();
 
+        if(includeRoot) {
+            valuesList.add(rootPage.getId());
+            labelsList.add(rootPage.getTitle() + " (top level)");
+        }
         for (Page page : rootPage.getChildPages()) {
-            recursive(page, "", null, valuesList, labelsList);
+            recursive(page, null, valuesList, labelsList, excludes);
         }
 
         String[] values = new String[valuesList.size()];
@@ -62,19 +71,22 @@ public class PageLogic {
         return DefaultSelectionProvider.create("pages", values, labels);
     }
 
-    private static void recursive(Page page, String path, String breadcrumb,
-                           List<String> valuesList, List<String> labelsList) {
-        String pagePath = String.format("%s/%s", path, page.getFragment());
+    private static void recursive(Page page, String breadcrumb,
+                           List<String> valuesList, List<String> labelsList,
+                           Page... excludes) {
+        if(ArrayUtils.contains(excludes, page)) {
+            return;
+        }
         String pageBreadcrumb;
         if (breadcrumb == null) {
             pageBreadcrumb = page.getTitle();
         } else {
             pageBreadcrumb = String.format("%s > %s", breadcrumb, page.getTitle());
         }
-        valuesList.add(pagePath);
+        valuesList.add(page.getId());
         labelsList.add(pageBreadcrumb);
         for (Page subPage : page.getChildPages()) {
-            recursive(subPage, pagePath, pageBreadcrumb, valuesList, labelsList);
+            recursive(subPage, pageBreadcrumb, valuesList, labelsList, excludes);
         }
     }
 
@@ -84,5 +96,18 @@ public class PageLogic {
         } else {
             return getPagePath(page.getParent()) + "/" + page.getFragment();
         }
+    }
+
+    public static Page getLandingPage(RootPage rootPage) {
+        String landingPageId = rootPage.getLandingPage();
+        if (landingPageId == null) {
+            return rootPage.getChildPages().get(0);
+        } else {
+            return rootPage.findDescendantPageById(landingPageId);
+        }
+    }
+
+    public static boolean isLandingPage(RootPage root, Page page) {
+        return page.equals(getLandingPage(root));
     }
 }

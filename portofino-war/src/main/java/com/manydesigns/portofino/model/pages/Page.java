@@ -144,10 +144,10 @@ public abstract class Page implements ModelObject {
     }
 
     public Page findDescendantPageById(String pageId) {
+        if(pageId.equals(getId())) {
+            return this;
+        }
         for(Page page : getChildPages()) {
-            if(pageId.equals(page.getId())) {
-                return page;
-            }
             Page descendant = page.findDescendantPageById(pageId);
             if(descendant != null) {
                 return descendant;
