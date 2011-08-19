@@ -1236,6 +1236,7 @@ public class CrudAction extends PortletAction {
     public Resolution configure() {
         prepareConfigurationForms();
         form.readFromObject(crudPage);
+        title = crudPage.getTitle();
         crudConfigurationForm.readFromObject(crudPage.getCrud());
 
         return new ForwardResolution("/layouts/crud/configure.jsp");
@@ -1270,11 +1271,14 @@ public class CrudAction extends PortletAction {
             crudConfigurationForm.readFromObject(crudPage.getCrud());
             form.readFromRequest(context.getRequest());
             crudConfigurationForm.readFromRequest(context.getRequest());
+
             boolean valid = form.validate();
             valid = crudConfigurationForm.validate() && valid;
+            valid = valid && getTitleFromRequest();
             if (valid) {
                 form.writeToObject(crudPage);
                 crudConfigurationForm.writeToObject(crudPage.getCrud());
+                crudPage.setTitle(title);
                 saveModel();
                 SessionMessages.addInfoMessage("Configuration updated successfully");
                 return cancel();

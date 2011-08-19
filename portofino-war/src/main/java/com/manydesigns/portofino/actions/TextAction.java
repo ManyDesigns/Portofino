@@ -58,7 +58,6 @@ public class TextAction extends PortletAction {
     public static final String TEXT_FILE_NAME_PATTERN = "text-{0}.data";
     public static final String ATTACHMENT_FILE_NAME_PATTERN = "attachment-{0}.data";
 
-    public String title;
     public String content;
     public String[] selection;
 
@@ -149,12 +148,7 @@ public class TextAction extends PortletAction {
 
     public Resolution updateConfiguration() throws IOException {
         synchronized (application) {
-            title = StringUtils.trimToNull(title);
-            boolean valid = true;
-            if (title == null) {
-                SessionMessages.addErrorMessage("Title cannot be empty");
-                valid = false;
-            }
+            boolean valid = getTitleFromRequest();
             if (valid) {
                 textPage.setTitle(title);
                 saveContent();
@@ -316,14 +310,6 @@ public class TextAction extends PortletAction {
     // Getters/setters
     //**************************************************************************
 
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
 
     public String getContent() {
         return content;
