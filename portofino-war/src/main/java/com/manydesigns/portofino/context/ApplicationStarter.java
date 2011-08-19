@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.context;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.context.hibernate.HibernateApplicationImpl;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
@@ -219,9 +218,6 @@ public class ApplicationStarter {
         portofinoConfiguration, databasePlatformsManager);
 
         try {
-            ElementsThreadLocals.setupDefaultElementsContext();
-
-
             String connectionsLocation =
                     portofinoConfiguration.getString(
                             PortofinoProperties.CONNECTIONS_LOCATION);
@@ -237,8 +233,6 @@ public class ApplicationStarter {
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
             return false;
-        } finally {
-            ElementsThreadLocals.removeElementsContext();
         }
         return true;
     }

@@ -41,6 +41,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class PortletAction extends AbstractActionBean {
+    public static final String DEFAULT_LAYOUT_CONTAINER = "default";
 
     //--------------------------------------------------------------------------
     // Properties
@@ -333,15 +334,21 @@ public class PortletAction extends AbstractActionBean {
 
     protected void setupPortlets(PageInstance pageInstance, String myself) {
         PortletInstance myPortletInstance = new PortletInstance("p", pageInstance.getLayoutOrder(), myself);
-        portlets.put(pageInstance.getLayoutContainer(), myPortletInstance);
+        String layoutContainer = pageInstance.getLayoutContainer();
+        if (layoutContainer == null) {
+            layoutContainer = DEFAULT_LAYOUT_CONTAINER;
+        }
+        portlets.put(layoutContainer, myPortletInstance);
         for(Page page : pageInstance.getChildPages()) {
-            if(page.getLayoutContainerInParent() != null) {
+            String layoutContainerInParent = page.getLayoutContainerInParent();
+            if(layoutContainerInParent != null) {
                 PortletInstance portletInstance =
                         new PortletInstance(
                                 "c" + page.getFragment(),
                                 page.getActualLayoutOrderInParent(),
                                 dispatch.getOriginalPath() + "/" + page.getFragment());
-                portlets.put(page.getLayoutContainerInParent(), portletInstance);
+
+                portlets.put(layoutContainerInParent, portletInstance);
             }
         }
         for(Object entryObj : portlets.entrySet()) {
@@ -431,7 +438,7 @@ public class PortletAction extends AbstractActionBean {
             BeanUtils.copyProperties(page, newPage);
             String pageId = RandomUtil.createRandomId();
             page.setId(pageId);
-            page.setLayoutContainer("default");
+            page.setLayoutContainer(DEFAULT_LAYOUT_CONTAINER);
             page.setLayoutOrder("0");
             Page parent;
             switch (insertPosition) {

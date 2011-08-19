@@ -29,8 +29,6 @@
 
 package com.manydesigns.portofino.actions;
 
-import org.apache.commons.lang.math.NumberUtils;
-
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -43,9 +41,9 @@ public class PortletInstance implements Comparable<PortletInstance> {
 
     protected final String jsp;
     protected final String id;
-    protected final int index;
+    protected final Integer index;
 
-    public PortletInstance(String id, int index, String jsp) {
+    public PortletInstance(String id, Integer index, String jsp) {
         this.id = id;
         this.index = index;
         this.jsp = jsp;
@@ -64,6 +62,18 @@ public class PortletInstance implements Comparable<PortletInstance> {
     }
 
     public int compareTo(PortletInstance that) {
-        return NumberUtils.compare(this.getIndex(), that.getIndex());
+        if (this.index == null) {
+            if (that.index == null) {
+                return this.id.compareTo(that.id);
+            } else {
+                return -1;
+            }
+        } else {
+            if (that.index == null) {
+                return 1;
+            } else {
+                return this.id.compareTo(that.id);
+            }
+        }
     }
 }
