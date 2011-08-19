@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.context.Application;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Resolution;
@@ -39,7 +39,6 @@ import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import org.slf4j.MDC;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -55,12 +54,10 @@ public class CleanUpInterceptor implements Interceptor  {
 
     public Resolution intercept(ExecutionContext context) throws Exception {
         ActionBeanContext actionContext = context.getActionBeanContext();
-        ServletContext servletContext = actionContext.getServletContext();
         HttpServletRequest req = actionContext.getRequest();
 
         Application application =
-                (Application)servletContext.getAttribute(
-                        ApplicationAttributes.APPLICATION);
+                (Application) req.getAttribute(RequestAttributes.APPLICATION);
 
         MDC.clear();
         if (application !=null && application.getModel() != null) {

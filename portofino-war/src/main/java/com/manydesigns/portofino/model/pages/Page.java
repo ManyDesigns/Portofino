@@ -69,6 +69,7 @@ public abstract class Page implements ModelObject {
     protected String layoutOrderInParent;
     protected String layoutContainer;
     protected String layoutOrder;
+    protected String layout;
 
     //**************************************************************************
     // Actual fields
@@ -274,6 +275,15 @@ public abstract class Page implements ModelObject {
 
     public void setLayoutOrder(String layoutOrder) {
         this.layoutOrder = layoutOrder;
+    }
+
+    @XmlAttribute(required = true)
+    public String getLayout() {
+        return layout;
+    }
+
+    public void setLayout(String layout) {
+        this.layout = layout;
     }
 
     /* TODO: spostare quaesto metodo nella classe che gestisce la logica

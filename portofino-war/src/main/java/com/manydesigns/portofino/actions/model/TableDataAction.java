@@ -35,7 +35,6 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.*;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.ModelObjectNotFoundError;
@@ -67,7 +66,7 @@ public class TableDataAction extends AbstractCrudAction {
     @Inject(RequestAttributes.MODEL)
     public Model model;
 
-    @Inject(ApplicationAttributes.APPLICATION)
+    @Inject(RequestAttributes.APPLICATION)
     public Application application;
 
     //**************************************************************************

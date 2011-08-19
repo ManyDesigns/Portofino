@@ -32,6 +32,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.email.EmailUtils;
@@ -58,7 +59,7 @@ public class PwdRecoveryAction extends AbstractActionBean implements LoginUnAwar
     // Injections
     //**************************************************************************
 
-    @Inject(ApplicationAttributes.APPLICATION)
+    @Inject(RequestAttributes.APPLICATION)
     public Application application;
 
     @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)

@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino;
+package com.manydesigns.portofino.context;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -35,13 +35,22 @@ package com.manydesigns.portofino;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class ApplicationAttributes {
+public class UninitializedApplicationException extends Exception {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public final static String ELEMENTS_CONFIGURATION = "elementsConfiguration";
-    public final static String PORTOFINO_CONFIGURATION = "portofinoConfiguration";
-    public final static String SERVER_INFO = "serverInfo";
-    public final static String APPLICATION_STARTER = "applicationStarter";
+    public UninitializedApplicationException() {
+    }
 
+    public UninitializedApplicationException(String s) {
+        super(s);
+    }
+
+    public UninitializedApplicationException(String s, Throwable throwable) {
+        super(s, throwable);
+    }
+
+    public UninitializedApplicationException(Throwable throwable) {
+        super(throwable);
+    }
 }

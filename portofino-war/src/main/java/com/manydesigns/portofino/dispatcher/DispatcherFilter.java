@@ -31,6 +31,8 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.context.ApplicationStarter;
 import net.sourceforge.stripes.controller.StripesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,10 +70,22 @@ public class DispatcherFilter implements Filter {
         // cast to http type
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
+        logger.debug("Retrieving application starter");
+        ApplicationStarter applicationStarter =
+                (ApplicationStarter) servletContext.getAttribute(
+                        ApplicationAttributes.APPLICATION_STARTER);
+
+        logger.debug("Retrieving application");
+        Application application;
+        try {
+            application = applicationStarter.getApplication();
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
+        request.setAttribute(RequestAttributes.APPLICATION, application);
+
         logger.debug("Invoking the dispatcher to create a dispatch");
-        Dispatcher dispatcher =
-                (Dispatcher) servletContext.getAttribute(
-                        ApplicationAttributes.DISPATCHER);
+        Dispatcher dispatcher = new Dispatcher(application);
         Dispatch dispatch = dispatcher.createDispatch(httpRequest);
 
         if (dispatch == null) {
@@ -136,6 +150,9 @@ public class DispatcherFilter implements Filter {
                 continue;
             }
             if(attrName.equals("cancelReturnUrl")) {
+                continue;
+            }
+            if(attrName.equals(RequestAttributes.APPLICATION)) {
                 continue;
             }
             request.removeAttribute(attrName);

@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
@@ -96,8 +95,8 @@ public class PortofinoInterceptor implements Interceptor {
 
         logger.debug("Retrieving Portofino long-lived objects");
         Application application =
-                (Application)servletContext.getAttribute(
-                        ApplicationAttributes.APPLICATION);
+                (Application) request.getAttribute(
+                        RequestAttributes.APPLICATION);
         Model model = application.getModel();
         request.setAttribute(RequestAttributes.MODEL, model);
         

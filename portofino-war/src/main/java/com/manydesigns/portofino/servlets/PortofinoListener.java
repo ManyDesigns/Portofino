@@ -30,22 +30,16 @@
 package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsProperties;
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.context.ApplicationStarter;
 import com.manydesigns.portofino.context.ServerInfo;
-import com.manydesigns.portofino.context.hibernate.HibernateApplicationImpl;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
-import com.manydesigns.portofino.dispatcher.Dispatcher;
-import com.manydesigns.portofino.email.EmailTask;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -56,8 +50,6 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-import java.io.File;
-import java.util.Timer;
 
 
 /*
@@ -78,9 +70,6 @@ public class PortofinoListener
     public static final String SEPARATOR =
             "----------------------------------------" +
             "----------------------------------------";
-    public static final int PERIOD = 10000;
-    public static final int DELAY = 5000;
-    public static final int DELAY2 = 5300;
 
     //**************************************************************************
     // Fields
@@ -92,10 +81,8 @@ public class PortofinoListener
     protected ServletContext servletContext;
     protected ServerInfo serverInfo;
 
-    protected DatabasePlatformsManager databasePlatformsManager;
-    protected Application application;
-    protected Dispatcher dispatcher;
-    protected Timer scheduler;
+    protected ApplicationStarter applicationStarter;
+
 
     //**************************************************************************
     // Logging
@@ -112,15 +99,12 @@ public class PortofinoListener
         // clear the Mapping Diagnostic Context for logging
         MDC.clear();
         
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
         servletContext = servletContextEvent.getServletContext();
 
         serverInfo = new ServerInfo(servletContext);
         servletContext.setAttribute(ApplicationAttributes.SERVER_INFO, serverInfo);
 
-        boolean success = setupCommonsConfiguration();
+        setupCommonsConfiguration();
 
         elementsConfiguration = ElementsProperties.getConfiguration();
         servletContext.setAttribute(
@@ -132,8 +116,24 @@ public class PortofinoListener
         servletContext.setAttribute(
                 ApplicationAttributes.PORTOFINO_CONFIGURATION, portofinoConfiguration);
 
+        logger.info("Checking servlet API version...");
+        if (serverInfo.getServletApiMajor() < 2 ||
+                (serverInfo.getServletApiMajor() == 2 &&
+                        serverInfo.getServletApiMinor() < 3)) {
+            String msg = String.format(
+                    "Servlet API version must be >= 2.3. Found: %s.",
+                    serverInfo.getServletApiVersion());
+            logger.error(msg);
+            throw new InternalError(msg);
+        }
+
+        logger.info("Creating the application starter...");
+        applicationStarter = new ApplicationStarter(portofinoConfiguration);
+        servletContext.setAttribute(
+                ApplicationAttributes.APPLICATION_STARTER, applicationStarter);
+
         logger.info("\n" + SEPARATOR +
-                "\n--- ManyDesigns Portofino {} starting..." +
+                "\n--- ManyDesigns Portofino {} started successfully" +
                 "\n--- Context path: {}" +
                 "\n--- Real path: {}" +
                 "\n" + SEPARATOR,
@@ -144,74 +144,12 @@ public class PortofinoListener
                         serverInfo.getRealPath()
                 }
         );
-
-        // check servlet API version
-        if (serverInfo.getServletApiMajor() < 2 ||
-                (serverInfo.getServletApiMajor() == 2 &&
-                        serverInfo.getServletApiMinor() < 3)) {
-            logger.error("Servlet API version must be >= 2.3. Found: {}.",
-                    serverInfo.getServletApiVersion());
-            success = false;
-        }
-
-        if (success) {
-            success = setupDirectories();
-        }
-
-        if (success) {
-            success = setupDatabasePlatformsManager();
-        }
-
-        if (success) {
-            success = setupApplication();
-            servletContext.setAttribute(
-                    ApplicationAttributes.APPLICATION, application);
-        }
-
-        if (success) {
-            success = setupDispatcher();
-            servletContext.setAttribute(
-                    ApplicationAttributes.DISPATCHER, dispatcher);
-        }
-
-        if (success) {
-            success = setupEmailScheduler();
-        }
-
-        stopWatch.stop();
-        if (success) {
-            logger.info("ManyDesigns Portofino successfully started in {} ms.",
-                    stopWatch.getTime());
-        } else {
-            logger.error("Failed to start ManyDesigns Portofino.");
-        }
-    }
-
-    public void addConfiguration(String resource) {
-        try {
-            portofinoConfiguration.addConfiguration(
-                    new PropertiesConfiguration(resource));
-        } catch (Throwable e) {
-            String errorMessage = ExceptionUtils.getRootCauseMessage(e);
-            logger.warn(errorMessage);
-            logger.debug("Error loading configuration", e);
-        }
     }
 
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        // clear the Mapping Diagnostic Context for logging
         MDC.clear();
-
         logger.info("ManyDesigns Portofino stopping...");
-
-        if (scheduler!=null) {
-            logger.info("Terminating the scheduler...");
-            scheduler.cancel();
-            EmailTask.stop();
-        }
-
-        ElementsThreadLocals.destroy();
-
+        applicationStarter.destroy();
         logger.info("ManyDesigns Portofino stopped.");
     }
 
@@ -230,112 +168,25 @@ public class PortofinoListener
     }
 
     //**************************************************************************
-    // Overridable setups
+    // Setup
     //**************************************************************************
 
-    public boolean setupDatabasePlatformsManager() {
-        logger.info("Creating database platform...");
-        databasePlatformsManager =
-                new DatabasePlatformsManager(portofinoConfiguration);
-        return true;
-    }
-
-    public boolean setupApplication() {
-        logger.info("Creating application instance...");
-        application = new HibernateApplicationImpl(
-        portofinoConfiguration, databasePlatformsManager);
-
+    public void addConfiguration(String resource) {
         try {
-            ElementsThreadLocals.setupDefaultElementsContext();
-
-
-            String connectionsLocation =
-                    portofinoConfiguration.getString(
-                            PortofinoProperties.CONNECTIONS_LOCATION);
-            String modelLocation =
-                    portofinoConfiguration.getString(
-                            PortofinoProperties.MODEL_LOCATION);
-
-            File connectionsFile = new File(connectionsLocation);
-            File modelFile = new File(modelLocation);
-
-            application.loadConnections(connectionsFile);
-            application.loadXmlModel(modelFile);
+            portofinoConfiguration.addConfiguration(
+                    new PropertiesConfiguration(resource));
         } catch (Throwable e) {
-            logger.error(ExceptionUtils.getRootCauseMessage(e), e);
-            return false;
-        } finally {
-            ElementsThreadLocals.removeElementsContext();
+            String errorMessage = ExceptionUtils.getRootCauseMessage(e);
+            logger.warn(errorMessage);
+            logger.debug("Error loading configuration", e);
         }
-        return true;
     }
 
-    public boolean setupDispatcher() {
-        dispatcher = new Dispatcher(application);
-        return true;
-    }
-
-    public boolean setupEmailScheduler() {
-        String securityType = portofinoConfiguration
-                .getString(PortofinoProperties.SECURITY_TYPE, "application");
-        boolean mailEnabled = portofinoConfiguration.getBoolean(
-                PortofinoProperties.MAIL_ENABLED, false);
-        if ("application".equals(securityType) && mailEnabled) {
-            String mailHost = portofinoConfiguration
-                    .getString(PortofinoProperties.MAIL_SMTP_HOST);
-            String mailSender = portofinoConfiguration
-                    .getString(PortofinoProperties.MAIL_SMTP_SENDER);
-            if (null == mailSender || null == mailHost ) {
-                logger.info("User admin email or smtp server not set in" +
-                        " portofino-custom.properties");
-            } else {
-                scheduler = new Timer(true);
-                try {
-
-                    //Invio mail
-                    scheduler.schedule(new EmailTask(application),
-                            DELAY2, PERIOD);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.error("Problems in starting schedulers", e);
-                }
-            }
-        }
-        return true;
-    }
-
-    public boolean setupCommonsConfiguration() {
-        logger.info("Setting up commons-configuration lookups...");
+    public void setupCommonsConfiguration() {
+        logger.debug("Setting up commons-configuration lookups...");
         BeanLookup serverInfoLookup = new BeanLookup(serverInfo);
         ConfigurationInterpolator.registerGlobalLookup(
-                ApplicationAttributes.SERVER_INFO,
-                serverInfoLookup);
-        return true;
-    }
-
-    public boolean setupDirectories() {
-        String storageDirectory =
-                portofinoConfiguration.getString(
-                        PortofinoProperties.STORAGE_DIRECTORY);
-        File file = new File(storageDirectory);
-        if (file.exists()) {
-            if (file.isDirectory()) {
-                logger.info("Storage directory: {}", file);
-            } else {
-                logger.error("Storage location is not a directory: {}", file);
-                return false;
-            }
-        } else {
-            if (file.mkdirs()) {
-                logger.info("Storage directory created successfully: {}", file);
-            } else {
-                logger.error("Cannot create storage directory: {}", file);
-                return false;
-            }
-        }
-        if (!file.canWrite()) {
-            logger.warn("Cannot write to storage directory: {}", file);
-        }
-        return true;
-    }
+        ApplicationAttributes.SERVER_INFO,
+        serverInfoLookup);
+}
 }
