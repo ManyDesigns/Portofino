@@ -81,6 +81,7 @@ public class PortletAction extends AbstractActionBean {
 
     public static final Logger logger =
             LoggerFactory.getLogger(PortletAction.class);
+    public String title;
 
     public boolean isEmbedded() {
         return getContext().getRequest().getAttribute(
@@ -414,6 +415,23 @@ public class PortletAction extends AbstractActionBean {
         }
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    protected boolean getTitleFromRequest() {
+        title = StringUtils.trimToNull(title);
+        if (title == null) {
+            SessionMessages.addErrorMessage("Title cannot be empty");
+            return false;
+        }
+        return true;
+    }
+
     public static enum InsertPosition {
         TOP, CHILD, SIBLING
     }
@@ -447,8 +465,10 @@ public class PortletAction extends AbstractActionBean {
                 default:
                     throw new IllegalStateException("Don't know how to add page " + page + " at position " + insertPosition);
             }
-            parent.addChildPage(page);
-            saveModel();
+            synchronized (application) {
+                parent.addChildPage(page);
+                saveModel();
+            }
             SessionMessages.addInfoMessage("Page created successfully. You should now configure it.");
             return new RedirectResolution(PageLogic.getPagePath(page)).addParameter("configure");
         } else {
@@ -458,14 +478,16 @@ public class PortletAction extends AbstractActionBean {
 
     public Resolution deletePage() {
         Page page = dispatch.getLastPageInstance().getPage();
-        if(page.getParent() == null) {
-            SessionMessages.addErrorMessage("You can't delete the root page!");
-        }  else if(PageLogic.isLandingPage(model.getRootPage(), page)) {
-            SessionMessages.addErrorMessage("You can't delete the landing page!");
-        } else {
-            page.getParent().removeChild(page);
-            saveModel();
-            return new RedirectResolution("/");
+        synchronized (application) {
+            if(page.getParent() == null) {
+                SessionMessages.addErrorMessage("You can't delete the root page!");
+            }  else if(PageLogic.isLandingPage(model.getRootPage(), page)) {
+                SessionMessages.addErrorMessage("You can't delete the landing page!");
+            } else {
+                page.getParent().removeChild(page);
+                saveModel();
+                return new RedirectResolution("/");
+            }
         }
         return new RedirectResolution(dispatch.getOriginalPath());
     }
@@ -476,17 +498,19 @@ public class PortletAction extends AbstractActionBean {
             return new RedirectResolution(dispatch.getOriginalPath());
         }
         Page page = dispatch.getLastPageInstance().getPage();
-        if(page.getParent() == null) {
-            SessionMessages.addErrorMessage("You can't move the root page!");
-        } else {
-            Page newParent = model.getRootPage().findDescendantPageById(movePageDestination);
-            if(newParent != null) {
-                page.getParent().removeChild(page);
-                newParent.addChildPage(page);
-                saveModel();
-                return new RedirectResolution(PageLogic.getPagePath(page));
+        synchronized (application) {
+            if(page.getParent() == null) {
+                SessionMessages.addErrorMessage("You can't move the root page!");
             } else {
-                SessionMessages.addErrorMessage("Invalid destination: " + movePageDestination);
+                Page newParent = model.getRootPage().findDescendantPageById(movePageDestination);
+                if(newParent != null) {
+                    page.getParent().removeChild(page);
+                    newParent.addChildPage(page);
+                    saveModel();
+                    return new RedirectResolution(PageLogic.getPagePath(page));
+                } else {
+                    SessionMessages.addErrorMessage("Invalid destination: " + movePageDestination);
+                }
             }
         }
         return new RedirectResolution(dispatch.getOriginalPath());

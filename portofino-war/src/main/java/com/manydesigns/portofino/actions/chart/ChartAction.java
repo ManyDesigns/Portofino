@@ -280,6 +280,7 @@ public class ChartAction extends PortletAction {
     public Resolution configure() {
         prepareForm();
         form.readFromObject(chartPage);
+        title = chartPage.getTitle();
 
         return new ForwardResolution("/layouts/chart/configure.jsp");
     }
@@ -300,9 +301,13 @@ public class ChartAction extends PortletAction {
     public Resolution updateConfiguration() {
         synchronized (application) {
             prepareForm();
-            form.readFromObject(chartPage);
-            form.readFromRequest(context.getRequest());
-            if (form.validate()) {
+            boolean valid = getTitleFromRequest();
+            if (valid) {
+                chartPage.setTitle(title);
+                form.readFromObject(chartPage);
+                form.readFromRequest(context.getRequest());
+            }
+            if (valid && form.validate()) {
                 form.writeToObject(chartPage);
                 saveModel();
                 SessionMessages.addInfoMessage("Configuration updated successfully");

@@ -15,7 +15,7 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Configure crud: <c:out value="${actionBean.crudPage.title}"/>
+        Configure crud: <stripes:text name="title" value="${actionBean.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>
