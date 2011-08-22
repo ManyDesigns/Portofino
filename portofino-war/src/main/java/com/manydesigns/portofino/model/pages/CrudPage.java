@@ -141,4 +141,35 @@ public class CrudPage extends Page {
     public int getActualDetailLayoutOrder() {
         return actualDetailLayoutOrder;
     }
+
+    public boolean removeDetailChild(Page page) {
+        return removeChild(page, detailChildPages);
+    }
+
+    public void addDetailChild(Page page) {
+        addChild(page, detailChildPages);
+    }
+
+    @Override
+    public Page findDescendantPageById(String pageId) {
+        if(pageId.equals(getId())) {
+            return this;
+        }
+        for(Page page : getChildPages()) {
+            Page descendant = page.findDescendantPageById(pageId);
+            if(descendant != null) {
+                return descendant;
+            }
+        }
+        for(Page page : getDetailChildPages()) {
+            Page descendant = page.findDescendantPageById(pageId);
+            if(descendant != null) {
+                return descendant;
+            }
+        }
+        return null;
+    }
+
+
+
 }

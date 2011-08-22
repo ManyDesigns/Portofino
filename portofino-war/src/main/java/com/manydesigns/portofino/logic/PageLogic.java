@@ -31,6 +31,7 @@ package com.manydesigns.portofino.logic;
 
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.RootPage;
 import org.apache.commons.lang.ArrayUtils;
@@ -49,10 +50,11 @@ public class PageLogic {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public static SelectionProvider createPagesSelectionProvider(RootPage rootPage, Page... excludes) {
-        return createPagesSelectionProvider(rootPage, false);
+        return createPagesSelectionProvider(rootPage, false, false, excludes);
     }
 
-    public static SelectionProvider createPagesSelectionProvider(RootPage rootPage, boolean includeRoot, Page... excludes) {
+    public static SelectionProvider createPagesSelectionProvider
+            (RootPage rootPage, boolean includeRoot, boolean includeDetailChildren, Page... excludes) {
         List<String> valuesList = new ArrayList<String>();
         List<String> labelsList = new ArrayList<String>();
 
@@ -61,7 +63,7 @@ public class PageLogic {
             labelsList.add(rootPage.getTitle() + " (top level)");
         }
         for (Page page : rootPage.getChildPages()) {
-            recursive(page, null, valuesList, labelsList, excludes);
+            recursive(page, null, valuesList, labelsList, includeDetailChildren, excludes);
         }
 
         String[] values = new String[valuesList.size()];
@@ -73,7 +75,7 @@ public class PageLogic {
 
     private static void recursive(Page page, String breadcrumb,
                            List<String> valuesList, List<String> labelsList,
-                           Page... excludes) {
+                           boolean includeDetailChildren, Page... excludes) {
         if(ArrayUtils.contains(excludes, page)) {
             return;
         }
@@ -85,8 +87,17 @@ public class PageLogic {
         }
         valuesList.add(page.getId());
         labelsList.add(pageBreadcrumb);
-        for (Page subPage : page.getChildPages()) {
-            recursive(subPage, pageBreadcrumb, valuesList, labelsList, excludes);
+        List<Page> children = page.getChildPages();
+        for (Page subPage : children) {
+            recursive(subPage, pageBreadcrumb, valuesList, labelsList, includeDetailChildren, excludes);
+        }
+        if(page instanceof CrudPage && includeDetailChildren) {
+            valuesList.add(page.getId() + "-detail");
+            pageBreadcrumb += " (detail)";
+            labelsList.add(pageBreadcrumb);
+            for (Page subPage : ((CrudPage) page).getDetailChildPages()) {
+               recursive(subPage, pageBreadcrumb, valuesList, labelsList, includeDetailChildren, excludes);
+            }
         }
     }
 

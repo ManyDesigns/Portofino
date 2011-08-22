@@ -119,4 +119,12 @@ public class PageInstance {
     public void setLayoutOrder(int order) {
         page.setLayoutOrder(Integer.toString(order));
     }
+
+    public void addChild(Page page) {
+        this.page.addChild(page);
+    }
+
+    public boolean removeChild(Page page) {
+        return this.page.removeChild(page);
+    }
 }

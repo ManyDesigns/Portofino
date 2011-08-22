@@ -71,7 +71,7 @@ public class PageAction extends AbstractActionBean {
 
     public Resolution chooseNewLocation() {
         SelectionProvider pagesSelectionProvider =
-                PageLogic.createPagesSelectionProvider(model.getRootPage(), true, page);
+                PageLogic.createPagesSelectionProvider(model.getRootPage(), true, true, page);
         moveForm = new FormBuilder(MovePage.class)
                 .configReflectiveFields()
                 .configSelectionProvider(pagesSelectionProvider, "destinationPageId")

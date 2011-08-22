@@ -121,4 +121,16 @@ public class Dispatch {
         }
         return sb.toString();
     }
+
+    public PageInstance getPageInstance(int index) {
+        if(index >= 0) {
+            return getPageInstancePath()[index];
+        } else {
+            return getPageInstancePath()[getPageInstancePath().length + index];
+        }
+    }
+
+    public PageInstance getParentPageInstance() {
+        return getPageInstance(-2);
+    }
 }

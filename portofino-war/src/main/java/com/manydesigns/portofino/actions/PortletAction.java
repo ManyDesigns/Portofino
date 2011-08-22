@@ -458,32 +458,35 @@ public class PortletAction extends AbstractActionBean {
             page.setId(pageId);
             page.setLayoutContainer(DEFAULT_LAYOUT_CONTAINER);
             page.setLayoutOrder("0");
-            Page parent;
-            switch (insertPosition) {
-                case TOP:
-                    parent = model.getRootPage();
-                    break;
-                case CHILD:
-                    parent = dispatch.getLastPageInstance().getPage();
-                    break;
-                case SIBLING:
-                    parent = dispatch.getLastPageInstance().getPage().getParent();
-                    break;
-                default:
-                    throw new IllegalStateException("Don't know how to add page " + page + " at position " + insertPosition);
-            }
+            String configurePath;
             synchronized (application) {
-                parent.addChildPage(page);
+                switch (insertPosition) {
+                    case TOP:
+                        model.getRootPage().addChild(page);
+                        configurePath = "";
+                        break;
+                    case CHILD:
+                        dispatch.getLastPageInstance().addChild(page);
+                        configurePath = dispatch.getOriginalPath();
+                        break;
+                    case SIBLING:
+                        dispatch.getPageInstance(-2).addChild(page);
+                        configurePath = dispatch.getParentPathUrl();
+                        break;
+                    default:
+                        throw new IllegalStateException("Don't know how to add page " + page + " at position " + insertPosition);
+                }
                 saveModel();
             }
             SessionMessages.addInfoMessage("Page created successfully. You should now configure it.");
-            return new RedirectResolution(PageLogic.getPagePath(page)).addParameter("configure");
+            return new RedirectResolution(configurePath + "/" + page.getFragment()).addParameter("configure");
         } else {
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
         }
     }
 
     public Resolution deletePage() {
+        PageInstance pageInstance = dispatch.getParentPageInstance();
         Page page = dispatch.getLastPageInstance().getPage();
         synchronized (application) {
             if(page.getParent() == null) {
@@ -491,9 +494,9 @@ public class PortletAction extends AbstractActionBean {
             }  else if(PageLogic.isLandingPage(model.getRootPage(), page)) {
                 SessionMessages.addErrorMessage("You can't delete the landing page!");
             } else {
-                page.getParent().removeChild(page);
+                pageInstance.removeChild(page);
                 saveModel();
-                return new RedirectResolution("/");
+                return new RedirectResolution(dispatch.getParentPathUrl());
             }
         }
         return new RedirectResolution(dispatch.getOriginalPath());
@@ -509,12 +512,20 @@ public class PortletAction extends AbstractActionBean {
             if(page.getParent() == null) {
                 SessionMessages.addErrorMessage("You can't move the root page!");
             } else {
+                boolean detail = movePageDestination.endsWith("-detail");
+                if(detail) {
+                    movePageDestination = movePageDestination.substring(0, movePageDestination.length() - 7);
+                }
                 Page newParent = model.getRootPage().findDescendantPageById(movePageDestination);
                 if(newParent != null) {
                     page.getParent().removeChild(page);
-                    newParent.addChildPage(page);
+                    if(detail) {
+                        ((CrudPage) newParent).addDetailChild(page);
+                    } else {
+                        newParent.addChild(page);
+                    }
                     saveModel();
-                    return new RedirectResolution(PageLogic.getPagePath(page));
+                    return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
                 } else {
                     SessionMessages.addErrorMessage("Invalid destination: " + movePageDestination);
                 }

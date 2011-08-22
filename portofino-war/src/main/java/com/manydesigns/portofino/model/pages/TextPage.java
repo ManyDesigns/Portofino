@@ -31,10 +31,12 @@ package com.manydesigns.portofino.model.pages;
 import com.manydesigns.portofino.model.Model;
 
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -46,7 +48,6 @@ import java.util.UUID;
 public class TextPage extends Page {
 
     protected final List<Attachment> attachments;
-    private String code;
 
     public TextPage() {
         super();
@@ -75,16 +76,6 @@ public class TextPage extends Page {
         for (Attachment attachment : attachments) {
             attachment.init(model);
         }
-    }
-
-
-    @XmlAttribute(required = true)
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 
     @XmlElementWrapper(name="attachments")

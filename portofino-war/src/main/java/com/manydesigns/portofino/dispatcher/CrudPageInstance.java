@@ -188,4 +188,26 @@ public class CrudPageInstance extends PageInstance {
             throw new IllegalStateException("Unsupported mode: " + mode);
         }
     }
+
+    @Override
+    public boolean removeChild(Page page) {
+        if (CrudPage.MODE_SEARCH.equals(mode)) {
+            return getPage().removeChild(page);
+        } else if (CrudPage.MODE_DETAIL.equals(mode)) {
+            return getPage().removeDetailChild(page);
+        } else {
+            throw new IllegalStateException("Unsupported mode: " + mode);
+        }
+    }
+
+    @Override
+    public void addChild(Page page) {
+        if (CrudPage.MODE_SEARCH.equals(mode)) {
+            getPage().addChild(page);
+        } else if (CrudPage.MODE_DETAIL.equals(mode)) {
+            getPage().addDetailChild(page);
+        } else {
+            throw new IllegalStateException("Unsupported mode: " + mode);
+        }
+    }
 }

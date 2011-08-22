@@ -313,8 +313,13 @@ public abstract class Page implements ModelObject {
         return actualLayoutOrder;
     }
 
-    public void addChildPage(Page page) {
-        for(Page child : getChildPages()) {
+    public void addChild(Page page) {
+        List<Page> children = getChildPages();
+        addChild(page, children);
+    }
+
+    protected void addChild(Page page, List<Page> children) {
+        for(Page child : children) {
             if(child.getFragment().equals(page.getFragment())) {
                 throw new IllegalArgumentException(
                         String.format("Page %s already has a child page with fragment %s and title %s",
@@ -322,13 +327,18 @@ public abstract class Page implements ModelObject {
             }
         }
         page.setParent(this);
-        getChildPages().add(page);
+        children.add(page);
     }
 
     public boolean removeChild(Page page) {
+        List<Page> children = getChildPages();
+        return removeChild(page, children);
+    }
+
+    protected boolean removeChild(Page page, List<Page> children) {
         if(page.getParent() == this) {
             page.setParent(null);
-            getChildPages().remove(page);
+            children.remove(page);
             return true;
         } else {
             return false;
