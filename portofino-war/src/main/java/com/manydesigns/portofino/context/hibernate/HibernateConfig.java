@@ -307,8 +307,9 @@ public class HibernateConfig {
             SimpleValue value = new SimpleValue();
             value.setTable(tab);
             if (type != null) {
-                value.setTypeName(getHibernateType(type.getJdbcType())
-                    .getName());
+                org.hibernate.type.Type hibernateType =
+                        getHibernateType(column.getActualJavaType(), type.getJdbcType());
+                value.setTypeName(hibernateType.getName());
             }
             value.addColumn(col);
             tab.getPrimaryKey().addColumn(col);
@@ -362,7 +363,8 @@ public class HibernateConfig {
         }
         col.setSqlType(columnType);
         if (type != null) {
-            org.hibernate.type.Type hibernateType = getHibernateType(type.getJdbcType());
+            org.hibernate.type.Type hibernateType =
+                    getHibernateType(column.getActualJavaType(), type.getJdbcType());
             id.setTypeName(hibernateType.getName());
         }
 

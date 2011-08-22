@@ -63,6 +63,12 @@ public class DbUtil {
     }
 
 
+    /**
+     * See getHibernateType(Class javaType, int jdbcType)
+     * @param jdbcType jdbc type
+     * @return the Hibernate type
+     */
+    @Deprecated()
     public static org.hibernate.type.Type getHibernateType(int jdbcType) {
         switch (jdbcType) {
             case Types.BIGINT:
