@@ -30,15 +30,20 @@
 package com.manydesigns.portofino.context;
 
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.context.hibernate.HibernateApplicationImpl;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.email.EmailTask;
+import liquibase.Liquibase;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.sql.Connection;
 import java.util.Timer;
 
 /**
@@ -178,6 +183,22 @@ public class ApplicationStarter {
         return success;
     }
 
+    private boolean updateSystemDatabase() {
+        ConnectionProvider connectionProvider = application.getConnectionProvider("portofino");
+        Connection connection = null;
+        try {
+            connection = connectionProvider.acquireConnection();
+            Liquibase lq = new Liquibase
+                    ("databases/portofino.default.changelog.xml", new ClassLoaderResourceAccessor(), new JdbcConnection(connection));
+            lq.update(null);
+            return true;
+        } catch (Exception e) {
+            logger.error("Couldn't update system database", e);
+            return false;
+        } finally {
+            connectionProvider.releaseConnection(connection);
+        }
+    }
 
     private boolean setupDirectories() {
         String storageDirectory =
@@ -229,6 +250,10 @@ public class ApplicationStarter {
             File modelFile = new File(modelLocation);
 
             application.loadConnections(connectionsFile);
+            boolean success = updateSystemDatabase();
+            if(!success) {
+                return false;
+            }
             application.loadXmlModel(modelFile);
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
