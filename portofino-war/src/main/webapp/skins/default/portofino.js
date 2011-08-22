@@ -150,7 +150,7 @@ function enablePortletDragAndDrop(button) {
                 hiddenField.setAttribute("name", "portletWrapper_" + element.id);
                 hiddenField.setAttribute("value", elements[index].substring("portletWrapper_".length));
                 hiddenField.setAttribute("class", "updateLayout");
-                theButton.after(hiddenField);
+                theButton.before(hiddenField);
             }
         });
         return true;

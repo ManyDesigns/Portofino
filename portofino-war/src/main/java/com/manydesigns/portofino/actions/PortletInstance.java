@@ -72,7 +72,7 @@ public class PortletInstance implements Comparable<PortletInstance> {
             if (that.index == null) {
                 return 1;
             } else {
-                return this.id.compareTo(that.id);
+                return this.index.compareTo(that.index);
             }
         }
     }

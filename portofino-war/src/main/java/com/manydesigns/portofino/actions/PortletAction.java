@@ -168,7 +168,7 @@ public class PortletAction extends AbstractActionBean {
                 myself.setLayoutOrder(i);
             } else if (current.startsWith("c")) {
                 String pageId = current.substring(1); //current = c...
-                PageInstance childPageInstance = myself.findChildPage(pageId);
+                PageInstance childPageInstance = myself.findChildPageByFragment(pageId);
                 Page childPage = childPageInstance.getPage();
                 childPage.setLayoutContainerInParent(layoutContainer);
                 childPage.setLayoutOrderInParent(i + "");

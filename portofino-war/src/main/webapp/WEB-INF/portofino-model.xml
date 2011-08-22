@@ -1023,7 +1023,7 @@ Struttura dell'XML:
     </databases>
     <rootPage fragment="/" title="Portofino4" description="portofino 4" skin="default">
         <childPages>
-            <textPage fragment="homepage" title="Homepage" description="Homepage" code="zpAUFstfgEUSzsEX9HoO" layoutContainer="contentLayoutTop">
+            <textPage fragment="homepage" title="Homepage" description="Homepage" code="zpAUFstfgEUSzsEX9HoO" layoutContainer="default">
                 <permissions>
                     <allow>
                         <group>anonymous</group>
@@ -1166,7 +1166,7 @@ Struttura dell'XML:
                       title="Projects"
                       description="Projects"
                       showInSideBar="true"
-                      layoutContainer="contentLayoutTop"
+                      layoutContainer="default"
                       detailLayoutContainer="contentLayoutLeft"
                       layoutOrder="1">
                 <crud name="projects"
@@ -1243,13 +1243,13 @@ Struttura dell'XML:
                                  database="redmine"
                                  query="select project_id, count(*) from issues group by project_id"
                                  urlExpression="/projects/%{key}"
-                                 layoutContainer="contentLayoutTop"
+                                 layoutContainer="default"
                                  layoutContainerInParent="contentLayoutLeft"
                                  layoutOrderInParent="1"
                             />
                 </childPages>
                 <detailChildPages>
-                    <crudPage fragment="issues" title="Issues" description="Issues" showInSideBar="true" layoutContainer="contentLayoutTop" layoutContainerInParent="contentLayoutRight">
+                    <crudPage fragment="issues" title="Issues" description="Issues" showInSideBar="true" layoutContainer="default" layoutContainerInParent="contentLayoutRight">
                         <crud name="issue"
                                  variable="issue"
                                  table="redmine.redmine.issues"

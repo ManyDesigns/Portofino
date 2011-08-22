@@ -82,13 +82,13 @@ public class PageInstance {
     // Utility Methods
     //**************************************************************************
 
-    public PageInstance findChildPage(String id) {
+    public PageInstance findChildPageByFragment(String fragment) {
         for(PageInstance page : getChildPageInstances()) {
-            if(id.equals(page.getPage().getFragment())) {
+            if(fragment.equals(page.getPage().getFragment())) {
                 return page;
             }
         }
-        logger.debug("Child page not found: {}", id);
+        logger.debug("Child page not found: {}", fragment);
         return null;
     }
 
