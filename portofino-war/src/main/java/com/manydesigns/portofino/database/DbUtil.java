@@ -34,6 +34,8 @@ import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Types;
@@ -108,6 +110,47 @@ public class DbUtil {
             case Types.STRUCT:
             default:
                 throw new Error("Unsupported type: " + jdbcType);
+        }
+    }
+
+    public static org.hibernate.type.Type getHibernateType(Class javaType, int jdbcType) {
+        if (javaType == Long.class) {
+            return Hibernate.LONG;
+        } else if (javaType == Short.class) {
+            return Hibernate.SHORT;
+        } else if (javaType == Integer.class) {
+            return Hibernate.INTEGER;
+        } else if (javaType == Byte.class) {
+            return Hibernate.BYTE;
+        } else if (javaType == Float.class) {
+            return Hibernate.FLOAT;
+        } else if (javaType == Double.class) {
+            return Hibernate.DOUBLE;
+        } else if (javaType == Character.class) {
+            return Hibernate.CHARACTER;
+        } else if (javaType == String.class) {
+            return Hibernate.STRING;
+        } else if (java.util.Date.class.isAssignableFrom(javaType)) {
+            switch (jdbcType) {
+                case Types.DATE:
+                    return Hibernate.DATE;
+                case Types.TIME:
+                    return Hibernate.TIME;
+                case Types.TIMESTAMP:
+                    return Hibernate.TIMESTAMP;
+                default:
+                    throw new Error("Unsupported date type: " + jdbcType);
+            }
+        } else if (javaType == Boolean.class) {
+            return Hibernate.BOOLEAN;
+        } else if (javaType == BigDecimal.class) {
+            return Hibernate.BIG_DECIMAL;
+        } else if (javaType == BigInteger.class) {
+            return Hibernate.BIG_INTEGER;
+        } else if (javaType == byte[].class) {
+            return Hibernate.BLOB;
+        } else {
+            throw new Error("Unsupported java type: " + javaType);
         }
     }
 

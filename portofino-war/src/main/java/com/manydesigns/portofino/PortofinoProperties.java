@@ -65,6 +65,8 @@ public final class PortofinoProperties {
             "database.platforms.list";
     public static final String SECURITY_TYPE =
             "security.type";
+    public static final String WAR_REAL_PATH =
+            "war.real.path";
 
     //Email properties
     public static final String MAIL_ENABLED = "mail.enabled";

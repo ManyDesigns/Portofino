@@ -45,8 +45,8 @@ public class UsersGroups implements Serializable {
     User user;
     Timestamp creationDate;
     Timestamp deletionDate;
-    Long userid;
-    Long groupid;
+    String userid;
+    String groupid;
 
 
     public Group getGroup() {
@@ -73,19 +73,19 @@ public class UsersGroups implements Serializable {
         this.user = user;
     }
 
-    public Long getUserid() {
+    public String getUserid() {
         return userid;
     }
 
-    public void setUserid(Long userid) {
+    public void setUserid(String userid) {
         this.userid = userid;
     }
 
-    public Long getGroupid() {
+    public String getGroupid() {
         return groupid;
     }
 
-    public void setGroupid(Long groupid) {
+    public void setGroupid(String groupid) {
         this.groupid = groupid;
     }
 

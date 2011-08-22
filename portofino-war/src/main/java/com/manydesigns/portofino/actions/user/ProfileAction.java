@@ -85,7 +85,7 @@ public class ProfileAction extends AbstractActionBean {
     public List<Group> groups;
 
     private Boolean enc;
-    private Long userId;
+    private String userId;
 
     @Before
     public void prepare() {
@@ -104,7 +104,7 @@ public class ProfileAction extends AbstractActionBean {
 
     public String execute() {
         HttpSession session = getSession();
-        userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
+        userId = (String) session.getAttribute(SessionAttributes.USER_ID);
         return read();
     }
 
@@ -130,7 +130,7 @@ public class ProfileAction extends AbstractActionBean {
     }
 
     public String edit() {
-        userId = (Long) getSession().getAttribute(SessionAttributes.USER_ID);
+        userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 
@@ -146,7 +146,7 @@ public class ProfileAction extends AbstractActionBean {
     }
 
     public String update() {
-        userId = (Long) getSession().getAttribute(SessionAttributes.USER_ID);
+        userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
         ClassAccessor accessor = application.getTableAccessor(UserUtils.USERTABLE);
@@ -172,7 +172,7 @@ public class ProfileAction extends AbstractActionBean {
     }
 
     public String changePwd() {
-        userId = (Long) getSession().getAttribute(SessionAttributes.USER_ID);
+        userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)
                 .build();
@@ -180,7 +180,7 @@ public class ProfileAction extends AbstractActionBean {
     }
 
     public String updatePwd() {
-        userId = (Long) getSession().getAttribute(SessionAttributes.USER_ID);
+        userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
 

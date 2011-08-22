@@ -43,17 +43,17 @@ public class Group implements Serializable{
     public static final String copyright
             = "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    Long groupId;
+    String groupId;
     String name;
     String description;
-    Long creatorId;
+    String creatorId;
     Timestamp deletionDate;
     Timestamp creationDate;
 
     public static Group ANONYMOUS_GROUP =
-            new Group(-1L, "anonymous", "anonymous", null, null, null);
+            new Group("anonymous", "anonymous", "anonymous", null, null, null);
     public static Group REGISTERED_GROUP =
-            new Group(-1L, "registered", "registered", null, null, null);
+            new Group("registered", "registered", "registered", null, null, null);
 
     List<User> users = new ArrayList<User>();
 
@@ -61,12 +61,12 @@ public class Group implements Serializable{
 
     }
     
-    public Group(Long groupId){
+    public Group(String groupId){
         this.groupId=groupId;
     }
 
-    public Group(Long groupId, String name, String description,
-                 Long creatorId, Timestamp deletionDate, Timestamp creationDate) {
+    public Group(String groupId, String name, String description,
+                 String creatorId, Timestamp deletionDate, Timestamp creationDate) {
         this.groupId = groupId;
         this.name = name;
         this.description = description;
@@ -75,11 +75,11 @@ public class Group implements Serializable{
         this.creationDate = creationDate;
     }
 
-    public Long getGroupId() {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId(Long groupId) {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 
@@ -107,11 +107,11 @@ public class Group implements Serializable{
         this.description = description;
     }
 
-    public Long getCreatorId() {
+    public String getCreatorId() {
         return creatorId;
     }
 
-    public void setCreatorId(Long creatorId) {
+    public void setCreatorId(String creatorId) {
         this.creatorId = creatorId;
     }
 

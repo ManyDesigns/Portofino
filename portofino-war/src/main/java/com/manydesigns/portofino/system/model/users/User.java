@@ -32,10 +32,8 @@ import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Password;
 import com.manydesigns.portofino.system.model.messages.Message;
 import org.apache.commons.lang.RandomStringUtils;
-import sun.misc.BASE64Encoder;
 
 import java.io.Serializable;
-import java.security.MessageDigest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +48,8 @@ public class User implements Serializable{
     public static final String copyright
             = "Copyright (c) 2005-2011, ManyDesigns srl";
     //Dati
-    Long userId;
-    Long state;
+    String userId;
+    Integer state;
 
 
     Timestamp deletionDate;
@@ -93,15 +91,15 @@ public class User implements Serializable{
 
     }
     
-    public User(Long userId){
+    public User(String userId){
         this.userId = userId;
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
@@ -131,11 +129,11 @@ public class User implements Serializable{
         this.groups = groups;
     }
 
-    public Long getState() {
+    public Integer getState() {
         return state;
     }
 
-    public void setState(Long state) {
+    public void setState(Integer state) {
         this.state = state;
     }
 

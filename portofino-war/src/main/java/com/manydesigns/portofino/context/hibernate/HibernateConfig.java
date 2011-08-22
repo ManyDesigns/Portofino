@@ -84,7 +84,7 @@ public class HibernateConfig {
             JdbcConnectionProvider jdbcConnectionProvider =
                     (JdbcConnectionProvider) connectionProvider;
             configuration.setProperty("hibernate.connection.url",
-                    jdbcConnectionProvider.getUrl())
+                    jdbcConnectionProvider.getActualUrl())
                     .setProperty("hibernate.connection.driver_class",
                             jdbcConnectionProvider.getDriver())
                     .setProperty("hibernate.connection.username",
@@ -243,7 +243,9 @@ public class HibernateConfig {
         org.hibernate.type.Type hibernateType =
                 null;
         if (type != null) {
-            hibernateType = getHibernateType(type.getJdbcType());
+//            hibernateType = getHibernateType(type.getJdbcType());
+            hibernateType = getHibernateType(
+                    column.getActualJavaType(), type.getJdbcType());
         }
         if (hibernateType != null) {
             value.setTypeName(hibernateType.getName());
@@ -716,6 +718,7 @@ public class HibernateConfig {
     }
 
     private String escapeName(String name) {
-        return "`"+name+"`";
+        return name;
+//        return "`"+name+"`";
     }
 }

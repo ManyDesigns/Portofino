@@ -40,11 +40,11 @@ import com.manydesigns.portofino.system.model.email.EmailBean;
 public class EmailUtils {
 
     //STATI POSSIBILI DELLA MAIL
-    public static final long SENDING  = 0;
-    public static final long TOBESENT  = 1;
-    public static final long SENT  = 2;
-    public static final long REJECTED  = 3;
-    public static final long BOUNCED  = 4;
+    public static final int SENDING  = 0;
+    public static final int TOBESENT  = 1;
+    public static final int SENT  = 2;
+    public static final int REJECTED  = 3;
+    public static final int BOUNCED  = 4;
 
 
     public static final String SUBJECT = "subject";

@@ -31,7 +31,11 @@ package com.manydesigns.portofino.connections;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Password;
+import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -51,6 +55,7 @@ import java.text.MessageFormat;
 public class JdbcConnectionProvider extends ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
+    public static final String SERVER_INFO_REAL_PATH = "${serverInfo:realPath}";
 
     //**************************************************************************
     // Fields (configured values)
@@ -61,6 +66,11 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     protected String username;
     protected String password;
 
+    //**************************************************************************
+    // Fields (calcuated values)
+    //**************************************************************************
+
+    protected String actualUrl;
 
     //**************************************************************************
     // Constructors
@@ -69,6 +79,28 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     public JdbcConnectionProvider() {
         super();
     }
+
+    //**************************************************************************
+    // Overrides
+    //**************************************************************************
+
+    @Override
+    public void reset() {
+        actualUrl = null;
+        super.reset();
+    }
+
+    @Override
+    public void init(DatabasePlatformsManager databasePlatformsManager) {
+        Configuration portofinoConfiguration =
+                databasePlatformsManager.getPortofinoConfiguration();
+        String warRealPath =
+                portofinoConfiguration.getString(
+                        PortofinoProperties.WAR_REAL_PATH);
+        actualUrl = StringUtils.replace(url, SERVER_INFO_REAL_PATH, warRealPath);
+        super.init(databasePlatformsManager);
+    }
+
 
     //**************************************************************************
     // Implementation of ConnectionProvider
@@ -81,7 +113,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
 
     public Connection acquireConnection() throws Exception {
         Class.forName(driver);
-        return DriverManager.getConnection(url,
+        return DriverManager.getConnection(actualUrl,
                 username, password);
     }
 
@@ -132,6 +164,9 @@ public class JdbcConnectionProvider extends ConnectionProvider {
         this.password = password;
     }
 
+    public String getActualUrl() {
+        return actualUrl;
+    }
 
     //**************************************************************************
     // Other methods

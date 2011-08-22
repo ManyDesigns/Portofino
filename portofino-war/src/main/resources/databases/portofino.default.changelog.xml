@@ -81,8 +81,8 @@
             <column name="deletiondate" type="TIMESTAMP"/>
             <column name="creationdate" type="TIMESTAMP"/>
             <column name="modifieddate" type="TIMESTAMP"/>
-            <column name="defaultuser" type="bool"/>
-            <column name="extauth" type="bool"/>
+            <column name="defaultuser" type="DECIMAL(1,0)"/>
+            <column name="extauth" type="DECIMAL(1,0)"/>
             <column name="pwd" type="VARCHAR(50)"/>
             <column name="lastpwdmoddate" type="TIMESTAMP"/>
             <column name="username" type="VARCHAR(50)">
@@ -98,8 +98,8 @@
             <column name="lastlogindate" type="TIMESTAMP"/>
             <column name="lastfailedlogindate" type="TIMESTAMP"/>
             <column name="failedloginattempts" type="DECIMAL(10,0)"/>
-            <column name="agreedtoterms" type="bool"/>
-            <column name="state" type="BIGINT">
+            <column name="agreedtoterms" type="DECIMAL(1,0)"/>
+            <column name="state" type="DECIMAL(10,0)">
                 <constraints nullable="false"/>
             </column>
             <column name="bounced" type="DECIMAL(10,0)"/>
@@ -138,37 +138,37 @@
         <addPrimaryKey columnNames="groupid, userid, creationdate" constraintName="users_groups_pkey" tableName="users_groups"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-11">
-        <addUniqueConstraint columnNames="name" constraintName="groups_name_key" deferrable="false" disabled="false" initiallyDeferred="false" tableName="groups"/>
+        <addUniqueConstraint columnNames="name" constraintName="groups_name_key" disabled="false" tableName="groups"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-12">
-        <addUniqueConstraint columnNames="username" constraintName="users_username_key" deferrable="false" disabled="false" initiallyDeferred="false" tableName="users"/>
+        <addUniqueConstraint columnNames="username" constraintName="users_username_key" disabled="false" tableName="users"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-13">
-        <addForeignKeyConstraint baseColumnNames="state" baseTableName="emailqueue" baseTableSchemaName="public" constraintName="fk_emailqueue_1" deferrable="true" initiallyDeferred="true" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="emailstate" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="state" baseTableName="emailqueue" baseTableSchemaName="public" constraintName="fk_emailqueue_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="emailstate" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-14">
-        <addForeignKeyConstraint baseColumnNames="creatorid" baseTableName="groups" baseTableSchemaName="public" constraintName="fk_group_1" deferrable="true" initiallyDeferred="true" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="creatorid" baseTableName="groups" baseTableSchemaName="public" constraintName="fk_group_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-15">
-        <addForeignKeyConstraint baseColumnNames="from_" baseTableName="msg" baseTableSchemaName="public" constraintName="fk_msg_2" deferrable="true" initiallyDeferred="true" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="from_" baseTableName="msg" baseTableSchemaName="public" constraintName="fk_msg_2" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-16">
-        <addForeignKeyConstraint baseColumnNames="state" baseTableName="msg" baseTableSchemaName="public" constraintName="fk_msg_1" deferrable="true" initiallyDeferred="true" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="msgstate" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="state" baseTableName="msg" baseTableSchemaName="public" constraintName="fk_msg_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="msgstate" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-17">
-        <addForeignKeyConstraint baseColumnNames="to_" baseTableName="msg" baseTableSchemaName="public" constraintName="fk_msg_3" deferrable="true" initiallyDeferred="true" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="to_" baseTableName="msg" baseTableSchemaName="public" constraintName="fk_msg_3" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-18">
-        <addForeignKeyConstraint baseColumnNames="userid" baseTableName="oldpwd" baseTableSchemaName="public" constraintName="fk_oldpwd_1" deferrable="true" initiallyDeferred="true" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="userid" baseTableName="oldpwd" baseTableSchemaName="public" constraintName="fk_oldpwd_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-19">
-        <addForeignKeyConstraint baseColumnNames="state" baseTableName="users" baseTableSchemaName="public" constraintName="fk_user_1" deferrable="true" initiallyDeferred="true" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="userstate" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="state" baseTableName="users" baseTableSchemaName="public" constraintName="fk_user_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="userstate" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-20">
-        <addForeignKeyConstraint baseColumnNames="groupid" baseTableName="users_groups" baseTableSchemaName="public" constraintName="fk_usersgroups_2" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="groupid" referencedTableName="groups" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="groupid" baseTableName="users_groups" baseTableSchemaName="public" constraintName="fk_usersgroups_2" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="groupid" referencedTableName="groups" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-21">
-        <addForeignKeyConstraint baseColumnNames="userid" baseTableName="users_groups" baseTableSchemaName="public" constraintName="fk_usersgroups_1" deferrable="true" initiallyDeferred="true" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="userid" baseTableName="users_groups" baseTableSchemaName="public" constraintName="fk_usersgroups_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
     </changeSet>
 
     <changeSet author="portofino" id="insert-userstates">

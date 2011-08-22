@@ -39,17 +39,17 @@ import java.sql.Timestamp;
 public class OldPassword {
         public static final String copyright
             = "Copyright (c) 2005-2011, ManyDesigns srl";
-    Long id;
+    String id;
     Timestamp createDate;
-    Long userId;
+    String userId;
     User user;
     String password;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -61,11 +61,11 @@ public class OldPassword {
         this.createDate = createDate;
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

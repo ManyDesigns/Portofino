@@ -42,15 +42,15 @@ public class UserState implements Serializable{
             "Copyright (c) 2005-2011, ManyDesigns srl";
     protected String name;
     protected String description;
-    protected Long id;
+    protected Integer id;
 
     List<User> users;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

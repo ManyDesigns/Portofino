@@ -51,12 +51,12 @@ public class UserUtils {
     public static final String PASSWORD = "pwd";
     public static final String GROUPS = "groups";
 
-    public static final Long ACTIVE = 1L;
-    public static final Long SUSPENDED = 2L;
-    public static final Long BANNED = 3L;
-    public static final Long SELFREGITRED = 4L;
+    public static final int ACTIVE = 1;
+    public static final int SUSPENDED = 2;
+    public static final int BANNED = 3;
+    public static final int SELFREGITRED = 4;
 
-    public static List<String> manageGroups(Application application, Long userId) {
+    public static List<String> manageGroups(Application application, String userId) {
         List<String> groups = new ArrayList<String>();
         if (userId == null) {
             groups.add(Group.ANONYMOUS_GROUP.getName());

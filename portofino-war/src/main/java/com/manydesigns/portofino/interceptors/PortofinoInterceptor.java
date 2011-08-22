@@ -107,12 +107,12 @@ public class PortofinoInterceptor implements Interceptor {
         request.setAttribute(RequestAttributes.STOP_WATCH, stopWatch);
 
         logger.debug("Retrieving user");
-        Long userId = null;
+        String userId = null;
         String userName = null;
         if (session == null) {
             logger.debug("No session found");
         } else {
-            userId = (Long) session.getAttribute(SessionAttributes.USER_ID);
+            userId = (String) session.getAttribute(SessionAttributes.USER_ID);
             userName = (String) session.getAttribute(SessionAttributes.USER_NAME);
             logger.debug("Retrieved userId={} userName={}", userId, userName);
         }

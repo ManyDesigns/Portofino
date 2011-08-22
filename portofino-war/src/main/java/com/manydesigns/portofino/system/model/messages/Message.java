@@ -43,7 +43,7 @@ public class Message implements Serializable {
     public static final String copyright
             = "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    Long id;
+    String id;
     String subject;
     String body;
     String toId;
@@ -51,14 +51,14 @@ public class Message implements Serializable {
     User from;
     User to;
     Date creationDate;
-    Long stateId;
+    Integer stateId;
     State state;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -118,11 +118,11 @@ public class Message implements Serializable {
         this.creationDate = creationDate;
     }
 
-    public Long getStateId() {
+    public Integer getStateId() {
         return stateId;
     }
 
-    public void setStateId(Long stateId) {
+    public void setStateId(Integer stateId) {
         this.stateId = stateId;
     }
 

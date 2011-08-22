@@ -41,21 +41,21 @@ import java.io.Serializable;
 public class EmailBean implements Serializable{
     public static final String copyright
             = "Copyright (c) 2005-2011, ManyDesigns srl";
-    Long id;
+    String id;
     String subject;
     String body;
     String to;
     String from;
     Date createDate;
-    Long state;
+    Integer state;
     String attachmentPath;
     String attachmentDescription;
     String attachmentName;
 
-    public static final long TOBESENT  = 1;
-    public static final long SENT  = 2;
-    public static final long REJECTED  = 3;
-    public static final long BOUNCED  = 4;
+    public static final int TOBESENT  = 1;
+    public static final int SENT  = 2;
+    public static final int REJECTED  = 3;
+    public static final int BOUNCED  = 4;
 
     public EmailBean() {
     }
@@ -69,11 +69,11 @@ public class EmailBean implements Serializable{
         this.setState(TOBESENT);
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -117,11 +117,11 @@ public class EmailBean implements Serializable{
         this.createDate = createDate;
     }
 
-    public Long getState() {
+    public Integer getState() {
         return state;
     }
 
-    public void setState(Long state) {
+    public void setState(Integer state) {
         this.state = state;
     }
 

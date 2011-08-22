@@ -31,10 +31,10 @@
             />
     <jdbcConnection
             databaseName="portofino"
-            driver="org.postgresql.Driver"
-            url="jdbc:postgresql://127.0.0.1:5432/portofino4"
-            username="manydesigns"
-            password="manydesigns"
+            driver="org.h2.Driver"
+            url="jdbc:h2:${serverInfo:realPath}/WEB-INF/db/portofino"
+            username="sa"
+            password=""
             includeSchemas="public"
             excludeSchemas=""
             />

@@ -116,4 +116,13 @@ public class DatabasePlatformsManager {
         databasePlatformList.toArray(result);
         return result;
     }
+
+    //**************************************************************************
+    // Gettes/setters
+    //**************************************************************************
+
+
+    public Configuration getPortofinoConfiguration() {
+        return portofinoConfiguration;
+    }
 }
