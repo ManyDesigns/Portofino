@@ -76,37 +76,56 @@
                     </stripes:form>
                 </div>
             </div>
-            <div id="sidebar" class="yui-b">
-                <c:out value="${requestScope.__stripes_resolved_action}"/>
+            <div id="sidebar" class="yui-b adminSidebar">
                 <ul>
                     <li>
                         <div class="navigationHeader first">Site content</div>
                         <ul>
-                            <li class="navigationItem">Recent site activity</li>
-                            <li class="navigationItem">Pages</li>
-                            <li class="navigationItem">Attachments</li>
+                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                                                   text="Recent site activity"
+                                                   link="/"/>
+                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                                                   text="Pages"
+                                                   link="/"/>
+                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                                                   text="Attachments"
+                                                   link="/"/>
                         </ul>
                     </li>
                     <li>
                         <div class="navigationHeader">Security</div>
                         <ul>
-                            <li class="navigationItem">Users</li>
-                            <li class="navigationItem">Groups</li>
-                            <li class="navigationItem <c:if test="${requestScope.__stripes_resolved_action eq '/admin/root-permissions.action'}">selected</c:if>"><stripes:link beanclass="com.manydesigns.portofino.actions.admin.RootPermissionsAction">Root permissions</stripes:link></li>
+                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                                                   text="Users"
+                                                   link="/"/>
+                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                                                   text="Groups"
+                                                   link="/"/>
+                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                                                   text="Root permissions"
+                                                   link="/admin/root-permissions.action"/>
                         </ul>
                     </li>
                     <li>
                         <div class="navigationHeader">Configuration</div>
                         <ul>
-                            <li class="navigationItem <c:if test="${requestScope.__stripes_resolved_action eq '/admin/settings.action'}">selected</c:if>"><stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction">Settings</stripes:link></li>
-                            <li class="navigationItem">Email</li>
+                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                                                   text="Settings"
+                                                   link="/admin/settings.action"/>
+                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                                                   text="Email"
+                                                   link="/"/>
                         </ul>
                     </li>
                     <li>
                         <div class="navigationHeader">Data modeling</div>
                         <ul>
-                            <li class="navigationItem">Connections</li>
-                            <li class="navigationItem">Tables</li>
+                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                                                   text="Connections"
+                                                   link="/"/>
+                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                                                   text="Tables"
+                                                   link="/"/>
                         </ul>
                     </li>
                 </ul>

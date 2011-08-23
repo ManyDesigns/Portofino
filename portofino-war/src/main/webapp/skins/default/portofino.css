@@ -245,6 +245,16 @@ div#sidebar ul li.path, div#sidebar ul li.path a {
     font-weight: bold;
 }
 
+
+div#sidebar.adminSidebar li {
+    padding: 0;
+}
+
+div#sidebar.adminSidebar li li {
+    padding: 0 0.5em;
+}
+
+
 .navigationHeader {
     margin-top: 0.5em;
     padding-top: 0.5em;
