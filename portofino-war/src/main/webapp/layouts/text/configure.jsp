@@ -22,7 +22,10 @@
         <%@include file="../portlet-common-configuration.jsp" %>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:textarea class="editor" name="content" value="${actionBean.content}"/>
+        <fieldset class="mde-form-fieldset" style="padding-top: 1em;">
+            <legend>Content</legend>
+            <stripes:textarea class="editor" name="content" value="${actionBean.content}"/>
+        </fieldset>
         <div class="horizontalSeparator"></div>
         This document is saved in the storage directory as: <c:out value="${actionBean.textFile.name}"/>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
