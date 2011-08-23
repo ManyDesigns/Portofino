@@ -260,37 +260,32 @@
 
     <changeSet author="portofino" id="insert-groups">
         <insert tableName="groups">
-            <column name="groupid" value="1" />
+            <column name="groupid" value="anonymous" />
             <column name="creatorid" value="1" />
-            <column name="name" value="admins" />
-            <column name="description" value="admins" />
+            <column name="name" value="anonymous" />
+            <column name="description" value="anonymous users" />
             <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
         </insert>
         <insert tableName="groups">
-            <column name="groupid" value="2" />
+            <column name="groupid" value="registered" />
             <column name="creatorid" value="1" />
-            <column name="name" value="users" />
-            <column name="description" value="users" />
+            <column name="name" value="registered" />
+            <column name="description" value="registered users" />
+            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
+        </insert>
+        <insert tableName="groups">
+            <column name="groupid" value="administrators" />
+            <column name="creatorid" value="1" />
+            <column name="name" value="administrators" />
+            <column name="description" value="administrators" />
             <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
         </insert>
     </changeSet>
 
     <changeSet author="portofino" id="insert-users_groups">
         <insert tableName="users_groups">
-            <column name="groupid" value="1"/>
+            <column name="groupid" value="administrators"/>
             <column name="userid" value="1"/>
-            <column name="deletiondate" />
-            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
-        </insert>
-        <insert tableName="users_groups">
-            <column name="groupid" value="2"/>
-            <column name="userid" value="1"/>
-            <column name="deletiondate" />
-            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
-        </insert>
-        <insert tableName="users_groups">
-            <column name="groupid" value="2"/>
-            <column name="userid" value="2"/>
             <column name="deletiondate" />
             <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
         </insert>
