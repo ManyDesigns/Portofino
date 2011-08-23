@@ -12,7 +12,10 @@
         <stripes:submit name="update" value="Update" class="contentButton"/>
         <stripes:submit name="returnToPages" value="Return to pages" class="contentButton"/>
     </stripes:layout-component>
-    <stripes:layout-component name="contentBody">
+    <stripes:layout-component name="portletTitle">
+        Settings
+    </stripes:layout-component>
+    <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">

@@ -193,6 +193,21 @@ public class PortletAction extends AbstractActionBean {
     List<Page> inheritedPages;
 
     public Resolution pagePermissions() {
+        Page page = pageInstance.getPage();
+
+        setupGroups(page);
+
+        inheritedPages = new ArrayList<Page>();
+        Page current = page.getParent();
+        while (current != null) {
+            inheritedPages.add(current);
+            current = current.getParent();
+        }
+        Collections.reverse(inheritedPages);
+        return new ForwardResolution("/layouts/page/permissions.jsp");
+    }
+
+    public void setupGroups(Page page) {
         List<Group> groups = new ArrayList<Group>();
         groups.add(Group.ANONYMOUS_GROUP);
         groups.add(Group.REGISTERED_GROUP);
@@ -201,7 +216,6 @@ public class PortletAction extends AbstractActionBean {
         denyGroups = new ArrayList<Group>();
         availableGroups = new ArrayList<Group>();
 
-        Page page = pageInstance.getPage();
         List<String> allow = page.getPermissions().getAllow();
         List<String> deny = page.getPermissions().getDeny();
 
@@ -214,55 +228,51 @@ public class PortletAction extends AbstractActionBean {
                 availableGroups.add(group);
             }
         }
-
-        inheritedPages = new ArrayList<Page>();
-        Page current = page.getParent();
-        while (current != null) {
-            inheritedPages.add(current);
-            current = current.getParent();
-        }
-        Collections.reverse(inheritedPages);
-        return new ForwardResolution("/layouts/page/permissions.jsp");
     }
 
     static final String[] emptyStringArray = new String[0];
 
     public Resolution updatePagePermissions() {
+        Page page = pageInstance.getPage();
         synchronized (application) {
-            String[] allowNameArray = StringUtils.split(allowGroupNames, ',');
-            if (allowNameArray == null) {
-                allowNameArray = emptyStringArray;
-            }
-            String[] denyNameArray = StringUtils.split(denyGroupNames, ',');
-            if (denyNameArray == null) {
-                denyNameArray = emptyStringArray;
-            }
-
-            // clean old lists
-            List<String> allow = pageInstance.getPage().getPermissions().getAllow();
-            List<String> deny = pageInstance.getPage().getPermissions().getDeny();
-            allow.clear();
-            deny.clear();
-
-            List<Group> groups = new ArrayList<Group>();
-            groups.add(Group.ANONYMOUS_GROUP);
-            groups.add(Group.REGISTERED_GROUP);
-            groups.addAll(application.getAllObjects(UserUtils.GROUPTABLE));
-
-            for (Group group : groups) {
-                String groupName = group.getName();
-                String comparableName = "group_" + groupName;
-                if (ArrayUtils.contains(allowNameArray, comparableName)) {
-                    allow.add(groupName);
-                } else if (ArrayUtils.contains(denyNameArray, comparableName)) {
-                    deny.add(groupName);
-                }
-            }
+            updatePagePermissions(page);
             saveModel();
             SessionMessages.addInfoMessage("Page permissions saved successfully.");
         }
 
         return new RedirectResolution(dispatch.getOriginalPath());
+    }
+
+    public void updatePagePermissions(Page page) {
+        String[] allowNameArray = StringUtils.split(allowGroupNames, ',');
+        if (allowNameArray == null) {
+            allowNameArray = emptyStringArray;
+        }
+        String[] denyNameArray = StringUtils.split(denyGroupNames, ',');
+        if (denyNameArray == null) {
+            denyNameArray = emptyStringArray;
+        }
+
+        // clean old lists
+        List<String> allow = page.getPermissions().getAllow();
+        List<String> deny = page.getPermissions().getDeny();
+        allow.clear();
+        deny.clear();
+
+        List<Group> groups = new ArrayList<Group>();
+        groups.add(Group.ANONYMOUS_GROUP);
+        groups.add(Group.REGISTERED_GROUP);
+        groups.addAll(application.getAllObjects(UserUtils.GROUPTABLE));
+
+        for (Group group : groups) {
+            String groupName = group.getName();
+            String comparableName = "group_" + groupName;
+            if (ArrayUtils.contains(allowNameArray, comparableName)) {
+                allow.add(groupName);
+            } else if (ArrayUtils.contains(denyNameArray, comparableName)) {
+                deny.add(groupName);
+            }
+        }
     }
 
     public List<Group> getAllowGroups() {

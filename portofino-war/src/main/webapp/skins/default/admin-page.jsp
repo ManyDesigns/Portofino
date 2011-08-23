@@ -38,9 +38,35 @@
                             </stripes:layout-component>
                         </div>
                         <div class="contentBody">
-                            <stripes:layout-component name="contentBody">
-                                Content body
-                            </stripes:layout-component>
+                            <div class="portletWrapper">
+                                <div class="portlet">
+                                    <div class="portletHeader">
+                                        <stripes:layout-component name="portletHeader">
+                                            <div class="yui-g">
+                                                <div class="portletTitle">
+                                                    <h1>
+                                                    <stripes:layout-component name="portletTitle">
+                                                        portletTitle
+                                                    </stripes:layout-component>
+                                                    </h1>
+                                                </div>
+                                                <div class="portletHeaderButtons">
+                                                    <stripes:layout-component name="portletHeaderButtons"/>
+                                                </div>
+                                            </div>
+                                        </stripes:layout-component>
+                                    </div>
+                                    <div class="portletBody">
+                                        <stripes:layout-component name="portletBody">
+                                            Portlet body
+                                        </stripes:layout-component>
+                                    </div>
+                                    <div class="portletFooter">
+                                        <stripes:layout-component name="portletFooter">
+                                        </stripes:layout-component>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="contentFooter">
                             <stripes:layout-component name="contentFooter">
@@ -51,6 +77,7 @@
                 </div>
             </div>
             <div id="sidebar" class="yui-b">
+                <c:out value="${requestScope.__stripes_resolved_action}"/>
                 <ul>
                     <li>
                         <div class="navigationHeader first">Site content</div>
@@ -61,11 +88,25 @@
                         </ul>
                     </li>
                     <li>
+                        <div class="navigationHeader">Security</div>
+                        <ul>
+                            <li class="navigationItem">Users</li>
+                            <li class="navigationItem">Groups</li>
+                            <li class="navigationItem <c:if test="${requestScope.__stripes_resolved_action eq '/admin/root-permissions.action'}">selected</c:if>"><stripes:link beanclass="com.manydesigns.portofino.actions.admin.RootPermissionsAction">Root permissions</stripes:link></li>
+                        </ul>
+                    </li>
+                    <li>
                         <div class="navigationHeader">Configuration</div>
                         <ul>
-                            <li class="navigationItem <c:if test="true">selected</c:if>"><stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction">Settings</stripes:link></li>
+                            <li class="navigationItem <c:if test="${requestScope.__stripes_resolved_action eq '/admin/settings.action'}">selected</c:if>"><stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction">Settings</stripes:link></li>
                             <li class="navigationItem">Email</li>
-                            <li class="navigationItem">Permissions</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <div class="navigationHeader">Data modeling</div>
+                        <ul>
+                            <li class="navigationItem">Connections</li>
+                            <li class="navigationItem">Tables</li>
                         </ul>
                     </li>
                 </ul>

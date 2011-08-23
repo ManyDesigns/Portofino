@@ -3,19 +3,17 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><stripes:layout-render name="/skins/${skin}/modal-page.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
+%><stripes:layout-render name="/skins/default/admin-page.jsp">
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.RootPermissionsAction"/>
+    <stripes:layout-component name="pageTitle">
+        Root permission
+    </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <stripes:submit name="updatePagePermissions" value="Save" class="contentButton"/>
-        <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
-        <div class="breadcrumbs">
-            <div class="inner">
-                <mde:write name="breadcrumbs"/>
-            </div>
-        </div>
+        <stripes:submit name="updatePagePermissions" value="Update" class="contentButton"/>
+        <stripes:submit name="returnToPages" value="Return to pages" class="contentButton"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Page permissions for: <c:out value="${actionBean.pageInstance.page.title}"/>
+        Root permission
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <div class="yui-gb">
@@ -65,28 +63,9 @@
                 return true;
             });
         </script>
-        <div class="horizontalSeparator"></div>
-        Inherited permissions:
-        <c:forEach var="currentPage" items="${actionBean.inheritedPages}">
-            <div class="inheritedPermission">
-                <span class="inheritedPageName"><c:out value="${currentPage.title}"/></span>
-                <br/>Allow groups:
-                <c:forEach var="group" varStatus="status" items="${currentPage.permissions.allow}">
-                    <b></b><c:out value="${group}"/></b><c:if test="${not status.last}">,</c:if>
-                </c:forEach>
-                <br/>Deny groups:
-                <c:forEach var="group" varStatus="status" items="${currentPage.permissions.deny}">
-                    <b><c:out value="${group}"/></b><c:if test="${not status.last}">,</c:if>
-                </c:forEach>
-        </c:forEach>
-        <c:forEach var="currentPage" items="${actionBean.inheritedPages}">
-            </div>
-        </c:forEach>
-        <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">
-        <stripes:submit name="updatePagePermissions" value="Save" class="contentButton"/>
-        <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
+        <stripes:submit name="updatePagePermissions" value="Update" class="contentButton"/>
+        <stripes:submit name="returnToPages" value="Return to pages" class="contentButton"/>
     </stripes:layout-component>
 </stripes:layout-render>

@@ -44,13 +44,13 @@ public class AccessImpl implements Access {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    private String value;
+    private AccessType value;
 
-    public AccessImpl(String value) {
+    public AccessImpl(AccessType value) {
         this.value = value;
     }
 
-    public String value() {
+    public AccessType value() {
         return value;
     }
 

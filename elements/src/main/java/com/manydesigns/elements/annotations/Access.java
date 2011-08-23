@@ -46,5 +46,11 @@ public @interface Access {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    String value();
+    public enum AccessType {
+        NONE,
+        R,
+        RW
+    }
+
+    AccessType value();
 }

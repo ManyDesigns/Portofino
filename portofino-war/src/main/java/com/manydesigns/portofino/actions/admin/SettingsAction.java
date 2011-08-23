@@ -119,7 +119,7 @@ public class SettingsAction extends AbstractActionBean {
                 model.init();
                 application.saveXmlModel();
                 SessionMessages.addInfoMessage("Settings updated successfully");
-                return new RedirectResolution("/admin/settings.action");
+                return new RedirectResolution(this.getClass());
             } else {
                 return new ForwardResolution("/layouts/admin/settings.jsp");
             }
