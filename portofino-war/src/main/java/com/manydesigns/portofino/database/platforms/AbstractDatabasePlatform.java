@@ -151,6 +151,11 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
         return database;
     }
 
+    public void shutdown(ConnectionProvider connectionProvider) {
+        logger.info("Shutting down connection provider: {}",
+                connectionProvider.getDatabaseName());
+    }
+
 
     //**************************************************************************
     // Read schemas

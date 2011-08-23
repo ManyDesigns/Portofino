@@ -230,6 +230,12 @@ public abstract class ConnectionProvider {
         }
     }
 
+    public void shutdown() {
+        if (databasePlatform != null) {
+            databasePlatform.shutdown(this);
+        }
+    }
+
     protected void readType(ResultSet typeRs)
             throws SQLException {
         String typeName = typeRs.getString("TYPE_NAME");

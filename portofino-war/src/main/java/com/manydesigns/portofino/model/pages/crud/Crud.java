@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.model.pages.crud;
 
 import com.manydesigns.elements.annotations.Multiline;
-import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
@@ -229,7 +228,6 @@ public class Crud implements ModelObject {
         this.actualTable = actualTable;
     }
 
-    @Required
     @Multiline
     @XmlAttribute(required = true)
     public String getQuery() {

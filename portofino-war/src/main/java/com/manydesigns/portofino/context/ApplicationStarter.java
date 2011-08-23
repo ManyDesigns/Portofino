@@ -140,6 +140,12 @@ public class ApplicationStarter {
 
         status = Status.DESTROYING;
 
+        if (application != null) {
+            for (ConnectionProvider current : application.getConnectionProviders()) {
+                current.shutdown();
+            }
+        }
+
         if (scheduler!=null) {
             logger.info("Terminating the scheduler...");
             scheduler.cancel();

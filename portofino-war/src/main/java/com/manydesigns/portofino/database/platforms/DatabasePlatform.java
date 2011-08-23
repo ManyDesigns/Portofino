@@ -58,4 +58,6 @@ public interface DatabasePlatform {
     void test();
     boolean isApplicable(ConnectionProvider connectionProvider);
     Database readModel(ConnectionProvider connectionProvider);
+    void shutdown(ConnectionProvider connectionProvider);
+
 }

@@ -64,15 +64,25 @@ public class CrudPageInstance extends PageInstance {
         super(application, page, mode);
         this.pk = param;
         this.crud = page.getCrud();
+
+        ClassAccessor tmpClassAccessor = null;
+        Table tmpBaseTable = null;
+        PkHelper tmpPkHelper = null;
         if(crud != null) {
-            classAccessor = application.getCrudAccessor(crud);
-            baseTable = crud.getActualTable();
-            pkHelper = new PkHelper(classAccessor);
-        } else {
-            classAccessor = null;
-            baseTable = null;
-            pkHelper = null;
+            try {
+                tmpClassAccessor = application.getCrudAccessor(crud);
+                tmpBaseTable = crud.getActualTable();
+                tmpPkHelper = new PkHelper(tmpClassAccessor);
+            } catch (Exception e) {
+                logger.debug("Crud threw exception (probably not configured).");
+                tmpClassAccessor = null;
+                tmpBaseTable = null;
+                tmpPkHelper = null;
+            }
         }
+        classAccessor = tmpClassAccessor;
+        baseTable = tmpBaseTable;
+        pkHelper = tmpPkHelper;
     }
 
     public void realize() {

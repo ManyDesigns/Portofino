@@ -32,6 +32,8 @@ package com.manydesigns.portofino.database.platforms;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import org.hibernate.dialect.PostgreSQLDialect;
 
+import java.sql.Connection;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -68,5 +70,20 @@ public class H2DatabasePlatform extends AbstractDatabasePlatform {
 
     public boolean isApplicable(ConnectionProvider connectionProvider) {
         return "H2".equals(connectionProvider.getDatabaseProductName());
+    }
+
+    @Override
+    public void shutdown(ConnectionProvider connectionProvider) {
+        super.shutdown(connectionProvider);
+        Connection connection = null;
+        try {
+            connection = connectionProvider.acquireConnection();
+            connection.createStatement().execute("SHUTDOWN");
+        } catch (Exception e) {
+            logger.warn("Could not shutdown connection provider: {}",
+                    connectionProvider.getDatabaseName());
+        } finally {
+            connectionProvider.releaseConnection(connection);
+        }
     }
 }
