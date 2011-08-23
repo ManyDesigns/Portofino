@@ -131,6 +131,10 @@ public class DataModelLogic {
     }
 
     public static Table findTableByQualifiedName(Model model, String qualifiedTableName) {
+        if (qualifiedTableName == null) {
+            return null;
+        }
+
         int lastDot = qualifiedTableName.lastIndexOf(".");
         if(lastDot==-1) {
             return null;

@@ -63,10 +63,12 @@ public abstract class AbstractAnnotatedAccessor
     // Constructors
     //**************************************************************************
 
-    public AbstractAnnotatedAccessor(
-            Collection<Annotation>
-                    annotations) {
+    public AbstractAnnotatedAccessor(Collection<Annotation> annotations) {
         this.annotations = new HashMap<Class, java.lang.annotation.Annotation>();
+
+        if (annotations == null) {
+            return;
+        }
 
         for (Annotation annotation : annotations) {
             Class annotationClass = annotation.getJavaAnnotationClass();

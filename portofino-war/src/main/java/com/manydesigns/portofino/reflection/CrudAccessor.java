@@ -31,12 +31,14 @@ package com.manydesigns.portofino.reflection;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.portofino.logic.CrudLogic;
+import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.util.Collection;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -71,26 +73,28 @@ public class CrudAccessor
         super(crud.getModelAnnotations());
         this.crud = crud;
         this.tableAccessor = tableAccessor;
-        List<CrudProperty> properties = crud.getProperties();
+        PropertyAccessor[] columnAccessors = tableAccessor.getProperties();
         PropertyAccessor[] keyColumnAccessors = tableAccessor.getKeyProperties();
 
-        propertyAccessors = new CrudPropertyAccessor[properties.size()];
+        propertyAccessors =
+                new CrudPropertyAccessor[columnAccessors.length];
         keyPropertyAccessors =
                 new CrudPropertyAccessor[keyColumnAccessors.length];
 
         int i = 0;
-        for (CrudProperty property : properties) {
-            String propertyName = property.getName();
-            try {
-                PropertyAccessor columnAccessor =
-                        tableAccessor.getProperty(propertyName);
-                CrudPropertyAccessor propertyAccessor =
-                        new CrudPropertyAccessor(property, columnAccessor);
-                propertyAccessors[i] = propertyAccessor;
-            } catch (NoSuchFieldException e) {
-                logger.error("Could not access table property: " +
-                        propertyName, e);
+        for (PropertyAccessor columnAccessor : columnAccessors) {
+            CrudProperty crudProperty =
+                    CrudLogic.findCrudPropertyByName(
+                            crud, columnAccessor.getName());
+            Collection<Annotation> annotations;
+            if (crudProperty == null) {
+                annotations = null;
+            } else {
+                annotations = crudProperty.getAnnotations();
             }
+            CrudPropertyAccessor propertyAccessor =
+                        new CrudPropertyAccessor(annotations, columnAccessor);
+            propertyAccessors[i] = propertyAccessor;
             i++;
         }
 

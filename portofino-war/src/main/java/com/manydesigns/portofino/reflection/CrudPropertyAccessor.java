@@ -30,11 +30,12 @@
 package com.manydesigns.portofino.reflection;
 
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.model.pages.crud.CrudProperty;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,7 +53,6 @@ public class CrudPropertyAccessor
     // Fields
     //**************************************************************************
 
-    protected final CrudProperty crudProperty;
     protected final PropertyAccessor nestedAccessor;
 
     public static final Logger logger =
@@ -63,10 +63,9 @@ public class CrudPropertyAccessor
     // Constructors
     //**************************************************************************
 
-    public CrudPropertyAccessor(CrudProperty crudProperty,
+    public CrudPropertyAccessor(@Nullable Collection<com.manydesigns.portofino.model.annotations.Annotation> annotations,
                                 PropertyAccessor nestedAccessor) {
-        super(crudProperty.getAnnotations());
-        this.crudProperty = crudProperty;
+        super(annotations);
         this.nestedAccessor = nestedAccessor;
     }
 
