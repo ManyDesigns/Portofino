@@ -268,6 +268,7 @@ public class TableForm implements Element {
                     xb.addAttribute("class", "tableform-error");
                 }
                 current.valueToXhtml(xb);
+                current.errorsToXhtml(xb);
                 xb.closeElement("td");
             }
 

@@ -40,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -251,6 +252,21 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
     public SelectionModel createSelectionModel() {
         return new DefaultSelectionModel();
+    }
+
+    public static SelectionProvider create(String name, Class<? extends Enum> enumeration) {
+        try {
+            Method valuesMethod = enumeration.getMethod("values");
+            Enum[] values = (Enum[]) valuesMethod.invoke(null);
+            String[] labels = new String[values.length];
+            for (int i = 0; i < values.length; i++) {
+                labels[i] = values[i].name();
+            }
+            return create(name, values, labels);
+        } catch (Exception e) {
+            logger.error("Cannot create Selection provider from enumeration", e);
+            throw new Error(e);
+        }
     }
 
     //**************************************************************************

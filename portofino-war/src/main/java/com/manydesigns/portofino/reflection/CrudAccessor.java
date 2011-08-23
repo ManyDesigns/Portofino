@@ -86,14 +86,8 @@ public class CrudAccessor
             CrudProperty crudProperty =
                     CrudLogic.findCrudPropertyByName(
                             crud, columnAccessor.getName());
-            Collection<Annotation> annotations;
-            if (crudProperty == null) {
-                annotations = null;
-            } else {
-                annotations = crudProperty.getAnnotations();
-            }
             CrudPropertyAccessor propertyAccessor =
-                        new CrudPropertyAccessor(annotations, columnAccessor);
+                        new CrudPropertyAccessor(crudProperty, columnAccessor);
             propertyAccessors[i] = propertyAccessor;
             i++;
         }

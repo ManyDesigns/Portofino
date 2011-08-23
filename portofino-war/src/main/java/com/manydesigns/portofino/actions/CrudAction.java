@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.Access;
 import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.fields.*;
@@ -44,14 +45,17 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
+import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.CrudLogic;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.crud.Button;
 import com.manydesigns.portofino.model.pages.crud.Crud;
+import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
@@ -65,6 +69,7 @@ import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fop.apps.FOPException;
@@ -1239,13 +1244,19 @@ public class CrudAction extends PortletAction {
             {{"name", "table", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable"}};
 
     public Form crudConfigurationForm;
+    public TableForm propertiesTableForm;
 
     public Resolution configure() {
-        configurePage(crudPage);
+        setupEdits();
+        setupPageConfiguration();
+
         crudConfigurationForm.readFromObject(crudPage.getCrud());
+        propertiesTableForm.readFromObject(edits);
 
         return new ForwardResolution("/layouts/crud/configure.jsp");
     }
+
+    CrudPropertyEdit[] edits;
 
     @Override
     protected void prepareConfigurationForms() {
@@ -1262,26 +1273,83 @@ public class CrudAction extends PortletAction {
                 .configFieldSetNames("Crud")
                 .configSelectionProvider(tableSelectionProvider, "table")
                 .build();
+
+        TableFormBuilder tableFormBuilder =
+                new TableFormBuilder(CrudPropertyEdit.class)
+                .configNRows(edits.length);
+        propertiesTableForm = tableFormBuilder.build();
+    }
+
+    private void setupEdits() {
+        PropertyAccessor[] propertyAccessors = classAccessor.getProperties();
+        edits = new CrudPropertyEdit[propertyAccessors.length];
+        for (int i = 0; i < propertyAccessors.length; i++) {
+            CrudPropertyEdit edit = new CrudPropertyEdit();
+            PropertyAccessor propertyAccessor = propertyAccessors[i];
+            CrudProperty crudProperty =
+                    CrudLogic.findCrudPropertyByName(
+                            crud, propertyAccessor.getName());
+            edit.name = propertyAccessor.getName();
+            if (crudProperty == null) {
+                // default values
+                edit.label = null;
+                edit.searchable = false;
+                edit.inSummary = ArrayUtils.contains(
+                        classAccessor.getKeyProperties(), propertyAccessor);
+                edit.access = Access.AccessType.RW;
+            } else {
+                edit.label = crudProperty.getLabel();
+                edit.searchable = crudProperty.isSearchable();
+                edit.inSummary = crudProperty.isInSummary();
+                edit.access = crudProperty.getActualAccess();
+            }
+            edits[i] = edit;
+        }
     }
 
     public Resolution updateConfiguration() {
         synchronized (application) {
-            prepareConfigurationForms();
+            setupEdits();
+            setupPageConfiguration();
+
             if(crudPage.getCrud() == null) {
                 crudPage.setCrud(new Crud());
             }
+
             crudConfigurationForm.readFromObject(crudPage.getCrud());
+            propertiesTableForm.readFromObject(edits);
+
+            pageConfigurationForm.readFromRequest(context.getRequest());
             crudConfigurationForm.readFromRequest(context.getRequest());
+            propertiesTableForm.readFromRequest(context.getRequest());
 
             boolean valid = crudConfigurationForm.validate();
-            valid = valid && updatePageConfiguration(crudPage);
+            valid = validatePageConfiguration() && valid;
+            valid = propertiesTableForm.validate() && valid;
             if (valid) {
+                updatePageConfiguration();
                 crudConfigurationForm.writeToObject(crudPage.getCrud());
-                crudPage.setTitle(title);
+                propertiesTableForm.writeToObject(edits);
+
+                crud.getProperties().clear();
+                for (CrudPropertyEdit edit : edits) {
+                    CrudProperty crudProperty = new CrudProperty();
+
+                    crudProperty.setName(edit.name);
+                    crudProperty.setLabel(edit.label);
+                    crudProperty.setInSummary(edit.inSummary);
+                    crudProperty.setSearchable(edit.searchable);
+                    crudProperty.setAccess(edit.access.name());
+
+                    crudProperty.setCrud(crud);
+                    crud.getProperties().add(crudProperty);
+                }
+
                 saveModel();
                 SessionMessages.addInfoMessage("Configuration updated successfully");
                 return cancel();
             } else {
+                SessionMessages.addErrorMessage("The configuration could not be saved. Review any errors below and submit again.");
                 return new ForwardResolution("/layouts/crud/configure.jsp");
             }
         }
@@ -1429,5 +1497,9 @@ public class CrudAction extends PortletAction {
 
     public void setCrudConfigurationForm(Form crudConfigurationForm) {
         this.crudConfigurationForm = crudConfigurationForm;
+    }
+
+    public TableForm getPropertiesTableForm() {
+        return propertiesTableForm;
     }
 }

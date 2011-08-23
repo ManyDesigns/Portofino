@@ -439,7 +439,8 @@ public class PortletAction extends AbstractActionBean {
                 .build();
     }
 
-    protected void configurePage(Page page) {
+    protected void setupPageConfiguration() {
+        Page page = pageInstance.getPage();
         prepareConfigurationForms();
         EditPage edit = new EditPage();
         edit.setDescription(page.getDescription());
@@ -448,26 +449,32 @@ public class PortletAction extends AbstractActionBean {
         title = page.getTitle();
     }
 
-    protected boolean updatePageConfiguration(Page page) {
-        boolean valid = getTitleFromRequest();
-        if(!valid) {
-            return false;
+    protected boolean validatePageConfiguration() {
+        boolean valid = true;
+        title = StringUtils.trimToNull(title);
+        if (title == null) {
+            SessionMessages.addErrorMessage("Title cannot be empty");
+            valid = false;
         }
+
+        valid = pageConfigurationForm.validate() && valid;
+
+        return valid;
+    }
+
+
+
+    protected void updatePageConfiguration() {
         EditPage edit = new EditPage();
-        pageConfigurationForm.readFromRequest(context.getRequest());
-        if(pageConfigurationForm.validate()) {
-            pageConfigurationForm.writeToObject(edit);
-            page.setTitle(title);
-            page.setDescription(edit.getDescription());
-            if(edit.isEmbedInParent()) {
-                page.setLayoutContainerInParent(DEFAULT_LAYOUT_CONTAINER);
-            } else {
-                page.setLayoutContainerInParent(null);
-                page.setLayoutOrderInParent(null);
-            }
-            return true;
+        pageConfigurationForm.writeToObject(edit);
+        Page page = pageInstance.getPage();
+        page.setTitle(title);
+        page.setDescription(edit.getDescription());
+        if(edit.isEmbedInParent()) {
+            page.setLayoutContainerInParent(DEFAULT_LAYOUT_CONTAINER);
         } else {
-            return false;
+            page.setLayoutContainerInParent(null);
+            page.setLayoutOrderInParent(null);
         }
     }
 
@@ -496,15 +503,6 @@ public class PortletAction extends AbstractActionBean {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    protected boolean getTitleFromRequest() {
-        title = StringUtils.trimToNull(title);
-        if (title == null) {
-            SessionMessages.addErrorMessage("Title cannot be empty");
-            return false;
-        }
-        return true;
     }
 
     public static enum InsertPosition {

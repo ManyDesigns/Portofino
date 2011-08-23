@@ -80,6 +80,13 @@ public class SelectField extends AbstractField {
         Select annotation = accessor.getAnnotation(Select.class);
         if (annotation == null) {
             displayMode = DisplayMode.DROPDOWN;
+            if (accessor.getType().isEnum()) {
+                SelectionProvider selectionProvider =
+                    DefaultSelectionProvider.create(
+                            accessor.getName(), accessor.getType());
+                selectionModel = selectionProvider.createSelectionModel();
+                selectionModelIndex = 0;
+            }
         } else {
             Object[] values = annotation.values();
             String[] labels = annotation.labels();

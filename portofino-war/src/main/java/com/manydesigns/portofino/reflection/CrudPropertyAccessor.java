@@ -29,13 +29,22 @@
 
 package com.manydesigns.portofino.reflection;
 
+import com.manydesigns.elements.annotations.Access;
+import com.manydesigns.elements.annotations.InSummary;
+import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.Searchable;
+import com.manydesigns.elements.annotations.impl.AccessImpl;
+import com.manydesigns.elements.annotations.impl.InSummaryImpl;
+import com.manydesigns.elements.annotations.impl.LabelImpl;
+import com.manydesigns.elements.annotations.impl.SearchableImpl;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.portofino.model.pages.crud.CrudProperty;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
-import java.util.Collection;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -53,6 +62,7 @@ public class CrudPropertyAccessor
     // Fields
     //**************************************************************************
 
+    protected final CrudProperty crudProperty;
     protected final PropertyAccessor nestedAccessor;
 
     public static final Logger logger =
@@ -63,10 +73,25 @@ public class CrudPropertyAccessor
     // Constructors
     //**************************************************************************
 
-    public CrudPropertyAccessor(@Nullable Collection<com.manydesigns.portofino.model.annotations.Annotation> annotations,
+    public CrudPropertyAccessor(@Nullable CrudProperty crudProperty,
                                 PropertyAccessor nestedAccessor) {
-        super(annotations);
+        super((crudProperty == null) ? null : crudProperty.getAnnotations());
+        this.crudProperty = crudProperty;
         this.nestedAccessor = nestedAccessor;
+
+        if (crudProperty != null) {
+            String label = crudProperty.getLabel();
+            if (StringUtils.isNotEmpty(label)) {
+                annotations.put(Label.class,
+                        new LabelImpl(label));
+            }
+            annotations.put(Searchable.class,
+                    new SearchableImpl(crudProperty.isSearchable()));
+            annotations.put(InSummary.class,
+                    new InSummaryImpl(crudProperty.isInSummary()));
+            annotations.put(Access.class,
+                    new AccessImpl(crudProperty.getActualAccess()));
+        }
     }
 
 

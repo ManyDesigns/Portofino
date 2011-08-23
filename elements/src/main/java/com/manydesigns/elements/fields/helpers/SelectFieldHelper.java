@@ -55,6 +55,8 @@ public class SelectFieldHelper implements FieldHelper {
         if (String.class.isAssignableFrom(propertyAccessor.getType())
                 && propertyAccessor.isAnnotationPresent(Select.class)) {
                 return new SelectField(propertyAccessor, mode, prefix);
+        } else if (propertyAccessor.getType().isEnum()) {
+                return new SelectField(propertyAccessor, mode, prefix);
         }
         return null;
     }

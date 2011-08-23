@@ -27,38 +27,29 @@
  *
  */
 
-package com.manydesigns.portofino.model.pages.crud;
+package com.manydesigns.portofino.actions.forms;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-public enum Access {
-    NONE("none"),
-    READ("read"),
-    WRITE("write");
+import com.manydesigns.elements.annotations.Access;
+import com.manydesigns.elements.annotations.Immutable;
+import com.manydesigns.elements.annotations.Required;
 
+/**
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public class CrudPropertyEdit {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    private final String name;
+    @Immutable
+    public String name;
 
-    Access(String name) {
-        this.name = name;
-    }
-
-    public static Access parseAccess(String s) {
-        for (Access current : values()) {
-            if (current.getName().equals(s)) {
-                return current;
-            }
-        }
-        throw new IllegalArgumentException("Invalid access format: " + s);
-    }
-
-    public String getName() {
-        return name;
-    }
+    public String label;
+    public boolean searchable;
+    public boolean inSummary;
+    
+    @Required
+    public Access.AccessType access;
 }

@@ -278,7 +278,7 @@ public class ChartAction extends PortletAction {
             {{"name", "legend", "database", "query", "urlExpression"}};
 
     public Resolution configure() {
-        configurePage(chartPage);
+        setupPageConfiguration();
 
         return new ForwardResolution("/layouts/chart/configure.jsp");
     }
@@ -305,9 +305,11 @@ public class ChartAction extends PortletAction {
             prepareConfigurationForms();
             form.readFromObject(chartPage);
             form.readFromRequest(context.getRequest());
+            pageConfigurationForm.readFromRequest(context.getRequest());
             boolean valid = form.validate();
-            valid = valid && updatePageConfiguration(chartPage);
+            valid = validatePageConfiguration() && valid;
             if (valid) {
+                updatePageConfiguration();
                 form.writeToObject(chartPage);
                 saveModel();
                 SessionMessages.addInfoMessage("Configuration updated successfully");

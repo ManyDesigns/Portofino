@@ -55,6 +55,8 @@ public class CustomTypeConverter implements TypeConverter {
         if ((toType == Timestamp.class) && (value instanceof Date)) {
                         Date thisValue = (Date) value;
                         return new Timestamp(thisValue.getTime());
+        } else if (toType.isEnum() && value instanceof String){
+            return Enum.valueOf(toType, (String) value);
         } else {
             return conv.convertValue(context, target, member, propertyName, value, toType);
         }

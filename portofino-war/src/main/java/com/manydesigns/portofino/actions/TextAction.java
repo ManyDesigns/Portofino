@@ -141,7 +141,7 @@ public class TextAction extends PortletAction {
     }
 
     public Resolution configure() throws IOException {
-        configurePage(textPage);
+        setupPageConfiguration();
         loadContent();
         return new ForwardResolution("/layouts/text/configure.jsp");
     }
@@ -149,8 +149,11 @@ public class TextAction extends PortletAction {
     public Resolution updateConfiguration() throws IOException {
         synchronized (application) {
             prepareConfigurationForms();
-            boolean valid = updatePageConfiguration(textPage);
+
+            pageConfigurationForm.readFromRequest(context.getRequest());
+            boolean valid = validatePageConfiguration();
             if (valid) {
+                updatePageConfiguration();
                 saveContent();
                 saveModel();
                 SessionMessages.addInfoMessage("Configuration updated successfully");

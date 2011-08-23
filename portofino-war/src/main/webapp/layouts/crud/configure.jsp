@@ -19,6 +19,8 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="crudConfigurationForm"/>
+        <div class="horizontalSeparator"></div>
+        <mde:write name="actionBean" property="propertiesTableForm"/>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>

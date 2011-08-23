@@ -29,10 +29,13 @@
 
 package com.manydesigns.portofino.model.pages.crud;
 
+import com.manydesigns.elements.annotations.Access;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.xml.Identifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
@@ -59,8 +62,25 @@ public class CrudProperty implements ModelObject {
     protected Crud crud;
 
     protected String name;
+    protected String label;
+    protected boolean searchable;
+    protected boolean inSummary;
+    protected String access;
     protected final List<Annotation> annotations;
 
+
+    //**************************************************************************
+    // Actual fields
+    //**************************************************************************
+
+    protected Access.AccessType actualAccess;
+
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
+
+    public static final Logger logger =
+            LoggerFactory.getLogger(CrudProperty.class);
 
     //**************************************************************************
     // Constructors
@@ -79,6 +99,7 @@ public class CrudProperty implements ModelObject {
     }
 
     public void reset() {
+        actualAccess = null;
         for (Annotation annotation : annotations) {
             annotation.reset();
         }
@@ -89,6 +110,11 @@ public class CrudProperty implements ModelObject {
         assert name != null;
         for (Annotation annotation : annotations) {
             annotation.init(model);
+        }
+        try {
+            actualAccess = Access.AccessType.valueOf(access);
+        } catch (Exception e) {
+            logger.warn("Cannot parse access: {}", access);
         }
     }
 
@@ -119,9 +145,45 @@ public class CrudProperty implements ModelObject {
         this.name = name;
     }
 
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public boolean isSearchable() {
+        return searchable;
+    }
+
+    public void setSearchable(boolean searchable) {
+        this.searchable = searchable;
+    }
+
+    public boolean isInSummary() {
+        return inSummary;
+    }
+
+    public void setInSummary(boolean inSummary) {
+        this.inSummary = inSummary;
+    }
+
+    public String getAccess() {
+        return access;
+    }
+
+    public void setAccess(String access) {
+        this.access = access;
+    }
+
     @XmlElementWrapper(name="annotations")
     @XmlElement(name="annotaion",type=Annotation.class)
     public List<Annotation> getAnnotations() {
         return annotations;
+    }
+
+    public Access.AccessType getActualAccess() {
+        return actualAccess;
     }
 }
