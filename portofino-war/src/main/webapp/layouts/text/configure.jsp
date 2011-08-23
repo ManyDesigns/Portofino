@@ -18,8 +18,8 @@
             </div>
         </div>
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <stripes:text name="title" value="${actionBean.title}"/>
+    <stripes:layout-component name="portletHeader">
+        <%@include file="../portlet-common-configuration.jsp" %>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <stripes:textarea class="editor" name="content" value="${actionBean.content}"/>

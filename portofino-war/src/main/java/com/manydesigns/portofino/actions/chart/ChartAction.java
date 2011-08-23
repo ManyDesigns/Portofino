@@ -180,7 +180,7 @@ public class ChartAction extends PortletAction {
         }
 
         chart = ChartFactory.createPieChart(
-                chartPage.getTitle(), dataset, true, true, true);
+                chartPage.getName(), dataset, true, true, true);
 
         chart.setAntiAlias(antiAlias);
 
@@ -274,18 +274,18 @@ public class ChartAction extends PortletAction {
     // Configuration
     //**************************************************************************
 
-    public static final String[] CONFIGURATION_FIELDS =
-            {"name", "legend", "database", "query", "urlExpression"};
+    public static final String[][] CONFIGURATION_FIELDS =
+            {{"name", "legend", "database", "query", "urlExpression"}};
 
     public Resolution configure() {
-        prepareForm();
-        form.readFromObject(chartPage);
-        title = chartPage.getTitle();
+        configurePage(chartPage);
 
         return new ForwardResolution("/layouts/chart/configure.jsp");
     }
 
-    private void prepareForm() {
+    @Override
+    protected void prepareConfigurationForms() {
+        super.prepareConfigurationForms();
         SelectionProvider databaseSelectionProvider =
                 DefaultSelectionProvider.create("database",
                         model.getDatabases(),
@@ -294,20 +294,20 @@ public class ChartAction extends PortletAction {
                         "databaseName");
         form = new FormBuilder(ChartPage.class)
                 .configFields(CONFIGURATION_FIELDS)
+                .configFieldSetNames("Chart")
                 .configSelectionProvider(databaseSelectionProvider, "database")
                 .build();
+        form.readFromObject(chartPage);
     }
 
     public Resolution updateConfiguration() {
         synchronized (application) {
-            prepareForm();
-            boolean valid = getTitleFromRequest();
+            prepareConfigurationForms();
+            form.readFromObject(chartPage);
+            form.readFromRequest(context.getRequest());
+            boolean valid = form.validate();
+            valid = valid && updatePageConfiguration(chartPage);
             if (valid) {
-                chartPage.setTitle(title);
-                form.readFromObject(chartPage);
-                form.readFromRequest(context.getRequest());
-            }
-            if (valid && form.validate()) {
                 form.writeToObject(chartPage);
                 saveModel();
                 SessionMessages.addInfoMessage("Configuration updated successfully");

@@ -14,11 +14,10 @@
             </div>
         </div>
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        Configure crud: <stripes:text name="title" value="${actionBean.title}"/>
+    <stripes:layout-component name="portletHeader">
+        <%@include file="../portlet-common-configuration.jsp" %>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <mde:write name="actionBean" property="form"/>
         <mde:write name="actionBean" property="crudConfigurationForm"/>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>

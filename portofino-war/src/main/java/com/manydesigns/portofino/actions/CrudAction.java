@@ -49,11 +49,11 @@ import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
-import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
 import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.crud.Button;
 import com.manydesigns.portofino.model.pages.crud.Crud;
+import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
+import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
@@ -123,7 +123,6 @@ public class CrudAction extends PortletAction {
 
     public SearchForm searchForm;
     public TableForm tableForm;
-    public Form form;
 
     //--------------------------------------------------------------------------
     // Data objects
@@ -276,7 +275,7 @@ public class CrudAction extends PortletAction {
     public Resolution embeddedSearch() {
         if (classAccessor == null) {
             logger.debug("Crud not correctly configured");
-            return forwardToPortletPage("/layouts/portlet-not-configured.jsp");
+            return new ForwardResolution("/layouts/portlet-not-configured.jsp");
         }
 
         try {
@@ -311,7 +310,7 @@ public class CrudAction extends PortletAction {
             //throw new Error("Object not found");
         }
         setupForm(Mode.VIEW);
-        form.readFromObject(object);
+        pageConfigurationForm.readFromObject(object);
         refreshBlobDownloadHref();
 
         // refresh crud buttons (enabled/disabled)
@@ -332,7 +331,7 @@ public class CrudAction extends PortletAction {
     }
 
     protected void refreshBlobDownloadHref() {
-        for (FieldSet fieldSet : form) {
+        for (FieldSet fieldSet : pageConfigurationForm) {
             for (Field field : fieldSet) {
                 if (field instanceof FileBlobField) {
                     FileBlobField fileBlobField = (FileBlobField) field;
@@ -367,10 +366,10 @@ public class CrudAction extends PortletAction {
     public Resolution save() {
         setupForm(Mode.CREATE);
 
-        form.readFromRequest(context.getRequest());
-        if (form.validate()) {
+        pageConfigurationForm.readFromRequest(context.getRequest());
+        if (pageConfigurationForm.validate()) {
             object = classAccessor.newInstance();
-            form.writeToObject(object);
+            pageConfigurationForm.writeToObject(object);
             application.saveObject(baseTable.getQualifiedName(), object);
             try {
                 application.commit(baseTable.getDatabaseName());
@@ -395,16 +394,16 @@ public class CrudAction extends PortletAction {
 
     public Resolution edit() {
         setupForm(Mode.EDIT);
-        form.readFromObject(object);
+        pageConfigurationForm.readFromObject(object);
         return new ForwardResolution("/layouts/crud/edit.jsp");
     }
 
     public Resolution update() {
         setupForm(Mode.EDIT);
-        form.readFromObject(object);
-        form.readFromRequest(context.getRequest());
-        if (form.validate()) {
-            form.writeToObject(object);
+        pageConfigurationForm.readFromObject(object);
+        pageConfigurationForm.readFromRequest(context.getRequest());
+        if (pageConfigurationForm.validate()) {
+            pageConfigurationForm.writeToObject(object);
             application.updateObject(baseTable.getQualifiedName(), object);
             try {
                 application.commit(baseTable.getDatabaseName());
@@ -448,13 +447,13 @@ public class CrudAction extends PortletAction {
 
     public Resolution bulkUpdate() {
         setupForm(Mode.BULK_EDIT);
-        form.readFromRequest(context.getRequest());
-        if (form.validate()) {
+        pageConfigurationForm.readFromRequest(context.getRequest());
+        if (pageConfigurationForm.validate()) {
             for (String current : selection) {
                 loadObject(current);
-                form.writeToObject(object);
+                pageConfigurationForm.writeToObject(object);
             }
-            form.writeToObject(object);
+            pageConfigurationForm.writeToObject(object);
             application.updateObject(baseTable.getQualifiedName(), object);
             try {
                 application.commit(baseTable.getDatabaseName());
@@ -714,7 +713,7 @@ public class CrudAction extends PortletAction {
             formBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
 
-        form = formBuilder
+        pageConfigurationForm = formBuilder
                 .configPrefix(prefix)
                 .configMode(mode)
                 .build();
@@ -862,7 +861,7 @@ public class CrudAction extends PortletAction {
 
         setupTableForm(Mode.VIEW);
         setupForm(Mode.VIEW);
-        form.readFromObject(object);
+        pageConfigurationForm.readFromObject(object);
 
         writeFileReadExcel(workbook);
     }
@@ -877,7 +876,7 @@ public class CrudAction extends PortletAction {
         addHeaderToSheet(sheet);
 
         int i = 1;
-        for (FieldSet fieldset : form) {
+        for (FieldSet fieldset : pageConfigurationForm) {
             int j = 0;
             for (Field field : fieldset) {
                 addFieldToCell(sheet, i, j, field);
@@ -1103,7 +1102,7 @@ public class CrudAction extends PortletAction {
 
         setupTableForm(Mode.VIEW);
         setupForm(Mode.VIEW);
-        form.readFromObject(object);
+        pageConfigurationForm.readFromObject(object);
 
 
         XmlBuffer xb = new XmlBuffer();
@@ -1113,7 +1112,7 @@ public class CrudAction extends PortletAction {
         xb.write(crud.getReadTitle());
         xb.closeElement("table");
 
-        for (FieldSet fieldset : form) {
+        for (FieldSet fieldset : pageConfigurationForm) {
             xb.openElement("tableData");
             xb.openElement("rows");
 
@@ -1236,27 +1235,21 @@ public class CrudAction extends PortletAction {
     // Configuration
     //**************************************************************************
 
-    public static final String[][] CRUD_PAGE_CONFIGURATION_FIELDS =
-            {{"title", "description"}};
     public static final String[][] CRUD_CONFIGURATION_FIELDS =
             {{"name", "table", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable"}};
 
     public Form crudConfigurationForm;
 
     public Resolution configure() {
-        prepareConfigurationForms();
-        form.readFromObject(crudPage);
-        title = crudPage.getTitle();
+        configurePage(crudPage);
         crudConfigurationForm.readFromObject(crudPage.getCrud());
 
         return new ForwardResolution("/layouts/crud/configure.jsp");
     }
 
-    private void prepareConfigurationForms() {
-        form = new FormBuilder(CrudPage.class)
-                .configFields(CRUD_PAGE_CONFIGURATION_FIELDS)
-                .configFieldSetNames("Crud page")
-                .build();
+    @Override
+    protected void prepareConfigurationForms() {
+        super.prepareConfigurationForms();
 
         SelectionProvider tableSelectionProvider =
                 DefaultSelectionProvider.create("table",
@@ -1274,19 +1267,15 @@ public class CrudAction extends PortletAction {
     public Resolution updateConfiguration() {
         synchronized (application) {
             prepareConfigurationForms();
-            form.readFromObject(crudPage);
             if(crudPage.getCrud() == null) {
                 crudPage.setCrud(new Crud());
             }
             crudConfigurationForm.readFromObject(crudPage.getCrud());
-            form.readFromRequest(context.getRequest());
             crudConfigurationForm.readFromRequest(context.getRequest());
 
-            boolean valid = form.validate();
-            valid = crudConfigurationForm.validate() && valid;
-            valid = valid && getTitleFromRequest();
+            boolean valid = crudConfigurationForm.validate();
+            valid = valid && updatePageConfiguration(crudPage);
             if (valid) {
-                form.writeToObject(crudPage);
                 crudConfigurationForm.writeToObject(crudPage.getCrud());
                 crudPage.setTitle(title);
                 saveModel();
@@ -1298,10 +1287,8 @@ public class CrudAction extends PortletAction {
         }
     }
 
-
-
     public boolean isRequiredFieldsPresent() {
-        return form.isRequiredFieldsPresent();
+        return pageConfigurationForm.isRequiredFieldsPresent();
     }
 
     public CrudPageInstance getPageInstance() {
@@ -1412,14 +1399,6 @@ public class CrudAction extends PortletAction {
         this.tableForm = tableForm;
     }
 
-    public Form getForm() {
-        return form;
-    }
-
-    public void setForm(Form form) {
-        this.form = form;
-    }
-
     public List getObjects() {
         return objects;
     }
@@ -1437,7 +1416,7 @@ public class CrudAction extends PortletAction {
     }
 
     public boolean isMultipartRequest() {
-        return form != null && form.isMultipartRequest();
+        return pageConfigurationForm != null && pageConfigurationForm.isMultipartRequest();
     }
 
     public String getMode() {

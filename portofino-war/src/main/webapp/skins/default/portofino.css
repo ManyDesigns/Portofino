@@ -165,8 +165,13 @@ Portlet
 .portlet {}
 
 .portletHeader {
-    border-bottom: solid 3px #EEEEFF;
     margin-bottom: 12px;
+    float: left;
+    width: 100%;
+}
+
+.portletHeaderSeparator {
+    border-bottom: solid 3px #EEEEFF;
     padding-bottom: 3px;
     float: left;
     width: 100%;

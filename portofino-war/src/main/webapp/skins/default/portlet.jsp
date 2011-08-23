@@ -22,6 +22,7 @@
                             <stripes:layout-component name="portletHeaderButtons"/>
                         </div>
                     </div>
+                    <div class="portletHeaderSeparator"></div>
                 </stripes:layout-component>
             </div>
             <div class="portletBody">

@@ -10,6 +10,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.actions.forms.EditPage;
 import com.manydesigns.portofino.actions.forms.NewPage;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.di.Inject;
@@ -42,6 +43,10 @@ import java.util.*;
 
 public class PortletAction extends AbstractActionBean {
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
+    public static final String[][] PAGE_CONFIGURATION_FIELDS =
+            {{"description", "embedInParent"}};
+    public static final String[][] TOP_LEVEL_PAGE_CONFIGURATION_FIELDS =
+            {{"description"}};
 
     //--------------------------------------------------------------------------
     // Properties
@@ -83,6 +88,7 @@ public class PortletAction extends AbstractActionBean {
     public static final Logger logger =
             LoggerFactory.getLogger(PortletAction.class);
     public String title;
+    public Form pageConfigurationForm;
 
     public boolean isEmbedded() {
         return getContext().getRequest().getAttribute(
@@ -343,6 +349,14 @@ public class PortletAction extends AbstractActionBean {
         this.resultSetNavigation = resultSetNavigation;
     }
 
+    public Form getPageConfigurationForm() {
+        return pageConfigurationForm;
+    }
+
+    public void setPageConfigurationForm(Form pageConfigurationForm) {
+        this.pageConfigurationForm = pageConfigurationForm;
+    }
+
     protected void setupPortlets(PageInstance pageInstance, String myself) {
         PortletInstance myPortletInstance = new PortletInstance("p", pageInstance.getLayoutOrder(), myself);
         String layoutContainer = pageInstance.getLayoutContainer();
@@ -411,6 +425,50 @@ public class PortletAction extends AbstractActionBean {
 
     public void setCancelReturnUrl(String cancelReturnUrl) {
         this.cancelReturnUrl = cancelReturnUrl;
+    }
+
+    //--------------------------------------------------------------------------
+    // Page configuration
+    //--------------------------------------------------------------------------
+
+    protected void prepareConfigurationForms() {
+        boolean isTopLevelPage = pageInstance.getPage().getParent() instanceof RootPage;
+        pageConfigurationForm = new FormBuilder(EditPage.class)
+                .configFields(isTopLevelPage ? TOP_LEVEL_PAGE_CONFIGURATION_FIELDS : PAGE_CONFIGURATION_FIELDS)
+                .configFieldSetNames("Page")
+                .build();
+    }
+
+    protected void configurePage(Page page) {
+        prepareConfigurationForms();
+        EditPage edit = new EditPage();
+        edit.setDescription(page.getDescription());
+        edit.setEmbedInParent(page.getLayoutContainerInParent() != null);
+        pageConfigurationForm.readFromObject(edit);
+        title = page.getTitle();
+    }
+
+    protected boolean updatePageConfiguration(Page page) {
+        boolean valid = getTitleFromRequest();
+        if(!valid) {
+            return false;
+        }
+        EditPage edit = new EditPage();
+        pageConfigurationForm.readFromRequest(context.getRequest());
+        if(pageConfigurationForm.validate()) {
+            pageConfigurationForm.writeToObject(edit);
+            page.setTitle(title);
+            page.setDescription(edit.getDescription());
+            if(edit.isEmbedInParent()) {
+                page.setLayoutContainerInParent(DEFAULT_LAYOUT_CONTAINER);
+            } else {
+                page.setLayoutContainerInParent(null);
+                page.setLayoutOrderInParent(null);
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     //--------------------------------------------------------------------------

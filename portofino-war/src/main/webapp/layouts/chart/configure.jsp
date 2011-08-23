@@ -14,11 +14,10 @@
             </div>
         </div>
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        Configure chart: <stripes:text name="title" value="${actionBean.title}"/>
+    <stripes:layout-component name="portletHeader">
+        <%@include file="../portlet-common-configuration.jsp" %>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        Fields marked with a "*" are required.
         <mde:write name="actionBean" property="form"/>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
