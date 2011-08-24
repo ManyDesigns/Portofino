@@ -145,6 +145,7 @@ public class CrudProperty implements ModelObject {
         this.name = name;
     }
 
+    @XmlAttribute(required = false)
     public String getLabel() {
         return label;
     }
@@ -153,6 +154,7 @@ public class CrudProperty implements ModelObject {
         this.label = label;
     }
 
+    @XmlAttribute(required = true)
     public boolean isSearchable() {
         return searchable;
     }
@@ -161,6 +163,7 @@ public class CrudProperty implements ModelObject {
         this.searchable = searchable;
     }
 
+    @XmlAttribute(required = true)
     public boolean isInSummary() {
         return inSummary;
     }
@@ -169,6 +172,7 @@ public class CrudProperty implements ModelObject {
         this.inSummary = inSummary;
     }
 
+    @XmlAttribute(required = true)
     public String getAccess() {
         return access;
     }
