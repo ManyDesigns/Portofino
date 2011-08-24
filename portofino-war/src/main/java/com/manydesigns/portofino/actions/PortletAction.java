@@ -471,7 +471,9 @@ public class PortletAction extends AbstractActionBean {
         page.setTitle(title);
         page.setDescription(edit.getDescription());
         if(edit.isEmbedInParent()) {
-            page.setLayoutContainerInParent(DEFAULT_LAYOUT_CONTAINER);
+            if(page.getLayoutContainerInParent() == null) {
+                page.setLayoutContainerInParent(DEFAULT_LAYOUT_CONTAINER);
+            }
         } else {
             page.setLayoutContainerInParent(null);
             page.setLayoutOrderInParent(null);

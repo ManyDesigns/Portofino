@@ -128,6 +128,7 @@ public class CrudAction extends PortletAction {
 
     public SearchForm searchForm;
     public TableForm tableForm;
+    public Form form;
 
     //--------------------------------------------------------------------------
     // Data objects
@@ -315,7 +316,7 @@ public class CrudAction extends PortletAction {
             //throw new Error("Object not found");
         }
         setupForm(Mode.VIEW);
-        pageConfigurationForm.readFromObject(object);
+        form.readFromObject(object);
         refreshBlobDownloadHref();
 
         // refresh crud buttons (enabled/disabled)
@@ -336,7 +337,7 @@ public class CrudAction extends PortletAction {
     }
 
     protected void refreshBlobDownloadHref() {
-        for (FieldSet fieldSet : pageConfigurationForm) {
+        for (FieldSet fieldSet : form) {
             for (Field field : fieldSet) {
                 if (field instanceof FileBlobField) {
                     FileBlobField fileBlobField = (FileBlobField) field;
@@ -371,10 +372,10 @@ public class CrudAction extends PortletAction {
     public Resolution save() {
         setupForm(Mode.CREATE);
 
-        pageConfigurationForm.readFromRequest(context.getRequest());
-        if (pageConfigurationForm.validate()) {
+        form.readFromRequest(context.getRequest());
+        if (form.validate()) {
             object = classAccessor.newInstance();
-            pageConfigurationForm.writeToObject(object);
+            form.writeToObject(object);
             application.saveObject(baseTable.getQualifiedName(), object);
             try {
                 application.commit(baseTable.getDatabaseName());
@@ -399,16 +400,16 @@ public class CrudAction extends PortletAction {
 
     public Resolution edit() {
         setupForm(Mode.EDIT);
-        pageConfigurationForm.readFromObject(object);
+        form.readFromObject(object);
         return new ForwardResolution("/layouts/crud/edit.jsp");
     }
 
     public Resolution update() {
         setupForm(Mode.EDIT);
-        pageConfigurationForm.readFromObject(object);
-        pageConfigurationForm.readFromRequest(context.getRequest());
-        if (pageConfigurationForm.validate()) {
-            pageConfigurationForm.writeToObject(object);
+        form.readFromObject(object);
+        form.readFromRequest(context.getRequest());
+        if (form.validate()) {
+            form.writeToObject(object);
             application.updateObject(baseTable.getQualifiedName(), object);
             try {
                 application.commit(baseTable.getDatabaseName());
@@ -452,13 +453,13 @@ public class CrudAction extends PortletAction {
 
     public Resolution bulkUpdate() {
         setupForm(Mode.BULK_EDIT);
-        pageConfigurationForm.readFromRequest(context.getRequest());
-        if (pageConfigurationForm.validate()) {
+        form.readFromRequest(context.getRequest());
+        if (form.validate()) {
             for (String current : selection) {
                 loadObject(current);
-                pageConfigurationForm.writeToObject(object);
+                form.writeToObject(object);
             }
-            pageConfigurationForm.writeToObject(object);
+            form.writeToObject(object);
             application.updateObject(baseTable.getQualifiedName(), object);
             try {
                 application.commit(baseTable.getDatabaseName());
@@ -718,7 +719,7 @@ public class CrudAction extends PortletAction {
             formBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
 
-        pageConfigurationForm = formBuilder
+        form = formBuilder
                 .configPrefix(prefix)
                 .configMode(mode)
                 .build();
@@ -866,7 +867,7 @@ public class CrudAction extends PortletAction {
 
         setupTableForm(Mode.VIEW);
         setupForm(Mode.VIEW);
-        pageConfigurationForm.readFromObject(object);
+        form.readFromObject(object);
 
         writeFileReadExcel(workbook);
     }
@@ -881,7 +882,7 @@ public class CrudAction extends PortletAction {
         addHeaderToSheet(sheet);
 
         int i = 1;
-        for (FieldSet fieldset : pageConfigurationForm) {
+        for (FieldSet fieldset : form) {
             int j = 0;
             for (Field field : fieldset) {
                 addFieldToCell(sheet, i, j, field);
@@ -1107,7 +1108,7 @@ public class CrudAction extends PortletAction {
 
         setupTableForm(Mode.VIEW);
         setupForm(Mode.VIEW);
-        pageConfigurationForm.readFromObject(object);
+        form.readFromObject(object);
 
 
         XmlBuffer xb = new XmlBuffer();
@@ -1117,7 +1118,7 @@ public class CrudAction extends PortletAction {
         xb.write(crud.getReadTitle());
         xb.closeElement("table");
 
-        for (FieldSet fieldset : pageConfigurationForm) {
+        for (FieldSet fieldset : form) {
             xb.openElement("tableData");
             xb.openElement("rows");
 
@@ -1356,7 +1357,7 @@ public class CrudAction extends PortletAction {
     }
 
     public boolean isRequiredFieldsPresent() {
-        return pageConfigurationForm.isRequiredFieldsPresent();
+        return form.isRequiredFieldsPresent();
     }
 
     public CrudPageInstance getPageInstance() {
@@ -1484,7 +1485,7 @@ public class CrudAction extends PortletAction {
     }
 
     public boolean isMultipartRequest() {
-        return pageConfigurationForm != null && pageConfigurationForm.isMultipartRequest();
+        return form != null && form.isMultipartRequest();
     }
 
     public String getMode() {
@@ -1501,5 +1502,13 @@ public class CrudAction extends PortletAction {
 
     public TableForm getPropertiesTableForm() {
         return propertiesTableForm;
+    }
+
+    public Form getForm() {
+        return form;
+    }
+
+    public void setForm(Form form) {
+        this.form = form;
     }
 }
