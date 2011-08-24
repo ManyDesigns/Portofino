@@ -29,7 +29,8 @@
 
 package com.manydesigns.elements.annotations.impl;
 
-import com.manydesigns.elements.annotations.Access;
+import com.manydesigns.elements.annotations.Insertable;
+import com.manydesigns.elements.annotations.Required;
 
 import java.lang.annotation.Annotation;
 
@@ -40,21 +41,21 @@ import java.lang.annotation.Annotation;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @SuppressWarnings({"ClassExplicitlyAnnotation"})
-public class AccessImpl implements Access {
+public class InsertableImpl implements Insertable {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    private AccessType value;
+    private boolean value;
 
-    public AccessImpl(AccessType value) {
+    public InsertableImpl(boolean value) {
         this.value = value;
     }
 
-    public AccessType value() {
+    public boolean value() {
         return value;
     }
 
     public Class<? extends Annotation> annotationType() {
-        return Access.class;
+        return Insertable.class;
     }
 }

@@ -29,14 +29,8 @@
 
 package com.manydesigns.portofino.reflection;
 
-import com.manydesigns.elements.annotations.Access;
-import com.manydesigns.elements.annotations.InSummary;
-import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.Searchable;
-import com.manydesigns.elements.annotations.impl.AccessImpl;
-import com.manydesigns.elements.annotations.impl.InSummaryImpl;
-import com.manydesigns.elements.annotations.impl.LabelImpl;
-import com.manydesigns.elements.annotations.impl.SearchableImpl;
+import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.annotations.impl.*;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import org.apache.commons.lang.StringUtils;
@@ -89,8 +83,26 @@ public class CrudPropertyAccessor
                     new SearchableImpl(crudProperty.isSearchable()));
             annotations.put(InSummary.class,
                     new InSummaryImpl(crudProperty.isInSummary()));
-            annotations.put(Access.class,
-                    new AccessImpl(crudProperty.getActualAccess()));
+            annotations.put(Enabled.class,
+                    new EnabledImpl(crudProperty.isEnabled()));
+
+            //If the nested accessor is not insertable, this one won't be as well
+            Insertable insertableAnn = nestedAccessor.getAnnotation(Insertable.class);
+            if(insertableAnn != null && !insertableAnn.value()) {
+                annotations.put(Insertable.class, new InsertableImpl(false));
+            } else {
+                annotations.put(Insertable.class,
+                        new InsertableImpl(crudProperty.isInsertable()));
+            }
+
+            //If the nested accessor is not updatable, this one won't be as well
+            Updatable updatableAnn = nestedAccessor.getAnnotation(Updatable.class);
+            if(updatableAnn != null && !updatableAnn.value()) {
+                annotations.put(Updatable.class, new UpdatableImpl(false));
+            } else {
+                annotations.put(Updatable.class,
+                        new UpdatableImpl(crudProperty.isUpdatable()));
+            }
         }
     }
 

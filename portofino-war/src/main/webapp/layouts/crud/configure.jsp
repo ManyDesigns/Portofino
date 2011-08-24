@@ -19,8 +19,33 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="crudConfigurationForm"/>
-        <div class="horizontalSeparator"></div>
-        <mde:write name="actionBean" property="propertiesTableForm"/>
+        <fieldset id="crudPropertiesFieldset" class="mde-form-fieldset" style="padding-top: 1em; margin-top: 1em;">
+            <legend>Properties</legend>
+            <c:if test="${not empty actionBean.propertiesTableForm}">
+                <mde:write name="actionBean" property="propertiesTableForm"/>
+            </c:if>
+            <c:if test="${empty actionBean.propertiesTableForm}">
+                You must select a table first.
+            </c:if>
+        </fieldset>
+        <c:if test="${not empty actionBean.propertiesTableForm}">
+            <script type="text/javascript">
+                var inputs = $("#crudPropertiesFieldset tr").find("td:first input[type=checkbox]");
+                inputs.each(function(i, obj) {
+                    obj = $(obj);
+                    var rowInputs = obj.parent().siblings().find("input");
+                    function toggleRow() {
+                        if(!obj.is(':checked')) {
+                            rowInputs.attr('disabled', 'disabled');
+                        } else {
+                            rowInputs.removeAttr('disabled');
+                        }
+                    }
+                    obj.click(toggleRow);
+                    toggleRow();
+                });
+            </script>
+        </c:if>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>

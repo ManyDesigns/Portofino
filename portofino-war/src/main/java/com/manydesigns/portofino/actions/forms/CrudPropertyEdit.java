@@ -29,9 +29,8 @@
 
 package com.manydesigns.portofino.actions.forms;
 
-import com.manydesigns.elements.annotations.Access;
-import com.manydesigns.elements.annotations.Immutable;
-import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.Updatable;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,13 +42,16 @@ public class CrudPropertyEdit {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    @Immutable
+    @Label("")
+    public boolean enabled;
+
+    @Updatable(false)
     public String name;
 
     public String label;
-    public boolean searchable;
+    public boolean insertable;
+    public boolean updatable;
     public boolean inSummary;
-    
-    @Required
-    public Access.AccessType access;
+    public boolean searchable;
+
 }

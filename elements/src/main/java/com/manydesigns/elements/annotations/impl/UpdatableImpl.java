@@ -27,12 +27,12 @@
  *
  */
 
-package com.manydesigns.elements.annotations;
+package com.manydesigns.elements.annotations.impl;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.manydesigns.elements.annotations.Insertable;
+import com.manydesigns.elements.annotations.Updatable;
+
+import java.lang.annotation.Annotation;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -40,17 +40,22 @@ import java.lang.annotation.Target;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
-public @interface Access {
+@SuppressWarnings({"ClassExplicitlyAnnotation"})
+public class UpdatableImpl implements Updatable {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public enum AccessType {
-        NONE,
-        R,
-        RW
+    private boolean value;
+
+    public UpdatableImpl(boolean value) {
+        this.value = value;
     }
 
-    AccessType value();
+    public boolean value() {
+        return value;
+    }
+
+    public Class<? extends Annotation> annotationType() {
+        return Updatable.class;
+    }
 }

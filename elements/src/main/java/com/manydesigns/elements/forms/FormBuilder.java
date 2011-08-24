@@ -30,7 +30,7 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.Access;
+import com.manydesigns.elements.annotations.Enabled;
 import com.manydesigns.elements.annotations.FieldSet;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
@@ -160,20 +160,12 @@ public class FormBuilder extends AbstractFormBuilder {
                 continue;
             }
 
-            // check if field is in detail
-            Access access = current.getAnnotation(Access.class);
-            if(mode == Mode.VIEW) {
-                if(access != null && access.value() == Access.AccessType.NONE) {
-                    logger.debug("Skipping non-readable field: {}",
-                            current.getName());
-                    continue;
-                }
-            } else if(mode == Mode.EDIT || mode == Mode.BULK_EDIT || mode == Mode.CREATE) {
-                if(access != null && access.value() != Access.AccessType.RW) {
-                    logger.debug("Skipping non-writable field: {}",
-                            current.getName());
-                    continue;
-                }
+            // check if field is enabled
+            Enabled enabled = current.getAnnotation(Enabled.class);
+            if(enabled != null && !enabled.value()) {
+                logger.debug("Skipping non-enabled field: {}",
+                        current.getName());
+                continue;
             }
 
             String groupName = null;

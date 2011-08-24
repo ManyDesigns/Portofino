@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.Access;
 import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.fields.*;
@@ -1246,18 +1245,19 @@ public class CrudAction extends PortletAction {
 
     public Form crudConfigurationForm;
     public TableForm propertiesTableForm;
+    public CrudPropertyEdit[] edits;
 
     public Resolution configure() {
         setupEdits();
         setupPageConfiguration();
 
         crudConfigurationForm.readFromObject(crudPage.getCrud());
-        propertiesTableForm.readFromObject(edits);
+        if(edits != null) {
+            propertiesTableForm.readFromObject(edits);
+        }
 
         return new ForwardResolution("/layouts/crud/configure.jsp");
     }
-
-    CrudPropertyEdit[] edits;
 
     @Override
     protected void prepareConfigurationForms() {
@@ -1275,13 +1275,18 @@ public class CrudAction extends PortletAction {
                 .configSelectionProvider(tableSelectionProvider, "table")
                 .build();
 
-        TableFormBuilder tableFormBuilder =
-                new TableFormBuilder(CrudPropertyEdit.class)
-                .configNRows(edits.length);
-        propertiesTableForm = tableFormBuilder.build();
+        if(edits != null) {
+            TableFormBuilder tableFormBuilder =
+                    new TableFormBuilder(CrudPropertyEdit.class)
+                        .configNRows(edits.length);
+            propertiesTableForm = tableFormBuilder.build();
+        }
     }
 
     private void setupEdits() {
+        if(classAccessor == null) {
+            return;
+        }
         PropertyAccessor[] propertyAccessors = classAccessor.getProperties();
         edits = new CrudPropertyEdit[propertyAccessors.length];
         for (int i = 0; i < propertyAccessors.length; i++) {
@@ -1297,12 +1302,16 @@ public class CrudAction extends PortletAction {
                 edit.searchable = false;
                 edit.inSummary = ArrayUtils.contains(
                         classAccessor.getKeyProperties(), propertyAccessor);
-                edit.access = Access.AccessType.RW;
+                edit.enabled = true;
+                edit.updatable = true;
+                edit.insertable = true;
             } else {
                 edit.label = crudProperty.getLabel();
                 edit.searchable = crudProperty.isSearchable();
                 edit.inSummary = crudProperty.isInSummary();
-                edit.access = crudProperty.getActualAccess();
+                edit.enabled = crudProperty.isEnabled();
+                edit.insertable = crudProperty.isInsertable();
+                edit.updatable = crudProperty.isUpdatable();
             }
             edits[i] = edit;
         }
@@ -1318,32 +1327,41 @@ public class CrudAction extends PortletAction {
             }
 
             crudConfigurationForm.readFromObject(crudPage.getCrud());
-            propertiesTableForm.readFromObject(edits);
 
             pageConfigurationForm.readFromRequest(context.getRequest());
             crudConfigurationForm.readFromRequest(context.getRequest());
-            propertiesTableForm.readFromRequest(context.getRequest());
 
             boolean valid = crudConfigurationForm.validate();
             valid = validatePageConfiguration() && valid;
-            valid = propertiesTableForm.validate() && valid;
+
+            if(propertiesTableForm != null) {
+                propertiesTableForm.readFromObject(edits);
+                propertiesTableForm.readFromRequest(context.getRequest());
+                valid = propertiesTableForm.validate() && valid;
+            }
+
             if (valid) {
                 updatePageConfiguration();
                 crudConfigurationForm.writeToObject(crudPage.getCrud());
-                propertiesTableForm.writeToObject(edits);
 
-                crud.getProperties().clear();
-                for (CrudPropertyEdit edit : edits) {
-                    CrudProperty crudProperty = new CrudProperty();
+                if(propertiesTableForm != null) {
+                    propertiesTableForm.writeToObject(edits);
 
-                    crudProperty.setName(edit.name);
-                    crudProperty.setLabel(edit.label);
-                    crudProperty.setInSummary(edit.inSummary);
-                    crudProperty.setSearchable(edit.searchable);
-                    crudProperty.setAccess(edit.access.name());
+                    crud.getProperties().clear();
+                    for (CrudPropertyEdit edit : edits) {
+                        CrudProperty crudProperty = new CrudProperty();
 
-                    crudProperty.setCrud(crud);
-                    crud.getProperties().add(crudProperty);
+                        crudProperty.setName(edit.name);
+                        crudProperty.setLabel(edit.label);
+                        crudProperty.setInSummary(edit.inSummary);
+                        crudProperty.setSearchable(edit.searchable);
+                        crudProperty.setEnabled(edit.enabled);
+                        crudProperty.setInsertable(edit.insertable);
+                        crudProperty.setUpdatable(edit.updatable);
+
+                        crudProperty.setCrud(crud);
+                        crud.getProperties().add(crudProperty);
+                    }
                 }
 
                 saveModel();

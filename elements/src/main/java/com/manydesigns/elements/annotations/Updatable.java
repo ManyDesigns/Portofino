@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
 */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
-public @interface Immutable {
+public @interface Updatable {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 

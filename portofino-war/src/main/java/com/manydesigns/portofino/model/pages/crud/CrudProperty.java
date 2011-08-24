@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.model.pages.crud;
 
-import com.manydesigns.elements.annotations.Access;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
@@ -65,15 +64,10 @@ public class CrudProperty implements ModelObject {
     protected String label;
     protected boolean searchable;
     protected boolean inSummary;
-    protected String access;
+    protected boolean enabled;
+    protected boolean insertable;
+    protected boolean updatable;
     protected final List<Annotation> annotations;
-
-
-    //**************************************************************************
-    // Actual fields
-    //**************************************************************************
-
-    protected Access.AccessType actualAccess;
 
     //**************************************************************************
     // Logging
@@ -99,7 +93,6 @@ public class CrudProperty implements ModelObject {
     }
 
     public void reset() {
-        actualAccess = null;
         for (Annotation annotation : annotations) {
             annotation.reset();
         }
@@ -110,11 +103,6 @@ public class CrudProperty implements ModelObject {
         assert name != null;
         for (Annotation annotation : annotations) {
             annotation.init(model);
-        }
-        try {
-            actualAccess = Access.AccessType.valueOf(access);
-        } catch (Exception e) {
-            logger.warn("Cannot parse access: {}", access);
         }
     }
 
@@ -173,12 +161,30 @@ public class CrudProperty implements ModelObject {
     }
 
     @XmlAttribute(required = true)
-    public String getAccess() {
-        return access;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setAccess(String access) {
-        this.access = access;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    @XmlAttribute(required = true)
+    public boolean isInsertable() {
+        return insertable;
+    }
+
+    public void setInsertable(boolean insertable) {
+        this.insertable = insertable;
+    }
+
+    @XmlAttribute(required = true)
+    public boolean isUpdatable() {
+        return updatable;
+    }
+
+    public void setUpdatable(boolean updatable) {
+        this.updatable = updatable;
     }
 
     @XmlElementWrapper(name="annotations")
@@ -187,7 +193,4 @@ public class CrudProperty implements ModelObject {
         return annotations;
     }
 
-    public Access.AccessType getActualAccess() {
-        return actualAccess;
-    }
 }

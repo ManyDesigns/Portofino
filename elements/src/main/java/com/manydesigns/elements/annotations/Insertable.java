@@ -27,11 +27,12 @@
  *
  */
 
-package com.manydesigns.elements.annotations.impl;
+package com.manydesigns.elements.annotations;
 
-import com.manydesigns.elements.annotations.Immutable;
-
-import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -39,22 +40,11 @@ import java.lang.annotation.Annotation;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@SuppressWarnings({"ClassExplicitlyAnnotation"})
-public class ImmutableImpl implements Immutable {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface Insertable {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    private boolean value;
-
-    public ImmutableImpl(boolean value) {
-        this.value = value;
-    }
-
-    public boolean value() {
-        return value;
-    }
-
-    public Class<? extends Annotation> annotationType() {
-        return Immutable.class;
-    }
+    boolean value() default true;
 }
