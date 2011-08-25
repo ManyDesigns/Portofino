@@ -32,12 +32,21 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.context.ServerInfo;
+import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.model.pages.JspPage;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletContext;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -56,6 +65,9 @@ public class JspAction extends PortletAction {
 
     public static final Logger logger =
             LoggerFactory.getLogger(JspAction.class);
+
+    @Inject(ApplicationAttributes.SERVER_INFO)
+    public ServerInfo serverInfo;
 
     @Before
     public void prepare() {
@@ -86,8 +98,8 @@ public class JspAction extends PortletAction {
         synchronized (application) {
             setupPageConfiguration();
             pageConfigurationForm.readFromRequest(context.getRequest());
-            boolean valid = validatePageConfiguration();
             form.readFromRequest(context.getRequest());
+            boolean valid = validatePageConfiguration();
             valid = form.validate() && valid;
             if(valid) {
                 updatePageConfiguration();
@@ -108,12 +120,42 @@ public class JspAction extends PortletAction {
 
         form = new FormBuilder(JspPage.class)
                 .configFields("jsp")
+                .configSelectionProvider(jspSelectionProvider, "jsp")
                 .build();
         form.readFromObject(jspPage);
     }
 
     private SelectionProvider createJspSelectionProvider() {
-        return null;  //To change body of created methods use File | Settings | File Templates.
+        File webAppDirFile = new File(serverInfo.getRealPath());
+        List<String> values = new ArrayList<String>();
+        List<String> labels = new ArrayList<String>();
+        File[] files = webAppDirFile.listFiles();
+        visitJspFiles(webAppDirFile, files, values, labels);
+        String[] valuesArr = values.toArray(new String[values.size()]);
+        String[] labelsArr = labels.toArray(new String[labels.size()]);
+        return DefaultSelectionProvider.create("jsp", valuesArr, labelsArr);
+    }
+
+    private void visitJspFiles(File root, File[] files, List<String> values, List<String> labels) {
+        for(File file : files) {
+            if(file.isFile() && file.getName().endsWith(".jsp")) {
+                String path = getRelativeFilePath(file, root);
+                values.add(path);
+                labels.add(path);
+            } else if(file.isDirectory()) {
+                visitJspFiles(root, file.listFiles(), values, labels);
+            }
+        }
+    }
+
+    private String getRelativeFilePath(File file, File root) {
+        String path = "";
+        File parent = file;
+        do {
+            path = "/" + parent.getName() + path;
+            parent = parent.getParentFile();
+        } while(parent != null && !parent.equals(root));
+        return path;
     }
 
     public JspPage getJspPage() {
@@ -129,6 +171,7 @@ public class JspAction extends PortletAction {
         if(!jsp.startsWith("/")) {
             jsp = "/" + jsp;
         }
+        ServletContext c = context.getServletContext();
         return jsp;
     }
 

@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.model.pages;
 
+import com.manydesigns.elements.annotations.Required;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
