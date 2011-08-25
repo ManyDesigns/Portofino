@@ -107,7 +107,8 @@ public class Dispatcher {
                 rewrittenPath = "/index.action";
             } else if (page instanceof CrudPage) {
                 rewrittenPath = "/crud.action";
-//                rewrittenPath = "/Crud/" + originalPath + ".action";
+            } else if (page instanceof JspPage) {
+                rewrittenPath = "/jsp.action";
             } else {
                 throw new Error("Unrecognized page type");
             }

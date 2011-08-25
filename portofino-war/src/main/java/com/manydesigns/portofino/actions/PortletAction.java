@@ -47,6 +47,8 @@ public class PortletAction extends AbstractActionBean {
             {{"description", "embedInParent"}};
     public static final String[][] TOP_LEVEL_PAGE_CONFIGURATION_FIELDS =
             {{"description"}};
+    public static final String PAGE_PORTLET_NOT_CONFIGURED = "/layouts/portlet-not-configured.jsp";
+    public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
     //--------------------------------------------------------------------------
     // Properties
@@ -505,6 +507,15 @@ public class PortletAction extends AbstractActionBean {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    protected Resolution portletError(Throwable e) {
+        context.getRequest().setAttribute(PORTOFINO_PORTLET_EXCEPTION, e);
+        if(isEmbedded()) {
+            return new ForwardResolution("/layouts/portlet-error.jsp");
+        } else {
+            return forwardToPortletPage("/layouts/portlet-error.jsp");
+        }
     }
 
     public static enum InsertPosition {

@@ -218,7 +218,8 @@ public abstract class Page implements ModelObject {
           @XmlElement(name="customPage",type=CustomPage.class),
           @XmlElement(name="customFolderPage",type=CustomFolderPage.class),
           @XmlElement(name="crudPage",type=CrudPage.class),
-          @XmlElement(name="portletPage",type=ChartPage.class)
+          @XmlElement(name="chartPage",type=ChartPage.class),
+          @XmlElement(name="jspPage",type=JspPage.class)
     })
     public List<Page> getChildPages() {
         return childPages;

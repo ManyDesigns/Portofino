@@ -262,7 +262,7 @@ public class CrudAction extends PortletAction {
 
         if (classAccessor == null) {
             logger.debug("Crud not correctly configured");
-            return forwardToPortletPage("/layouts/portlet-not-configured.jsp");
+            return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
         }
 
         try {
@@ -273,14 +273,14 @@ public class CrudAction extends PortletAction {
             return forwardToPortletPage("/layouts/crud/search.jsp");
         } catch(Exception e) {
             logger.debug("Crud not correctly configured", e);
-            return forwardToPortletPage("/layouts/portlet-not-configured.jsp");
+            return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
         }
     }
 
     public Resolution embeddedSearch() {
         if (classAccessor == null) {
             logger.debug("Crud not correctly configured");
-            return new ForwardResolution("/layouts/portlet-not-configured.jsp");
+            return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
         }
 
         try {
@@ -290,7 +290,7 @@ public class CrudAction extends PortletAction {
             return new ForwardResolution("/layouts/crud/embedded-search.jsp");
         } catch(Exception e) {
             logger.error("Crud not correctly configured", e);
-            return new ForwardResolution("/layouts/portlet-not-configured.jsp");
+            return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
         }
     }
 
