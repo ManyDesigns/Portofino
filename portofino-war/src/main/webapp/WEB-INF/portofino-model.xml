@@ -774,7 +774,7 @@ Struttura dell'XML:
                     <tables>
                         <table tableName="users" javaClass="com.manydesigns.portofino.system.model.users.User">
                             <columns>
-                                <column columnName="userid" columnType="bigserial" nullable="false" length="19" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Long" propertyName="userId"/>
+                                <column columnName="userid" columnType="char" nullable="false" length="25" scale="0" searchable="true" javaType="java.lang.String" propertyName="userId"/>
                                 <column columnName="emailaddress" columnType="varchar" nullable="false" length="100" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String" propertyName="email">
 
                                     <annotations>
@@ -789,7 +789,7 @@ Struttura dell'XML:
 
                                     </annotations>
                                 </column>
-                                <column columnName="state" columnType="int8" nullable="false" length="19" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Long"/>
+                                <column columnName="state" columnType="int4" nullable="false" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
                                 <column columnName="token" columnType="varchar" nullable="true" length="100" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
                                 <column columnName="remquestion" columnType="varchar" nullable="true" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String" propertyName="remQuestion"/>
                                 <column columnName="remans" columnType="varchar" nullable="true" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
@@ -799,9 +799,10 @@ Struttura dell'XML:
 
                                 <column columnName="lastname" columnType="varchar" nullable="true" length="50" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String" propertyName="lastName"/>
                                 <column columnName="jobtitle" columnType="varchar" nullable="true" length="50" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String" propertyName="jobTitle"/>
-                                <column columnName="defaultuser" columnType="bool" nullable="true" length="1" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Boolean" propertyName="defaultUser"/>
-                                <column columnName="extauth" columnType="bool" nullable="true" length="1" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Boolean" propertyName="extAuth"/>
-                                <column columnName="agreedtoterms" columnType="bool" nullable="true" length="1" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Boolean" propertyName="agreedToTerms"/>
+                                <!-- TODO usare CHAR(1) per i boolean -->
+                                <column columnName="defaultuser" columnType="numeric" nullable="true" length="1" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Boolean" propertyName="defaultUser"/>
+                                <column columnName="extauth" columnType="numeric" nullable="true" length="1" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Boolean" propertyName="extAuth"/>
+                                <column columnName="agreedtoterms" columnType="numeric" nullable="true" length="1" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Boolean" propertyName="agreedToTerms"/>
                                 <column columnName="creationdate" columnType="timestamp" nullable="true" length="29" scale="6" autoincrement="false" searchable="true" javaType="java.util.Date" propertyName="creationDate"/>
                                 <column columnName="deletiondate" columnType="timestamp" nullable="true" length="29" scale="6" autoincrement="false" searchable="true" javaType="java.util.Date" propertyName="deletionDate"/>
                                 <column columnName="modifieddate" columnType="timestamp" nullable="true" length="29" scale="6" autoincrement="false" searchable="true" javaType="java.util.Date" propertyName="modifiedDate"/>
@@ -833,7 +834,7 @@ Struttura dell'XML:
                         </table>
                         <table tableName="groups" javaClass="com.manydesigns.portofino.system.model.users.Group">
                             <columns>
-                                <column columnName="groupid" columnType="bigserial" nullable="false" length="19" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Long" propertyName="groupId"/>
+                                <column columnName="groupid" columnType="char" nullable="false" length="25" scale="0" searchable="true" javaType="java.lang.String" propertyName="groupId"/>
                                 <column columnName="name" columnType="varchar" nullable="true" length="50" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
 
                                 <column columnName="description" columnType="varchar" nullable="true" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String">
@@ -846,7 +847,7 @@ Struttura dell'XML:
                                     </annotations>
 
                                 </column>
-                                <column columnName="creatorid" columnType="int8" nullable="true" length="19" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Long" propertyName="creatorId"/>
+                                <column columnName="creatorid" columnType="char" nullable="true" length="25" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String" propertyName="creatorId"/>
                                 <column columnName="deletiondate" columnType="timestamp" nullable="true" length="29" scale="6" autoincrement="false" searchable="true" javaType="java.util.Date" propertyName="deletionDate"/>
                                 <column columnName="creationdate" columnType="timestamp" nullable="true" length="29" scale="6" autoincrement="false" searchable="true" javaType="java.util.Date" propertyName="creationDate"/>
                             </columns>
@@ -870,8 +871,8 @@ Struttura dell'XML:
                         </table>
                         <table tableName="users_groups" manyToMany="true" javaClass="com.manydesigns.portofino.system.model.users.UsersGroups">
                             <columns>
-                                <column columnName="userid" columnType="int8" nullable="false" length="19" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Long"/>
-                                <column columnName="groupid" columnType="int8" nullable="false" length="19" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Long"/>
+                                <column columnName="userid" columnType="char" nullable="false" length="25" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
+                                <column columnName="groupid" columnType="char" nullable="false" length="25" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
                                 <column columnName="deletiondate" columnType="timestamp" nullable="true" length="29" scale="6" autoincrement="false" searchable="true" javaType="java.util.Date" propertyName="deletionDate"/>
                                 <column columnName="creationdate" columnType="timestamp" nullable="false" length="29" scale="6" autoincrement="false" searchable="true" javaType="java.util.Date" propertyName="creationDate"/>
 

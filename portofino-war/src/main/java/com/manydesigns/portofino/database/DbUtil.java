@@ -31,6 +31,8 @@ package com.manydesigns.portofino.database;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.hibernate.Hibernate;
+import org.hibernate.type.NumericBooleanType;
+import org.hibernate.type.TypeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +53,8 @@ public class DbUtil {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
+
+    public static final NumericBooleanType NUMERIC_BOOLEAN = new NumericBooleanType();
 
     public static void closeResultSetAndStatement(ResultSet rs) {
         try {
@@ -119,7 +123,20 @@ public class DbUtil {
         }
     }
 
-    public static org.hibernate.type.Type getHibernateType(Class javaType, int jdbcType) {
+    public static String getHibernateTypeName(Class javaType, final int jdbcType) {
+        org.hibernate.type.Type type = getHibernateType(javaType, jdbcType);
+        if(type == null) {
+            return null;
+        }
+        org.hibernate.type.Type basicType = TypeFactory.basic(type.getName());
+        if(basicType != null) {
+            return basicType.getName();
+        } else {
+            return type.getClass().getName();
+        }
+    }
+
+    public static org.hibernate.type.Type getHibernateType(Class javaType, final int jdbcType) {
         if (javaType == Long.class) {
             return Hibernate.LONG;
         } else if (javaType == Short.class) {
@@ -148,7 +165,13 @@ public class DbUtil {
                     throw new Error("Unsupported date type: " + jdbcType);
             }
         } else if (javaType == Boolean.class) {
-            return Hibernate.BOOLEAN;
+            if(jdbcType == Types.BIT) {
+                return Hibernate.BOOLEAN;
+            } else if(jdbcType == Types.NUMERIC || jdbcType == Types.DECIMAL) {
+                return NUMERIC_BOOLEAN;
+            } else {
+                throw new Error("Unsupported boolean type: " + jdbcType);
+            }
         } else if (javaType == BigDecimal.class) {
             return Hibernate.BIG_DECIMAL;
         } else if (javaType == BigInteger.class) {

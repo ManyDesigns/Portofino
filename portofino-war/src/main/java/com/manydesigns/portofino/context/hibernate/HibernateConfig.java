@@ -56,7 +56,7 @@ import java.util.*;
 import java.util.List;
 
 import static com.manydesigns.portofino.database.DbUtil.getHibernateType;
-
+import static com.manydesigns.portofino.database.DbUtil.getHibernateTypeName;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -240,15 +240,14 @@ public class HibernateConfig {
 
         SimpleValue value = new SimpleValue();
         value.setTable(tab);
-        org.hibernate.type.Type hibernateType =
-                null;
+        String hibernateTypeName = null;
         if (type != null) {
 //            hibernateType = getHibernateType(type.getJdbcType());
-            hibernateType = getHibernateType(
+            hibernateTypeName = getHibernateTypeName(
                     column.getActualJavaType(), type.getJdbcType());
         }
-        if (hibernateType != null) {
-            value.setTypeName(hibernateType.getName());
+        if (hibernateTypeName != null) {
+            value.setTypeName(hibernateTypeName);
         }
         value.addColumn(col);
         clazz.addProperty(prop);
