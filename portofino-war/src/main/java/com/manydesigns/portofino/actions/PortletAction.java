@@ -616,8 +616,10 @@ public class PortletAction extends AbstractActionBean {
     private void prepareNewPageForm() {
         SelectionProvider classSelectionProvider =
                 DefaultSelectionProvider.create("pageClassName",
-                        new String[] { CrudPage.class.getName(), ChartPage.class.getName(), TextPage.class.getName() },
-                        new String[] { "Crud", "Chart", "Text" });
+                        new String[] {
+                                CrudPage.class.getName(), ChartPage.class.getName(),
+                                TextPage.class.getName(), JspPage.class.getName() },
+                        new String[] { "Crud", "Chart", "Text", "JSP" });
         boolean includeSiblingOption = dispatch.getPageInstancePath().length > 1;
         int fieldCount = includeSiblingOption ? 3 : 2;
         String[] insertPositions = new String[fieldCount];

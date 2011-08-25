@@ -57,6 +57,12 @@ public class CustomTypeConverter implements TypeConverter {
                         return new Timestamp(thisValue.getTime());
         } else if (toType.isEnum() && value instanceof String){
             return Enum.valueOf(toType, (String) value);
+        } else if (toType == Class.class && value instanceof String) {
+            try {
+                return Class.forName((String) value);
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Unable to convert type " + value.getClass().getName() + " of " + value + " to type of " + toType.getName(), e);
+            }
         } else {
             return conv.convertValue(context, target, member, propertyName, value, toType);
         }

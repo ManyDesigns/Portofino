@@ -124,6 +124,14 @@ public class JspAction extends PortletAction {
         return form;
     }
 
+    public String getTargetJsp() {
+        String jsp = jspPage.getJsp();
+        if(!jsp.startsWith("/")) {
+            jsp = "/" + jsp;
+        }
+        return jsp;
+    }
+
     /*
    File webAppDirFile = new File(serverInfo.getRealPath());
        File skinDirFile = new File(webAppDirFile, "skins");

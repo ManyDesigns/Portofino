@@ -7,7 +7,7 @@
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.JspAction"/>
 <% try { %>
-    <jsp:include page="${actionBean.jspPage.jsp}" />
+    <jsp:include page="${actionBean.targetJsp}" />
 <% } catch (Exception e) {
     actionBean.logger.error("Custom JSP threw an exception", e);
     request.setAttribute(PortletAction.PORTOFINO_PORTLET_EXCEPTION, e);
