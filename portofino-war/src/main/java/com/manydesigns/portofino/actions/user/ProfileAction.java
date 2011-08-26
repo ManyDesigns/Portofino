@@ -38,15 +38,15 @@ import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
-import net.sourceforge.stripes.action.Before;
+import net.sourceforge.stripes.action.*;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,12 +65,10 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@UrlBinding("/Profile.action")
 public class ProfileAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
-
-    public static final String CHANGE_PWD = "changePwd";
-    public static final String UPDATE_PWD = "updatePwd";
 
     //**************************************************************************
     // Injections
@@ -81,6 +79,9 @@ public class ProfileAction extends AbstractActionBean {
 
     @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
+
+    @Inject(RequestAttributes.DISPATCH)
+    public Dispatch dispatch;
 
     public List<Group> groups;
 
@@ -102,13 +103,14 @@ public class ProfileAction extends AbstractActionBean {
     public static final Logger logger =
             LoggerFactory.getLogger(ProfileAction.class);
 
-    public String execute() {
+    @DefaultHandler
+    public Resolution execute() {
         HttpSession session = getSession();
         userId = (String) session.getAttribute(SessionAttributes.USER_ID);
         return read();
     }
 
-    private String read() {
+    private Resolution read() {
         User thisUser =
             (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
         ClassAccessor accessor = application.getTableAccessor(UserUtils.USERTABLE);
@@ -126,10 +128,10 @@ public class ProfileAction extends AbstractActionBean {
                 .configMode(Mode.VIEW)
                 .build();
         form.readFromObject(thisUser);
-        return PortofinoAction.READ;
+        return new ForwardResolution("/layouts/user/profile/read.jsp");
     }
 
-    public String edit() {
+    public Resolution edit() {
         userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
@@ -142,10 +144,10 @@ public class ProfileAction extends AbstractActionBean {
                 .configMode(Mode.EDIT)
                 .build();
         form.readFromObject(thisUser);
-        return PortofinoAction.EDIT;
+        return new ForwardResolution("/layouts/user/profile/edit.jsp");
     }
 
-    public String update() {
+    public Resolution update() {
         userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
@@ -165,21 +167,21 @@ public class ProfileAction extends AbstractActionBean {
             application.commit("portofino");
             logger.debug("User {} updated", thisUser.getEmail());
             SessionMessages.addInfoMessage("Utente aggiornato correttamente");
-            return PortofinoAction.UPDATE;
+            return new RedirectResolution(dispatch.getOriginalPath());
         } else {
-            return PortofinoAction.EDIT;
+            return new ForwardResolution("/layouts/user/profile/edit.jsp");
         }
     }
 
-    public String changePwd() {
+    public Resolution changePwd() {
         userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)
                 .build();
-        return CHANGE_PWD;
+        return new ForwardResolution("/layouts/user/profile/changePwd.jsp");
     }
 
-    public String updatePwd() {
+    public Resolution updatePwd() {
         userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
@@ -221,14 +223,14 @@ public class ProfileAction extends AbstractActionBean {
                 logger.debug("User {} updated", thisUser.getEmail());
                 SessionMessages.addInfoMessage("Password correctely updated");
 
-                return UPDATE_PWD;
+                return new RedirectResolution(dispatch.getOriginalPath());
             } else {
                 SessionMessages.addErrorMessage
                         ("La password non corrisponde a quella in uso");
-                return CHANGE_PWD;
+                return new ForwardResolution("/layouts/user/profile/changePwd.jsp");
             }
         } else {
-            return CHANGE_PWD;
+            return new ForwardResolution("/layouts/user/profile/changePwd.jsp");
         }
     }
 }
