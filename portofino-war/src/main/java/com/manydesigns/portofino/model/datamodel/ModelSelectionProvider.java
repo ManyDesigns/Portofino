@@ -27,15 +27,19 @@
  *
  */
 
-package com.manydesigns.portofino.model.selectionproviders;
+package com.manydesigns.portofino.model.datamodel;
 
+import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.xml.Identifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,53 +47,81 @@ import javax.xml.bind.annotation.XmlAttribute;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class SelectionProperty implements ModelObject {
+public class ModelSelectionProvider implements ModelObject, HasReferences {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    protected ModelSelectionProvider modelSelectionProvider;
+    protected final List<Reference> references;
 
     protected String name;
+    protected String database;
+    protected String schema;
+    protected String sql;
+    protected String hql;
 
+    protected Table fromTable;
+    protected Table toTable;
+
+    //**************************************************************************
+    // Support fields
+    //**************************************************************************
+
+    protected String toTableName;
+
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
+
+    public static final Logger logger =
+            LoggerFactory.getLogger(ModelSelectionProvider.class);
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-
-    public SelectionProperty() {}
+    public ModelSelectionProvider() {
+        references = new ArrayList<Reference>();
+    }
 
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
-        modelSelectionProvider = (ModelSelectionProvider) parent;
+        fromTable = (Table) parent;
     }
 
-    public void reset() {}
+    public void reset() {
+        toTableName = null;
+    }
 
     public void init(Model model) {
-        assert modelSelectionProvider != null;
         assert name != null;
+        assert database != null;
+
+        String qualifiedToTableName =
+                Table.composeQualifiedName(database, schema, toTableName);
+        toTable = DataModelLogic.findTableByQualifiedName(model, qualifiedToTableName);
+        if (toTable == null) {
+            logger.warn("Cannot find destination table '{}'", qualifiedToTableName);
+        }
     }
 
     public String getQualifiedName() {
-        return String.format("%s.%s",
-                modelSelectionProvider.getQualifiedName(), name);
+        return name;
     }
 
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
+    @XmlElementWrapper(name="references")
+    @XmlElement(name="reference",type=Reference.class)
+    public List<Reference> getReferences() {
+        return references;
+    }
 
+    @Identifier
     @XmlAttribute(required = true)
     public String getName() {
         return name;
@@ -99,11 +131,56 @@ public class SelectionProperty implements ModelObject {
         this.name = name;
     }
 
-    public ModelSelectionProvider getModelSelectionProvider() {
-        return modelSelectionProvider;
+    @XmlAttribute(required = true)
+    public String getDatabase() {
+        return database;
     }
 
-    public void setModelSelectionProvider(ModelSelectionProvider modelSelectionProvider) {
-        this.modelSelectionProvider = modelSelectionProvider;
+    public void setDatabase(String database) {
+        this.database = database;
+    }
+
+    @XmlAttribute(required = true)
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
+
+    @XmlAttribute(required = false)
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
+
+    @XmlAttribute(required = false)
+    public String getHql() {
+        return hql;
+    }
+
+    public void setHql(String hql) {
+        this.hql = hql;
+    }
+
+    public Table getFromTable() {
+        return fromTable;
+    }
+
+    public Table getToTable() {
+        return toTable;
+    }
+
+    @XmlAttribute(name = "toTable")
+    public String getToTableName() {
+        return toTableName;
+    }
+
+    public void setToTableName(String toTableName) {
+        this.toTableName = toTableName;
     }
 }

@@ -63,6 +63,7 @@ public class Table implements ModelObject {
     protected final List<Column> columns;
     protected final List<ForeignKey> foreignKeys;
     protected final List<Annotation> annotations;
+    protected final List<ModelSelectionProvider> selectionProviders;
 
     protected Schema schema;
     protected String tableName;
@@ -96,6 +97,7 @@ public class Table implements ModelObject {
         foreignKeys = new ArrayList<ForeignKey>();
         oneToManyRelationships = new ArrayList<ForeignKey>();
         annotations = new ArrayList<Annotation>();
+        selectionProviders = new ArrayList<ModelSelectionProvider>();
     }
 
     //**************************************************************************
@@ -130,6 +132,10 @@ public class Table implements ModelObject {
         for (Annotation annotation : annotations) {
             annotation.reset();
         }
+
+        for(ModelSelectionProvider selectionProvider : selectionProviders) {
+            selectionProvider.reset();
+        }
     }
 
     public void init(Model model) {
@@ -161,6 +167,10 @@ public class Table implements ModelObject {
 
         for (Annotation annotation : annotations) {
             annotation.init(model);
+        }
+
+        for(ModelSelectionProvider selectionProvider : selectionProviders) {
+            selectionProvider.init(model);
         }
     }
 
@@ -269,6 +279,12 @@ public class Table implements ModelObject {
             type = com.manydesigns.portofino.model.annotations.Annotation.class)
     public List<Annotation> getAnnotations() {
         return annotations;
+    }
+
+    @XmlElementWrapper(name="selectionProviders")
+    @XmlElement(name="selectionProvider",type=ModelSelectionProvider.class)
+    public List<ModelSelectionProvider> getSelectionProviders() {
+        return selectionProviders;
     }
 
     //**************************************************************************

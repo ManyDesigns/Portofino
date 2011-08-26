@@ -52,7 +52,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class ForeignKey implements ModelObject {
+public class ForeignKey implements ModelObject, HasReferences {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -78,14 +78,10 @@ public class ForeignKey implements ModelObject {
 
     protected String toDatabase;
     protected String toSchema;
-    protected String toTable;
+    protected String toTableName;
 
     protected String onUpdate;
     protected String onDelete;
-
-    protected boolean virtual;
-
-
 
     //**************************************************************************
     // Fields (logical)
@@ -98,7 +94,7 @@ public class ForeignKey implements ModelObject {
     // Fields for wire-up
     //**************************************************************************
 
-    protected Table actualToTable;
+    protected Table toTable;
     protected String actualManyPropertyName;
     protected String actualOnePropertyName;
 
@@ -132,7 +128,7 @@ public class ForeignKey implements ModelObject {
     }
 
     public void reset() {
-        actualToTable = null;
+        toTable = null;
         actualManyPropertyName = null;
         actualOnePropertyName = null;
 
@@ -146,19 +142,19 @@ public class ForeignKey implements ModelObject {
         assert foreignKeyName != null;
         assert toDatabase != null;
         assert toSchema != null;
-        assert toTable != null;
+        assert toTableName != null;
 
         // wire up ForeignKey.toTable
         String qualifiedToTableName =
-                Table.composeQualifiedName(toDatabase, toSchema, toTable);
-        actualToTable = DataModelLogic.findTableByQualifiedName(
+                Table.composeQualifiedName(toDatabase, toSchema, toTableName);
+        toTable = DataModelLogic.findTableByQualifiedName(
                 model, qualifiedToTableName);
-        if (actualToTable == null) {
+        if (toTable == null) {
             logger.warn("Cannot wire '{}' to table '{}'",
                     this, qualifiedToTableName);
         } else {
             // wire up Table.oneToManyRelationships
-            actualToTable.getOneToManyRelationships().add(this);
+            toTable.getOneToManyRelationships().add(this);
         }
 
         if (references.isEmpty()) {
@@ -257,13 +253,13 @@ public class ForeignKey implements ModelObject {
         this.toSchema = toSchema;
     }
 
-    @XmlAttribute(required = true)
-    public String getToTable() {
-        return toTable;
+    @XmlAttribute(name = "toTable", required = true)
+    public String getToTableName() {
+        return toTableName;
     }
 
-    public void setToTable(String toTable) {
-        this.toTable = toTable;
+    public void setToTableName(String toTable) {
+        this.toTableName = toTable;
     }
 
     @XmlAttribute(required = true)
@@ -305,15 +301,6 @@ public class ForeignKey implements ModelObject {
         return onePropertyName;
     }
 
-    @XmlAttribute(required = true)
-    public boolean isVirtual() {
-        return virtual;
-    }
-
-    public void setVirtual(boolean virtual) {
-        this.virtual = virtual;
-    }
-
     public void setOnePropertyName(String onePropertyName) {
         this.onePropertyName = onePropertyName;
     }
@@ -324,12 +311,12 @@ public class ForeignKey implements ModelObject {
         return annotations;
     }
 
-    public Table getActualToTable() {
-        return actualToTable;
+    public Table getToTable() {
+        return toTable;
     }
 
-    public void setActualToTable(Table actualToTable) {
-        this.actualToTable = actualToTable;
+    public void setToTable(Table toTable) {
+        this.toTable = toTable;
     }
 
     public String getActualManyPropertyName() {

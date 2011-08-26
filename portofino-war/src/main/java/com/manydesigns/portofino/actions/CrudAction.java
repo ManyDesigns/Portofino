@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.forms.*;
@@ -41,7 +40,6 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.elements.text.OgnlTextFormat;
-import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
@@ -55,10 +53,7 @@ import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.crud.Button;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.model.pages.crud.CrudProperty;
-import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
-import com.manydesigns.portofino.model.selectionproviders.SelectionProperty;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
-import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
@@ -84,7 +79,10 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -173,7 +171,7 @@ public class CrudAction extends PortletAction {
     }
 
     private void setupSelectionProviders() {
-        for (ModelSelectionProvider current : crud.getSelectionProviders()) {
+        /*for (ModelSelectionProvider current : crud.getSelectionProviders()) {
             String name = current.getName();
             String database = current.getDatabase();
             String sql = current.getSql();
@@ -212,7 +210,7 @@ public class CrudAction extends PortletAction {
                 ShortName shortNameAnnotation =
                         tableAccessor.getAnnotation(ShortName.class);
                 TextFormat[] textFormats = null;
-                if (shortNameAnnotation != null) {
+                if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) { //???
                     textFormats = new TextFormat[] {
                         OgnlTextFormat.create(shortNameAnnotation.value())
                     };
@@ -229,7 +227,7 @@ public class CrudAction extends PortletAction {
             CrudSelectionProvider crudSelectionProvider =
                     new CrudSelectionProvider(selectionProvider, fieldNames);
             crudSelectionProviders.add(crudSelectionProvider);
-        }
+        }*/
     }
 
     //--------------------------------------------------------------------------

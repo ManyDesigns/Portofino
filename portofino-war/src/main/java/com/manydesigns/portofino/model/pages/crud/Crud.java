@@ -35,7 +35,6 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.model.selectionproviders.ModelSelectionProvider;
 import com.manydesigns.portofino.xml.Identifier;
 
 import javax.xml.bind.Unmarshaller;
@@ -63,7 +62,6 @@ public class Crud implements ModelObject {
 
     protected final Crud parentCrud;
     protected final List<CrudProperty> properties;
-    protected final List<ModelSelectionProvider> selectionProviders;
     protected final List<Annotation> annotations;
     protected final List<Button> buttons;
 
@@ -93,7 +91,6 @@ public class Crud implements ModelObject {
     public Crud(Crud parentCrud) {
         this.parentCrud = parentCrud;
         properties = new ArrayList<CrudProperty>();
-        selectionProviders = new ArrayList<ModelSelectionProvider>();
         annotations = new ArrayList<Annotation>();
         buttons = new ArrayList<Button>();
     }
@@ -126,10 +123,6 @@ public class Crud implements ModelObject {
             property.reset();
         }
 
-        for (ModelSelectionProvider modelSelectionProvider : selectionProviders) {
-            modelSelectionProvider.reset();
-        }
-
         for (Annotation annotation : annotations) {
             annotation.reset();
         }
@@ -144,10 +137,6 @@ public class Crud implements ModelObject {
 
         for (CrudProperty property : properties) {
             property.init(model);
-        }
-
-        for (ModelSelectionProvider modelSelectionProvider : selectionProviders) {
-            modelSelectionProvider.init(model);
         }
 
         for (Annotation annotation : annotations) {
@@ -181,12 +170,6 @@ public class Crud implements ModelObject {
     @XmlElement(name="property",type=CrudProperty.class)
     public List<CrudProperty> getProperties() {
         return properties;
-    }
-
-    @XmlElementWrapper(name="selectionProviders")
-    @XmlElement(name="selectionProvider",type=ModelSelectionProvider.class)
-    public List<ModelSelectionProvider> getSelectionProviders() {
-        return selectionProviders;
     }
 
     @XmlElementWrapper(name="annotations")

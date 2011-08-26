@@ -179,5 +179,10 @@ public class DataModelLogic {
     }
 
 
-
+    /*public static Collection<? extends SelectionProvider> generateDefaultSelectionProviders(Table actualTable) {
+        List<ForeignKey> foreignKeys = actualTable.getForeignKeys();
+        for(ForeignKey fk : foreignKeys) {
+            fk.getRe
+        }
+    }*/
 }

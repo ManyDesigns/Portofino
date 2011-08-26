@@ -484,7 +484,7 @@ public class HibernateConfig {
         com.manydesigns.portofino.model.datamodel.Table manyMDTable =
                 relationship.getFromTable();
         com.manydesigns.portofino.model.datamodel.Table oneMDTable =
-                relationship.getActualToTable();
+                relationship.getToTable();
 
         //Se la classe One non è dinamica e
         // non ha la proprietà non inserisco la relazione
@@ -528,7 +528,7 @@ public class HibernateConfig {
         // nelle relazioni
         set.setLazy(LAZY);
 
-        set.setRole(relationship.getActualToTable()+"."+relationship.getActualManyPropertyName());
+        set.setRole(relationship.getToTable()+"."+relationship.getActualManyPropertyName());
         set.setNodeName(relationship.getActualManyPropertyName());
         set.setCollectionTable(clazzMany.getTable());
         OneToMany oneToMany = new OneToMany(set.getOwner());
@@ -578,6 +578,8 @@ public class HibernateConfig {
             prop.setCascade("none");
         }
         clazzOne.addProperty(prop);
+
+        //if(!StringUtils.)
     }
 
     private DependantValue createFKComposite(com.manydesigns.portofino.model.datamodel.ForeignKey relationship,
@@ -667,7 +669,7 @@ public class HibernateConfig {
         com.manydesigns.portofino.model.datamodel.Table manyMDTable =
                 relationship.getFromTable();
         com.manydesigns.portofino.model.datamodel.Table oneMDTable =
-                relationship.getActualToTable();
+                relationship.getToTable();
         String manyMDQualifiedTableName = manyMDTable.getActualEntityName();
         String oneMDQualifiedTableName = oneMDTable.getActualEntityName();
 

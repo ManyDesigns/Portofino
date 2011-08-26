@@ -54,7 +54,7 @@ public class Reference implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected ForeignKey foreignKey;
+    protected HasReferences owner;
     protected String fromColumn;
     protected String toColumn;
 
@@ -70,16 +70,14 @@ public class Reference implements ModelObject {
     // Constructors
     //**************************************************************************
 
-    public Reference() {
-        this.foreignKey = foreignKey;
-    }
+    public Reference() {}
 
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
-        foreignKey = (ForeignKey) parent;
+        this.owner = (HasReferences) parent;
     }
 
     public void reset() {
@@ -88,16 +86,16 @@ public class Reference implements ModelObject {
     }
 
     public void init(Model model) {
-        assert foreignKey != null;
+        assert owner != null;
         assert fromColumn != null;
         assert toColumn != null;
 
         actualFromColumn =
-                foreignKey.getFromTable().findColumnByName(fromColumn);
+                owner.getFromTable().findColumnByName(fromColumn);
 
-        Table actualToTable = foreignKey.getActualToTable();
-        if (actualToTable != null) {
-            actualToColumn = actualToTable.findColumnByName(toColumn);
+        Table toTable = owner.getToTable();
+        if (toTable != null) {
+            actualToColumn = toTable.findColumnByName(toColumn);
         }
     }
 
@@ -110,24 +108,12 @@ public class Reference implements ModelObject {
     //**************************************************************************
 
 
-    public ForeignKey getForeignKey() {
-        return foreignKey;
+    public HasReferences getOwner() {
+        return owner;
     }
 
-    public void setForeignKey(ForeignKey foreignKey) {
-        this.foreignKey = foreignKey;
-    }
-
-    public String getFromDatabaseName() {
-        return foreignKey.getFromDatabaseName();
-    }
-
-    public String getFromSchemaName() {
-        return foreignKey.getFromSchemaName();
-    }
-
-    public String getFromTableName() {
-        return foreignKey.getFromTableName();
+    public void setOwner(HasReferences owner) {
+        this.owner = owner;
     }
 
     @Identifier
@@ -138,18 +124,6 @@ public class Reference implements ModelObject {
 
     public void setFromColumn(String fromColumn) {
         this.fromColumn = fromColumn;
-    }
-
-    public String getToDatabaseName() {
-        return foreignKey.getToDatabase();
-    }
-
-    public String getToSchemaName() {
-        return foreignKey.getToSchema();
-    }
-
-    public String getToTableName() {
-        return foreignKey.getToTable();
     }
 
     @Identifier

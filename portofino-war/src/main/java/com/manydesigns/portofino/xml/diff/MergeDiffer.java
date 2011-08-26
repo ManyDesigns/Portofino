@@ -254,7 +254,7 @@ public class MergeDiffer extends AbstractDiffer {
 
     public void diffReferenceTargetNull(ReferenceDiff referenceDiff) {
         targetReference = new Reference();
-        targetReference.setForeignKey(targetForeignKey);
+        targetReference.setOwner(targetForeignKey);
         targetForeignKey.getReferences().add(targetReference);
         diffReferenceSourceTarget(referenceDiff);
     }

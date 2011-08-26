@@ -415,7 +415,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                     relationship.setForeignKeyName(fkName);
                     relationship.setToDatabase(referencedDatabaseName);
                     relationship.setToSchema(referencedSchemaName);
-                    relationship.setToTable(referencedTableName);
+                    relationship.setToTableName(referencedTableName);
                     relationship.setOnUpdate(decodeUpdateDeleteRule(updateRule));
                     relationship.setOnDelete(decodeUpdateDeleteRule(deleteRule));
 
@@ -426,7 +426,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                 }
 
                 Reference reference = new Reference();
-                reference.setForeignKey(relationship);
+                reference.setOwner(relationship);
                 reference.setFromColumn(columnName);
                 reference.setToColumn(referencedColumnName);
 

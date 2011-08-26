@@ -134,7 +134,7 @@ public class TableDataAction extends AbstractCrudAction {
 
     protected CrudSelectionProvider createCrudSelectionProvider(ForeignKey foreignKey) {
         // retrieve the related objects
-        Table relatedTable = foreignKey.getActualToTable();
+        Table relatedTable = foreignKey.getToTable();
         ClassAccessor classAccessor =
                 application.getTableAccessor(relatedTable.getQualifiedName());
         List<Object> relatedObjects =

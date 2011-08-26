@@ -262,6 +262,7 @@ public class MutableHttpServletRequest implements MultipartRequest {
         throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public boolean isRequestedSessionIdFromUrl() {
         throw new UnsupportedOperationException();
     }
@@ -334,6 +335,7 @@ public class MutableHttpServletRequest implements MultipartRequest {
         throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     public String getRealPath(String s) {
         throw new UnsupportedOperationException();
     }

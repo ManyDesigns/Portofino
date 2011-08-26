@@ -522,7 +522,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                     relationship.setForeignKeyName(fkName);
                     relationship.setToDatabase(referencedDatabaseName);
                     relationship.setToSchema(referencedSchemaName);
-                    relationship.setToTable(referencedTableName);
+                    relationship.setToTableName(referencedTableName);
                     relationship.setOnUpdate(decodeUpdateDeleteRule(updateRule));
                     relationship.setOnDelete(decodeUpdateDeleteRule(deleteRule));
 
@@ -532,7 +532,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 }
 
                 Reference reference = new Reference();
-                reference.setForeignKey(relationship);
+                reference.setOwner(relationship);
                 reference.setFromColumn(columnName);
                 reference.setToColumn(referencedColumnName);
 
