@@ -789,7 +789,8 @@ Struttura dell'XML:
 
                                     </annotations>
                                 </column>
-                                <column columnName="state" columnType="int4" nullable="false" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <!-- TODO discrepanza numeric/decimal -->
+                                <column columnName="state" columnType="numeric" nullable="false" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
                                 <column columnName="token" columnType="varchar" nullable="true" length="100" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
                                 <column columnName="remquestion" columnType="varchar" nullable="true" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String" propertyName="remQuestion"/>
                                 <column columnName="remans" columnType="varchar" nullable="true" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
@@ -799,10 +800,9 @@ Struttura dell'XML:
 
                                 <column columnName="lastname" columnType="varchar" nullable="true" length="50" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String" propertyName="lastName"/>
                                 <column columnName="jobtitle" columnType="varchar" nullable="true" length="50" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String" propertyName="jobTitle"/>
-                                <!-- TODO usare CHAR(1) per i boolean -->
-                                <column columnName="defaultuser" columnType="numeric" nullable="true" length="1" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Boolean" propertyName="defaultUser"/>
-                                <column columnName="extauth" columnType="numeric" nullable="true" length="1" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Boolean" propertyName="extAuth"/>
-                                <column columnName="agreedtoterms" columnType="numeric" nullable="true" length="1" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Boolean" propertyName="agreedToTerms"/>
+                                <column columnName="defaultuser" columnType="char" nullable="true" length="1" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Boolean" propertyName="defaultUser"/>
+                                <column columnName="extauth" columnType="char" nullable="true" length="1" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Boolean" propertyName="extAuth"/>
+                                <column columnName="agreedtoterms" columnType="char" nullable="true" length="1" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Boolean" propertyName="agreedToTerms"/>
                                 <column columnName="creationdate" columnType="timestamp" nullable="true" length="29" scale="6" autoincrement="false" searchable="true" javaType="java.util.Date" propertyName="creationDate"/>
                                 <column columnName="deletiondate" columnType="timestamp" nullable="true" length="29" scale="6" autoincrement="false" searchable="true" javaType="java.util.Date" propertyName="deletionDate"/>
                                 <column columnName="modifieddate" columnType="timestamp" nullable="true" length="29" scale="6" autoincrement="false" searchable="true" javaType="java.util.Date" propertyName="modifiedDate"/>
@@ -810,9 +810,9 @@ Struttura dell'XML:
 
                                 <column columnName="lastlogindate" columnType="timestamp" nullable="true" length="29" scale="6" autoincrement="false" searchable="true" javaType="java.util.Date" propertyName="lastLoginDate"/>
                                 <column columnName="lastfailedlogindate" columnType="timestamp" nullable="true" length="29" scale="6" autoincrement="false" searchable="true" javaType="java.util.Date" propertyName="lastFailedLoginDate"/>
-                                <column columnName="failedloginattempts" columnType="int4" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer" propertyName="failedLoginAttempts"/>
-                                <column columnName="gracelogincount" columnType="int4" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer" propertyName="graceLoginCount"/>
-                                <column columnName="bounced" columnType="int4" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer" propertyName="bounced"/>
+                                <column columnName="failedloginattempts" columnType="numeric" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer" propertyName="failedLoginAttempts"/>
+                                <column columnName="gracelogincount" columnType="numeric" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer" propertyName="graceLoginCount"/>
+                                <column columnName="bounced" columnType="numeric" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer" propertyName="bounced"/>
                             </columns>
                             <primaryKey primaryKeyName="user_pkey">
                                 <column columnName="userid"/>
@@ -899,7 +899,7 @@ Struttura dell'XML:
                         </table>
                         <table tableName="emailstate">
                             <columns>
-                                <column columnName="id" columnType="bigserial" nullable="false" length="19" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Long"/>
+                                <column columnName="id" columnType="numeric" nullable="false" length="10" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Integer"/>
                                 <column columnName="name" columnType="varchar" nullable="false" length="75" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
                                 <column columnName="description" columnType="varchar" nullable="true" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
                             </columns>
@@ -910,7 +910,7 @@ Struttura dell'XML:
                         </table>
                         <table tableName="emailqueue" javaClass="com.manydesigns.portofino.system.model.email.EmailBean">
                             <columns>
-                                <column columnName="id" columnType="bigserial" nullable="false" length="19" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Long"/>
+                                <column columnName="id" columnType="numeric" nullable="false" length="10" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Integer"/>
                                 <column columnName="subject" columnType="varchar" nullable="true" length="100" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
                                 <column columnName="body" columnType="varchar" nullable="true" length="4000" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
                                 <column columnName="to_" columnType="varchar" nullable="true" length="100" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String" propertyName="to"/>
@@ -920,7 +920,7 @@ Struttura dell'XML:
                                 <column columnName="attachmentname" columnType="varchar" nullable="true" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String" propertyName="attachmentName"/>
                                 <column columnName="from_" columnType="varchar" nullable="true" length="100" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String" propertyName="from"/>
                                 <column columnName="createdate" columnType="date" nullable="true" length="13" scale="0" autoincrement="false" searchable="true" javaType="java.sql.Date" propertyName="createDate"/>
-                                <column columnName="state" columnType="int4" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
+                                <column columnName="state" columnType="numeric" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer"/>
                             </columns>
                             <primaryKey primaryKeyName="EmailQueue_pkey">
                                 <column columnName="id"/>
@@ -937,7 +937,7 @@ Struttura dell'XML:
                         <table tableName="userstate" javaClass="com.manydesigns.portofino.system.model.users.UserState">
 
                             <columns>
-                                <column columnName="id" columnType="bigserial" nullable="false" length="19" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Long"/>
+                                <column columnName="id" columnType="numeric" nullable="false" length="10" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Integer"/>
                                 <column columnName="description" columnType="varchar" nullable="true" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
                                 <column columnName="name" columnType="varchar" nullable="false" length="75" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
                             </columns>
@@ -956,11 +956,11 @@ Struttura dell'XML:
                                 <column columnName="body" columnType="varchar" nullable="true" length="4000" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
 
                                 <column columnName="creationdate" columnType="timestamp" nullable="true" length="29" scale="6" autoincrement="false" searchable="true" javaType="java.util.Date" propertyName="creationDate"/>
-                                <column columnName="from_" columnType="int8" nullable="true" length="19" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Long" propertyName="fromId"/>
-                                <column columnName="id" columnType="bigserial" nullable="false" length="19" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Long"/>
-                                <column columnName="state" columnType="int4" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer" propertyName="stateId"/>
+                                <column columnName="from_" columnType="char" nullable="true" length="25" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String" propertyName="fromId"/>
+                                <column columnName="id" columnType="char" nullable="false" length="25" scale="0" autoincrement="true" searchable="true" javaType="java.lang.String"/>
+                                <column columnName="state" columnType="numeric" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer" propertyName="stateId"/>
                                 <column columnName="subject" columnType="varchar" nullable="true" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
-                                <column columnName="to_" columnType="int8" nullable="true" length="19" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Long" propertyName="toId"/>
+                                <column columnName="to_" columnType="char" nullable="true" length="25" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String" propertyName="toId"/>
                             </columns>
                             <primaryKey primaryKeyName="msg_pkey">
                                 <column columnName="id"/>
@@ -989,7 +989,7 @@ Struttura dell'XML:
                         <table tableName="msgstate" javaClass="com.manydesigns.portofino.system.model.messages.State">
                             <columns>
                                 <column columnName="description" columnType="varchar" nullable="true" length="255" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
-                                <column columnName="id" columnType="bigserial" nullable="false" length="19" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Long"/>
+                                <column columnName="id" columnType="numeric" nullable="false" length="10" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Integer"/>
                                 <column columnName="name" columnType="varchar" nullable="false" length="50" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
                             </columns>
                             <primaryKey primaryKeyName="msgstate_pkey">
@@ -1000,9 +1000,9 @@ Struttura dell'XML:
                         <table tableName="oldpwd">
                             <columns>
                                 <column columnName="createdate" columnType="timestamp" nullable="true" length="29" scale="6" autoincrement="false" searchable="true" javaType="java.util.Date" propertyName="createDate"/>
-                                <column columnName="id" columnType="bigserial" nullable="false" length="19" scale="0" autoincrement="true" searchable="true" javaType="java.lang.Long"/>
+                                <column columnName="id" columnType="char" nullable="false" length="25" scale="0" autoincrement="true" searchable="true" javaType="java.lang.String"/>
                                 <column columnName="password" columnType="varchar" nullable="true" length="30" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String"/>
-                                <column columnName="userid" columnType="int4" nullable="true" length="10" scale="0" autoincrement="false" searchable="true" javaType="java.lang.Integer" propertyName="userId"/>
+                                <column columnName="userid" columnType="char" nullable="true" length="25" scale="0" autoincrement="false" searchable="true" javaType="java.lang.String" propertyName="userId"/>
                             </columns>
 
                             <primaryKey primaryKeyName="OldPwd_pkey">

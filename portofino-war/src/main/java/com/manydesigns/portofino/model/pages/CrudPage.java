@@ -114,7 +114,8 @@ public class CrudPage extends Page {
           @XmlElement(name="customPage",type=CustomPage.class),
           @XmlElement(name="customFolderPage",type=CustomFolderPage.class),
           @XmlElement(name="crudPage",type=CrudPage.class),
-          @XmlElement(name="portletPage",type=ChartPage.class)
+          @XmlElement(name="chartPage",type=ChartPage.class),
+          @XmlElement(name="jspPage",type=JspPage.class)
     })
     public ArrayList<Page> getDetailChildPages() {
         return detailChildPages;

@@ -169,6 +169,8 @@ public class DbUtil {
                 return Hibernate.BOOLEAN;
             } else if(jdbcType == Types.NUMERIC || jdbcType == Types.DECIMAL) {
                 return NUMERIC_BOOLEAN;
+            } else if(jdbcType == Types.CHAR) {
+                return Hibernate.TRUE_FALSE;
             } else {
                 throw new Error("Unsupported boolean type: " + jdbcType);
             }
