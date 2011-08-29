@@ -63,7 +63,7 @@ public class Table implements ModelObject {
     protected final List<Column> columns;
     protected final List<ForeignKey> foreignKeys;
     protected final List<Annotation> annotations;
-    protected final List<ModelSelectionProvider> selectionProviders;
+    protected final List<DatabaseSelectionProvider> selectionProviders;
 
     protected Schema schema;
     protected String tableName;
@@ -97,7 +97,7 @@ public class Table implements ModelObject {
         foreignKeys = new ArrayList<ForeignKey>();
         oneToManyRelationships = new ArrayList<ForeignKey>();
         annotations = new ArrayList<Annotation>();
-        selectionProviders = new ArrayList<ModelSelectionProvider>();
+        selectionProviders = new ArrayList<DatabaseSelectionProvider>();
     }
 
     //**************************************************************************
@@ -133,7 +133,7 @@ public class Table implements ModelObject {
             annotation.reset();
         }
 
-        for(ModelSelectionProvider selectionProvider : selectionProviders) {
+        for(DatabaseSelectionProvider selectionProvider : selectionProviders) {
             selectionProvider.reset();
         }
     }
@@ -169,7 +169,7 @@ public class Table implements ModelObject {
             annotation.init(model);
         }
 
-        for(ModelSelectionProvider selectionProvider : selectionProviders) {
+        for(DatabaseSelectionProvider selectionProvider : selectionProviders) {
             selectionProvider.init(model);
         }
     }
@@ -282,8 +282,8 @@ public class Table implements ModelObject {
     }
 
     @XmlElementWrapper(name="selectionProviders")
-    @XmlElement(name="selectionProvider",type=ModelSelectionProvider.class)
-    public List<ModelSelectionProvider> getSelectionProviders() {
+    @XmlElement(name="selectionProvider",type=DatabaseSelectionProvider.class)
+    public List<DatabaseSelectionProvider> getSelectionProviders() {
         return selectionProviders;
     }
 

@@ -135,8 +135,10 @@ public class SelectSearchField extends AbstractSearchField {
         } else {
             Object[] castedValues = new Object[values.length];
             for (int i=0;i<values.length;i++){
-                castedValues[i] =
-                        OgnlUtils.convertValue((String) values[i], accessor.getType());
+                if(!StringUtils.isEmpty((String) values[i])) {
+                    castedValues[i] =
+                            OgnlUtils.convertValue((String) values[i], accessor.getType());
+                }
             }
             selectionModel.setValue(selectionModelIndex, castedValues);
         }

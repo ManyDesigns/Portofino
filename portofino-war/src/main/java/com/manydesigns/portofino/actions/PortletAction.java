@@ -451,6 +451,11 @@ public class PortletAction extends AbstractActionBean {
         title = page.getTitle();
     }
 
+    protected void readPageConfigurationFromRequest() {
+        pageConfigurationForm.readFromRequest(context.getRequest());
+        title = context.getRequest().getParameter("title");
+    }
+
     protected boolean validatePageConfiguration() {
         boolean valid = true;
         title = StringUtils.trimToNull(title);

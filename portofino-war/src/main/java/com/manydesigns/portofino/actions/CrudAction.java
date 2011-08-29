@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.forms.*;
@@ -40,6 +41,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
@@ -48,12 +50,16 @@ import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.CrudLogic;
 import com.manydesigns.portofino.logic.DataModelLogic;
+import com.manydesigns.portofino.model.datamodel.DatabaseSelectionProvider;
+import com.manydesigns.portofino.model.datamodel.ForeignKey;
+import com.manydesigns.portofino.model.datamodel.Reference;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.crud.Button;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
+import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
@@ -79,10 +85,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -171,63 +174,72 @@ public class CrudAction extends PortletAction {
     }
 
     private void setupSelectionProviders() {
-        /*for (ModelSelectionProvider current : crud.getSelectionProviders()) {
-            String name = current.getName();
-            String database = current.getDatabase();
-            String sql = current.getSql();
-            String hql = current.getHql();
-            List<SelectionProperty> selectionProperties =
-                    current.getSelectionProperties();
+        Table table = crud.getActualTable();
 
-            String[] fieldNames = new String[selectionProperties.size()];
-            Class[] fieldTypes = new Class[selectionProperties.size()];
+        for(ForeignKey fk : table.getForeignKeys()) {
+            setupSelectionProvider(fk);
+        }
 
-            int i = 0;
-            for (SelectionProperty selectionProperty : selectionProperties) {
-                try {
-                    fieldNames[i] = selectionProperty.getName();
-                    PropertyAccessor propertyAccessor =
-                            classAccessor.getProperty(fieldNames[i]);
-                    fieldTypes[i] = propertyAccessor.getType();
-                    i++;
-                } catch (NoSuchFieldException e) {
-                    throw new Error(e);
-                }
+        for (DatabaseSelectionProvider current : table.getSelectionProviders()) {
+            setupSelectionProvider(current);
+        }
+    }
+
+    private void setupSelectionProvider(DatabaseSelectionProvider current) {
+        String name = current.getName();
+        String database = current.getToDatabase();
+        String sql = current.getSql();
+        String hql = current.getHql();
+        List<Reference> references = current.getReferences();
+
+        String[] fieldNames = new String[references.size()];
+        Class[] fieldTypes = new Class[references.size()];
+
+        int i = 0;
+        for (Reference reference : references) {
+            try {
+                fieldNames[i] = reference.getFromColumn();
+                PropertyAccessor propertyAccessor =
+                        classAccessor.getProperty(fieldNames[i]);
+                fieldTypes[i] = propertyAccessor.getType();
+                i++;
+            } catch (NoSuchFieldException e) {
+                throw new Error(e);
+            }
+        }
+
+
+        SelectionProvider selectionProvider;
+        if (sql != null) {
+            Collection<Object[]> objects = application.runSql(database, sql);
+            selectionProvider = DefaultSelectionProvider.create(
+                    name, fieldNames.length, fieldTypes, objects);
+        } else if (hql != null) {
+            Collection<Object> objects = application.getObjects(hql);
+            String qualifiedTableName =
+                    application.getQualifiedTableNameFromQueryString(hql);
+            TableAccessor tableAccessor =
+                    application.getTableAccessor(qualifiedTableName);
+            ShortName shortNameAnnotation =
+                    tableAccessor.getAnnotation(ShortName.class);
+            TextFormat[] textFormats = null;
+            if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) { //???
+                textFormats = new TextFormat[] {
+                    OgnlTextFormat.create(shortNameAnnotation.value())
+                };
             }
 
+            selectionProvider = DefaultSelectionProvider.create(
+                    name, objects, tableAccessor, textFormats);
+        } else {
+            logger.warn("ModelSelection provider '{}':" +
+                    " both 'hql' and 'sql' are null", name);
+            return;
+        }
 
-            SelectionProvider selectionProvider;
-            if (sql != null) {
-                Collection<Object[]> objects = application.runSql(database, sql);
-                selectionProvider = DefaultSelectionProvider.create(
-                        name, fieldNames.length, fieldTypes, objects);
-            } else if (hql != null) {
-                Collection<Object> objects = application.getObjects(hql);
-                String qualifiedTableName = 
-                        application.getQualifiedTableNameFromQueryString(hql);
-                TableAccessor tableAccessor =
-                        application.getTableAccessor(qualifiedTableName);
-                ShortName shortNameAnnotation =
-                        tableAccessor.getAnnotation(ShortName.class);
-                TextFormat[] textFormats = null;
-                if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) { //???
-                    textFormats = new TextFormat[] {
-                        OgnlTextFormat.create(shortNameAnnotation.value())
-                    };
-                }
-
-                selectionProvider = DefaultSelectionProvider.create(
-                        name, objects, tableAccessor, textFormats);
-            } else {
-                logger.warn("ModelSelection provider '{}':" +
-                        " both 'hql' and 'sql' are null", name);
-                break;
-            }
-
-            CrudSelectionProvider crudSelectionProvider =
-                    new CrudSelectionProvider(selectionProvider, fieldNames);
-            crudSelectionProviders.add(crudSelectionProvider);
-        }*/
+        CrudSelectionProvider crudSelectionProvider =
+                new CrudSelectionProvider(selectionProvider, fieldNames);
+        crudSelectionProviders.add(crudSelectionProvider);
     }
 
     //--------------------------------------------------------------------------
@@ -672,6 +684,21 @@ public class CrudAction extends PortletAction {
             SelectionProvider selectionProvider =
                     current.getSelectionProvider();
             String[] fieldNames = current.getFieldNames();
+            /*
+            //Include only searchable fields
+            List<String> actualFieldNames = new ArrayList<String>();
+            for(PropertyAccessor p : classAccessor.getProperties()) {
+                if(ArrayUtils.contains(fieldNames, p.getName())) {
+                    Searchable searchable = p.getAnnotation(Searchable.class);
+                    if(searchable != null && searchable.value()) {
+                        actualFieldNames.add(p.getName());
+                    }
+                }
+            }
+            if(!actualFieldNames.isEmpty()) {
+                String[] actualFieldNamesArr = actualFieldNames.toArray(new String[actualFieldNames.size()]);
+                searchFormBuilder.configSelectionProvider(selectionProvider, actualFieldNamesArr);
+            }*/
             searchFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
 
@@ -1326,7 +1353,8 @@ public class CrudAction extends PortletAction {
 
             crudConfigurationForm.readFromObject(crudPage.getCrud());
 
-            pageConfigurationForm.readFromRequest(context.getRequest());
+            readPageConfigurationFromRequest();
+
             crudConfigurationForm.readFromRequest(context.getRequest());
 
             boolean valid = crudConfigurationForm.validate();

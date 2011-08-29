@@ -188,6 +188,10 @@ public class SearchFormBuilder extends AbstractFormBuilder {
             for (int i = 0; i < fieldNames.length; i++) {
                 SelectSearchField selectSearchField =
                         (SelectSearchField)fieldMap.get(fieldNames[i]);
+                if(selectSearchField == null) {
+                    previousField = null;
+                    continue;
+                }
                 selectSearchField.setSelectionModel(selectionModel);
                 selectSearchField.setSelectionModelIndex(i);
                 if (previousField != null) {

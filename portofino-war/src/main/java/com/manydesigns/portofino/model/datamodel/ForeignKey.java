@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
@@ -39,7 +38,6 @@ import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -52,7 +50,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class ForeignKey implements ModelObject, HasReferences {
+public class ForeignKey extends DatabaseSelectionProvider implements ModelObject, HasReferences {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -70,15 +68,9 @@ public class ForeignKey implements ModelObject, HasReferences {
     // Fields (physical JDBC)
     //**************************************************************************
 
-    protected Table fromTable;
-    protected final List<Reference> references;
     protected final List<Annotation> annotations;
 
     protected String foreignKeyName;
-
-    protected String toDatabase;
-    protected String toSchema;
-    protected String toTableName;
 
     protected String onUpdate;
     protected String onDelete;
@@ -94,7 +86,6 @@ public class ForeignKey implements ModelObject, HasReferences {
     // Fields for wire-up
     //**************************************************************************
 
-    protected Table toTable;
     protected String actualManyPropertyName;
     protected String actualOnePropertyName;
 
@@ -110,7 +101,6 @@ public class ForeignKey implements ModelObject, HasReferences {
     //**************************************************************************
 
     public ForeignKey() {
-        references = new ArrayList<Reference>();
         annotations = new ArrayList<Annotation>();
     }
 
@@ -118,17 +108,15 @@ public class ForeignKey implements ModelObject, HasReferences {
     // ModelObject implementation
     //**************************************************************************
 
+    @Override
     public String getQualifiedName() {
         return MessageFormat.format("{0}${1}",
                 fromTable.getQualifiedName(), foreignKeyName);
     }
 
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
-        fromTable = (Table) parent;
-    }
-
+    @Override
     public void reset() {
-        toTable = null;
+        super.reset();
         actualManyPropertyName = null;
         actualOnePropertyName = null;
 
@@ -137,30 +125,25 @@ public class ForeignKey implements ModelObject, HasReferences {
         }
     }
 
+    @Override
     public void init(Model model) {
+        super.init(model);
+
         assert fromTable != null;
         assert foreignKeyName != null;
-        assert toDatabase != null;
         assert toSchema != null;
-        assert toTableName != null;
-
-        // wire up ForeignKey.toTable
-        String qualifiedToTableName =
-                Table.composeQualifiedName(toDatabase, toSchema, toTableName);
-        toTable = DataModelLogic.findTableByQualifiedName(
-                model, qualifiedToTableName);
-        if (toTable == null) {
-            logger.warn("Cannot wire '{}' to table '{}'",
-                    this, qualifiedToTableName);
-        } else {
-            // wire up Table.oneToManyRelationships
-            toTable.getOneToManyRelationships().add(this);
-        }
 
         if (references.isEmpty()) {
             throw new Error(MessageFormat.format(
                     "Foreign key {0} has no referneces",
                     getQualifiedName()));
+        }
+
+        if (toTable != null) {
+            // wire up Table.oneToManyRelationships
+            toTable.getOneToManyRelationships().add(this);
+            //Build HQL query
+            hql = "from " + toTable.getActualEntityName();
         }
 
         for (Reference reference : references) {
@@ -205,14 +188,6 @@ public class ForeignKey implements ModelObject, HasReferences {
     // Getters/setter
     //**************************************************************************
 
-    public Table getFromTable() {
-        return fromTable;
-    }
-
-    public void setFromTable(Table fromTable) {
-        this.fromTable = fromTable;
-    }
-
     public String getFromDatabaseName() {
         return fromTable.getDatabaseName();
     }
@@ -236,33 +211,6 @@ public class ForeignKey implements ModelObject, HasReferences {
     }
 
     @XmlAttribute(required = true)
-    public String getToDatabase() {
-        return toDatabase;
-    }
-
-    public void setToDatabase(String toDatabase) {
-        this.toDatabase = toDatabase;
-    }
-
-    @XmlAttribute(required = true)
-    public String getToSchema() {
-        return toSchema;
-    }
-
-    public void setToSchema(String toSchema) {
-        this.toSchema = toSchema;
-    }
-
-    @XmlAttribute(name = "toTable", required = true)
-    public String getToTableName() {
-        return toTableName;
-    }
-
-    public void setToTableName(String toTable) {
-        this.toTableName = toTable;
-    }
-
-    @XmlAttribute(required = true)
     public String getOnUpdate() {
         return onUpdate;
     }
@@ -278,13 +226,6 @@ public class ForeignKey implements ModelObject, HasReferences {
 
     public void setOnDelete(String onDelete) {
         this.onDelete = onDelete;
-    }
-
-
-    @XmlElementWrapper(name="references")
-    @XmlElement(name="reference", type=Reference.class)
-    public List<Reference> getReferences() {
-        return references;
     }
 
     @XmlAttribute(required = false)
@@ -309,14 +250,6 @@ public class ForeignKey implements ModelObject, HasReferences {
     @XmlElement(name="annotation",type=Annotation.class)
     public List<Annotation> getAnnotations() {
         return annotations;
-    }
-
-    public Table getToTable() {
-        return toTable;
-    }
-
-    public void setToTable(Table toTable) {
-        this.toTable = toTable;
     }
 
     public String getActualManyPropertyName() {

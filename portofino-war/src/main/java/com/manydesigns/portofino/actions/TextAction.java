@@ -149,8 +149,7 @@ public class TextAction extends PortletAction {
     public Resolution updateConfiguration() throws IOException {
         synchronized (application) {
             prepareConfigurationForms();
-
-            pageConfigurationForm.readFromRequest(context.getRequest());
+            readPageConfigurationFromRequest();
             boolean valid = validatePageConfiguration();
             if (valid) {
                 updatePageConfiguration();

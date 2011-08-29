@@ -301,7 +301,7 @@ public class ChartAction extends PortletAction {
             prepareConfigurationForms();
             form.readFromObject(chartPage);
             form.readFromRequest(context.getRequest());
-            pageConfigurationForm.readFromRequest(context.getRequest());
+            readPageConfigurationFromRequest();
             boolean valid = form.validate();
             valid = validatePageConfiguration() && valid;
             if (valid) {

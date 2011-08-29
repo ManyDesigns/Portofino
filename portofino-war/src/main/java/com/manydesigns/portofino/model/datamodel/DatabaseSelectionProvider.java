@@ -48,15 +48,15 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class ModelSelectionProvider implements ModelObject, HasReferences {
+public class DatabaseSelectionProvider implements ModelObject, HasReferences {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     protected final List<Reference> references;
 
     protected String name;
-    protected String database;
-    protected String schema;
+    protected String toDatabase;
+    protected String toSchema;
     protected String sql;
     protected String hql;
 
@@ -74,13 +74,13 @@ public class ModelSelectionProvider implements ModelObject, HasReferences {
     //**************************************************************************
 
     public static final Logger logger =
-            LoggerFactory.getLogger(ModelSelectionProvider.class);
+            LoggerFactory.getLogger(DatabaseSelectionProvider.class);
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public ModelSelectionProvider() {
+    public DatabaseSelectionProvider() {
         references = new ArrayList<Reference>();
     }
 
@@ -93,15 +93,17 @@ public class ModelSelectionProvider implements ModelObject, HasReferences {
     }
 
     public void reset() {
-        toTableName = null;
+        toTable = null;
     }
 
     public void init(Model model) {
         assert name != null;
-        assert database != null;
+        assert toDatabase != null;
+        assert toSchema != null;
+        assert toTableName != null;
 
         String qualifiedToTableName =
-                Table.composeQualifiedName(database, schema, toTableName);
+                Table.composeQualifiedName(toDatabase, toSchema, toTableName);
         toTable = DataModelLogic.findTableByQualifiedName(model, qualifiedToTableName);
         if (toTable == null) {
             logger.warn("Cannot find destination table '{}'", qualifiedToTableName);
@@ -132,21 +134,21 @@ public class ModelSelectionProvider implements ModelObject, HasReferences {
     }
 
     @XmlAttribute(required = true)
-    public String getDatabase() {
-        return database;
+    public String getToDatabase() {
+        return toDatabase;
     }
 
-    public void setDatabase(String database) {
-        this.database = database;
+    public void setToDatabase(String toDatabase) {
+        this.toDatabase = toDatabase;
     }
 
     @XmlAttribute(required = true)
-    public String getSchema() {
-        return schema;
+    public String getToSchema() {
+        return toSchema;
     }
 
-    public void setSchema(String schema) {
-        this.schema = schema;
+    public void setToSchema(String toSchema) {
+        this.toSchema = toSchema;
     }
 
     @XmlAttribute(required = false)
@@ -171,8 +173,16 @@ public class ModelSelectionProvider implements ModelObject, HasReferences {
         return fromTable;
     }
 
+    public void setFromTable(Table fromTable) {
+        this.fromTable = fromTable;
+    }
+
     public Table getToTable() {
         return toTable;
+    }
+
+    public void setToTable(Table toTable) {
+        this.toTable = toTable;
     }
 
     @XmlAttribute(name = "toTable")

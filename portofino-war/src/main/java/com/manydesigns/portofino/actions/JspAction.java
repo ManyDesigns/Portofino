@@ -97,7 +97,7 @@ public class JspAction extends PortletAction {
     public Resolution updateConfiguration() {
         synchronized (application) {
             setupPageConfiguration();
-            pageConfigurationForm.readFromRequest(context.getRequest());
+            readPageConfigurationFromRequest();
             form.readFromRequest(context.getRequest());
             boolean valid = validatePageConfiguration();
             valid = form.validate() && valid;

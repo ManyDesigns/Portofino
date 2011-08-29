@@ -31,7 +31,6 @@ package com.manydesigns.portofino.actions.forms;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.elements.annotations.Select;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
