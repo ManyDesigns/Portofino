@@ -94,9 +94,18 @@ public class Dispatcher {
             return null;
         }
 
-        PageInstance pageInstance =
-                path.get(path.size() - 1);
+        PageInstance pageInstance = path.get(path.size() - 1);
         Page page = pageInstance.getPage();
+        String rewrittenPath = getRewrittenPath(page);
+        
+        PageInstance[] pageArray =
+                new PageInstance[path.size()];
+        path.toArray(pageArray);
+
+        return new Dispatch(request, originalPath, rewrittenPath, pageArray, tree);
+    }
+
+    public static String getRewrittenPath(Page page) {
         String rewrittenPath = page.getUrl();
         if (rewrittenPath == null) {
             if (page instanceof TextPage) {
@@ -109,16 +118,13 @@ public class Dispatcher {
                 rewrittenPath = "/crud.action";
             } else if (page instanceof JspPage) {
                 rewrittenPath = "/jsp.action";
+            } else if (page instanceof PageReference) {
+                rewrittenPath = "/ref.action";
             } else {
                 throw new Error("Unrecognized page type");
             }
         }
-
-        PageInstance[] pageArray =
-                new PageInstance[path.size()];
-        path.toArray(pageArray);
-
-        return new Dispatch(request, originalPath, rewrittenPath, pageArray, tree);
+        return rewrittenPath;
     }
 
     private void visitPagesInPath(List<PageInstance> path,
@@ -153,6 +159,19 @@ public class Dispatcher {
     private PageInstance visitPageInPath(List<PageInstance> path,
                                  ListIterator<String> fragmentsIterator,
                                  Page page) {
+        PageInstance pageInstance = makePageInstance(page, fragmentsIterator);
+
+        // add to path
+        path.add(pageInstance);
+
+        // visit recursively
+        visitPagesInPath(path, pageInstance.getChildPageInstances(),
+                pageInstance.getChildPages(), fragmentsIterator);
+
+        return pageInstance;
+    }
+
+    protected PageInstance makePageInstance(Page page, ListIterator<String> fragmentsIterator) {
         PageInstance pageInstance;
         if (page instanceof CrudPage) {
             CrudPage crudPage = (CrudPage) page;
@@ -177,18 +196,19 @@ public class Dispatcher {
             }
             pageInstance = new CrudPageInstance(
                     application, crudPage, mode, param);
+        } else if(page instanceof PageReference) {
+            Page toPage = ((PageReference) page).getToPage();
+            if(toPage != null) {
+                PageInstance wrappedPageInstance = makePageInstance(toPage, fragmentsIterator);
+                pageInstance = new PageReferenceInstance(application, page, null, wrappedPageInstance);
+            } else {
+                pageInstance =
+                    new PageInstance(application, page, null);
+            }
         } else {
             pageInstance =
                     new PageInstance(application, page, null);
         }
-
-        // add to path
-        path.add(pageInstance);
-
-        // visit recursively
-        visitPagesInPath(path, pageInstance.getChildPageInstances(),
-                pageInstance.getChildPages(), fragmentsIterator);
-
         return pageInstance;
     }
 

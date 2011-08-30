@@ -70,7 +70,9 @@ public class JspAction extends PortletAction {
     public ServerInfo serverInfo;
 
     @Before
+    @Override
     public void prepare() {
+        super.prepare();
         jspPage = (JspPage) getPageInstance().getPage();
     }
 

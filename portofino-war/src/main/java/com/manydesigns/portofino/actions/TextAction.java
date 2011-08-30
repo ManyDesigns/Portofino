@@ -89,7 +89,9 @@ public class TextAction extends PortletAction {
     //**************************************************************************
 
     @Before
+    @Override
     public void prepare() {
+        super.prepare();
         textPage = (TextPage) pageInstance.getPage();
         String storageDirectory =
                 portofinoConfiguration.getString(

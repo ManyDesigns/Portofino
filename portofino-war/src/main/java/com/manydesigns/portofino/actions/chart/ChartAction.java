@@ -123,7 +123,9 @@ public class ChartAction extends PortletAction {
 
 
     @Before
+    @Override
     public void prepare() {
+        super.prepare();
         chartPage = (ChartPage) pageInstance.getPage();
     }
 

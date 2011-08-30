@@ -24,6 +24,7 @@ import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.util.ShortNameUtils;
+import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -95,6 +96,15 @@ public class PortletAction extends AbstractActionBean {
     public boolean isEmbedded() {
         return getContext().getRequest().getAttribute(
                 StripesConstants.REQ_ATTR_INCLUDE_PATH) != null;
+    }
+
+    @Before
+    protected void prepare() {
+        dereferencePageInstance();
+    }
+
+    protected void dereferencePageInstance() {
+        pageInstance = pageInstance.dereference();
     }
 
     public void setupReturnToParentTarget() {
@@ -623,8 +633,9 @@ public class PortletAction extends AbstractActionBean {
                 DefaultSelectionProvider.create("pageClassName",
                         new String[] {
                                 CrudPage.class.getName(), ChartPage.class.getName(),
-                                TextPage.class.getName(), JspPage.class.getName() },
-                        new String[] { "Crud", "Chart", "Text", "JSP" });
+                                TextPage.class.getName(), JspPage.class.getName(),
+                                PageReference.class.getName() },
+                        new String[] { "Crud", "Chart", "Text", "JSP", "Reference to another page" });
         boolean includeSiblingOption = dispatch.getPageInstancePath().length > 1;
         int fieldCount = includeSiblingOption ? 3 : 2;
         String[] insertPositions = new String[fieldCount];

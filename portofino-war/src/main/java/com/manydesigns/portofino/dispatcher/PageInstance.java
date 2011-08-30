@@ -78,6 +78,10 @@ public class PageInstance {
     public void realize() {
     }
 
+    public PageInstance dereference() {
+        return this;
+    }
+
     //**************************************************************************
     // Utility Methods
     //**************************************************************************

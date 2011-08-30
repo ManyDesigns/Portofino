@@ -156,7 +156,9 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     @Before
+    @Override
     public void prepare() {
+        super.prepare();
         CrudPageInstance crudPageInstance = getPageInstance();
         pk = crudPageInstance.getPk();
         crudPage = getPageInstance().getPage();
