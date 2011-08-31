@@ -89,7 +89,8 @@ public class HibernateApplicationImpl implements Application {
 
     protected static final String WHERE_STRING = " WHERE ";
     protected static final Pattern FROM_PATTERN =
-            Pattern.compile("[fF][rR][oO][mM]\\s+([a-z_$\\u0080-\\ufffe]{1}[a-z_$1-9\\u0080-\\ufffe]*).*");
+            Pattern.compile("[fF][rR][oO][mM]\\s+([a-z_$\\u0080-\\ufffe]{1}[a-z_$1-9\\u0080-\\ufffe]*).*",
+                            Pattern.DOTALL); //. (dot) matches newlines
 
 
     //**************************************************************************
@@ -329,22 +330,26 @@ public class HibernateApplicationImpl implements Application {
         if(queryString.toUpperCase().indexOf("WHERE") == -1) {
             return getObjectByPk(qualifiedTableName, pk);
         }
-        Session session = getSession(qualifiedTableName);
         TableAccessor table = getTableAccessor(qualifiedTableName);
-        String actualEntityName = table.getTable().getActualEntityName();
         List<Object> result;
         PropertyAccessor[] keyProperties = table.getKeyProperties();
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
         String formatString = sqlFormat.getFormatString();
         Object[] ognlParameters = sqlFormat.evaluateOgnlExpressions(rootObject);
-        int i = ognlParameters.length;
-        Object[] parameters = new Object[i + keyProperties.length];
-        System.arraycopy(ognlParameters, 0, parameters, 0, i);
+        int i = keyProperties.length;
+        int p = ognlParameters.length;
+        Object[] parameters = new Object[p + i];
+        System.arraycopy(ognlParameters, i, parameters, i, p - 1);
+        int indexOfWhere = formatString.toUpperCase().indexOf("WHERE") + 5; //5 = "WHERE".length()
+        String formatStringPrefix = formatString.substring(0, indexOfWhere);
+        formatString = formatString.substring(indexOfWhere);
+
         for(PropertyAccessor propertyAccessor : keyProperties) {
-            formatString += " AND " + propertyAccessor.getName() + " = ?";
+            i--;
+            formatString = propertyAccessor.getName() + " = ? AND " + formatString;
             parameters[i] = propertyAccessor.get(pk);
-            i++;
         }
+        formatString = formatStringPrefix + " " + formatString;
         result = runHqlQuery(qualifiedTableName, formatString, parameters);
         if(result != null && !result.isEmpty()) {
             return result.get(0);
