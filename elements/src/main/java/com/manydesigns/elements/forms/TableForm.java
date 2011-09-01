@@ -32,6 +32,7 @@ package com.manydesigns.elements.forms;
 import com.manydesigns.elements.Element;
 import com.manydesigns.elements.annotations.Help;
 import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
@@ -238,16 +239,15 @@ public class TableForm implements Element {
     // Inner class: Row
     //**************************************************************************
 
-    public class Row implements Element {
+    public class Row extends AbstractCompositeElement<Field> {
         public static final String copyright =
                 "Copyright (c) 2005-2011, ManyDesigns srl";
 
         protected String key;
-        protected final Field[] fields;
         protected final int index;
 
         public Row(int index) {
-            fields = new Field[columns.length];
+            super(columns.length);
             this.index = index;
         }
 
@@ -262,7 +262,7 @@ public class TableForm implements Element {
                 xb.closeElement("td");
             }
 
-            for (Field current : fields) {
+            for (Field current : this) {
                 xb.openElement("td");
                 if (!current.getErrors().isEmpty()) {
                     xb.addAttribute("class", "tableform-error");
@@ -276,14 +276,14 @@ public class TableForm implements Element {
         }
 
         public void readFromRequest(HttpServletRequest req) {
-            for (Field current : fields) {
+            for (Field current : this) {
                 current.readFromRequest(req);
             }
         }
 
         public boolean validate() {
             boolean result = true;
-            for (Field current : fields) {
+            for (Field current : this) {
                 result = current.validate() && result;
             }
             return result;
@@ -296,7 +296,7 @@ public class TableForm implements Element {
                 key = keyTextFormat.format(obj);
             }
             int index = 0;
-            for (Field field : fields) {
+            for (Field field : this) {
                 Column column = columns[index];
                 TextFormat hrefTextFormat = column.getHrefTextFormat();
                 TextFormat titleTextFormat = column.getTitleTextFormat();
@@ -312,17 +312,13 @@ public class TableForm implements Element {
         }
 
         public void writeToObject(Object obj) {
-            for (Field current : fields) {
+            for (Field current : this) {
                 current.writeToObject(obj);
             }
         }
 
         public String getKey() {
             return key;
-        }
-
-        public Field[] getFields() {
-            return fields;
         }
 
         public int getIndex() {

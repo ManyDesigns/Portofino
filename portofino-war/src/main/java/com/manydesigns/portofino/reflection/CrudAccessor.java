@@ -32,13 +32,10 @@ package com.manydesigns.portofino.reflection;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.logic.CrudLogic;
-import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

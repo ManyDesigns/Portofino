@@ -56,4 +56,6 @@ public @interface Select {
 
     String[] values() default {};
     String[] labels() default {};
+
+    boolean nullOption() default true;
 }

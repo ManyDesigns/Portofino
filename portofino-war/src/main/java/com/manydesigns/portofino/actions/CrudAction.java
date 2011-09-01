@@ -45,6 +45,7 @@ import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
+import com.manydesigns.portofino.actions.forms.CrudSelectionProviderEdit;
 import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -58,6 +59,7 @@ import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.crud.Button;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.model.pages.crud.CrudProperty;
+import com.manydesigns.portofino.model.pages.crud.SelectionProviderReference;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
@@ -69,6 +71,8 @@ import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
+import org.apache.commons.collections.MultiHashMap;
+import org.apache.commons.collections.MultiMap;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -110,6 +114,7 @@ public class CrudAction extends PortletAction {
     public PkHelper pkHelper;
     public List<CrudButton> crudButtons;
     public List<CrudSelectionProvider> crudSelectionProviders;
+    public MultiMap availableSelectionProviders; //List<String> -> DatabaseSelectionProvider
     public String pk;
 
     public final static String prefix = null;
@@ -163,6 +168,7 @@ public class CrudAction extends PortletAction {
         pk = crudPageInstance.getPk();
         crudPage = getPageInstance().getPage();
         crud = crudPage.getCrud();
+        availableSelectionProviders = new MultiHashMap();
         if(crud != null) {
             classAccessor = crudPageInstance.getClassAccessor();
             baseTable = crudPageInstance.getBaseTable();
@@ -176,19 +182,31 @@ public class CrudAction extends PortletAction {
     }
 
     private void setupSelectionProviders() {
+        Set<String> configuredSPs = new HashSet<String>();
+        for(SelectionProviderReference ref : crud.getSelectionProviders()) {
+            if(!ref.isEnabled()) {
+                continue; //TODO isEnabled o sottoclasse?
+            }
+            if(ref.getForeignKey() == null) {
+                logger.error("Not supported");
+                continue;
+            }
+            boolean added = setupSelectionProvider(ref.getForeignKey(), configuredSPs);
+            if(!added) {
+                logger.warn("Selection provider {} not added; check whether the fields on which it is configured " +
+                        "overlap with some other selection provider", ref.getQualifiedName());
+            }
+        }
+
         Table table = crud.getActualTable();
 
         for(ForeignKey fk : table.getForeignKeys()) {
-            setupSelectionProvider(fk);
-        }
-
-        for (DatabaseSelectionProvider current : table.getSelectionProviders()) {
-            setupSelectionProvider(current);
+            setupSelectionProvider(fk, configuredSPs);
         }
     }
 
-    private void setupSelectionProvider(DatabaseSelectionProvider current) {
-        String name = current.getName();
+    private boolean setupSelectionProvider(DatabaseSelectionProvider current, Set<String> configuredSPs) {
+        String name = current.getQualifiedName();
         String database = current.getToDatabase();
         String sql = current.getSql();
         String hql = current.getHql();
@@ -210,6 +228,13 @@ public class CrudAction extends PortletAction {
             }
         }
 
+        availableSelectionProviders.put(Arrays.asList(fieldNames), current);
+        for(String fieldName : fieldNames) {
+            //If another SP is configured for the same field, stop
+            if(configuredSPs.contains(fieldName)) {
+                return false;
+            }
+        }
 
         SelectionProvider selectionProvider;
         if (sql != null) {
@@ -236,12 +261,16 @@ public class CrudAction extends PortletAction {
         } else {
             logger.warn("ModelSelection provider '{}':" +
                     " both 'hql' and 'sql' are null", name);
-            return;
+            return false;
         }
 
         CrudSelectionProvider crudSelectionProvider =
                 new CrudSelectionProvider(selectionProvider, fieldNames);
         crudSelectionProviders.add(crudSelectionProvider);
+        for(String fieldName : fieldNames) {
+            configuredSPs.add(fieldName);
+        }
+        return true;
     }
 
     //--------------------------------------------------------------------------
@@ -961,7 +990,7 @@ public class CrudAction extends PortletAction {
     private void exportRows(WritableSheet sheet, int i,
                             TableForm.Row row) throws WriteException {
         int j = 0;
-        for (Field field : row.getFields()) {
+        for (Field field : row) {
             addFieldToCell(sheet, i, j, field);
             j++;
         }
@@ -1106,7 +1135,7 @@ public class CrudAction extends PortletAction {
 
         for (TableForm.Row row : tableForm.getRows()) {
             xb.openElement("rows");
-            for (Field field : row.getFields()) {
+            for (Field field : row) {
                 xb.openElement("row");
                 xb.openElement("value");
                 xb.write(field.getStringValue());
@@ -1273,15 +1302,18 @@ public class CrudAction extends PortletAction {
     public Form crudConfigurationForm;
     public TableForm propertiesTableForm;
     public CrudPropertyEdit[] edits;
+    public TableForm selectionProvidersForm;
+    public CrudSelectionProviderEdit[] selectionProviderEdits;
 
     public Resolution configure() {
-        setupEdits();
-        setupPageConfiguration();
+        prepareConfigurationForms();
 
         crudConfigurationForm.readFromObject(crudPage.getCrud());
         if(edits != null) {
             propertiesTableForm.readFromObject(edits);
         }
+
+        selectionProvidersForm.readFromObject(selectionProviderEdits);
 
         return new ForwardResolution("/layouts/crud/configure.jsp");
     }
@@ -1302,11 +1334,43 @@ public class CrudAction extends PortletAction {
                 .configSelectionProvider(tableSelectionProvider, "table")
                 .build();
 
+        setupEdits();
+
         if(edits != null) {
             TableFormBuilder tableFormBuilder =
                     new TableFormBuilder(CrudPropertyEdit.class)
                         .configNRows(edits.length);
             propertiesTableForm = tableFormBuilder.build();
+        }
+
+        if(!availableSelectionProviders.isEmpty()) {
+            setupSelectionProviderEdits();
+            TableFormBuilder tableFormBuilder =
+                    new TableFormBuilder(CrudSelectionProviderEdit.class);
+            tableFormBuilder.configNRows(availableSelectionProviders.size());
+            for(int i = 0; i < selectionProviderEdits.length; i++) {
+                Collection<DatabaseSelectionProvider> availableProviders =
+                        (Collection) availableSelectionProviders.get
+                                (Arrays.asList(selectionProviderEdits[i].fieldNames));
+                if(availableProviders == null || availableProviders.size() == 0) {
+                    continue;
+                }
+                String[] availableProviderNames = new String[availableProviders.size() + 1];
+                availableProviderNames[0] = "None";
+                int j = 1;
+                for(DatabaseSelectionProvider sp : availableProviders) {
+                    availableProviderNames[j] = sp.getQualifiedName();
+                    j++;
+                }
+                String[] availableProviderValues = new String[availableProviderNames.length];
+                System.arraycopy(availableProviderNames, 1,
+                                 availableProviderValues, 1, availableProviderNames.length - 1);
+                DefaultSelectionProvider selectionProvider =
+                        DefaultSelectionProvider.create
+                                (selectionProviderEdits[i].columns, availableProviderValues, availableProviderNames);
+                tableFormBuilder.configSelectionProvider(i, selectionProvider, "selectionProvider");
+            }
+            selectionProvidersForm = tableFormBuilder.build();
         }
     }
 
@@ -1344,10 +1408,27 @@ public class CrudAction extends PortletAction {
         }
     }
 
+    private void setupSelectionProviderEdits() {
+        selectionProviderEdits = new CrudSelectionProviderEdit[availableSelectionProviders.size()];
+        int i = 0;
+        for(Map.Entry entry : (Set<Map.Entry>) availableSelectionProviders.entrySet()) {
+            selectionProviderEdits[i] = new CrudSelectionProviderEdit();
+            String[] fieldNames = (String[]) ((Collection) entry.getKey()).toArray(new String[0]);
+            selectionProviderEdits[i].fieldNames = fieldNames;
+            selectionProviderEdits[i].columns = StringUtils.join(fieldNames, ", ");
+            selectionProviderEdits[i].displayMode = SelectField.DisplayMode.DROPDOWN; //TODO
+            for(CrudSelectionProvider cp : crudSelectionProviders) {
+                if(Arrays.equals(cp.fieldNames, fieldNames)) {
+                    selectionProviderEdits[i].selectionProvider = cp.getSelectionProvider().getName();
+                }
+            }
+            i++;
+        }
+    }
+
     public Resolution updateConfiguration() {
         synchronized (application) {
-            setupEdits();
-            setupPageConfiguration();
+            prepareConfigurationForms();
 
             if(crudPage.getCrud() == null) {
                 crudPage.setCrud(new Crud());
@@ -1367,6 +1448,10 @@ public class CrudAction extends PortletAction {
                 propertiesTableForm.readFromRequest(context.getRequest());
                 valid = propertiesTableForm.validate() && valid;
             }
+
+            selectionProvidersForm.readFromRequest(context.getRequest());
+
+            valid = selectionProvidersForm.validate() && valid;
 
             if (valid) {
                 updatePageConfiguration();
@@ -1389,6 +1474,37 @@ public class CrudAction extends PortletAction {
 
                         crudProperty.setCrud(crud);
                         crud.getProperties().add(crudProperty);
+                    }
+                }
+
+                if(!availableSelectionProviders.isEmpty()) {
+                    selectionProvidersForm.writeToObject(selectionProviderEdits);
+                    crud.getSelectionProviders().clear();
+                    for(CrudSelectionProviderEdit sp : selectionProviderEdits) {
+                        if(sp.selectionProvider == null) {
+                            SelectionProviderReference sel = new SelectionProviderReference();
+                            sel.setEnabled(false);
+                            sel.setParent(crud);
+                            crud.getSelectionProviders().add(sel);
+                        } else {
+                            List<String> key = Arrays.asList(sp.fieldNames);
+                            Collection<DatabaseSelectionProvider> selectionProviders =
+                                    (Collection<DatabaseSelectionProvider>) availableSelectionProviders.get(key);
+                            for(DatabaseSelectionProvider dsp : selectionProviders) {
+                                if(sp.selectionProvider.equals(dsp.getQualifiedName())) {
+                                    SelectionProviderReference sel = new SelectionProviderReference();
+                                    if(dsp instanceof ForeignKey) {
+                                        sel.setForeignKeyName(dsp.getQualifiedName());
+                                    } else {
+                                        logger.error("Unimplemented case");
+                                        break;
+                                    }
+                                    sel.setParent(crud);
+                                    crud.getSelectionProviders().add(sel);
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -1556,5 +1672,9 @@ public class CrudAction extends PortletAction {
 
     public void setForm(Form form) {
         this.form = form;
+    }
+
+    public TableForm getSelectionProvidersForm() {
+        return selectionProvidersForm;
     }
 }

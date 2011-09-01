@@ -444,16 +444,14 @@ public class PortletAction extends AbstractActionBean {
     //--------------------------------------------------------------------------
 
     protected void prepareConfigurationForms() {
+        Page page = pageInstance.getPage();
+
         boolean isTopLevelPage = pageInstance.getPage().getParent() instanceof RootPage;
         pageConfigurationForm = new FormBuilder(EditPage.class)
                 .configFields(isTopLevelPage ? TOP_LEVEL_PAGE_CONFIGURATION_FIELDS : PAGE_CONFIGURATION_FIELDS)
                 .configFieldSetNames("Page")
                 .build();
-    }
 
-    protected void setupPageConfiguration() {
-        Page page = pageInstance.getPage();
-        prepareConfigurationForms();
         EditPage edit = new EditPage();
         edit.setDescription(page.getDescription());
         edit.setEmbedInParent(page.getLayoutContainerInParent() != null);

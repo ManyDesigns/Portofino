@@ -276,7 +276,7 @@ public class ChartAction extends PortletAction {
             {{"name", "legend", "database", "query", "urlExpression"}};
 
     public Resolution configure() {
-        setupPageConfiguration();
+        prepareConfigurationForms();
 
         return new ForwardResolution("/layouts/chart/configure.jsp");
     }

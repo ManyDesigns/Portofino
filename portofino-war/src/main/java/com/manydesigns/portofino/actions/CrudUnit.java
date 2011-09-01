@@ -699,7 +699,7 @@ public class CrudUnit {
     private void exportRows(WritableSheet sheet, int i,
                             TableForm.Row row) throws WriteException {
         int j = 0;
-        for (Field field : row.getFields()) {
+        for (Field field : row) {
             addFieldToCell(sheet, i, j, field);
             j++;
         }
@@ -844,7 +844,7 @@ public class CrudUnit {
 
         for (TableForm.Row row : tableForm.getRows()) {
             xb.openElement("rows");
-            for (Field field : row.getFields()) {
+            for (Field field : row) {
                 xb.openElement("row");
                 xb.openElement("value");
                 xb.write(field.getStringValue());

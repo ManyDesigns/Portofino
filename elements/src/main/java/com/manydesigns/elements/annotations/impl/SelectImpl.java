@@ -50,13 +50,15 @@ public class SelectImpl implements Select {
     private SelectSearchField.DisplayMode searchDisplayMode;
     private String[] values;
     private String[] labels;
+    private boolean nullOption;
 
     public SelectImpl(SelectField.DisplayMode displayMode, SelectSearchField.DisplayMode searchDisplayMode,
-                      String[] values, String[] labels) {
+                      String[] values, String[] labels, boolean nullOption) {
         this.displayMode = displayMode;
         this.searchDisplayMode=searchDisplayMode;
         this.values = values;
         this.labels = labels;
+        this.nullOption = nullOption;
     }
 
     public SelectField.DisplayMode displayMode() {
@@ -73,6 +75,10 @@ public class SelectImpl implements Select {
 
     public String[] labels() {
         return labels;
+    }
+
+    public boolean nullOption() {
+        return nullOption;
     }
 
     public Class<? extends Annotation> annotationType() {

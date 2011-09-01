@@ -29,8 +29,8 @@
 
 package com.manydesigns.portofino.actions.forms;
 
-import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.fields.SelectField;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -38,12 +38,20 @@ import com.manydesigns.elements.annotations.Required;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class MovePage {
+public class CrudSelectionProviderEdit {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    @Required
-    @Label("Move to")
-    public String destinationPageId;
+    @Updatable(false)
+    public String columns;
 
+    @Select(nullOption = false)
+    public String selectionProvider;
+
+    @Select(nullOption = false)
+    @Required
+    public SelectField.DisplayMode displayMode;
+
+    @InSummary(false) //Per non includere in TableForm
+    public String[] fieldNames;
 }

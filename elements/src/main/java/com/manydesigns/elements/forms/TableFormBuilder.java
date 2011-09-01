@@ -70,6 +70,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
 
     protected List<PropertyAccessor> propertyAccessors;
     protected int nRows = DEFAULT_N_ROWS;
+    protected final List<Map<String[], SelectionProvider>> rowSelectionProviders;
     protected Mode mode = Mode.EDIT;
 
     public static final Logger logger =
@@ -89,6 +90,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
 
         hrefTextFormats = new HashMap<String, TextFormat>();
         titleTextFormats = new HashMap<String, TextFormat>();
+        rowSelectionProviders = new ArrayList<Map<String[], SelectionProvider>>(nRows);
     }
 
 
@@ -117,6 +119,9 @@ public class TableFormBuilder extends AbstractFormBuilder {
 
     public TableFormBuilder configNRows(int nRows) {
         this.nRows = nRows;
+        while(rowSelectionProviders.size() < nRows) {
+            rowSelectionProviders.add(new HashMap<String[], SelectionProvider>());
+        }
         return this;
     }
 
@@ -128,6 +133,12 @@ public class TableFormBuilder extends AbstractFormBuilder {
     public TableFormBuilder configSelectionProvider(SelectionProvider selectionProvider,
                                             String... fieldNames) {
         selectionProviders.put(fieldNames, selectionProvider);
+        return this;
+    }
+
+    public TableFormBuilder configSelectionProvider(int row, SelectionProvider selectionProvider,
+                                                    String... fieldNames) {
+        rowSelectionProviders.get(row).put(fieldNames, selectionProvider);
         return this;
     }
 
@@ -219,34 +230,44 @@ public class TableFormBuilder extends AbstractFormBuilder {
                             propertyAccessor);
                     break;
                 }
-                row.fields[j] = field;
+                row.add(field);
             }
 
             // handle cascaded select fields
             for (Map.Entry<String[], SelectionProvider> current :
                     selectionProviders.entrySet()) {
-                String[] fieldNames = current.getKey();
-                SelectionProvider selectionProvider = current.getValue();
-                SelectionModel selectionModel =
-                        selectionProvider.createSelectionModel();
+                setupSelectionProvidersForRow(tableForm, row, current);
+            }
 
-                SelectField previousField = null;
-                for (int i = 0; i < fieldNames.length; i++) {
-                    int fieldIndex =
-                            findFieldIndexByName(tableForm, fieldNames[i]);
-                    SelectField selectField =
-                            (SelectField) row.getFields()[fieldIndex];
-                    selectField.setSelectionModel(selectionModel);
-                    selectField.setSelectionModelIndex(i);
-                    if (previousField != null) {
-                        selectField.setPreviousSelectField(previousField);
-                        previousField.setNextSelectField(selectField);
-                    }
-                    previousField = selectField;
-                }
+            for (Map.Entry<String[], SelectionProvider> current :
+                    rowSelectionProviders.get(index).entrySet()) {
+                setupSelectionProvidersForRow(tableForm, row, current);
             }
 
             index++;
+        }
+    }
+
+    protected void setupSelectionProvidersForRow(TableForm tableForm, TableForm.Row row,
+                                                 Map.Entry<String[], SelectionProvider> current) {
+        String[] fieldNames = current.getKey();
+        SelectionProvider selectionProvider = current.getValue();
+        SelectionModel selectionModel =
+                selectionProvider.createSelectionModel();
+
+        SelectField previousField = null;
+        for (int i = 0; i < fieldNames.length; i++) {
+            int fieldIndex =
+                    findFieldIndexByName(tableForm, fieldNames[i]);
+            SelectField selectField =
+                    (SelectField) row.get(fieldIndex);
+            selectField.setSelectionModel(selectionModel);
+            selectField.setSelectionModelIndex(i);
+            if (previousField != null) {
+                selectField.setPreviousSelectField(previousField);
+                previousField.setNextSelectField(selectField);
+            }
+            previousField = selectField;
         }
     }
 

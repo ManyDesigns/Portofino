@@ -46,6 +46,12 @@
                 });
             </script>
         </c:if>
+
+        <fieldset id="crudSelectionProvidersFieldset" class="mde-form-fieldset" style="padding-top: 1em; margin-top: 1em;">
+            <legend>Selection Providers</legend>
+            <mde:write name="actionBean" property="selectionProvidersForm"/>
+        </fieldset>
+
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>

@@ -143,7 +143,7 @@ public class TextAction extends PortletAction {
     }
 
     public Resolution configure() throws IOException {
-        setupPageConfiguration();
+        prepareConfigurationForms();
         loadContent();
         return new ForwardResolution("/layouts/text/configure.jsp");
     }

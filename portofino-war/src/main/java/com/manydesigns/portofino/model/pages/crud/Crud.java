@@ -64,6 +64,7 @@ public class Crud implements ModelObject {
     protected final List<CrudProperty> properties;
     protected final List<Annotation> annotations;
     protected final List<Button> buttons;
+    protected final List<SelectionProviderReference> selectionProviders;
 
     protected String name;
     protected String table;
@@ -93,6 +94,7 @@ public class Crud implements ModelObject {
         properties = new ArrayList<CrudProperty>();
         annotations = new ArrayList<Annotation>();
         buttons = new ArrayList<Button>();
+        selectionProviders = new ArrayList<SelectionProviderReference>();
     }
 
     public Crud(Crud parentCrud,
@@ -130,6 +132,10 @@ public class Crud implements ModelObject {
         for (Button button : buttons) {
             button.reset();
         }
+
+        for(SelectionProviderReference ref : selectionProviders) {
+            ref.reset();
+        }
     }
 
     public void init(Model model) {
@@ -145,6 +151,10 @@ public class Crud implements ModelObject {
 
         for (Button button : buttons) {
             button.init(model);
+        }
+
+        for(SelectionProviderReference ref : selectionProviders) {
+            ref.init(model);
         }
     }
 
@@ -268,5 +278,13 @@ public class Crud implements ModelObject {
 
     public String getActualVariable() {
         return variable != null ? variable : name;
+    }
+
+    @XmlElementWrapper(name="selectionProviders")
+    @XmlElements({
+          @XmlElement(name="selectionProvider",type=SelectionProviderReference.class)
+    })
+    public List<SelectionProviderReference> getSelectionProviders() {
+        return selectionProviders;
     }
 }

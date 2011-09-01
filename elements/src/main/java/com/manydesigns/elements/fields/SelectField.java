@@ -39,6 +39,7 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
@@ -78,7 +79,10 @@ public class SelectField extends AbstractField {
         super(accessor, mode, prefix);
 
         Select annotation = accessor.getAnnotation(Select.class);
-        if (annotation == null) {
+
+        boolean nullOption = (annotation == null) || annotation.nullOption();
+
+        if (annotation == null || annotation.values().length == 0) {
             displayMode = DisplayMode.DROPDOWN;
             if (accessor.getType().isEnum()) {
                 SelectionProvider selectionProvider =
@@ -99,7 +103,9 @@ public class SelectField extends AbstractField {
             displayMode = annotation.displayMode();
         }
 
-        comboLabel = getText("elements.field.select.select", label);
+        if(nullOption) {
+            comboLabel = getText("elements.field.select.select", label);
+        }
         autocompleteId = id + AUTOCOMPLETE_SUFFIX;
         autocompleteInputName = inputName + AUTOCOMPLETE_SUFFIX;
     }
@@ -203,7 +209,7 @@ public class SelectField extends AbstractField {
         xb.addAttribute("name", inputName);
 
         boolean checked = (value == null);
-        if (!options.isEmpty()) {
+        if (comboLabel != null && !options.isEmpty()) {
             xb.writeOption("", checked, comboLabel);
         }
 
@@ -212,8 +218,10 @@ public class SelectField extends AbstractField {
             Object optionValue = option.getKey();
             String optionStringValue =
                     (String) OgnlUtils.convertValue(optionValue, String.class);
+            optionStringValue = StringUtils.defaultString(optionStringValue);
             String optionLabel = option.getValue();
-            checked =  optionValue.equals(value);
+            checked =  (optionValue == value) ||
+                       (optionValue != null && optionValue.equals(value));
             xb.writeOption(optionStringValue, checked, optionLabel);
         }
         xb.closeElement("select");

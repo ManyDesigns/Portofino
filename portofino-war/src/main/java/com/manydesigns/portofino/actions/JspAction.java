@@ -92,13 +92,13 @@ public class JspAction extends PortletAction {
     }
 
     public Resolution configure() {
-        setupPageConfiguration();
+        prepareConfigurationForms();
         return new ForwardResolution("/layouts/jsp/configure.jsp");
     }
 
     public Resolution updateConfiguration() {
         synchronized (application) {
-            setupPageConfiguration();
+            prepareConfigurationForms();
             readPageConfigurationFromRequest();
             form.readFromRequest(context.getRequest());
             boolean valid = validatePageConfiguration();

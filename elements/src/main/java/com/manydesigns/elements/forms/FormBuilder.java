@@ -263,6 +263,14 @@ public class FormBuilder extends AbstractFormBuilder {
     protected void buildField(com.manydesigns.elements.forms.FieldSet fieldSet,
                               PropertyAccessor propertyAccessor,
                               Map<String,Field> fieldMap) {
+        Field field = buildField(propertyAccessor);
+        if(field != null) {
+            fieldSet.add(field);
+            fieldMap.put(propertyAccessor.getName(), field);
+        }
+    }
+
+    protected Field buildField(PropertyAccessor propertyAccessor) {
         Field field = null;
         String fieldName = propertyAccessor.getName();
         for (Map.Entry<String[], SelectionProvider> current
@@ -282,10 +290,7 @@ public class FormBuilder extends AbstractFormBuilder {
         if (field == null) {
             logger.warn("Cannot instanciate field for property {}",
                     propertyAccessor);
-            return;
         }
-
-        fieldSet.add(field);
-        fieldMap.put(fieldName, field);
+        return field;
     }
 }
