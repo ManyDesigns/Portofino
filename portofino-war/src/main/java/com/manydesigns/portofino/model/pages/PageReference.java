@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.model.pages;
 
+import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.portofino.model.Model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -81,6 +82,7 @@ public class PageReference extends Page {
     //**************************************************************************
 
     @XmlAttribute(required = true)
+    @Label("Reference to page")
     public String getTo() {
         return to;
     }

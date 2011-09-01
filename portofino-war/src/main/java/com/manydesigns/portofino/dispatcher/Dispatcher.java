@@ -38,7 +38,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -106,6 +109,9 @@ public class Dispatcher {
     }
 
     public static String getRewrittenPath(Page page) {
+        if(page == null) {
+            return null;
+        }
         String rewrittenPath = page.getUrl();
         if (rewrittenPath == null) {
             if (page instanceof TextPage) {
@@ -120,8 +126,10 @@ public class Dispatcher {
                 rewrittenPath = "/jsp.action";
             } else if (page instanceof PageReference) {
                 rewrittenPath = "/ref.action";
+            } else if (page instanceof RootPage) {
+                rewrittenPath = "/";
             } else {
-                throw new Error("Unrecognized page type");
+                throw new Error("Unrecognized page type: " + page.getClass().getName());
             }
         }
         return rewrittenPath;

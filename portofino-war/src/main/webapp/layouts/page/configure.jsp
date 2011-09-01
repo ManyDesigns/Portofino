@@ -15,11 +15,11 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="portletHeader">
-        <%@include file="../portlet-common-configuration.jsp" %>
+        <mde:write name="actionBean" property="form" />
+        <stripes:submit name="configureReferencedPage" value="Configure referenced page" />
+        <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <mde:write name="actionBean" property="form" />
-        <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">

@@ -36,15 +36,14 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.Dispatcher;
-import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.dispatcher.PageReferenceInstance;
 import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.model.pages.PageReference;
 import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.util.UrlBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -60,8 +59,6 @@ public class PageReferenceAction extends PortletAction {
     protected PageReference pageReference;
 
     protected Form form;
-
-    protected String includeActionPath;
 
     public static final Logger logger =
             LoggerFactory.getLogger(PageReferenceAction.class);
@@ -92,25 +89,38 @@ public class PageReferenceAction extends PortletAction {
         } else {
             //Never embed in this case - the referenced action will take
             //care of it.
-            includeActionPath = Dispatcher.getRewrittenPath(pageReference.getToPage());
-            return new ForwardResolution(includeActionPath);
+            String fwd = Dispatcher.getRewrittenPath(pageReference.getToPage());
+            return new ForwardResolution(fwd);
+        }
+    }
+
+    public Resolution configureReferencedPage() {
+        if(pageReference.getToPage() == null) {
+            SessionMessages.addErrorMessage("No referenced page specified");
+            return configure();
+        } else {
+            String fwd = Dispatcher.getRewrittenPath(pageReference.getToPage());
+            UrlBuilder cancelReturnUrlBuilder =
+                    new UrlBuilder(Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), true);
+            cancelReturnUrlBuilder.addParameter("configure");
+            cancelReturnUrlBuilder.addParameter("cancelReturnUrl", cancelReturnUrl);
+            context.getRequest().setAttribute
+                    ("cancelReturnUrl", cancelReturnUrlBuilder.toString());
+            return new ForwardResolution(fwd).addParameter("configure");
         }
     }
 
     public Resolution configure() {
-        setupPageConfiguration();
+        setupConfigurationForm();
         return new ForwardResolution("/layouts/page/configure.jsp");
     }
 
     public Resolution updateConfiguration() {
         synchronized (application) {
-            setupPageConfiguration();
-            readPageConfigurationFromRequest();
+            setupConfigurationForm();
             form.readFromRequest(context.getRequest());
-            boolean valid = validatePageConfiguration();
-            valid = form.validate() && valid;
+            boolean valid = form.validate();
             if(valid) {
-                updatePageConfiguration();
                 form.writeToObject(pageReference);
                 saveModel();
                 SessionMessages.addInfoMessage("Configuration updated successfully");
@@ -119,12 +129,12 @@ public class PageReferenceAction extends PortletAction {
         }
     }
 
-    @Override
-    protected void prepareConfigurationForms() {
-        super.prepareConfigurationForms();
-
+    protected void setupConfigurationForm() {
+        //Do NOT include root page: since it issues a redirect, it is impossible
+        //to update the PageReference configuration.
         SelectionProvider pagesSelectionProvider =
-                PageLogic.createPagesSelectionProvider(model.getRootPage(), true, true, pageReference);
+                PageLogic.createPagesSelectionProvider(model.getRootPage(), false,
+                                                       true, pageReference);
 
         form = new FormBuilder(PageReference.class)
                 .configFields("to")
@@ -139,10 +149,6 @@ public class PageReferenceAction extends PortletAction {
 
     public Form getForm() {
         return form;
-    }
-
-    public String getIncludeActionPath() {
-        return includeActionPath;
     }
 
 }

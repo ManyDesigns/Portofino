@@ -339,7 +339,7 @@ public class HibernateApplicationImpl implements Application {
         int i = keyProperties.length;
         int p = ognlParameters.length;
         Object[] parameters = new Object[p + i];
-        System.arraycopy(ognlParameters, i, parameters, i, p - 1);
+        System.arraycopy(ognlParameters, 0, parameters, i, p);
         int indexOfWhere = formatString.toUpperCase().indexOf("WHERE") + 5; //5 = "WHERE".length()
         String formatStringPrefix = formatString.substring(0, indexOfWhere);
         formatString = formatString.substring(indexOfWhere);
