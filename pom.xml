@@ -40,9 +40,10 @@
         <groovy.version>1.7.5</groovy.version>
     </properties>
     <modules>
-        <module>portofino-war</module>
         <module>elements</module>
         <module>elements-extras</module>
+        <module>portofino-jar</module>
+        <module>portofino-war</module>
     </modules>
     
     <build>

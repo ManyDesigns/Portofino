@@ -1,7 +1,5 @@
 package com.manydesigns.portofino.model;
 
-import com.manydesigns.portofino.connections.Connections;
-
 import javax.xml.bind.annotation.XmlRegistry;
 
 @XmlRegistry

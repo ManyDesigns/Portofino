@@ -321,7 +321,11 @@ public class CrudAction extends PortletAction {
             loadObjects();
             setupTableForm(Mode.VIEW);
 
-            return forwardToPortletPage("/layouts/crud/search.jsp");
+            String fwd = crudPage.getSearchUrl();
+            if(StringUtils.isEmpty(fwd)) {
+                fwd = "/layouts/crud/search.jsp";
+            }
+            return forwardToPortletPage(fwd);
         } catch(Exception e) {
             logger.debug("Crud not correctly configured", e);
             return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
@@ -338,7 +342,11 @@ public class CrudAction extends PortletAction {
             loadObjects();
             setupTableForm(Mode.VIEW);
             tableForm.setSelectable(false);
-            return new ForwardResolution("/layouts/crud/embedded-search.jsp");
+            String fwd = crudPage.getEmbeddedSearchUrl();
+            if(StringUtils.isEmpty(fwd)) {
+                fwd = "/layouts/crud/embedded-search.jsp";
+            }
+            return new ForwardResolution(fwd);
         } catch(Exception e) {
             logger.error("Crud not correctly configured", e);
             return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
@@ -383,7 +391,11 @@ public class CrudAction extends PortletAction {
 
         setupReturnToParentTarget();
 
-        return forwardToPortletPage("/layouts/crud/read.jsp");
+        String fwd = crudPage.getReadUrl();
+        if(StringUtils.isEmpty(fwd)) {
+            fwd = "/layouts/crud/read.jsp";
+        }
+        return forwardToPortletPage(fwd);
     }
 
     protected void refreshBlobDownloadHref() {
@@ -1332,7 +1344,9 @@ public class CrudAction extends PortletAction {
             propertiesTableForm.readFromObject(edits);
         }
 
-        selectionProvidersForm.readFromObject(selectionProviderEdits);
+        if(selectionProviderEdits != null) {
+            selectionProvidersForm.readFromObject(selectionProviderEdits);
+        }
 
         return new ForwardResolution("/layouts/crud/configure.jsp");
     }
@@ -1472,9 +1486,10 @@ public class CrudAction extends PortletAction {
                 valid = propertiesTableForm.validate() && valid;
             }
 
-            selectionProvidersForm.readFromRequest(context.getRequest());
-
-            valid = selectionProvidersForm.validate() && valid;
+            if(selectionProvidersForm != null) {
+                selectionProvidersForm.readFromRequest(context.getRequest());
+                valid = selectionProvidersForm.validate() && valid;
+            }
 
             if (valid) {
                 updatePageConfiguration();
@@ -1504,7 +1519,7 @@ public class CrudAction extends PortletAction {
         crud.getSelectionProviders().clear();
         for(CrudSelectionProviderEdit sp : selectionProviderEdits) {
             if(sp.selectionProvider == null) {
-                //Shortcut: take the first available selection provider and disable it
+                //TODO this is a shortcut: takes the first available selection provider and disables it
                 List<String> key = Arrays.asList(sp.fieldNames);
                 Collection<DatabaseSelectionProvider> selectionProviders =
                         (Collection<DatabaseSelectionProvider>) availableSelectionProviders.get(key);

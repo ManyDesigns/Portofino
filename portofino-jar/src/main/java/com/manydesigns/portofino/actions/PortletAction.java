@@ -578,7 +578,7 @@ public class PortletAction extends AbstractActionBean {
     }
 
     public Resolution deletePage() {
-        PageInstance pageInstance = dispatch.getParentPageInstance();
+        PageInstance parentPageInstance = dispatch.getParentPageInstance();
         Page page = dispatch.getLastPageInstance().getPage();
         synchronized (application) {
             if(page.getParent() == null) {
@@ -586,7 +586,7 @@ public class PortletAction extends AbstractActionBean {
             }  else if(PageLogic.isLandingPage(model.getRootPage(), page)) {
                 SessionMessages.addErrorMessage("You can't delete the landing page!");
             } else {
-                pageInstance.removeChild(page);
+                parentPageInstance.removeChild(page);
                 saveModel();
                 return new RedirectResolution(dispatch.getParentPathUrl());
             }

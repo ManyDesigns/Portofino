@@ -63,6 +63,10 @@ public class CrudPage extends Page {
 
     protected int actualDetailLayoutOrder;
 
+    protected String searchUrl;
+    protected String embeddedSearchUrl;
+    protected String readUrl;
+
     public CrudPage() {
         super();
         detailChildPages = new ArrayList<Page>();
@@ -172,6 +176,30 @@ public class CrudPage extends Page {
         return null;
     }
 
+    @XmlAttribute
+    public String getSearchUrl() {
+        return searchUrl;
+    }
 
+    public void setSearchUrl(String searchUrl) {
+        this.searchUrl = searchUrl;
+    }
 
+    @XmlAttribute
+    public String getEmbeddedSearchUrl() {
+        return embeddedSearchUrl;
+    }
+
+    public void setEmbeddedSearchUrl(String embeddedSearchUrl) {
+        this.embeddedSearchUrl = embeddedSearchUrl;
+    }
+
+    @XmlAttribute
+    public String getReadUrl() {
+        return readUrl;
+    }
+
+    public void setReadUrl(String readUrl) {
+        this.readUrl = readUrl;
+    }
 }

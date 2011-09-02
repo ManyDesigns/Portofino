@@ -1024,7 +1024,7 @@ Struttura dell'XML:
     </databases>
     <rootPage fragment="/" title="Portofino4" description="portofino 4" skin="default">
         <childPages>
-            <textPage fragment="homepage" title="Homepage" description="Homepage" code="zpAUFstfgEUSzsEX9HoO" layoutContainer="default">
+            <textPage fragment="homepage" title="Homepage" description="Homepage" id="zpAUFstfgEUSzsEX9HoO" layoutContainer="default">
                 <permissions>
                     <allow>
                         <group>anonymous</group>

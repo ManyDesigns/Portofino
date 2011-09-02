@@ -82,25 +82,32 @@ public class SelectField extends AbstractField {
 
         boolean nullOption = (annotation == null) || annotation.nullOption();
 
-        if (annotation == null || annotation.values().length == 0) {
+        Object[] values;
+        String[] labels;
+
+        if (annotation == null) {
             displayMode = DisplayMode.DROPDOWN;
-            if (accessor.getType().isEnum()) {
-                SelectionProvider selectionProvider =
-                    DefaultSelectionProvider.create(
-                            accessor.getName(), accessor.getType());
-                selectionModel = selectionProvider.createSelectionModel();
-                selectionModelIndex = 0;
-            }
+            values = new Object[0];
+            labels = new String[0];
         } else {
-            Object[] values = annotation.values();
-            String[] labels = annotation.labels();
-            assert(values.length == labels.length);
+            values = annotation.values();
+            labels = annotation.labels();
+            displayMode = annotation.displayMode();
+        }
+
+        assert(values.length == labels.length);
+        if(values.length > 0) {
             SelectionProvider selectionProvider =
                     DefaultSelectionProvider.create(
                             accessor.getName(), values, labels);
             selectionModel = selectionProvider.createSelectionModel();
             selectionModelIndex = 0;
-            displayMode = annotation.displayMode();
+        } else if (accessor.getType().isEnum()) {
+            SelectionProvider selectionProvider =
+                DefaultSelectionProvider.create(
+                        accessor.getName(), accessor.getType());
+            selectionModel = selectionProvider.createSelectionModel();
+            selectionModelIndex = 0;
         }
 
         if(nullOption) {

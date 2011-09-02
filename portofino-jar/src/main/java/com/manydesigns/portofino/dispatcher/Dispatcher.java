@@ -69,6 +69,11 @@ public class Dispatcher {
             originalPath = request.getServletPath();
         }
 
+        if(originalPath.endsWith(".jsp")) {
+            logger.debug("Path is a JSP page ({}), not dispatching.", originalPath);
+            return null;
+        }
+
         List<PageInstance> path = new ArrayList<PageInstance>();
         List<PageInstance> tree = new ArrayList<PageInstance>();
 
@@ -96,6 +101,8 @@ public class Dispatcher {
             logger.debug("Not all fragments matched");
             return null;
         }
+
+        path.add(0, new PageInstance(application, rootPage, null));
 
         PageInstance pageInstance = path.get(path.size() - 1);
         Page page = pageInstance.getPage();

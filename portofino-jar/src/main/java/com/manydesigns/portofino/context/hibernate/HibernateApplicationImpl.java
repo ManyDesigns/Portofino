@@ -89,8 +89,8 @@ public class HibernateApplicationImpl implements Application {
 
     protected static final String WHERE_STRING = " WHERE ";
     protected static final Pattern FROM_PATTERN =
-            Pattern.compile("[fF][rR][oO][mM]\\s+([a-z_$\\u0080-\\ufffe]{1}[a-z_$1-9\\u0080-\\ufffe]*).*",
-                            Pattern.DOTALL); //. (dot) matches newlines
+            Pattern.compile("(SELECT\\s+.*\\s+)?FROM\\s+([a-z_$\\u0080-\\ufffe]{1}[a-z_$1-9\\u0080-\\ufffe]*).*",
+                            Pattern.CASE_INSENSITIVE | Pattern.DOTALL); //. (dot) matches newlines
 
 
     //**************************************************************************
@@ -567,7 +567,7 @@ public class HibernateApplicationImpl implements Application {
         Matcher matcher = FROM_PATTERN.matcher(queryString);
         String entityName;
         if (matcher.matches()) {
-            entityName =  matcher.group(1);
+            entityName =  matcher.group(2);
         } else {
             return null;
         }
@@ -631,14 +631,27 @@ public class HibernateApplicationImpl implements Application {
         return runHqlQuery(fullQueryString, mergedParameters);
     }
 
-    private List<Object> runHqlQuery(String queryString, Object[] parameters) {
+    public List<Object> runHqlQuery
+            (String queryString, Object[] parameters) {
+        return runHqlQuery(queryString, parameters, null);
+    }
+
+    public List<Object> runHqlQuery
+            (String queryString, Object[] parameters, Integer maxResults) {
         String qualifiedName =
                 getQualifiedTableNameFromQueryString(queryString);
 
-        return runHqlQuery(qualifiedName, queryString, parameters);
+        return runHqlQuery(qualifiedName, queryString, parameters, maxResults);
     }
 
-    private List<Object> runHqlQuery(String qualifiedTableName, String queryString, Object[] parameters) {
+    public List<Object> runHqlQuery
+            (String qualifiedTableName, String queryString, Object[] parameters) {
+        return runHqlQuery(qualifiedTableName, queryString, parameters, null);
+    }
+
+    public List<Object> runHqlQuery
+            (String qualifiedTableName, String queryString,
+             Object[] parameters, Integer maxResults) {
         Session session = getSession(qualifiedTableName);
 
         Query query = session.createQuery(queryString);
@@ -647,6 +660,9 @@ public class HibernateApplicationImpl implements Application {
         }
 
         //noinspection unchecked
+        if(maxResults != null) {
+            query.setMaxResults(maxResults);
+        }
         List<Object> result = query.list();
         return result;
     }
