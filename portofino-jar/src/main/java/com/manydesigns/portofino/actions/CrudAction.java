@@ -196,9 +196,10 @@ public class CrudAction extends PortletAction {
         }
 
         Table table = crud.getActualTable();
-
-        for(ForeignKey fk : table.getForeignKeys()) {
-            setupSelectionProvider(fk, true, configuredSPs);
+        if(table != null) {
+            for(ForeignKey fk : table.getForeignKeys()) {
+                setupSelectionProvider(fk, true, configuredSPs);
+            }
         }
     }
 
