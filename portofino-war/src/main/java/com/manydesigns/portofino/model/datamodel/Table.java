@@ -303,7 +303,7 @@ public class Table implements ModelObject {
 
     public ForeignKey findForeignKeyByName(String fkName) {
         for (ForeignKey current : foreignKeys) {
-            if (current.getForeignKeyName().equals(fkName)) {
+            if (current.getName().equals(fkName)) {
                 return current;
             }
         }
@@ -313,7 +313,7 @@ public class Table implements ModelObject {
 
     public ForeignKey findOneToManyRelationshipByName(String relationshipName) {
         for (ForeignKey current : getOneToManyRelationships()) {
-            if (current.getForeignKeyName().equals(relationshipName)) {
+            if (current.getName().equals(relationshipName)) {
                 return current;
             }
         }

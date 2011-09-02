@@ -392,7 +392,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                 }
 
                 if (relationship == null ||
-                        !relationship.getForeignKeyName().equals(fkName)) {
+                        !relationship.getName().equals(fkName)) {
                     if (relationship != null) {
                         installRelationship(table, relationship, referenceArray);
                     }
@@ -412,7 +412,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
 
                     relationship = new ForeignKey();
                     relationship.setFromTable(table);
-                    relationship.setForeignKeyName(fkName);
+                    relationship.setName(fkName);
                     relationship.setToDatabase(referencedDatabaseName);
                     relationship.setToSchema(referencedSchemaName);
                     relationship.setToTableName(referencedTableName);

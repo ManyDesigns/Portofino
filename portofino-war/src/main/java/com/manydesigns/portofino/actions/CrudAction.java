@@ -184,15 +184,12 @@ public class CrudAction extends PortletAction {
     private void setupSelectionProviders() {
         Set<String> configuredSPs = new HashSet<String>();
         for(SelectionProviderReference ref : crud.getSelectionProviders()) {
-            if(!ref.isEnabled()) {
-                continue; //TODO isEnabled o sottoclasse?
-            }
             if(ref.getForeignKey() == null) {
                 logger.error("Not supported");
                 continue;
             }
-            boolean added = setupSelectionProvider(ref.getForeignKey(), configuredSPs);
-            if(!added) {
+            boolean added = setupSelectionProvider(ref.getForeignKey(), ref.isEnabled(), configuredSPs);
+            if(ref.isEnabled() && !added) {
                 logger.warn("Selection provider {} not added; check whether the fields on which it is configured " +
                         "overlap with some other selection provider", ref.getQualifiedName());
             }
@@ -201,15 +198,12 @@ public class CrudAction extends PortletAction {
         Table table = crud.getActualTable();
 
         for(ForeignKey fk : table.getForeignKeys()) {
-            setupSelectionProvider(fk, configuredSPs);
+            setupSelectionProvider(fk, true, configuredSPs);
         }
     }
 
-    private boolean setupSelectionProvider(DatabaseSelectionProvider current, Set<String> configuredSPs) {
-        String name = current.getQualifiedName();
-        String database = current.getToDatabase();
-        String sql = current.getSql();
-        String hql = current.getHql();
+    private boolean setupSelectionProvider
+            (DatabaseSelectionProvider current, boolean enabled, Set<String> configuredSPs) {
         List<Reference> references = current.getReferences();
 
         String[] fieldNames = new String[references.size()];
@@ -237,6 +231,30 @@ public class CrudAction extends PortletAction {
         }
 
         SelectionProvider selectionProvider;
+
+        if(enabled) {
+            selectionProvider = createSelectionProvider(current, fieldNames, fieldTypes);
+        } else {
+            selectionProvider = null;
+        }
+
+        CrudSelectionProvider crudSelectionProvider =
+                new CrudSelectionProvider(selectionProvider, fieldNames);
+        crudSelectionProviders.add(crudSelectionProvider);
+        for(String fieldName : fieldNames) {
+            configuredSPs.add(fieldName);
+        }
+        return true;
+    }
+
+    protected SelectionProvider createSelectionProvider
+            (DatabaseSelectionProvider current, String[] fieldNames, Class[] fieldTypes) {
+        SelectionProvider selectionProvider = null;
+        String name = current.getName();
+        String database = current.getToDatabase();
+        String sql = current.getSql();
+        String hql = current.getHql();
+
         if (sql != null) {
             Collection<Object[]> objects = application.runSql(database, sql);
             selectionProvider = DefaultSelectionProvider.create(
@@ -261,16 +279,8 @@ public class CrudAction extends PortletAction {
         } else {
             logger.warn("ModelSelection provider '{}':" +
                     " both 'hql' and 'sql' are null", name);
-            return false;
         }
-
-        CrudSelectionProvider crudSelectionProvider =
-                new CrudSelectionProvider(selectionProvider, fieldNames);
-        crudSelectionProviders.add(crudSelectionProvider);
-        for(String fieldName : fieldNames) {
-            configuredSPs.add(fieldName);
-        }
-        return true;
+        return selectionProvider;
     }
 
     //--------------------------------------------------------------------------
@@ -714,6 +724,9 @@ public class CrudAction extends PortletAction {
         for (CrudSelectionProvider current : crudSelectionProviders) {
             SelectionProvider selectionProvider =
                     current.getSelectionProvider();
+            if(selectionProvider == null) {
+                continue;
+            }
             String[] fieldNames = current.getFieldNames();
             /*
             //Include only searchable fields
@@ -770,6 +783,9 @@ public class CrudAction extends PortletAction {
         for (CrudSelectionProvider current : crudSelectionProviders) {
             SelectionProvider selectionProvider =
                     current.getSelectionProvider();
+            if(selectionProvider == null) {
+                continue;
+            }
             String[] fieldNames = current.getFieldNames();
             formBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
@@ -792,6 +808,9 @@ public class CrudAction extends PortletAction {
         for (CrudSelectionProvider current : crudSelectionProviders) {
             SelectionProvider selectionProvider =
                     current.getSelectionProvider();
+            if(selectionProvider == null) {
+                continue;
+            }
             String[] fieldNames = current.getFieldNames();
             tableFormBuilder.configSelectionProvider(
                     selectionProvider, fieldNames);
@@ -1356,15 +1375,14 @@ public class CrudAction extends PortletAction {
                     continue;
                 }
                 String[] availableProviderNames = new String[availableProviders.size() + 1];
+                String[] availableProviderValues = new String[availableProviderNames.length];
                 availableProviderNames[0] = "None";
                 int j = 1;
                 for(DatabaseSelectionProvider sp : availableProviders) {
-                    availableProviderNames[j] = sp.getQualifiedName();
+                    availableProviderNames[j] = sp.getName();
+                    availableProviderValues[j] = sp.getName();
                     j++;
                 }
-                String[] availableProviderValues = new String[availableProviderNames.length];
-                System.arraycopy(availableProviderNames, 1,
-                                 availableProviderValues, 1, availableProviderNames.length - 1);
                 DefaultSelectionProvider selectionProvider =
                         DefaultSelectionProvider.create
                                 (selectionProviderEdits[i].columns, availableProviderValues, availableProviderNames);
@@ -1419,7 +1437,12 @@ public class CrudAction extends PortletAction {
             selectionProviderEdits[i].displayMode = SelectField.DisplayMode.DROPDOWN; //TODO
             for(CrudSelectionProvider cp : crudSelectionProviders) {
                 if(Arrays.equals(cp.fieldNames, fieldNames)) {
-                    selectionProviderEdits[i].selectionProvider = cp.getSelectionProvider().getName();
+                    SelectionProvider selectionProvider = cp.getSelectionProvider();
+                    if(selectionProvider != null) {
+                        selectionProviderEdits[i].selectionProvider = selectionProvider.getName();
+                    } else {
+                        selectionProviderEdits[i].selectionProvider = null;
+                    }
                 }
             }
             i++;
@@ -1458,64 +1481,81 @@ public class CrudAction extends PortletAction {
                 crudConfigurationForm.writeToObject(crudPage.getCrud());
 
                 if(propertiesTableForm != null) {
-                    propertiesTableForm.writeToObject(edits);
-
-                    crud.getProperties().clear();
-                    for (CrudPropertyEdit edit : edits) {
-                        CrudProperty crudProperty = new CrudProperty();
-
-                        crudProperty.setName(edit.name);
-                        crudProperty.setLabel(edit.label);
-                        crudProperty.setInSummary(edit.inSummary);
-                        crudProperty.setSearchable(edit.searchable);
-                        crudProperty.setEnabled(edit.enabled);
-                        crudProperty.setInsertable(edit.insertable);
-                        crudProperty.setUpdatable(edit.updatable);
-
-                        crudProperty.setCrud(crud);
-                        crud.getProperties().add(crudProperty);
-                    }
+                    updateProperties();
                 }
 
                 if(!availableSelectionProviders.isEmpty()) {
-                    selectionProvidersForm.writeToObject(selectionProviderEdits);
-                    crud.getSelectionProviders().clear();
-                    for(CrudSelectionProviderEdit sp : selectionProviderEdits) {
-                        if(sp.selectionProvider == null) {
-                            SelectionProviderReference sel = new SelectionProviderReference();
-                            sel.setEnabled(false);
-                            sel.setParent(crud);
-                            crud.getSelectionProviders().add(sel);
-                        } else {
-                            List<String> key = Arrays.asList(sp.fieldNames);
-                            Collection<DatabaseSelectionProvider> selectionProviders =
-                                    (Collection<DatabaseSelectionProvider>) availableSelectionProviders.get(key);
-                            for(DatabaseSelectionProvider dsp : selectionProviders) {
-                                if(sp.selectionProvider.equals(dsp.getQualifiedName())) {
-                                    SelectionProviderReference sel = new SelectionProviderReference();
-                                    if(dsp instanceof ForeignKey) {
-                                        sel.setForeignKeyName(dsp.getQualifiedName());
-                                    } else {
-                                        logger.error("Unimplemented case");
-                                        break;
-                                    }
-                                    sel.setParent(crud);
-                                    crud.getSelectionProviders().add(sel);
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    updateSelectionProviders();
                 }
 
                 saveModel();
                 SessionMessages.addInfoMessage("Configuration updated successfully");
                 return cancel();
             } else {
-                SessionMessages.addErrorMessage("The configuration could not be saved. Review any errors below and submit again.");
+                SessionMessages.addErrorMessage("The configuration could not be saved. " +
+                        "Review any errors below and submit again.");
                 return new ForwardResolution("/layouts/crud/configure.jsp");
             }
         }
+    }
+
+    private void updateSelectionProviders() {
+        selectionProvidersForm.writeToObject(selectionProviderEdits);
+        crud.getSelectionProviders().clear();
+        for(CrudSelectionProviderEdit sp : selectionProviderEdits) {
+            if(sp.selectionProvider == null) {
+                //Shortcut: take the first available selection provider and disable it
+                List<String> key = Arrays.asList(sp.fieldNames);
+                Collection<DatabaseSelectionProvider> selectionProviders =
+                        (Collection<DatabaseSelectionProvider>) availableSelectionProviders.get(key);
+                DatabaseSelectionProvider dsp = selectionProviders.iterator().next();
+                SelectionProviderReference sel = makeSelectionProviderReference(dsp);
+                sel.setEnabled(false);
+            } else {
+                List<String> key = Arrays.asList(sp.fieldNames);
+                Collection<DatabaseSelectionProvider> selectionProviders =
+                        (Collection<DatabaseSelectionProvider>) availableSelectionProviders.get(key);
+                for(DatabaseSelectionProvider dsp : selectionProviders) {
+                    if(sp.selectionProvider.equals(dsp.getName())) {
+                        makeSelectionProviderReference(dsp);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateProperties() {
+        propertiesTableForm.writeToObject(edits);
+
+        crud.getProperties().clear();
+        for (CrudPropertyEdit edit : edits) {
+            CrudProperty crudProperty = new CrudProperty();
+
+            crudProperty.setName(edit.name);
+            crudProperty.setLabel(edit.label);
+            crudProperty.setInSummary(edit.inSummary);
+            crudProperty.setSearchable(edit.searchable);
+            crudProperty.setEnabled(edit.enabled);
+            crudProperty.setInsertable(edit.insertable);
+            crudProperty.setUpdatable(edit.updatable);
+
+            crudProperty.setCrud(crud);
+            crud.getProperties().add(crudProperty);
+        }
+    }
+
+    protected SelectionProviderReference makeSelectionProviderReference(DatabaseSelectionProvider dsp) {
+        SelectionProviderReference sel = new SelectionProviderReference();
+        if(dsp instanceof ForeignKey) {
+            sel.setForeignKeyName(dsp.getName());
+        } else {
+            logger.error("Unimplemented case");
+            return null;
+        }
+        sel.setParent(crud);
+        crud.getSelectionProviders().add(sel);
+        return sel;
     }
 
     public boolean isRequiredFieldsPresent() {

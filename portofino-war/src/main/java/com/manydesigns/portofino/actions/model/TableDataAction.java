@@ -150,7 +150,7 @@ public class TableDataAction extends AbstractCrudAction {
             };
         }
         SelectionProvider selectionProvider =
-                DefaultSelectionProvider.create(foreignKey.getForeignKeyName(),
+                DefaultSelectionProvider.create(foreignKey.getName(),
                         relatedObjects, classAccessor, textFormats);
 
         // create field names
@@ -193,7 +193,7 @@ public class TableDataAction extends AbstractCrudAction {
         String subQuery = sb.toString();
         String subSearchTitle = MessageFormat.format(
                 "Objects related through foreign key: {0}",
-                foreignKey.getForeignKeyName());
+                foreignKey.getName());
         String subPrefix = MessageFormat.format("subCrudUnits[{0}].", index);
 
         CrudUnit subCrudUnit =

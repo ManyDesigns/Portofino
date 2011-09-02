@@ -320,7 +320,7 @@ public class MessageDiffer extends AbstractDiffer {
         String difference = MessageFormat.format(
                 "Source table {0} does not contain foreign key: {1}",
                 sourceTable.getQualifiedName(),
-                targetForeignKey.getForeignKeyName());
+                targetForeignKey.getName());
         messages.add(difference);
     }
 
@@ -328,17 +328,17 @@ public class MessageDiffer extends AbstractDiffer {
         String difference = MessageFormat.format(
                 "Target table {0} does not contain foreign key: {1}",
                 targetTable.getQualifiedName(),
-                sourceForeignKey.getForeignKeyName());
+                sourceForeignKey.getName());
         messages.add(difference);
     }
 
     public void diffForeignKeySourceTarget(ForeignKeyDiff foreignKeyDiff) {
-        if (!ObjectUtils.equals(sourceForeignKey.getForeignKeyName(),
-                targetForeignKey.getForeignKeyName())) {
+        if (!ObjectUtils.equals(sourceForeignKey.getName(),
+                targetForeignKey.getName())) {
             String difference = MessageFormat.format(
                     "Foreign key names {0} / {1} are different",
-                    sourceForeignKey.getForeignKeyName(),
-                    targetForeignKey.getForeignKeyName());
+                    sourceForeignKey.getName(),
+                    targetForeignKey.getName());
             messages.add(difference);
         }
 
@@ -353,7 +353,7 @@ public class MessageDiffer extends AbstractDiffer {
         String difference = MessageFormat.format(
                 "Source table {0} foreign key: {1} does not contain reference: {2}->{3}",
                 sourceTable.getQualifiedName(),
-                sourceForeignKey.getForeignKeyName(),
+                sourceForeignKey.getName(),
                 targetReference.getFromColumn(),
                 targetReference.getToColumn());
         messages.add(difference);
@@ -363,7 +363,7 @@ public class MessageDiffer extends AbstractDiffer {
         String difference = MessageFormat.format(
                 "Target table {0} foreign key: {1} does not contain reference: {2}->{3}",
                 targetTable.getQualifiedName(),
-                targetForeignKey.getForeignKeyName(),
+                targetForeignKey.getName(),
                 sourceReference.getFromColumn(),
                 sourceReference.getToColumn());
         messages.add(difference);
@@ -398,7 +398,7 @@ public class MessageDiffer extends AbstractDiffer {
     public void diffForeignKeyAnnotationSourceNull(ModelAnnotationDiff modelAnnotationDiff) {
         String difference = MessageFormat.format(
                 "Source foreign key {0} does not contain annotation of type: {1}",
-                sourceForeignKey.getForeignKeyName(),
+                sourceForeignKey.getName(),
                 targetAnnotation.getType());
         messages.add(difference);
     }
@@ -406,7 +406,7 @@ public class MessageDiffer extends AbstractDiffer {
     public void diffForeignKeyAnnotationTargetNull(ModelAnnotationDiff modelAnnotationDiff) {
         String difference = MessageFormat.format(
                 "Target foreign key {0} does not contain annotation of type: {1}",
-                targetForeignKey.getForeignKeyName(),
+                targetForeignKey.getName(),
                 sourceAnnotation.getType());
         messages.add(difference);
     }

@@ -170,7 +170,7 @@ public class DBParserTest extends AbstractPortofinoTest {
                                     String toSchema, String toTable,
                                     String onUpdate, String onDelete) {
         ForeignKey rel = relationships.get(idx);
-        assertEquals(name, rel.getForeignKeyName());
+        assertEquals(name, rel.getName());
         assertEquals(toSchema, rel.getToSchema());
         assertEquals(toTable, rel.getToTable());
         assertEquals(onUpdate, rel.getOnUpdate());

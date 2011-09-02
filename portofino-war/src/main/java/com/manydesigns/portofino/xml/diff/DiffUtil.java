@@ -389,7 +389,7 @@ public class DiffUtil {
             return;
         }
         for (ForeignKey foreignKey : table.getForeignKeys()) {
-            foreignKeyNames.add(foreignKey.getForeignKeyName());
+            foreignKeyNames.add(foreignKey.getName());
         }
     }
 

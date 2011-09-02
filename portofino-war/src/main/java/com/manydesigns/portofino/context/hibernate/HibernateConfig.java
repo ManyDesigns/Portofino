@@ -138,7 +138,7 @@ public class HibernateConfig {
                 for (ForeignKey rel : aTable.getForeignKeys()) {
                     if (BooleanUtils.isTrue(aTable.getManyToMany())) {
                         logger.debug(MessageFormat.format("Many to one - {0} {1}",
-                                aTable.getQualifiedName(), rel.getForeignKeyName()));
+                                aTable.getQualifiedName(), rel.getName()));
                         createM2O(configuration, mappings, rel);
                     }
                 }
@@ -152,7 +152,7 @@ public class HibernateConfig {
                     schema.getTables()) {
                 for (ForeignKey rel : aTable.getOneToManyRelationships()) {
                      logger.debug(MessageFormat.format("One to many - {0} {1}",
-                                aTable.getQualifiedName(), rel.getForeignKeyName()));
+                                aTable.getQualifiedName(), rel.getName()));
                     createO2M(configuration, mappings, rel);
                 }
             }
@@ -559,7 +559,7 @@ public class HibernateConfig {
                     oneColumns, manyColumns, refs);
         }
 
-        tableMany.createForeignKey(relationship.getForeignKeyName(),
+        tableMany.createForeignKey(relationship.getName(),
                 manyColumns,
                 oneMDQualifiedTableName,
                 oneColumns);

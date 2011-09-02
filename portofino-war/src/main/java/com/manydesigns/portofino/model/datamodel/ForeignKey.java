@@ -33,7 +33,6 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.util.Pair;
-import com.manydesigns.portofino.xml.Identifier;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,8 +68,6 @@ public class ForeignKey extends DatabaseSelectionProvider implements ModelObject
     //**************************************************************************
 
     protected final List<Annotation> annotations;
-
-    protected String foreignKeyName;
 
     protected String onUpdate;
     protected String onDelete;
@@ -111,7 +108,7 @@ public class ForeignKey extends DatabaseSelectionProvider implements ModelObject
     @Override
     public String getQualifiedName() {
         return MessageFormat.format("{0}${1}",
-                fromTable.getQualifiedName(), foreignKeyName);
+                fromTable.getQualifiedName(), name);
     }
 
     @Override
@@ -130,7 +127,7 @@ public class ForeignKey extends DatabaseSelectionProvider implements ModelObject
         super.init(model);
 
         assert fromTable != null;
-        assert foreignKeyName != null;
+        assert name != null;
         assert toSchema != null;
 
         if (references.isEmpty()) {
@@ -151,11 +148,11 @@ public class ForeignKey extends DatabaseSelectionProvider implements ModelObject
         }
 
         actualManyPropertyName = (manyPropertyName == null)
-                ? foreignKeyName
+                ? name
                 : manyPropertyName;
 
         actualOnePropertyName = (onePropertyName == null)
-                ? foreignKeyName
+                ? name
                 : onePropertyName;
     }
 
@@ -198,16 +195,6 @@ public class ForeignKey extends DatabaseSelectionProvider implements ModelObject
 
     public String getFromTableName() {
         return fromTable.getTableName();
-    }
-
-    @Identifier
-    @XmlAttribute(required = true)
-    public String getForeignKeyName() {
-        return foreignKeyName;
-    }
-
-    public void setForeignKeyName(String foreignKeyName) {
-        this.foreignKeyName = foreignKeyName;
     }
 
     @XmlAttribute(required = true)

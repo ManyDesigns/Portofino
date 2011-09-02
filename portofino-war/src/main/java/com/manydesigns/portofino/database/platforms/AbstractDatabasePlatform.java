@@ -512,14 +512,14 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 }
 
                 if (relationship == null ||
-                        !relationship.getForeignKeyName().equals(fkName)) {
+                        !relationship.getName().equals(fkName)) {
                     if (relationship != null) {
                         installRelationship(table, relationship, referenceArray);
                     }
 
                     relationship = new ForeignKey();
                     relationship.setFromTable(table);
-                    relationship.setForeignKeyName(fkName);
+                    relationship.setName(fkName);
                     relationship.setToDatabase(referencedDatabaseName);
                     relationship.setToSchema(referencedSchemaName);
                     relationship.setToTableName(referencedTableName);
@@ -578,12 +578,12 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
         // sanity check
         if (relationship.getReferences().size() == 0) {
             logger.warn("Foreign key {} is empty. Discarding.",
-                    relationship.getForeignKeyName());
+                    relationship.getName());
             return;
         }
         table.getForeignKeys().add(relationship);
         logger.debug("Installed FK {} with number of columns: {}",
-                relationship.getForeignKeyName(),
+                relationship.getName(),
                 relationship.getReferences().size());
     }
 
