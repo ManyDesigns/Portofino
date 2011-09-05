@@ -1,5 +1,6 @@
 ^profiles.xml
 ^target
+^portofino-jar/target
 ^portofino-war/target
 ^elements/target
 ^elements-struts1/target
