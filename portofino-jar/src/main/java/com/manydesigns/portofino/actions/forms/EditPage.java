@@ -42,25 +42,14 @@ public class EditPage {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    private String description;
-    private boolean embedInParent;
-
     @Label("Description")
     @Required
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public String description;
 
     @Label("Embed in parent?")
-    public boolean isEmbedInParent() {
-        return embedInParent;
-    }
+    public boolean embedInParent;
 
-    public void setEmbedInParent(boolean embedInParent) {
-        this.embedInParent = embedInParent;
-    }
+    @Label("Show in navigation?")
+    public boolean showInNavigation;
+
 }

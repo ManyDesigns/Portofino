@@ -70,6 +70,7 @@ public abstract class Page implements ModelObject {
     protected String layoutContainer;
     protected String layoutOrder;
     protected String layout;
+    protected boolean showInNavigation = true;
 
     //**************************************************************************
     // Actual fields
@@ -286,6 +287,15 @@ public abstract class Page implements ModelObject {
 
     public void setLayout(String layout) {
         this.layout = layout;
+    }
+
+    @XmlAttribute
+    public boolean isShowInNavigation() {
+        return showInNavigation;
+    }
+
+    public void setShowInNavigation(boolean showInNavigation) {
+        this.showInNavigation = showInNavigation;
     }
 
     /* TODO: spostare quaesto metodo nella classe che gestisce la logica

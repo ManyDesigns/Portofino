@@ -93,6 +93,9 @@ public class Navigation implements XhtmlFragment {
             if (!page.isAllowed(groups)) {
                 continue;
             }
+            if(!page.isShowInNavigation()) {
+                continue;
+            }
 
             // gestire permessi
             if(first) {

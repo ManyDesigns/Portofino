@@ -45,9 +45,9 @@ import java.util.*;
 public class PortletAction extends AbstractActionBean {
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
-            {{"description", "embedInParent"}};
+            {{"description", "embedInParent", "showInNavigation"}};
     public static final String[][] TOP_LEVEL_PAGE_CONFIGURATION_FIELDS =
-            {{"description"}};
+            {{"description", "showInNavigation"}};
     public static final String PAGE_PORTLET_NOT_CONFIGURED = "/layouts/portlet-not-configured.jsp";
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
@@ -453,8 +453,9 @@ public class PortletAction extends AbstractActionBean {
                 .build();
 
         EditPage edit = new EditPage();
-        edit.setDescription(page.getDescription());
-        edit.setEmbedInParent(page.getLayoutContainerInParent() != null);
+        edit.description = page.getDescription();
+        edit.embedInParent = page.getLayoutContainerInParent() != null;
+        edit.showInNavigation = page.isShowInNavigation();
         pageConfigurationForm.readFromObject(edit);
         title = page.getTitle();
     }
@@ -484,14 +485,19 @@ public class PortletAction extends AbstractActionBean {
         pageConfigurationForm.writeToObject(edit);
         Page page = pageInstance.getPage();
         page.setTitle(title);
-        page.setDescription(edit.getDescription());
-        if(edit.isEmbedInParent()) {
+        page.setDescription(edit.description);
+        if(edit.embedInParent) {
             if(page.getLayoutContainerInParent() == null) {
                 page.setLayoutContainerInParent(DEFAULT_LAYOUT_CONTAINER);
             }
         } else {
             page.setLayoutContainerInParent(null);
             page.setLayoutOrderInParent(null);
+        }
+        page.setShowInNavigation(edit.showInNavigation);
+        if(!edit.embedInParent && !edit.showInNavigation) {
+            SessionMessages.addWarningMessage(
+                    "The page is not embedded and not included in navigation - it will only be reachable by URL or explicit linking.");
         }
     }
 
