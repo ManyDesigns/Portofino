@@ -428,16 +428,21 @@ public class CrudAction extends PortletAction {
 
     public Resolution create() {
         setupForm(Mode.CREATE);
+        object = classAccessor.newInstance();
+        // TODO: script createSetup()
+        form.readFromObject(object);
 
         return new ForwardResolution("/layouts/crud/create.jsp");
     }
 
     public Resolution save() {
         setupForm(Mode.CREATE);
+        object = classAccessor.newInstance();
+        // TODO: script createSetup()
+        form.readFromObject(object);
 
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
-            object = classAccessor.newInstance();
             form.writeToObject(object);
             application.saveObject(baseTable.getQualifiedName(), object);
             try {
@@ -521,9 +526,8 @@ public class CrudAction extends PortletAction {
             for (String current : selection) {
                 loadObject(current);
                 form.writeToObject(object);
+                application.updateObject(baseTable.getQualifiedName(), object);
             }
-            form.writeToObject(object);
-            application.updateObject(baseTable.getQualifiedName(), object);
             try {
                 application.commit(baseTable.getDatabaseName());
             } catch (Throwable e) {
