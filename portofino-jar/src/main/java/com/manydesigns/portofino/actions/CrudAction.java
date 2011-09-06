@@ -36,6 +36,7 @@ import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -188,7 +189,7 @@ public class CrudAction extends PortletAction {
                 logger.error("Not supported");
                 continue;
             }
-            boolean added = setupSelectionProvider(ref.getForeignKey(), ref.isEnabled(), configuredSPs);
+            boolean added = setupSelectionProvider(ref, ref.getForeignKey(), configuredSPs);
             if(ref.isEnabled() && !added) {
                 logger.warn("Selection provider {} not added; check whether the fields on which it is configured " +
                         "overlap with some other selection provider", ref.getQualifiedName());
@@ -198,13 +199,13 @@ public class CrudAction extends PortletAction {
         Table table = crud.getActualTable();
         if(table != null) {
             for(ForeignKey fk : table.getForeignKeys()) {
-                setupSelectionProvider(fk, true, configuredSPs);
+                setupSelectionProvider(null, fk, configuredSPs);
             }
         }
     }
 
     private boolean setupSelectionProvider
-            (DatabaseSelectionProvider current, boolean enabled, Set<String> configuredSPs) {
+            (SelectionProviderReference ref, DatabaseSelectionProvider current, Set<String> configuredSPs) {
         List<Reference> references = current.getReferences();
 
         String[] fieldNames = new String[references.size()];
@@ -233,8 +234,10 @@ public class CrudAction extends PortletAction {
 
         SelectionProvider selectionProvider;
 
-        if(enabled) {
-            selectionProvider = createSelectionProvider(current, fieldNames, fieldTypes);
+        if(ref == null || ref.isEnabled()) {
+            DisplayMode dm = ref != null ? ref.getDisplayMode() : DisplayMode.DROPDOWN;
+            selectionProvider = createSelectionProvider
+                    (current, fieldNames, fieldTypes, dm);
         } else {
             selectionProvider = null;
         }
@@ -249,8 +252,9 @@ public class CrudAction extends PortletAction {
     }
 
     protected SelectionProvider createSelectionProvider
-            (DatabaseSelectionProvider current, String[] fieldNames, Class[] fieldTypes) {
-        SelectionProvider selectionProvider = null;
+            (DatabaseSelectionProvider current, String[] fieldNames,
+             Class[] fieldTypes, DisplayMode dm) {
+        DefaultSelectionProvider selectionProvider = null;
         String name = current.getName();
         String database = current.getToDatabase();
         String sql = current.getSql();
@@ -260,6 +264,7 @@ public class CrudAction extends PortletAction {
             Collection<Object[]> objects = application.runSql(database, sql);
             selectionProvider = DefaultSelectionProvider.create(
                     name, fieldNames.length, fieldTypes, objects);
+            selectionProvider.setDisplayMode(dm);
         } else if (hql != null) {
             Collection<Object> objects = application.getObjects(hql);
             String qualifiedTableName =
@@ -277,6 +282,7 @@ public class CrudAction extends PortletAction {
 
             selectionProvider = DefaultSelectionProvider.create(
                     name, objects, tableAccessor, textFormats);
+            selectionProvider.setDisplayMode(dm);
         } else {
             logger.warn("ModelSelection provider '{}':" +
                     " both 'hql' and 'sql' are null", name);
@@ -1453,14 +1459,15 @@ public class CrudAction extends PortletAction {
             String[] fieldNames = (String[]) ((Collection) entry.getKey()).toArray(new String[0]);
             selectionProviderEdits[i].fieldNames = fieldNames;
             selectionProviderEdits[i].columns = StringUtils.join(fieldNames, ", ");
-            selectionProviderEdits[i].displayMode = SelectField.DisplayMode.DROPDOWN; //TODO
             for(CrudSelectionProvider cp : crudSelectionProviders) {
                 if(Arrays.equals(cp.fieldNames, fieldNames)) {
                     SelectionProvider selectionProvider = cp.getSelectionProvider();
                     if(selectionProvider != null) {
                         selectionProviderEdits[i].selectionProvider = selectionProvider.getName();
+                        selectionProviderEdits[i].displayMode = selectionProvider.getDisplayMode();
                     } else {
                         selectionProviderEdits[i].selectionProvider = null;
+                        selectionProviderEdits[i].displayMode = DisplayMode.DROPDOWN;
                     }
                 }
             }
@@ -1537,7 +1544,8 @@ public class CrudAction extends PortletAction {
                         (Collection<DatabaseSelectionProvider>) availableSelectionProviders.get(key);
                 for(DatabaseSelectionProvider dsp : selectionProviders) {
                     if(sp.selectionProvider.equals(dsp.getName())) {
-                        makeSelectionProviderReference(dsp);
+                        SelectionProviderReference sel = makeSelectionProviderReference(dsp);
+                        sel.setDisplayMode(sp.displayMode);
                         break;
                     }
                 }

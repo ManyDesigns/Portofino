@@ -30,8 +30,8 @@
 package com.manydesigns.elements.annotations.impl;
 
 import com.manydesigns.elements.annotations.Select;
-import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.search.SelectSearchField;
+import com.manydesigns.elements.options.DisplayMode;
 
 import java.lang.annotation.Annotation;
 
@@ -46,13 +46,13 @@ public class SelectImpl implements Select {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    private SelectField.DisplayMode displayMode;
+    private DisplayMode displayMode;
     private SelectSearchField.DisplayMode searchDisplayMode;
     private String[] values;
     private String[] labels;
     private boolean nullOption;
 
-    public SelectImpl(SelectField.DisplayMode displayMode, SelectSearchField.DisplayMode searchDisplayMode,
+    public SelectImpl(DisplayMode displayMode, SelectSearchField.DisplayMode searchDisplayMode,
                       String[] values, String[] labels, boolean nullOption) {
         this.displayMode = displayMode;
         this.searchDisplayMode=searchDisplayMode;
@@ -61,7 +61,7 @@ public class SelectImpl implements Select {
         this.nullOption = nullOption;
     }
 
-    public SelectField.DisplayMode displayMode() {
+    public DisplayMode displayMode() {
         return displayMode;
     }
 

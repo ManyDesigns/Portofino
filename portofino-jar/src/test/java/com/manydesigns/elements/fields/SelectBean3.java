@@ -31,6 +31,7 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.annotations.Select;
+import com.manydesigns.elements.options.DisplayMode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,7 +43,7 @@ public class SelectBean3 {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    @Select(displayMode = SelectField.DisplayMode.RADIO)
+    @Select(displayMode = DisplayMode.RADIO)
     @Required
     public Long longValue;
 

@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.model.pages.crud;
 
+import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
@@ -57,12 +58,14 @@ public class SelectionProviderReference implements ModelObject {
     protected Crud parent;
     protected String foreignKeyName;
     protected boolean enabled = true;
+    protected String displayModeName;
 
     //**************************************************************************
     // Fields for wire-up
     //**************************************************************************
 
     protected ForeignKey foreignKey;
+    private DisplayMode displayMode;
 
     //**************************************************************************
     // ModelObject implementation
@@ -80,6 +83,12 @@ public class SelectionProviderReference implements ModelObject {
         if(!StringUtils.isEmpty(foreignKeyName)) {
             foreignKey = parent.getActualTable().findForeignKeyByName(foreignKeyName);
         } //else TODO
+
+        if(displayModeName != null) {
+            displayMode = DisplayMode.valueOf(displayModeName);
+        } else {
+            displayMode = DisplayMode.DROPDOWN;
+        }
     }
 
     public String getQualifiedName() {
@@ -124,4 +133,21 @@ public class SelectionProviderReference implements ModelObject {
         this.enabled = enabled;
     }
 
+    @XmlAttribute(name = "displayMode")
+    public String getDisplayModeName() {
+        return displayModeName;
+    }
+
+    public void setDisplayModeName(String displayModeName) {
+        this.displayModeName = displayModeName;
+    }
+
+    public DisplayMode getDisplayMode() {
+        return displayMode;
+    }
+
+    public void setDisplayMode(DisplayMode displayMode) {
+        this.displayMode = displayMode;
+        displayModeName = displayMode.name();
+    }
 }

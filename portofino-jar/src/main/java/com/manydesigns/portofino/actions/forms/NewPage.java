@@ -32,7 +32,7 @@ package com.manydesigns.portofino.actions.forms;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.annotations.Select;
-import com.manydesigns.elements.fields.SelectField;
+import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.portofino.model.pages.Page;
 
 /**
@@ -59,7 +59,7 @@ public class NewPage extends Page {
     }
 
     @Label("Where")
-    @Select(displayMode = SelectField.DisplayMode.RADIO)
+    @Select(displayMode = DisplayMode.RADIO)
     @Required
     public String getInsertPositionName() {
         return insertPositionName;

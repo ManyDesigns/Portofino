@@ -34,6 +34,7 @@ import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.json.JsonBuffer;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -55,11 +56,6 @@ public class SelectField extends AbstractField {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public final static String AUTOCOMPLETE_SUFFIX = "_autocomplete";
-    public enum DisplayMode {
-        DROPDOWN,
-        RADIO,
-        AUTOCOMPLETE
-    }
 
     protected SelectionModel selectionModel;
     protected int selectionModelIndex;
@@ -76,36 +72,49 @@ public class SelectField extends AbstractField {
     // Costruttori
     //**************************************************************************
     public SelectField(PropertyAccessor accessor, Mode mode, String prefix) {
+        this(accessor, null, mode, prefix);
+    }
+
+    public SelectField(PropertyAccessor accessor, SelectionProvider selectionProvider,
+                       Mode mode, String prefix) {
         super(accessor, mode, prefix);
 
         Select annotation = accessor.getAnnotation(Select.class);
 
         boolean nullOption = (annotation == null) || annotation.nullOption();
 
-        Object[] values;
-        String[] labels;
+        if(selectionProvider == null) {
+            Object[] values;
+            String[] labels;
 
-        if (annotation == null) {
-            displayMode = DisplayMode.DROPDOWN;
-            values = new Object[0];
-            labels = new String[0];
+            if (annotation == null) {
+                values = new Object[0];
+                labels = new String[0];
+            } else {
+                values = annotation.values();
+                labels = annotation.labels();
+                displayMode = annotation.displayMode();
+            }
+
+            assert(values.length == labels.length);
+            if(values.length > 0) {
+                selectionProvider =
+                        DefaultSelectionProvider.create(
+                                accessor.getName(), values, labels);
+            } else if (accessor.getType().isEnum()) {
+                selectionProvider =
+                    DefaultSelectionProvider.create(
+                            accessor.getName(), accessor.getType());
+            }
         } else {
-            values = annotation.values();
-            labels = annotation.labels();
-            displayMode = annotation.displayMode();
+            displayMode = selectionProvider.getDisplayMode();
         }
 
-        assert(values.length == labels.length);
-        if(values.length > 0) {
-            SelectionProvider selectionProvider =
-                    DefaultSelectionProvider.create(
-                            accessor.getName(), values, labels);
-            selectionModel = selectionProvider.createSelectionModel();
-            selectionModelIndex = 0;
-        } else if (accessor.getType().isEnum()) {
-            SelectionProvider selectionProvider =
-                DefaultSelectionProvider.create(
-                        accessor.getName(), accessor.getType());
+        if(displayMode == null) {
+            displayMode = DisplayMode.DROPDOWN;
+        }
+
+        if(selectionProvider != null) {
             selectionModel = selectionProvider.createSelectionModel();
             selectionModelIndex = 0;
         }

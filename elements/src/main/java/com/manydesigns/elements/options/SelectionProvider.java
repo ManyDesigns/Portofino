@@ -42,5 +42,7 @@ public interface SelectionProvider {
     String getName();
     int getFieldCount();
 
+    DisplayMode getDisplayMode();
+
     SelectionModel createSelectionModel();
 }

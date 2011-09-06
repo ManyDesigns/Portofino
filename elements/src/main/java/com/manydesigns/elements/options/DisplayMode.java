@@ -27,31 +27,16 @@
 *
 */
 
-package com.manydesigns.portofino.actions.forms;
-
-import com.manydesigns.elements.annotations.*;
-import com.manydesigns.elements.options.DisplayMode;
+package com.manydesigns.elements.options;
 
 /**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Alessio Stalla       - alessio.stalla@manydesigns.com
- */
-public class CrudSelectionProviderEdit {
-    public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
-
-    @Updatable(false)
-    public String columns;
-
-    @Select(nullOption = false)
-    public String selectionProvider;
-
-    @Select(nullOption = false)
-    @Required
-    public DisplayMode displayMode;
-
-    @InSummary(false) //Per non includere in TableForm
-    public String[] fieldNames;
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+public enum DisplayMode {
+    DROPDOWN,
+    RADIO,
+    AUTOCOMPLETE
 }

@@ -29,8 +29,8 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.annotations.Select;
-import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.search.SelectSearchField;
+import com.manydesigns.elements.options.DisplayMode;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,12 +45,12 @@ public class AnnotatedBean3 {
     @Select(values={"1", "2"},labels={"a", "b"})
     public String field1;
     public String field2;
-    @Select(values={"1", "2"},labels={"a", "b"}, displayMode = SelectField.DisplayMode.AUTOCOMPLETE, searchDisplayMode = SelectSearchField.DisplayMode.AUTOCOMPLETE)
+    @Select(values={"1", "2"},labels={"a", "b"}, displayMode = DisplayMode.AUTOCOMPLETE, searchDisplayMode = SelectSearchField.DisplayMode.AUTOCOMPLETE)
     public String field3;
-    @Select(values={"1", "2"},labels={"a", "b"}, displayMode = SelectField.DisplayMode.RADIO, searchDisplayMode = SelectSearchField.DisplayMode.RADIO)
+    @Select(values={"1", "2"},labels={"a", "b"}, displayMode = DisplayMode.RADIO, searchDisplayMode = SelectSearchField.DisplayMode.RADIO)
     public String field4;
-    @Select(values={"1", "2"},labels={"a", "b"}, displayMode = SelectField.DisplayMode.RADIO, searchDisplayMode = SelectSearchField.DisplayMode.CHECKBOX)
+    @Select(values={"1", "2"},labels={"a", "b"}, displayMode = DisplayMode.RADIO, searchDisplayMode = SelectSearchField.DisplayMode.CHECKBOX)
     public String field5;
-    @Select(values={"1", "2"},labels={"a", "b"}, displayMode = SelectField.DisplayMode.RADIO, searchDisplayMode = SelectSearchField.DisplayMode.MULTIPLESELECT)
+    @Select(values={"1", "2"},labels={"a", "b"}, displayMode = DisplayMode.RADIO, searchDisplayMode = SelectSearchField.DisplayMode.MULTIPLESELECT)
     public String field6;
 }

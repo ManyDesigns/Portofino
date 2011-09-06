@@ -278,7 +278,8 @@ public class FormBuilder extends AbstractFormBuilder {
             String[] fieldNames = current.getKey();
             int index = ArrayUtils.indexOf(fieldNames, fieldName);
             if (index >= 0) {
-                field = new SelectField(propertyAccessor, mode, prefix);
+                field = new SelectField
+                        (propertyAccessor, current.getValue(), mode, prefix);
                 break;
             }
         }

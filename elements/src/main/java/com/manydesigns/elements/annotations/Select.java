@@ -29,8 +29,8 @@
 
 package com.manydesigns.elements.annotations;
 
-import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.search.SelectSearchField;
+import com.manydesigns.elements.options.DisplayMode;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -49,8 +49,8 @@ public @interface Select {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
     
-    SelectField.DisplayMode displayMode()
-            default SelectField.DisplayMode.DROPDOWN;
+    DisplayMode displayMode()
+            default DisplayMode.DROPDOWN;
     SelectSearchField.DisplayMode searchDisplayMode()
                 default SelectSearchField.DisplayMode.DROPDOWN;
 

@@ -65,6 +65,8 @@ public class DefaultSelectionProvider implements SelectionProvider {
     protected final Object[][] valuesArray;
     protected final String[][] labelsArray;
 
+    protected DisplayMode displayMode;
+
     public final static Logger logger =
             LoggerFactory.getLogger(DefaultSelectionProvider.class);
     public static final String NON_WORD_CHARACTERS =
@@ -397,5 +399,13 @@ public class DefaultSelectionProvider implements SelectionProvider {
             }
         }
         return false;
+    }
+
+    public DisplayMode getDisplayMode() {
+        return displayMode;
+    }
+
+    public void setDisplayMode(DisplayMode displayMode) {
+        this.displayMode = displayMode;
     }
 }

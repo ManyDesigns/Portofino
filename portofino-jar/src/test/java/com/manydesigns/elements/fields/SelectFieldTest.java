@@ -32,6 +32,7 @@ package com.manydesigns.elements.fields;
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -115,9 +116,9 @@ public class SelectFieldTest extends AbstractElementsTest {
 
     public void testSimple() {
         setupSelectFields(Mode.EDIT);
-        assertEquals(SelectField.DisplayMode.DROPDOWN,
+        assertEquals(DisplayMode.DROPDOWN,
                 selectField.getDisplayMode());
-        assertEquals(SelectField.DisplayMode.DROPDOWN,
+        assertEquals(DisplayMode.DROPDOWN,
                 selectField2.getDisplayMode());
 
         assertNotNull(selectField.getComboLabel());
@@ -137,8 +138,8 @@ public class SelectFieldTest extends AbstractElementsTest {
 
     public void testSimpleRadio() {
         setupSelectFields(Mode.EDIT);
-        selectField.setDisplayMode(SelectField.DisplayMode.RADIO);
-        assertEquals(SelectField.DisplayMode.RADIO,
+        selectField.setDisplayMode(DisplayMode.RADIO);
+        assertEquals(DisplayMode.RADIO,
                 selectField.getDisplayMode());
     }
 
@@ -160,7 +161,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
     public void testEditNullRadio() {
         setupSelectFields(Mode.EDIT);
-        selectField.setDisplayMode(SelectField.DisplayMode.RADIO);
+        selectField.setDisplayMode(DisplayMode.RADIO);
 
         String text = Util.elementToString(selectField);
         assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
@@ -202,7 +203,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
     public void testEditNullRadioRequired() {
         setupSelectFields(Mode.EDIT);
-        selectField.setDisplayMode(SelectField.DisplayMode.RADIO);
+        selectField.setDisplayMode(DisplayMode.RADIO);
                 
         selectField.setRequired(true);
         String text = Util.elementToString(selectField);
