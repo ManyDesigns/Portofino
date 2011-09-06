@@ -23,6 +23,7 @@ import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.UserUtils;
+import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -502,6 +503,7 @@ public class PortletAction extends AbstractActionBean {
     // Page crud
     //--------------------------------------------------------------------------
 
+    @RequiresAdministrator
     public Resolution newPage() {
         prepareNewPageForm();
         return new ForwardResolution("/layouts/page-crud/new-page.jsp");

@@ -150,7 +150,7 @@ public class PortofinoInterceptor implements Interceptor {
 
             Page page = pageInstance.getPage();
             //3. Ho i permessi necessari vado alla pagina
-            if(page.isAllowed(groups)){
+            if(page.isAllowed(groups) && UserUtils.isAllowed(context.getHandler(), request)){
                 return context.proceed();
             } else {
                 //4. Non ho i permessi, ma non sono loggato, vado alla pagina di login
@@ -169,7 +169,7 @@ public class PortofinoInterceptor implements Interceptor {
                     actionContext.getValueStack().getRoot().push(bean);
                     invocation.getStack().push(bean);
                     */
-                    return new ForwardResolution("/skins/default/user/login.jsp");
+                    return new ForwardResolution("/user/login.action");
                 } else {
                     //5. Non ho i permessi, ma sono loggato, errore 401
                     return new ErrorResolution(UNAUTHORIZED);
