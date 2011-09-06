@@ -50,11 +50,6 @@ public class Group implements Serializable{
     Timestamp deletionDate;
     Timestamp creationDate;
 
-    public static Group ANONYMOUS_GROUP =
-            new Group("anonymous", "anonymous", "anonymous", null, null, null);
-    public static Group REGISTERED_GROUP =
-            new Group("registered", "registered", "registered", null, null, null);
-
     List<User> users = new ArrayList<User>();
 
     public Group() {
@@ -138,13 +133,13 @@ public class Group implements Serializable{
 
         Group group = (Group) o;
 
-        return groupId.equals(group.groupId);
+        return getGroupId().equals(group.getGroupId());
 
     }
 
     @Override
     public int hashCode() {
-        return groupId.hashCode();
+        return getGroupId().hashCode();
     }
 }
 

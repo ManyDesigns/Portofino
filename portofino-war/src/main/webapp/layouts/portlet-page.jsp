@@ -1,3 +1,4 @@
+<%@ page import="com.manydesigns.portofino.system.model.users.UserUtils" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
         %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -23,27 +24,29 @@
                 </div>
                 <div class="contentBarRight">
                     <!-- Admin buttons -->
-                    <div class="contentBarButtons">
-                        <button onclick="enablePortletDragAndDrop(this); return false;"
-                                class="arrow-4">Edit page layout</button>
-                        <button name="reloadModel" class="refresh">Reload model</button>
-                        <button name="pagePermissions" class="person">Page permissions</button>
-                        <button name="newPage" class="plusthick">Add page</button>
-                        <button name="deletePage" class="minusthick"
-                                onclick="confirmDeletePage(
-                                            '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
-                                            '<%= request.getContextPath() %>');
-                                        return false;">
-                            Delete page
-                        </button>
-                        <button name="movePage" class="transferthick-e-w"
-                                onclick="showMovePageDialog(
-                                            '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
-                                            '<%= request.getContextPath() %>');
-                                        return false;">
-                            Move page
-                        </button>
-                    </div>
+                    <% if(UserUtils.isAdministrator(request)) { %>
+                        <div class="contentBarButtons">
+                            <button onclick="enablePortletDragAndDrop(this); return false;"
+                                    class="arrow-4">Edit page layout</button>
+                            <button name="reloadModel" class="refresh">Reload model</button>
+                            <button name="pagePermissions" class="person">Page permissions</button>
+                            <button name="newPage" class="plusthick">Add page</button>
+                            <button name="deletePage" class="minusthick"
+                                    onclick="confirmDeletePage(
+                                                '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
+                                                '<%= request.getContextPath() %>');
+                                            return false;">
+                                Delete page
+                            </button>
+                            <button name="movePage" class="transferthick-e-w"
+                                    onclick="showMovePageDialog(
+                                                '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
+                                                '<%= request.getContextPath() %>');
+                                            return false;">
+                                Move page
+                            </button>
+                        </div>
+                    <% } %>
                     <!-- End admin buttons -->
                     <c:set var="resultSetNavigation" scope="request"
                            value="${actionBean.resultSetNavigation}"/>

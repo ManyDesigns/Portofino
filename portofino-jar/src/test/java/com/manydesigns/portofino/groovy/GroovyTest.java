@@ -35,6 +35,9 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import ognl.OgnlContext;
 
+import java.io.File;
+import java.io.IOException;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -49,7 +52,6 @@ public class GroovyTest extends AbstractElementsTest {
     public void setUp() throws Exception {
         super.setUp();
     }
-
 
     public void testOgnlBinding() {
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
@@ -66,4 +68,23 @@ public class GroovyTest extends AbstractElementsTest {
         assertEquals(20, value);
         assertEquals(123, binding.getVariable("x"));
     }
+
+    public void testGroovyFile() throws IOException, NoSuchMethodException {
+        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+
+        Binding binding = new Binding(ognlContext);
+
+        ognlContext.put("bar", 2);
+        assertEquals(2, binding.getVariable("bar"));
+
+        GroovyShell shell = new GroovyShell(binding);
+
+        shell.evaluate(new File("/Users/alessio/projects/portofino4/portofino-jar/src/test/java/com/manydesigns/portofino/groovy/Pippo.groovy"));
+        Object value = shell.evaluate("new com.manydesigns.portofino.groovy.Pippo().foo()");
+        assertFalse((Boolean) value);
+        shell.evaluate(new File("/Users/alessio/projects/portofino4/portofino-jar/src/test/java/com/manydesigns/portofino/groovy/Pippo.groovy"));
+        value = shell.evaluate("new com.manydesigns.portofino.groovy.Pippo().foo()");
+        assertFalse((Boolean) value);
+    }
+
 }

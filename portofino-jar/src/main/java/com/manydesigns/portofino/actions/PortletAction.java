@@ -227,8 +227,6 @@ public class PortletAction extends AbstractActionBean {
 
     public void setupGroups(Page page) {
         List<Group> groups = new ArrayList<Group>();
-        groups.add(Group.ANONYMOUS_GROUP);
-        groups.add(Group.REGISTERED_GROUP);
         groups.addAll(application.getAllObjects(UserUtils.GROUPTABLE));
         allowGroups = new ArrayList<Group>();
         denyGroups = new ArrayList<Group>();
@@ -278,8 +276,6 @@ public class PortletAction extends AbstractActionBean {
         deny.clear();
 
         List<Group> groups = new ArrayList<Group>();
-        groups.add(Group.ANONYMOUS_GROUP);
-        groups.add(Group.REGISTERED_GROUP);
         groups.addAll(application.getAllObjects(UserUtils.GROUPTABLE));
 
         for (Group group : groups) {

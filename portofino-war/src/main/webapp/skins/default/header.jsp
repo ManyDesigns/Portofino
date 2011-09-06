@@ -1,3 +1,4 @@
+<%@ page import="com.manydesigns.portofino.system.model.users.UserUtils" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java" pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
@@ -16,16 +17,15 @@
                     href="/user/Settings.action">Settings</stripes:link> -
             <stripes:link
                     href="/user/Help.action">Help</stripes:link> -
-            <stripes:link
-                    href="/admin/settings.action">Administration</stripes:link> -
+            <% if(UserUtils.isAdministrator(request)) { %>
+                <stripes:link
+                        href="/admin/settings.action">Administration</stripes:link> -
+            <% } %>
             <stripes:link
                     href="/user/login.action?logout=">Log out</stripes:link>
         </c:if><c:if test="${empty userId}">
         <stripes:link href="/user/Help.action">Help</stripes:link> -
-        <stripes:link
-                href="/admin/settings.action">Administration</stripes:link> -
-        <stripes:link
-        href="/user/login.action">Log in</stripes:link>
+        <stripes:link href="/user/login.action">Log in</stripes:link>
     </c:if>
     </c:if><c:if
         test="${not mde:getBoolean(portofinoConfiguration, 'user.enabled')}">

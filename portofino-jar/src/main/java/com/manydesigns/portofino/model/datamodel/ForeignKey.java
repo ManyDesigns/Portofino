@@ -132,15 +132,14 @@ public class ForeignKey extends DatabaseSelectionProvider implements ModelObject
 
         if (references.isEmpty()) {
             throw new Error(MessageFormat.format(
-                    "Foreign key {0} has no referneces",
+                    "Foreign key {0} has no references",
                     getQualifiedName()));
         }
 
         if (toTable != null) {
             // wire up Table.oneToManyRelationships
             toTable.getOneToManyRelationships().add(this);
-            //Build HQL query
-            hql = "from " + toTable.getActualEntityName();
+            //TODO calculate HQL query
         }
 
         for (Reference reference : references) {
@@ -253,6 +252,17 @@ public class ForeignKey extends DatabaseSelectionProvider implements ModelObject
 
     public void setActualOnePropertyName(String actualOnePropertyName) {
         this.actualOnePropertyName = actualOnePropertyName;
+    }
+
+    @Override
+    @XmlTransient
+    public String getHql() {
+        if(toTable != null && toTable.getActualEntityName() != null) {
+            //Build HQL query
+            return "from " + toTable.getActualEntityName();
+        } else {
+            return null;
+        }
     }
 
     //**************************************************************************

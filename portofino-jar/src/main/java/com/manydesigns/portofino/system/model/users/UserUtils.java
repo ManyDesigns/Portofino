@@ -28,9 +28,11 @@
  */
 package com.manydesigns.portofino.system.model.users;
 
+import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.context.Application;
 import sun.misc.BASE64Encoder;
 
+import javax.servlet.ServletRequest;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,12 +61,12 @@ public class UserUtils {
     public static List<String> manageGroups(Application application, String userId) {
         List<String> groups = new ArrayList<String>();
         if (userId == null) {
-            groups.add(Group.ANONYMOUS_GROUP.getName());
+            groups.add(application.getAnonymousGroup().getName());
         } else {
             User u = (User) application.getObjectByPk(UserUtils.USERTABLE,
                     new User(userId));
-            groups.add(Group.ANONYMOUS_GROUP.getName());
-            groups.add(Group.REGISTERED_GROUP.getName());
+            groups.add(application.getAnonymousGroup().getName());
+            groups.add(application.getRegisteredGroup().getName());
 
             for (UsersGroups ug : u.getGroups()) {
                 if (ug.getDeletionDate() == null) {
@@ -86,5 +88,25 @@ public class UserUtils {
         }
     }
 
+    public static boolean isUserInGroup(ServletRequest request, Group group) {
+        return isUserInGroup(request, group.getName());
+    }
+
+    public static boolean isUserInGroup(ServletRequest request, String name) {
+        List<String> groups = (List<String>) request.getAttribute(RequestAttributes.GROUPS);
+        return groups.contains(name);
+    }
+
+    public static boolean isRegisteredUser(ServletRequest request) {
+        Application appl = (Application) request.getAttribute(RequestAttributes.APPLICATION);
+        Group registeredGroup = appl.getRegisteredGroup();
+        return isUserInGroup(request, registeredGroup);
+    }
+
+    public static boolean isAdministrator(ServletRequest request) {
+        Application appl = (Application) request.getAttribute(RequestAttributes.APPLICATION);
+        Group administratorsGroup = appl.getAdministratorsGroup();
+        return isUserInGroup(request, administratorsGroup);
+    }
 
 }

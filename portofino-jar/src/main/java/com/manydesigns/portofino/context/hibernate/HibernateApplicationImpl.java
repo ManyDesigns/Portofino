@@ -50,6 +50,7 @@ import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.xml.diff.DatabaseDiff;
@@ -767,7 +768,7 @@ public class HibernateApplicationImpl implements Application {
         session.getTransaction().rollback();
     }
     
-   public void commit() {
+    public void commit() {
         for (HibernateDatabaseSetup current : setups.values()) {
             Session session = current.getThreadSession();
             if (session != null) {
@@ -962,6 +963,37 @@ public class HibernateApplicationImpl implements Application {
             return (User) result.get(0);
         } else {
             return null;
+        }
+    }
+
+    public Group getAnonymousGroup() {
+        String name = portofinoConfiguration.getString(PortofinoProperties.GROUP_ANONYMOUS);
+        return getGroup(name);
+    }
+
+    public Group getRegisteredGroup() {
+        String name = portofinoConfiguration.getString(PortofinoProperties.GROUP_REGISTERED);
+        return getGroup(name);
+    }
+
+    public Group getAdministratorsGroup() {
+        String name = portofinoConfiguration.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
+        return getGroup(name);
+    }
+
+    protected Group getGroup(String name) {
+        TableAccessor table = getTableAccessor(UserUtils.GROUPTABLE);
+        String actualEntityName = table.getTable().getActualEntityName();
+        List result = runHqlQuery
+                (UserUtils.GROUPTABLE,
+                "FROM " + actualEntityName + " WHERE name = ?",
+                new Object[] { name });
+        if(result.isEmpty()) {
+            throw new IllegalStateException("Group " + name + " not found");
+        } else if(result.size() == 1) {
+            return (Group) result.get(0);
+        } else {
+            throw new IllegalStateException("Multiple groups named " + name + " found");
         }
     }
 

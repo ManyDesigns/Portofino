@@ -88,5 +88,9 @@ public final class PortofinoProperties {
     //Password properties
     public static final String PWD_ENCRYPTED = "pwd.encrypted";
 
+    public static final String GROUP_ANONYMOUS = "group.anonymous";
+    public static final String GROUP_REGISTERED = "group.registered";
+    public static final String GROUP_ADMINISTRATORS = "group.administrators";
+
     private PortofinoProperties() {}
 }

@@ -1,3 +1,4 @@
+<%@ page import="com.manydesigns.portofino.system.model.users.UserUtils" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -14,12 +15,13 @@
                         <div class="portletTitle">
                             <h1>
                             <stripes:layout-component name="portletTitle">
-                                portletTitle
                             </stripes:layout-component>
                             </h1>
                         </div>
                         <div class="portletHeaderButtons">
-                            <stripes:layout-component name="portletHeaderButtons"/>
+                            <% if(UserUtils.isAdministrator(request)) { %>
+                                <stripes:layout-component name="portletHeaderButtons"/>
+                            <% } %>
                         </div>
                     </div>
                     <div class="portletHeaderSeparator"></div>
@@ -27,7 +29,6 @@
             </div>
             <div class="portletBody">
                 <stripes:layout-component name="portletBody">
-                    Portlet body
                 </stripes:layout-component>
             </div>
             <div class="portletFooter">

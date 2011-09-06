@@ -35,6 +35,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import org.apache.commons.configuration.Configuration;
 
@@ -161,5 +162,10 @@ public interface Application {
 
     public User findUserByToken(String token);
 
+    Group getAnonymousGroup();
+
+    Group getRegisteredGroup();
+
+    Group getAdministratorsGroup();
 
 }

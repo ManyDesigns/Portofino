@@ -29,7 +29,6 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.model.pages.*;
-import com.manydesigns.portofino.system.model.users.Group;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
@@ -88,7 +87,7 @@ public class PageTest extends TestCase {
         n1_1.setTitle("homepage title");
         n1_1.setFragment("homepage");
 
-        n1_1_perm.getAllow().add(Group.ANONYMOUS_GROUP.getName());
+        n1_1_perm.getAllow().add("anonymous");
 
         //1.2
         n1_2 = new FolderPage();
@@ -99,7 +98,7 @@ public class PageTest extends TestCase {
         n1_2.setTitle("Model title");
         n1_2.setFragment("model");
 
-        n1_2_perm.getAllow().add(Group.REGISTERED_GROUP.getName());
+        n1_2_perm.getAllow().add("registered");
 
         n1_2_1 = new CustomFolderPage();
         n1_2_1.setParent(n1_2);
@@ -189,7 +188,7 @@ public class PageTest extends TestCase {
 
 
     public void testAnonymous() {
-        groups.add(Group.ANONYMOUS_GROUP.getName());
+        groups.add("anonymous");
 
         assertTrue(root.isAllowed(groups));
         assertTrue(n1_1.isAllowed(groups));
@@ -204,8 +203,8 @@ public class PageTest extends TestCase {
     }
 
     public void testRegistered() {
-        groups.add(Group.ANONYMOUS_GROUP.getName());
-        groups.add(Group.REGISTERED_GROUP.getName());
+        groups.add("anonymous");
+        groups.add("registered");
 
         assertTrue(root.isAllowed(groups));
         assertTrue(n1_1.isAllowed(groups));
@@ -220,8 +219,8 @@ public class PageTest extends TestCase {
     }
 
     public void testAdmins() {
-        groups.add(Group.ANONYMOUS_GROUP.getName());
-        groups.add(Group.REGISTERED_GROUP.getName());
+        groups.add("anonymous");
+        groups.add("registered");
         groups.add("admins");
 
         assertTrue(root.isAllowed(groups));
@@ -239,8 +238,8 @@ public class PageTest extends TestCase {
     }
 
     public void testCattivi() {
-        groups.add(Group.ANONYMOUS_GROUP.getName());
-        groups.add(Group.REGISTERED_GROUP.getName());
+        groups.add("anonymous");
+        groups.add("registered");
         groups.add("cattivi");
 
         assertTrue(root.isAllowed(groups));
@@ -258,8 +257,8 @@ public class PageTest extends TestCase {
     }
 
     public void testBuoni() {
-        groups.add(Group.ANONYMOUS_GROUP.getName());
-        groups.add(Group.REGISTERED_GROUP.getName());
+        groups.add("anonymous");
+        groups.add("registered");
         groups.add("buoni");
 
         assertTrue(root.isAllowed(groups));
@@ -276,8 +275,8 @@ public class PageTest extends TestCase {
     }
 
     public void testBuoniCattivi() {
-        groups.add(Group.ANONYMOUS_GROUP.getName());
-        groups.add(Group.REGISTERED_GROUP.getName());
+        groups.add("anonymous");
+        groups.add("registered");
         groups.add("buoni");
         groups.add("cattivi");
 
