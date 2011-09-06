@@ -27,11 +27,9 @@
 *
 */
 
-package com.manydesigns.portofino.actions.forms;
+package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.elements.annotations.Updatable;
+import com.manydesigns.portofino.model.ModelObject;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -39,22 +37,14 @@ import com.manydesigns.elements.annotations.Updatable;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class EditPage {
+public interface ModelSelectionProvider extends ModelObject, HasReferences {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    @Label("id")
-    @Updatable(false)
-    public String id;
+    String getName();
 
-    @Label("Description")
-    @Required
-    public String description;
+    String getToDatabase();
 
-    @Label("Embed in parent?")
-    public boolean embedInParent;
-
-    @Label("Show in navigation?")
-    public boolean showInNavigation;
+    String getToSchema();
 
 }

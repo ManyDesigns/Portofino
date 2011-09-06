@@ -41,7 +41,7 @@ public interface HasReferences {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    List<? extends Reference> getReferences();
+    List<Reference> getReferences();
     Table getFromTable();
     Table getToTable();
 

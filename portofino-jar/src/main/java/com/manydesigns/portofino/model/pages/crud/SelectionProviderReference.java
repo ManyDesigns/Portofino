@@ -33,6 +33,7 @@ import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
+import com.manydesigns.portofino.model.datamodel.ModelSelectionProvider;
 import org.apache.commons.lang.StringUtils;
 
 import javax.xml.bind.Unmarshaller;
@@ -59,6 +60,7 @@ public class SelectionProviderReference implements ModelObject {
     protected String foreignKeyName;
     protected boolean enabled = true;
     protected String displayModeName;
+    protected String selectionProviderName;
 
     //**************************************************************************
     // Fields for wire-up
@@ -66,6 +68,7 @@ public class SelectionProviderReference implements ModelObject {
 
     protected ForeignKey foreignKey;
     private DisplayMode displayMode;
+    private ModelSelectionProvider selectionProvider;
 
     //**************************************************************************
     // ModelObject implementation
@@ -82,6 +85,11 @@ public class SelectionProviderReference implements ModelObject {
     public void init(Model model) {
         if(!StringUtils.isEmpty(foreignKeyName)) {
             foreignKey = parent.getActualTable().findForeignKeyByName(foreignKeyName);
+        } //else TODO
+
+        if(!StringUtils.isEmpty(selectionProviderName)) {
+            selectionProvider = parent.getActualTable()
+                    .findSelectionProviderByName(selectionProviderName);
         } //else TODO
 
         if(displayModeName != null) {
@@ -120,6 +128,15 @@ public class SelectionProviderReference implements ModelObject {
         this.foreignKeyName = foreignKeyName;
     }
 
+    @XmlAttribute(name = "selectionProvider")
+    public String getSelectionProviderName() {
+        return selectionProviderName;
+    }
+
+    public void setSelectionProviderName(String selectionProviderName) {
+        this.selectionProviderName = selectionProviderName;
+    }
+
     public ForeignKey getForeignKey() {
         return foreignKey;
     }
@@ -149,5 +166,9 @@ public class SelectionProviderReference implements ModelObject {
     public void setDisplayMode(DisplayMode displayMode) {
         this.displayMode = displayMode;
         displayModeName = displayMode.name();
+    }
+
+    public ModelSelectionProvider getSelectionProvider() {
+        return selectionProvider;
     }
 }

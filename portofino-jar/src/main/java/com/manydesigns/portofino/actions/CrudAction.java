@@ -52,10 +52,7 @@ import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.CrudLogic;
 import com.manydesigns.portofino.logic.DataModelLogic;
-import com.manydesigns.portofino.model.datamodel.DatabaseSelectionProvider;
-import com.manydesigns.portofino.model.datamodel.ForeignKey;
-import com.manydesigns.portofino.model.datamodel.Reference;
-import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.crud.Button;
 import com.manydesigns.portofino.model.pages.crud.Crud;
@@ -185,11 +182,16 @@ public class CrudAction extends PortletAction {
     private void setupSelectionProviders() {
         Set<String> configuredSPs = new HashSet<String>();
         for(SelectionProviderReference ref : crud.getSelectionProviders()) {
-            if(ref.getForeignKey() == null) {
-                logger.error("Not supported");
+            boolean added = false;
+            if(ref.getForeignKey() != null) {
+                added = setupSelectionProvider(ref, ref.getForeignKey(), configuredSPs);
+            } else if(ref.getSelectionProvider() instanceof DatabaseSelectionProvider) {
+                DatabaseSelectionProvider dsp = (DatabaseSelectionProvider) ref.getSelectionProvider();
+                added = setupSelectionProvider(ref, dsp, configuredSPs);
+            } else {
+                logger.error("Unsupported selection provider: " + ref.getSelectionProvider());
                 continue;
             }
-            boolean added = setupSelectionProvider(ref, ref.getForeignKey(), configuredSPs);
             if(ref.isEnabled() && !added) {
                 logger.warn("Selection provider {} not added; check whether the fields on which it is configured " +
                         "overlap with some other selection provider", ref.getQualifiedName());
@@ -200,6 +202,14 @@ public class CrudAction extends PortletAction {
         if(table != null) {
             for(ForeignKey fk : table.getForeignKeys()) {
                 setupSelectionProvider(null, fk, configuredSPs);
+            }
+            for(ModelSelectionProvider dsp : table.getSelectionProviders()) {
+                if(dsp instanceof DatabaseSelectionProvider) {
+                    setupSelectionProvider(null, (DatabaseSelectionProvider) dsp, configuredSPs);
+                } else {
+                    logger.error("Unsupported selection provider: " + dsp);
+                    continue;
+                }
             }
         }
     }
@@ -1393,7 +1403,7 @@ public class CrudAction extends PortletAction {
                     new TableFormBuilder(CrudSelectionProviderEdit.class);
             tableFormBuilder.configNRows(availableSelectionProviders.size());
             for(int i = 0; i < selectionProviderEdits.length; i++) {
-                Collection<DatabaseSelectionProvider> availableProviders =
+                Collection<ModelSelectionProvider> availableProviders =
                         (Collection) availableSelectionProviders.get
                                 (Arrays.asList(selectionProviderEdits[i].fieldNames));
                 if(availableProviders == null || availableProviders.size() == 0) {
@@ -1403,7 +1413,7 @@ public class CrudAction extends PortletAction {
                 String[] availableProviderValues = new String[availableProviderNames.length];
                 availableProviderNames[0] = "None";
                 int j = 1;
-                for(DatabaseSelectionProvider sp : availableProviders) {
+                for(ModelSelectionProvider sp : availableProviders) {
                     availableProviderNames[j] = sp.getName();
                     availableProviderValues[j] = sp.getName();
                     j++;
@@ -1533,16 +1543,16 @@ public class CrudAction extends PortletAction {
             if(sp.selectionProvider == null) {
                 //TODO this is a shortcut: takes the first available selection provider and disables it
                 List<String> key = Arrays.asList(sp.fieldNames);
-                Collection<DatabaseSelectionProvider> selectionProviders =
-                        (Collection<DatabaseSelectionProvider>) availableSelectionProviders.get(key);
-                DatabaseSelectionProvider dsp = selectionProviders.iterator().next();
+                Collection<ModelSelectionProvider> selectionProviders =
+                        (Collection<ModelSelectionProvider>) availableSelectionProviders.get(key);
+                ModelSelectionProvider dsp = selectionProviders.iterator().next();
                 SelectionProviderReference sel = makeSelectionProviderReference(dsp);
                 sel.setEnabled(false);
             } else {
                 List<String> key = Arrays.asList(sp.fieldNames);
-                Collection<DatabaseSelectionProvider> selectionProviders =
-                        (Collection<DatabaseSelectionProvider>) availableSelectionProviders.get(key);
-                for(DatabaseSelectionProvider dsp : selectionProviders) {
+                Collection<ModelSelectionProvider> selectionProviders =
+                        (Collection<ModelSelectionProvider>) availableSelectionProviders.get(key);
+                for(ModelSelectionProvider dsp : selectionProviders) {
                     if(sp.selectionProvider.equals(dsp.getName())) {
                         SelectionProviderReference sel = makeSelectionProviderReference(dsp);
                         sel.setDisplayMode(sp.displayMode);
@@ -1573,13 +1583,12 @@ public class CrudAction extends PortletAction {
         }
     }
 
-    protected SelectionProviderReference makeSelectionProviderReference(DatabaseSelectionProvider dsp) {
+    protected SelectionProviderReference makeSelectionProviderReference(ModelSelectionProvider dsp) {
         SelectionProviderReference sel = new SelectionProviderReference();
         if(dsp instanceof ForeignKey) {
             sel.setForeignKeyName(dsp.getName());
         } else {
-            logger.error("Unimplemented case");
-            return null;
+            sel.setSelectionProviderName(dsp.getName());
         }
         sel.setParent(crud);
         crud.getSelectionProviders().add(sel);

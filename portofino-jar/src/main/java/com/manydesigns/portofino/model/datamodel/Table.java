@@ -63,7 +63,7 @@ public class Table implements ModelObject {
     protected final List<Column> columns;
     protected final List<ForeignKey> foreignKeys;
     protected final List<Annotation> annotations;
-    protected final List<DatabaseSelectionProvider> selectionProviders;
+    protected final List<ModelSelectionProvider> selectionProviders;
 
     protected Schema schema;
     protected String tableName;
@@ -97,7 +97,7 @@ public class Table implements ModelObject {
         foreignKeys = new ArrayList<ForeignKey>();
         oneToManyRelationships = new ArrayList<ForeignKey>();
         annotations = new ArrayList<Annotation>();
-        selectionProviders = new ArrayList<DatabaseSelectionProvider>();
+        selectionProviders = new ArrayList<ModelSelectionProvider>();
     }
 
     //**************************************************************************
@@ -133,7 +133,7 @@ public class Table implements ModelObject {
             annotation.reset();
         }
 
-        for(DatabaseSelectionProvider selectionProvider : selectionProviders) {
+        for(ModelSelectionProvider selectionProvider : selectionProviders) {
             selectionProvider.reset();
         }
     }
@@ -169,7 +169,7 @@ public class Table implements ModelObject {
             annotation.init(model);
         }
 
-        for(DatabaseSelectionProvider selectionProvider : selectionProviders) {
+        for(ModelSelectionProvider selectionProvider : selectionProviders) {
             selectionProvider.init(model);
         }
     }
@@ -282,8 +282,8 @@ public class Table implements ModelObject {
     }
 
     @XmlElementWrapper(name="selectionProviders")
-    @XmlElement(name="selectionProvider",type=DatabaseSelectionProvider.class)
-    public List<DatabaseSelectionProvider> getSelectionProviders() {
+    @XmlElement(name="query",type=DatabaseSelectionProvider.class)
+    public List<ModelSelectionProvider> getSelectionProviders() {
         return selectionProviders;
     }
 
@@ -308,6 +308,16 @@ public class Table implements ModelObject {
             }
         }
         logger.debug("Foreign key not found: {}", fkName);
+        return null;
+    }
+
+    public ModelSelectionProvider findSelectionProviderByName(String selectionProviderName) {
+        for (ModelSelectionProvider current : selectionProviders) {
+            if (current.getName().equals(selectionProviderName)) {
+                return current;
+            }
+        }
+        logger.debug("Selection provider not found: {}", selectionProviderName);
         return null;
     }
 

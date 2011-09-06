@@ -45,9 +45,9 @@ import java.util.*;
 public class PortletAction extends AbstractActionBean {
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
-            {{"description", "embedInParent", "showInNavigation"}};
+            {{"id", "description", "embedInParent", "showInNavigation"}};
     public static final String[][] TOP_LEVEL_PAGE_CONFIGURATION_FIELDS =
-            {{"description", "showInNavigation"}};
+            {{"id", "description", "showInNavigation"}};
     public static final String PAGE_PORTLET_NOT_CONFIGURED = "/layouts/portlet-not-configured.jsp";
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
@@ -449,6 +449,7 @@ public class PortletAction extends AbstractActionBean {
                 .build();
 
         EditPage edit = new EditPage();
+        edit.id = page.getId();
         edit.description = page.getDescription();
         edit.embedInParent = page.getLayoutContainerInParent() != null;
         edit.showInNavigation = page.isShowInNavigation();

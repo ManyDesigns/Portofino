@@ -31,7 +31,6 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class DatabaseSelectionProvider implements ModelObject, HasReferences {
+public class DatabaseSelectionProvider implements ModelSelectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
