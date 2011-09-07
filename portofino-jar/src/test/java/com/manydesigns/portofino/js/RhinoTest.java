@@ -30,10 +30,7 @@
 package com.manydesigns.portofino.js;
 
 import com.manydesigns.elements.AbstractElementsTest;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.EcmaError;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -132,8 +129,12 @@ public class RhinoTest extends AbstractElementsTest {
 
     public void testReturn() {
         String s = "return true;";
-        Object result = cx.evaluateString(scope, s, "<cmd>", 1, null);
-        assertEquals(2, result);
+        try {
+            Object result = cx.evaluateString(scope, s, "<cmd>", 1, null);
+            fail();
+        } catch (EvaluatorException e) {
+            assertEquals("invalid return (<cmd>#1)", e.getMessage());
+        }
     }
 
 }
