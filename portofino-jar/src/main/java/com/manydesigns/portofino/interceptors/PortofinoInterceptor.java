@@ -136,12 +136,10 @@ public class PortofinoInterceptor implements Interceptor {
             Navigation navigation = new Navigation(application, dispatch, groups);
             request.setAttribute(RequestAttributes.NAVIGATION, navigation);
 
-            PageInstance[] pageInstances = dispatch.getPageInstancePath();
-            for(PageInstance page : pageInstances) {
+            for(PageInstance page : dispatch.getPageInstancePath()) {
                 page.realize();
             }
-            PageInstance pageInstance =
-                    pageInstances[pageInstances.length-1];
+            PageInstance pageInstance = dispatch.getLastPageInstance();
             request.setAttribute(RequestAttributes.PAGE_INSTANCE, pageInstance);
 
             logger.debug("Creating breadcrumbs");

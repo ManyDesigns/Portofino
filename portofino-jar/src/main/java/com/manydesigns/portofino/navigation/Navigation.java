@@ -78,17 +78,21 @@ public class Navigation implements XhtmlFragment {
     //**************************************************************************
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
-        print(dispatch.getRequest().getContextPath(),
-                dispatch.getNavigationPageInstances(), xb, false);
+        String contextPath = dispatch.getRequest().getContextPath();
+        PageInstance rootPageInstance = dispatch.getRootPageInstance();
+        List<PageInstance> pageInstances =
+                rootPageInstance.getChildPageInstances();
+        print(contextPath, pageInstances, xb, false);
     }
 
-    private void print(String path, List<PageInstance> pages, XhtmlBuffer xb, boolean recursive) {
-        if (pages == null) {
+    private void print(String path, List<PageInstance> pageInstances,
+                       XhtmlBuffer xb, boolean recursive) {
+        if (pageInstances == null) {
             return;
         }
         boolean first = true;
         PageInstance expand = null;
-        for (PageInstance current : pages) {
+        for (PageInstance current : pageInstances) {
             Page page = current.getPage();
             if (!page.isAllowed(groups)) {
                 continue;

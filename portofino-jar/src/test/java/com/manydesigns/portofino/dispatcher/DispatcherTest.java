@@ -75,9 +75,9 @@ public class DispatcherTest extends AbstractPortofinoTest {
 
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
-        assertEquals(1, pageInstancePath.length);
+        assertEquals(2, pageInstancePath.length);
 
-        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[0];
+        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[1];
         Page page = model.getRootPage().getChildPages().get(0);
         assertEquals(page, pageInstance.getPage());
         assertEquals(CrudPage.MODE_SEARCH, pageInstance.getMode());
@@ -122,9 +122,9 @@ public class DispatcherTest extends AbstractPortofinoTest {
 
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
-        assertEquals(1, pageInstancePath.length);
+        assertEquals(2, pageInstancePath.length);
 
-        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[0];
+        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[1];
         Page page = model.getRootPage().getChildPages().get(0);
         assertEquals(page, pageInstance.getPage());
         assertEquals(CrudPage.MODE_NEW, pageInstance.getMode());
@@ -163,15 +163,15 @@ public class DispatcherTest extends AbstractPortofinoTest {
 
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
-        assertEquals(2, pageInstancePath.length);
+        assertEquals(3, pageInstancePath.length);
 
-        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[0];
+        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[1];
         Page page = model.getRootPage().getChildPages().get(0);
         assertEquals(page, pageInstance.getPage());
         assertEquals(CrudPage.MODE_SEARCH, pageInstance.getMode());
         assertNull(pageInstance.getPk());
 
-        PageInstance reportNodeInstance = pageInstancePath[1];
+        PageInstance reportNodeInstance = pageInstancePath[2];
         Page reportNode = page.getChildPages().get(0);
         assertEquals("report", reportNode.getFragment());
         assertEquals(reportNode, reportNodeInstance.getPage());
@@ -209,15 +209,18 @@ public class DispatcherTest extends AbstractPortofinoTest {
 
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
-        assertEquals(1, pageInstancePath.length);
+        assertEquals(2, pageInstancePath.length);
 
         // nodo /project
-        List<PageInstance> tree = dispatch.getNavigationPageInstances();
+        PageInstance rootPageInstance = dispatch.getRootPageInstance();
+        assertEquals(pageInstancePath[0], rootPageInstance);
+
+        List<PageInstance> tree = rootPageInstance.getChildPageInstances();
         assertNotNull(tree);
         assertEquals(1, tree.size());
 
         CrudPageInstance pageInstance = (CrudPageInstance) tree.get(0);
-        assertEquals(pageInstancePath[0], pageInstance);
+        assertEquals(pageInstancePath[1], pageInstance);
         RootPage rootPage = model.getRootPage();
         CrudPage page = (CrudPage) rootPage.getChildPages().get(0);
         assertEquals(page, pageInstance.getPage());
@@ -277,7 +280,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
 
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
-        assertEquals(2, pageInstancePath.length);
+        assertEquals(3, pageInstancePath.length);
 
         Navigation navigation =
                 new Navigation(application, dispatch, Collections.EMPTY_LIST);
@@ -286,7 +289,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         */
 
         // Page e NavigationNode per /projects
-        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[0];
+        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[1];
         Page page = model.getRootPage().getChildPages().get(0);
         assertEquals(page, pageInstance.getPage());
         assertEquals(CrudPage.MODE_DETAIL, pageInstance.getMode());
@@ -300,7 +303,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertTrue(navigationNode.isEnabled());
         */
 
-        pageInstance = (CrudPageInstance) pageInstancePath[1];
+        pageInstance = (CrudPageInstance) pageInstancePath[2];
         page = ((CrudPage) page).getDetailChildPages().get(0);
         assertEquals(page, pageInstance.getPage());
         assertEquals(CrudPage.MODE_SEARCH, pageInstance.getMode());
@@ -334,15 +337,15 @@ public class DispatcherTest extends AbstractPortofinoTest {
 
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
-        assertEquals(2, pageInstancePath.length);
+        assertEquals(3, pageInstancePath.length);
 
-        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[0];
+        CrudPageInstance pageInstance = (CrudPageInstance) pageInstancePath[1];
         CrudPage expected = (CrudPage) model.getRootPage().getChildPages().get(0);
         assertEquals(expected, pageInstance.getPage());
         assertEquals(CrudPage.MODE_DETAIL, pageInstance.getMode());
         assertEquals("10", pageInstance.getPk());
 
-        pageInstance = (CrudPageInstance) pageInstancePath[1];
+        pageInstance = (CrudPageInstance) pageInstancePath[2];
         expected = (CrudPage) expected.getDetailChildPages().get(0);
         assertEquals(expected, pageInstance.getPage());
         assertEquals(CrudPage.MODE_DETAIL, pageInstance.getMode());

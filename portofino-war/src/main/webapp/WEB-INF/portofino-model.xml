@@ -819,7 +819,7 @@ Struttura dell'XML:
                             </primaryKey>
 
                             <foreignKeys>
-                                <foreignKey foreignKeyName="fk_user_1" toDatabase="portofino" toSchema="public" toTable="userstate" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="users" onePropertyName="state" virtual="false">
+                                <foreignKey name="fk_user_1" toDatabase="portofino" toSchema="public" toTable="userstate" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="users" onePropertyName="state" virtual="false">
                                     <references>
                                         <reference fromColumn="state" toColumn="id"/>
                                     </references>
@@ -856,7 +856,7 @@ Struttura dell'XML:
                             </primaryKey>
                             <foreignKeys>
 
-                                <foreignKey foreignKeyName="fk_group_1" toDatabase="portofino" toSchema="public" toTable="users" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="groupsCreated" onePropertyName="creatorId" virtual="false">
+                                <foreignKey name="fk_group_1" toDatabase="portofino" toSchema="public" toTable="users" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="groupsCreated" onePropertyName="creatorId" virtual="false">
                                     <references>
                                         <reference fromColumn="creatorid" toColumn="userid"/>
                                     </references>
@@ -883,13 +883,13 @@ Struttura dell'XML:
                                 <column columnName="creationdate"/>
                             </primaryKey>
                             <foreignKeys>
-                                <foreignKey foreignKeyName="fk_usersgroups_1" toDatabase="portofino" toSchema="public" toTable="users" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="groups" onePropertyName="user" virtual="false">
+                                <foreignKey name="fk_usersgroups_1" toDatabase="portofino" toSchema="public" toTable="users" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="groups" onePropertyName="user" virtual="false">
                                     <references>
 
                                         <reference fromColumn="userid" toColumn="userid"/>
                                     </references>
                                 </foreignKey>
-                                <foreignKey foreignKeyName="fk_usersgroups_2" toDatabase="portofino" toSchema="public" toTable="groups" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="users" onePropertyName="group" virtual="false">
+                                <foreignKey name="fk_usersgroups_2" toDatabase="portofino" toSchema="public" toTable="groups" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="users" onePropertyName="group" virtual="false">
                                     <references>
                                         <reference fromColumn="groupid" toColumn="groupid"/>
                                     </references>
@@ -927,7 +927,7 @@ Struttura dell'XML:
                             </primaryKey>
 
                             <foreignKeys>
-                                <foreignKey foreignKeyName="fk_emailqueue_1" toDatabase="portofino" toSchema="public" toTable="emailstate" onUpdate="NO ACTION" onDelete="NO ACTION" virtual="false">
+                                <foreignKey name="fk_emailqueue_1" toDatabase="portofino" toSchema="public" toTable="emailstate" onUpdate="NO ACTION" onDelete="NO ACTION" virtual="false">
                                     <references>
                                         <reference fromColumn="state" toColumn="id"/>
                                     </references>
@@ -967,18 +967,18 @@ Struttura dell'XML:
 
                             </primaryKey>
                             <foreignKeys>
-                                <foreignKey foreignKeyName="fk_msg_1" toDatabase="portofino" toSchema="public" toTable="msgstate" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="messages" onePropertyName="state" virtual="false">
+                                <foreignKey name="fk_msg_1" toDatabase="portofino" toSchema="public" toTable="msgstate" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="messages" onePropertyName="state" virtual="false">
                                     <references>
                                         <reference fromColumn="state" toColumn="id"/>
                                     </references>
                                 </foreignKey>
-                                <foreignKey foreignKeyName="fk_msg_2" toDatabase="portofino" toSchema="public" toTable="users" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="messageIn" onePropertyName="from" virtual="false">
+                                <foreignKey name="fk_msg_2" toDatabase="portofino" toSchema="public" toTable="users" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="messageIn" onePropertyName="from" virtual="false">
                                     <references>
 
                                         <reference fromColumn="from_" toColumn="userid"/>
                                     </references>
                                 </foreignKey>
-                                <foreignKey foreignKeyName="fk_msg_3" toDatabase="portofino" toSchema="public" toTable="users" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="messageOut" onePropertyName="to" virtual="false">
+                                <foreignKey name="fk_msg_3" toDatabase="portofino" toSchema="public" toTable="users" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="messageOut" onePropertyName="to" virtual="false">
                                     <references>
                                         <reference fromColumn="to_" toColumn="userid"/>
                                     </references>
@@ -1009,7 +1009,7 @@ Struttura dell'XML:
                                 <column columnName="id"/>
                             </primaryKey>
                             <foreignKeys>
-                                <foreignKey foreignKeyName="fk_oldpwd_1" toDatabase="portofino" toSchema="public" toTable="users" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="oldPwds" onePropertyName="user" virtual="false">
+                                <foreignKey name="fk_oldpwd_1" toDatabase="portofino" toSchema="public" toTable="users" onUpdate="NO ACTION" onDelete="NO ACTION" manyPropertyName="oldPwds" onePropertyName="user" virtual="false">
                                     <references>
                                         <reference fromColumn="userid" toColumn="userid"/>
                                     </references>

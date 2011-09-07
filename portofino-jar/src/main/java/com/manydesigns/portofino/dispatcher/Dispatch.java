@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.dispatcher;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -46,18 +45,15 @@ public class Dispatch {
     protected final String originalPath;
     protected final String rewrittenPath;
     protected final PageInstance[] pageInstancePath;
-    protected final List<PageInstance> navigationPageInstances;
 
     public Dispatch(HttpServletRequest request,
                     String originalPath,
                     String rewrittenPath,
-                    PageInstance[] pageInstancePath,
-                    List<PageInstance> navigationPageInstances) {
+                    PageInstance[] pageInstancePath) {
         this.request = request;
         this.originalPath = originalPath;
         this.rewrittenPath = rewrittenPath;
         this.pageInstancePath = pageInstancePath;
-        this.navigationPageInstances = navigationPageInstances;
 
         String pathUrl = getPathUrl();
         assert pathUrl.equals(originalPath);
@@ -76,8 +72,8 @@ public class Dispatch {
         return pageInstancePath;
     }
 
-    public List<PageInstance> getNavigationPageInstances() {
-        return navigationPageInstances;
+    public PageInstance getRootPageInstance() {
+        return pageInstancePath[0];
     }
 
     public PageInstance getLastPageInstance() {
@@ -107,17 +103,17 @@ public class Dispatch {
 
     public String getPathUrl(int length) {
         StringBuilder sb = new StringBuilder();
-        sb.append("/");
         boolean first = true;
         for (int i = 0; i < length; i++) {
             PageInstance current = pageInstancePath[i];
             String fragment = current.getUrlFragment();
             if (first) {
                 first = false;
+                // ignore fragment of root node
             } else {
                 sb.append("/");
+                sb.append(fragment);
             }
-            sb.append(fragment);
         }
         return sb.toString();
     }

@@ -63,9 +63,9 @@
             </schemas>
         </database>
     </databases>
-    <rootPage title="Portofino4" description="portofino 4" id="/">
+    <rootPage title="Portofino4" description="portofino 4" fragment="/">
         <childPages>
-            <crudPage description="projects" id="projects" title="projects">
+            <crudPage id="1" description="projects" fragment="projects" title="projects">
                 <crud name="projects"
                          table="test-database.public.projects"
                          query="projects-query">
@@ -76,7 +76,8 @@
                     </properties>
                 </crud>
                 <childPages>
-                    <portletPage id="report"
+                    <chartPage id="2"
+                                 fragment="report"
                                  title="report title"
                                  description="report description"
                                  name="report"
@@ -87,7 +88,7 @@
                                  urlExpression="http://www.manydesigns.com/"/>
                 </childPages>
                 <detailChildPages>
-                    <crudPage description="tickets" id="tickets" title="tickets">
+                    <crudPage id="3" description="tickets" fragment="tickets" title="tickets">
                         <crud name="tickets"
                                  table="test-database.public.tickets"
                                  query="tickets-query">

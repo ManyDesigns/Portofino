@@ -75,7 +75,6 @@ public class Dispatcher {
         }
 
         List<PageInstance> path = new ArrayList<PageInstance>();
-        List<PageInstance> tree = new ArrayList<PageInstance>();
 
         Model model = application.getModel();
 
@@ -84,25 +83,21 @@ public class Dispatcher {
             throw new Error("Model is null");
         }
 
-        Page rootPage = model.getRootPage();
-        List<Page> pageList = rootPage.getChildPages();
         String[] fragments = StringUtils.split(originalPath, '/');
 
         List<String> fragmentsAsList = Arrays.asList(fragments);
         ListIterator<String> fragmentsIterator = fragmentsAsList.listIterator();
 
-        visitPagesInPath(path, tree, pageList, fragmentsIterator);
-
-        if (path.isEmpty()) {
-            return null;
-        }
+        Page rootPage = model.getRootPage();
+        visitPageInPath(path, fragmentsIterator, rootPage);
 
         if (fragmentsIterator.hasNext()) {
             logger.debug("Not all fragments matched");
             return null;
         }
 
-        path.add(0, new PageInstance(application, rootPage, null));
+        // must contain root page and some child page at least
+        assert path.size() > 1;
 
         PageInstance pageInstance = path.get(path.size() - 1);
         Page page = pageInstance.getPage();
@@ -112,7 +107,7 @@ public class Dispatcher {
                 new PageInstance[path.size()];
         path.toArray(pageArray);
 
-        return new Dispatch(request, originalPath, rewrittenPath, pageArray, tree);
+        return new Dispatch(request, originalPath, rewrittenPath, pageArray);
     }
 
     public static String getRewrittenPath(Page page) {
