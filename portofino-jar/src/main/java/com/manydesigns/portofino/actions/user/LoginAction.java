@@ -172,4 +172,12 @@ public class LoginAction extends AbstractActionBean {
 
         return new RedirectResolution("/");
     }
+
+    public String getReturnUrl() {
+        return returnUrl;
+    }
+
+    public void setReturnUrl(String returnUrl) {
+        this.returnUrl = returnUrl;
+    }
 }
