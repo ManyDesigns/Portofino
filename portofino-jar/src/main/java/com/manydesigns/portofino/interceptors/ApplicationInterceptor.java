@@ -29,41 +29,24 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
-import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.navigation.Navigation;
-import com.manydesigns.portofino.system.model.users.UserUtils;
 import net.sourceforge.stripes.action.ActionBeanContext;
-import net.sourceforge.stripes.action.ErrorResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
-import net.sourceforge.stripes.util.UrlBuilder;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -72,17 +55,12 @@ import java.util.concurrent.ConcurrentHashMap;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @Intercepts(LifecycleStage.CustomValidation)
-public class PortofinoInterceptor implements Interceptor {
+public class ApplicationInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    private static final int UNAUTHORIZED = 401;
-
     public final static Logger logger =
-            LoggerFactory.getLogger(PortofinoInterceptor.class);
-
-    protected Map<Class, Map<Class<? extends Annotation>, Field[]>> annotationCache =
-            new ConcurrentHashMap<Class, Map<Class<? extends Annotation>, Field[]>>();
+            LoggerFactory.getLogger(ApplicationInterceptor.class);
 
     public Resolution intercept(ExecutionContext context) throws Exception {
         logger.debug("Retrieving Stripes objects");
@@ -90,48 +68,30 @@ public class PortofinoInterceptor implements Interceptor {
 
         logger.debug("Retrieving Servlet API objects");
         HttpServletRequest request = actionContext.getRequest();
-        ServletContext servletContext = actionContext.getServletContext();
-        HttpSession session = request.getSession(false);
 
-        logger.debug("Retrieving Portofino long-lived objects");
+        logger.debug("Retrieving Portofino application");
         Application application =
                 (Application) request.getAttribute(
                         RequestAttributes.APPLICATION);
-        Model model = application.getModel();
-        request.setAttribute(RequestAttributes.MODEL, model);
-        
+
         logger.debug("Starting page response timer");
         StopWatch stopWatch = new StopWatch();
-        // Non è necessario stopparlo
+        // There is no need to stop this timer.
         stopWatch.start();
         request.setAttribute(RequestAttributes.STOP_WATCH, stopWatch);
 
-        logger.debug("Retrieving user");
-        String userId = null;
-        String userName = null;
-        if (session == null) {
-            logger.debug("No session found");
-        } else {
-            userId = (String) session.getAttribute(SessionAttributes.USER_ID);
-            userName = (String) session.getAttribute(SessionAttributes.USER_NAME);
-            logger.debug("Retrieved userId={} userName={}", userId, userName);
-        }
-
-        logger.debug("Setting up logging MDC");
-        MDC.clear();
-        MDC.put(SessionAttributes.USER_ID, ObjectUtils.toString(userId));
-        MDC.put(SessionAttributes.USER_NAME, userName);
-
-        List<String> groups = UserUtils.manageGroups(application, userId);
-        request.setAttribute(RequestAttributes.GROUPS, groups);
-
         logger.debug("Setting skin");
         if(request.getAttribute("skin") == null) {
-            request.setAttribute("skin", model.getRootPage().getSkin());
+            String skin = application.getModel().getRootPage().getSkin();
+            request.setAttribute("skin", skin);
         }
 
-        Dispatch dispatch = (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
+        Dispatch dispatch =
+                (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
         if (dispatch != null) {
+            List<String> groups =
+                    (List<String>) request.getAttribute(RequestAttributes.GROUPS);
+
             logger.debug("Creating navigation");
             Navigation navigation = new Navigation(application, dispatch, groups);
             request.setAttribute(RequestAttributes.NAVIGATION, navigation);
@@ -145,29 +105,7 @@ public class PortofinoInterceptor implements Interceptor {
             logger.debug("Creating breadcrumbs");
             Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
             request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
-
-            Page page = pageInstance.getPage();
-            //3. Ho i permessi necessari vado alla pagina
-            if(page.isAllowed(groups) && UserUtils.isAllowed(context.getHandler(), request)){
-                return context.proceed();
-            } else {
-                //4. Non ho i permessi, ma non sono loggato, vado alla pagina di login
-                if (userId==null){
-                    UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(),
-                            dispatch.getOriginalPath(), false);
-                    Map parameters = request.getParameterMap();
-                    urlBuilder.addParameters(parameters);
-                    String returnUrl = urlBuilder.toString();
-
-                    return new RedirectResolution(LoginAction.class)
-                            .addParameter("returnUrl", returnUrl);
-                } else {
-                    //5. Non ho i permessi, ma sono loggato, errore 401
-                    return new ErrorResolution(UNAUTHORIZED);
-                }
-            }
-        } else {
-            return context.proceed();
         }
+        return context.proceed();
     }
 }

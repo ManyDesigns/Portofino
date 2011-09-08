@@ -14,7 +14,7 @@
             <interceptor name="elements-struts2"
                          class="com.manydesigns.elements.struts2.ElementsInterceptor" />
             <interceptor name="portofino"
-                         class="com.manydesigns.portofino.interceptors.PortofinoInterceptor" />
+                         class="com.manydesigns.portofino.interceptors.ApplicationInterceptor" />
             <interceptor-stack name="mdstack">
 <!-- customized interceptor stack based on struts-default.xml in Struts 2.2.1 -->
                 <interceptor-ref name="exception">

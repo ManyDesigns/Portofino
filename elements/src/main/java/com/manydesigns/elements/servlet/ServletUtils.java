@@ -27,16 +27,13 @@
  *
  */
 
-package com.manydesigns.portofino.actions.admin;
+package com.manydesigns.elements.servlet;
 
-import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.actions.PortletAction;
-import com.manydesigns.portofino.model.pages.Page;
-import com.manydesigns.portofino.model.pages.RootPage;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
-import net.sourceforge.stripes.action.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -44,45 +41,35 @@ import org.slf4j.LoggerFactory;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@RequiresAdministrator
-@UrlBinding("/admin/root-permissions.action")
-public class RootPermissionsAction extends PortletAction {
+public class ServletUtils {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    RootPage rootPage;
-
-    //--------------------------------------------------------------------------
-    // Logging
-    //--------------------------------------------------------------------------
-
     public final static Logger logger =
-            LoggerFactory.getLogger(SettingsAction.class);
+            LoggerFactory.getLogger(ServletUtils.class);
 
-    //--------------------------------------------------------------------------
-    // Action events
-    //--------------------------------------------------------------------------
-
-    @DefaultHandler
-    public Resolution execute() {
-        Page page = model.getRootPage();
-        setupGroups(page);
-        return new ForwardResolution("/layouts/admin/rootPermissions.jsp");
+    public static String getOriginalPath(HttpServletRequest request) {
+        String originalPath =
+                (String) request.getAttribute(
+                        "javax.servlet.include.servlet_path");
+        if (originalPath == null) {
+            originalPath = (String) request.getAttribute(
+                "javax.servlet.forward.servlet_path");
+        }
+        if (originalPath == null) {
+            originalPath = request.getServletPath();
+        }
+        return originalPath;
     }
 
-    public Resolution updatePagePermissions() {
-        Page page = model.getRootPage();
-        synchronized (application) {
-            updatePagePermissions(page);
-            saveModel();
-            SessionMessages.addInfoMessage("Root permissions saved successfully.");
+    public static void dumpRequestAttributes(HttpServletRequest request) {
+        Enumeration attNames = request.getAttributeNames();
+        while (attNames.hasMoreElements()) {
+            String attrName = (String) attNames.nextElement();
+            Object attrValue = request.getAttribute(attrName);
+            logger.info("{} = {}", attrName, attrValue);
         }
 
-        return new RedirectResolution(this.getClass());
-    }
-
-    public Resolution returnToPages() {
-        return new RedirectResolution("/");
     }
 
 }

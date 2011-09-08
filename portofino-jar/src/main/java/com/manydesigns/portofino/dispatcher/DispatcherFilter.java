@@ -33,6 +33,7 @@ import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.context.ApplicationStarter;
+import com.manydesigns.portofino.model.Model;
 import net.sourceforge.stripes.controller.StripesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +84,10 @@ public class DispatcherFilter implements Filter {
             throw new ServletException(e);
         }
         request.setAttribute(RequestAttributes.APPLICATION, application);
+        if (application != null) {
+            Model model = application.getModel();
+            request.setAttribute(RequestAttributes.MODEL, model);
+        }
 
         logger.debug("Invoking the dispatcher to create a dispatch");
         Dispatcher dispatcher = new Dispatcher(application);

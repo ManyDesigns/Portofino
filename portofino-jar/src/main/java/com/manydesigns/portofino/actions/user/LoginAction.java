@@ -84,7 +84,6 @@ public class LoginAction extends AbstractActionBean {
 
     public String returnUrl;
 
-    private static final String home = "/";
     public static final Logger logger =
             LoggerFactory.getLogger(LoginAction.class);
 
@@ -136,9 +135,11 @@ public class LoginAction extends AbstractActionBean {
         session.setAttribute(SessionAttributes.USER_ID, user.getUserId());
         session.setAttribute(SessionAttributes.USER_NAME, user.getUserName());
         updateUser(user);
-        returnUrl = StringUtils.trimToNull(returnUrl);
-        returnUrl=(returnUrl!=null)?returnUrl:home;
 
+        if (StringUtils.isEmpty(returnUrl)) {
+            returnUrl = "/";
+        }
+        logger.debug("Redirecting to: {}", returnUrl);
         return new RedirectResolution(returnUrl);
     }
 

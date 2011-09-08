@@ -147,6 +147,7 @@ public class PortletAction extends AbstractActionBean {
     // Admin methods
     //--------------------------------------------------------------------------
 
+    @RequiresAdministrator
     public Resolution updateLayout() {
         synchronized (application) {
             HttpServletRequest request = context.getRequest();
@@ -169,13 +170,12 @@ public class PortletAction extends AbstractActionBean {
         application.saveXmlModel();
     }
 
-    public Resolution cancelLayout() {
-        return new RedirectResolution(dispatch.getOriginalPath());
-    }
-
+    @RequiresAdministrator
     public Resolution reloadModel() {
-        application.reloadXmlModel();
-        return new RedirectResolution(dispatch.getOriginalPath());
+        synchronized (application) {
+            application.reloadXmlModel();
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
     }
 
     protected void updateLayout(String layoutContainer, String[] portletWrapperIds) {
@@ -211,6 +211,7 @@ public class PortletAction extends AbstractActionBean {
 
     List<Page> inheritedPages;
 
+    @RequiresAdministrator
     public Resolution pagePermissions() {
         Page page = pageInstance.getPage();
 
@@ -249,6 +250,7 @@ public class PortletAction extends AbstractActionBean {
 
     static final String[] emptyStringArray = new String[0];
 
+    @RequiresAdministrator
     public Resolution updatePagePermissions() {
         Page page = pageInstance.getPage();
         synchronized (application) {
@@ -509,6 +511,7 @@ public class PortletAction extends AbstractActionBean {
         return new ForwardResolution("/layouts/page-crud/new-page.jsp");
     }
 
+    @RequiresAdministrator
     public Resolution createPage() {
         try {
             return doCreateNewPage();
@@ -582,6 +585,7 @@ public class PortletAction extends AbstractActionBean {
         }
     }
 
+    @RequiresAdministrator
     public Resolution deletePage() {
         PageInstance parentPageInstance = dispatch.getParentPageInstance();
         Page page = dispatch.getLastPageInstance().getPage();
@@ -599,6 +603,7 @@ public class PortletAction extends AbstractActionBean {
         return new RedirectResolution(dispatch.getOriginalPath());
     }
 
+    @RequiresAdministrator
     public Resolution movePage() {
         if(movePageDestination == null) {
             SessionMessages.addErrorMessage("You must select a destination");

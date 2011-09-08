@@ -43,6 +43,7 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.RootPage;
+import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +57,7 @@ import java.io.FileFilter;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@RequiresAdministrator
 @UrlBinding("/admin/settings.action")
 public class SettingsAction extends AbstractActionBean {
     public static final String copyright =

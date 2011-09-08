@@ -40,12 +40,9 @@ import java.lang.annotation.Target;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequiresAdministrator {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
-
-    boolean value() default true;
-
 }

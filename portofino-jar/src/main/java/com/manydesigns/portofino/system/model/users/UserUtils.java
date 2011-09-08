@@ -30,11 +30,9 @@ package com.manydesigns.portofino.system.model.users;
 
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.context.Application;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import sun.misc.BASE64Encoder;
 
 import javax.servlet.ServletRequest;
-import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
@@ -109,14 +107,6 @@ public class UserUtils {
         Application appl = (Application) request.getAttribute(RequestAttributes.APPLICATION);
         Group administratorsGroup = appl.getAdministratorsGroup();
         return isUserInGroup(request, administratorsGroup);
-    }
-
-    public static boolean isAllowed(Method method, ServletRequest request) {
-        RequiresAdministrator reqAdmin = method.getAnnotation(RequiresAdministrator.class);
-        if(reqAdmin != null && reqAdmin.value()) {
-            return isAdministrator(request);
-        }
-        return true;
     }
 
 }

@@ -29,10 +29,10 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.portofino.context.Application;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.*;
-import net.sourceforge.stripes.controller.StripesConstants;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,11 +63,7 @@ public class Dispatcher {
     }
 
     public Dispatch createDispatch(HttpServletRequest request) {
-        String originalPath = (String) request.getAttribute(
-                StripesConstants.REQ_ATTR_INCLUDE_PATH);
-        if (originalPath == null) {
-            originalPath = request.getServletPath();
-        }
+        String originalPath = ServletUtils.getOriginalPath(request);
 
         if(originalPath.endsWith(".jsp")) {
             logger.debug("Path is a JSP page ({}), not dispatching.", originalPath);
