@@ -174,6 +174,11 @@ public class LoginAction extends AbstractActionBean {
         return new RedirectResolution("/");
     }
 
+    // do not expose this method publicly
+    protected HttpSession getSession() {
+        return context.getRequest().getSession(false);
+    }
+
     public String getReturnUrl() {
         return returnUrl;
     }

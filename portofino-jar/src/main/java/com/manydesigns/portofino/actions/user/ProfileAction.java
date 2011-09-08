@@ -233,4 +233,9 @@ public class ProfileAction extends AbstractActionBean {
             return new ForwardResolution("/layouts/user/profile/changePwd.jsp");
         }
     }
+
+    // do not expose this method publicly
+    protected HttpSession getSession() {
+        return context.getRequest().getSession(false);
+    }
 }
