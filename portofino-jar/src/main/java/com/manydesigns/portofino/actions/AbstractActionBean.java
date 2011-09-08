@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.elements.servlet.ServletUtils;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 
@@ -48,9 +49,12 @@ public abstract class AbstractActionBean implements ActionBean {
     public final static String SUCCESS = "success";
 
     protected ActionBeanContext context;
+    protected String originalPath;
 
     public void setContext(ActionBeanContext context) {
         this.context = context;
+        originalPath = ServletUtils.getOriginalPath(context.getRequest());
+        System.out.println(originalPath);
     }
 
     public ActionBeanContext getContext() {
@@ -59,5 +63,9 @@ public abstract class AbstractActionBean implements ActionBean {
 
     public HttpSession getSession() {
         return context.getRequest().getSession(false);
+    }
+
+    public String getOriginalPath() {
+        return originalPath;
     }
 }

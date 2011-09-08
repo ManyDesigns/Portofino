@@ -8,6 +8,7 @@
              type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="model" scope="request"
              type="com.manydesigns.portofino.model.Model"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.AbstractActionBean"/>
 <div id="globalLinks">
     <c:if test="${mde:getBoolean(portofinoConfiguration, 'user.enabled')}">
         <c:if test="${not empty userId}">
@@ -26,7 +27,10 @@
             </stripes:link>
         </c:if><c:if test="${empty userId}">
         <stripes:link href="/user/Help.action">Help</stripes:link> -
-        <stripes:link beanclass="com.manydesigns.portofino.actions.user.LoginAction">Log in</stripes:link>
+        <stripes:link beanclass="com.manydesigns.portofino.actions.user.LoginAction">
+            <stripes:param name="returnUrl" value="${actionBean.originalPath}"/>
+            Log in
+        </stripes:link>
     </c:if>
     </c:if><c:if
         test="${not mde:getBoolean(portofinoConfiguration, 'user.enabled')}">

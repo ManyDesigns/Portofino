@@ -135,11 +135,12 @@ public class LoginAction extends AbstractActionBean {
         session.setAttribute(SessionAttributes.USER_ID, user.getUserId());
         session.setAttribute(SessionAttributes.USER_NAME, user.getUserName());
         updateUser(user);
-        if (StringUtils.isEmpty(returnUrl)) {
 
+        if (StringUtils.isEmpty(returnUrl)) {
+            returnUrl = "/";
         }
         logger.debug("Redirecting to: {}", returnUrl);
-        return new RedirectResolution(returnUrl, false);
+        return new RedirectResolution(returnUrl);
     }
 
     private void updateFailedUser(String username) {
