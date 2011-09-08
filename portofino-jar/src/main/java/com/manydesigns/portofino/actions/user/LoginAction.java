@@ -100,7 +100,7 @@ public class LoginAction extends AbstractActionBean {
 
         recoverPwd = portofinoConfiguration.getBoolean(
                 PortofinoProperties.MAIL_ENABLED, false);
-        
+
         return new ForwardResolution("/layouts/user/login.jsp");
     }
 
@@ -135,12 +135,11 @@ public class LoginAction extends AbstractActionBean {
         session.setAttribute(SessionAttributes.USER_ID, user.getUserId());
         session.setAttribute(SessionAttributes.USER_NAME, user.getUserName());
         updateUser(user);
-
         if (StringUtils.isEmpty(returnUrl)) {
-            returnUrl = "/";
+
         }
         logger.debug("Redirecting to: {}", returnUrl);
-        return new RedirectResolution(returnUrl);
+        return new RedirectResolution(returnUrl, false);
     }
 
     private void updateFailedUser(String username) {
