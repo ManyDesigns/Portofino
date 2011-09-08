@@ -333,12 +333,13 @@ Search form
 *******************************************************************************/
 
 .search_form {
-    background-color: #f0f0f0;
-    border: 1px solid #888;
-    padding: 10px;
     overflow: hidden;
-    margin: 0 0 0.5em 1em;
 
+}
+
+.search_form th, .search_form td {
+    border: none;
+    padding-left: 0;
 }
 
 .search_form ul {
@@ -350,10 +351,9 @@ Search form
 .search_form ul li {
     display: block;
     list-style: none;
-    margin-bottom: 6px;
-    padding-bottom: 6px;
-    border: 0 none;
-    border-bottom: 1px solid #888;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid #AAAAAA;
+    margin-bottom: 0.5em;
 }
 
 .search_form fieldset {
@@ -394,6 +394,19 @@ Search form
 
 .search_results {
     overflow-x: auto;
+}
+
+.search_results.withSearchForm {
+    padding-right: 1em;
+    border-right: 1px solid #AAAAAA;
+}
+
+.search_form .matchMode {
+    margin-right: 0.5em;
+}
+
+.searchFormButtons {
+    margin-top: 1em;
 }
 
 /*******************************************************************************

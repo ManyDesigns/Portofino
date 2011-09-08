@@ -160,6 +160,9 @@ public class DispatcherFilter implements Filter {
             if(attrName.equals(RequestAttributes.APPLICATION)) {
                 continue;
             }
+            if(attrName.equals(RequestAttributes.MODEL)) {
+                continue;
+            }
             request.removeAttribute(attrName);
         }
         logger.debug("--- end req dump ---");

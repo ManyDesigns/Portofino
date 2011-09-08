@@ -8,6 +8,14 @@ function fixSideBar() {
             if (contentOffsetHeight < sideBarOffsetHeight) {
                 contentNode.css('min-height', sideBarOffsetHeight + 'px')
             }
+
+            contentNode = $('div.search_results.withSearchForm');
+            sideBarNode = contentNode.parent().parent();
+            contentOffsetHeight = contentNode.attr('offsetHeight');
+            sideBarOffsetHeight = sideBarNode.attr('offsetHeight');
+            if (contentOffsetHeight < sideBarOffsetHeight) {
+                contentNode.css('min-height', sideBarOffsetHeight + 'px')
+            }
         }
     )
 }
