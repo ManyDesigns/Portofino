@@ -68,7 +68,8 @@ import java.util.Map;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @Intercepts(LifecycleStage.CustomValidation)
-public class SecurityInterceptor implements Interceptor {
+public class
+        SecurityInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 

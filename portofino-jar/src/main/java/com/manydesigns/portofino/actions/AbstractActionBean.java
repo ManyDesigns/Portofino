@@ -33,8 +33,6 @@ import com.manydesigns.elements.servlet.ServletUtils;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 
-import javax.servlet.http.HttpSession;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -54,15 +52,10 @@ public abstract class AbstractActionBean implements ActionBean {
     public void setContext(ActionBeanContext context) {
         this.context = context;
         originalPath = ServletUtils.getOriginalPath(context.getRequest());
-        System.out.println(originalPath);
     }
 
     public ActionBeanContext getContext() {
         return context;
-    }
-
-    public HttpSession getSession() {
-        return context.getRequest().getSession(false);
     }
 
     public String getOriginalPath() {

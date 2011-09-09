@@ -85,4 +85,7 @@ public class RootPermissionsAction extends PortletAction {
         return new RedirectResolution("/");
     }
 
+    public void dereferencePageInstance() {
+        /* DO NOTHING */
+    }
 }
