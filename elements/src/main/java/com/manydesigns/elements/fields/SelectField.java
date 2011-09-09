@@ -108,6 +108,9 @@ public class SelectField extends AbstractField {
             }
         } else {
             displayMode = selectionProvider.getDisplayMode();
+            if(displayMode == null && annotation != null) {
+                displayMode = annotation.displayMode();
+            }
         }
 
         if(displayMode == null) {

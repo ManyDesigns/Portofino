@@ -644,7 +644,8 @@ public class PortletAction extends AbstractActionBean {
                                 TextPage.class.getName(), JspPage.class.getName(),
                                 PageReference.class.getName() },
                         new String[] { "Crud", "Chart", "Text", "JSP", "Reference to another page" });
-        boolean includeSiblingOption = dispatch.getPageInstancePath().length > 1;
+        //root + at least 1 child
+        boolean includeSiblingOption = dispatch.getPageInstancePath().length > 2;
         int fieldCount = includeSiblingOption ? 3 : 2;
         String[] insertPositions = new String[fieldCount];
         String[] labels =  new String[fieldCount];

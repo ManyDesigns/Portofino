@@ -41,12 +41,13 @@
         <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
         <script type="text/javascript">
             var rootPath = "<%= request.getContextPath() %>";
-            var rootBreadcrumbs = "<span class='breadcrumb-item'>${actionBean.application.model.rootPage.title}</span>";
+            var rootBreadcrumbs = ""; //"<span class='breadcrumb-item'>${actionBean.application.model.rootPage.title}</span>";
 
             var currentPath = "<%= actionBean.dispatch.getPathUrl() %>";
             var currentBreadcrumbs =
                     "<%= StringEscapeUtils.escapeJavaScript(
-                            Util.elementToString(new Breadcrumbs(actionBean.dispatch, false))) %>";
+                            Util.elementToString(new Breadcrumbs(actionBean.dispatch, false))) %>" +
+                    "<span class='breadcrumb-separator'> &gt; </span>";
 
             var parentPath = "<%= actionBean.dispatch.getParentPathUrl() %>";
             var parentBreadcrumbs =
@@ -54,7 +55,8 @@
                             Util.elementToString(
                                 new Breadcrumbs(actionBean.dispatch,
                                                 actionBean.dispatch.getPageInstancePath().length - 1,
-                                                false))) %>";
+                                                false))) %>" +
+                    "<span class='breadcrumb-separator'> &gt; </span>";
 
             var urlField = $("#url");
             var breadcrumbsField = $("#breadcrumbs");
@@ -77,7 +79,7 @@
                 }
 
                 urlField.html(basePath + "/" + fragmentField.val());
-                breadcrumbsField.html(baseBreadcrumbs + "<span class='breadcrumb-separator'> &gt; </span><span class='breadcrumb-item'>" + titleField.val() + "</span>");
+                breadcrumbsField.html(baseBreadcrumbs + "<span class='breadcrumb-item'>" + titleField.val() + "</span>");
             }
 
             fragmentField.change(recalculateUrlAndBreadcrumbs);
