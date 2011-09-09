@@ -31,9 +31,15 @@ package com.manydesigns.portofino.scripting;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
+import com.manydesigns.elements.util.RandomUtil;
 import groovy.lang.Binding;
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.GroovyObject;
 import groovy.lang.GroovyShell;
 import ognl.OgnlContext;
+
+import java.io.File;
+import java.io.IOException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -44,6 +50,8 @@ import ognl.OgnlContext;
 public class ScriptingUtil {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
+
+    public static final String GROOVY_FILE_NAME_PATTERN = "script_{0}.groovy";
 
     public static Object runScript(String script,
                                    String scriptLanguage,
@@ -62,6 +70,44 @@ public class ScriptingUtil {
                     "Unrecognised script language: %s", scriptLanguage);
             throw new IllegalArgumentException(msg);
         }
+    }
+
+    public static GroovyObject getGroovyObject(File storageDir, String pageId) throws IOException {
+        File file = getGroovyScriptFile(storageDir, pageId);
+        return getGroovyObject(file);
+    }
+
+    public static GroovyObject getGroovyObject(File file) throws IOException {
+        ClassLoader parent = ScriptingUtil.class.getClassLoader();
+        GroovyClassLoader loader = new GroovyClassLoader(parent);
+        if(!file.exists()) {
+            return null;
+        }
+
+        Class groovyClass = loader.parseClass(file);
+
+        try {
+            return (GroovyObject) groovyClass.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static GroovyObject getGroovyObject(String text, String fileName) {
+        ClassLoader parent = ScriptingUtil.class.getClassLoader();
+        GroovyClassLoader loader = new GroovyClassLoader(parent);
+
+        Class groovyClass = loader.parseClass(text, fileName);
+
+        try {
+            return (GroovyObject) groovyClass.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static File getGroovyScriptFile(File storageDir, String pageId) {
+        return RandomUtil.getCodeFile(storageDir, GROOVY_FILE_NAME_PATTERN, pageId);
     }
 
 }

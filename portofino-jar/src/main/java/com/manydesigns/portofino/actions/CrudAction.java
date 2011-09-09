@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.blobs.Blob;
@@ -45,6 +46,7 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
 import com.manydesigns.portofino.actions.forms.CrudSelectionProviderEdit;
 import com.manydesigns.portofino.context.TableCriteria;
@@ -63,6 +65,10 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
+import groovy.lang.Binding;
+import groovy.lang.GroovyObject;
+import groovy.lang.MissingMethodException;
+import groovy.lang.Script;
 import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
@@ -71,6 +77,7 @@ import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -85,6 +92,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.lang.Boolean;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.*;
@@ -155,6 +163,14 @@ public class CrudAction extends PortletAction {
     private static final String TEMPLATE_FOP_READ = "templateFOP-Read.xsl";
 
     //**************************************************************************
+    // Scripting
+    //**************************************************************************
+
+    protected GroovyObject groovyObject;
+    protected String script;
+    protected File storageDirFile;
+
+    //**************************************************************************
     // Setup
     //**************************************************************************
 
@@ -176,6 +192,33 @@ public class CrudAction extends PortletAction {
             object = crudPageInstance.getObject();
 
             setupSelectionProviders();
+        }
+
+        String storageDirectory =
+                portofinoConfiguration.getString(
+                        PortofinoProperties.STORAGE_DIRECTORY);
+        storageDirFile = new File(storageDirectory);
+
+        if(script == null) {
+            prepareScript();
+        }
+    }
+
+    protected void prepareScript() {
+        File file = ScriptingUtil.getGroovyScriptFile(storageDirFile, crudPage.getId());
+        if(file.exists()) {
+            try {
+                FileReader fr = new FileReader(file);
+                script = IOUtils.toString(fr);
+                IOUtils.closeQuietly(fr);
+                groovyObject = ScriptingUtil.getGroovyObject(script, file.getAbsolutePath());
+                Script scriptObject = (Script) groovyObject;
+                Binding binding = new Binding(ElementsThreadLocals.getOgnlContext());
+                binding.setVariable("actionBean", this);
+                scriptObject.setBinding(binding);
+            } catch (Exception e) {
+                logger.warn("Couldn't load script for crud page " + crudPage.getId(), e);
+            }
         }
     }
 
@@ -445,7 +488,7 @@ public class CrudAction extends PortletAction {
     public Resolution create() {
         setupForm(Mode.CREATE);
         object = classAccessor.newInstance();
-        // TODO: script createSetup()
+        createSetup(object);
         form.readFromObject(object);
 
         return new ForwardResolution("/layouts/crud/create.jsp");
@@ -454,28 +497,29 @@ public class CrudAction extends PortletAction {
     public Resolution save() {
         setupForm(Mode.CREATE);
         object = classAccessor.newInstance();
-        // TODO: script createSetup()
+        createSetup(object);
         form.readFromObject(object);
 
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
             form.writeToObject(object);
-            application.saveObject(baseTable.getQualifiedName(), object);
-            try {
-                application.commit(baseTable.getDatabaseName());
-            } catch (Throwable e) {
-                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-                logger.warn(rootCauseMessage, e);
-                SessionMessages.addErrorMessage(rootCauseMessage);
-                return new ForwardResolution("/layouts/crud/create.jsp");
+            if(createValidate(object)) {
+                application.saveObject(baseTable.getQualifiedName(), object);
+                try {
+                    application.commit(baseTable.getDatabaseName());
+                } catch (Throwable e) {
+                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                    logger.warn(rootCauseMessage, e);
+                    SessionMessages.addErrorMessage(rootCauseMessage);
+                    return new ForwardResolution("/layouts/crud/create.jsp");
+                }
+                pk = pkHelper.generatePkString(object);
+                SessionMessages.addInfoMessage("SAVE avvenuto con successo");
+                String url = dispatch.getOriginalPath() + "/" + pk;
+                return new RedirectResolution(url);
             }
-            pk = pkHelper.generatePkString(object);
-            SessionMessages.addInfoMessage("SAVE avvenuto con successo");
-            String url = dispatch.getOriginalPath() + "/" + pk;
-            return new RedirectResolution(url);
-        } else {
-            return new ForwardResolution("/layouts/crud/create.jsp");
         }
+        return new ForwardResolution("/layouts/crud/create.jsp");
     }
 
     //**************************************************************************
@@ -1345,6 +1389,37 @@ public class CrudAction extends PortletAction {
     }
 
     //**************************************************************************
+    // Hooks/scripting
+    //**************************************************************************
+
+    protected void createSetup(Object object) {
+        String methodName = "createSetup";
+        Object methodArgs = new Object[] { object };
+        invokeGroovyMethod(methodName, methodArgs);
+    }
+
+    protected boolean createValidate(Object object) {
+        String methodName = "createValidate";
+        Object methodArgs = new Object[] { object };
+        Boolean b = (Boolean) invokeGroovyMethod(methodName, methodArgs);
+        return (b == null) || b;
+    }
+
+    protected Object invokeGroovyMethod(String methodName, Object methodArgs) {
+        if(groovyObject != null) {
+            try {
+                logger.debug("Invoking Groovy method {}", methodName);
+                return groovyObject.invokeMethod(methodName, methodArgs);
+            } catch(MissingMethodException e) {
+                logger.debug("The Groovy method {} is missing", methodName);
+            }
+        } else {
+            logger.debug("No script for this page: {}", crudPage.getId());
+        }
+        return null;
+    }
+
+    //**************************************************************************
     // Configuration
     //**************************************************************************
 
@@ -1523,6 +1598,22 @@ public class CrudAction extends PortletAction {
 
                 if(!availableSelectionProviders.isEmpty()) {
                     updateSelectionProviders();
+                }
+
+                File groovyScriptFile =
+                        ScriptingUtil.getGroovyScriptFile(storageDirFile, crudPage.getId());
+                if(!StringUtils.isBlank(script)) {
+                    FileWriter fw = null;
+                    try {
+                        fw = new FileWriter(groovyScriptFile);
+                        fw.write(script);
+                    } catch (IOException e) {
+                        logger.error("Error writing script to " + groovyScriptFile, e);
+                    } finally {
+                        IOUtils.closeQuietly(fw);
+                    }
+                } else {
+                    groovyScriptFile.delete();
                 }
 
                 saveModel();
@@ -1753,5 +1844,13 @@ public class CrudAction extends PortletAction {
 
     public TableForm getSelectionProvidersForm() {
         return selectionProvidersForm;
+    }
+
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
     }
 }
