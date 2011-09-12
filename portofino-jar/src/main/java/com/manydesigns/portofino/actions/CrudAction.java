@@ -505,6 +505,7 @@ public class CrudAction extends PortletAction {
             form.writeToObject(object);
             if(createValidate(object)) {
                 application.saveObject(baseTable.getQualifiedName(), object);
+                createPostProcess(object);
                 try {
                     application.commit(baseTable.getDatabaseName());
                 } catch (Throwable e) {
@@ -528,31 +529,35 @@ public class CrudAction extends PortletAction {
 
     public Resolution edit() {
         setupForm(Mode.EDIT);
+        editSetup(object);
         form.readFromObject(object);
         return new ForwardResolution("/layouts/crud/edit.jsp");
     }
 
     public Resolution update() {
         setupForm(Mode.EDIT);
+        editSetup(object);
         form.readFromObject(object);
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
-            form.writeToObject(object);
-            application.updateObject(baseTable.getQualifiedName(), object);
-            try {
-                application.commit(baseTable.getDatabaseName());
-            } catch (Throwable e) {
-                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-                logger.warn(rootCauseMessage, e);
-                SessionMessages.addErrorMessage(rootCauseMessage);
-                return new ForwardResolution("/layouts/crud/edit.jsp");
+            if(editValidate(object)) {
+                form.writeToObject(object);
+                application.updateObject(baseTable.getQualifiedName(), object);
+                editPostProcess(object);
+                try {
+                    application.commit(baseTable.getDatabaseName());
+                } catch (Throwable e) {
+                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                    logger.warn(rootCauseMessage, e);
+                    SessionMessages.addErrorMessage(rootCauseMessage);
+                    return new ForwardResolution("/layouts/crud/edit.jsp");
+                }
+                SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
+                return new RedirectResolution(dispatch.getOriginalPath())
+                        .addParameter(SEARCH_STRING_PARAM, searchString);
             }
-            SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
-            return new RedirectResolution(dispatch.getOriginalPath())
-                    .addParameter(SEARCH_STRING_PARAM, searchString);
-        } else {
-            return new ForwardResolution("/layouts/crud/edit.jsp");
         }
+        return new ForwardResolution("/layouts/crud/edit.jsp");
     }
 
     //**************************************************************************
@@ -1403,6 +1408,31 @@ public class CrudAction extends PortletAction {
         Object methodArgs = new Object[] { object };
         Boolean b = (Boolean) invokeGroovyMethod(methodName, methodArgs);
         return (b == null) || b;
+    }
+
+    protected void createPostProcess(Object object) {
+        String methodName = "createPostProcess";
+        Object methodArgs = new Object[] { object };
+        invokeGroovyMethod(methodName, methodArgs);
+    }
+
+    protected void editSetup(Object object) {
+        String methodName = "editSetup";
+        Object methodArgs = new Object[] { object };
+        invokeGroovyMethod(methodName, methodArgs);
+    }
+
+    protected boolean editValidate(Object object) {
+        String methodName = "editValidate";
+        Object methodArgs = new Object[] { object };
+        Boolean b = (Boolean) invokeGroovyMethod(methodName, methodArgs);
+        return (b == null) || b;
+    }
+
+    protected void editPostProcess(Object object) {
+        String methodName = "editPostProcess";
+        Object methodArgs = new Object[] { object };
+        invokeGroovyMethod(methodName, methodArgs);
     }
 
     protected Object invokeGroovyMethod(String methodName, Object methodArgs) {

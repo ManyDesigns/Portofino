@@ -69,9 +69,7 @@
                   style="position: relative; padding: 0; margin-top: 1em; min-height: 20em;">
             <legend>Script</legend>
             <pre id="scriptEditor" name="script"
-                              style="min-height: 20em; width: 100%;">
-                <c:out value="${actionBean.script}" />
-            </pre>
+                 style="min-height: 20em; width: 100%;"><c:out value="${actionBean.script}" /></pre>
         </fieldset>
 
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
