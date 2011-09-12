@@ -5,15 +5,12 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <stripes:layout-component name="customScripts">
-        <script src="<stripes:url value="/ace-0.2.0/ace-uncompressed.js" />" type="text/javascript" charset="utf-8"></script>
+        <script src="<stripes:url value="/ace-0.2.0/ace.js" />" type="text/javascript" charset="utf-8"></script>
         <script src="<stripes:url value="/ace-0.2.0/theme-twilight.js" />" type="text/javascript" charset="utf-8"></script>
         <script src="<stripes:url value="/ace-0.2.0/mode-groovy.js" />" type="text/javascript" charset="utf-8"></script>
         <script type="text/javascript">
-            console.log("boh");
             window.onload = function() {
-                console.log("mah");
                 var editor = ace.edit("scriptEditor");
-                console.log("ehm");
             };
         </script>
     </stripes:layout-component>
@@ -62,15 +59,19 @@
         </c:if>
         <!-- End properties -->
 
-        <fieldset id="crudSelectionProvidersFieldset" class="mde-form-fieldset" style="padding-top: 1em; margin-top: 1em;">
+        <fieldset id="crudSelectionProvidersFieldset" class="mde-form-fieldset"
+                  style="padding-top: 1em; margin-top: 1em;">
             <legend>Selection Providers</legend>
             <mde:write name="actionBean" property="selectionProvidersForm"/>
         </fieldset>
 
-        <fieldset id="scriptFieldset" class="mde-form-fieldset" style="padding-top: 1em; margin-top: 1em;">
+        <fieldset id="scriptFieldset" class="mde-form-fieldset"
+                  style="position: relative; padding: 0; margin-top: 1em; min-height: 20em;">
             <legend>Script</legend>
-            <stripes:textarea id="scriptEditor" name="script" value="${actionBean.script}"
-                              style="min-height: 20em; width: 100%;"/>
+            <pre id="scriptEditor" name="script"
+                              style="min-height: 20em; width: 100%;">
+                <c:out value="${actionBean.script}" />
+            </pre>
         </fieldset>
 
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
