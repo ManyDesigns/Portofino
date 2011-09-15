@@ -32,6 +32,7 @@ package com.manydesigns.portofino.chart;
 import com.manydesigns.portofino.model.pages.ChartPage;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.CategoryDataset;
 
 /**
@@ -45,7 +46,7 @@ public class ChartStackedBar3DGenerator extends Chart2DGenerator {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     protected JFreeChart createChart(ChartPage chartPage,
-                                     CategoryDataset dataset) {
+                                     CategoryDataset dataset, PlotOrientation plotOrientation) {
         return ChartFactory.createStackedBarChart3D(
                 chartPage.getName(), chartPage.getXAxisName(), chartPage.getYAxisName(), dataset,
                 plotOrientation, true, true, true);

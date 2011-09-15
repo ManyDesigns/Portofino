@@ -150,12 +150,16 @@ public class ChartAction extends PortletAction {
 
     public void generateChart() {
         ChartGenerator chartGenerator = null;
+
+        if(chartPage.getGeneratorClass() == null) {
+            throw new IllegalStateException("Invalid chart type: " + chartPage.getType());
+        }
         try {
             chartGenerator = chartPage.getGeneratorClass().newInstance();
         } catch (Exception e) {
-            logger.error("Invalid generator for chart", e);
-            return;
+            throw new RuntimeException("Invalid generator for chart", e);
         }
+
         chartGenerator.setAntiAlias(antiAlias);
         chartGenerator.setBorderVisible(borderVisible);
         chartGenerator.setHeight(height);

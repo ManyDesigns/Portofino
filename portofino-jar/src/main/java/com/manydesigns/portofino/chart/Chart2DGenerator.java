@@ -68,10 +68,6 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
     private final Font legendItemFont = new Font("SansSerif", Font.PLAIN, 10);
     private final Color transparentColor = new Color(0, true);
 
-    PlotOrientation plotOrientation = PlotOrientation.HORIZONTAL;
-                        /*(orientation == ORIENTATION_HORIZONTAL) ?
-                                PlotOrientation.HORIZONTAL : PlotOrientation.VERTICAL;*/
-
     public JFreeChart generate(ChartPage chartPage, Application application) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         java.util.List<Object[]> result;
@@ -81,7 +77,12 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
             dataset.setValue((Number)current[0], (Comparable)current[1], (Comparable)current[2]);
         }
 
-        JFreeChart chart = createChart(chartPage, dataset);
+        PlotOrientation plotOrientation = PlotOrientation.HORIZONTAL;
+        if (chartPage.getOrientation() == ChartPage.Orientation.VERTICAL) {
+                plotOrientation = PlotOrientation.VERTICAL;
+        }
+
+        JFreeChart chart = createChart(chartPage, dataset, plotOrientation);
 
         chart.setAntiAlias(antiAlias);
 
@@ -145,7 +146,7 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
     }
 
     protected abstract JFreeChart createChart
-            (ChartPage chartPage, CategoryDataset dataset);
+            (ChartPage chartPage, CategoryDataset dataset, PlotOrientation plotOrientation);
 
 
 }

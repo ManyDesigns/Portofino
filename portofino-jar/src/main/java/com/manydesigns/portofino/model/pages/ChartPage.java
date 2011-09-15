@@ -66,6 +66,7 @@ public class ChartPage extends Page {
     protected String urlExpression;
     protected String xAxisName;
     protected String yAxisName;
+    protected String orientationName;
 
     //**************************************************************************
     // Fields for wire-up
@@ -73,6 +74,11 @@ public class ChartPage extends Page {
 
     protected Database actualDatabase;
     protected Class<? extends ChartGenerator> generatorClass;
+    protected Orientation orientation;
+
+    public static enum Orientation {
+        HORIZONTAL, VERTICAL
+    }
 
     //**************************************************************************
     // Built-in chart generators
@@ -124,6 +130,7 @@ public class ChartPage extends Page {
         super.reset();
         actualDatabase = null;
         generatorClass = null;
+        orientation = null;
     }
 
     @Override
@@ -151,6 +158,14 @@ public class ChartPage extends Page {
                 }
             } catch (Exception e) {
                 logger.error("Invalid chart type: " + type, e);
+            }
+        }
+
+        if(orientationName != null) {
+            try {
+                orientation = Orientation.valueOf(orientationName.toUpperCase());
+            } catch (Exception e) {
+                logger.error("Invalid orientation: " + orientation, e);
             }
         }
     }
@@ -253,5 +268,18 @@ public class ChartPage extends Page {
 
     public void setYAxisName(String yAxisName) {
         this.yAxisName = yAxisName;
+    }
+
+    @XmlAttribute(name = "orientation")
+    public String getOrientationName() {
+        return orientationName;
+    }
+
+    public void setOrientationName(String orientationName) {
+        this.orientationName = orientationName;
+    }
+
+    public Orientation getOrientation() {
+        return orientation;
     }
 }
