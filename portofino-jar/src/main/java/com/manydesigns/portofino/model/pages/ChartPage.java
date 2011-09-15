@@ -32,7 +32,7 @@ package com.manydesigns.portofino.model.pages;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.portofino.chart.ChartGenerator;
+import com.manydesigns.portofino.chart.*;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Database;
@@ -40,6 +40,8 @@ import com.manydesigns.portofino.model.datamodel.Database;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -73,6 +75,39 @@ public class ChartPage extends Page {
     protected Class<? extends ChartGenerator> generatorClass;
 
     //**************************************************************************
+    // Built-in chart generators
+    //**************************************************************************
+
+    public static final Map<String, Class<? extends ChartGenerator>>
+        chartGenerators;
+
+    public static final String
+        AREA = "area",
+        BAR = "bar",
+        BAR3D = "bar3D",
+        LINE = "line",
+        LINE3D = "line3D",
+        PIE = "pie",
+        PIE3D = "pie3D",
+        RING = "ring",
+        STACKED_BAR = "stackedBar",
+        STACKED_BAR_3D = "stackedBar3D";
+
+    static {
+        chartGenerators = new HashMap<String, Class<? extends ChartGenerator>>();
+        chartGenerators.put(AREA, ChartAreaGenerator.class);
+        chartGenerators.put(BAR, ChartBarGenerator.class);
+        chartGenerators.put(BAR3D, ChartBar3DGenerator.class);
+        chartGenerators.put(LINE, ChartLineGenerator.class);
+        chartGenerators.put(LINE3D, ChartLine3DGenerator.class);
+        chartGenerators.put(PIE, ChartPieGenerator.class);
+        chartGenerators.put(PIE3D, ChartPie3DGenerator.class);
+        chartGenerators.put(RING, ChartRingGenerator.class);
+        chartGenerators.put(STACKED_BAR, ChartStackedBarGenerator.class);
+        chartGenerators.put(STACKED_BAR_3D, ChartStackedBar3DGenerator.class);
+    }
+
+    //**************************************************************************
     // Constructors
     //**************************************************************************
 
@@ -88,6 +123,7 @@ public class ChartPage extends Page {
     public void reset() {
         super.reset();
         actualDatabase = null;
+        generatorClass = null;
     }
 
     @Override
@@ -103,15 +139,19 @@ public class ChartPage extends Page {
 
         actualDatabase = DataModelLogic.findDatabaseByName(model, database);
 
-        try {
-            generatorClass =
-                (Class<? extends ChartGenerator>) Class.forName(type, true, getClass().getClassLoader());
-            if(!ChartGenerator.class.isAssignableFrom(generatorClass)) {
-                logger.error("Invalid chart type: " + type);
-                generatorClass = null;
+        generatorClass = chartGenerators.get(type);
+
+        if(generatorClass == null) {
+            try {
+                generatorClass =
+                    (Class<? extends ChartGenerator>) Class.forName(type, true, getClass().getClassLoader());
+                if(!ChartGenerator.class.isAssignableFrom(generatorClass)) {
+                    logger.error("Invalid chart type: " + type);
+                    generatorClass = null;
+                }
+            } catch (Exception e) {
+                logger.error("Invalid chart type: " + type, e);
             }
-        } catch (Exception e) {
-            logger.error("Invalid chart type: " + type, e);
         }
     }
 
