@@ -59,13 +59,15 @@ public class JFreeChartInstance implements XhtmlFragment {
     protected final int height;
 
     protected final String chartUrl;
-    protected final String alt = "alt";
-    protected final String mapId = "mapId";
+    protected final String alt;
+    protected final String mapId;
 
-    public JFreeChartInstance(JFreeChart chart, File file, int width, int height,
-                              String chartUrl) throws IOException {
+    public JFreeChartInstance(JFreeChart chart, File file, String mapId, String alt,
+                              int width, int height, String chartUrl) throws IOException {
         this.chart = chart;
         this.file = file;
+        this.mapId = mapId;
+        this.alt = alt;
         this.width = width;
         this.height = height;
         this.chartUrl = chartUrl;

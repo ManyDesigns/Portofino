@@ -90,7 +90,7 @@ public class OgnlTextFormat
             argStrings[i] = url ? Util.urlencode(argString) : argString;
         }
 
-        String result = MessageFormat.format(getFormatString(), argStrings);
+        String result = MessageFormat.format(getFormatString(), (Object[]) argStrings);
 
         if (url) {
             result = Util.getAbsoluteUrl(result);

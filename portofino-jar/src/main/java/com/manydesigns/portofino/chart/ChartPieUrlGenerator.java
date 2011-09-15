@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.actions.chart;
+package com.manydesigns.portofino.chart;
 
 import com.manydesigns.elements.text.OgnlTextFormat;
 import org.jfree.chart.urls.PieURLGenerator;
@@ -40,7 +40,7 @@ public class ChartPieUrlGenerator implements PieURLGenerator {
     protected final OgnlTextFormat format;
     protected final PieURLGeneratorValue value;
 
-    ChartPieUrlGenerator(String expression) {
+    public ChartPieUrlGenerator(String expression) {
         format = OgnlTextFormat.create(expression);
         format.setUrl(true);
         value = new PieURLGeneratorValue();

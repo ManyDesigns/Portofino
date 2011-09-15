@@ -32,6 +32,7 @@ package com.manydesigns.portofino.model.pages;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.portofino.chart.ChartGenerator;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Database;
@@ -61,12 +62,15 @@ public class ChartPage extends Page {
     protected String database;
     protected String query;
     protected String urlExpression;
+    protected String xAxisName;
+    protected String yAxisName;
 
     //**************************************************************************
     // Fields for wire-up
     //**************************************************************************
 
     protected Database actualDatabase;
+    protected Class<? extends ChartGenerator> generatorClass;
 
     //**************************************************************************
     // Constructors
@@ -98,6 +102,17 @@ public class ChartPage extends Page {
         assert urlExpression != null;
 
         actualDatabase = DataModelLogic.findDatabaseByName(model, database);
+
+        try {
+            generatorClass =
+                (Class<? extends ChartGenerator>) Class.forName(type, true, getClass().getClassLoader());
+            if(!ChartGenerator.class.isAssignableFrom(generatorClass)) {
+                logger.error("Invalid chart type: " + type);
+                generatorClass = null;
+            }
+        } catch (Exception e) {
+            logger.error("Invalid chart type: " + type, e);
+        }
     }
 
 
@@ -178,4 +193,25 @@ public class ChartPage extends Page {
         this.actualDatabase = actualDatabase;
     }
 
+    public Class<? extends ChartGenerator> getGeneratorClass() {
+        return generatorClass;
+    }
+
+    @XmlAttribute(name = "xAxisName")
+    public String getXAxisName() {
+        return xAxisName;
+    }
+
+    public void setXAxisName(String xAxisName) {
+        this.xAxisName = xAxisName;
+    }
+
+    @XmlAttribute(name = "yAxisName")
+    public String getYAxisName() {
+        return yAxisName;
+    }
+
+    public void setYAxisName(String yAxisName) {
+        this.yAxisName = yAxisName;
+    }
 }
