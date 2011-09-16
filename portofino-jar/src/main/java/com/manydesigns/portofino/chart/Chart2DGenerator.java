@@ -74,7 +74,15 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
         String query = chartPage.getQuery();
         result = application.runSql(chartPage.getDatabase(), query);
         for (Object[] current : result) {
-            dataset.setValue((Number)current[0], (Comparable)current[1], (Comparable)current[2]);
+            ComparableWrapper x = new ComparableWrapper((Comparable)current[1]);
+            ComparableWrapper y = new ComparableWrapper((Comparable)current[2]);
+            if(current.length > 3) {
+                x.setLabel(current[3].toString());
+            }
+            if(current.length > 4) {
+                y.setLabel(current[4].toString());
+            }
+            dataset.setValue((Number)current[0], x, y);
         }
 
         PlotOrientation plotOrientation = PlotOrientation.HORIZONTAL;
