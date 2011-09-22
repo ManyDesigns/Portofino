@@ -79,6 +79,11 @@ public class PrimaryKey implements ModelObject {
         primaryKeyColumns = new ArrayList<PrimaryKeyColumn>();
     }
 
+    public PrimaryKey(Table table) {
+        this();
+        this.table = table;
+    }
+
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************

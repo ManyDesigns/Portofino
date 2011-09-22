@@ -31,6 +31,7 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.annotations.Annotated;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.util.Pair;
 import org.apache.commons.lang.ObjectUtils;
@@ -49,7 +50,8 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class ForeignKey extends DatabaseSelectionProvider implements ModelObject, HasReferences {
+public class ForeignKey extends DatabaseSelectionProvider
+        implements ModelObject, HasReferences, Annotated {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -99,6 +101,11 @@ public class ForeignKey extends DatabaseSelectionProvider implements ModelObject
 
     public ForeignKey() {
         annotations = new ArrayList<Annotation>();
+    }
+
+    public ForeignKey(Table fromTable) {
+        this();
+        this.fromTable = fromTable;
     }
 
     //**************************************************************************

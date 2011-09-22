@@ -43,6 +43,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -623,5 +624,19 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
         Reference[] newArray = new Reference[length];
         System.arraycopy(oldArray, 0, newArray, 0, oldArray.length);
         return newArray;
+    }
+
+    public List<String> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
+        ResultSet rs = databaseMetaData.getSchemas();
+        List<String> schemaNames = new ArrayList<String>();
+        try {
+            while(rs.next()) {
+                String schemaName = rs.getString(TABLE_SCHEM);
+                schemaNames.add(schemaName);
+            }
+        } finally {
+            DbUtils.closeQuietly(rs);
+        }
+        return schemaNames;
     }
 }

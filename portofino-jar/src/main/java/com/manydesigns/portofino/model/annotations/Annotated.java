@@ -27,9 +27,9 @@
 *
 */
 
-package com.manydesigns.portofino.model.datamodel;
+package com.manydesigns.portofino.model.annotations;
 
-import com.manydesigns.portofino.model.ModelObject;
+import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -37,20 +37,10 @@ import com.manydesigns.portofino.model.ModelObject;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface ModelSelectionProvider extends ModelObject, HasReferences {
+public interface Annotated {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    String getName();
-    void setName(String name);
-
-    String getToDatabase();
-    void setToDatabase(String toDatabase);
-
-    String getToSchema();
-    void setToSchema(String toSchema);
-
-    String getToTableName();
-    void setToTableName(String toTableName);
+    List<Annotation> getAnnotations();
 
 }

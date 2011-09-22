@@ -42,7 +42,11 @@ public interface HasReferences {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     List<Reference> getReferences();
+
     Table getFromTable();
+    void setFromTable(Table fromTable);
+
     Table getToTable();
+    void setToTable(Table toTable);
 
 }

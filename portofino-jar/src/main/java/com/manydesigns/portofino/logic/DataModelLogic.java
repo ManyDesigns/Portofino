@@ -164,6 +164,26 @@ public class DataModelLogic {
         return null;
     }
 
+    public static Table findTableByName(Schema schema, String tableName) {
+        for (Table table : schema.getTables()) {
+            if (table.getTableName().equals(tableName)) {
+                return table;
+            }
+        }
+        logger.debug("Table {} not found in {}", tableName, schema);
+        return null;
+    }
+
+    public static Column findColumnByName(Table table, String columnName) {
+        for (Column column : table.getColumns()) {
+            if (column.getColumnName().equals(columnName)) {
+                return column;
+            }
+        }
+        logger.debug("Column {} not found in {}", columnName, table);
+        return null;
+    }
+
     public static Column findColumnByQualifiedName(Model model,
                                             String qualifiedColumnName) {
         int lastDot = qualifiedColumnName.lastIndexOf(".");

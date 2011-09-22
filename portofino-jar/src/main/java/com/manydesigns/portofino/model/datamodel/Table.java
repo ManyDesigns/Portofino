@@ -33,6 +33,7 @@ import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.annotations.Annotated;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.xml.Identifier;
 import org.apache.commons.lang.StringUtils;
@@ -52,7 +53,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public class Table implements ModelObject {
+public class Table implements ModelObject, Annotated {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 

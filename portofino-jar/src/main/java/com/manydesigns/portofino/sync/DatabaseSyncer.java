@@ -29,24 +29,24 @@
 
 package com.manydesigns.portofino.sync;
 
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.datamodel.Schema;
-import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.annotations.Annotated;
+import com.manydesigns.portofino.model.annotations.Annotation;
+import com.manydesigns.portofino.model.datamodel.*;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.snapshot.DatabaseSnapshot;
 import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
+import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,17 +134,175 @@ public class DatabaseSyncer {
         logger.debug("Synchronizing schema: {}", sourceSchema.getSchemaName());
         Schema targetSchema = new Schema();
         targetSchema.setSchemaName(sourceSchema.getSchemaName());
+
+        syncTables(databaseSnapshot, sourceSchema, targetSchema);
+
+        syncPrimaryKeys(databaseSnapshot, sourceSchema, targetSchema);
+
+        syncForeignKeys(databaseSnapshot, sourceSchema, targetSchema);
+
+        return targetSchema;
+    }
+
+    protected void syncForeignKeys(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
+        for(liquibase.database.structure.ForeignKey liquibaseFK : databaseSnapshot.getForeignKeys()) {
+            String fkTableName = liquibaseFK.getForeignKeyTable().getName();
+            Table sourceTable = DataModelLogic.findTableByName(sourceSchema, fkTableName);
+            String fkName = liquibaseFK.getName();
+
+            Table targetFromTable = DataModelLogic.findTableByName(targetSchema, fkTableName);
+
+            ForeignKey targetFK = new ForeignKey(targetFromTable);
+            targetFK.setName(fkName);
+
+            liquibase.database.structure.Table pkTable = liquibaseFK.getPrimaryKeyTable();
+            targetFK.setToSchema(pkTable.getSchema());
+            targetFK.setToTableName(pkTable.getName());
+
+            String[] fromColumns = liquibaseFK.getForeignKeyColumns().split(",");
+            String[] toColumns = liquibaseFK.getPrimaryKeyColumns().split(",");
+            if(fromColumns.length != toColumns.length) {
+                logger.error("Invalid foreign key {} - columns don't match", fkName);
+                continue;
+            }
+            for(int i = 0; i < fromColumns.length; i++) {
+                Reference reference = new Reference();
+                reference.setOwner(targetFK);
+                reference.setFromColumn(fromColumns[i]);
+                reference.setToColumn(toColumns[i]);
+                targetFK.getReferences().add(reference);
+            }
+            targetFromTable.getForeignKeys().add(targetFK);
+
+            //TODO ricercare per struttura? Es. rename
+            ForeignKey sourceFK = sourceTable.findForeignKeyByName(fkName);
+
+            if(sourceFK != null) {
+                copyAnnotations(sourceFK, targetFK);
+            }
+
+        }
+    }
+
+    protected void syncPrimaryKeys(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
+        logger.debug("Synchronizing primary keys");
+        for(liquibase.database.structure.PrimaryKey liquibasePK : databaseSnapshot.getPrimaryKeys()) {
+            String pkTableName = liquibasePK.getTable().getName();
+
+            Table sourceTable = DataModelLogic.findTableByName(sourceSchema, pkTableName);
+            PrimaryKey sourcePK = sourceTable.getPrimaryKey();
+
+            Table targetTable = DataModelLogic.findTableByName(targetSchema, pkTableName);
+            PrimaryKey targetPK = new PrimaryKey(targetTable);
+            targetTable.setPrimaryKey(targetPK);
+
+            for(String columnName : liquibasePK.getColumnNamesAsList()) {
+                PrimaryKeyColumn targetPKColumn = new PrimaryKeyColumn(targetPK);
+                targetPKColumn.setColumnName(columnName);
+
+                if(sourcePK != null) {
+                    PrimaryKeyColumn sourcePKColumn =
+                            sourcePK.findPrimaryKeyColumnByName(columnName);
+                    Generator sourceGenerator = sourcePKColumn.getGenerator();
+                    if(sourcePKColumn != null && sourceGenerator != null) {
+                        Generator targetGenerator =
+                                (Generator) ReflectionUtil.newInstance(sourceGenerator.getClass());
+
+                        try {
+                            BeanUtils.copyProperties(targetGenerator, sourceGenerator);
+                        } catch (Exception e) {
+                            logger.error("Couldn't copy generator", e);
+                        }
+
+                        targetGenerator.setPrimaryKeyColumn(targetPKColumn);
+                        targetPKColumn.setGenerator(sourcePKColumn.getGenerator());
+                    }
+                }
+
+                targetPK.getPrimaryKeyColumns().add(targetPKColumn);
+            }
+        }
+    }
+
+    protected void syncTables(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
+        logger.debug("Synchronizing tables");
         for (liquibase.database.structure.Table liquibaseTable
                 : databaseSnapshot.getTables()) {
             logger.debug("Processing table: {}", liquibaseTable.getName());
+            Table sourceTable = DataModelLogic.findTableByName(sourceSchema, liquibaseTable.getName());
+            if(sourceTable == null) {
+                sourceTable = new Table();
+            }
+
             Table targetTable = new Table(targetSchema);
             targetSchema.getTables().add(targetTable);
 
             targetTable.setTableName(liquibaseTable.getName());
 
-            // merge table attributes and annotations
+            logger.debug("Merging table attributes and annotations");
+            targetTable.setEntityName(sourceTable.getEntityName());
+            targetTable.setJavaClass(sourceTable.getJavaClass());
+            targetTable.setManyToMany(sourceTable.getManyToMany());
+            copyAnnotations(sourceTable, targetTable);
+
+            syncColumns(liquibaseTable, sourceTable, targetTable);
+
+            copySelectionProviders(sourceTable, targetTable);
         }
-        return targetSchema;
+    }
+
+    protected void copySelectionProviders(Table sourceTable, Table targetTable) {
+        for(ModelSelectionProvider selectionProvider : sourceTable.getSelectionProviders()) {
+            ModelSelectionProvider targetSP =
+                    (ModelSelectionProvider) ReflectionUtil.newInstance(selectionProvider.getClass());
+            try {
+                BeanUtils.copyProperties(targetSP, selectionProvider);
+                targetSP.setFromTable(targetTable);
+                targetSP.setToTable(null);
+            } catch (Exception e) {
+                logger.error("Couldn't copy selection provider {}", selectionProvider);
+            }
+        }
+    }
+
+    protected void syncColumns(liquibase.database.structure.Table liquibaseTable, Table sourceTable, Table targetTable) {
+        logger.debug("Synchronizing columns");
+        for(liquibase.database.structure.Column liquibaseColumn : liquibaseTable.getColumns()) {
+            logger.debug("Processing column: {}", liquibaseColumn.getName());
+
+            Column targetColumn = new Column(targetTable);
+            targetTable.getColumns().add(targetColumn);
+
+            targetColumn.setColumnName(liquibaseColumn.getName());
+
+            logger.debug("Merging column attributes and annotations");
+            targetColumn.setAutoincrement(liquibaseColumn.isAutoIncrement());
+            targetColumn.setColumnType(liquibaseColumn.getTypeName());
+            targetColumn.setLength(liquibaseColumn.getColumnSize());
+            targetColumn.setNullable(liquibaseColumn.isNullable());
+            targetColumn.setScale(liquibaseColumn.getDecimalDigits());
+            //TODO liquibaseColumn.getLengthSemantics()
+
+            Column sourceColumn = DataModelLogic.findColumnByName(sourceTable, liquibaseColumn.getName());
+            if(sourceColumn != null) {
+                targetColumn.setPropertyName(sourceColumn.getPropertyName());
+                targetColumn.setJavaType(sourceColumn.getJavaType());
+                targetColumn.setSearchable(sourceColumn.isSearchable());
+                copyAnnotations(sourceColumn, targetColumn);
+            }
+        }
+    }
+
+    protected void copyAnnotations(Annotated source, Annotated target) {
+        for(Annotation ann : source.getAnnotations()) {
+            Annotation annCopy = new Annotation();
+            annCopy.setParent(source);
+            annCopy.setType(ann.getType());
+            for(String value : ann.getValues()) {
+                annCopy.getValues().add(value);
+            }
+            target.getAnnotations().add(annCopy);
+        }
     }
 
     protected List<String> readSchemaNames(Connection conn,
@@ -156,36 +314,31 @@ public class DatabaseSyncer {
 
         List<String> result = new ArrayList<String>();
 
-        ResultSet rs = null;
         Pattern includePattern = connectionProvider.getIncludeSchemasPattern();
         Pattern excludePattern = connectionProvider.getExcludeSchemasPattern();
-        try {
-            rs = metadata.getSchemas();
-            while(rs.next()) {
-                String schemaName = rs.getString(TABLE_SCHEM);
-                if (includePattern != null) {
-                    Matcher includeMatcher = includePattern.matcher(schemaName);
-                    if (!includeMatcher.matches()) {
-                        logger.info("Schema '{}' does not match include pattern '{}'. Skipping this schema.",
-                                schemaName,
-                                connectionProvider.getIncludeSchemas());
-                        continue;
-                    }
+        List<String> schemaNames =
+                connectionProvider.getDatabasePlatform().getSchemaNames(metadata);
+        for(String schemaName : schemaNames) {
+            if (includePattern != null) {
+                Matcher includeMatcher = includePattern.matcher(schemaName);
+                if (!includeMatcher.matches()) {
+                    logger.info("Schema '{}' does not match include pattern '{}'. Skipping this schema.",
+                            schemaName,
+                            connectionProvider.getIncludeSchemas());
+                    continue;
                 }
-                if (excludePattern != null) {
-                    Matcher excludeMatcher = excludePattern.matcher(schemaName);
-                    if (excludeMatcher.matches()) {
-                        logger.info("Schema '{}' matches exclude pattern '{}'. Skipping this schema.",
-                                schemaName,
-                                connectionProvider.getExcludeSchemas());
-                        continue;
-                    }
-                }
-                logger.info("Found schema: {}", schemaName);
-                result.add(schemaName);
             }
-        } finally {
-            DbUtil.closeResultSetAndStatement(rs);
+            if (excludePattern != null) {
+                Matcher excludeMatcher = excludePattern.matcher(schemaName);
+                if (excludeMatcher.matches()) {
+                    logger.info("Schema '{}' matches exclude pattern '{}'. Skipping this schema.",
+                            schemaName,
+                            connectionProvider.getExcludeSchemas());
+                    continue;
+                }
+            }
+            logger.info("Found schema: {}", schemaName);
+            result.add(schemaName);
         }
         return result;
     }

@@ -34,6 +34,10 @@ import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
 import org.hibernate.dialect.Dialect;
 
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.List;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -60,5 +64,7 @@ public interface DatabasePlatform {
     boolean isApplicable(ConnectionProvider connectionProvider);
     Database readModel(ConnectionProvider connectionProvider);
     void shutdown(ConnectionProvider connectionProvider);
+
+    List<String> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException;
 
 }

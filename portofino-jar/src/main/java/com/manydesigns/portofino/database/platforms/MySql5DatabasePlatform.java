@@ -39,6 +39,7 @@ import org.hibernate.dialect.MySQLDialect;
 
 import java.sql.*;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -467,5 +468,18 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
         }
     }
 
-
+    public List<String> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
+        ResultSet rs = databaseMetaData.getCatalogs();
+        List<String> schemaNames = new ArrayList<String>();
+        try {
+            while(rs.next()) {
+                String schemaName = rs.getString(TABLE_CAT);
+                schemaNames.add(schemaName);
+            }
+        } finally {
+            DbUtils.closeQuietly(rs);
+        }
+        return schemaNames;
+    }
 }
+

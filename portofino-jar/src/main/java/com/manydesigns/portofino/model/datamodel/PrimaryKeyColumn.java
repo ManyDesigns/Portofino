@@ -76,6 +76,11 @@ public class PrimaryKeyColumn implements ModelObject {
 
     public PrimaryKeyColumn() {}
 
+    public PrimaryKeyColumn(PrimaryKey primaryKey) {
+        this();
+        this.primaryKey = primaryKey;
+    }
+
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
