@@ -32,7 +32,6 @@ package com.manydesigns.portofino.chart;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import org.jfree.chart.urls.CategoryURLGenerator;
 import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.general.PieDataset;
 
 public class ChartBarUrlGenerator implements CategoryURLGenerator {
     public static final String copyright =
@@ -48,11 +47,11 @@ public class ChartBarUrlGenerator implements CategoryURLGenerator {
     }
 
     public String generateURL(CategoryDataset dataset, int series, int category) {
-        Comparable c1 = dataset.getRowKey(series);
-        Comparable c2 = dataset.getColumnKey(category);
+        ComparableWrapper c1 = (ComparableWrapper) dataset.getRowKey(series);
+        ComparableWrapper c2 = (ComparableWrapper) dataset.getColumnKey(category);
         value.dataset = dataset;
-        value.series = c1;
-        value.category = c2;
+        value.series = c1.getObject();
+        value.category = c2.getObject();
         return format.format(value);
     }
 

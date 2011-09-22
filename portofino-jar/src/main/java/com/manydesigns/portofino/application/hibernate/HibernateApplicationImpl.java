@@ -64,6 +64,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.impl.SessionFactoryImpl;
+import org.hibernate.jdbc.Work;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
-import java.sql.Connection;
+import java.sql.*;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -725,16 +726,39 @@ public class HibernateApplicationImpl implements Application {
         }
         Session session = setup.getThreadSession();
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
-        String formatString = sqlFormat.getFormatString();
-        Object[] parameters = sqlFormat.evaluateOgnlExpressions(null);
+        final String formatString = sqlFormat.getFormatString();
+        final Object[] parameters = sqlFormat.evaluateOgnlExpressions(null);
 
-        SQLQuery query = session.createSQLQuery(formatString);
+        /*SQLQuery query = session.createSQLQuery(formatString);
         for (int i = 0; i < parameters.length; i++) {
             query.setParameter(i, parameters[i]);
-        }
+        }*/
 
         //noinspection unchecked
-        List<Object[]> result = query.list();
+        //List<Object[]> result = query.list();
+
+        final List<Object[]> result = new ArrayList<Object[]>();
+
+        session.doWork(new Work() {
+            public void execute(Connection connection) throws SQLException {
+                PreparedStatement stmt = connection.prepareStatement(formatString);
+                for (int i = 0; i < parameters.length; i++) {
+                    stmt.setObject(i + 1, parameters[i]);
+                }
+                ResultSet rs = stmt.executeQuery();
+                ResultSetMetaData md = rs.getMetaData();
+                int cc = md.getColumnCount();
+                while(rs.next()) {
+                    Object[] current = new Object[cc];
+                    for(int i = 0; i < cc; i++) {
+                        current[i] = rs.getObject(i + 1);
+                    }
+                    result.add(current);
+                }
+                rs.close();
+                stmt.close();
+            }
+        });
 
         return result;
     }

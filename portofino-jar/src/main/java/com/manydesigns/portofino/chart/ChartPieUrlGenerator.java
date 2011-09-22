@@ -49,7 +49,7 @@ public class ChartPieUrlGenerator implements PieURLGenerator {
     public String generateURL(PieDataset dataset,
                               Comparable key, int index) {
         value.dataset = dataset;
-        value.key = key;
+        value.key = ((ComparableWrapper) key).getObject();
         value.index = index;
         return format.format(value);
     }

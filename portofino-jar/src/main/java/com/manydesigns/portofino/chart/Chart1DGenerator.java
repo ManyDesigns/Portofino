@@ -72,7 +72,11 @@ public abstract class Chart1DGenerator extends AbstractChartGenerator {
         String query = chartPage.getQuery();
         result = application.runSql(chartPage.getDatabase(), query);
         for (Object[] current : result) {
-            dataset.setValue((Comparable)current[0], (Number)current[1]);
+            ComparableWrapper value = new ComparableWrapper((Comparable)current[0]);
+            dataset.setValue(value, (Number)current[1]);
+            if(current.length > 2) {
+                value.setLabel(current[2].toString());
+            }
         }
 
         JFreeChart chart = createChart(chartPage, dataset);
