@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.logic;
 
-import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.system.model.users.Group;
 
 /**

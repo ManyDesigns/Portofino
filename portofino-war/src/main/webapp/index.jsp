@@ -1,5 +1,5 @@
 <%@ page import="com.manydesigns.portofino.actions.RequestAttributes" %>
-<%@ page import="com.manydesigns.portofino.context.Application" %>
+<%@ page import="com.manydesigns.portofino.application.Application" %>
 <%@ page import="com.manydesigns.portofino.logic.PageLogic" %>
 <%@ page import="com.manydesigns.portofino.model.Model" %>
 <%@ page import="com.manydesigns.portofino.model.pages.Page" %>

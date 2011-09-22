@@ -45,7 +45,7 @@ import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.connections.JdbcConnectionProvider;
 import com.manydesigns.portofino.connections.JndiConnectionProvider;
-import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;

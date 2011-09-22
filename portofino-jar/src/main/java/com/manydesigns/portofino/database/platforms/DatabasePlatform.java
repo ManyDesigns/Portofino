@@ -51,6 +51,7 @@ public interface DatabasePlatform {
     String getDescription();
     String getStandardDriverClassName();
     Dialect getHibernateDialect();
+    liquibase.database.Database createLiquibaseDatabase();
 
     @Status(red={}, amber={STATUS_CREATED, STATUS_DRIVER_NOT_FOUND}, green={STATUS_OK})
     String getStatus();

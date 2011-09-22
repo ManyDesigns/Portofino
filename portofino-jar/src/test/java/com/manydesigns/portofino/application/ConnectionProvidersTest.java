@@ -26,7 +26,7 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.context;
+package com.manydesigns.portofino.application;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.connections.ConnectionProvider;

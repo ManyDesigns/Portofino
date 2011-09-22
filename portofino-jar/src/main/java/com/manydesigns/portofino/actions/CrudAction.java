@@ -49,7 +49,7 @@ import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
 import com.manydesigns.portofino.actions.forms.CrudSelectionProviderEdit;
-import com.manydesigns.portofino.context.TableCriteria;
+import com.manydesigns.portofino.application.TableCriteria;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.CrudLogic;

@@ -31,8 +31,8 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
-import com.manydesigns.portofino.context.Application;
-import com.manydesigns.portofino.context.ApplicationStarter;
+import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.application.ApplicationStarter;
 import com.manydesigns.portofino.model.Model;
 import net.sourceforge.stripes.controller.StripesConstants;
 import org.slf4j.Logger;

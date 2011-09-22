@@ -26,7 +26,7 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.context.hibernate;
+package com.manydesigns.portofino.application.hibernate;
 
 
 import com.manydesigns.elements.reflection.JavaClassAccessor;

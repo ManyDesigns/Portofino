@@ -33,7 +33,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;

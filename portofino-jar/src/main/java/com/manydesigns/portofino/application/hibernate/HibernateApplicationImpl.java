@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.context.hibernate;
+package com.manydesigns.portofino.application.hibernate;
 
 import com.manydesigns.elements.fields.search.Criterion;
 import com.manydesigns.elements.fields.search.TextMatchMode;
@@ -37,10 +37,10 @@ import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
+import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.application.TableCriteria;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.connections.Connections;
-import com.manydesigns.portofino.context.Application;
-import com.manydesigns.portofino.context.TableCriteria;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.logic.DataModelLogic;

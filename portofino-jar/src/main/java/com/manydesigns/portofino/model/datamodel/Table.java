@@ -100,6 +100,11 @@ public class Table implements ModelObject {
         selectionProviders = new ArrayList<ModelSelectionProvider>();
     }
 
+    public Table(Schema schema) {
+        this();
+        this.schema = schema;
+    }
+
     //**************************************************************************
     // DatamodelObject implementation
     //**************************************************************************

@@ -29,7 +29,7 @@
 package com.manydesigns.portofino.system.model.users;
 
 import com.manydesigns.portofino.actions.RequestAttributes;
-import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.application.Application;
 import sun.misc.BASE64Encoder;
 
 import javax.servlet.ServletRequest;

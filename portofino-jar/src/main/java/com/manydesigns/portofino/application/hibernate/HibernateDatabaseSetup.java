@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.context.hibernate;
+package com.manydesigns.portofino.application.hibernate;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

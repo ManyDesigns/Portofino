@@ -12,7 +12,7 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.forms.EditPage;
 import com.manydesigns.portofino.actions.forms.NewPage;
-import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;

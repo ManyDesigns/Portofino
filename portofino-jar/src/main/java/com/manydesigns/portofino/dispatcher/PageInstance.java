@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.pages.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

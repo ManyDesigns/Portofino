@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.*;
 import org.apache.commons.lang.StringUtils;

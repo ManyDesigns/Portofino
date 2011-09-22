@@ -27,16 +27,20 @@
  *
  */
 
-package com.manydesigns.portofino.context;
+package com.manydesigns.portofino.application;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.context.hibernate.HibernateApplicationImpl;
+import com.manydesigns.portofino.application.hibernate.HibernateApplicationImpl;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.email.EmailTask;
 import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
+import liquibase.snapshot.DatabaseSnapshot;
+import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -44,6 +48,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.sql.Connection;
+import java.util.List;
 import java.util.Timer;
 
 /**
@@ -194,9 +199,18 @@ public class ApplicationStarter {
         Connection connection = null;
         try {
             connection = connectionProvider.acquireConnection();
-            Liquibase lq = new Liquibase
-                    ("databases/portofino.default.changelog.xml", new ClassLoaderResourceAccessor(), new JdbcConnection(connection));
+            JdbcConnection jdbcConnection = new JdbcConnection(connection);
+            Liquibase lq = new Liquibase(
+                    "databases/portofino.default.changelog.xml",
+                    new ClassLoaderResourceAccessor(),
+                    jdbcConnection);
             lq.update(null);
+            DatabaseFactory df = DatabaseFactory.getInstance();
+            List<Database> implemented = df.getImplementedDatabases();
+            Database database = df.findCorrectDatabaseImplementation(jdbcConnection);
+            DatabaseSnapshotGeneratorFactory dsgf =
+                    DatabaseSnapshotGeneratorFactory.getInstance();
+            DatabaseSnapshot snapshot = dsgf.createSnapshot(database, "public", null);
             return true;
         } catch (Exception e) {
             logger.error("Couldn't update system database", e);

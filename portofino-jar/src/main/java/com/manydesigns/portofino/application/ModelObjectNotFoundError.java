@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.context;
+package com.manydesigns.portofino.application;
 
 public class ModelObjectNotFoundError extends Error {
     public ModelObjectNotFoundError() {

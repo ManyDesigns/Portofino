@@ -118,6 +118,16 @@ public class DataModelLogic {
         return null;
     }
 
+    public static Schema findSchemaByName(Database database, String schemaName) {
+        for (Schema schema : database.getSchemas()) {
+            if (schema.getSchemaName().equals(schemaName)) {
+                return schema;
+            }
+        }
+        logger.debug("Schema not found: {}", schemaName);
+        return null;
+    }
+
     public static Schema findSchemaByQualifiedName(Model model,
                                             String qualifiedSchemaName) {
         int lastDot = qualifiedSchemaName.lastIndexOf(".");

@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.portofino.actions.RequestAttributes;
-import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.application.Application;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;

@@ -35,7 +35,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.context.ServerInfo;
+import com.manydesigns.portofino.application.ServerInfo;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.model.pages.JspPage;
 import net.sourceforge.stripes.action.*;

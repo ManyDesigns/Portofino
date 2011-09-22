@@ -30,6 +30,8 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.connections.ConnectionProvider;
+import liquibase.database.Database;
+import liquibase.database.core.H2Database;
 import org.hibernate.dialect.PostgreSQLDialect;
 
 import java.sql.Connection;
@@ -66,6 +68,10 @@ public class H2DatabasePlatform extends AbstractDatabasePlatform {
 
     public String getStandardDriverClassName() {
         return STANDARD_DRIVER_CLASS_NAME;
+    }
+
+    public Database createLiquibaseDatabase() {
+        return new H2Database();
     }
 
     public boolean isApplicable(ConnectionProvider connectionProvider) {

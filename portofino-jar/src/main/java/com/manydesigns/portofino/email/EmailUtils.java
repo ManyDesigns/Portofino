@@ -28,7 +28,7 @@
  */
 package com.manydesigns.portofino.email;
 
-import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 
 /*

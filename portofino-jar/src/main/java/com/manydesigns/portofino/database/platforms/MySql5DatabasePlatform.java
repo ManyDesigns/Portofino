@@ -33,6 +33,7 @@ import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.datamodel.*;
+import liquibase.database.core.MySQLDatabase;
 import org.apache.commons.dbutils.DbUtils;
 import org.hibernate.dialect.MySQLDialect;
 
@@ -74,6 +75,10 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
 
     public String getStandardDriverClassName() {
         return STANDARD_DRIVER_CLASS_NAME;
+    }
+
+    public liquibase.database.Database createLiquibaseDatabase() {
+        return new MySQLDatabase();
     }
 
     public boolean isApplicable(ConnectionProvider connectionProvider) {

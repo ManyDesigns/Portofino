@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.chart;
 
-import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.pages.ChartPage;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
 import org.jfree.chart.JFreeChart;

@@ -76,6 +76,11 @@ public class Schema implements ModelObject {
         tables = new ArrayList<Table>();
     }
 
+    public Schema(Database database) {
+        this();
+        this.database = database;
+    }
+
     //**************************************************************************
     // DatamodelObject implementation
     //**************************************************************************

@@ -31,7 +31,7 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.Page;

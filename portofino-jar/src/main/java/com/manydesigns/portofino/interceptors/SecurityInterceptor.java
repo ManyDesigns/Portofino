@@ -33,7 +33,7 @@ import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.user.LoginAction;
-import com.manydesigns.portofino.context.Application;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.pages.Page;
