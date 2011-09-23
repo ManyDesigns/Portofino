@@ -211,17 +211,6 @@ public class DiffUtil {
                 new ArrayList<String>(annotationTypes);
         Collections.sort(sortedAnnotationTypes);
 
-        for (String annotationType : sortedAnnotationTypes) {
-            Annotation sourceAnnotation =
-                    findModelAnnotation(sourceForeignKey, annotationType);
-            Annotation targetAnnotation =
-                    findModelAnnotation(sourceForeignKey, annotationType);
-
-            ModelAnnotationDiff modelAnnotationDiff =
-                    diff(sourceAnnotation, targetAnnotation);
-            result.getModelAnnotationDiffs().add(modelAnnotationDiff);
-        }
-
         return result;
     }
 
@@ -329,14 +318,6 @@ public class DiffUtil {
             return null;
         }
         return column.findModelAnnotationByType(annotationType);
-    }
-
-    public static Annotation findModelAnnotation(ForeignKey foreignKey,
-                                                      String annotationType) {
-        if (foreignKey == null) {
-            return null;
-        }
-        return foreignKey.findModelAnnotationByType(annotationType);
     }
 
     //--------------------------------------------------------------------------

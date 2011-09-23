@@ -47,7 +47,13 @@ public class SequenceGenerator extends Generator{
 
     protected String name;
 
-    public SequenceGenerator() {}
+    public SequenceGenerator() {
+        super();
+    }
+
+    public SequenceGenerator(PrimaryKeyColumn primaryKeyColumn) {
+        super(primaryKeyColumn);
+    }
 
     public void reset() {
         super.reset();

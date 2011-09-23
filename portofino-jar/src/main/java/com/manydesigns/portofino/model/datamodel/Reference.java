@@ -72,6 +72,10 @@ public class Reference implements ModelObject {
 
     public Reference() {}
 
+    public Reference(HasReferences owner) {
+        this.owner = owner;
+    }
+
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************

@@ -36,6 +36,7 @@ import com.manydesigns.portofino.connections.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
+import liquibase.database.structure.ForeignKeyConstraintType;
 import org.apache.commons.lang.BooleanUtils;
 import org.hibernate.FetchMode;
 import org.hibernate.cfg.Configuration;
@@ -572,7 +573,8 @@ public class HibernateConfig {
         prop.setName(relationship.getActualManyPropertyName());
         prop.setNodeName(relationship.getActualManyPropertyName());
         prop.setValue(set);
-        if ("cascade".equalsIgnoreCase(relationship.getOnDelete())){
+        if (ForeignKeyConstraintType.importedKeyCascade.name()
+                .equalsIgnoreCase(relationship.getOnDelete())){
             prop.setCascade("delete");
         } else {
             prop.setCascade("none");

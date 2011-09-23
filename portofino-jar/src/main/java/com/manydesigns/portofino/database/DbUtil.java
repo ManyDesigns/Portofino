@@ -165,7 +165,7 @@ public class DbUtil {
                     throw new Error("Unsupported date type: " + jdbcType);
             }
         } else if (javaType == Boolean.class) {
-            if(jdbcType == Types.BIT) {
+            if(jdbcType == Types.BIT || jdbcType == Types.BOOLEAN) {
                 return Hibernate.BOOLEAN;
             } else if(jdbcType == Types.NUMERIC || jdbcType == Types.DECIMAL) {
                 return NUMERIC_BOOLEAN;

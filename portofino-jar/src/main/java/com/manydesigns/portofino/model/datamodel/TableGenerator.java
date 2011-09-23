@@ -52,7 +52,13 @@ public class TableGenerator extends Generator{
     protected String keyValue;
     protected String valueColumn;
 
-    public TableGenerator() {}
+    public TableGenerator() {
+        super();
+    }
+
+    public TableGenerator(PrimaryKeyColumn primaryKeyColumn) {
+        super(primaryKeyColumn);
+    }
 
     public void reset() {
         super.reset();

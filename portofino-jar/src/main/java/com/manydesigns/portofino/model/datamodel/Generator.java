@@ -54,6 +54,9 @@ public abstract class Generator implements ModelObject{
 
     public Generator() {}
 
+    protected Generator(PrimaryKeyColumn primaryKeyColumn) {
+        this.primaryKeyColumn = primaryKeyColumn;
+    }
 
     //**************************************************************************
     // Getter/setter

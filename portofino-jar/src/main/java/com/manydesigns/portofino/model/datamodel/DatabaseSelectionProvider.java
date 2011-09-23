@@ -83,6 +83,11 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
         references = new ArrayList<Reference>();
     }
 
+    public DatabaseSelectionProvider(Table fromTable) {
+        this();
+        this.fromTable = fromTable;
+    }
+
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************

@@ -44,7 +44,13 @@ public class IncrementGenerator extends Generator{
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public IncrementGenerator() {}
+    public IncrementGenerator() {
+        super();
+    }
+
+    public IncrementGenerator(PrimaryKeyColumn primaryKeyColumn) {
+        super(primaryKeyColumn);
+    }
 
     public void reset() {
         super.reset();

@@ -94,6 +94,12 @@ public class Annotation implements ModelObject {
         this.type = type;
     }
 
+    public Annotation(Object parent, String type) {
+        this();
+        this.parent = parent;
+        this.type = type;
+    }
+
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************

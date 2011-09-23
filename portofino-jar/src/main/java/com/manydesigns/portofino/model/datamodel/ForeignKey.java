@@ -31,17 +31,16 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.annotations.Annotated;
-import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.util.Pair;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -51,7 +50,7 @@ import java.util.List;
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
 public class ForeignKey extends DatabaseSelectionProvider
-        implements ModelObject, HasReferences, Annotated {
+        implements ModelObject, HasReferences {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -68,8 +67,6 @@ public class ForeignKey extends DatabaseSelectionProvider
     //**************************************************************************
     // Fields (physical JDBC)
     //**************************************************************************
-
-    protected final List<Annotation> annotations;
 
     protected String onUpdate;
     protected String onDelete;
@@ -100,7 +97,6 @@ public class ForeignKey extends DatabaseSelectionProvider
     //**************************************************************************
 
     public ForeignKey() {
-        annotations = new ArrayList<Annotation>();
     }
 
     public ForeignKey(Table fromTable) {
@@ -177,16 +173,6 @@ public class ForeignKey extends DatabaseSelectionProvider
         return null;
     }
 
-    public Annotation findModelAnnotationByType(String annotationType) {
-        for (Annotation annotation : annotations) {
-            if (annotation.getType().equals(annotationType)) {
-                return annotation;
-            }
-        }
-        logger.debug("Model annotation not found: {}", annotationType);
-        return null;
-    }
-
     //**************************************************************************
     // Getters/setter
     //**************************************************************************
@@ -237,12 +223,6 @@ public class ForeignKey extends DatabaseSelectionProvider
 
     public void setOnePropertyName(String onePropertyName) {
         this.onePropertyName = onePropertyName;
-    }
-
-    @XmlElementWrapper(name="annotations")
-    @XmlElement(name="annotation",type=Annotation.class)
-    public List<Annotation> getAnnotations() {
-        return annotations;
     }
 
     public String getActualManyPropertyName() {

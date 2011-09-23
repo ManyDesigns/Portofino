@@ -39,6 +39,7 @@ import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.database.structure.ForeignKeyConstraintType;
 import liquibase.snapshot.DatabaseSnapshot;
 import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
 import org.apache.commons.beanutils.BeanUtils;
@@ -64,6 +65,7 @@ public class DatabaseSyncer {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public static final String TABLE_SCHEM = "TABLE_SCHEM";
+    public static final String INFORMATION_SCHEMA = "INFORMATION_SCHEMA";
 
     public static final Logger logger =
             LoggerFactory.getLogger(DatabaseSyncer.class);
@@ -71,7 +73,9 @@ public class DatabaseSyncer {
 
     public Database syncDatabase(ConnectionProvider connectionProvider,
                                  Model sourceModel) throws Exception {
+        String databaseName = connectionProvider.getDatabaseName();
         Database targetDatabase = new Database();
+        targetDatabase.setDatabaseName(databaseName);
 
         Connection conn = null;
         try {
@@ -86,7 +90,6 @@ public class DatabaseSyncer {
                     new JdbcConnection(conn);
 
             logger.debug("Retrieving source database");
-            String databaseName = connectionProvider.getDatabaseName();
             Database sourceDatabase =
                     DataModelLogic.findDatabaseByName(sourceModel, databaseName);
             if (sourceDatabase == null) {
@@ -120,9 +123,10 @@ public class DatabaseSyncer {
                 DatabaseSnapshot snapshot = dsgf.createSnapshot(liquibaseDatabase, "public", null);
 
                 logger.debug("Synchronizing schema");
-                Schema targetSchema = syncSchema(snapshot, sourceSchema);
+                Schema targetSchema = new Schema();
                 targetSchema.setDatabase(targetDatabase);
                 targetDatabase.getSchemas().add(targetSchema);
+                syncSchema(snapshot, sourceSchema, targetSchema);
         }
         } finally {
             connectionProvider.releaseConnection(conn);
@@ -130,9 +134,8 @@ public class DatabaseSyncer {
         return targetDatabase;
     }
 
-    public Schema syncSchema(DatabaseSnapshot databaseSnapshot, Schema sourceSchema) {
+    public Schema syncSchema(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
         logger.debug("Synchronizing schema: {}", sourceSchema.getSchemaName());
-        Schema targetSchema = new Schema();
         targetSchema.setSchemaName(sourceSchema.getSchemaName());
 
         syncTables(databaseSnapshot, sourceSchema, targetSchema);
@@ -156,8 +159,16 @@ public class DatabaseSyncer {
             targetFK.setName(fkName);
 
             liquibase.database.structure.Table pkTable = liquibaseFK.getPrimaryKeyTable();
+            targetFK.setToDatabase(targetSchema.getDatabaseName());
             targetFK.setToSchema(pkTable.getSchema());
             targetFK.setToTableName(pkTable.getName());
+
+            ForeignKeyConstraintType updateRule =
+                    liquibaseFK.getUpdateRule();
+            targetFK.setOnUpdate(updateRule.name());
+            ForeignKeyConstraintType deleteRule =
+                    liquibaseFK.getDeleteRule();
+            targetFK.setOnDelete(deleteRule.name());
 
             String[] fromColumns = liquibaseFK.getForeignKeyColumns().split(",");
             String[] toColumns = liquibaseFK.getPrimaryKeyColumns().split(",");
@@ -175,9 +186,17 @@ public class DatabaseSyncer {
             targetFromTable.getForeignKeys().add(targetFK);
 
             //TODO ricercare per struttura? Es. rename
-            ForeignKey sourceFK = sourceTable.findForeignKeyByName(fkName);
+            ForeignKey sourceFK;
+            if (sourceTable == null) {
+                sourceFK = null;
+            } else {
+                sourceFK = sourceTable.findForeignKeyByName(fkName);
+            }
 
             if(sourceFK != null) {
+                targetFK.setManyPropertyName(sourceFK.getManyPropertyName());
+                targetFK.setOnePropertyName(sourceFK.getOnePropertyName());
+
                 copyAnnotations(sourceFK, targetFK);
             }
 
@@ -190,10 +209,16 @@ public class DatabaseSyncer {
             String pkTableName = liquibasePK.getTable().getName();
 
             Table sourceTable = DataModelLogic.findTableByName(sourceSchema, pkTableName);
-            PrimaryKey sourcePK = sourceTable.getPrimaryKey();
+            PrimaryKey sourcePK;
+            if (sourceTable == null) {
+                sourcePK = null;
+            } else {
+                sourcePK = sourceTable.getPrimaryKey();
+            }
 
             Table targetTable = DataModelLogic.findTableByName(targetSchema, pkTableName);
             PrimaryKey targetPK = new PrimaryKey(targetTable);
+            targetPK.setPrimaryKeyName(liquibasePK.getName());
             targetTable.setPrimaryKey(targetPK);
 
             for(String columnName : liquibasePK.getColumnNamesAsList()) {
@@ -203,19 +228,23 @@ public class DatabaseSyncer {
                 if(sourcePK != null) {
                     PrimaryKeyColumn sourcePKColumn =
                             sourcePK.findPrimaryKeyColumnByName(columnName);
-                    Generator sourceGenerator = sourcePKColumn.getGenerator();
-                    if(sourcePKColumn != null && sourceGenerator != null) {
-                        Generator targetGenerator =
-                                (Generator) ReflectionUtil.newInstance(sourceGenerator.getClass());
+                    if(sourcePKColumn != null) {
+                        logger.debug("Found source PK column: {}", columnName);
+                        Generator sourceGenerator = sourcePKColumn.getGenerator();
+                        if(sourceGenerator != null) {
+                            logger.debug("Found generator: {}", sourceGenerator);
+                            Generator targetGenerator =
+                                    (Generator) ReflectionUtil.newInstance(sourceGenerator.getClass());
 
-                        try {
-                            BeanUtils.copyProperties(targetGenerator, sourceGenerator);
-                        } catch (Exception e) {
-                            logger.error("Couldn't copy generator", e);
+                            try {
+                                BeanUtils.copyProperties(targetGenerator, sourceGenerator);
+                            } catch (Exception e) {
+                                logger.error("Couldn't copy generator", e);
+                            }
+
+                            targetGenerator.setPrimaryKeyColumn(targetPKColumn);
+                            targetPKColumn.setGenerator(sourcePKColumn.getGenerator());
                         }
-
-                        targetGenerator.setPrimaryKeyColumn(targetPKColumn);
-                        targetPKColumn.setGenerator(sourcePKColumn.getGenerator());
                     }
                 }
 
@@ -252,15 +281,22 @@ public class DatabaseSyncer {
     }
 
     protected void copySelectionProviders(Table sourceTable, Table targetTable) {
-        for(ModelSelectionProvider selectionProvider : sourceTable.getSelectionProviders()) {
+        for(ModelSelectionProvider sourceSP : sourceTable.getSelectionProviders()) {
             ModelSelectionProvider targetSP =
-                    (ModelSelectionProvider) ReflectionUtil.newInstance(selectionProvider.getClass());
+                    (ModelSelectionProvider) ReflectionUtil.newInstance(sourceSP.getClass());
             try {
-                BeanUtils.copyProperties(targetSP, selectionProvider);
+                BeanUtils.copyProperties(targetSP, sourceSP);
                 targetSP.setFromTable(targetTable);
                 targetSP.setToTable(null);
+                targetTable.getSelectionProviders().add(targetSP);
+                for (Reference sourceReference : sourceSP.getReferences()) {
+                    Reference targetReference = new Reference(targetSP);
+                    targetSP.getReferences().add(targetReference);
+                    targetReference.setFromColumn(sourceReference.getFromColumn());
+                    targetReference.setToColumn(sourceReference.getToColumn());
+                }
             } catch (Exception e) {
-                logger.error("Couldn't copy selection provider {}", selectionProvider);
+                logger.error("Couldn't copy selection provider {}", sourceSP);
             }
         }
     }
@@ -296,7 +332,7 @@ public class DatabaseSyncer {
     protected void copyAnnotations(Annotated source, Annotated target) {
         for(Annotation ann : source.getAnnotations()) {
             Annotation annCopy = new Annotation();
-            annCopy.setParent(source);
+            annCopy.setParent(target);
             annCopy.setType(ann.getType());
             for(String value : ann.getValues()) {
                 annCopy.getValues().add(value);
@@ -319,6 +355,10 @@ public class DatabaseSyncer {
         List<String> schemaNames =
                 connectionProvider.getDatabasePlatform().getSchemaNames(metadata);
         for(String schemaName : schemaNames) {
+            if (INFORMATION_SCHEMA.equalsIgnoreCase(schemaName)) {
+                logger.info("Skipping information schema: {}", schemaName);
+                continue;
+            }
             if (includePattern != null) {
                 Matcher includeMatcher = includePattern.matcher(schemaName);
                 if (!includeMatcher.matches()) {
