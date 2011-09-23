@@ -50,16 +50,17 @@ import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.sync.DatabaseSyncer;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
-import com.manydesigns.portofino.xml.diff.DatabaseDiff;
-import com.manydesigns.portofino.xml.diff.DiffUtil;
-import com.manydesigns.portofino.xml.diff.MergeDiffer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.hibernate.*;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.dialect.Dialect;
@@ -284,22 +285,13 @@ public class HibernateApplicationImpl implements Application {
         return model;
     }
 
-    public void syncDataModel() {
-        MergeDiffer mergeDiffer = new MergeDiffer();
-
-        for (ConnectionProvider current : connectionProviders.getConnections()) {
-            Database sourceDatabase = current.readModel();
-
-            Database targetDatabase =
-                    DataModelLogic.findDatabaseByName(
-                            model, current.getDatabaseName());
-
-            DatabaseDiff diff =
-                    DiffUtil.diff(sourceDatabase, targetDatabase);
-
-            mergeDiffer.diffDatabase(diff);
-        }
-
+    public void syncDataModel(String databaseName) throws Exception {
+        ConnectionProvider connectionProvider = getConnectionProvider(databaseName);
+        Database sourceDatabase = DataModelLogic.findDatabaseByName(model, databaseName);
+        DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
+        Database targetDatabase = dbSyncer.syncDatabase(model);
+        model.getDatabases().remove(sourceDatabase);
+        model.getDatabases().add(targetDatabase);
         model.init();
         installDataModel(model);
         saveXmlModel();

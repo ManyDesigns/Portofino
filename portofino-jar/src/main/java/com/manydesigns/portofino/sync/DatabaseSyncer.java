@@ -31,6 +31,7 @@ package com.manydesigns.portofino.sync;
 
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.connections.ConnectionProvider;
+import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
@@ -70,9 +71,13 @@ public class DatabaseSyncer {
     public static final Logger logger =
             LoggerFactory.getLogger(DatabaseSyncer.class);
 
+    protected ConnectionProvider connectionProvider;
 
-    public Database syncDatabase(ConnectionProvider connectionProvider,
-                                 Model sourceModel) throws Exception {
+    public DatabaseSyncer(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
+    }
+
+    public Database syncDatabase(Model sourceModel) throws Exception {
         String databaseName = connectionProvider.getDatabaseName();
         Database targetDatabase = new Database();
         targetDatabase.setDatabaseName(databaseName);
@@ -322,6 +327,16 @@ public class DatabaseSyncer {
                 targetColumn.setPropertyName(sourceColumn.getPropertyName());
                 targetColumn.setJavaType(sourceColumn.getJavaType());
                 copyAnnotations(sourceColumn, targetColumn);
+            }
+            if(targetColumn.getJavaType() == null) {
+                String liquibaseColumnType = liquibaseColumn.getTypeName();
+                Type type = connectionProvider.getTypeByName(liquibaseColumnType);
+                if (type != null) {
+                    targetColumn.setJavaType(type.getDefaultJavaType().getName());
+                } else {
+                    logger.error("Cannot find JDBC type for table {}, column {}, type {}",
+                            new Object[]{targetTable.getTableName(), targetColumn.getColumnName(), liquibaseColumnType});
+                }
             }
         }
     }

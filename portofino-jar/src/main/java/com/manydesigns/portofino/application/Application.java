@@ -92,7 +92,7 @@ public interface Application {
     //**************************************************************************
 
     Model getModel();
-    void syncDataModel();
+    void syncDataModel(String databaseName) throws Exception;
 
     //**************************************************************************
     // Persistance

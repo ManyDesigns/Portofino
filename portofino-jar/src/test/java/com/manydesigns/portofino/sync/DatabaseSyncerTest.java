@@ -61,11 +61,11 @@ public class DatabaseSyncerTest extends AbstractPortofinoTest {
     }
 
     public void testSyncDatabase() throws Exception {
-        DatabaseSyncer dbSyncer = new DatabaseSyncer();
         String databaseName = "jpetstore";
         ConnectionProvider connectionProvider = application.getConnectionProvider(databaseName);
+        DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
         Model sourceModel = new Model();
-        Database targetDatabase = dbSyncer.syncDatabase(connectionProvider, sourceModel);
+        Database targetDatabase = dbSyncer.syncDatabase(sourceModel);
         assertNotNull(targetDatabase);
         assertEquals(databaseName, targetDatabase.getDatabaseName());
 
@@ -229,7 +229,7 @@ public class DatabaseSyncerTest extends AbstractPortofinoTest {
         reference.setToColumn("to_selection");
 
         //Sync
-        targetDatabase = dbSyncer.syncDatabase(connectionProvider, sourceModel);
+        targetDatabase = dbSyncer.syncDatabase(sourceModel);
 
         schema = targetDatabase.getSchemas().get(0);
 

@@ -125,7 +125,7 @@ public class SelfTestAction extends AbstractActionBean {
 
     public String sync() throws SQLException {
         try {
-            application.syncDataModel();
+            //application.syncDataModel();
             SessionMessages.addInfoMessage(
                     "In-memory model synchronized to database model");
         } catch (Throwable e) {

@@ -30,27 +30,26 @@
 package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.connections.JdbcConnectionProvider;
 import com.manydesigns.portofino.connections.JndiConnectionProvider;
-import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -89,6 +88,13 @@ public class ConnectionProvidersAction extends AbstractActionBean {
 
     @Inject(RequestAttributes.APPLICATION)
     public Application application;
+
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
+
+    public static final Logger logger =
+            LoggerFactory.getLogger(ConnectionProvidersAction.class);
 
     //--------------------------------------------------------------------------
     // Action events
@@ -305,6 +311,16 @@ public class ConnectionProvidersAction extends AbstractActionBean {
             SessionMessages.addInfoMessage("No Connection providers selected");
         }
         return new RedirectResolution(this.getClass());
+    }
+
+    public Resolution sync() {
+        try {
+            application.syncDataModel(databaseName);
+        } catch (Exception e) {
+            logger.error("Errore in sincronizzazione", e);
+            SessionMessages.addErrorMessage("Errore in sincronizzazione: " + ExceptionUtils.getRootCauseMessage(e));
+        }
+        return new RedirectResolution(getClass()).addParameter("databaseName", databaseName);
     }
 
     public Resolution returnToList() {
