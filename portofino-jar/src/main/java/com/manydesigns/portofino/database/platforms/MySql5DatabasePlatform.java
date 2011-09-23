@@ -217,7 +217,6 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
                 column.setAutoincrement(autoincrement);
                 column.setLength(length);
                 column.setScale(scale);
-                column.setSearchable(searchable);
                 logger.debug("Found column: {} of type {}",
                         column.getQualifiedName(),
                         column.getColumnType());

@@ -75,7 +75,7 @@ public class TextFieldTest extends AbstractElementsTest {
         assertFalse(textField.isMultiline());
         assertEquals(70, textField.getTextAreaWidth());
         assertEquals(4, textField.getTextAreaMinRows());
-        assertEquals(70, textField.getSize());
+        assertNull(textField.getSize());
     }
 
     public void testValue() {

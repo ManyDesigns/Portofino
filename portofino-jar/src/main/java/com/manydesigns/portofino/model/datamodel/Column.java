@@ -67,8 +67,7 @@ public class Column implements ModelObject, Annotated {
     protected boolean autoincrement;
     protected Integer length;
     protected Integer scale;
-    protected boolean searchable;
-    
+
     //**************************************************************************
     // Fields (logical)
     //**************************************************************************
@@ -225,9 +224,9 @@ public class Column implements ModelObject, Annotated {
         this.autoincrement = autoincrement;
     }
 
-    @XmlAttribute(required = true)
     public boolean isSearchable() {
-        return searchable;
+        // TODO: Blobs are not searchable but Liquibase does not return this information
+        return true;
     }
 
     public Class getActualJavaType() {
@@ -255,10 +254,6 @@ public class Column implements ModelObject, Annotated {
 
     public void setPropertyName(String propertyName) {
         this.propertyName = propertyName;
-    }
-
-    public void setSearchable(boolean searchable) {
-        this.searchable = searchable;
     }
 
     @XmlElementWrapper(name="annotations")

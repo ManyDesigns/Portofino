@@ -318,7 +318,6 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
                 column.setAutoincrement(type.isAutoincrement());
                 column.setLength(length);
                 column.setScale(scale);
-                column.setSearchable(type.isSearchable());
                 logger.debug("Found column: {} of type {}",
                         column.getQualifiedName(),
                         column.getColumnType());

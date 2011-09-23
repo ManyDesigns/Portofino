@@ -29,8 +29,7 @@
 
 package com.manydesigns.portofino.connections;
 
-import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.Status;
+import com.manydesigns.elements.annotations.*;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
@@ -270,6 +269,8 @@ public abstract class ConnectionProvider {
     //**************************************************************************
 
     @XmlAttribute(required = true)
+    @Updatable(false)
+    @Required
     public String getDatabaseName() {
         return databaseName;
     }
@@ -279,6 +280,7 @@ public abstract class ConnectionProvider {
     }
 
     @XmlAttribute()
+    @FieldSize(100)
     public String getIncludeSchemas() {
         return includeSchemas;
     }
@@ -288,6 +290,7 @@ public abstract class ConnectionProvider {
     }
 
     @XmlAttribute()
+    @FieldSize(100)
     public String getExcludeSchemas() {
         return excludeSchemas;
     }
@@ -297,14 +300,18 @@ public abstract class ConnectionProvider {
     }
 
     @Status(red={STATUS_ERROR}, amber={STATUS_DISCONNECTED}, green={STATUS_CONNECTED})
+    @Updatable(false)
     public String getStatus() {
         return status;
     }
 
+    @Updatable(false)
     public String getErrorMessage() {
         return errorMessage;
     }
 
+    @DateFormat("yyyy-MM-dd HH:mm:ss")
+    @Updatable(false)
     public Date getLastTested() {
         return lastTested;
     }

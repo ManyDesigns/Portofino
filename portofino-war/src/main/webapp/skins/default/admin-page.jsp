@@ -122,7 +122,7 @@
                         <ul>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Connections"
-                                                   link="/"/>
+                                                   link="/admin/connection-providers.action"/>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Tables"
                                                    link="/"/>

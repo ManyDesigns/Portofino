@@ -213,7 +213,7 @@
             </result>
         </action>
         <action name="ConnectionProviders"
-                class="com.manydesigns.portofino.actions.model.ConnectionProvidersAction">
+                class="com.manydesigns.portofino.actions.admin.ConnectionProvidersAction">
             <result name="list">/skins/default/model/connectionProviders/list.jsp</result>
             <result name="read">/skins/default/model/connectionProviders/read.jsp</result>
             <result name="create">/skins/default/model/connectionProviders/create.jsp</result>

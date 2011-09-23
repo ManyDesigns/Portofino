@@ -30,6 +30,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.FieldSize;
 import com.manydesigns.elements.annotations.MaxLength;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -49,7 +50,7 @@ public abstract class AbstractTextField extends AbstractField {
     protected boolean autoCapitalize = false;
     protected Integer maxLength = null;
 
-    protected int size = 70;
+    protected Integer size;
 
     //**************************************************************************
     // Costruttori
@@ -62,6 +63,9 @@ public abstract class AbstractTextField extends AbstractField {
         super(accessor, mode, prefix);
         if (accessor.isAnnotationPresent(MaxLength.class)) {
             maxLength = accessor.getAnnotation(MaxLength.class).value();
+        }
+        if (accessor.isAnnotationPresent(FieldSize.class)) {
+            size = accessor.getAnnotation(FieldSize.class).value();
         }
     }
 
@@ -103,14 +107,8 @@ public abstract class AbstractTextField extends AbstractField {
     }
 
     protected void valueToXhtmlEdit(XhtmlBuffer xb) {
-        Integer textInputSize = null;
-        if (maxLength != null) {
-            textInputSize = (maxLength > size)
-                    ? size
-                    : maxLength;
-        }
         xb.writeInputText(id, inputName, stringValue,
-                fieldCssClass, textInputSize, maxLength);
+                fieldCssClass, size, maxLength);
     }
 
     protected void valueToXhtmlPreview(XhtmlBuffer xb) {
@@ -157,11 +155,11 @@ public abstract class AbstractTextField extends AbstractField {
         this.maxLength = maxLength;
     }
 
-    public int getSize() {
+    public Integer getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(Integer size) {
         this.size = size;
     }
 }

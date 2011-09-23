@@ -196,8 +196,6 @@ public class DatabaseSyncer {
             if(sourceFK != null) {
                 targetFK.setManyPropertyName(sourceFK.getManyPropertyName());
                 targetFK.setOnePropertyName(sourceFK.getOnePropertyName());
-
-                copyAnnotations(sourceFK, targetFK);
             }
 
         }
@@ -323,7 +321,6 @@ public class DatabaseSyncer {
             if(sourceColumn != null) {
                 targetColumn.setPropertyName(sourceColumn.getPropertyName());
                 targetColumn.setJavaType(sourceColumn.getJavaType());
-                targetColumn.setSearchable(sourceColumn.isSearchable());
                 copyAnnotations(sourceColumn, targetColumn);
             }
         }

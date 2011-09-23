@@ -203,14 +203,6 @@ public class DiffUtil {
             result.getReferenceDiffs().add(referenceDiff);
         }
 
-        // diff table annotations
-        Set<String> annotationTypes = new HashSet<String>();
-        extractAnnotationTypes(sourceForeignKey, annotationTypes);
-        extractAnnotationTypes(sourceForeignKey, annotationTypes);
-        List<String> sortedAnnotationTypes =
-                new ArrayList<String>(annotationTypes);
-        Collections.sort(sortedAnnotationTypes);
-
         return result;
     }
 
@@ -404,16 +396,6 @@ public class DiffUtil {
             return;
         }
         for (Annotation annotation : column.getAnnotations()) {
-            annotationTypes.add(annotation.getType());
-        }
-    }
-
-    public static void extractAnnotationTypes(ForeignKey foreignKey,
-                                              Set<String> annotationTypes) {
-        if (foreignKey == null) {
-            return;
-        }
-        for (Annotation annotation : foreignKey.getAnnotations()) {
             annotationTypes.add(annotation.getType());
         }
     }

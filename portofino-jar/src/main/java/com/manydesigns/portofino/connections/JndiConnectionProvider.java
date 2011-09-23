@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.connections;
 
+import com.manydesigns.elements.annotations.Required;
 import org.apache.commons.dbutils.DbUtils;
 
 import javax.naming.InitialContext;
@@ -88,6 +89,7 @@ public class JndiConnectionProvider extends ConnectionProvider {
     //**************************************************************************
 
     @XmlAttribute(required = true)
+    @Required
     public String getJndiResource() {
         return jndiResource;
     }

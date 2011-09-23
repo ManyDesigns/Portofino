@@ -29,8 +29,10 @@
 
 package com.manydesigns.portofino.connections;
 
+import com.manydesigns.elements.annotations.FieldSize;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Password;
+import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import org.apache.commons.configuration.Configuration;
@@ -127,6 +129,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     //**************************************************************************
 
     @XmlAttribute(required = true)
+    @Required
     public String getDriver() {
         return driver;
     }
@@ -137,6 +140,8 @@ public class JdbcConnectionProvider extends ConnectionProvider {
 
     @Label("connection URL")
     @XmlAttribute(required = true)
+    @FieldSize(100)
+    @Required
     public String getUrl() {
         return url;
     }
@@ -145,7 +150,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
         this.url = url;
     }
 
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = false)
     public String getUsername() {
         return username;
     }
@@ -155,7 +160,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     }
 
     @Password
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = false)
     public String getPassword() {
         return password;
     }
