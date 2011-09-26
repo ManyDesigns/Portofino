@@ -398,10 +398,6 @@ public abstract class ConnectionProvider {
         return null;
     }
 
-    public Database readModel() {
-        return databasePlatform.readModel(this);
-    }
-
     private static class TypeComparator implements Comparator<Type> {
         public int compare(Type o1, Type o2) {
             return o1.getTypeName().compareToIgnoreCase(o2.getTypeName());

@@ -29,17 +29,12 @@
 
 package com.manydesigns.portofino.actions.model;
 
-import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
-import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.xml.XmlDiffer;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,27 +97,11 @@ public class SelfTestAction extends AbstractActionBean {
     //--------------------------------------------------------------------------
 
     public String execute() throws SQLException {
-        xmlDiffer = new XmlDiffer();
-
-        treeTableDiffer = new TreeTableDiffer();
-        treeTableDiffer.setShowBothNull(showBothNull);
-        treeTableDiffer.setShowSourceNull(showSourceNull);
-        treeTableDiffer.setShowTargetNull(showTargetNull);
-        treeTableDiffer.setShowEqual(showEqual);
-        treeTableDiffer.setShowDifferent(showDifferent);
-
-        for (ConnectionProvider current : application.getConnectionProviders()) {
-            Database sourceDatabase = current.readModel();
-            Database targetDatabase =
-                    DataModelLogic.findDatabaseByName(
-                            model, current.getDatabaseName());
-            XmlDiffer.ElementDiffer rootDiffer =
-                    xmlDiffer.diff("database", sourceDatabase, targetDatabase);
-            treeTableDiffer.run(rootDiffer);
-        }
         return "SUCCESS";
     }
 
+<<<<<<< local
+=======
     public String sync() throws SQLException {
         try {
             //application.syncDataModel();
@@ -137,6 +116,7 @@ public class SelfTestAction extends AbstractActionBean {
     }
 
 
+>>>>>>> other
     public String export() throws Exception {
         contentType= "text/xml";
         contentDisposition= MessageFormat.format("inline; filename={0}.xml",

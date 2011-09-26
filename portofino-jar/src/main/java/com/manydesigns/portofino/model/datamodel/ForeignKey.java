@@ -55,16 +55,6 @@ public class ForeignKey extends DatabaseSelectionProvider
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
-    // Constants
-    //**************************************************************************
-
-    public static final String RULE_NO_ACTION = "NO ACTION";
-    public static final String RULE_CASCADE = "CASCADE";
-    public static final String RULE_SET_NULL = "SET NULL";
-    public static final String RULE_SET_DEFAULT = "SET DEFAULT";
-    
-
-    //**************************************************************************
     // Fields (physical JDBC)
     //**************************************************************************
 
