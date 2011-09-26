@@ -128,6 +128,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     // Getters
     //**************************************************************************
 
+    @FieldSize(50)
     @XmlAttribute(required = true)
     @Required
     public String getDriver() {

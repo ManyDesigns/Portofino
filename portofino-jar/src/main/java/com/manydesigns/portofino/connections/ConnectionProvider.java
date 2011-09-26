@@ -34,7 +34,7 @@ import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
-import com.manydesigns.portofino.model.datamodel.Database;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,13 +149,13 @@ public abstract class ConnectionProvider {
     }
 
     public void init(DatabasePlatformsManager databasePlatformsManager) {
-        if (includeSchemas == null) {
+        if (StringUtils.isBlank(includeSchemas)) {
             includeSchemasPattern = null;
         } else {
             includeSchemasPattern = Pattern.compile(includeSchemas);
         }
 
-        if (excludeSchemas == null) {
+        if (StringUtils.isBlank(excludeSchemas)) {
             excludeSchemasPattern = null;
         } else {
             excludeSchemasPattern = Pattern.compile(excludeSchemas);

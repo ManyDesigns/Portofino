@@ -71,7 +71,7 @@ public class DatabaseSyncer {
     public static final Logger logger =
             LoggerFactory.getLogger(DatabaseSyncer.class);
 
-    protected ConnectionProvider connectionProvider;
+    protected final ConnectionProvider connectionProvider;
 
     public DatabaseSyncer(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
@@ -125,14 +125,15 @@ public class DatabaseSyncer {
                         databasePlatform.createLiquibaseDatabase();
                 liquibaseDatabase.setConnection(liquibaseConnection);
                 logger.debug("Creating Liquibase database snapshot");
-                DatabaseSnapshot snapshot = dsgf.createSnapshot(liquibaseDatabase, "public", null);
+                DatabaseSnapshot snapshot =
+                        dsgf.createSnapshot(liquibaseDatabase, schemaName, null);
 
                 logger.debug("Synchronizing schema");
                 Schema targetSchema = new Schema();
                 targetSchema.setDatabase(targetDatabase);
                 targetDatabase.getSchemas().add(targetSchema);
                 syncSchema(snapshot, sourceSchema, targetSchema);
-        }
+            }
         } finally {
             connectionProvider.releaseConnection(conn);
         }
@@ -170,10 +171,21 @@ public class DatabaseSyncer {
 
             ForeignKeyConstraintType updateRule =
                     liquibaseFK.getUpdateRule();
-            targetFK.setOnUpdate(updateRule.name());
+            if (updateRule == null) {
+                logger.warn("Foreign key with null update rule: {}", fkName);
+                targetFK.setOnUpdate(ForeignKeyConstraintType.importedKeyRestrict.name());
+            } else {
+                targetFK.setOnUpdate(updateRule.name());
+            }
+
             ForeignKeyConstraintType deleteRule =
                     liquibaseFK.getDeleteRule();
-            targetFK.setOnDelete(deleteRule.name());
+            if (deleteRule == null) {
+                logger.warn("Foreign key with null delete rule: {}", fkName);
+                targetFK.setOnDelete(ForeignKeyConstraintType.importedKeyRestrict.name());
+            } else {
+                targetFK.setOnDelete(deleteRule.name());
+            }
 
             String[] fromColumns = liquibaseFK.getForeignKeyColumns().split(",");
             String[] toColumns = liquibaseFK.getPrimaryKeyColumns().split(",");
@@ -309,8 +321,9 @@ public class DatabaseSyncer {
         for(liquibase.database.structure.Column liquibaseColumn : liquibaseTable.getColumns()) {
             logger.debug("Processing column: {}", liquibaseColumn.getName());
 
+            boolean columnHasErrors = false;
+
             Column targetColumn = new Column(targetTable);
-            targetTable.getColumns().add(targetColumn);
 
             targetColumn.setColumnName(liquibaseColumn.getName());
 
@@ -330,13 +343,26 @@ public class DatabaseSyncer {
             }
             if(targetColumn.getJavaType() == null) {
                 String liquibaseColumnType = liquibaseColumn.getTypeName();
-                Type type = connectionProvider.getTypeByName(liquibaseColumnType);
-                if (type != null) {
-                    targetColumn.setJavaType(type.getDefaultJavaType().getName());
-                } else {
-                    logger.error("Cannot find JDBC type for table {}, column {}, type {}",
-                            new Object[]{targetTable.getTableName(), targetColumn.getColumnName(), liquibaseColumnType});
-                }
+                int jdbcType = liquibaseColumn.getDataType();
+                targetColumn.setJavaType(Type.getDefaultJavaType(jdbcType).getName());
+//                Type type = connectionProvider.getTypeByName(liquibaseColumnType);
+//                if (type != null) {
+//                    targetColumn.setJavaType(type.getDefaultJavaType().getName());
+//                } else {
+//                    columnHasErrors = true;
+//                    logger.error("Cannot find JDBC type for table {}, column {}, type {}",
+//                            new Object[]{targetTable.getTableName(),
+//                                    targetColumn.getColumnName(),
+//                                    liquibaseColumnType});
+//                }
+            }
+
+            if (columnHasErrors) {
+                logger.warn("Skipping column because of errors: {}.{}",
+                        new Object[]{targetTable.getTableName(),
+                                targetColumn.getColumnName()});
+            } else {
+                targetTable.getColumns().add(targetColumn);
             }
         }
     }

@@ -72,8 +72,6 @@ public class ConnectionProvidersAction extends AbstractActionBean {
 
     public TableForm tableForm;
     public Form form;
-    public Form jdbcForm;
-    public Form jndiForm;
     public Form detectedValuesForm;
     public TableForm databasePlatformsTableForm;
 
@@ -297,7 +295,8 @@ public class ConnectionProvidersAction extends AbstractActionBean {
     public Resolution delete(){
         if(null!=databaseName){
             application.deleteConnectionProvider(databaseName);
-            SessionMessages.addInfoMessage("Connection providers deleted successfully");
+            SessionMessages.addInfoMessage(
+                    "Connection providers deleted successfully");
         }
         return new RedirectResolution(this.getClass());
     }
@@ -306,7 +305,8 @@ public class ConnectionProvidersAction extends AbstractActionBean {
 
         if(null!=selection && 0!=selection.length){
             application.deleteConnectionProvider(selection);
-            SessionMessages.addInfoMessage("Connection providers deleted successfully");
+            SessionMessages.addInfoMessage(
+                    "Connection providers deleted successfully");
         } else {
             SessionMessages.addInfoMessage("No Connection providers selected");
         }
@@ -316,11 +316,16 @@ public class ConnectionProvidersAction extends AbstractActionBean {
     public Resolution sync() {
         try {
             application.syncDataModel(databaseName);
+            SessionMessages.addInfoMessage(
+                    "Connection provider synchronized correctly");
         } catch (Exception e) {
             logger.error("Errore in sincronizzazione", e);
-            SessionMessages.addErrorMessage("Errore in sincronizzazione: " + ExceptionUtils.getRootCauseMessage(e));
+            SessionMessages.addErrorMessage(
+                    "Synchronization error: " +
+                            ExceptionUtils.getRootCauseMessage(e));
         }
-        return new RedirectResolution(getClass()).addParameter("databaseName", databaseName);
+        return new RedirectResolution(getClass())
+                .addParameter("databaseName", databaseName);
     }
 
     public Resolution returnToList() {

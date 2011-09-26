@@ -31,6 +31,7 @@ package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;

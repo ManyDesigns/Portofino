@@ -67,6 +67,7 @@ public class PrimaryKey implements ModelObject {
     //**************************************************************************
 
     protected final List<Column> columns;
+    protected boolean valid;
 
     public static final Logger logger = LoggerFactory.getLogger(Table.class);
 
@@ -103,11 +104,15 @@ public class PrimaryKey implements ModelObject {
         for (PrimaryKeyColumn pkc : primaryKeyColumns) {
             pkc.reset();
         }
+
+        valid = true;
     }
 
     public void init(Model model) {
         assert table != null;
-        assert primaryKeyName != null;
+
+// Liquibase on MySQL returns null primaryKey name if the name is "PRIMARY"
+//        assert primaryKeyName != null;
 
         if (primaryKeyColumns.isEmpty()) {
             throw new Error(MessageFormat.format(
@@ -118,7 +123,13 @@ public class PrimaryKey implements ModelObject {
         for (PrimaryKeyColumn pkc : primaryKeyColumns) {
             pkc.init(model);
             Column column = pkc.getActualColumn();
-            columns.add(column);
+            if (column == null) {
+                valid = false;
+                logger.warn("Invalid primary key column: {}-{}",
+                        getQualifiedName(), pkc.getColumnName());
+            } else {
+                columns.add(column);
+            }
         }
 
         if (columns.isEmpty()) {
@@ -180,6 +191,10 @@ public class PrimaryKey implements ModelObject {
     @XmlElement(name="column",type=PrimaryKeyColumn.class)
     public List<PrimaryKeyColumn> getPrimaryKeyColumns() {
         return primaryKeyColumns;
+    }
+
+    public boolean isValid() {
+        return valid;
     }
 
     //**************************************************************************

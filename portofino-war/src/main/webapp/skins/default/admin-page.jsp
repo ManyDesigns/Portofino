@@ -125,7 +125,7 @@
                                                    link="/admin/connection-providers.action"/>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Tables"
-                                                   link="/"/>
+                                                   link="/admin/tables.action"/>
                         </ul>
                     </li>
                 </ul>

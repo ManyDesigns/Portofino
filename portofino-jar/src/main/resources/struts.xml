@@ -305,14 +305,14 @@
         </action>
 
         <action name="TableDesign"
-                class="com.manydesigns.portofino.actions.model.TableDesignAction">
+                class="com.manydesigns.portofino.actions.admin.TablesAction">
             <result name="search">/skins/default/model/tableDesign/create.jsp</result>
             <result name="redirectToFirst" type="redirectAction">
                 <param name="actionName">%{qualifiedTableName}/TableDesign</param>
             </result>
         </action>
         <action name="*/TableDesign"
-                class="com.manydesigns.portofino.actions.model.TableDesignAction">
+                class="com.manydesigns.portofino.actions.admin.TablesAction">
             <param name="qualifiedTableName">{1}</param>
             <result name="summary">/skins/default/model/tableDesign/summary.jsp</result>
             <result name="create">/skins/default/model/tableDesign/create.jsp</result>
