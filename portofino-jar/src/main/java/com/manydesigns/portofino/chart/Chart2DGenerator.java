@@ -33,20 +33,21 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.pages.ChartPage;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.*;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.DrawingSupplier;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.chart.title.Title;
 import org.jfree.chart.urls.CategoryURLGenerator;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.ui.HorizontalAlignment;
-import org.jfree.ui.RectangleEdge;
-import org.jfree.ui.RectangleInsets;
-import org.jfree.ui.VerticalAlignment;
+import org.jfree.text.TextBlockAnchor;
+import org.jfree.ui.*;
 
 import java.awt.*;
 
@@ -64,6 +65,7 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
     // Other objects
     //**************************************************************************
     private final Font titleFont = new Font("SansSerif", Font.BOLD, 12);
+    private final Font axisFont = new Font("SansSerif", Font.PLAIN, 12);
     private final Font legendFont = new Font("SansSerif", Font.BOLD, 10);
     private final Font legendItemFont = new Font("SansSerif", Font.PLAIN, 10);
     private final Color transparentColor = new Color(0, true);
@@ -111,6 +113,17 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
         CategoryItemRenderer renderer = plot.getRenderer();
     //        renderer.setItemURLGenerator(urlGenerator);
         renderer.setBaseItemURLGenerator(urlGenerator);
+        renderer.setBaseOutlinePaint(Color.BLACK);
+
+        /////////////////
+        if (renderer instanceof BarRenderer) {
+            BarRenderer barRenderer = (BarRenderer)renderer;
+
+            barRenderer.setDrawBarOutline(true);
+            barRenderer.setShadowVisible(false);
+            barRenderer.setBarPainter(new StandardBarPainter());
+        }
+        /////////////////
 
         // il plot ha sfondo e bordo trasparente
         // (quindi si vede il colore del chart)
@@ -125,6 +138,42 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
         plot.setRangeGridlinesVisible(true);
         plot.setRangeGridlinePaint(Color.GRAY);
         plot.setAxisOffset(new RectangleInsets(0,0,0,0));
+
+        // Category axis
+        CategoryAxis categoryAxis = plot.getDomainAxis();
+        categoryAxis.setAxisLinePaint(Color.BLACK);
+        categoryAxis.setLabelFont(axisFont);
+        categoryAxis.setAxisLineVisible(true);
+
+        // impostiamo la rotazione dell'etichetta
+        if (plot.getOrientation() == PlotOrientation.VERTICAL) {
+            CategoryLabelPosition pos =
+                    new CategoryLabelPosition(RectangleAnchor.TOP_LEFT,
+                            TextBlockAnchor.TOP_RIGHT,
+                            TextAnchor.TOP_RIGHT, -Math.PI / 4.0,
+                            CategoryLabelWidthType.CATEGORY, 100);
+            CategoryLabelPositions positions =
+                    new CategoryLabelPositions(pos, pos, pos, pos);
+            categoryAxis.setCategoryLabelPositions(positions);
+            categoryAxis.setMaximumCategoryLabelWidthRatio(6.0f);
+            height = 333;
+        } else {
+            categoryAxis.setMaximumCategoryLabelWidthRatio(0.4f);
+
+            // recuperiamo 8 pixel a sinistra
+            plot.setInsets(new RectangleInsets(4.0, 0.0, 4.0, 8.0));
+
+            height = 74;
+
+            // contiamo gli elementi nel dataset
+            height += 23 * dataset.getColumnCount();
+
+            height += 57;
+        }
+
+        Axis rangeAxis = plot.getRangeAxis();
+        rangeAxis.setAxisLinePaint(Color.BLACK);
+        rangeAxis.setLabelFont(axisFont);
 
         DrawingSupplier supplier =
                 new DesaturatedDrawingSupplier(plot.getDrawingSupplier());
