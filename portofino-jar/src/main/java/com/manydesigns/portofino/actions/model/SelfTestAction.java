@@ -34,7 +34,6 @@ import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.xml.XmlDiffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +69,6 @@ public class SelfTestAction extends AbstractActionBean {
     // Fields
     //--------------------------------------------------------------------------
 
-    public XmlDiffer xmlDiffer;
-    public TreeTableDiffer treeTableDiffer;
     // result parameters
     public InputStream inputStream;
     public String contentType;
@@ -100,23 +97,6 @@ public class SelfTestAction extends AbstractActionBean {
         return "SUCCESS";
     }
 
-<<<<<<< local
-=======
-    public String sync() throws SQLException {
-        try {
-            //application.syncDataModel();
-            SessionMessages.addInfoMessage(
-                    "In-memory model synchronized to database model");
-        } catch (Throwable e) {
-            String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-            logger.error(rootCauseMessage, e);
-            SessionMessages.addErrorMessage(rootCauseMessage);
-        }
-        return "sync";
-    }
-
-
->>>>>>> other
     public String export() throws Exception {
         contentType= "text/xml";
         contentDisposition= MessageFormat.format("inline; filename={0}.xml",
