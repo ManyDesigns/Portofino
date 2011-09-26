@@ -765,7 +765,7 @@ public class HibernateApplicationImpl implements Application {
                     logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
                 }
             }
-            current.setThreadSession(null);
+            current.removeThreadSession();
         }
     }
 
@@ -995,6 +995,17 @@ public class HibernateApplicationImpl implements Application {
     public Group getAdministratorsGroup() {
         String name = portofinoConfiguration.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
         return getGroup(name);
+    }
+
+    public void shutdown() {
+        for(HibernateDatabaseSetup setup : setups.values()) {
+            //TODO It is the responsibility of the application to ensure that there are no open Sessions before calling close().
+            //http://ajava.org/online/hibernate3api/org/hibernate/SessionFactory.html#close%28%29
+            setup.getSessionFactory().close();
+        }
+        for (ConnectionProvider current : getConnectionProviders()) {
+            current.shutdown();
+        }
     }
 
     protected Group getGroup(String name) {

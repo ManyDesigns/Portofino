@@ -168,4 +168,6 @@ public interface Application {
 
     Group getAdministratorsGroup();
 
+    void shutdown();
+
 }

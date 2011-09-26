@@ -90,4 +90,8 @@ public class HibernateDatabaseSetup {
     public void setThreadSession(Session session) {
         threadSessions.set(session);
     }
+
+    public void removeThreadSession() {
+        threadSessions.remove();
+    }
 }
