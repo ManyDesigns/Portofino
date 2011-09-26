@@ -31,7 +31,6 @@ package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.model.datamodel.Database;
 import org.hibernate.dialect.Dialect;
 
 import java.sql.DatabaseMetaData;
@@ -62,7 +61,6 @@ public interface DatabasePlatform {
 
     void test();
     boolean isApplicable(ConnectionProvider connectionProvider);
-    Database readModel(ConnectionProvider connectionProvider);
     void shutdown(ConnectionProvider connectionProvider);
 
     List<String> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException;
