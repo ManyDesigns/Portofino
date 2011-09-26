@@ -32,6 +32,7 @@ package com.manydesigns.portofino.model.pages;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.portofino.chart.*;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
@@ -149,7 +150,7 @@ public class ChartPage extends Page {
 
         if(orientationName != null) {
             try {
-                orientation = Orientation.valueOf(orientationName.toUpperCase());
+                orientation = Orientation.valueOf(orientationName);
             } catch (Exception e) {
                 logger.error("Invalid orientation: " + orientation, e);
             }
@@ -262,6 +263,9 @@ public class ChartPage extends Page {
     }
 
     @XmlAttribute(name = "orientation")
+    @Label("Orientation")
+    @Required
+    @Select(nullOption = false)
     public String getOrientationName() {
         return orientationName;
     }
