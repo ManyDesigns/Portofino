@@ -121,8 +121,19 @@ public class HibernateConfig {
         for (Schema schema : database.getSchemas()) {
             for (com.manydesigns.portofino.model.datamodel.Table aTable :
                     schema.getTables()) {
-                logger.debug(MessageFormat.format("Class - {0} ",
-                                aTable.getQualifiedName()));
+                logger.debug("Class - {}", aTable.getQualifiedName());
+                com.manydesigns.portofino.model.datamodel.PrimaryKey primaryKey =
+                        aTable.getPrimaryKey();
+                if (primaryKey == null) {
+                    logger.debug("Skipping table without primary key: {}",
+                            aTable.getQualifiedName());
+                    continue;
+                }
+                if (!primaryKey.isValid()) {
+                    logger.debug("Skipping table with invalid primary key: {}",
+                            aTable.getQualifiedName());
+                    continue;
+                }
                 RootClass clazz = createTableMapping(
                         mappings, aTable);
                 mappings.addClass(clazz);
@@ -289,6 +300,10 @@ public class HibernateConfig {
 
         for (com.manydesigns.portofino.model.datamodel.Column
                 column : columnPKList) {
+            if (column == null ) {
+                throw new InternalError("Null column");
+            }
+
             Column col = new Column();
             col.setName(escapeName(column.getColumnName()));
             String columnType = column.getColumnType();

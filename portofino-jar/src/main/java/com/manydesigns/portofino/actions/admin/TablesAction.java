@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.actions.model;
+package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.AnnotationsManager;
@@ -44,6 +44,9 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.actions.model.AnnModel;
+import com.manydesigns.portofino.actions.model.PrimaryKeyColumnModel;
+import com.manydesigns.portofino.actions.model.PrimaryKeyModel;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ModelObjectNotFoundError;
 import com.manydesigns.portofino.database.Type;
@@ -51,6 +54,11 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
+import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -74,7 +82,9 @@ import java.util.Set;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class TableDesignAction extends AbstractActionBean {
+@RequiresAdministrator
+@UrlBinding("/admin/tables.action")
+public class TablesAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -142,6 +152,7 @@ public class TableDesignAction extends AbstractActionBean {
     //**************************************************************************
     // Forms
     //**************************************************************************
+    public TableForm multilineForm;
     public Form tableForm;
     public Form columnForm;
     public Form pkForm;
@@ -160,7 +171,7 @@ public class TableDesignAction extends AbstractActionBean {
     //**************************************************************************
 
     public static final Logger logger =
-            LoggerFactory.getLogger(TableDesignAction.class);
+            LoggerFactory.getLogger(TablesAction.class);
 
 
     //**************************************************************************
@@ -177,7 +188,7 @@ public class TableDesignAction extends AbstractActionBean {
     //**************************************************************************
     // Constructor
     //**************************************************************************
-    public TableDesignAction() {
+    public TablesAction() {
         annotations = new ArrayList<String>();
         annotationsImpl = new ArrayList<String>();
         Set<Class> annotationsClasses
@@ -201,12 +212,28 @@ public class TableDesignAction extends AbstractActionBean {
     // Action default execute method
     //**************************************************************************
 
-    public String execute() {
+    @DefaultHandler
+    public Resolution execute() {
         if (qualifiedTableName == null) {
-            qualifiedTableName = DataModelLogic.getAllTables(model).get(0).getQualifiedName();
-            return PortofinoAction.REDIRECT_TO_FIRST;
+            return search();
+        } else {
+            return read();
         }
+    }
 
+    public Resolution search() {
+        List<Table> tableList = DataModelLogic.getAllTables(model);
+        multilineForm = new TableFormBuilder(Table.class)
+                .configFields("databaseName", "schemaName", "tableName")
+                .configNRows(tableList.size())
+                .configMode(Mode.VIEW)
+                .build();
+        multilineForm.readFromObject(tableList);
+        multilineForm.setSelectable(true);
+        return new ForwardResolution("/layouts/admin/tables/list.jsp");
+    }
+
+    public Resolution read() {
         Table table = setupTable();
 
         tableForm = new FormBuilder(Table.class)
@@ -221,7 +248,7 @@ public class TableDesignAction extends AbstractActionBean {
                 .configMode(Mode.VIEW)
                 .build();
         columnTableForm.readFromObject(table.getColumns());
-        return PortofinoAction.SUMMARY;
+        return new ForwardResolution("/layouts/admin/tables/read.jsp");
     }
 
     //**************************************************************************

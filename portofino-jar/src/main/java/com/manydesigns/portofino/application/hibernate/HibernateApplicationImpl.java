@@ -286,8 +286,10 @@ public class HibernateApplicationImpl implements Application {
     }
 
     public void syncDataModel(String databaseName) throws Exception {
-        ConnectionProvider connectionProvider = getConnectionProvider(databaseName);
-        Database sourceDatabase = DataModelLogic.findDatabaseByName(model, databaseName);
+        ConnectionProvider connectionProvider =
+                getConnectionProvider(databaseName);
+        Database sourceDatabase =
+                DataModelLogic.findDatabaseByName(model, databaseName);
         DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
         Database targetDatabase = dbSyncer.syncDatabase(model);
         model.getDatabases().remove(sourceDatabase);

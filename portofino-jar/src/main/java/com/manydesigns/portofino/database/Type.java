@@ -122,6 +122,10 @@ public class Type {
     }
 
     public Class getDefaultJavaType() {
+        return getDefaultJavaType(jdbcType);
+    }
+
+    public static Class getDefaultJavaType(int jdbcType) {
         switch (jdbcType) {
             case Types.BIGINT:
                 return Long.class;
