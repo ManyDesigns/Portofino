@@ -141,9 +141,7 @@ public class ApplicationStarter {
         status = Status.DESTROYING;
 
         if (application != null) {
-            for (ConnectionProvider current : application.getConnectionProviders()) {
-                current.shutdown();
-            }
+            application.shutdown();
         }
 
         if (scheduler!=null) {

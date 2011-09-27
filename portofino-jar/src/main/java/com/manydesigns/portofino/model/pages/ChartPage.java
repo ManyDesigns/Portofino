@@ -32,6 +32,7 @@ package com.manydesigns.portofino.model.pages;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.portofino.chart.*;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
@@ -40,8 +41,6 @@ import com.manydesigns.portofino.model.datamodel.Database;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import java.util.HashMap;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -59,7 +58,7 @@ public class ChartPage extends Page {
     //**************************************************************************
 
     protected String name;
-    protected String type;
+    protected String typeName;
     protected String legend;
     protected String database;
     protected String query;
@@ -73,6 +72,7 @@ public class ChartPage extends Page {
     //**************************************************************************
 
     protected Database actualDatabase;
+    protected Type type;
     protected Class<? extends ChartGenerator> generatorClass;
     protected Orientation orientation;
 
@@ -84,33 +84,27 @@ public class ChartPage extends Page {
     // Built-in chart generators
     //**************************************************************************
 
-    public static final Map<String, Class<? extends ChartGenerator>>
-        chartGenerators;
+    public static enum Type {
+        AREA(ChartAreaGenerator.class),
+        BAR(ChartBarGenerator.class),
+        BAR3D(ChartBar3DGenerator.class),
+        LINE(ChartLineGenerator.class),
+        LINE3D(ChartLine3DGenerator.class),
+        PIE(ChartPieGenerator.class),
+        PIE3D(ChartPie3DGenerator.class),
+        RING(ChartRingGenerator.class),
+        STACKED_BAR(ChartStackedBarGenerator.class),
+        STACKED_BAR_3D(ChartStackedBar3DGenerator.class);
 
-    public static final String
-        AREA = "area",
-        BAR = "bar",
-        BAR3D = "bar3D",
-        LINE = "line",
-        LINE3D = "line3D",
-        PIE = "pie",
-        PIE3D = "pie3D",
-        RING = "ring",
-        STACKED_BAR = "stackedBar",
-        STACKED_BAR_3D = "stackedBar3D";
+        private Class<? extends ChartGenerator> generatorClass;
 
-    static {
-        chartGenerators = new HashMap<String, Class<? extends ChartGenerator>>();
-        chartGenerators.put(AREA, ChartAreaGenerator.class);
-        chartGenerators.put(BAR, ChartBarGenerator.class);
-        chartGenerators.put(BAR3D, ChartBar3DGenerator.class);
-        chartGenerators.put(LINE, ChartLineGenerator.class);
-        chartGenerators.put(LINE3D, ChartLine3DGenerator.class);
-        chartGenerators.put(PIE, ChartPieGenerator.class);
-        chartGenerators.put(PIE3D, ChartPie3DGenerator.class);
-        chartGenerators.put(RING, ChartRingGenerator.class);
-        chartGenerators.put(STACKED_BAR, ChartStackedBarGenerator.class);
-        chartGenerators.put(STACKED_BAR_3D, ChartStackedBar3DGenerator.class);
+        Type(Class<? extends ChartGenerator> generatorClass) {
+            this.generatorClass = generatorClass;
+        }
+
+        public Class<? extends ChartGenerator> getGeneratorClass() {
+            return generatorClass;
+        }
     }
 
     //**************************************************************************
@@ -131,6 +125,7 @@ public class ChartPage extends Page {
         actualDatabase = null;
         generatorClass = null;
         orientation = null;
+        type = null;
     }
 
     @Override
@@ -146,24 +141,16 @@ public class ChartPage extends Page {
 
         actualDatabase = DataModelLogic.findDatabaseByName(model, database);
 
-        generatorClass = chartGenerators.get(type);
-
-        if(generatorClass == null) {
-            try {
-                generatorClass =
-                    (Class<? extends ChartGenerator>) Class.forName(type, true, getClass().getClassLoader());
-                if(!ChartGenerator.class.isAssignableFrom(generatorClass)) {
-                    logger.error("Invalid chart type: " + type);
-                    generatorClass = null;
-                }
-            } catch (Exception e) {
-                logger.error("Invalid chart type: " + type, e);
-            }
+        try {
+            type = Type.valueOf(typeName);
+            generatorClass = type.getGeneratorClass();
+        } catch (Exception e) {
+            logger.error("Invalid chart type: " + typeName, e);
         }
 
         if(orientationName != null) {
             try {
-                orientation = Orientation.valueOf(orientationName.toUpperCase());
+                orientation = Orientation.valueOf(orientationName);
             } catch (Exception e) {
                 logger.error("Invalid orientation: " + orientation, e);
             }
@@ -188,14 +175,19 @@ public class ChartPage extends Page {
         this.name = name;
     }
 
+    @XmlAttribute(name = "type", required = true)
     @Required
-    @XmlAttribute(required = true)
-    public String getType() {
-        return type;
+    @Label("Type")
+    public String getTypeName() {
+        return typeName;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     @Required
@@ -271,6 +263,9 @@ public class ChartPage extends Page {
     }
 
     @XmlAttribute(name = "orientation")
+    @Label("Orientation")
+    @Required
+    @Select(nullOption = false)
     public String getOrientationName() {
         return orientationName;
     }

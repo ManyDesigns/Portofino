@@ -50,14 +50,14 @@ public class ReflectionUtil {
     // Static fields and initialization
     //**************************************************************************
 
-    protected final static ClassLoader classLoader;
+    //protected final static ClassLoader classLoader;
 
     public final static Logger logger =
             LoggerFactory.getLogger(ReflectionUtil.class);
 
-    static {
+    /*static {
         classLoader = ReflectionUtil.class.getClassLoader();
-    }
+    }*/
 
 
     //**************************************************************************
@@ -136,6 +136,6 @@ public class ReflectionUtil {
     }
 
     public static InputStream getResourceAsStream(String resourceName) {
-        return classLoader.getResourceAsStream(resourceName);
+        return ReflectionUtil.class.getClassLoader().getResourceAsStream(resourceName);
     }
 }

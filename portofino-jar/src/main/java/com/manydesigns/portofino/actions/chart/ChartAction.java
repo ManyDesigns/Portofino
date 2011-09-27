@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.actions.chart;
 
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.jfreechart.JFreeChartInstance;
@@ -47,10 +49,8 @@ import org.jfree.chart.JFreeChart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -117,7 +117,12 @@ public class ChartAction extends PortletAction {
 
         try {
             // Run/generate the chart
-            generateChart();
+            try {
+                Thread.currentThread().setContextClassLoader(Class.class.getClassLoader());
+                generateChart();
+            } finally {
+                Thread.currentThread().setContextClassLoader(ChartAction.class.getClassLoader());
+            }
 
             chartId = RandomUtil.createRandomId();
 
@@ -196,7 +201,52 @@ public class ChartAction extends PortletAction {
     //**************************************************************************
 
     public static final String[][] CONFIGURATION_FIELDS =
-            {{"name", "legend", "database", "query", "urlExpression"}};
+            {{"name", "typeName", "orientationName", "legend", "database", "query", "urlExpression"}};
+
+    public static final String[] chartTypes1D = {
+        ChartPage.Type.PIE.name(),
+        ChartPage.Type.PIE3D.name(),
+        ChartPage.Type.RING.name()
+    };
+
+    public static final String[] chartTypes2D = {
+        ChartPage.Type.AREA.name(),
+        ChartPage.Type.BAR.name(),
+        ChartPage.Type.BAR3D.name(),
+        ChartPage.Type.LINE.name(),
+        ChartPage.Type.LINE3D.name(),
+        ChartPage.Type.STACKED_BAR.name(),
+        ChartPage.Type.STACKED_BAR_3D.name()
+    };
+
+    public static final String[] chartTypeValues =
+            new String[chartTypes1D.length + chartTypes2D.length + 2];
+    public static final String[] chartTypeLabels =
+            new String[chartTypeValues.length];
+
+    static {
+        Properties props = new Properties();
+        String prefix = "com.manydesigns.portofino.chart.type.";
+        try {
+            InputStream is = ChartAction.class.getResourceAsStream("chart-types.properties");
+            props.load(is);
+        } catch (Exception e) {
+            logger.error("Couldn't load chart type labels", e);
+        }
+        chartTypeValues[0] = "--1D";
+        chartTypeLabels[0] = "-- 1D charts --";
+        for(int i = 0; i < chartTypes1D.length; i++) {
+            chartTypeValues[i + 1] = chartTypes1D[i];
+            chartTypeLabels[i + 1] = props.getProperty(prefix + chartTypes1D[i], chartTypes1D[i]);
+        }
+        chartTypeValues[chartTypes1D.length + 1] = "--2D";
+        chartTypeLabels[chartTypes1D.length + 1] = "-- 2D charts --";
+        for(int i = 0; i < chartTypes2D.length; i++) {
+            chartTypeValues[i + 2 + chartTypes1D.length] = chartTypes2D[i];
+            chartTypeLabels[i + 2 + chartTypes1D.length] =
+                    props.getProperty(prefix + chartTypes2D[i], chartTypes2D[i]);
+        }
+    }
 
     public Resolution configure() {
         prepareConfigurationForms();
@@ -213,9 +263,18 @@ public class ChartAction extends PortletAction {
                         Database.class,
                         null,
                         "databaseName");
+        SelectionProvider typeSelectionProvider =
+                DefaultSelectionProvider.create("typeName", chartTypeValues, chartTypeLabels);
+        String[] orientationValues =
+                { ChartPage.Orientation.HORIZONTAL.name(), ChartPage.Orientation.VERTICAL.name() };
+        String[] orientationLabels = { "Horizontal", "Vertical" };
+        SelectionProvider orientationSelectionProvider =
+                DefaultSelectionProvider.create("orientationName", orientationValues, orientationLabels);
         form = new FormBuilder(ChartPage.class)
                 .configFields(CONFIGURATION_FIELDS)
                 .configFieldSetNames("Chart")
+                .configSelectionProvider(typeSelectionProvider, "typeName")
+                .configSelectionProvider(orientationSelectionProvider, "orientationName")
                 .configSelectionProvider(databaseSelectionProvider, "database")
                 .build();
         form.readFromObject(chartPage);
@@ -229,6 +288,17 @@ public class ChartAction extends PortletAction {
             readPageConfigurationFromRequest();
             boolean valid = form.validate();
             valid = validatePageConfiguration() && valid;
+            Field typeField = form.findFieldByPropertyName("typeName");
+            String typeValue = typeField.getStringValue();
+            boolean placeHolderValue =
+                    typeValue != null && typeValue.startsWith("--");
+            if(placeHolderValue) {
+                valid = false;
+                String errorMessage =
+                        ElementsThreadLocals.getTextProvider().getText("elements.error.field.required");
+                typeField.getErrors().add(errorMessage);
+                SessionMessages.addErrorMessage("");
+            }
             if (valid) {
                 updatePageConfiguration();
                 form.writeToObject(chartPage);
