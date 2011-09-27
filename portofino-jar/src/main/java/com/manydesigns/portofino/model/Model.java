@@ -125,7 +125,7 @@ public class Model {
         for(Database db : this.getDatabases()) {
             for(Schema schema : db.getSchemas()){
                 for (Table tb : schema.getTables()){
-                    if(entityName.equals(tb.getActualEntityName())){
+                    if(entityName.equalsIgnoreCase(tb.getActualEntityName())){
                         return tb;
                     }
                 }

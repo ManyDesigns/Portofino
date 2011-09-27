@@ -34,6 +34,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.logic.CrudLogic;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.model.pages.crud.CrudProperty;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,7 @@ public class CrudAccessor
     // Constructors
     //**************************************************************************
 
-    public CrudAccessor(Crud crud, ClassAccessor tableAccessor) {
+    public CrudAccessor(@NotNull Crud crud, @NotNull ClassAccessor tableAccessor) {
         super(crud.getModelAnnotations());
         this.crud = crud;
         this.tableAccessor = tableAccessor;

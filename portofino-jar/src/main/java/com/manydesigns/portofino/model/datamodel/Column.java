@@ -62,7 +62,8 @@ public class Column implements ModelObject, Annotated {
 
     protected Table table;
     protected String columnName;
-    protected String columnType;
+    protected int jdbcType;
+    protected String  columnType;
     protected boolean nullable;
     protected boolean autoincrement;
     protected Integer length;
@@ -176,6 +177,15 @@ public class Column implements ModelObject, Annotated {
 
     public void setColumnName(String columnName) {
         this.columnName = columnName;
+    }
+
+    @XmlAttribute(required = true)
+    public int getJdbcType() {
+        return jdbcType;
+    }
+
+    public void setJdbcType(int jdbcType) {
+        this.jdbcType = jdbcType;
     }
 
     @Required

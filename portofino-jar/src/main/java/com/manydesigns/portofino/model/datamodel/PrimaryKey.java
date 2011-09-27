@@ -143,7 +143,7 @@ public class PrimaryKey implements ModelObject {
 
     public PrimaryKeyColumn findPrimaryKeyColumnByName(String columnName) {
         for (PrimaryKeyColumn primaryKeyColumn : primaryKeyColumns) {
-            if (primaryKeyColumn.getColumnName().equals(columnName)) {
+            if (primaryKeyColumn.getColumnName().equalsIgnoreCase(columnName)) {
                 return primaryKeyColumn;
             }
         }

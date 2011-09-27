@@ -67,6 +67,7 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.jdbc.Work;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,6 +151,19 @@ public class HibernateApplicationImpl implements Application {
             JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
             Unmarshaller um = jc.createUnmarshaller();
             Model loadedModel = (Model) um.unmarshal(file);
+            boolean syncOnStart = false;
+            if (syncOnStart) {
+                for (ConnectionProvider connectionProvider :
+                        connectionProviders.getConnections()) {
+                    String databaseName = connectionProvider.getDatabaseName();
+                    Database sourceDatabase =
+                            DataModelLogic.findDatabaseByName(loadedModel, databaseName);
+                    DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
+                    Database targetDatabase = dbSyncer.syncDatabase(loadedModel);
+                    loadedModel.getDatabases().remove(sourceDatabase);
+                    loadedModel.getDatabases().add(targetDatabase);
+                }
+            }
             loadedModel.init();
             installDataModel(loadedModel);
             xmlModelFile = file;
@@ -907,13 +921,14 @@ public class HibernateApplicationImpl implements Application {
         return result;
     }
 
-    public TableAccessor getTableAccessor(String qualifiedTableName) {
+    public @NotNull TableAccessor getTableAccessor(String qualifiedTableName) {
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, qualifiedTableName);
+        assert table != null;
         return new TableAccessor(table);
     }
 
-    public CrudAccessor getCrudAccessor(Crud crud) {
+    public @NotNull CrudAccessor getCrudAccessor(@NotNull Crud crud) {
         String qualifiedTableName = crud.getTable();
         TableAccessor tableAccessor = getTableAccessor(qualifiedTableName);
         return new CrudAccessor(crud, tableAccessor);
@@ -1001,6 +1016,8 @@ public class HibernateApplicationImpl implements Application {
 
     protected Group getGroup(String name) {
         TableAccessor table = getTableAccessor(UserUtils.GROUPTABLE);
+        assert table != null;
+
         String actualEntityName = table.getTable().getActualEntityName();
         List result = runHqlQuery
                 (UserUtils.GROUPTABLE,

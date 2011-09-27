@@ -33,7 +33,6 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.connections.JdbcConnectionProvider;
-import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import liquibase.database.structure.ForeignKeyConstraintType;
@@ -233,16 +232,9 @@ public class HibernateConfig {
         col.setScale(column.getScale());
         col.setNullable(column.isNullable());
         String columnType = column.getColumnType();
-        Type type = connectionProvider.getTypeByName(columnType);
-        if (type==null) {
-            logger.error("Cannot find JDBC type for table {}," +
-                    " column {}, type {}",
-                    new String[] {tab.getName(), column.getColumnName(), columnType});
-        }
+        int jdbcType = column.getJdbcType();
 
-        if (type != null) {
-            col.setSqlTypeCode(type.getJdbcType());
-        }
+        col.setSqlTypeCode(jdbcType);
         col.setSqlType(columnType);
         tab.addColumn(col);
 
@@ -252,12 +244,8 @@ public class HibernateConfig {
 
         SimpleValue value = new SimpleValue();
         value.setTable(tab);
-        String hibernateTypeName = null;
-        if (type != null) {
-//            hibernateType = getHibernateType(type.getJdbcType());
-            hibernateTypeName = getHibernateTypeName(
-                    column.getActualJavaType(), type.getJdbcType());
-        }
+        String hibernateTypeName =
+                getHibernateTypeName(column.getActualJavaType(), jdbcType);
         if (hibernateTypeName != null) {
             value.setTypeName(hibernateTypeName);
         }
@@ -307,25 +295,17 @@ public class HibernateConfig {
             Column col = new Column();
             col.setName(escapeName(column.getColumnName()));
             String columnType = column.getColumnType();
+            int jdbcType = column.getJdbcType();
 
-            Type type = connectionProvider.getTypeByName(columnType);
-            if (type==null) {
-            logger.error("Cannot find JDBC type for table {}," +
-                    " column {}, type {}",
-                    new String[] {tab.getName(), column.getColumnName(), columnType});
-            }
-            if (type != null) {
-                col.setSqlTypeCode(type.getJdbcType());
-            }
+            col.setSqlTypeCode(jdbcType);
             col.setSqlType(columnType);
             primaryKey.addColumn(col);
             SimpleValue value = new SimpleValue();
             value.setTable(tab);
-            if (type != null) {
-                org.hibernate.type.Type hibernateType =
-                        getHibernateType(column.getActualJavaType(), type.getJdbcType());
-                value.setTypeName(hibernateType.getName());
-            }
+            org.hibernate.type.Type hibernateType =
+                    getHibernateType(column.getActualJavaType(), jdbcType);
+            value.setTypeName(hibernateType.getName());
+
             value.addColumn(col);
             tab.getPrimaryKey().addColumn(col);
             tab.addColumn(col);
@@ -367,21 +347,13 @@ public class HibernateConfig {
         col.setPrecision(column.getLength());
         col.setScale(column.getScale());
         col.setNullable(column.isNullable());
-        Type type = connectionProvider.getTypeByName(columnType);
-        if (type==null) {
-            logger.error("Cannot find JDBC type for table {}," +
-                    " column {}, type {}",
-                    new String[] {tab.getName(), column.getColumnName(), columnType});
-        }
-        if (type != null) {
-            col.setSqlTypeCode(type.getJdbcType());
-        }
+        int jdbcType = column.getJdbcType();
+
+        col.setSqlTypeCode(jdbcType);
         col.setSqlType(columnType);
-        if (type != null) {
-            org.hibernate.type.Type hibernateType =
-                    getHibernateType(column.getActualJavaType(), type.getJdbcType());
-            id.setTypeName(hibernateType.getName());
-        }
+        org.hibernate.type.Type hibernateType =
+                getHibernateType(column.getActualJavaType(), jdbcType);
+        id.setTypeName(hibernateType.getName());
 
 
         mappings.addColumnBinding(column.getColumnName(),

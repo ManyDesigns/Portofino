@@ -299,7 +299,7 @@ public class Table implements ModelObject, Annotated {
 
     public Column findColumnByName(String columnName) {
         for (Column column : columns) {
-            if (column.getColumnName().equals(columnName)) {
+            if (column.getColumnName().equalsIgnoreCase(columnName)) {
                 return column;
             }
         }
@@ -309,7 +309,7 @@ public class Table implements ModelObject, Annotated {
 
     public ForeignKey findForeignKeyByName(String fkName) {
         for (ForeignKey current : foreignKeys) {
-            if (current.getName().equals(fkName)) {
+            if (current.getName().equalsIgnoreCase(fkName)) {
                 return current;
             }
         }
@@ -319,7 +319,7 @@ public class Table implements ModelObject, Annotated {
 
     public ModelSelectionProvider findSelectionProviderByName(String selectionProviderName) {
         for (ModelSelectionProvider current : selectionProviders) {
-            if (current.getName().equals(selectionProviderName)) {
+            if (current.getName().equalsIgnoreCase(selectionProviderName)) {
                 return current;
             }
         }
@@ -329,7 +329,7 @@ public class Table implements ModelObject, Annotated {
 
     public ForeignKey findOneToManyRelationshipByName(String relationshipName) {
         for (ForeignKey current : getOneToManyRelationships()) {
-            if (current.getName().equals(relationshipName)) {
+            if (current.getName().equalsIgnoreCase(relationshipName)) {
                 return current;
             }
         }
@@ -339,7 +339,7 @@ public class Table implements ModelObject, Annotated {
 
     public Annotation findModelAnnotationByType(String annotationType) {
         for (Annotation annotation : annotations) {
-            if (annotation.getType().equals(annotationType)) {
+            if (annotation.getType().equalsIgnoreCase(annotationType)) {
                 return annotation;
             }
         }

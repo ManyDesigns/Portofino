@@ -166,7 +166,7 @@ public class Database implements ModelObject {
         int lastDot = qualifiedSchemaName.lastIndexOf(".");
         String schemaName = qualifiedSchemaName.substring(lastDot + 1);
         for (Schema schema : schemas) {
-            if (schema.getSchemaName().equals(schemaName)) {
+            if (schema.getSchemaName().equalsIgnoreCase(schemaName)) {
                 return schema;
             }
         }
@@ -181,7 +181,7 @@ public class Database implements ModelObject {
         Schema schema = findSchemaByQualifiedName(qualifiedSchemaName);
         if (schema != null) {
             for (Table table : schema.getTables()) {
-                if (table.getTableName().equals(tableName)) {
+                if (table.getTableName().equalsIgnoreCase(tableName)) {
                     return table;
                 }
             }
@@ -197,7 +197,7 @@ public class Database implements ModelObject {
         Table table = findTableByQualifiedName(qualifiedTableName);
         if (table != null) {
             for (Column column : table.getColumns()) {
-                if (column.getColumnName().equals(columnName)) {
+                if (column.getColumnName().equalsIgnoreCase(columnName)) {
                     return column;
                 }
             }

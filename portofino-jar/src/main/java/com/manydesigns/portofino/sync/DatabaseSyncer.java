@@ -329,6 +329,7 @@ public class DatabaseSyncer {
 
             logger.debug("Merging column attributes and annotations");
             targetColumn.setAutoincrement(liquibaseColumn.isAutoIncrement());
+            targetColumn.setJdbcType(liquibaseColumn.getDataType());
             targetColumn.setColumnType(liquibaseColumn.getTypeName());
             targetColumn.setLength(liquibaseColumn.getColumnSize());
             targetColumn.setNullable(liquibaseColumn.isNullable());

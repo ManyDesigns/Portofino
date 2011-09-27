@@ -35,6 +35,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.PrimaryKey;
 import com.manydesigns.portofino.model.datamodel.Table;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +70,7 @@ public class TableAccessor
     // Constructors and initialization
     //**************************************************************************
 
-    public TableAccessor(Table table) {
+    public TableAccessor(@NotNull Table table) {
         super(table.getAnnotations());
         Class clazz = table.getActualJavaClass();
         if (clazz != null) {

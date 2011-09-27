@@ -163,7 +163,7 @@ public class Schema implements ModelObject {
         int lastDot = qualifiedTableName.lastIndexOf(".");
         String tableName = qualifiedTableName.substring(lastDot + 1);
         for (Table table : tables) {
-            if (table.getTableName().equals(tableName)) {
+            if (table.getTableName().equalsIgnoreCase(tableName)) {
                 return table;
             }
         }
@@ -178,7 +178,7 @@ public class Schema implements ModelObject {
         Table table = findTableByQualifiedName(qualifiedTableName);
         if (table != null) {
             for (Column column : table.getColumns()) {
-                if (column.getColumnName().equals(columnName)) {
+                if (column.getColumnName().equalsIgnoreCase(columnName)) {
                     return column;
                 }
             }

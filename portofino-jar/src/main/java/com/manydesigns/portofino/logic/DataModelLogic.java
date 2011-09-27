@@ -31,6 +31,7 @@ package com.manydesigns.portofino.logic;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,9 +109,10 @@ public class DataModelLogic {
     // Search objects of a certain kind
     //**************************************************************************
 
-    public static Database findDatabaseByName(Model model, String databaseName) {
+    public static @Nullable Database findDatabaseByName(
+            Model model, String databaseName) {
         for (Database database : model.getDatabases()) {
-            if (database.getDatabaseName().equals(databaseName)) {
+            if (database.getDatabaseName().equalsIgnoreCase(databaseName)) {
                 return database;
             }
         }
@@ -118,9 +120,10 @@ public class DataModelLogic {
         return null;
     }
 
-    public static Schema findSchemaByName(Database database, String schemaName) {
+    public static @Nullable Schema findSchemaByName(
+            Database database, String schemaName) {
         for (Schema schema : database.getSchemas()) {
-            if (schema.getSchemaName().equals(schemaName)) {
+            if (schema.getSchemaName().equalsIgnoreCase(schemaName)) {
                 return schema;
             }
         }
@@ -128,7 +131,7 @@ public class DataModelLogic {
         return null;
     }
 
-    public static Schema findSchemaByQualifiedName(Model model,
+    public static @Nullable Schema findSchemaByQualifiedName(Model model,
                                             String qualifiedSchemaName) {
         int lastDot = qualifiedSchemaName.lastIndexOf(".");
         String databaseName = qualifiedSchemaName.substring(0, lastDot);
@@ -140,7 +143,8 @@ public class DataModelLogic {
         return null;
     }
 
-    public static Table findTableByQualifiedName(Model model, String qualifiedTableName) {
+    public static @Nullable Table findTableByQualifiedName(
+            Model model, String qualifiedTableName) {
         if (qualifiedTableName == null) {
             return null;
         }
@@ -155,7 +159,7 @@ public class DataModelLogic {
         Schema schema = findSchemaByQualifiedName(model, qualifiedSchemaName);
         if (schema != null) {
             for (Table table : schema.getTables()) {
-                if (table.getTableName().equals(tableName)) {
+                if (table.getTableName().equalsIgnoreCase(tableName)) {
                     return table;
                 }
             }
@@ -164,9 +168,9 @@ public class DataModelLogic {
         return null;
     }
 
-    public static Table findTableByName(Schema schema, String tableName) {
+    public static @Nullable Table findTableByName(Schema schema, String tableName) {
         for (Table table : schema.getTables()) {
-            if (table.getTableName().equals(tableName)) {
+            if (table.getTableName().equalsIgnoreCase(tableName)) {
                 return table;
             }
         }
@@ -174,9 +178,10 @@ public class DataModelLogic {
         return null;
     }
 
-    public static Column findColumnByName(Table table, String columnName) {
+    public static @Nullable Column findColumnByName(
+            Table table, String columnName) {
         for (Column column : table.getColumns()) {
-            if (column.getColumnName().equals(columnName)) {
+            if (column.getColumnName().equalsIgnoreCase(columnName)) {
                 return column;
             }
         }
@@ -184,15 +189,15 @@ public class DataModelLogic {
         return null;
     }
 
-    public static Column findColumnByQualifiedName(Model model,
-                                            String qualifiedColumnName) {
+    public static @Nullable Column findColumnByQualifiedName(
+            Model model, String qualifiedColumnName) {
         int lastDot = qualifiedColumnName.lastIndexOf(".");
         String qualifiedTableName = qualifiedColumnName.substring(0, lastDot);
         String columnName = qualifiedColumnName.substring(lastDot + 1);
         Table table = findTableByQualifiedName(model, qualifiedTableName);
         if (table != null) {
             for (Column column : table.getColumns()) {
-                if (column.getColumnName().equals(columnName)) {
+                if (column.getColumnName().equalsIgnoreCase(columnName)) {
                     return column;
                 }
             }
@@ -201,10 +206,11 @@ public class DataModelLogic {
         return null;
     }
 
-    public static ForeignKey findOneToManyRelationship(Model model,
+    public static @Nullable ForeignKey findOneToManyRelationship(Model model,
                                                 String qualifiedTableName,
                                                 String relationshipName) {
         Table table = findTableByQualifiedName(model, qualifiedTableName);
+        assert table != null;
         return table.findOneToManyRelationshipByName(relationshipName);
     }
 
