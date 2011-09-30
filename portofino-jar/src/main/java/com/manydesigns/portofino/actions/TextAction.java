@@ -54,7 +54,7 @@ public class TextAction extends PortletAction {
             "Copyright (c) 2005-2011, ManyDesigns srl";
     public static final String CONTENT_ENCODING = "UTF-8";
     public static final String EMPTY_STRING = "";
-    public static final String TEXT_FILE_NAME_PATTERN = "text-{0}.data";
+    public static final String TEXT_FILE_NAME_PATTERN = "text-{0}.html";
     public static final String ATTACHMENT_FILE_NAME_PATTERN = "attachment-{0}.data";
 
     public String content;
@@ -197,12 +197,15 @@ public class TextAction extends PortletAction {
             logger.info("Uploading attachment");
             InputStream attachmentStream = upload.getInputStream();
             String attachmentId = RandomUtil.createRandomId();
-            File dataFile =
-                RandomUtil.getCodeFile(storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
+            File dataFile = RandomUtil.getCodeFile(
+                    storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
 
             // copy the data
             IOUtils.copyLarge(attachmentStream, new FileOutputStream(dataFile));
-            TextLogic.createAttachment(textPage, attachmentId, upload.getFileName(), upload.getContentType(), upload.getSize());
+            TextLogic.createAttachment(
+                    textPage, attachmentId,
+                    upload.getFileName(), upload.getContentType(),
+                    upload.getSize());
             viewAttachmentUrl =
                     String.format("%s?viewAttachment=&id=%s",
                             dispatch.getAbsoluteOriginalPath(),
@@ -222,7 +225,8 @@ public class TextAction extends PortletAction {
 
         try {
             String attachmentId = attachment.getId();
-            File file = RandomUtil.getCodeFile(storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
+            File file = RandomUtil.getCodeFile(
+                    storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
             InputStream is = new FileInputStream(file);
             Resolution resolution =
                     new StreamingResolution(attachment.getContentType(), is)
@@ -246,7 +250,8 @@ public class TextAction extends PortletAction {
 
         try {
             String attachmentId = attachment.getId();
-            File file = RandomUtil.getCodeFile(storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
+            File file = RandomUtil.getCodeFile(
+                    storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
             InputStream is = new FileInputStream(file);
             Resolution resolution =
                     new StreamingResolution(attachment.getContentType(), is)
