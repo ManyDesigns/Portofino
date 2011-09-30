@@ -55,18 +55,16 @@ public final class PortofinoProperties {
 
     public static final String PORTOFINO_VERSION =
             "portofino.version";
-    public static final String CONNECTIONS_LOCATION =
-            "connections.location";
-    public static final String STORAGE_DIRECTORY =
-            "storage.directory";
-    public static final String MODEL_LOCATION =
-            "model.location";
     public static final String DATABASE_PLATFORMS_LIST =
             "database.platforms.list";
     public static final String SECURITY_TYPE =
             "security.type";
     public static final String WAR_REAL_PATH =
             "war.real.path";
+    public static final String APPS_DIR_PATH =
+            "apps.dir.path";
+    public static final String APP_ID =
+            "app.id";
 
     //Email properties
     public static final String MAIL_ENABLED = "mail.enabled";

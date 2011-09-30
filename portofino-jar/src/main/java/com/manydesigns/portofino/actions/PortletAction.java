@@ -173,7 +173,7 @@ public class PortletAction extends AbstractActionBean {
     @RequiresAdministrator
     public Resolution reloadModel() {
         synchronized (application) {
-            application.reloadXmlModel();
+            application.loadXmlModel();
             return new RedirectResolution(dispatch.getOriginalPath());
         }
     }

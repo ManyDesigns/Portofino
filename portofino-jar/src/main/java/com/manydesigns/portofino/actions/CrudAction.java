@@ -194,10 +194,7 @@ public class CrudAction extends PortletAction {
             setupSelectionProviders();
         }
 
-        String storageDirectory =
-                portofinoConfiguration.getString(
-                        PortofinoProperties.STORAGE_DIRECTORY);
-        storageDirFile = new File(storageDirectory);
+        storageDirFile = application.getAppStorageDir();
 
         if(script == null) {
             prepareScript();

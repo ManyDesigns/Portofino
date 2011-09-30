@@ -63,8 +63,8 @@ public abstract class CommonTestUtil extends AbstractPortofinoTest{
     }
 
     private void setupPortofinoProperties() throws IOException{
-        portofinoConfiguration.setProperty(PortofinoProperties.MODEL_LOCATION,
-                "portofino-war/src/test/resources/portofino-model.xml");
+//        portofinoConfiguration.setProperty(PortofinoProperties.MODEL_LOCATION,
+//                "portofino-war/src/test/resources/portofino-model.xml");
     }
 
     private void setUpWorkingDirectory() {

@@ -30,9 +30,9 @@ package com.manydesigns.portofino;
 
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.application.hibernate.HibernateApplicationImpl;
+import com.manydesigns.portofino.application.ApplicationStarter;
+import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -102,13 +102,6 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         portofinoConfiguration.addConfiguration(
                     new PropertiesConfiguration(
                             PortofinoProperties.PROPERTIES_RESOURCE));
-
-        File portofinoConnectionsFile = copyResourceToTempFile(getPortofinoConnectionsResource());
-        portofinoConfiguration.setProperty(
-                PortofinoProperties.CONNECTIONS_LOCATION, portofinoConnectionsFile.getAbsolutePath());
-        File portofinoModelFile = copyResourceToTempFile(getPortofinoModelResource());
-        portofinoConfiguration.setProperty(
-                PortofinoProperties.MODEL_LOCATION, portofinoModelFile.getAbsolutePath());
 
         databasePlatformsManager =
                 new DatabasePlatformsManager(portofinoConfiguration);
@@ -208,23 +201,9 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         try {
             // ElementsThreadLocals è già stato impostato da AbstractElementsTest
 
-            application = new HibernateApplicationImpl(
-                    portofinoConfiguration, databasePlatformsManager);
-
-            String connectionsFileName =
-                    portofinoConfiguration.getString(
-                            PortofinoProperties.CONNECTIONS_LOCATION);
-            String modelLocation =
-                    portofinoConfiguration.getString(
-                            PortofinoProperties.MODEL_LOCATION);
-
-            //String rootDirPath = ServletContext.getRealPath("/");
-
-            modelFile = new File(modelLocation);
-            connectionsFile = new File(connectionsFileName);
-
-            application.loadConnections(connectionsFile);
-            application.loadXmlModel(modelFile);
+            ApplicationStarter applicationStarter =
+                    new ApplicationStarter(portofinoConfiguration);
+            application = applicationStarter.getApplication();
             model = application.getModel();
 
 

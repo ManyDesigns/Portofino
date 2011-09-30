@@ -60,6 +60,14 @@ public class ApplicationStarter {
     // Constants
     //**************************************************************************
 
+    public static final String APP_BLOBS_DIR = "blobs";
+    public static final String APP_CONNECTIONS_FILE = "portofino-connections.xml";
+    public static final String APP_DBS_DIR = "dbs";
+    public static final String APP_MODEL_FILE = "portofino-model.xml";
+    public static final String APP_SCRIPTS_DIR = "scripts";
+    public static final String APP_STORAGE_DIR = "storage";
+    public static final String APP_WEB_DIR = "web";
+
     public static final int PERIOD = 10000;
     public static final int DELAY2 = 5300;
 
@@ -82,6 +90,16 @@ public class ApplicationStarter {
     private DatabasePlatformsManager databasePlatformsManager;
     private Application application;
     private Timer scheduler;
+    private String appId;
+
+    private File appDir;
+    private File appBlobsDir;
+    private File appConnectionsFile;
+    private File appDbsDir;
+    private File appModelFile;
+    private File appScriptsDir;
+    private File appStorageDir;
+    private File appWebDir;
 
     //--------------------------------------------------------------------------
     // Logging
@@ -208,20 +226,60 @@ public class ApplicationStarter {
     }
 
     private boolean setupDirectories() {
-        String storageDirectory =
-                portofinoConfiguration.getString(
-                        PortofinoProperties.STORAGE_DIRECTORY);
-        File file = new File(storageDirectory);
+        appId = portofinoConfiguration.getString(PortofinoProperties.APP_ID);
+        logger.info("Application id: {}", appId);
+
+        String appsDirPath =
+        portofinoConfiguration.getString(
+                PortofinoProperties.APPS_DIR_PATH);
+        File appsDir = new File(appsDirPath);
+        logger.info("Apps dir: {}", appsDir.getAbsolutePath());
+        boolean result = ensureDirectoryExistsAndWritable(appsDir);
+
+        appDir = new File(appsDir, appId);
+        logger.info("Application dir: {}", appDir.getAbsolutePath());
+        result = result && ensureDirectoryExistsAndWritable(appsDir);
+
+        appBlobsDir = new File(appDir, APP_BLOBS_DIR);
+        logger.info("Application blobs dir: {}", appBlobsDir.getAbsolutePath());
+        result = result && ensureDirectoryExistsAndWritable(appBlobsDir);
+
+        appConnectionsFile = new File(appDir, APP_CONNECTIONS_FILE);
+        logger.info("Application connections file: {}", appConnectionsFile.getAbsolutePath());
+
+        appDbsDir = new File(appDir, APP_DBS_DIR);
+        logger.info("Application dbs dir: {}", appDbsDir.getAbsolutePath());
+        result = result && ensureDirectoryExistsAndWritable(appDbsDir);
+
+        appModelFile = new File(appDir, APP_MODEL_FILE);
+        logger.info("Application model file: {}", appModelFile.getAbsolutePath());
+
+        appScriptsDir = new File(appDir, APP_SCRIPTS_DIR);
+        logger.info("Application scripts dir: {}", appScriptsDir.getAbsolutePath());
+        result = result && ensureDirectoryExistsAndWritable(appScriptsDir);
+
+        appStorageDir = new File(appDir, APP_STORAGE_DIR);
+        logger.info("Application storage dir: {}", appStorageDir.getAbsolutePath());
+        result = result && ensureDirectoryExistsAndWritable(appStorageDir);
+
+        appWebDir = new File(appDir, APP_WEB_DIR);
+        logger.info("Application web dir: {}", appWebDir.getAbsolutePath());
+        result = result && ensureDirectoryExistsAndWritable(appWebDir);
+
+        return result;
+    }
+
+    private boolean ensureDirectoryExistsAndWritable(File file) {
         if (file.exists()) {
             if (file.isDirectory()) {
-                logger.info("Storage directory: {}", file);
+                logger.debug("Storage directory: {}", file);
             } else {
                 logger.error("Storage location is not a directory: {}", file);
                 return false;
             }
         } else {
             if (file.mkdirs()) {
-                logger.info("Storage directory created successfully: {}", file);
+                logger.info("Directory created successfully: {}", file);
             } else {
                 logger.error("Cannot create storage directory: {}", file);
                 return false;
@@ -243,25 +301,16 @@ public class ApplicationStarter {
     public boolean setupApplication() {
         logger.info("Creating application instance...");
         application = new HibernateApplicationImpl(
-        portofinoConfiguration, databasePlatformsManager);
-
+                portofinoConfiguration, databasePlatformsManager,
+                appDir, appBlobsDir, appConnectionsFile, appDbsDir,
+                appModelFile, appScriptsDir, appStorageDir, appWebDir);
         try {
-            String connectionsLocation =
-                    portofinoConfiguration.getString(
-                            PortofinoProperties.CONNECTIONS_LOCATION);
-            String modelLocation =
-                    portofinoConfiguration.getString(
-                            PortofinoProperties.MODEL_LOCATION);
-
-            File connectionsFile = new File(connectionsLocation);
-            File modelFile = new File(modelLocation);
-
-            application.loadConnections(connectionsFile);
+            application.loadConnections();
             boolean success = updateSystemDatabase();
             if(!success) {
                 return false;
             }
-            application.loadXmlModel(modelFile);
+            application.loadXmlModel();
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
             return false;
