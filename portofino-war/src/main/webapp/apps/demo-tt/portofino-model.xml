@@ -1850,7 +1850,7 @@
                             <deny/>
                         </permissions>
                     </jspPage>
-                    <chartPage database="redmine" legend="Workload" name="workload" orientation="HORIZONTAL" query="select u.id, count(issues.id), login from issues join users u on assigned_to_id = u.id group by u.id, u.login" type="PIE3D" urlExpression="/people/%{key}" description="Workload" fragment="workload" id="4xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="1" showInNavigation="false" title="workload">
+                    <chartPage database="redmine" legend="Workload" name="Workload" orientation="HORIZONTAL" query="select u.id, count(issues.id), login from issues join users u on assigned_to_id = u.id group by u.id, u.login" type="PIE3D" urlExpression="/people/%{key}" description="Workload" fragment="workload" id="4xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="1" showInNavigation="false" title="workload">
                         <childPages/>
                         <permissions>
                             <allow/>
