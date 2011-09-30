@@ -30,7 +30,6 @@ package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.logic.TextLogic;
 import com.manydesigns.portofino.model.pages.Attachment;
 import com.manydesigns.portofino.model.pages.TextPage;
@@ -93,10 +92,7 @@ public class TextAction extends PortletAction {
     public void prepare() {
         super.prepare();
         textPage = (TextPage) pageInstance.getPage();
-        String storageDirectory =
-                portofinoConfiguration.getString(
-                        PortofinoProperties.STORAGE_DIRECTORY);
-        storageDirFile = new File(storageDirectory);
+        storageDirFile = application.getAppStorageDir();
     }
 
     //**************************************************************************

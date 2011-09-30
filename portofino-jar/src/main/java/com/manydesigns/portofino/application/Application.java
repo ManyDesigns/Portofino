@@ -54,14 +54,29 @@ public interface Application {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
+    String getAppId();
+
+    //**************************************************************************
+    // App directories and files
+    //**************************************************************************
+
+    File getAppDir();
+    File getAppBlobsDir();
+    File getAppConnectionsFile();
+    File getAppDbsDir();
+    File getAppModelFile();
+    File getAppScriptsDir();
+    File getAppStorageDir();
+    File getAppWebDir();
+
+
     //**************************************************************************
     // Model loading
     //**************************************************************************
 
-    void loadConnections(File file);
-    void loadXmlModel(File file);
+    void loadConnections();
+    void loadXmlModel();
     void saveXmlModel();
-    void reloadXmlModel();
 
 
     //**************************************************************************

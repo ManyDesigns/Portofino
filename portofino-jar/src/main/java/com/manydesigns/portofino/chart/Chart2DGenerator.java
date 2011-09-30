@@ -88,7 +88,7 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
         }
 
         PlotOrientation plotOrientation = PlotOrientation.HORIZONTAL;
-        if (chartPage.getOrientation() == ChartPage.Orientation.VERTICAL) {
+        if (chartPage.getActualOrientation() == ChartPage.Orientation.VERTICAL) {
                 plotOrientation = PlotOrientation.VERTICAL;
         }
 

@@ -46,7 +46,6 @@ import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -106,8 +105,18 @@ public class HibernateApplicationImpl implements Application {
     protected Connections connectionProviders;
     protected Model model;
     protected Map<String, HibernateDatabaseSetup> setups;
-    protected final List<Page> pages;
-    protected File xmlModelFile;
+
+    protected final String appId;
+
+    protected final File appDir;
+    protected final File appBlobsDir;
+    protected final File appConnectionsFile;
+    protected final File appDbsDir;
+    protected final File appModelFile;
+    protected final File appScriptsDir;
+    protected final File appStorageDir;
+    protected final File appWebDir;
+
 
     public static final Logger logger =
             LoggerFactory.getLogger(HibernateApplicationImpl.class);
@@ -117,40 +126,57 @@ public class HibernateApplicationImpl implements Application {
     // Constructors
     //**************************************************************************
 
-    public HibernateApplicationImpl(org.apache.commons.configuration.Configuration portofinoConfiguration,
-                                    DatabasePlatformsManager databasePlatformsManager) {
+    public HibernateApplicationImpl(String appId,
+                                    org.apache.commons.configuration.Configuration portofinoConfiguration,
+                                    DatabasePlatformsManager databasePlatformsManager,
+                                    File appDir,
+                                    File appBlobsDir,
+                                    File appConnectionsFile,
+                                    File appDbsDir,
+                                    File appModelFile,
+                                    File appScriptsDir,
+                                    File appStorageDir,
+                                    File appWebDir
+    ) {
+        this.appId = appId;
         this.portofinoConfiguration = portofinoConfiguration;
         this.databasePlatformsManager = databasePlatformsManager;
-        pages = new ArrayList<Page>();
+        this.appDir = appDir;
+        this.appBlobsDir = appBlobsDir;
+        this.appConnectionsFile = appConnectionsFile;
+        this.appDbsDir = appDbsDir;
+        this.appModelFile = appModelFile;
+        this.appScriptsDir = appScriptsDir;
+        this.appStorageDir = appStorageDir;
+        this.appWebDir = appWebDir;
     }
 
     //**************************************************************************
     // Model loading
     //**************************************************************************
 
-    public void loadConnections(File file) {
-        logger.info("Loading connections from file: {}",
-                file.getAbsolutePath());
+    public void loadConnections() {
+        logger.info("Loading connections from file: {}", appConnectionsFile);
         try {
             JAXBContext jc = JAXBContext.newInstance(
                     Connections.JAXB_CONNECTIONS_PACKAGES);
             Unmarshaller um = jc.createUnmarshaller();
-            connectionProviders = (Connections) um.unmarshal(file);
+            connectionProviders = (Connections) um.unmarshal(appConnectionsFile);
             connectionProviders.reset();
             connectionProviders.init(databasePlatformsManager);
         } catch (Exception e) {
-            logger.error("Cannot load/parse file: " + file, e);
+            logger.error("Cannot load/parse file: " + appConnectionsFile, e);
         }
     }
 
-    public synchronized void loadXmlModel(File file) {
+    public synchronized void loadXmlModel() {
         logger.info("Loading xml model from file: {}",
-                file.getAbsolutePath());
+                appModelFile.getAbsolutePath());
 
         try {
             JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
             Unmarshaller um = jc.createUnmarshaller();
-            Model loadedModel = (Model) um.unmarshal(file);
+            Model loadedModel = (Model) um.unmarshal(appModelFile);
             boolean syncOnStart = false;
             if (syncOnStart) {
                 for (ConnectionProvider connectionProvider :
@@ -166,30 +192,25 @@ public class HibernateApplicationImpl implements Application {
             }
             loadedModel.init();
             installDataModel(loadedModel);
-            xmlModelFile = file;
         } catch (Exception e) {
-            logger.error("Cannot load/parse model: " + file, e);
+            logger.error("Cannot load/parse model: " + appModelFile, e);
         }
-    }
-
-    public synchronized void reloadXmlModel() {
-        loadXmlModel(xmlModelFile);
     }
 
     public void saveXmlModel() {
         try {
-            File tempFile = File.createTempFile(xmlModelFile.getName(), "");
+            File tempFile = File.createTempFile(appModelFile.getName(), "");
 
             JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             m.marshal(model, tempFile);
 
-            moveFileSafely(tempFile, xmlModelFile.getAbsolutePath());
+            moveFileSafely(tempFile, appModelFile.getAbsolutePath());
 
-            logger.info("Saved xml model to file: {}", xmlModelFile);
+            logger.info("Saved xml model to file: {}", appModelFile);
         } catch (Throwable e) {
-            logger.error("Cannot save xml model to file: " + xmlModelFile, e);
+            logger.error("Cannot save xml model to file: " + appModelFile, e);
         }
     }
 
@@ -1049,7 +1070,6 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
 
     private void writeToConnectionFile() {
-        String fileName = portofinoConfiguration.getString(PortofinoProperties.CONNECTIONS_LOCATION);
         OutputStream os = null;
         try {
             File tempFile = File.createTempFile("portofino", "connections.xml");
@@ -1061,11 +1081,11 @@ public class HibernateApplicationImpl implements Application {
             m.marshal(connectionProviders, tempFile);
             os.flush();
 
-            moveFileSafely(tempFile, fileName);
+            moveFileSafely(tempFile, appConnectionsFile.getAbsolutePath());
 
-            logger.info("Saved connections to file: {}", fileName);
+            logger.info("Saved connections to file: {}", appConnectionsFile);
         } catch (Throwable e) {
-            logger.error("Cannot save connections to file: " + fileName, e);
+            logger.error("Cannot save connections to file: " + appConnectionsFile, e);
         } finally {
             IOUtils.closeQuietly(os);
         }
@@ -1084,4 +1104,44 @@ public class HibernateApplicationImpl implements Application {
         }
     }
 
+    //**************************************************************************
+    // App directories and files
+    //**************************************************************************
+
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public File getAppDir() {
+        return appDir;
+    }
+
+    public File getAppBlobsDir() {
+        return appBlobsDir;
+    }
+
+    public File getAppConnectionsFile() {
+        return appConnectionsFile;
+    }
+
+    public File getAppDbsDir() {
+        return appDbsDir;
+    }
+
+    public File getAppModelFile() {
+        return appModelFile;
+    }
+
+    public File getAppScriptsDir() {
+        return appScriptsDir;
+    }
+
+    public File getAppStorageDir() {
+        return appStorageDir;
+    }
+
+    public File getAppWebDir() {
+        return appWebDir;
+    }
 }

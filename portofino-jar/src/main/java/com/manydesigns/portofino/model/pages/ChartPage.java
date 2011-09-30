@@ -58,23 +58,23 @@ public class ChartPage extends Page {
     //**************************************************************************
 
     protected String name;
-    protected String typeName;
+    protected String type;
     protected String legend;
     protected String database;
     protected String query;
     protected String urlExpression;
     protected String xAxisName;
     protected String yAxisName;
-    protected String orientationName;
+    protected String orientation;
 
     //**************************************************************************
     // Fields for wire-up
     //**************************************************************************
 
     protected Database actualDatabase;
-    protected Type type;
+    protected Type actualType;
     protected Class<? extends ChartGenerator> generatorClass;
-    protected Orientation orientation;
+    protected Orientation actualOrientation;
 
     public static enum Orientation {
         HORIZONTAL, VERTICAL
@@ -124,8 +124,8 @@ public class ChartPage extends Page {
         super.reset();
         actualDatabase = null;
         generatorClass = null;
-        orientation = null;
-        type = null;
+        actualOrientation = null;
+        actualType = null;
     }
 
     @Override
@@ -142,17 +142,17 @@ public class ChartPage extends Page {
         actualDatabase = DataModelLogic.findDatabaseByName(model, database);
 
         try {
-            type = Type.valueOf(typeName);
-            generatorClass = type.getGeneratorClass();
+            actualType = Type.valueOf(type);
+            generatorClass = actualType.getGeneratorClass();
         } catch (Exception e) {
-            logger.error("Invalid chart type: " + typeName, e);
+            logger.error("Invalid chart type: " + type, e);
         }
 
-        if(orientationName != null) {
+        if(orientation != null) {
             try {
-                orientation = Orientation.valueOf(orientationName);
+                actualOrientation = Orientation.valueOf(orientation);
             } catch (Exception e) {
-                logger.error("Invalid orientation: " + orientation, e);
+                logger.error("Invalid orientation: " + actualOrientation, e);
             }
         }
     }
@@ -178,16 +178,16 @@ public class ChartPage extends Page {
     @XmlAttribute(name = "type", required = true)
     @Required
     @Label("Type")
-    public String getTypeName() {
-        return typeName;
-    }
-
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
-    }
-
-    public Type getType() {
+    public String getType() {
         return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Type getActualType() {
+        return actualType;
     }
 
     @Required
@@ -266,15 +266,15 @@ public class ChartPage extends Page {
     @Label("Orientation")
     @Required
     @Select(nullOption = false)
-    public String getOrientationName() {
-        return orientationName;
-    }
-
-    public void setOrientationName(String orientationName) {
-        this.orientationName = orientationName;
-    }
-
-    public Orientation getOrientation() {
+    public String getOrientation() {
         return orientation;
+    }
+
+    public void setOrientation(String orientation) {
+        this.orientation = orientation;
+    }
+
+    public Orientation getActualOrientation() {
+        return actualOrientation;
     }
 }
