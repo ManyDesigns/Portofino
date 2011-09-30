@@ -75,29 +75,49 @@ public class Model {
     // Reset / init
     //**************************************************************************
 
-    protected void reset() {
-        // databases
-        for (Database database : databases) {
-            database.reset();
-        }
+    protected class ResetVisitor extends ModelVisitor {
 
-        // pages
-        if (rootPage != null) {
-            rootPage.reset();
+        @Override
+        public void visitNode(ModelObject node) {
+            node.reset();
         }
+    }
+
+    protected class InitVisitor extends ModelVisitor {
+
+        @Override
+        public void visitNode(ModelObject node) {
+            node.init();
+        }
+    }
+
+    protected class LinkVisitor extends ModelVisitor {
+
+        @Override
+        public void visitNode(ModelObject node) {
+            node.link(Model.this);
+        }
+    }
+
+    protected void reset() {
+        visit(new ResetVisitor());
     }
 
     public void init() {
         reset();
-        
+        visit(new InitVisitor());
+        visit(new LinkVisitor());
+    }
+
+    protected void visit(ModelVisitor visitor) {
         // databases
         for (Database database : databases) {
-            database.init(this);
+            visitor.visit(database);
         }
 
         // pages
         if (rootPage != null) {
-            rootPage.init(this);
+            visitor.visit(rootPage);
         }
     }
 

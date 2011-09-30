@@ -70,8 +70,8 @@ public class PageReference extends Page {
     }
 
     @Override
-    public void init(Model model) {
-        super.init(model);
+    public void link(Model model) {
+        super.link(model);
         if(to != null) {
             toPage = model.getRootPage().findDescendantPageById(to);
         }

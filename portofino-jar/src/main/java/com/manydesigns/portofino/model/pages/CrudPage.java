@@ -28,7 +28,7 @@
  */
 package com.manydesigns.portofino.model.pages;
 
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 
 import javax.xml.bind.annotation.*;
@@ -82,32 +82,22 @@ public class CrudPage extends Page {
     }
 
     @Override
-    public void reset() {
-        super.reset();
-
-        for (Page current : detailChildPages) {
-            current.reset();
-        }
-
-        if(crud != null) {
-            crud.reset();
-        }
-    }
-
-    @Override
-    public void init(Model model) {
-        super.init(model);
+    public void init() {
+        super.init();
 
         if(detailLayoutOrder != null) {
             actualDetailLayoutOrder = Integer.parseInt(detailLayoutOrder);
         }
+    }
 
+    public void visitChildren(ModelVisitor visitor) {
+        super.visitChildren(visitor);
         for (Page current : detailChildPages) {
-            current.init(model);
+            visitor.visit(current);
         }
 
         if(crud != null) {
-            crud.init(model);
+            visitor.visit(crud);
         }
     }
 

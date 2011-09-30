@@ -33,6 +33,7 @@ import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.annotations.Annotated;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.xml.Identifier;
@@ -122,29 +123,9 @@ public class Table implements ModelObject, Annotated {
     public void reset() {
         actualJavaClass = null;
         oneToManyRelationships.clear();
-
-        for (Column column : columns) {
-            column.reset();
-        }
-
-        if (primaryKey != null) {
-            primaryKey.reset();
-        }
-
-        for (ForeignKey foreignKey : foreignKeys) {
-            foreignKey.reset();
-        }
-
-        for (Annotation annotation : annotations) {
-            annotation.reset();
-        }
-
-        for(ModelSelectionProvider selectionProvider : selectionProviders) {
-            selectionProvider.reset();
-        }
     }
 
-    public void init(Model model) {
+    public void init() {
         assert schema != null;
         assert tableName != null;
         
@@ -156,27 +137,31 @@ public class Table implements ModelObject, Annotated {
         } else {
             actualEntityName = defineEntityName(entityName);
         }
+    }
 
+    public void link(Model model) {}
+
+    public void visitChildren(ModelVisitor visitor) {
         for (Column column : columns) {
-            column.init(model);
+            visitor.visit(column);
         }
 
         if (primaryKey == null) {
             logger.warn("Table {} has no primary key", toString());
         } else {
-            primaryKey.init(model);
+            visitor.visit(primaryKey);
         }
 
         for (ForeignKey foreignKey : foreignKeys) {
-            foreignKey.init(model);
+            visitor.visit(foreignKey);
         }
 
         for (Annotation annotation : annotations) {
-            annotation.init(model);
+            visitor.visit(annotation);
         }
 
         for(ModelSelectionProvider selectionProvider : selectionProviders) {
-            selectionProvider.init(model);
+            visitor.visit(selectionProvider);
         }
     }
 

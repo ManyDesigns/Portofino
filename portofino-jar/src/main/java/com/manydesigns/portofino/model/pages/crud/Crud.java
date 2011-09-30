@@ -33,6 +33,7 @@ import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.xml.Identifier;
@@ -120,41 +121,29 @@ public class Crud implements ModelObject {
 
     public void reset() {
         actualTable = null;
-
-        for (CrudProperty property : properties) {
-            property.reset();
-        }
-
-        for (Annotation annotation : annotations) {
-            annotation.reset();
-        }
-
-        for (Button button : buttons) {
-            button.reset();
-        }
-
-        for(SelectionProviderReference ref : selectionProviders) {
-            ref.reset();
-        }
     }
 
-    public void init(Model model) {
-        actualTable = DataModelLogic.findTableByQualifiedName(model, table);
+    public void init() {}
 
+    public void link(Model model) {
+        actualTable = DataModelLogic.findTableByQualifiedName(model, table);
+    }
+
+    public void visitChildren(ModelVisitor visitor) {
         for (CrudProperty property : properties) {
-            property.init(model);
+            visitor.visit(property);
         }
 
         for (Annotation annotation : annotations) {
-            annotation.init(model);
+            visitor.visit(annotation);
         }
 
         for (Button button : buttons) {
-            button.init(model);
+            visitor.visit(button);
         }
 
         for(SelectionProviderReference ref : selectionProviders) {
-            ref.init(model);
+            visitor.visit(ref);
         }
     }
 

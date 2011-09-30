@@ -32,6 +32,7 @@ package com.manydesigns.portofino.model.pages;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,27 +104,29 @@ public abstract class Page implements ModelObject {
     }
 
     public void reset() {
-        for (Page childPage : childPages) {
-            childPage.reset();
-        }
         actualLayoutOrderInParent = null;
         actualLayoutOrder = 0;
     }
 
-    public void init(Model model) {
+    public void init() {
         assert fragment != null;
         assert title != null;
         assert description != null;
 
-        for (Page childPage : childPages) {
-            childPage.init(model);
-        }
         if (layoutOrderInParent != null) {
             //TODO controllare che sia non-null anche layoutContainerInParent
             actualLayoutOrderInParent = Integer.parseInt(layoutOrderInParent);
         }
         if(layoutOrder != null) {
             actualLayoutOrder = Integer.parseInt(layoutOrder);
+        }
+    }
+
+    public void link(Model model) {}
+
+    public void visitChildren(ModelVisitor visitor) {
+        for (Page childPage : childPages) {
+            visitor.visit(childPage);
         }
     }
 

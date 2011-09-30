@@ -168,8 +168,7 @@ public class PageTest extends TestCase {
         model.setRootPage(root);
 
 
-        root.reset();
-        root.init(model);
+        model.init();
 
 
         permissions = new Permissions();

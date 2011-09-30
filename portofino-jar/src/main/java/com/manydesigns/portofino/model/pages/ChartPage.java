@@ -29,10 +29,7 @@
 
 package com.manydesigns.portofino.model.pages;
 
-import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.Multiline;
-import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.elements.annotations.Select;
+import com.manydesigns.elements.annotations.*;
 import com.manydesigns.portofino.chart.*;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
@@ -129,8 +126,8 @@ public class ChartPage extends Page {
     }
 
     @Override
-    public void init(Model model) {
-        super.init(model);
+    public void init() {
+        super.init();
         assert name != null;
         assert type != null;
         assert title != null;
@@ -138,8 +135,6 @@ public class ChartPage extends Page {
         assert database != null;
         assert query != null;
         assert urlExpression != null;
-
-        actualDatabase = DataModelLogic.findDatabaseByName(model, database);
 
         try {
             actualType = Type.valueOf(type);
@@ -157,6 +152,11 @@ public class ChartPage extends Page {
         }
     }
 
+    @Override
+    public void link(Model model) {
+        super.link(model);
+        actualDatabase = DataModelLogic.findDatabaseByName(model, database);
+    }
 
     public String getQualifiedName() {
         return null;
@@ -224,6 +224,7 @@ public class ChartPage extends Page {
 
     @Label("URL expression")
     @XmlAttribute(required = true)
+    @FieldSize(100)
     public String getUrlExpression() {
         return urlExpression;
     }

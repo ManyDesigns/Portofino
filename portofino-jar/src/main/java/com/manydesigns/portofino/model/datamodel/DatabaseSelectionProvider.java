@@ -31,6 +31,7 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,12 +101,14 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
         toTable = null;
     }
 
-    public void init(Model model) {
+    public void init() {
         assert name != null;
         assert toDatabase != null;
         assert toSchema != null;
         assert toTableName != null;
+    }
 
+    public void link(Model model) {
         String qualifiedToTableName =
                 Table.composeQualifiedName(toDatabase, toSchema, toTableName);
         toTable = DataModelLogic.findTableByQualifiedName(model, qualifiedToTableName);
@@ -113,6 +116,8 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
             logger.warn("Cannot find destination table '{}'", qualifiedToTableName);
         }
     }
+
+    public void visitChildren(ModelVisitor visitor) {}
 
     public String getQualifiedName() {
         return name;

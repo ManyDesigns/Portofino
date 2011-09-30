@@ -31,6 +31,7 @@ package com.manydesigns.portofino.model.pages.crud;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.xml.Identifier;
 
 import javax.xml.bind.Unmarshaller;
@@ -96,7 +97,7 @@ public class Button implements ModelObject {
         actualScriptLanguage = null;
     }
 
-    public void init(Model model) {
+    public void init() {
         assert crud != null;
         assert name != null;
         assert label != null;
@@ -109,6 +110,10 @@ public class Button implements ModelObject {
                 ? DEFAULT_SCRIPT_LANGUAGE
                 : scriptLanguage;
     }
+
+    public void link(Model model) {}
+
+    public void visitChildren(ModelVisitor visitor) {}
 
     public String getQualifiedName() {
         return String.format("%s*%s", crud.getQualifiedName(), name);

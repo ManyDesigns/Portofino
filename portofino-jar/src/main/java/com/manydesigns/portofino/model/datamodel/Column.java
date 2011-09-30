@@ -33,6 +33,7 @@ import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.annotations.Annotated;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.xml.Identifier;
@@ -115,13 +116,9 @@ public class Column implements ModelObject, Annotated {
     public void reset() {
         actualPropertyName = null;
         actualJavaType = null;
-
-        for (Annotation annotation : annotations) {
-            annotation.reset();
-        }
     }
 
-    public void init(Model model) {
+    public void init() {
         assert table != null;
         assert columnName != null;
         assert columnType != null;
@@ -139,8 +136,13 @@ public class Column implements ModelObject, Annotated {
             logger.warn("Cannot load column {} of java type: {}", getQualifiedName(), javaType);
         }
 
+    }
+
+    public void link(Model model) {}
+
+    public void visitChildren(ModelVisitor visitor) {
         for (Annotation annotation : annotations) {
-            annotation.init(model);
+            visitor.visit(annotation);
         }
     }
 

@@ -28,7 +28,7 @@
  */
 package com.manydesigns.portofino.model.pages;
 
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelVisitor;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -62,19 +62,11 @@ public class TextPage extends Page {
         this.parent = (Page) parent;
     }
 
-    public void reset() {
-        super.reset();
-
+    @Override
+    public void visitChildren(ModelVisitor visitor) {
+        super.visitChildren(visitor);
         for (Attachment attachment : attachments) {
-            attachment.reset();
-        }
-    }
-
-    public void init(Model model) {
-        super.init(model);
-
-        for (Attachment attachment : attachments) {
-            attachment.init(model);
+            visitor.visit(attachment);
         }
     }
 

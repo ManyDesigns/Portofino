@@ -31,6 +31,7 @@ package com.manydesigns.portofino.model.pages;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.xml.bind.Unmarshaller;
@@ -76,10 +77,14 @@ public class Permissions implements ModelObject {
 
     public void reset() {}
 
-    public void init(Model model) {}
+    public void init() {}
+
+    public void link(Model model) {}
+
+    public void visitChildren(ModelVisitor visitor) {}
 
     public String getQualifiedName() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     //**************************************************************************

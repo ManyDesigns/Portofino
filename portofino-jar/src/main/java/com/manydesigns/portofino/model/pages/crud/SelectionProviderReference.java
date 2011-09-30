@@ -32,6 +32,7 @@ package com.manydesigns.portofino.model.pages.crud;
 import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.ModelSelectionProvider;
 import org.apache.commons.lang.StringUtils;
@@ -82,7 +83,15 @@ public class SelectionProviderReference implements ModelObject {
         foreignKey = null;
     }
 
-    public void init(Model model) {
+    public void init() {
+        if(displayModeName != null) {
+            displayMode = DisplayMode.valueOf(displayModeName);
+        } else {
+            displayMode = DisplayMode.DROPDOWN;
+        }
+    }
+
+    public void link(Model model) {
         if(!StringUtils.isEmpty(foreignKeyName)) {
             foreignKey = parent.getActualTable().findForeignKeyByName(foreignKeyName);
         } //else TODO
@@ -91,13 +100,9 @@ public class SelectionProviderReference implements ModelObject {
             selectionProvider = parent.getActualTable()
                     .findSelectionProviderByName(selectionProviderName);
         } //else TODO
-
-        if(displayModeName != null) {
-            displayMode = DisplayMode.valueOf(displayModeName);
-        } else {
-            displayMode = DisplayMode.DROPDOWN;
-        }
     }
+
+    public void visitChildren(ModelVisitor visitor) {}
 
     public String getQualifiedName() {
         if(foreignKey != null) {

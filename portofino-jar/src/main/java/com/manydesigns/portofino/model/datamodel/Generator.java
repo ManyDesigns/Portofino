@@ -30,6 +30,7 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 
 import javax.xml.bind.Unmarshaller;
 
@@ -80,7 +81,11 @@ public abstract class Generator implements ModelObject{
 
     public void reset() {}
 
-    public void init(Model model) {
+    public void init() {
         assert primaryKeyColumn != null;
     }
+
+    public void link(Model model) {}
+
+    public void visitChildren(ModelVisitor visitor) {}
 }

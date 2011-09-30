@@ -31,6 +31,7 @@ package com.manydesigns.portofino.model.pages;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.xml.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -90,11 +91,13 @@ public class Attachment implements ModelObject {
         this.textPage = (TextPage) parent;
     }
 
-    public void reset() {
-    }
+    public void reset() {}
 
-    public void init(Model model) {
-    }
+    public void init() {}
+
+    public void link(Model model) {}
+
+    public void visitChildren(ModelVisitor visitor) {}
 
     public String getQualifiedName() {
         return null;

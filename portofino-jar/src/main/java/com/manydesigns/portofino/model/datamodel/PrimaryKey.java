@@ -32,6 +32,7 @@ package com.manydesigns.portofino.model.datamodel;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,15 +101,10 @@ public class PrimaryKey implements ModelObject {
 
     public void reset() {
         columns.clear();
-
-        for (PrimaryKeyColumn pkc : primaryKeyColumns) {
-            pkc.reset();
-        }
-
         valid = true;
     }
 
-    public void init(Model model) {
+    public void init() {
         assert table != null;
 
 // Liquibase on MySQL returns null primaryKey name if the name is "PRIMARY"
@@ -120,8 +116,10 @@ public class PrimaryKey implements ModelObject {
                     getQualifiedName()));
         }
 
+    }
+
+    public void link(Model model) {
         for (PrimaryKeyColumn pkc : primaryKeyColumns) {
-            pkc.init(model);
             Column column = pkc.getActualColumn();
             if (column == null) {
                 valid = false;
@@ -134,6 +132,12 @@ public class PrimaryKey implements ModelObject {
 
         if (columns.isEmpty()) {
             logger.warn("Primary key '{}' has no columns", this);
+        }
+    }
+
+    public void visitChildren(ModelVisitor visitor) {
+        for (PrimaryKeyColumn pkc : primaryKeyColumns) {
+            visitor.visit(pkc);
         }
     }
 

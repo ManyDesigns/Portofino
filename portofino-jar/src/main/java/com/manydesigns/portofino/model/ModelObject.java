@@ -44,7 +44,10 @@ public interface ModelObject {
     void afterUnmarshal(Unmarshaller u, Object parent);
 
     void reset();
-    void init(Model model);
+    void init();
+    void link(Model model);
+
+    void visitChildren(ModelVisitor visitor);
 
     String getQualifiedName();
 }

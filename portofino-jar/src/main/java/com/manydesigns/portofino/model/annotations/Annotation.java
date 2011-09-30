@@ -35,6 +35,7 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,7 +114,7 @@ public class Annotation implements ModelObject {
         javaAnnotationClass = null;
     }
 
-    public void init(Model model) {
+    public void init() {
         javaAnnotationClass = ReflectionUtil.loadClass(type);
         if (javaAnnotationClass == null) {
             logger.warn("Cannot load annotation class: {}", type);
@@ -178,6 +179,10 @@ public class Annotation implements ModelObject {
             logger.warn("Cannot instanciate annotation: {}", javaAnnotationClass);
         }
     }
+
+    public void link(Model model) {}
+
+    public void visitChildren(ModelVisitor visitor) {}
 
     public String getQualifiedName() {
         return null;

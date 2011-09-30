@@ -201,7 +201,7 @@ public class ChartAction extends PortletAction {
     //**************************************************************************
 
     public static final String[][] CONFIGURATION_FIELDS =
-            {{"name", "typeName", "orientationName", "legend", "database", "query", "urlExpression"}};
+            {{"name", "type", "orientation", "legend", "database", "query", "urlExpression"}};
 
     public static final String[] chartTypes1D = {
         ChartPage.Type.PIE.name(),
@@ -264,17 +264,17 @@ public class ChartAction extends PortletAction {
                         null,
                         "databaseName");
         SelectionProvider typeSelectionProvider =
-                DefaultSelectionProvider.create("typeName", chartTypeValues, chartTypeLabels);
+                DefaultSelectionProvider.create("type", chartTypeValues, chartTypeLabels);
         String[] orientationValues =
                 { ChartPage.Orientation.HORIZONTAL.name(), ChartPage.Orientation.VERTICAL.name() };
         String[] orientationLabels = { "Horizontal", "Vertical" };
         SelectionProvider orientationSelectionProvider =
-                DefaultSelectionProvider.create("orientationName", orientationValues, orientationLabels);
+                DefaultSelectionProvider.create("orientation", orientationValues, orientationLabels);
         form = new FormBuilder(ChartPage.class)
                 .configFields(CONFIGURATION_FIELDS)
                 .configFieldSetNames("Chart")
-                .configSelectionProvider(typeSelectionProvider, "typeName")
-                .configSelectionProvider(orientationSelectionProvider, "orientationName")
+                .configSelectionProvider(typeSelectionProvider, "type")
+                .configSelectionProvider(orientationSelectionProvider, "orientation")
                 .configSelectionProvider(databaseSelectionProvider, "database")
                 .build();
         form.readFromObject(chartPage);

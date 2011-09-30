@@ -31,6 +31,7 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.util.Pair;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
@@ -110,14 +111,11 @@ public class ForeignKey extends DatabaseSelectionProvider
         actualManyPropertyName = null;
         actualOnePropertyName = null;
 
-        for (Reference reference : references) {
-            reference.reset();
-        }
     }
 
     @Override
-    public void init(Model model) {
-        super.init(model);
+    public void init() {
+        super.init();
 
         assert fromTable != null;
         assert name != null;
@@ -129,16 +127,6 @@ public class ForeignKey extends DatabaseSelectionProvider
                     getQualifiedName()));
         }
 
-        if (toTable != null) {
-            // wire up Table.oneToManyRelationships
-            toTable.getOneToManyRelationships().add(this);
-            //TODO calculate HQL query
-        }
-
-        for (Reference reference : references) {
-            reference.init(model);
-        }
-
         actualManyPropertyName = (manyPropertyName == null)
                 ? name
                 : manyPropertyName;
@@ -148,6 +136,23 @@ public class ForeignKey extends DatabaseSelectionProvider
                 : onePropertyName;
     }
 
+    @Override
+    public void link(Model model) {
+        super.link(model);
+        if(toTable != null) {
+            // wire up Table.oneToManyRelationships
+            toTable.getOneToManyRelationships().add(this);
+            hql = "from " + toTable.getActualEntityName();
+        }
+    }
+
+    @Override
+    public void visitChildren(ModelVisitor visitor) {
+        super.visitChildren(visitor);
+        for (Reference reference : references) {
+            visitor.visit(reference);
+        }
+    }
 
     //**************************************************************************
     // Find methods
@@ -234,12 +239,7 @@ public class ForeignKey extends DatabaseSelectionProvider
     @Override
     @XmlTransient
     public String getHql() {
-        if(toTable != null && toTable.getActualEntityName() != null) {
-            //Build HQL query
-            return "from " + toTable.getActualEntityName();
-        } else {
-            return null;
-        }
+        return hql;
     }
 
     //**************************************************************************

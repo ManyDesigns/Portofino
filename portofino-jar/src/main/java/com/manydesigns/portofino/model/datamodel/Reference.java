@@ -31,6 +31,7 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.xml.Identifier;
 
 import javax.xml.bind.Unmarshaller;
@@ -89,11 +90,13 @@ public class Reference implements ModelObject {
         actualToColumn = null;
     }
 
-    public void init(Model model) {
+    public void init() {
         assert owner != null;
         assert fromColumn != null;
         assert toColumn != null;
+    }
 
+    public void link(Model model) {
         actualFromColumn =
                 owner.getFromTable().findColumnByName(fromColumn);
 
@@ -102,6 +105,8 @@ public class Reference implements ModelObject {
             actualToColumn = toTable.findColumnByName(toColumn);
         }
     }
+
+    public void visitChildren(ModelVisitor visitor) {}
 
     public String getQualifiedName() {
         return null;

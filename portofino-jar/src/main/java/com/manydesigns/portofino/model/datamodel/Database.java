@@ -31,6 +31,7 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,16 +86,17 @@ public class Database implements ModelObject {
         return databaseName;
     }
 
-    public void reset() {
-        for (Schema schema : schemas) {
-            schema.reset();
-        }
+    public void reset() {}
+
+    public void init() {
+        assert databaseName != null;
     }
 
-    public void init(Model model) {
-        assert databaseName != null;
+    public void link(Model model) {}
+
+    public void visitChildren(ModelVisitor visitor) {
         for (Schema schema : schemas) {
-            schema.init(model);
+            visitor.visit(schema);
         }
     }
 
