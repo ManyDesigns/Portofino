@@ -78,8 +78,9 @@ public class JspAction extends PortletAction {
 
     @DefaultHandler
     public Resolution execute() {
+        String jsp = jspPage.getJsp();
         String fwd;
-        if(StringUtils.isEmpty(jspPage.getJsp())) {
+        if(StringUtils.isEmpty(jsp)) {
             fwd = PAGE_PORTLET_NOT_CONFIGURED;
         } else {
             fwd = "/layouts/jsp/view.jsp";

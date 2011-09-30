@@ -157,7 +157,7 @@ public class ChartAction extends PortletAction {
         ChartGenerator chartGenerator = null;
 
         if(chartPage.getGeneratorClass() == null) {
-            throw new IllegalStateException("Invalid chart type: " + chartPage.getType());
+            throw new IllegalStateException("Invalid chart type: " + chartPage.getActualType());
         }
         try {
             chartGenerator = chartPage.getGeneratorClass().newInstance();

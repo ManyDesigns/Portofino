@@ -106,6 +106,8 @@ public class HibernateApplicationImpl implements Application {
     protected Model model;
     protected Map<String, HibernateDatabaseSetup> setups;
 
+    protected final String appId;
+
     protected final File appDir;
     protected final File appBlobsDir;
     protected final File appConnectionsFile;
@@ -124,7 +126,8 @@ public class HibernateApplicationImpl implements Application {
     // Constructors
     //**************************************************************************
 
-    public HibernateApplicationImpl(org.apache.commons.configuration.Configuration portofinoConfiguration,
+    public HibernateApplicationImpl(String appId,
+                                    org.apache.commons.configuration.Configuration portofinoConfiguration,
                                     DatabasePlatformsManager databasePlatformsManager,
                                     File appDir,
                                     File appBlobsDir,
@@ -135,6 +138,7 @@ public class HibernateApplicationImpl implements Application {
                                     File appStorageDir,
                                     File appWebDir
     ) {
+        this.appId = appId;
         this.portofinoConfiguration = portofinoConfiguration;
         this.databasePlatformsManager = databasePlatformsManager;
         this.appDir = appDir;
@@ -1104,6 +1108,10 @@ public class HibernateApplicationImpl implements Application {
     // App directories and files
     //**************************************************************************
 
+
+    public String getAppId() {
+        return appId;
+    }
 
     public File getAppDir() {
         return appDir;

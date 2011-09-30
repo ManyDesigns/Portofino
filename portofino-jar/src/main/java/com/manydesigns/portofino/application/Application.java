@@ -54,6 +54,8 @@ public interface Application {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
+    String getAppId();
+
     //**************************************************************************
     // App directories and files
     //**************************************************************************

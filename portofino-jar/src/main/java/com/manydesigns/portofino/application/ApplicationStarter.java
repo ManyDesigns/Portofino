@@ -88,6 +88,7 @@ public class ApplicationStarter {
     private Status status;
 
     private DatabasePlatformsManager databasePlatformsManager;
+    private Application tmpApplication;
     private Application application;
     private Timer scheduler;
     private String appId;
@@ -185,6 +186,7 @@ public class ApplicationStarter {
 
 
     private boolean initializeApplication() {
+        tmpApplication = null;
         boolean success = setupDirectories();
 
         if (success) {
@@ -200,13 +202,15 @@ public class ApplicationStarter {
         }
 
         if (success) {
+            application = tmpApplication;
             logger.info("Application initialized successfully");
         }
         return success;
     }
 
     private boolean updateSystemDatabase() {
-        ConnectionProvider connectionProvider = application.getConnectionProvider("portofino");
+        ConnectionProvider connectionProvider =
+                tmpApplication.getConnectionProvider("portofino");
         Connection connection = null;
         try {
             connection = connectionProvider.acquireConnection();
@@ -300,17 +304,17 @@ public class ApplicationStarter {
 
     public boolean setupApplication() {
         logger.info("Creating application instance...");
-        application = new HibernateApplicationImpl(
-                portofinoConfiguration, databasePlatformsManager,
-                appDir, appBlobsDir, appConnectionsFile, appDbsDir,
-                appModelFile, appScriptsDir, appStorageDir, appWebDir);
         try {
-            application.loadConnections();
+            tmpApplication = new HibernateApplicationImpl(appId,
+                    portofinoConfiguration, databasePlatformsManager,
+                    appDir, appBlobsDir, appConnectionsFile, appDbsDir,
+                    appModelFile, appScriptsDir, appStorageDir, appWebDir);
+            tmpApplication.loadConnections();
             boolean success = updateSystemDatabase();
             if(!success) {
                 return false;
             }
-            application.loadXmlModel();
+            tmpApplication.loadXmlModel();
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
             return false;
@@ -336,7 +340,7 @@ public class ApplicationStarter {
                 try {
 
                     //Invio mail
-                    scheduler.schedule(new EmailTask(application),
+                    scheduler.schedule(new EmailTask(tmpApplication),
                             DELAY2, PERIOD);
                 } catch (Exception e) {
                     e.printStackTrace();
