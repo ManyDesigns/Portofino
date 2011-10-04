@@ -145,8 +145,10 @@ function enablePortletDragAndDrop(button) {
 
     var container = $(button).parent();
     $(button).remove();
-    container.prepend('<button name="cancel">Cancel</button> ');
-    container.prepend('<button name="updateLayout">Save</button>');
+    container.prepend('<button name="cancel" class="contentButton">Cancel</button> ');
+    container.prepend('<button name="updateLayout" class="contentButton">Save</button>');
+    container.children("button[name=cancel]").button();
+    container.children("button[name=updateLayout]").button();
     $("button[name=updateLayout]").click(function() {
         var theButton = $(this);
         $('div.portletContainer').each( function(index, element) {
