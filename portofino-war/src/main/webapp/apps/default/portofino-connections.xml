@@ -1,34 +1,5 @@
 <?xml version="1.0" ?>
 <connections>
-<!--
-    <jdbcConnection
-            databaseName="jpetstore"
-            driver="org.postgresql.Driver"
-            url="jdbc:postgresql://127.0.0.1:5432/jpetstore"
-            username="manydesigns"
-            password="manydesigns"
-            includeSchemas="public"
-            excludeSchemas=""
-            />
-    <jdbcConnection
-            databaseName="hibernatetest"
-            driver="org.postgresql.Driver"
-            url="jdbc:postgresql://127.0.0.1:5432/hibernatetest"
-            username="manydesigns"
-            password="manydesigns"
-            includeSchemas="public"
-            excludeSchemas=""
-            />
--->
-    <jdbcConnection
-            databaseName="redmine"
-            driver="com.mysql.jdbc.Driver"
-            url="jdbc:mysql://localhost/redmine"
-            username="manydesigns"
-            password="manydesigns"
-            includeSchemas="redmine"
-            excludeSchemas=""
-            />
     <jdbcConnection
             databaseName="portofino"
             driver="org.h2.Driver"

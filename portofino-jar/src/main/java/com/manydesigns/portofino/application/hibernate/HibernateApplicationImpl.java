@@ -53,6 +53,10 @@ import com.manydesigns.portofino.sync.DatabaseSyncer;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
+import liquibase.Liquibase;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.FileSystemResourceAccessor;
+import liquibase.resource.ResourceAccessor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -89,6 +93,8 @@ import java.util.regex.Pattern;
 public class HibernateApplicationImpl implements Application {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
+
+    public final static String changelogFileNameTemplate = "{0}-changelog.xml";
 
     protected static final String WHERE_STRING = " WHERE ";
     protected static final Pattern FROM_PATTERN =
@@ -166,6 +172,35 @@ public class HibernateApplicationImpl implements Application {
             connectionProviders.init(databasePlatformsManager);
         } catch (Exception e) {
             logger.error("Cannot load/parse file: " + appConnectionsFile, e);
+            return;
+        }
+
+        logger.info("Updating database definitions");
+        ResourceAccessor resourceAccessor =
+                new FileSystemResourceAccessor();
+        for (ConnectionProvider current : connectionProviders.getConnections()) {
+            String databaseName = current.getDatabaseName();
+            String changelogFileName =
+                    MessageFormat.format(
+                            changelogFileNameTemplate, databaseName);
+            File changelogFile =
+                new File(appDbsDir, changelogFileName);
+            logger.info("Running changelog file: {}", changelogFile);
+            Connection connection = null;
+            try {
+                connection = current.acquireConnection();
+                JdbcConnection jdbcConnection = new JdbcConnection(connection);
+                Liquibase lq = new Liquibase(
+                        changelogFile.getAbsolutePath(),
+                        resourceAccessor,
+                        jdbcConnection);
+                lq.update(null);
+            } catch (Exception e) {
+                logger.error("Couldn't update database: " + databaseName, e);
+            } finally {
+                current.releaseConnection(connection);
+            }
+
         }
     }
 

@@ -31,19 +31,14 @@ package com.manydesigns.portofino.application;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.hibernate.HibernateApplicationImpl;
-import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.email.EmailTask;
-import liquibase.Liquibase;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.resource.ClassLoaderResourceAccessor;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.sql.Connection;
 import java.util.Timer;
 
 /**
@@ -208,27 +203,6 @@ public class ApplicationStarter {
         return success;
     }
 
-    private boolean updateSystemDatabase() {
-        ConnectionProvider connectionProvider =
-                tmpApplication.getConnectionProvider("portofino");
-        Connection connection = null;
-        try {
-            connection = connectionProvider.acquireConnection();
-            JdbcConnection jdbcConnection = new JdbcConnection(connection);
-            Liquibase lq = new Liquibase(
-                    "databases/portofino.default.changelog.xml",
-                    new ClassLoaderResourceAccessor(),
-                    jdbcConnection);
-            lq.update(null);
-            return true;
-        } catch (Exception e) {
-            logger.error("Couldn't update system database", e);
-            return false;
-        } finally {
-            connectionProvider.releaseConnection(connection);
-        }
-    }
-
     private boolean setupDirectories() {
         appId = portofinoConfiguration.getString(PortofinoProperties.APP_ID);
         logger.info("Application id: {}", appId);
@@ -310,10 +284,6 @@ public class ApplicationStarter {
                     appDir, appBlobsDir, appConnectionsFile, appDbsDir,
                     appModelFile, appScriptsDir, appStorageDir, appWebDir);
             tmpApplication.loadConnections();
-            boolean success = updateSystemDatabase();
-            if(!success) {
-                return false;
-            }
             tmpApplication.loadXmlModel();
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
