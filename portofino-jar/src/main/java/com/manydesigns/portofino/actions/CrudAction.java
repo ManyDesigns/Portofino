@@ -384,7 +384,7 @@ public class CrudAction extends PortletAction {
             }
             return forwardToPortletPage(fwd);
         } catch(Exception e) {
-            logger.debug("Crud not correctly configured", e);
+            logger.warn("Crud not correctly configured", e);
             return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
         }
     }

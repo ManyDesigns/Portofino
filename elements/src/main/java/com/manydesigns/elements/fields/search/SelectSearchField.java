@@ -119,7 +119,15 @@ public class SelectSearchField extends AbstractSearchField {
 
     public void configureCriteria(Criteria criteria) {
        Object[] values = (Object[]) selectionModel.getValue(selectionModelIndex);
-       criteria.in(accessor, values);
+       if (values == null) {
+           logger.debug("Null values array. Not adding 'in' criteria.");
+       } else if (values.length == 0) {
+           logger.debug("Enpty values array. Not adding 'in' criteria.");
+       } else {
+           logger.debug("Adding 'in' criteria for values: {}",
+                   ArrayUtils.toString(values));
+           criteria.in(accessor, values);
+       }
     }
 
     //**************************************************************************

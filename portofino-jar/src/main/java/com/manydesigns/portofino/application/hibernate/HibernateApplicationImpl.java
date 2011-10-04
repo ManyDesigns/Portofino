@@ -429,13 +429,13 @@ public class HibernateApplicationImpl implements Application {
                 Object value = eqCriterion.getValue();
                 hqlFormat = "{0} = ?";
                 parametersList.add(value);
-            }else if (criterion instanceof TableCriteria.InCriterion) {
+            } else if (criterion instanceof TableCriteria.InCriterion) {
                 TableCriteria.InCriterion inCriterion =
                         (TableCriteria.InCriterion) criterion;
                 Object[] values = inCriterion.getValues();
                 StringBuffer params = new StringBuffer();
-                boolean first = true;
-                if (values!=null){
+                if (values != null){
+                    boolean first = true;
                     for (Object value : values){
                         if (!first){
                             params.append(", ?");
@@ -447,7 +447,7 @@ public class HibernateApplicationImpl implements Application {
                     }
                     hqlFormat = "{0} in ("+params.toString()+")";
                 } else {
-                    hqlFormat ="";
+                    hqlFormat = null;
                 }
             } else if (criterion instanceof TableCriteria.NeCriterion) {
                 TableCriteria.NeCriterion neCriterion =
@@ -510,6 +510,10 @@ public class HibernateApplicationImpl implements Application {
             } else {
                 logger.error("Unrecognized criterion: {}", criterion);
                 throw new InternalError("Unrecognied criterion");
+            }
+
+            if (hqlFormat == null) {
+                continue;
             }
 
             String hql = MessageFormat.format(hqlFormat,

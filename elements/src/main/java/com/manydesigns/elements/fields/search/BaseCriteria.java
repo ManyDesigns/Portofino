@@ -30,6 +30,7 @@
 package com.manydesigns.elements.fields.search;
 
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -136,7 +137,8 @@ public class BaseCriteria extends ArrayList<Criterion> implements Criteria {
     public static class EqCriterion extends AbstractCriterion {
         protected final Object value;
 
-        public EqCriterion(PropertyAccessor accessor, Object value) {
+        public EqCriterion(@NotNull PropertyAccessor accessor,
+                           @NotNull Object value) {
             super(accessor);
             this.value = value;
         }
@@ -149,9 +151,15 @@ public class BaseCriteria extends ArrayList<Criterion> implements Criteria {
     public static class InCriterion extends AbstractCriterion {
         protected final Object[] values;
 
-        public InCriterion(PropertyAccessor accessor, Object[] values) {
+        public InCriterion(@NotNull PropertyAccessor accessor,
+                           @NotNull Object[] values) {
             super(accessor);
             this.values = values;
+            for (Object value : values) {
+                if (value == null) {
+                    throw new IllegalArgumentException("Null value");
+                }
+            }
         }
 
         public Object[] getValues() {
@@ -162,7 +170,7 @@ public class BaseCriteria extends ArrayList<Criterion> implements Criteria {
     public static class NeCriterion extends AbstractCriterion {
         protected final Object value;
 
-        public NeCriterion(PropertyAccessor accessor, Object value) {
+        public NeCriterion(@NotNull PropertyAccessor accessor, @NotNull Object value) {
             super(accessor);
             this.value = value;
         }

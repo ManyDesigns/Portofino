@@ -1970,7 +1970,7 @@
 <property enabled="true" inSummary="true" insertable="true" label="" name="subject" searchable="false" updatable="false">
     <annotations/>
 </property>
-<property enabled="true" inSummary="true" insertable="true" label="" name="description" searchable="false" updatable="false">
+<property enabled="true" inSummary="false" insertable="true" label="" name="description" searchable="false" updatable="false">
     <annotations/>
 </property>
 <property enabled="false" inSummary="true" insertable="false" label="Due date" name="due_date" searchable="false" updatable="false">
@@ -2000,7 +2000,7 @@
 <property enabled="true" inSummary="true" insertable="false" label="Created" name="created_on" searchable="false" updatable="false">
     <annotations/>
 </property>
-<property enabled="true" inSummary="true" insertable="false" label="Updated" name="updated_on" searchable="false" updatable="false">
+<property enabled="true" inSummary="false" insertable="false" label="Updated" name="updated_on" searchable="false" updatable="false">
     <annotations/>
 </property>
 <property enabled="false" inSummary="false" insertable="false" label="" name="start_date" searchable="false" updatable="false">
