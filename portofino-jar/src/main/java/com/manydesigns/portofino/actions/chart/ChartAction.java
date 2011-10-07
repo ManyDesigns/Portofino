@@ -288,7 +288,7 @@ public class ChartAction extends PortletAction {
             readPageConfigurationFromRequest();
             boolean valid = form.validate();
             valid = validatePageConfiguration() && valid;
-            Field typeField = form.findFieldByPropertyName("typeName");
+            Field typeField = form.findFieldByPropertyName("type");
             String typeValue = typeField.getStringValue();
             boolean placeHolderValue =
                     typeValue != null && typeValue.startsWith("--");
