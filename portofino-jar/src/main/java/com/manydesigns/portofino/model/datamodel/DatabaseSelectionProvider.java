@@ -101,7 +101,7 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
         toTable = null;
     }
 
-    public void init() {
+    public void init(Model model) {
         assert name != null;
         assert toDatabase != null;
         assert toSchema != null;

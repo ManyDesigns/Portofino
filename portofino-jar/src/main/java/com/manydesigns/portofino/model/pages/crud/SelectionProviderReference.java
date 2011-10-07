@@ -83,7 +83,7 @@ public class SelectionProviderReference implements ModelObject {
         foreignKey = null;
     }
 
-    public void init() {
+    public void init(Model model) {
         if(displayModeName != null) {
             displayMode = DisplayMode.valueOf(displayModeName);
         } else {

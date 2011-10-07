@@ -108,7 +108,7 @@ public abstract class Page implements ModelObject {
         actualLayoutOrder = 0;
     }
 
-    public void init() {
+    public void init(Model model) {
         assert fragment != null;
         assert title != null;
         assert description != null;

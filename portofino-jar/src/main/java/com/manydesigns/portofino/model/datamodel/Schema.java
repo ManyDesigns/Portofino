@@ -96,7 +96,7 @@ public class Schema implements ModelObject {
 
     public void reset() {}
 
-    public void init() {
+    public void init(Model model) {
         assert database != null;
         assert schemaName != null;
     }

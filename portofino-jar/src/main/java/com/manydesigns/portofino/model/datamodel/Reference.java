@@ -90,7 +90,7 @@ public class Reference implements ModelObject {
         actualToColumn = null;
     }
 
-    public void init() {
+    public void init(Model model) {
         assert owner != null;
         assert fromColumn != null;
         assert toColumn != null;

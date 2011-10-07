@@ -102,7 +102,7 @@ public class PrimaryKeyColumn implements ModelObject {
         return null;
     }
 
-    public void init() {
+    public void init(Model model) {
         assert primaryKey != null;
         assert columnName != null;
 

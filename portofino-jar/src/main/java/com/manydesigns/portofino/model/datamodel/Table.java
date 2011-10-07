@@ -125,7 +125,7 @@ public class Table implements ModelObject, Annotated {
         oneToManyRelationships.clear();
     }
 
-    public void init() {
+    public void init(Model model) {
         assert schema != null;
         assert tableName != null;
         

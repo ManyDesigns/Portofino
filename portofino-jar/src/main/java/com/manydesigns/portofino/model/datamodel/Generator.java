@@ -81,7 +81,7 @@ public abstract class Generator implements ModelObject{
 
     public void reset() {}
 
-    public void init() {
+    public void init(Model model) {
         assert primaryKeyColumn != null;
     }
 

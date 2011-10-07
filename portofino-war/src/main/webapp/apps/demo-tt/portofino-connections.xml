@@ -1,32 +1,13 @@
 <?xml version="1.0" ?>
 <connections>
-<!--
-    <jdbcConnection
-            databaseName="jpetstore"
-            driver="org.postgresql.Driver"
-            url="jdbc:postgresql://127.0.0.1:5432/jpetstore"
-            username="manydesigns"
-            password="manydesigns"
-            includeSchemas="public"
-            excludeSchemas=""
-            />
-    <jdbcConnection
-            databaseName="hibernatetest"
-            driver="org.postgresql.Driver"
-            url="jdbc:postgresql://127.0.0.1:5432/hibernatetest"
-            username="manydesigns"
-            password="manydesigns"
-            includeSchemas="public"
-            excludeSchemas=""
-            />
--->
+    <!--url="jdbc:mysql://192.168.1.8/redmine"-->
     <jdbcConnection
             databaseName="redmine"
-            driver="com.mysql.jdbc.Driver"
-            url="jdbc:mysql://192.168.1.8/redmine"
+            driver="org.h2.Driver"
+            url="jdbc:h2:${serverInfo:realPath}/WEB-INF/db/redmine"
             username="manydesigns"
             password="manydesigns"
-            includeSchemas="redmine"
+            includeSchemas="PUBLIC"
             excludeSchemas=""
             />
     <jdbcConnection

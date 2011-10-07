@@ -126,8 +126,8 @@ public class ChartPage extends Page {
     }
 
     @Override
-    public void init() {
-        super.init();
+    public void init(Model model) {
+        super.init(model);
         assert name != null;
         assert type != null;
         assert title != null;

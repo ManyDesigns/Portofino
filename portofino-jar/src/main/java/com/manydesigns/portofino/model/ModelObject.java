@@ -44,7 +44,7 @@ public interface ModelObject {
     void afterUnmarshal(Unmarshaller u, Object parent);
 
     void reset();
-    void init();
+    void init(Model model);
     void link(Model model);
 
     void visitChildren(ModelVisitor visitor);

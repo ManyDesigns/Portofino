@@ -46,6 +46,7 @@ import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
+import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -54,6 +55,7 @@ import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import liquibase.Liquibase;
+import liquibase.database.*;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
@@ -190,10 +192,14 @@ public class HibernateApplicationImpl implements Application {
             try {
                 connection = current.acquireConnection();
                 JdbcConnection jdbcConnection = new JdbcConnection(connection);
+                liquibase.database.Database lqDatabase =
+                        DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
+                //XXX temporaneo funziona con uno schema solo
+                //lqDatabase.setDefaultSchemaName(current.getIncludeSchemas());
                 Liquibase lq = new Liquibase(
                         changelogFile.getAbsolutePath(),
                         resourceAccessor,
-                        jdbcConnection);
+                        lqDatabase);
                 lq.update(null);
             } catch (Exception e) {
                 logger.error("Couldn't update database: " + databaseName, e);

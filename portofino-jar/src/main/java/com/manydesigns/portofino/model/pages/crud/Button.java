@@ -97,7 +97,7 @@ public class Button implements ModelObject {
         actualScriptLanguage = null;
     }
 
-    public void init() {
+    public void init(Model model) {
         assert crud != null;
         assert name != null;
         assert label != null;

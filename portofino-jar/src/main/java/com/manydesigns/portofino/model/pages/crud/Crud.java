@@ -123,11 +123,11 @@ public class Crud implements ModelObject {
         actualTable = null;
     }
 
-    public void init() {}
-
-    public void link(Model model) {
+    public void init(Model model) {
         actualTable = DataModelLogic.findTableByQualifiedName(model, table);
     }
+
+    public void link(Model model) {}
 
     public void visitChildren(ModelVisitor visitor) {
         for (CrudProperty property : properties) {

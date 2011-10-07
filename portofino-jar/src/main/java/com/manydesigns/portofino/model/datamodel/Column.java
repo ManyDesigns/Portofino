@@ -118,7 +118,7 @@ public class Column implements ModelObject, Annotated {
         actualJavaType = null;
     }
 
-    public void init() {
+    public void init(Model model) {
         assert table != null;
         assert columnName != null;
         assert columnType != null;

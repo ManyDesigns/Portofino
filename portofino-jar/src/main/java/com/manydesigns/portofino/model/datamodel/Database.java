@@ -88,7 +88,7 @@ public class Database implements ModelObject {
 
     public void reset() {}
 
-    public void init() {
+    public void init(Model model) {
         assert databaseName != null;
     }
 

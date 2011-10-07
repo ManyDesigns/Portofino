@@ -95,7 +95,7 @@ public class CrudProperty implements ModelObject {
 
     public void reset() {}
 
-    public void init() {
+    public void init(Model model) {
         assert crud != null;
         assert name != null;
     }

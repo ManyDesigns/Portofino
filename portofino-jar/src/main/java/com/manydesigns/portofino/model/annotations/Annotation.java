@@ -114,7 +114,7 @@ public class Annotation implements ModelObject {
         javaAnnotationClass = null;
     }
 
-    public void init() {
+    public void init(Model model) {
         javaAnnotationClass = ReflectionUtil.loadClass(type);
         if (javaAnnotationClass == null) {
             logger.warn("Cannot load annotation class: {}", type);

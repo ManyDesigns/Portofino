@@ -104,7 +104,7 @@ public class PrimaryKey implements ModelObject {
         valid = true;
     }
 
-    public void init() {
+    public void init(Model model) {
         assert table != null;
 
 // Liquibase on MySQL returns null primaryKey name if the name is "PRIMARY"

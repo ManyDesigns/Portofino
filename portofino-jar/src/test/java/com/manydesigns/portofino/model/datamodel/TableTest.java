@@ -49,7 +49,7 @@ public class TableTest extends TestCase {
         table.setSchema(schema);
         table.setTableName(" ab!!!..acus$%/()");
         model.getDatabases().add(db);
-        table.init();
+        table.init(model);
 
         assertNotNull(table.getActualEntityName());
         assertEquals("portofino_meta__ab_____acus$____", table.getActualEntityName());
@@ -58,7 +58,7 @@ public class TableTest extends TestCase {
         table = new Table();
         table.setSchema(schema);
         table.setTableName("0DPrpt");
-        table.init();
+        table.init(model);
         assertEquals("portofino_meta_0dprpt", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
@@ -71,7 +71,7 @@ public class TableTest extends TestCase {
         table = new Table();
         table.setSchema(schema);
         table.setTableName("0DPrpt");
-        table.init();
+        table.init(model);
         assertEquals("_1portofino_meta_0dprpt", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
@@ -83,24 +83,24 @@ public class TableTest extends TestCase {
         table = new Table();
         table.setSchema(schema);
         table.setTableName("0DPrpt");
-        table.init();
+        table.init(model);
         assertEquals("$1portofino_meta_0dprpt", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
         db = new Database();
         db.setDatabaseName(".portofino");
         table.setTableName("0DPrpt");
-        table.init();
+        table.init(model);
         assertEquals("_portofino_meta_0dprpt", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
         table.setTableName("XYZéèçò°àùì");
-        table.init();
+        table.init(model);
         assertEquals("_portofino_meta_xyzéèçò_àùì", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
         table.setTableName("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ");
-        table.init();
+        table.init(model);
         assertEquals("_portofino_meta_ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
     }

@@ -77,7 +77,7 @@ public class Permissions implements ModelObject {
 
     public void reset() {}
 
-    public void init() {}
+    public void init(Model model) {}
 
     public void link(Model model) {}
 

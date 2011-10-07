@@ -87,7 +87,7 @@ public class Model {
 
         @Override
         public void visitNode(ModelObject node) {
-            node.init();
+            node.init(Model.this);
         }
     }
 

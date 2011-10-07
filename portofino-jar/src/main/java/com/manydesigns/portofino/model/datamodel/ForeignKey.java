@@ -114,8 +114,8 @@ public class ForeignKey extends DatabaseSelectionProvider
     }
 
     @Override
-    public void init() {
-        super.init();
+    public void init(Model model) {
+        super.init(model);
 
         assert fromTable != null;
         assert name != null;

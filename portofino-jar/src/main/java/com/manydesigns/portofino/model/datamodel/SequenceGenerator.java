@@ -28,6 +28,8 @@
  */
 package com.manydesigns.portofino.model.datamodel;
 
+import com.manydesigns.portofino.model.Model;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -57,8 +59,8 @@ public class SequenceGenerator extends Generator{
         super.reset();
     }
 
-    public void init() {
-        super.init();
+    public void init(Model model) {
+        super.init(model);
         assert name != null;
     }
 

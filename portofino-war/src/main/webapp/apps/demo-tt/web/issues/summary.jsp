@@ -21,7 +21,7 @@
                 Application appl = (Application) request.getAttribute("application");
                 List<?> objects = appl.getObjects(
                         "SELECT t.name, sum(1 - st.is_closed) as sum, count(*) as count " +
-                        "FROM redmine_redmine_issues i, redmine_redmine_trackers t, redmine_redmine_issue_statuses st " +
+                        "FROM redmine_public_issues i, redmine_public_trackers t, redmine_public_issue_statuses st " +
                         "WHERE t.id = i.tracker_id " +
                         "  AND i.project_id = %{#project.id} " +
                         "  AND i.status_id = st.id " +

@@ -28,6 +28,7 @@
  */
 package com.manydesigns.portofino.model.pages;
 
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 
@@ -82,8 +83,8 @@ public class CrudPage extends Page {
     }
 
     @Override
-    public void init() {
-        super.init();
+    public void init(Model model) {
+        super.init(model);
 
         if(detailLayoutOrder != null) {
             actualDetailLayoutOrder = Integer.parseInt(detailLayoutOrder);
