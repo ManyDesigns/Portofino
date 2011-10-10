@@ -50,8 +50,6 @@ public class RootPermissionsAction extends PortletAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    RootPage rootPage;
-
     //--------------------------------------------------------------------------
     // Logging
     //--------------------------------------------------------------------------

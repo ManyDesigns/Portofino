@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <connections>
-    <!--
+<!--
     <jdbcConnection
             databaseName="portofino"
             driver="com.mysql.jdbc.Driver"
