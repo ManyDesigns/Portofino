@@ -138,9 +138,9 @@ public class Type {
             case Types.VARCHAR:
                 return String.class;
             case Types.DATE:
-                return java.sql.Date.class;
+                return Date.class;
             case Types.TIME:
-                return java.sql.Time.class;
+                return Date.class;
             case Types.TIMESTAMP:
                 return Date.class;
             case Types.DECIMAL:

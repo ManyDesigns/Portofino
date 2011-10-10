@@ -113,7 +113,7 @@
 <column autoincrement="false" columnName="activity_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="spent_on" columnType="DATE" javaType="java.sql.Date" jdbcType="91" length="10" nullable="false" scale="0">
+<column autoincrement="false" columnName="spent_on" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="tyear" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
@@ -601,7 +601,7 @@
 <column autoincrement="false" columnName="description" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="due_date" columnType="DATE" javaType="java.sql.Date" jdbcType="91" length="10" nullable="true" scale="0">
+<column autoincrement="false" columnName="due_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="category_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
@@ -631,7 +631,7 @@
 <column autoincrement="false" columnName="updated_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="start_date" columnType="DATE" javaType="java.sql.Date" jdbcType="91" length="10" nullable="true" scale="0">
+<column autoincrement="false" columnName="start_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="done_ratio" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
@@ -690,7 +690,7 @@
 <column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="effective_date" columnType="DATE" javaType="java.sql.Date" jdbcType="91" length="10" nullable="true" scale="0">
+<column autoincrement="false" columnName="effective_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
@@ -1195,7 +1195,7 @@
 <column autoincrement="false" columnName="comments" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="commit_date" columnType="DATE" javaType="java.sql.Date" jdbcType="91" length="10" nullable="true" scale="0">
+<column autoincrement="false" columnName="commit_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="scmid" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -1771,7 +1771,7 @@
 <column autoincrement="false" columnName="FROM_" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="100" nullable="true" propertyName="from" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="CREATEDATE" columnType="DATE" javaType="java.sql.Date" jdbcType="91" length="8" nullable="true" propertyName="createDate" scale="0">
+<column autoincrement="false" columnName="CREATEDATE" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="true" propertyName="createDate" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="STATE" columnType="DECIMAL" javaType="java.lang.Integer" jdbcType="3" length="10" nullable="true" propertyName="state" scale="0">
