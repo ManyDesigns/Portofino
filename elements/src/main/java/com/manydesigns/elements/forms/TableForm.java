@@ -351,7 +351,7 @@ public class TableForm implements Element {
             if (propertyAccessor.isAnnotationPresent(Label.class)) {
                 label = propertyAccessor.getAnnotation(Label.class).value();
             } else {
-                label = Util.camelCaseToWords(propertyAccessor.getName());
+                label = Util.guessToWords(propertyAccessor.getName());
             }
 
             if (propertyAccessor.isAnnotationPresent(Help.class)) {

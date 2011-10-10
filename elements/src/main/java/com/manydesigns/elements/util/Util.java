@@ -117,6 +117,52 @@ public class Util {
         return sb.toString();
     }
 
+    public static String guessToWords(String s) {
+        if (s == null) {
+            return null;
+        }
+        if (isAllLowerCase(s) || isAllUpperCase(s)) {
+            return letterOrDigitToWords(s);
+        } else {
+            return camelCaseToWords(s);
+        }
+    }
+
+    public static String letterOrDigitToWords(String s) {
+        if (s == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isLetterOrDigit(c)) {
+                sb.append(Character.toLowerCase(c));
+            } else {
+                sb.append(' ');
+            }
+        }
+        return sb.toString();
+    }
+
+    static boolean isAllUpperCase(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isLetter(c) && Character.isLowerCase(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static boolean isAllLowerCase(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isLetter(c) && Character.isUpperCase(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public static String urlencode(String s) {
         if (s == null) {

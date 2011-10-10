@@ -44,7 +44,7 @@ public class CrudLogic {
 
     public static CrudProperty findCrudPropertyByName(Crud crud, String propertyName) {
         for (CrudProperty current : crud.getProperties()) {
-            if (current.getName().equals(propertyName)) {
+            if (current.getName().equalsIgnoreCase(propertyName)) {
                 return current;
             }
         }

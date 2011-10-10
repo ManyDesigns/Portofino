@@ -141,7 +141,7 @@ public abstract class AbstractField implements Field {
             label = accessor.getAnnotation(Label.class).value();
             logger.debug("Label annotation present with value: {}", label);
         } else {
-            label = Util.camelCaseToWords(accessor.getName());
+            label = Util.guessToWords(accessor.getName());
             logger.debug("Setting label from property name: {}", label);
         }
 

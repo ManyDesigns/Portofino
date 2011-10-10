@@ -121,7 +121,7 @@
                         <div class="navigationHeader">Data modeling</div>
                         <ul>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Connections"
+                                                   text="Connection providers"
                                                    link="/admin/connection-providers.action"/>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Tables"
