@@ -151,13 +151,13 @@
 <column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_in_chlog" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_in_chlog" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_in_roadmap" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_in_roadmap" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
                             </columns>
@@ -315,7 +315,7 @@
 <column autoincrement="false" columnName="updated_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="locked" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="true" scale="0">
+<column autoincrement="false" columnName="locked" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="sticky" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
@@ -384,7 +384,7 @@
 <column autoincrement="false" columnName="others" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="hide_mail" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="true" scale="0">
+<column autoincrement="false" columnName="hide_mail" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="time_zone" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -425,7 +425,7 @@
 <column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="mail_notification" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="mail_notification" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
                             </columns>
@@ -515,7 +515,7 @@
 <column autoincrement="false" columnName="mail" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="60" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="admin" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="admin" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="status" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
@@ -756,10 +756,10 @@
 <column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_closed" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_closed" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_default" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_default" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
@@ -838,13 +838,13 @@
 <column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_default" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_default" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="active" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="active" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
@@ -885,7 +885,7 @@
 <column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="assignable" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="true" scale="0">
+<column autoincrement="false" columnName="assignable" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="builtin" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
@@ -941,7 +941,7 @@
 <column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="protected" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="protected" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="parent_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
@@ -1003,7 +1003,7 @@
 <column autoincrement="false" columnName="user_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_public" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_public" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="column_names" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
@@ -1049,28 +1049,28 @@
 <column autoincrement="false" columnName="max_length" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_required" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_required" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_for_all" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_for_all" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_filter" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_filter" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="searchable" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="true" scale="0">
+<column autoincrement="false" columnName="searchable" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="default_value" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="editable" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="true" scale="0">
+<column autoincrement="false" columnName="editable" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="visible" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="visible" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
                             </columns>
@@ -1273,10 +1273,10 @@
 <column autoincrement="false" columnName="attr_mail" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="onthefly_register" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="onthefly_register" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="tls" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="tls" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
                             </columns>
@@ -1416,7 +1416,7 @@
 <column autoincrement="false" columnName="homepage" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_public" columnType="BIT" javaType="java.lang.Byte" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_public" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="parent_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
