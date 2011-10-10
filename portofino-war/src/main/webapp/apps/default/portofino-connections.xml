@@ -1,5 +1,16 @@
 <?xml version="1.0" ?>
 <connections>
+    <!--
+    <jdbcConnection
+            databaseName="portofino"
+            driver="com.mysql.jdbc.Driver"
+            url="jdbc:mysql://localhost/public"
+            username="manydesigns"
+            password=""
+            includeSchemas="public"
+            excludeSchemas=""
+            />
+            -->
     <jdbcConnection
             databaseName="portofino"
             driver="org.h2.Driver"

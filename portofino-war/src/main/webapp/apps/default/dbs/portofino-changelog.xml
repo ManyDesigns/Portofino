@@ -35,8 +35,8 @@
             <column name="creatorid" type="CHAR(25)"/>
             <column name="name" type="VARCHAR(50)"/>
             <column name="description" type="VARCHAR(255)"/>
-            <column name="deletiondate" type="TIMESTAMP"/>
-            <column name="creationdate" type="TIMESTAMP"/>
+            <column name="deletiondate" type="TIMESTAMP NULL"/>
+            <column name="creationdate" type="TIMESTAMP NULL"/>
         </createTable>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-4">
@@ -48,7 +48,7 @@
             <column name="body" type="VARCHAR(4000)"/>
             <column name="to_" type="CHAR(25)"/>
             <column name="from_" type="CHAR(25)"/>
-            <column name="creationdate" type="TIMESTAMP"/>
+            <column name="creationdate" type="TIMESTAMP NULL"/>
             <column name="state" type="DECIMAL(10,0)"/>
         </createTable>
     </changeSet>
@@ -68,7 +68,7 @@
             <column name="id" type="CHAR(25)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="OldPwd_pkey"/>
             </column>
-            <column name="createdate" type="TIMESTAMP"/>
+            <column name="createdate" type="TIMESTAMP NULL"/>
             <column name="password" type="VARCHAR(30)"/>
             <column name="userid" type="CHAR(25)"/>
         </createTable>
@@ -78,13 +78,13 @@
             <column name="userid" type="CHAR(25)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="user_pkey"/>
             </column>
-            <column name="deletiondate" type="TIMESTAMP"/>
-            <column name="creationdate" type="TIMESTAMP"/>
-            <column name="modifieddate" type="TIMESTAMP"/>
+            <column name="deletiondate" type="TIMESTAMP NULL"/>
+            <column name="creationdate" type="TIMESTAMP NULL"/>
+            <column name="modifieddate" type="TIMESTAMP NULL"/>
             <column name="defaultuser" type="CHAR(1)"/>
             <column name="extauth" type="CHAR(1)"/>
             <column name="pwd" type="VARCHAR(50)"/>
-            <column name="lastpwdmoddate" type="TIMESTAMP"/>
+            <column name="lastpwdmoddate" type="TIMESTAMP NULL"/>
             <column name="username" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
@@ -95,8 +95,8 @@
             <column name="middlename" type="VARCHAR(50)"/>
             <column name="lastname" type="VARCHAR(50)"/>
             <column name="jobtitle" type="VARCHAR(50)"/>
-            <column name="lastlogindate" type="TIMESTAMP"/>
-            <column name="lastfailedlogindate" type="TIMESTAMP"/>
+            <column name="lastlogindate" type="TIMESTAMP NULL"/>
+            <column name="lastfailedlogindate" type="TIMESTAMP NULL"/>
             <column name="failedloginattempts" type="DECIMAL(10,0)"/>
             <column name="agreedtoterms" type="CHAR(1)"/>
             <column name="state" type="DECIMAL(10,0)">
@@ -117,8 +117,8 @@
             <column name="userid" type="CHAR(25)">
                 <constraints nullable="false"/>
             </column>
-            <column name="deletiondate" type="TIMESTAMP"/>
-            <column name="creationdate" type="TIMESTAMP">
+            <column name="deletiondate" type="TIMESTAMP NULL"/>
+            <column name="creationdate" type="TIMESTAMP NULL">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -238,6 +238,7 @@
     <changeSet author="portofino" id="insert-users">
         <insert tableName="users">
             <column name="userid" value="1" />
+            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
             <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
             <column name="pwd" value="admin" />
             <column name="username" value="admin" />
