@@ -47,24 +47,6 @@
                 <input type="hidden" name="availableGroupNames"/>
             </div>
         </div>
-        <script type="text/javascript">
-            $(".groupBox").sortable({
-                connectWith: ".groupBox",
-                placeholder: "groupPlaceholder",
-                cursor: "move", // cursor image
-                revert: true, // moves the portlet to its new position with a smooth transition
-                tolerance: "pointer" // mouse pointer overlaps the droppable
-            }).disableSelection();
-            $("input[name=updatePagePermissions]").click(function() {
-                $('.groupBox').each( function(index, element) {
-                    var wrapper = $(element);
-                    var toAttay = wrapper.sortable('toArray');
-                    var hidden = wrapper.siblings('input');
-                    hidden.val(toAttay);
-                });
-                return true;
-            });
-        </script>
         <div class="horizontalSeparator"></div>
         Inherited permissions:
         <c:forEach var="currentPage" items="${actionBean.inheritedPages}">
@@ -88,5 +70,23 @@
     <stripes:layout-component name="contentFooter">
         <stripes:submit name="updatePagePermissions" value="Save" class="contentButton"/>
         <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
+        <script type="text/javascript">
+            $(".groupBox").sortable({
+                connectWith: ".groupBox",
+                placeholder: "groupPlaceholder",
+                cursor: "move", // cursor image
+                revert: true, // moves the portlet to its new position with a smooth transition
+                tolerance: "pointer" // mouse pointer overlaps the droppable
+            }).disableSelection();
+            $("input[name=updatePagePermissions]").click(function() {
+                $('.groupBox').each( function(index, element) {
+                    var wrapper = $(element);
+                    var toAttay = wrapper.sortable('toArray');
+                    var hidden = wrapper.siblings('input');
+                    hidden.val(toAttay);
+                });
+                return true;
+            });
+        </script>
     </stripes:layout-component>
 </stripes:layout-render>

@@ -45,6 +45,10 @@
                 <input type="hidden" name="availableGroupNames"/>
             </div>
         </div>
+    </stripes:layout-component>
+    <stripes:layout-component name="contentFooter">
+        <stripes:submit name="updatePagePermissions" value="Update" class="contentButton"/>
+        <stripes:submit name="returnToPages" value="Return to pages" class="contentButton"/>
         <script type="text/javascript">
             $(".groupBox").sortable({
                 connectWith: ".groupBox",
@@ -63,9 +67,5 @@
                 return true;
             });
         </script>
-    </stripes:layout-component>
-    <stripes:layout-component name="contentFooter">
-        <stripes:submit name="updatePagePermissions" value="Update" class="contentButton"/>
-        <stripes:submit name="returnToPages" value="Return to pages" class="contentButton"/>
     </stripes:layout-component>
 </stripes:layout-render>
