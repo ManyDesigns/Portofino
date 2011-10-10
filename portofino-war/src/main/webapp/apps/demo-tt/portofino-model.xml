@@ -2076,7 +2076,7 @@
                             <deny/>
                         </permissions>
                     </chartPage>
-                    <chartPage database="redmine" legend="Issues by date" name="Issues by date" orientation="VERTICAL" query="select count(*), 'anno-mese', concat(Year(created_on),'-',  Month(created_on)) data   from issues where project_id = %{#project.id} group by data order by Year(created_on), Month(created_on)" type="BAR" urlExpression="/projects/%{#project.id}/issues?search=&amp;status_id=%{series}&amp;tracker_id=%{category}" xAxisName="Tracker" yAxisName="Number of issues" description="Issues by date" fragment="issues-by-date-bar" id="3yozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="4" showInNavigation="false" title="Issues by date">
+                    <chartPage database="redmine" legend="Issues by date" name="Issues by date" orientation="VERTICAL" query="select count(*), 'anno-mese', concat(Year(created_on),'-',  Month(created_on)) data   from issues where project_id = %{#project.id} group by created_on order by created_on" type="BAR" urlExpression="/projects/%{#project.id}/issues?search=&amp;status_id=%{series}&amp;tracker_id=%{category}" xAxisName="Tracker" yAxisName="Number of issues" description="Issues by date" fragment="issues-by-date-bar" id="3yozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="4" showInNavigation="false" title="Issues by date">
                         <childPages/>
                         <permissions>
                             <allow/>

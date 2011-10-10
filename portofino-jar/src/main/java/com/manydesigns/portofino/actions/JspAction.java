@@ -34,16 +34,12 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.application.ServerInfo;
-import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.model.pages.JspPage;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,9 +61,6 @@ public class JspAction extends PortletAction {
 
     public static final Logger logger =
             LoggerFactory.getLogger(JspAction.class);
-
-    @Inject(ApplicationAttributes.SERVER_INFO)
-    public ServerInfo serverInfo;
 
     @Before
     @Override
@@ -129,17 +122,18 @@ public class JspAction extends PortletAction {
     }
 
     private SelectionProvider createJspSelectionProvider() {
-        File webAppDirFile = new File(serverInfo.getRealPath());
+        File appWebDir = application.getAppWebDir();
         List<String> values = new ArrayList<String>();
         List<String> labels = new ArrayList<String>();
-        File[] files = webAppDirFile.listFiles();
-        visitJspFiles(webAppDirFile, files, values, labels);
+        File[] files = appWebDir.listFiles();
+        visitJspFiles(appWebDir, files, values, labels);
         String[] valuesArr = values.toArray(new String[values.size()]);
         String[] labelsArr = labels.toArray(new String[labels.size()]);
         return DefaultSelectionProvider.create("jsp", valuesArr, labelsArr);
     }
 
-    private void visitJspFiles(File root, File[] files, List<String> values, List<String> labels) {
+    private void visitJspFiles(File root, File[] files,
+                               List<String> values, List<String> labels) {
         for(File file : files) {
             if(file.isFile() && file.getName().endsWith(".jsp")) {
                 String path = getRelativeFilePath(file, root);
@@ -168,37 +162,5 @@ public class JspAction extends PortletAction {
     public Form getForm() {
         return form;
     }
-
-    public String getTargetJsp() {
-        String jsp = jspPage.getJsp();
-        if(!jsp.startsWith("/")) {
-            jsp = "/" + jsp;
-        }
-        ServletContext c = context.getServletContext();
-        return jsp;
-    }
-
-    /*
-   File webAppDirFile = new File(serverInfo.getRealPath());
-       File skinDirFile = new File(webAppDirFile, "skins");
-       File[] skinFiles = skinDirFile.listFiles(new FileFilter() {
-           public boolean accept(File file) {
-               return file.isDirectory();
-           }
-       });
-
-       String[] skins = new String[skinFiles.length];
-       for (int i = 0; i < skinFiles.length; i++) {
-           File current = skinFiles[i];
-           String skinName = current.getName();
-           skins[i] = skinName;
-           logger.debug("Found skin: {}", skinName);
-       }
-
-       SelectionProvider skinSelectionProvider =
-               DefaultSelectionProvider.create("skins", skins, skins);
-
-       return skinSelectionProvider;
-    */
 
 }
