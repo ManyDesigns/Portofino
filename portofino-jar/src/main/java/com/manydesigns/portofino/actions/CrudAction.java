@@ -46,7 +46,6 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
 import com.manydesigns.portofino.actions.forms.CrudSelectionProviderEdit;
 import com.manydesigns.portofino.application.TableCriteria;
@@ -263,15 +262,10 @@ public class CrudAction extends PortletAction {
 
         int i = 0;
         for (Reference reference : references) {
-            try {
-                fieldNames[i] = reference.getFromColumn();
-                PropertyAccessor propertyAccessor =
-                        classAccessor.getProperty(fieldNames[i]);
-                fieldTypes[i] = propertyAccessor.getType();
-                i++;
-            } catch (NoSuchFieldException e) {
-                throw new Error(e);
-            }
+            Column column = reference.getActualFromColumn();
+            fieldNames[i] = column.getColumnName();
+            fieldTypes[i] = column.getActualJavaType();
+            i++;
         }
 
         availableSelectionProviders.put(Arrays.asList(fieldNames), current);
