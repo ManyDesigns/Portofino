@@ -84,6 +84,7 @@ import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -253,8 +254,10 @@ public class CrudAction extends PortletAction {
         }
     }
 
-    private boolean setupSelectionProvider
-            (SelectionProviderReference ref, DatabaseSelectionProvider current, Set<String> configuredSPs) {
+    private boolean setupSelectionProvider(
+            @Nullable SelectionProviderReference ref,
+            DatabaseSelectionProvider current,
+            Set<String> configuredSPs) {
         List<Reference> references = current.getReferences();
 
         String[] fieldNames = new String[references.size()];
@@ -289,9 +292,7 @@ public class CrudAction extends PortletAction {
         CrudSelectionProvider crudSelectionProvider =
                 new CrudSelectionProvider(selectionProvider, fieldNames);
         crudSelectionProviders.add(crudSelectionProvider);
-        for(String fieldName : fieldNames) {
-            configuredSPs.add(fieldName);
-        }
+        Collections.addAll(configuredSPs, fieldNames);
         return true;
     }
 

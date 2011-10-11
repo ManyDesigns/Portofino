@@ -117,7 +117,11 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
         }
     }
 
-    public void visitChildren(ModelVisitor visitor) {}
+    public void visitChildren(ModelVisitor visitor) {
+        for (Reference reference : references) {
+            visitor.visit(reference);
+        }
+    }
 
     public String getQualifiedName() {
         return name;

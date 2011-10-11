@@ -31,7 +31,6 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.util.Pair;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
@@ -143,14 +142,6 @@ public class ForeignKey extends DatabaseSelectionProvider
             // wire up Table.oneToManyRelationships
             toTable.getOneToManyRelationships().add(this);
             hql = "from " + toTable.getActualEntityName();
-        }
-    }
-
-    @Override
-    public void visitChildren(ModelVisitor visitor) {
-        super.visitChildren(visitor);
-        for (Reference reference : references) {
-            visitor.visit(reference);
         }
     }
 
