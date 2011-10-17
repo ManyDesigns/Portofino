@@ -69,6 +69,9 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
 
 
         application.addConnectionProvider(conn);
+
+        File connectionsFile = application.getAppConnectionsFile();
+
         assertEquals(4, connectionProviders.size());
         InputStream is = null;
         try {

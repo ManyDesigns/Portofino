@@ -64,6 +64,11 @@ public class DispatcherTest extends AbstractPortofinoTest {
         application.closeSessions();
     }
 
+    @Override
+    public String getTestAppId() {
+        return "demo-tt";
+    }
+
     public void testProjectSearch() {
         String originalPath = "/projects";
         req.setServletPath(originalPath);

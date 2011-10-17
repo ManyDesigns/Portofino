@@ -57,36 +57,11 @@ import java.sql.Connection;
 public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
     // Long-lived Portofino objects
-    protected CompositeConfiguration portofinoConfiguration;
-    protected DatabasePlatformsManager databasePlatformsManager;
+    protected PropertiesConfiguration portofinoConfiguration;
     protected Application application;
 
-
     //Connessioni e context
-    public Connection connPetStore;
-    public Connection connPortofino;
-    public Connection connDBTest;
     public Model model;
-
-    public File modelFile;
-    public File connectionsFile;
-
-    public static final String PORTOFINO_TEST_PROPERTIES_RESOURCE =
-            "portofino-test.properties";
-    public static final String PORTOFINO_CONNECTIONS_RESOURCE =
-            "portofino-connections.xml";
-    public static final String PORTOFINO_MODEL_RESOURCE =
-            "portofino-model.xml";
-
-    //Script per h2 3 file di configurazione
-    public static final String PETSTORE_DB_SCHEMA =
-        "database/jpetstore-postgres-schema.sql";
-    public static final String PETSTORE_DB_DATA =
-            "database/jpetstore-postgres-dataload.sql";
-    public static final String PORTOFINO4_DB =
-            "database/portofino4.sql";
-    public static final String TEST_DB =
-            "database/hibernatetest.sql";
 
     //--------------------------------------------------------------------------
     // Setup e teardown
@@ -95,104 +70,11 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        portofinoConfiguration = new CompositeConfiguration();
-        portofinoConfiguration.addConfiguration(
-                    new PropertiesConfiguration(
-                            PORTOFINO_TEST_PROPERTIES_RESOURCE));
-        portofinoConfiguration.addConfiguration(
-                    new PropertiesConfiguration(
-                            PortofinoProperties.PROPERTIES_RESOURCE));
+        portofinoConfiguration = new PropertiesConfiguration(
+                            PortofinoProperties.PROPERTIES_RESOURCE);
 
-        databasePlatformsManager =
-                new DatabasePlatformsManager(portofinoConfiguration);
+        String appId = getTestAppId();
 
-        createApplication();
-
-        ClassLoader cl = AbstractPortofinoTest.class.getClassLoader();
-        connPortofino = application.getConnectionProvider("portofino").acquireConnection();
-        connPetStore = application.getConnectionProvider("jpetstore").acquireConnection();
-        connDBTest = application.getConnectionProvider("hibernatetest").acquireConnection();
-
-        RunScript.execute(connPortofino,
-                new InputStreamReader(
-                        cl.getResourceAsStream(PORTOFINO4_DB)));
-        RunScript.execute(connPetStore,
-                new InputStreamReader(
-                        cl.getResourceAsStream(PETSTORE_DB_SCHEMA)));
-        RunScript.execute(connPetStore,
-                new InputStreamReader(
-                        cl.getResourceAsStream(PETSTORE_DB_DATA)));
-        RunScript.execute(connDBTest,
-                new InputStreamReader(
-                        cl.getResourceAsStream(TEST_DB)));
-
-        setupAdditionalDatabases("portofino", "jpetstore", "hibernatetest");
-    }
-
-    private void setupAdditionalDatabases(String... excludes) throws Exception {
-        ClassLoader cl = getClass().getClassLoader();
-        for(ConnectionProvider cp : application.getConnectionProviders()) {
-            if(!ArrayUtils.contains(excludes, cp.getDatabaseName())) {
-                Connection conn = cp.acquireConnection();
-                String schemaResource = getResource("-schema.sql", null);
-                if(schemaResource != null) {
-                    RunScript.execute(conn, new InputStreamReader(cl.getResourceAsStream(schemaResource)));
-                }
-                String dataResource = getResource("-dataload.sql", null);
-                if(dataResource != null) {
-                    RunScript.execute(conn, new InputStreamReader(cl.getResourceAsStream(dataResource)));
-                }
-            }
-        }
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    //--------------------------------------------------------------------------
-    // Parametrizzazione del test
-    //--------------------------------------------------------------------------
-
-    public String getPortofinoConnectionsResource() {
-        return getResource("-connections.xml", PORTOFINO_CONNECTIONS_RESOURCE);
-    }
-
-    public String getPortofinoModelResource() {
-        return getResource("-model.xml", PORTOFINO_MODEL_RESOURCE);
-    }
-
-    public String getResource(String suffix, @Nullable String defaultResource) {
-        String className = getClass().getName();
-        String resourceName = className.replace('.', '/') + suffix;
-        ClassLoader cl = getClass().getClassLoader();
-        InputStream is = cl.getResourceAsStream(resourceName);
-        if (is == null) {
-            return defaultResource;
-        } else {
-            return resourceName;
-        }
-    }
-
-
-    //--------------------------------------------------------------------------
-    // utilità
-    //--------------------------------------------------------------------------
-
-    protected File copyResourceToTempFile(String resourceName) throws IOException {
-        InputStream is =
-                ReflectionUtil.getResourceAsStream(resourceName);
-        File tempFile = File.createTempFile("portofino", "");
-        Writer writer = new FileWriter(tempFile);
-        IOUtils.copy(is, writer);
-        IOUtils.closeQuietly(writer);
-        return tempFile;
-    }
-
-
-
-    protected void createApplication() {
         Logger logger = LoggerFactory.getLogger(AbstractPortofinoTest.class);
         logger.info("Creating Context and " +
                 "registering on servlet context...");
@@ -203,6 +85,7 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
             ApplicationStarter applicationStarter =
                     new ApplicationStarter(portofinoConfiguration);
+            applicationStarter.initializeApplication(appId);
             application = applicationStarter.getApplication();
             model = application.getModel();
 
@@ -210,5 +93,20 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
         }
+
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
+
+
+    //--------------------------------------------------------------------------
+    // Parametrizzazione del test
+    //--------------------------------------------------------------------------
+
+    public String getTestAppId() {
+        return "default";
     }
 }

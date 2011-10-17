@@ -180,8 +180,17 @@ public class ApplicationStarter {
     //--------------------------------------------------------------------------
 
 
-    private boolean initializeApplication() {
+    public boolean initializeApplication() {
+        return initializeApplication(
+                portofinoConfiguration.getString(PortofinoProperties.APP_ID));
+    }
+
+    public boolean initializeApplication(String appId) {
         tmpApplication = null;
+
+        this.appId = appId;
+        logger.info("Application id: {}", appId);
+
         boolean success = setupDirectories();
 
         if (success) {
@@ -204,9 +213,6 @@ public class ApplicationStarter {
     }
 
     private boolean setupDirectories() {
-        appId = portofinoConfiguration.getString(PortofinoProperties.APP_ID);
-        logger.info("Application id: {}", appId);
-
         String appsDirPath =
         portofinoConfiguration.getString(
                 PortofinoProperties.APPS_DIR_PATH);
