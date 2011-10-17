@@ -2,13 +2,15 @@
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><jsp:include page="/skins/default/header.jsp"/>
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<jsp:include page="/skins/default/header.jsp"/>
 <div id="inner-content">
-    <h1>Handlers</h1>
+    <h1><fmt:message key="layouts.system-admin.logs.handlers"/></h1>
     <table>
         <tr>
-            <th>Name</th>
-            <th>Level</th>
+            <th><fmt:message key="layouts.system-admin.logs.name"/></th>
+            <th><fmt:message key="layouts.system-admin.logs.level"/></th>
         </tr>
     <s:iterator value="handlers">
         <tr>
@@ -18,12 +20,12 @@
     </s:iterator>
     </table>
 
-    <h1>Loggers</h1>
+    <h1><fmt:message key="layouts.system-admin.logs.loggers"/></h1>
     Current LogManager: <s:property value="logManager"/><br/>
     <table>
         <tr>
-            <th>Name</th>
-            <th>Level</th>
+            <th><fmt:message key="layouts.system-admin.logs.name"/></th>
+            <th><fmt:message key="layouts.system-admin.logs.level"/></th>
         </tr>
     <s:iterator value="loggers">
         <tr>

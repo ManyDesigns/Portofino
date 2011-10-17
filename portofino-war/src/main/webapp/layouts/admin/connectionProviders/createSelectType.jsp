@@ -3,16 +3,18 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><stripes:layout-render name="/skins/default/admin-page.jsp">
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.ConnectionProvidersAction"/>
     <stripes:layout-component name="pageTitle">
-        Select connection provider type
+        <fmt:message key="layouts.admin.connectionProviders.createSelectType.select_provider_type"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
         <stripes:submit name="returnToList" value="<< Return to list" class="contentButton"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Select connection provider type
+        <fmt:message key="layouts.admin.connectionProviders.createSelectType.select_provider_type"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <stripes:select name="connectionType">

@@ -3,7 +3,9 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><stripes:layout-render name="/skins/default/admin-page.jsp">
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.RootPermissionsAction"/>
     <stripes:layout-component name="pageTitle">
         Root permission
@@ -18,7 +20,7 @@
     <stripes:layout-component name="portletBody">
         <div class="yui-gb">
             <div class="yui-u first">
-                <div class="groupBoxTitle">Allow groups</div>
+                <div class="groupBoxTitle"><fmt:message key="layouts.admin.rootPermissions.allow_groups"/></div>
                 <ul class="groupBox">
                     <c:forEach var="group" items="${actionBean.allowGroups}">
                         <li id="group_<c:out value='${group.name}'/>" class="group ui-state-default"><c:out value="${group.name}"/></li>
@@ -27,7 +29,7 @@
                 <input type="hidden" name="allowGroupNames"/>
             </div>
             <div class="yui-u">
-                <div class="groupBoxTitle">Deny groups</div>
+                <div class="groupBoxTitle"><fmt:message key="layouts.admin.rootPermissions.deny_groups"/></div>
                 <ul class="groupBox">
                     <c:forEach var="group" items="${actionBean.denyGroups}">
                         <li id="group_<c:out value='${group.name}'/>" class="group ui-state-default"><c:out value="${group.name}"/></li>
@@ -36,7 +38,7 @@
                 <input type="hidden" name="denyGroupNames"/>
             </div>
             <div class="yui-u">
-                <div class="groupBoxTitle">Available groups</div>
+                <div class="groupBoxTitle"><fmt:message key="layouts.admin.rootPermissions.available_groups"/></div>
                 <ul class="groupBox">
                     <c:forEach var="group" items="${actionBean.availableGroups}">
                         <li id="group_<c:out value='${group.name}'/>" class="group ui-state-default"><c:out value="${group.name}"/></li>

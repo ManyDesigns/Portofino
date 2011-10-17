@@ -3,17 +3,19 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><stripes:layout-render name="/skins/default/admin-page.jsp">
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.ConnectionProvidersAction"/>
     <stripes:layout-component name="pageTitle">
-        Create connection provider
+        <fmt:message key="commons.create"/> connection provider
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
         <stripes:submit name="save" value="Save" class="contentButton"/>
         <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Create connection provider
+        <fmt:message key="commons.create"/> connection provider
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>

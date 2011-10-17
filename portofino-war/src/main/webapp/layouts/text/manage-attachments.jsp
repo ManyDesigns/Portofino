@@ -3,7 +3,9 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><stripes:layout-render name="/skins/${skin}/modal-page.jsp">
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.TextAction"/>
     <stripes:layout-component name="contentHeader">
         <stripes:submit name="cancel" value="Ok" class="contentButton"/>
@@ -14,11 +16,11 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Manage attachments for page <c:out value="${actionBean.textPage.title}"/>
+        <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page"/> <c:out value="${actionBean.textPage.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:if test="${not empty actionBean.textPage.attachments}">
-            Attachments:
+            <fmt:message key="commons.attachments"/>:
             <p>
                 <c:forEach var="attachment" items="${actionBean.textPage.attachments}">
                     <br/>
@@ -30,10 +32,10 @@
             <br/>
             <stripes:submit name="deleteAttachments" value="Delete selected attachments" class="portletButton"/>
         </c:if><c:if test="${empty actionBean.textPage.attachments}">
-            There are no attachments.
+            <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page"/>
         </c:if>
         <div class="horizontalSeparator"></div>
-        Upload a new file:
+        <fmt:message key="layouts.text.manage-attachments.upload_new_file"/>:
         <stripes:file name="upload"/>
         <br/>
         <br/>

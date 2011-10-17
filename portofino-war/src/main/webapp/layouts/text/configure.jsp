@@ -3,7 +3,9 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><stripes:layout-render name="/skins/${skin}/modal-page.jsp">
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <stripes:layout-component name="customScripts">
         <script type="text/javascript" src="<stripes:url value="/ckeditor/ckeditor.js"/>"></script>
         <script type="text/javascript" src="<stripes:url value="/ckeditor/adapters/jquery.js"/>"></script>
@@ -23,11 +25,11 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <fieldset class="mde-form-fieldset" style="padding-top: 1em;">
-            <legend>Content</legend>
+            <legend><fmt:message key="layouts.text.configure.content"/></legend>
             <stripes:textarea class="editor" name="content" value="${actionBean.content}"/>
         </fieldset>
         <div class="horizontalSeparator"></div>
-        This document is saved in the storage directory as: <c:out value="${actionBean.textFile.name}"/>
+        <fmt:message key="layouts.text.configure.this_document_is_saved"/> <c:out value="${actionBean.textFile.name}"/>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">

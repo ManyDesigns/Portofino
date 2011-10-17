@@ -10,6 +10,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
 <%@ taglib prefix="mde" uri="/manydesigns-elements"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
 <stripes:layout-definition><%--
 --%><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
@@ -19,7 +20,7 @@
         <jsp:useBean id="model" scope="request"
                      type="com.manydesigns.portofino.model.Model"/>
         <c:set var="applicationName" value="${model.rootPage.title}"/>
-        <title>Login to <c:out value="${applicationName}"/></title>
+        <title><fmt:message key="skins.default.login.login_to"/> <c:out value="${applicationName}"/></title>
     </head>
     <body>
     <div id="doc3">
@@ -38,7 +39,7 @@
                             <div class="portletHeader">
                                 <div class="yui-g">
                                     <div class="portletTitle">
-                                        <h1>Login to: <c:out value="${applicationName}"/></h1>
+                                        <h1><fmt:message key="skins.default.login.login_to"/>: <c:out value="${applicationName}"/></h1>
                                     </div>
                                     <div class="portletHeaderButtons">
                                         <stripes:layout-component name="portletHeaderButtons"/>
@@ -50,7 +51,7 @@
                                     <table class="mde-form-table loginTable">
                                         <tbody>
                                         <tr>
-                                            <th><label class="mde-field-label" for="userName">User name:</label></th>
+                                            <th><label class="mde-field-label" for="userName"><fmt:message key="skins.default.login.username"/>:</label></th>
                                             <td><stripes:text name="userName" id="userName" class="mde-text-field" /></td>
                                         </tr>
                                         <tr>
@@ -60,14 +61,14 @@
                                         <tr>
                                             <th></th>
                                             <td>
-                                                <stripes:submit name="login" value="Login" class="portletButton"/>
-                                                <stripes:submit name="cancel" value="Cancel" class="portletButton"/>
+                                                <stripes:submit name="login"  class="portletButton"><fmt:message key="commons.login"/></stripes:submit>
+                                                <stripes:submit name="cancel" class="portletButton"><fmt:message key="commons.cancel"/></stripes:submit>
                                             </td>
                                         </tr>
                                         <c:if test="recoverPwd">
                                             <tr>
                                                 <td colspan="2">
-                                                    Hai dimenticato la password? <a href="PwdRecovery.action">recupera password</a>
+                                                    <fmt:message key="skins.default.login.forgot_pwd"/> <a href="PwdRecovery.action"><fmt:message key="skins.default.login.retrieve_pwd"/></a>
                                                 </td>
                                             </tr>
                                         </c:if>

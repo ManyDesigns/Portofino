@@ -4,7 +4,9 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
-%><stripes:layout-render name="/skins/${skin}/portlet.jsp">
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.TextAction"/>
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.textPage.title}"/>
@@ -17,7 +19,7 @@
         <c:out value="${actionBean.content}" escapeXml="false"/>
         <c:if test="${not empty actionBean.textPage.attachments}">
             <div class="horizontalSeparator"></div>
-            Attachments:
+            <fmt:message key="commons.attachments"/>:
             <div class="attachmentBox">
                 <c:forEach var="attachment" items="${actionBean.textPage.attachments}">
                     <div class="attachment <c:out value="mime-${fn:replace(attachment.contentType,'/','-')}"/>">

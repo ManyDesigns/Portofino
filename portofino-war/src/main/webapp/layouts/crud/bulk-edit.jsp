@@ -3,7 +3,9 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><stripes:layout-render name="/skins/${skin}/modal-page.jsp">
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
     <stripes:layout-component name="contentHeader">
         <stripes:submit name="bulkUpdate" value="Update" class="contentButton"/>
@@ -18,7 +20,7 @@
         <c:out value="${actionBean.crud.editTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        In the first column, select the fields you want to edit. Then, fill in their values.
+        <fmt:message key = "layouts.crud.bulk-edit.select_columns"/>
         <mde:write name="actionBean" property="form"/>
         <stripes:hidden name="selection"/>
         <c:if test="${not empty actionBean.searchString}">

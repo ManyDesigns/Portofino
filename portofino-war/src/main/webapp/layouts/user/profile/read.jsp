@@ -3,7 +3,10 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><stripes:layout-render name="/skins/${skin}/modal-page.jsp">
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.ProfileAction"/>
     <stripes:layout-component name="contentHeader">
         <stripes:submit name="updateConfiguration" value="Update configuration" class="contentButton"/>
@@ -16,14 +19,14 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <jsp:include page="readButtonsBar.jsp"/>
-        <h1>Profile</h1>
+        <h1><fmt:message key="layouts.user.profile.edit.profile" /></h1>
 
         <mde:write name="actionBean" property="form"/>
-        <h1>My groups</h1>
+        <h1><fmt:message key="layouts.user.profile.edit.my_groups" /></h1>
         <table>
             <thead>
                 <tr>
-                    <th>Name</th> <th>Description</th>
+                    <th><fmt:message key="layouts.user.profile.edit.name" /></th> <th><fmt:message key="layouts.user.profile.edit.description" /></th>
                 </tr>
             </thead>
             <tbody>

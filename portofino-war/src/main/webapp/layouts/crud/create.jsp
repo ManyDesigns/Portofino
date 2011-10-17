@@ -3,7 +3,9 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><stripes:layout-render name="/skins/${skin}/modal-page.jsp">
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
     <stripes:layout-component name="contentHeader">
         <stripes:submit name="save" value="Save" class="contentButton"/>
@@ -19,7 +21,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:if test="${actionBean.requiredFieldsPresent}">
-            Fields marked with a "*" are required.
+            <fmt:message key="commons.fields_required"/>
         </c:if>
         <mde:write name="actionBean" property="form"/>
         <input type="hidden" name="pk" value="<c:out value="${actionBean.pk}"/>"/>

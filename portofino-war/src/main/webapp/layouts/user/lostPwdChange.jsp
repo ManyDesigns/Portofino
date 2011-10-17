@@ -2,11 +2,13 @@
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><jsp:include page="/skins/default/header.jsp"/>
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<jsp:include page="/skins/default/header.jsp"/>
 <s:form method="post">
     <jsp:include page="/skins/default/user/profile/readButtonsBar.jsp"/>
     <div id="inner-content">
-        <h1>Cambia password</h1>
+        <h1><fmt:message key="layouts.user.lostPwdChange.change_password"/></h1>
         <mdes:write value="form"/>
         <input type="hidden" name="token" value="<s:property value="token"/>"/>
         <input type="hidden" name="method:updatePwd" value="updatePwd"/>

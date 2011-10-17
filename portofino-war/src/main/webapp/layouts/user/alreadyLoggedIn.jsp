@@ -1,3 +1,4 @@
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%--
   Created by IntelliJ IDEA.
   User: predo
@@ -7,6 +8,6 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
-<head><title>Simple jsp page</title></head>
-<body>You are already logged in</body>
+<head><title><fmt:message key="layouts.user.alreadyLoggedIn"/></title></head>
+<body><fmt:message key="layouts.user.alreadyLoggedIn"/></body>
 </html>

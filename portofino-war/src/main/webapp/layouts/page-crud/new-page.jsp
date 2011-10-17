@@ -6,20 +6,22 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><stripes:layout-render name="/skins/${skin}/modal-page.jsp">
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
     <stripes:layout-component name="contentHeader">
         <stripes:submit name="createPage" value="Create" class="contentButton"/>
         <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Add new page
+        <fmt:message key="layouts.page-crud.new-page.add_new_page"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="newPageForm"/>
         <br /><br />
         <fieldset class="mde-form-fieldset">
-            <legend>Preview</legend>
+            <legend><fmt:message key="layouts.page-crud.new-page.preview"/></legend>
             <table class="mde-form-table">
                 <tbody>
                 <tr>

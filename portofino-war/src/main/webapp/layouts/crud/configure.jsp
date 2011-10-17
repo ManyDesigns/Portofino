@@ -3,7 +3,9 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><stripes:layout-render name="/skins/${skin}/modal-page.jsp">
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <stripes:layout-component name="customScripts">
         <script src="<stripes:url value="/ace-0.2.0/ace.js" />" type="text/javascript" charset="utf-8"></script>
         <script src="<stripes:url value="/ace-0.2.0/theme-twilight.js" />" type="text/javascript" charset="utf-8"></script>
@@ -31,12 +33,12 @@
         <mde:write name="actionBean" property="crudConfigurationForm"/>
         <!-- Properties -->
         <fieldset id="crudPropertiesFieldset" class="mde-form-fieldset" style="padding-top: 1em; margin-top: 1em;">
-            <legend>Properties</legend>
+            <legend><fmt:message key= "layouts.crud.configure.properties" /></legend>
             <c:if test="${not empty actionBean.propertiesTableForm}">
                 <mde:write name="actionBean" property="propertiesTableForm"/>
             </c:if>
             <c:if test="${empty actionBean.propertiesTableForm}">
-                You must select a table first.
+                <fmt:message key= "layouts.crud.configure.table_first" />
             </c:if>
         </fieldset>
         <c:if test="${not empty actionBean.propertiesTableForm}">

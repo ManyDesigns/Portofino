@@ -58,6 +58,10 @@
                 com.manydesigns.portofino.interceptors.CleanUpInterceptor
             </param-value>
         </init-param>
+        <init-param>
+            <param-name>LocalePicker.Locales</param-name>
+            <param-value>it_IT</param-value>
+        </init-param>
  	</filter>
 
     <filter-mapping>
@@ -67,6 +71,7 @@
         <dispatcher>INCLUDE</dispatcher>
         <dispatcher>FORWARD</dispatcher>
 	</filter-mapping>
+
 
 	<servlet>
 		<servlet-name>StripesDispatcher</servlet-name>
@@ -105,6 +110,13 @@
         <url-pattern>/LoginErrorPage</url-pattern>
     </servlet-mapping>
 -->
+    <context-param>
+      <param-name>
+        javax.servlet.jsp.jstl.fmt.localizationContext
+      </param-name>
+      <param-value>StripesResources</param-value>
+    </context-param>
+
 
     <session-config>
         <session-timeout>60</session-timeout>
