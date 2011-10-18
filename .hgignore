@@ -16,4 +16,5 @@ syntax: glob
 *~
 *.bak
 *.orig
-
+*h2.db
+*trace.db
