@@ -61,12 +61,12 @@ public class DispatcherTest extends AbstractPortofinoTest {
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
-        application.closeSessions();
+
     }
 
     @Override
     public String getTestAppId() {
-        return "demo-tt";
+        return "test-tt";
     }
 
     public void testProjectSearch() {

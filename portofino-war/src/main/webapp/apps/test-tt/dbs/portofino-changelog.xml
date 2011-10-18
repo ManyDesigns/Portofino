@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+    <changeSet author="alessio (generated)" id="1313767352015-1">
+        <createTable tableName="emailqueue">
+            <column name="id" type="CHAR(25)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="EmailQueue_pkey"/>
+            </column>
+            <column name="subject" type="VARCHAR(100)"/>
+            <column name="body" type="VARCHAR(4000)"/>
+            <column name="to_" type="VARCHAR(100)"/>
+            <column name="from_" type="VARCHAR(100)"/>
+            <column name="createdate" type="DATE"/>
+            <column name="state" type="DECIMAL(10,0)"/>
+            <column name="attachmentpath" type="VARCHAR(255)"/>
+            <column name="attachmentdescription" type="VARCHAR(255)"/>
+            <column name="attachmentname" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-2">
+        <createTable tableName="emailstate">
+            <column name="id" type="DECIMAL(10,0)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="emailstate_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(75)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-3">
+        <createTable tableName="groups">
+            <column name="groupid" type="CHAR(25)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="group_pkey"/>
+            </column>
+            <column name="creatorid" type="CHAR(25)"/>
+            <column name="name" type="VARCHAR(50)"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="deletiondate" type="TIMESTAMP NULL"/>
+            <column name="creationdate" type="TIMESTAMP NULL"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-4">
+        <createTable tableName="msg">
+            <column name="id" type="CHAR(25)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="msg_pkey"/>
+            </column>
+            <column name="subject" type="VARCHAR(255)"/>
+            <column name="body" type="VARCHAR(4000)"/>
+            <column name="to_" type="CHAR(25)"/>
+            <column name="from_" type="CHAR(25)"/>
+            <column name="creationdate" type="TIMESTAMP NULL"/>
+            <column name="state" type="DECIMAL(10,0)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-5">
+        <createTable tableName="msgstate">
+            <column name="id" type="DECIMAL(10,0)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="msgstate_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-6">
+        <createTable tableName="oldpwd">
+            <column name="id" type="CHAR(25)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="OldPwd_pkey"/>
+            </column>
+            <column name="createdate" type="TIMESTAMP NULL"/>
+            <column name="password" type="VARCHAR(30)"/>
+            <column name="userid" type="CHAR(25)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-7">
+        <createTable tableName="users">
+            <column name="userid" type="CHAR(25)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="user_pkey"/>
+            </column>
+            <column name="deletiondate" type="TIMESTAMP NULL"/>
+            <column name="creationdate" type="TIMESTAMP NULL"/>
+            <column name="modifieddate" type="TIMESTAMP NULL"/>
+            <column name="defaultuser" type="CHAR(1)"/>
+            <column name="extauth" type="CHAR(1)"/>
+            <column name="pwd" type="VARCHAR(50)"/>
+            <column name="lastpwdmoddate" type="TIMESTAMP NULL"/>
+            <column name="username" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="emailaddress" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="firstname" type="VARCHAR(50)"/>
+            <column name="middlename" type="VARCHAR(50)"/>
+            <column name="lastname" type="VARCHAR(50)"/>
+            <column name="jobtitle" type="VARCHAR(50)"/>
+            <column name="lastlogindate" type="TIMESTAMP NULL"/>
+            <column name="lastfailedlogindate" type="TIMESTAMP NULL"/>
+            <column name="failedloginattempts" type="DECIMAL(10,0)"/>
+            <column name="agreedtoterms" type="CHAR(1)"/>
+            <column name="state" type="DECIMAL(10,0)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bounced" type="DECIMAL(10,0)"/>
+            <column name="token" type="VARCHAR(100)"/>
+            <column name="remquestion" type="VARCHAR(255)"/>
+            <column name="remans" type="VARCHAR(255)"/>
+            <column name="gracelogincount" type="DECIMAL(10,0)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-8">
+        <createTable tableName="users_groups">
+            <column name="groupid" type="CHAR(25)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="userid" type="CHAR(25)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deletiondate" type="TIMESTAMP NULL"/>
+            <column name="creationdate" type="TIMESTAMP NULL">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-9">
+        <createTable tableName="userstate">
+            <column name="id" type="DECIMAL(10,0)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="userstate_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(75)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-10">
+        <addPrimaryKey columnNames="groupid, userid, creationdate" constraintName="users_groups_pkey" tableName="users_groups"/>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-11">
+        <addUniqueConstraint columnNames="name" constraintName="groups_name_key" disabled="false" tableName="groups"/>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-12">
+        <addUniqueConstraint columnNames="username" constraintName="users_username_key" disabled="false" tableName="users"/>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-13">
+        <addForeignKeyConstraint baseColumnNames="state" baseTableName="emailqueue" constraintName="fk_emailqueue_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="emailstate" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-14">
+        <addForeignKeyConstraint baseColumnNames="creatorid" baseTableName="groups" constraintName="fk_group_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-15">
+        <addForeignKeyConstraint baseColumnNames="from_" baseTableName="msg" constraintName="fk_msg_2" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-16">
+        <addForeignKeyConstraint baseColumnNames="state" baseTableName="msg" constraintName="fk_msg_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="msgstate" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-17">
+        <addForeignKeyConstraint baseColumnNames="to_" baseTableName="msg" constraintName="fk_msg_3" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-18">
+        <addForeignKeyConstraint baseColumnNames="userid" baseTableName="oldpwd" constraintName="fk_oldpwd_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-19">
+        <addForeignKeyConstraint baseColumnNames="state" baseTableName="users" constraintName="fk_user_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="userstate" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-20">
+        <addForeignKeyConstraint baseColumnNames="groupid" baseTableName="users_groups" constraintName="fk_usersgroups_2" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="groupid" referencedTableName="groups" referencesUniqueColumn="false"/>
+    </changeSet>
+    <changeSet author="alessio (generated)" id="1313767352015-21">
+        <addForeignKeyConstraint baseColumnNames="userid" baseTableName="users_groups" constraintName="fk_usersgroups_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencesUniqueColumn="false"/>
+    </changeSet>
+
+    <changeSet author="portofino" id="insert-userstates">
+        <insert tableName="userstate">
+            <column name="id" valueNumeric="1" />
+            <column name="name" value="active" />
+            <column name="description" />
+        </insert>
+        <insert tableName="userstate">
+            <column name="id" valueNumeric="2" />
+            <column name="name" value="suspended" />
+            <column name="description" />
+        </insert>
+        <insert tableName="userstate">
+            <column name="id" valueNumeric="3" />
+            <column name="name" value="banned" />
+            <column name="description" />
+        </insert>
+        <insert tableName="userstate">
+            <column name="id" valueNumeric="4" />
+            <column name="name" value="selfregistred" />
+            <column name="description" />
+        </insert>
+    </changeSet>
+
+    <changeSet author="portofino" id="insert-emailstates">
+        <insert tableName="emailstate">
+            <column name="id" valueNumeric="0" />
+            <column name="name" value="sending" />
+            <column name="description" />
+        </insert>
+        <insert tableName="emailstate">
+            <column name="id" valueNumeric="1" />
+            <column name="name" value="to be sent" />
+            <column name="description" />
+        </insert>
+        <insert tableName="emailstate">
+            <column name="id" valueNumeric="2" />
+            <column name="name" value="sent" />
+            <column name="description" />
+        </insert>
+        <insert tableName="emailstate">
+            <column name="id" valueNumeric="3" />
+            <column name="name" value="rejected" />
+            <column name="description" />
+        </insert>
+        <insert tableName="emailstate">
+            <column name="id" valueNumeric="4" />
+            <column name="name" value="bounced" />
+            <column name="description" />
+        </insert>
+    </changeSet>
+
+    <changeSet author="portofino" id="insert-msgstates">
+        <insert tableName="msgstate">
+            <column name="id" valueNumeric="1" />
+            <column name="name" value="sent" />
+            <column name="description" />
+        </insert>
+        <insert tableName="msgstate">
+            <column name="id" valueNumeric="2" />
+            <column name="name" value="read" />
+            <column name="description" />
+        </insert>
+    </changeSet>
+
+    <changeSet author="portofino" id="insert-users">
+        <insert tableName="users">
+            <column name="userid" value="1" />
+            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
+            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
+            <column name="pwd" value="admin" />
+            <column name="username" value="admin" />
+            <column name="emailaddress" value="admin@example.com" />
+            <column name="firstname" value="Ad" />
+            <column name="lastname" value="Min" />
+            <column name="state" valueNumeric="1" />
+        </insert>
+        <insert tableName="users">
+            <column name="userid" value="2" />
+            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
+            <column name="pwd" value="user" />
+            <column name="username" value="user" />
+            <column name="emailaddress" value="user@example.com" />
+            <column name="firstname" value="User" />
+            <column name="lastname" value="User" />
+            <column name="state" valueNumeric="1" />
+        </insert>
+    </changeSet>
+
+    <changeSet author="portofino" id="insert-groups">
+        <insert tableName="groups">
+            <column name="groupid" value="anonymous" />
+            <column name="creatorid" value="1" />
+            <column name="name" value="anonymous" />
+            <column name="description" value="anonymous users" />
+            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
+        </insert>
+        <insert tableName="groups">
+            <column name="groupid" value="registered" />
+            <column name="creatorid" value="1" />
+            <column name="name" value="registered" />
+            <column name="description" value="registered users" />
+            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
+        </insert>
+        <insert tableName="groups">
+            <column name="groupid" value="administrators" />
+            <column name="creatorid" value="1" />
+            <column name="name" value="administrators" />
+            <column name="description" value="administrators" />
+            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
+        </insert>
+    </changeSet>
+
+    <changeSet author="portofino" id="insert-users_groups">
+        <insert tableName="users_groups">
+            <column name="groupid" value="administrators"/>
+            <column name="userid" value="1"/>
+            <column name="deletiondate" />
+            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>

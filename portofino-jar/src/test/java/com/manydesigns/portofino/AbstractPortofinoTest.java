@@ -53,6 +53,7 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
     // Long-lived Portofino objects
     protected PropertiesConfiguration portofinoConfiguration;
+    protected ApplicationStarter applicationStarter;
     protected Application application;
 
     //Connessioni e context
@@ -91,10 +92,10 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
         try {
             // ElementsThreadLocals è già stato impostato da AbstractElementsTest
 
-            ApplicationStarter applicationStarter =
+            applicationStarter =
                     new ApplicationStarter(portofinoConfiguration);
             applicationStarter.initializeApplication(appId);
-            application = applicationStarter.getApplication(appId);
+            application = applicationStarter.getApplication();
             model = application.getModel();
 
 
@@ -134,8 +135,11 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
     @Override
     public void tearDown() throws Exception {
+
         super.tearDown();
-        String currDir;
+        application.closeSessions();
+        applicationStarter.destroy();
+/*        String currDir;
         currDir = MessageFormat.format("{0}/portofino-war/target/portofino-war-{1}/WEB-INF/db",
                     dir, version);
         File directory = new File(currDir);
@@ -146,7 +150,7 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
             {
                 System.out.println("Failed to delete "+file);
             }
-        }
+        } */
     }
 
 

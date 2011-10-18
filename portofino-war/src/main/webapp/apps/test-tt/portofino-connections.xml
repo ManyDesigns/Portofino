@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<connections>
+    <!--url="jdbc:mysql://192.168.1.8/redmine"-->
+    <jdbcConnection
+            databaseName="redmine"
+            driver="org.h2.Driver"
+            url="jdbc:h2:mem:redmine"
+            username="manydesigns"
+            password="manydesigns"
+            includeSchemas="PUBLIC"
+            excludeSchemas=""
+            />
+    <jdbcConnection
+            databaseName="portofino"
+            driver="org.h2.Driver"
+            url="jdbc:h2:mem:portofino"
+            username="sa"
+            password=""
+            includeSchemas="PUBLIC"
+            excludeSchemas=""
+            />
+</connections>
