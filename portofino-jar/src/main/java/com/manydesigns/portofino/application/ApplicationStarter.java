@@ -146,6 +146,35 @@ public class ApplicationStarter {
         }
     }
 
+    public synchronized Application getApplication(String appId)
+            throws UninitializedApplicationException, DestroyedApplicationException {
+        if (status == Status.DESTROYED) {
+            throw new DestroyedApplicationException();
+        }
+        if (status == Status.UNINITIALIZED) {
+            logger.info("Trying to initilize application");
+            try {
+                status = Status.INITIALIZING;
+                if (initializeApplication(appId)) {
+                    status = Status.INITIALIZED;
+                } else {
+                    status = Status.UNINITIALIZED;
+                    throw new UninitializedApplicationException();
+                }
+            } catch (Throwable e) {
+                status = Status.UNINITIALIZED;
+                logger.error("Failed to initilize application", e);
+                throw new UninitializedApplicationException();
+            }
+        }
+        if (status == Status.INITIALIZED) {
+            return application;
+        } else {
+            logger.error("Illegal state (probably due to concurrency issues): {}", status);
+            throw new InternalError("Status: " + status);
+        }
+    }
+
     public synchronized void destroy() {
         if (status != Status.INITIALIZED) {
             logger.info("Application not initialized. Nothing to destroy.");

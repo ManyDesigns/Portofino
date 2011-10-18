@@ -29,24 +29,19 @@
 package com.manydesigns.portofino;
 
 import com.manydesigns.elements.AbstractElementsTest;
-import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ApplicationStarter;
-import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.h2.tools.RunScript;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.sql.Connection;
+import java.text.MessageFormat;
+import java.util.StringTokenizer;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -62,6 +57,8 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
     //Connessioni e context
     public Model model;
+    private String version;
+    private String dir;
 
     //--------------------------------------------------------------------------
     // Setup e teardown
@@ -70,8 +67,19 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
+
+
+        TestServerInfo serverInfo = new TestServerInfo();
+        BeanLookup serverInfoLookup = new BeanLookup(serverInfo);
+        ConfigurationInterpolator.registerGlobalLookup(
+                ApplicationAttributes.SERVER_INFO,
+                serverInfoLookup);
+
         portofinoConfiguration = new PropertiesConfiguration(
                             PortofinoProperties.PROPERTIES_RESOURCE);
+
+        version = portofinoConfiguration.getString("portofino.version");
+        dir = getPrjDir(portofinoConfiguration.getString("portofino.build.directory"));
 
         String appId = getTestAppId();
 
@@ -86,7 +94,7 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
             ApplicationStarter applicationStarter =
                     new ApplicationStarter(portofinoConfiguration);
             applicationStarter.initializeApplication(appId);
-            application = applicationStarter.getApplication();
+            application = applicationStarter.getApplication(appId);
             model = application.getModel();
 
 
@@ -96,9 +104,49 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
     }
 
+    private String getPrjDir(String dir) {
+        String sep = System.getProperty("file.separator");
+        String result;
+        result = dir.startsWith(sep)?sep:"";
+        StringTokenizer tokenizer = new StringTokenizer(dir, sep);
+        boolean first = true;
+        while (tokenizer.hasMoreTokens()){
+            String token = tokenizer.nextToken();
+            if("elements-struts1".equals(token)||
+                    "elements-struts2".equals(token)||
+                    "elements".equals(token)||
+                    "elements-extras".equals(token)||
+                    "portofino-jar".equals(token)||
+                    "portofino-war".equals(token)){
+                break;
+            }
+            if(first){
+                result = result+token;
+                first = false;
+            } else {
+                result = result + sep + token;
+
+            }
+
+        }
+        return result;
+    }
+
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
+        String currDir;
+        currDir = MessageFormat.format("{0}/portofino-war/target/portofino-war-{1}/WEB-INF/db",
+                    dir, version);
+        File directory = new File(currDir);
+        File[] files = directory.listFiles();
+        for (File file : files)
+        {
+            if (!file.delete())
+            {
+                System.out.println("Failed to delete "+file);
+            }
+        }
     }
 
 
@@ -108,5 +156,16 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
 
     public String getTestAppId() {
         return "default";
+    }
+
+    public class TestServerInfo {
+        String realPath;
+
+        public String getRealPath(){
+            String currDir;
+            currDir = MessageFormat.format("{0}/portofino-war/target/portofino-war-{1}",
+                    dir, version);
+            return currDir;
+        }
     }
 }
