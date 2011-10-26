@@ -4,9 +4,9 @@
 <meta http-equiv="Content-Script-Type" content="text/javascript"/>
 <meta http-equiv="Content-Style-Type" content="text/css"/>
 <link rel="stylesheet" type="text/css"
-      href="<stripes:url value="/yui-2.8.1/build/reset-fonts-grids/reset-fonts-grids.css"/>"/>
+      href="<stripes:url value="/yui-2.9.0/build/reset-fonts-grids/reset-fonts-grids.css"/>"/>
 <link rel="stylesheet" type="text/css"
-      href="<stripes:url value="/yui-2.8.1/build/base/base-min.css"/>"/>
+      href="<stripes:url value="/yui-2.9.0/build/base/base-min.css"/>"/>
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/jquery-ui-1.8.9/css/smoothness/jquery-ui-1.8.9.custom.css"/>"/>
 <link rel="stylesheet" type="text/css"
