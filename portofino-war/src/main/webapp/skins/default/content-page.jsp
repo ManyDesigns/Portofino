@@ -20,7 +20,7 @@
                      type="com.manydesigns.portofino.dispatcher.Dispatch"/>
         <title><c:out value="${dispatch.lastPageInstance.page.description}"/></title>
     </head>
-    <body>
+    <body class="yui-skin-sam">
     <div id="doc3" class="yui-t2">
         <div id="hd">
             <jsp:include page="header.jsp"/>

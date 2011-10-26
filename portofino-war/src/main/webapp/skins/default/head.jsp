@@ -7,14 +7,31 @@
       href="<stripes:url value="/yui-2.9.0/build/reset-fonts-grids/reset-fonts-grids.css"/>"/>
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/yui-2.9.0/build/base/base-min.css"/>"/>
+
+<link rel="stylesheet" type="text/css"
+      href="<stripes:url value="/yui-2.9.0/build/datatable/assets/skins/sam/datatable.css"/>">
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/jquery-ui-1.8.9/css/smoothness/jquery-ui-1.8.9.custom.css"/>"/>
+
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/skins/default/portofino.css"/>"/>
+
 <script type="text/javascript"
         src="<stripes:url value="/jquery-ui-1.8.9/js/jquery-1.4.4.min.js"/>"></script>
 <script type="text/javascript"
         src="<stripes:url value="/jquery-ui-1.8.9/js/jquery-ui-1.8.9.custom.min.js"/>"></script>
+
+<script type="text/javascript"
+        src="<stripes:url value="/yui-2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"/>"></script>
+<script type="text/javascript"
+        src="<stripes:url value="/yui-2.9.0/build/element/element-min.js"/>"></script>
+<script type="text/javascript"
+        src="<stripes:url value="/yui-2.9.0/build/datasource/datasource-min.js"/>"></script>
+<script type="text/javascript"
+        src="<stripes:url value="/yui-2.9.0/build/json/json-min.js"/>"></script>
+<script type="text/javascript"
+        src="<stripes:url value="/yui-2.9.0/build/datatable/datatable-min.js"/>"></script>
+
 <script type="text/javascript"
         src="<stripes:url value="/elements.js"/>"></script>
 <script type="text/javascript"
