@@ -38,6 +38,7 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import org.apache.commons.configuration.Configuration;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.Serializable;
@@ -119,17 +120,13 @@ public interface Application {
 
     List getAllObjects(String qualifiedTableName);
 
-    List<Object> getObjects(TableCriteria criteria);
+    List<Object> getObjects(TableCriteria criteria, @Nullable Integer firstResult, @Nullable Integer maxResults);
 
-    List<Object> getObjects(String queryString, Object rootObject);
+    List<Object> getObjects(String queryString, Object rootObject, @Nullable Integer firstResult, @Nullable Integer maxResults);
 
-    List<Object> getObjects(String qualifiedTablename, String queryString, Object rootObject);
+    List<Object> getObjects(String queryString, @Nullable Integer firstResult, @Nullable Integer maxResults);
 
-    List<Object> getObjects(String queryString);
-
-    List<Object> getObjects(String queryString, TableCriteria criteria, Object rootObject);
-
-    List<Object> getObjects(String queryString, TableCriteria criteria);
+    List<Object> getObjects(String queryString, TableCriteria criteria, Object rootObject, @Nullable Integer firstResult, @Nullable Integer maxResults);
 
     void saveObject(String qualifiedTableName, Object obj);
 
@@ -185,4 +182,28 @@ public interface Application {
 
     void shutdown();
 
+    List<Object> runHqlQuery(
+            String queryString,
+            @Nullable Object[] parameters
+    );
+
+    List<Object> runHqlQuery(
+            String queryString,
+            @Nullable Object[] parameters,
+            @Nullable Integer firstResult,
+            @Nullable Integer maxResults
+    );
+
+    List<Object> runHqlQuery(String qualifiedTableName,
+                             String queryString,
+                             @Nullable Object[] parameters
+    );
+
+    List<Object> runHqlQuery(
+            String qualifiedTableName,
+            String queryString,
+            @Nullable Object[] parameters,
+            @Nullable Integer firstResult,
+            @Nullable Integer maxResults
+    );
 }

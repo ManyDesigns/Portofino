@@ -132,7 +132,7 @@ public class EmailTask extends TimerTask {
             criteria.eq(accessor.getProperty("state"), EmailUtils.TOBESENT);
             List<Object> emails = application.getObjects(
                     criteria.eq(accessor.getProperty("state"),
-                            EmailUtils.TOBESENT));
+                            EmailUtils.TOBESENT), null, null);
             for (Object obj : emails) {
                 EmailSender emailSender = new EmailSender(application,
                         (EmailBean) obj);
@@ -170,7 +170,7 @@ public class EmailTask extends TimerTask {
 
             ClassAccessor accessor = application.getTableAccessor(USERTABLE);
             List<Object> users = application.getObjects(
-                    criteria.gt(accessor.getProperty("email"), email));
+                    criteria.gt(accessor.getProperty("email"), email), null, null);
             if (users.size() == 0) {
                 logger.warn("no user found for email {}", email);
                 return;

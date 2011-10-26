@@ -79,7 +79,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         final int expectedId = 3;
         try {
             criteria.eq(tableAccessor.getProperty("suppid"), expectedId);
-            List listObjs = application.getObjects(criteria);
+            List listObjs = application.getObjects(criteria, null, null);
             assertEquals(1, listObjs.size());
             Map<String,String> supp = (Map<String, String>) listObjs.get(0);
             String name = supp.get("name");
@@ -104,7 +104,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         final long expectedId = 1;
         try {
             criteria.eq(tableAccessor.getProperty("id"), expectedId);
-            List listObjs = application.getObjects(criteria);
+            List listObjs = application.getObjects(criteria, null, null);
             assertEquals(1, listObjs.size());
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
@@ -150,7 +150,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         TableCriteria criteria = new TableCriteria(table);
         try {
             criteria.eq(tableAccessor.getProperty("orderid"), expectedId);
-            List listObjs = application.getObjects(criteria);
+            List listObjs = application.getObjects(criteria, null, null);
             assertEquals(1, listObjs.size());
             Map<String,String> supp = (Map<String, String>) listObjs.get(0);
             String name = supp.get("userid");
@@ -176,7 +176,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         final long expectedId = 3L;
         try {
             criteria.eq(tableAccessor.getProperty("groupId"), expectedId);
-            List<Object> listObjs = application.getObjects(criteria);
+            List<Object> listObjs = application.getObjects(criteria, null, null);
             assertEquals(1, listObjs.size());
             myGroup = (Group) listObjs.get(0);
             String name = myGroup.getName();

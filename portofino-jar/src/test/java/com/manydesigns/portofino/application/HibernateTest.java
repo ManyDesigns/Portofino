@@ -123,7 +123,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         HashMap<String, String> category=null;
         try {
             criteria.eq(tableAccessor.getProperty("catid"), "FISH");
-            List<Object> listObjs = application.getObjects(criteria);
+            List<Object> listObjs = application.getObjects(criteria, null, null);
             assertEquals(1, listObjs.size());
             category = (HashMap<String, String>) listObjs.get(0);
             String catid = category.get("catid");

@@ -311,7 +311,7 @@ public class CrudAction extends PortletAction {
                     name, fieldNames.length, fieldTypes, objects);
             selectionProvider.setDisplayMode(dm);
         } else if (hql != null) {
-            Collection<Object> objects = application.getObjects(hql);
+            Collection<Object> objects = application.getObjects(hql, null, null);
             String qualifiedTableName =
                     application.getQualifiedTableNameFromQueryString(hql);
             TableAccessor tableAccessor =
@@ -941,7 +941,7 @@ public class CrudAction extends PortletAction {
             if(searchForm != null) {
                 searchForm.configureCriteria(criteria);
             }
-            objects = application.getObjects(crud.getQuery(), criteria, this);
+            objects = application.getObjects(crud.getQuery(), criteria, this, null, null);
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
             logger.warn("Incorrect Field Type", e);

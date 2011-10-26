@@ -22,7 +22,7 @@
             <%
                 //TODO esporre maxResults nell'interfaccia e non usare direttamente runHqlQuery
                 HibernateApplicationImpl appl = (HibernateApplicationImpl) request.getAttribute("application");
-                List objects = appl.runHqlQuery("FROM redmine_public_projects order by updated_on desc, created_on desc", new Object[0], 3);
+                List objects = appl.runHqlQuery("FROM redmine_public_projects order by updated_on desc, created_on desc", new Object[0], null, 3);
                 for(Object obj : objects) {
                     Map map = (Map) obj;
                     %>

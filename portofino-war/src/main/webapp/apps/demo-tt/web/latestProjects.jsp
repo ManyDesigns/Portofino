@@ -4,6 +4,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="com.manydesigns.portofino.application.Application" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -20,9 +21,9 @@
     <stripes:layout-component name="portletBody">
         <ul>
             <%
-                //TODO esporre maxResults nell'interfaccia e non usare direttamente runHqlQuery
-                HibernateApplicationImpl appl = (HibernateApplicationImpl) request.getAttribute("application");
-                List objects = appl.runHqlQuery("FROM redmine_public_projects order by updated_on desc, created_on desc", new Object[0], 3);
+                Application appl = (Application) request.getAttribute("application");
+                String queryString = "FROM redmine_public_projects order by updated_on desc, created_on desc";
+                List objects = appl.runHqlQuery(queryString, new Object[0], 0, 3);
                 for(Object obj : objects) {
                     Map map = (Map) obj;
                     %>

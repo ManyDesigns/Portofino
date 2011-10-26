@@ -25,7 +25,7 @@
                         "WHERE t.id = i.tracker_id " +
                         "  AND i.project_id = %{#project.id} " +
                         "  AND i.status_id = st.id " +
-                        "GROUP BY t.name");
+                        "GROUP BY t.name", null, null);
                 for(Object obj : objects) {
                     Object[] obArr = (Object[]) obj;
                     out.print(obArr[0] + ": " + obArr[1] + " open / " + obArr[2] + "<br />");

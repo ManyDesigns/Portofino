@@ -73,6 +73,7 @@ import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.jdbc.Work;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -610,33 +611,36 @@ public class HibernateApplicationImpl implements Application {
         return pattern;
     }
 
-    public List<Object> getObjects(TableCriteria criteria) {
+    public List<Object> getObjects(TableCriteria criteria,
+                                   @Nullable Integer firstResult,
+                                   @Nullable Integer maxResults) {
         QueryStringWithParameters queryStringWithParameters =
                 getQueryStringWithParametersForCriteria(criteria);
 
         return runHqlQuery(
                 queryStringWithParameters.getQueryString(),
-                queryStringWithParameters.getParamaters());
+                queryStringWithParameters.getParamaters(),
+                firstResult,
+                maxResults
+        );
     }
 
 
-    public List<Object> getObjects(String queryString, Object rootObject) {
+    public List<Object> getObjects(String queryString,
+                                   Object rootObject,
+                                   @Nullable Integer firstResult,
+                                   @Nullable Integer maxResults) {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
         String formatString = sqlFormat.getFormatString();
         Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
 
-        return runHqlQuery(formatString, parameters);
+        return runHqlQuery(formatString, parameters, firstResult, maxResults);
     }
 
-    public List<Object> getObjects(String qualifiedTableName, String queryString, Object rootObject) {
-        OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
-        String formatString = sqlFormat.getFormatString();
-        Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
-        return runHqlQuery(qualifiedTableName, formatString, parameters);
-    }
-
-    public List<Object> getObjects(String queryString) {
-        return getObjects(queryString, null);
+    public List<Object> getObjects(String queryString,
+                                   @Nullable Integer firstResult,
+                                   @Nullable Integer maxResults) {
+        return getObjects(queryString, (TableCriteria) null, null, firstResult, maxResults);
     }
 
     public String getQualifiedTableNameFromQueryString(String queryString) {
@@ -652,13 +656,11 @@ public class HibernateApplicationImpl implements Application {
         return table.getQualifiedName();
     }
 
-    public List<Object> getObjects(String queryString, TableCriteria criteria) {
-        return getObjects(queryString, criteria, null);
-    }
-
     public List<Object> getObjects(String queryString,
                                    TableCriteria criteria,
-                                   Object rootObject) {
+                                   @Nullable Object rootObject,
+                                   @Nullable Integer firstResult,
+                                   @Nullable Integer maxResults) {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
         String formatString = sqlFormat.getFormatString();
         Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
@@ -704,41 +706,60 @@ public class HibernateApplicationImpl implements Application {
         Object[] mergedParameters = new Object[mergedParametersList.size()];
         mergedParametersList.toArray(mergedParameters);
 
-        return runHqlQuery(fullQueryString, mergedParameters);
+        return runHqlQuery(fullQueryString, mergedParameters, firstResult, maxResults);
     }
 
-    public List<Object> runHqlQuery
-            (String queryString, Object[] parameters) {
-        return runHqlQuery(queryString, parameters, null);
+    public List<Object> runHqlQuery(
+            String queryString,
+            @Nullable Object[] parameters
+    ) {
+        return runHqlQuery(queryString, parameters, null, null);
     }
 
-    public List<Object> runHqlQuery
-            (String queryString, Object[] parameters, Integer maxResults) {
+    public List<Object> runHqlQuery(
+            String queryString,
+            @Nullable Object[] parameters,
+            @Nullable Integer firstResult,
+            @Nullable Integer maxResults
+    ) {
         String qualifiedName =
                 getQualifiedTableNameFromQueryString(queryString);
 
-        return runHqlQuery(qualifiedName, queryString, parameters, maxResults);
+        return runHqlQuery(qualifiedName, queryString, parameters, firstResult, maxResults);
     }
 
-    public List<Object> runHqlQuery
-            (String qualifiedTableName, String queryString, Object[] parameters) {
-        return runHqlQuery(qualifiedTableName, queryString, parameters, null);
+    public List<Object> runHqlQuery(
+            String qualifiedTableName,
+            String queryString,
+            @Nullable Object[] parameters
+    ) {
+        return runHqlQuery(qualifiedTableName, queryString, parameters, null, null);
     }
 
-    public List<Object> runHqlQuery
-            (String qualifiedTableName, String queryString,
-             Object[] parameters, Integer maxResults) {
+    public List<Object> runHqlQuery(
+            String qualifiedTableName,
+            String queryString,
+            @Nullable Object[] parameters,
+            @Nullable Integer firstResult,
+            @Nullable Integer maxResults) {
         Session session = getSession(qualifiedTableName);
 
         Query query = session.createQuery(queryString);
-        for (int i = 0; i < parameters.length; i++) {
-            query.setParameter(i, parameters[i]);
+        if (parameters != null) {
+            for (int i = 0; i < parameters.length; i++) {
+                query.setParameter(i, parameters[i]);
+            }
         }
 
-        //noinspection unchecked
+        if (firstResult != null) {
+            query.setFirstResult(firstResult);
+        }
+
         if(maxResults != null) {
             query.setMaxResults(maxResults);
         }
+
+        //noinspection unchecked
         List<Object> result = query.list();
         return result;
     }

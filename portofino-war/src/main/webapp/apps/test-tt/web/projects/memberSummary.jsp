@@ -28,7 +28,7 @@
                         "WHERE m.project_id = %{#project.id}" +
                         "  AND m.user_id = u.id " +
                         "  AND mr.member_id = m.id " +
-                        "  AND mr.role_id = r.id ");
+                        "  AND mr.role_id = r.id ", null, null);
                 MultiMap mm = new MultiHashMap();
                 for(Object obj : objects) {
                     Object[] obArr = (Object[]) obj;

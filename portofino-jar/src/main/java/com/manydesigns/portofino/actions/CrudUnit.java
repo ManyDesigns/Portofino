@@ -554,7 +554,7 @@ public class CrudUnit {
         try {
             TableCriteria criteria = new TableCriteria(baseTable);
             searchForm.configureCriteria(criteria);
-            objects = application.getObjects(query, criteria, this);
+            objects = application.getObjects(query, criteria, this, null, null);
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
             logger.warn("Incorrect Field Type", e);
