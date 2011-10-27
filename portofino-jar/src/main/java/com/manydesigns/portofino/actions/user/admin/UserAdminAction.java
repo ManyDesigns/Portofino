@@ -30,6 +30,15 @@ package com.manydesigns.portofino.actions.user.admin;
 
 
 import com.manydesigns.portofino.actions.CrudAction;
+import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.dispatcher.CrudPageInstance;
+import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.model.pages.CrudPage;
+import com.manydesigns.portofino.model.pages.crud.Crud;
+import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
+import net.sourceforge.stripes.action.Before;
+import net.sourceforge.stripes.action.UrlBinding;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -37,43 +46,61 @@ import com.manydesigns.portofino.actions.CrudAction;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@RequiresAdministrator
+@UrlBinding(UserAdminAction.ACTION_PATH)
 public class UserAdminAction extends CrudAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
-/*
 
     //**************************************************************************
     // Constants
     //**************************************************************************
 
+    public static final String ACTION_PATH = "/admin/users.action";
+
     private static final String userTable = "portofino.public.users";
     private static final String groupTable = "portofino.public.groups";
     private static final String usersGroupsTable = "portofino.public.users_groups";
-    private final int pwdLength;
-    private final Boolean enc;
+    /*private final int pwdLength;
+    private final Boolean enc;*/
 
     //**************************************************************************
     // Injections
     //**************************************************************************
 
-
-    @InjectHttpSession
-    public HttpSession session;
+    //**************************************************************************
+    // Action methods
+    //**************************************************************************
 
     public UserAdminAction() {
-        super();
-        this.pwdLength = Integer.parseInt(PortofinoProperties.getProperties()
+        /*this.pwdLength = Integer.parseInt(PortofinoProperties.getProperties()
                 .getProperty("pwd.lenght.min","6"));
         enc = Boolean.parseBoolean(PortofinoProperties.getProperties()
                 .getProperty(PortofinoProperties.PWD_ENCRYPTED, "false"));
-
+        */
     }
 
+    @Override
+    @Before
+    public void prepare() {
+        crudPage = new CrudPage();
+        Crud crud = new Crud();
+        crud.setTable(userTable);
+        crud.setQuery("FROM portofino_public_users");
+        crudPage.setCrud(crud);
+        model.init(crudPage);
+        pageInstance = new CrudPageInstance(application, crudPage, CrudPage.MODE_SEARCH, null);
+        PageInstance rootPageInstance = new PageInstance(application, model.getRootPage(), null);
+        dispatch = new Dispatch(context.getRequest(), ACTION_PATH, ACTION_PATH, rootPageInstance, pageInstance);
+        context.getRequest().setAttribute(RequestAttributes.DISPATCH, dispatch);
+        super.prepare();
+    }
 
     //**************************************************************************
     // Remove user from Group
     //**************************************************************************
 
+    /*
     public String removeGroups() throws NoSuchFieldException {
         if (null==subCrudUnits.get(1).selection) {
             SessionMessages.addInfoMessage("No group selected");

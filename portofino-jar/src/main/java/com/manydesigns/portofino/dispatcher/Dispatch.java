@@ -49,7 +49,7 @@ public class Dispatch {
     public Dispatch(HttpServletRequest request,
                     String originalPath,
                     String rewrittenPath,
-                    PageInstance[] pageInstancePath) {
+                    PageInstance... pageInstancePath) {
         this.request = request;
         this.originalPath = originalPath;
         this.rewrittenPath = rewrittenPath;
