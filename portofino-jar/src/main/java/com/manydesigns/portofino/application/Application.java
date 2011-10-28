@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.application;
 
+import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
@@ -209,4 +210,7 @@ public interface Application {
             @Nullable Integer firstResult,
             @Nullable Integer maxResults
     );
+
+    QueryStringWithParameters mergeQuery
+            (String queryString, TableCriteria criteria, Object rootObject);
 }

@@ -43,6 +43,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
@@ -84,8 +85,6 @@ import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONStringer;
@@ -416,11 +415,21 @@ public class CrudAction extends PortletAction {
         loadObjects();
 
         // calculate totalRecords
-        String totalRecordsQueryString = "select count(*) " + crud.getQuery();
-        Session session = application.getSession(
-                crud.getActualTable().getQualifiedName());
-        Query totalRecordsQuery = session.createQuery(totalRecordsQueryString);
-        long totalRecords = (Long) totalRecordsQuery.uniqueResult();
+        TableCriteria criteria = new TableCriteria(baseTable);
+        if(searchForm != null) {
+            searchForm.configureCriteria(criteria);
+        }
+        QueryStringWithParameters query =
+                application.mergeQuery(crud.getQuery(), criteria, this);
+
+        String queryString = query.getQueryString();
+        String totalRecordsQueryString = "select count(*) " + queryString;
+        String qualifiedTableName =
+                crud.getActualTable().getQualifiedName();
+        List<Object> result = application.runHqlQuery
+                (qualifiedTableName, totalRecordsQueryString,
+                 query.getParamaters());
+        long totalRecords = (Long) result.get(0);
 
         setupTableForm(Mode.VIEW);
         JSONStringer js = new JSONStringer();

@@ -46,7 +46,6 @@ import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -55,7 +54,7 @@ import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UserUtils;
 import liquibase.Liquibase;
-import liquibase.database.*;
+import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
@@ -661,6 +660,13 @@ public class HibernateApplicationImpl implements Application {
                                    @Nullable Object rootObject,
                                    @Nullable Integer firstResult,
                                    @Nullable Integer maxResults) {
+        QueryStringWithParameters result = mergeQuery(queryString, criteria, rootObject);
+
+        return runHqlQuery(result.getQueryString(), result.getParamaters(), firstResult, maxResults);
+    }
+
+    public QueryStringWithParameters mergeQuery
+            (String queryString, TableCriteria criteria, Object rootObject) {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
         String formatString = sqlFormat.getFormatString();
         Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
@@ -706,7 +712,7 @@ public class HibernateApplicationImpl implements Application {
         Object[] mergedParameters = new Object[mergedParametersList.size()];
         mergedParametersList.toArray(mergedParameters);
 
-        return runHqlQuery(fullQueryString, mergedParameters, firstResult, maxResults);
+        return new QueryStringWithParameters(fullQueryString, mergedParameters);
     }
 
     public List<Object> runHqlQuery(

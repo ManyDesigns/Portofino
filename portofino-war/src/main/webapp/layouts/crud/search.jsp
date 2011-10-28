@@ -1,9 +1,6 @@
-<%@ page import="com.manydesigns.elements.reflection.ClassAccessor" %>
-<%@ page import="com.manydesigns.elements.reflection.PropertyAccessor" %>
-<%@ page import="com.manydesigns.elements.annotations.InSummary" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
-<%@ page import="com.manydesigns.elements.annotations.Label" %>
 <%@ page import="com.manydesigns.elements.forms.TableForm" %>
+<%@ page import="com.manydesigns.elements.reflection.PropertyAccessor" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.json.JSONWriter" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
@@ -113,7 +110,9 @@
 
                                 // Build custom request
                                 return  "&firstResult=" + startIndex +
-                                        "&maxResults=10";
+                                        "&maxResults=10" +
+                                        "&searchString=" + encodeURIComponent(
+                                            '<%= StringEscapeUtils.escapeJavaScript(actionBean.getSearchString()) %>');
                             };
 
                             var myConfigs = {
