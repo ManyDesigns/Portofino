@@ -1,0 +1,15 @@
+{"ResultSet":{
+    "totalResultsAvailable":665,
+    "totalResultsReturned":10,
+    "firstResultPosition":1,
+    "ResultSetMapUrl":"http:\/\/local.yahoo.com\/mapview?stx=pizza&csz=Sunnyvale%2C+CA+94089&city=Sunnyvale&state=CA&radius=15&ed=9brhZa131DwigChqKlCo22kM1H_9WgoouCr87Ao-",
+    "Result":[
+        {
+            "id":"my id",
+            "name" : "my name",
+            "description" : "my description",
+            "parent_id" : "my parent_id",
+            "status" : "my status"
+        }
+    ]}
+}

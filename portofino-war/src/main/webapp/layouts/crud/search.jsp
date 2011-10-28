@@ -63,9 +63,12 @@
                             </table>
                         </div>
                         <script type="text/javascript">
-                            var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("myTable"));
-                            myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
+
+                            var myDataSource = new YAHOO.util.DataSource("/portofino4/data.json");
+                            myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+                            myDataSource.connXhrMode = "queueRequests";
                             myDataSource.responseSchema = {
+                                resultsList: "ResultSet.Result",
                                 fields: [
                                     <%
                                         boolean first = true;
@@ -114,7 +117,8 @@
                                 %>
                             ];
 
-                            var myDataTable = new YAHOO.widget.DataTable("myMarkedUpContainer", myColumnDefs, myDataSource);
+                            var myDataTable = new YAHOO.widget.DataTable("myMarkedUpContainer", myColumnDefs,
+                                                                         myDataSource, {initialRequest:""});
                         </script>
                         <stripes:submit name="create" value="Create new" class="portletButton"/>
                         <stripes:submit name="bulkEdit" value="Edit" class="portletButton"/>
