@@ -84,7 +84,11 @@ import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONException;
+import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,6 +136,8 @@ public class CrudAction extends PortletAction {
     public String[] selection;
     public String searchString;
     public String successReturnUrl;
+    public Integer firstResult;
+    public Integer maxResults;
 
     //--------------------------------------------------------------------------
     // UI forms
@@ -370,7 +376,7 @@ public class CrudAction extends PortletAction {
 
         try {
             setupSearchForm();
-            loadObjects();
+//            loadObjects();
             setupTableForm(Mode.VIEW);
 
             String fwd = crudPage.getSearchUrl();
@@ -392,8 +398,8 @@ public class CrudAction extends PortletAction {
 
         try {
             loadObjects();
-            setupTableForm(Mode.VIEW);
-            tableForm.setSelectable(false);
+//            setupTableForm(Mode.VIEW);
+//            tableForm.setSelectable(false);
             String fwd = crudPage.getEmbeddedSearchUrl();
             if(StringUtils.isEmpty(fwd)) {
                 fwd = "/layouts/crud/embedded-search.jsp";
@@ -403,6 +409,52 @@ public class CrudAction extends PortletAction {
             logger.error("Crud not correctly configured", e);
             return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
         }
+    }
+
+    public Resolution jsonSearchData() throws JSONException {
+        setupSearchForm();
+        loadObjects();
+
+        // calculate totalRecords
+        String totalRecordsQueryString = "select count(*) " + crud.getQuery();
+        Session session = application.getSession(
+                crud.getActualTable().getQualifiedName());
+        Query totalRecordsQuery = session.createQuery(totalRecordsQueryString);
+        long totalRecords = (Long) totalRecordsQuery.uniqueResult();
+
+        setupTableForm(Mode.VIEW);
+        JSONStringer js = new JSONStringer();
+        js.object()
+                .key("recordsReturned")
+                .value(objects.size())
+                .key("totalRecords")
+                .value(totalRecords)
+                .key("startIndex")
+                .value(firstResult == null ? 0 : firstResult)
+                .key("Result")
+                .array();
+        for (TableForm.Row row : tableForm.getRows()) {
+            js.object();
+            for (Field field : row) {
+                Object value = "bla";
+                String stringValue = field.getStringValue();
+                String href = field.getHref();
+                js.key(field.getPropertyAccessor().getName());
+                js.object()
+                        .key("value")
+                        .value(value)
+                        .key("stringValue")
+                        .value(stringValue)
+                        .key("href")
+                        .value(href)
+                        .endObject();
+            }
+            js.endObject();
+        }
+        js.endArray();
+        js.endObject();
+        String jsonText = js.toString();
+        return new StreamingResolution("application/json", jsonText);
     }
 
     public Resolution resetSearch() {
@@ -895,14 +947,23 @@ public class CrudAction extends PortletAction {
                     property.getName(), hrefFormat);
         }
 
+        int nRows;
+        if (objects == null) {
+            nRows = 0;
+        } else {
+            nRows = objects.size();
+        }
+
         tableForm = tableFormBuilder
                 .configPrefix(prefix)
-                .configNRows(objects.size())
+                .configNRows(nRows)
                 .configMode(mode)
                 .build();
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
         tableForm.setSelectable(true);
-        tableForm.readFromObject(objects);
+        if (objects != null) {
+            tableForm.readFromObject(objects);
+        }
     }
 
     protected String getReadLinkExpression() {
@@ -941,7 +1002,8 @@ public class CrudAction extends PortletAction {
             if(searchForm != null) {
                 searchForm.configureCriteria(criteria);
             }
-            objects = application.getObjects(crud.getQuery(), criteria, this, null, null);
+            objects = application.getObjects(
+                    crud.getQuery(), criteria, this, firstResult, maxResults);
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
             logger.warn("Incorrect Field Type", e);
@@ -961,7 +1023,7 @@ public class CrudAction extends PortletAction {
     public void exportSearchExcel(File fileTemp) {
         setupSearchForm();
         loadObjects();
-        setupTableForm(Mode.VIEW);
+//        setupTableForm(Mode.VIEW);
 
         writeFileSearchExcel(fileTemp);
     }
@@ -1013,7 +1075,7 @@ public class CrudAction extends PortletAction {
 
         loadObjects();
 
-        setupTableForm(Mode.VIEW);
+//        setupTableForm(Mode.VIEW);
         setupForm(Mode.VIEW);
         form.readFromObject(object);
 
@@ -1812,14 +1874,6 @@ public class CrudAction extends PortletAction {
         this.searchForm = searchForm;
     }
 
-    public TableForm getTableForm() {
-        return tableForm;
-    }
-
-    public void setTableForm(TableForm tableForm) {
-        this.tableForm = tableForm;
-    }
-
     public List getObjects() {
         return objects;
     }
@@ -1864,6 +1918,14 @@ public class CrudAction extends PortletAction {
         this.form = form;
     }
 
+    public TableForm getTableForm() {
+        return tableForm;
+    }
+
+    public void setTableForm(TableForm tableForm) {
+        this.tableForm = tableForm;
+    }
+
     public TableForm getSelectionProvidersForm() {
         return selectionProvidersForm;
     }
@@ -1874,5 +1936,21 @@ public class CrudAction extends PortletAction {
 
     public void setScript(String script) {
         this.script = script;
+    }
+
+    public Integer getFirstResult() {
+        return firstResult;
+    }
+
+    public void setFirstResult(Integer firstResult) {
+        this.firstResult = firstResult;
+    }
+
+    public Integer getMaxResults() {
+        return maxResults;
+    }
+
+    public void setMaxResults(Integer maxResults) {
+        this.maxResults = maxResults;
     }
 }

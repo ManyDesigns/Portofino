@@ -38,6 +38,7 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import org.apache.commons.configuration.Configuration;
+import org.hibernate.Session;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -113,6 +114,8 @@ public interface Application {
     //**************************************************************************
     // Persistance
     //**************************************************************************
+
+    Session getSession(String qualifiedTableName);
 
     Object getObjectByPk(String qualifiedTableName, Serializable pk);
 

@@ -9,6 +9,8 @@
       href="<stripes:url value="/yui-2.9.0/build/base/base-min.css"/>"/>
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/yui-2.9.0/build/datatable/assets/skins/sam/datatable.css"/>">
+<link rel="stylesheet" type="text/css"
+      href="<stripes:url value="/yui-2.9.0/build/paginator/assets/skins/sam/paginator.css"/>">
 
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/jquery-ui-1.8.9/css/smoothness/jquery-ui-1.8.9.custom.css"/>"/>
@@ -33,6 +35,8 @@
         src="<stripes:url value="/yui-2.9.0/build/connection/connection-min.js"/>"></script>
 <script type="text/javascript"
         src="<stripes:url value="/yui-2.9.0/build/datatable/datatable-min.js"/>"></script>
+<script type="text/javascript"
+        src="<stripes:url value="/yui-2.9.0/build/paginator/paginator-min.js"/>"></script>
 
 <script type="text/javascript"
         src="<stripes:url value="/elements.js"/>"></script>

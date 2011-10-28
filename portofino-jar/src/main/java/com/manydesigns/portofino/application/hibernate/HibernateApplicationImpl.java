@@ -445,7 +445,7 @@ public class HibernateApplicationImpl implements Application {
         return result;
     }
 
-    protected Session getSession(String qualifiedTableName) {
+    public Session getSession(String qualifiedTableName) {
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, qualifiedTableName);
         String databaseName = table.getDatabaseName();

@@ -167,3 +167,21 @@ function enablePortletDragAndDrop(button) {
     });
 
 }
+
+
+var HTML_CHARS = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '/': '&#x2F;',
+    '`': '&#x60;'
+};
+
+function htmlEscape (string) {
+    return (string + '').replace(/[&<>"'\/`]/g, function (match) {
+        return HTML_CHARS[match];
+    });
+}
+
