@@ -397,8 +397,8 @@ public class CrudAction extends PortletAction {
 
         try {
             loadObjects();
-//            setupTableForm(Mode.VIEW);
-//            tableForm.setSelectable(false);
+            setupTableForm(Mode.VIEW);
+            tableForm.setSelectable(false);
             String fwd = crudPage.getEmbeddedSearchUrl();
             if(StringUtils.isEmpty(fwd)) {
                 fwd = "/layouts/crud/embedded-search.jsp";
