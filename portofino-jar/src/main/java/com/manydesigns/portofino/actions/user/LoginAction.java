@@ -28,6 +28,7 @@
  */
 package com.manydesigns.portofino.actions.user;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
@@ -36,15 +37,24 @@ import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.system.model.users.User;
-import com.manydesigns.portofino.system.model.users.UserUtils;
+import groovy.lang.Binding;
+import groovy.lang.GroovyObject;
+import groovy.lang.Script;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileReader;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.Date;
@@ -78,6 +88,14 @@ public class LoginAction extends AbstractActionBean {
     public String pwd;
 
     //**************************************************************************
+    // Scripting
+    //**************************************************************************
+
+    protected GroovyObject groovyObject;
+    protected String script;
+    protected File storageDirFile;
+
+    //**************************************************************************
     // Presentation elements
     //**************************************************************************
     public boolean recoverPwd;
@@ -104,14 +122,39 @@ public class LoginAction extends AbstractActionBean {
         return new ForwardResolution("/layouts/user/login.jsp");
     }
 
+    protected void prepareScript() {
+        storageDirFile = application.getAppStorageDir();
+        File file = ScriptingUtil.getGroovyScriptFile(storageDirFile, "login");
+        if(file.exists()) {
+            try {
+                FileReader fr = new FileReader(file);
+                script = IOUtils.toString(fr);
+                IOUtils.closeQuietly(fr);
+                groovyObject = ScriptingUtil.getGroovyObject(script, file.getAbsolutePath());
+                Script scriptObject = (Script) groovyObject;
+                Binding binding = new Binding(ElementsThreadLocals.getOgnlContext());
+                binding.setVariable("loginAction", this);
+                scriptObject.setBinding(binding);
+            } catch (Exception e) {
+                logger.warn("Couldn't load script for login page", e);
+            }
+        }
+    }
+
     public Resolution login () {
         boolean enc = portofinoConfiguration.getBoolean(
                 PortofinoProperties.PWD_ENCRYPTED, true);
 
         if (enc) {
-            pwd = UserUtils.encryptPassword(pwd);
+            pwd = SecurityLogic.encryptPassword(pwd);
         }
-        User user = application.login(userName, pwd);
+        User user;
+        prepareScript();
+        if(groovyObject != null) {
+            user = (User) groovyObject.invokeMethod("login", new Object[] { userName, pwd });
+        } else {
+            user = SecurityLogic.defaultLogin(application, userName, pwd);
+        }
 
         if (user==null) {
             String errMsg = MessageFormat.format("FAILED AUTH for user {0}",
@@ -122,7 +165,7 @@ public class LoginAction extends AbstractActionBean {
             return new ForwardResolution("/layouts/user/login.jsp");
         }
 
-        if (!user.getState().equals(UserUtils.ACTIVE)) {
+        if (!user.getState().equals(SecurityLogic.ACTIVE)) {
             String errMsg = MessageFormat.format("User {0} is not active. " +
                     "Please contact the administrator", userName);
             SessionMessages.addInfoMessage(errMsg);
@@ -152,7 +195,7 @@ public class LoginAction extends AbstractActionBean {
         user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
         int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
         user.setFailedLoginAttempts(failedAttempts+1);
-        application.updateObject(UserUtils.USERTABLE, user);
+        application.updateObject(SecurityLogic.USERTABLE, user);
         application.commit("portofino");
     }
 
@@ -160,8 +203,11 @@ public class LoginAction extends AbstractActionBean {
         user.setFailedLoginAttempts(0);
         user.setLastLoginDate(new Timestamp(new Date().getTime()));
         user.setToken(null);
-        application.updateObject(UserUtils.USERTABLE, user);
-        application.commit("portofino");
+        Session session = application.getSessionByDatabaseName("portofino");
+        Transaction tx = session.beginTransaction();
+        session.saveOrUpdate("portofino_public_users", user);
+        session.flush();
+        tx.commit();
     }
 
     public Resolution logout() {
@@ -185,5 +231,18 @@ public class LoginAction extends AbstractActionBean {
 
     public void setReturnUrl(String returnUrl) {
         this.returnUrl = returnUrl;
+    }
+
+    //**************************************************************************
+    // Getters/setters
+    //**************************************************************************
+
+
+    public Application getApplication() {
+        return application;
+    }
+
+    public Configuration getPortofinoConfiguration() {
+        return portofinoConfiguration;
     }
 }

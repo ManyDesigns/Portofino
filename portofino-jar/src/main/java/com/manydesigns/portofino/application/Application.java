@@ -116,6 +116,8 @@ public interface Application {
     // Persistance
     //**************************************************************************
 
+    Session getSessionByDatabaseName(String databaseName);
+
     Session getSession(String qualifiedTableName);
 
     Object getObjectByPk(String qualifiedTableName, Serializable pk);
@@ -169,8 +171,6 @@ public interface Application {
     //**************************************************************************
     // User
     //**************************************************************************
-
-    User login(String username, String password);
 
     public User findUserByEmail(String email);
 

@@ -18,11 +18,11 @@ import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.PageLogic;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.system.model.users.Group;
-import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.Before;
@@ -229,7 +229,7 @@ public class PortletAction extends AbstractActionBean {
 
     public void setupGroups(Page page) {
         List<Group> groups = new ArrayList<Group>();
-        groups.addAll(application.getAllObjects(UserUtils.GROUPTABLE));
+        groups.addAll(application.getAllObjects(SecurityLogic.GROUPTABLE));
         allowGroups = new ArrayList<Group>();
         denyGroups = new ArrayList<Group>();
         availableGroups = new ArrayList<Group>();
@@ -279,7 +279,7 @@ public class PortletAction extends AbstractActionBean {
         deny.clear();
 
         List<Group> groups = new ArrayList<Group>();
-        groups.addAll(application.getAllObjects(UserUtils.GROUPTABLE));
+        groups.addAll(application.getAllObjects(SecurityLogic.GROUPTABLE));
 
         for (Group group : groups) {
             String groupName = group.getName();

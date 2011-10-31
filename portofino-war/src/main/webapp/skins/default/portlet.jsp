@@ -1,4 +1,4 @@
-<%@ page import="com.manydesigns.portofino.system.model.users.UserUtils" %>
+<%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -19,7 +19,7 @@
                             </h1>
                         </div>
                         <div class="portletHeaderButtons">
-                            <% if(UserUtils.isAdministrator(request)) { %>
+                            <% if(SecurityLogic.isAdministrator(request)) { %>
                                 <stripes:layout-component name="portletHeaderButtons"/>
                             <% } %>
                         </div>

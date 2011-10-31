@@ -1,4 +1,4 @@
-<%@ page import="com.manydesigns.portofino.system.model.users.UserUtils" %>
+<%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
         %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -24,7 +24,7 @@
                 </div>
                 <div class="contentBarRight">
                     <!-- Admin buttons -->
-                    <% if(UserUtils.isAdministrator(request)) { %>
+                    <% if(SecurityLogic.isAdministrator(request)) { %>
                         <div class="contentBarButtons">
                             <button onclick="enablePortletDragAndDrop(this); return false;"
                                     class="arrow-4">Edit page layout</button>
