@@ -275,11 +275,11 @@ public class NumericField extends AbstractTextField {
         this.scale = scale;
     }
 
-    public BigDecimal getDecimalValue() {
+    public BigDecimal getValue() {
         return decimalValue;
     }
 
-    public void setDecimalValue(BigDecimal decimalValue) {
+    public void setValue(BigDecimal decimalValue) {
         this.decimalValue = decimalValue;
     }
 

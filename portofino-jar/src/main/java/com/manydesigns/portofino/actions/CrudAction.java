@@ -443,9 +443,11 @@ public class CrudAction extends PortletAction {
                 .key("Result")
                 .array();
         for (TableForm.Row row : tableForm.getRows()) {
-            js.object();
+            js.object()
+                    .key("rowKey")
+                    .value(row.getKey());
             for (Field field : row) {
-                Object value = "bla";
+                Object value = field.getValue();
                 String stringValue = field.getStringValue();
                 String href = field.getHref();
                 js.key(field.getPropertyAccessor().getName());
@@ -509,7 +511,7 @@ public class CrudAction extends PortletAction {
             for (Field field : fieldSet) {
                 if (field instanceof FileBlobField) {
                     FileBlobField fileBlobField = (FileBlobField) field;
-                    Blob blob = fileBlobField.getBlob();
+                    Blob blob = fileBlobField.getValue();
                     if (blob != null) {
                         String url = getBlobDownloadUrl(blob.getCode());
                         field.setHref(url);
@@ -1167,9 +1169,9 @@ public class CrudAction extends PortletAction {
                                 Field field) throws WriteException {
         if (field instanceof NumericField) {
             NumericField numField = (NumericField) field;
-            if (numField.getDecimalValue() != null) {
+            if (numField.getValue() != null) {
                 Number number;
-                BigDecimal decimalValue = numField.getDecimalValue();
+                BigDecimal decimalValue = numField.getValue();
                 if (numField.getDecimalFormat() == null) {
                     number = new Number(j, i,
                             decimalValue == null
@@ -1193,15 +1195,15 @@ public class CrudAction extends PortletAction {
         } else if (field instanceof DateField) {
             DateField dateField = (DateField) field;
             DateTime dateCell;
-            Date date = dateField.getDateValue();
+            Date date = dateField.getValue();
             if (date != null) {
                 DateFormat dateFormat = new DateFormat(
                         dateField.getDatePattern());
                 WritableCellFormat wDateFormat =
                         new WritableCellFormat(dateFormat);
                 dateCell = new DateTime(j, i,
-                        dateField.getDateValue() == null
-                                ? null : dateField.getDateValue(),
+                        dateField.getValue() == null
+                                ? null : dateField.getValue(),
                         wDateFormat);
                 sheet.addCell(dateCell);
             }

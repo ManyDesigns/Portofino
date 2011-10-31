@@ -226,11 +226,11 @@ public class BooleanField extends AbstractField {
     //**************************************************************************
     // Getter/setter
     //**************************************************************************
-    public Boolean getBooleanValue() {
+    public Boolean getValue() {
         return booleanValue;
     }
 
-    public void setBooleanValue(Boolean booleanValue) {
+    public void setValue(Boolean booleanValue) {
         this.booleanValue = booleanValue;
     }
 }

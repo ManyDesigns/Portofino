@@ -102,7 +102,7 @@ public class TextField extends AbstractTextField {
     }
 
     //**************************************************************************
-    // Implementazione di Element
+    // Implementazione/override di AbstractTextField
     //**************************************************************************
     public void readFromRequest(HttpServletRequest req) {
         super.readFromRequest(req);
@@ -180,6 +180,10 @@ public class TextField extends AbstractTextField {
             xb.closeElement("a");
         }
         xb.closeElement("div");
+    }
+
+    public String getValue() {
+        return stringValue;
     }
 
     //**************************************************************************

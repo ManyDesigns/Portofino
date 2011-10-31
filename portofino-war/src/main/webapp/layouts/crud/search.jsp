@@ -58,6 +58,11 @@
                                 }
                             };
 
+                            var selectionFormatter = function(elCell, oRecord, oColumn, sData) {
+                                elCell.innerHTML =
+                                        '<input name="selection" type="checkbox" value="' + htmlEscape(sData) + '" />';
+                            }
+
                             var myDataSource = new YAHOO.util.DataSource("<c:out value="${actionBean.dispatch.absoluteOriginalPath}?jsonSearchData="/>");
                             myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
                             myDataSource.connXhrMode = "queueRequests";
@@ -67,6 +72,10 @@
                                     <%
                                         JSONWriter jsonWriter = new JSONWriter(out);
                                         jsonWriter.array();
+                                        jsonWriter.object();
+                                        jsonWriter.key("key");
+                                        jsonWriter.value("rowKey");
+                                        jsonWriter.endObject();
                                         for (TableForm.Column column : columns) {
                                             PropertyAccessor propertyAccessor = column.getPropertyAccessor();
                                             jsonWriter.object();
@@ -83,15 +92,11 @@
                             };
 
                             var myColumnDefs = [
+                                {key: 'rowKey', label: '', formatter: selectionFormatter}
                                 <%
-                                    boolean first = true;
                                     for (TableForm.Column column : columns) {
                                         PropertyAccessor propertyAccessor = column.getPropertyAccessor();
-                                        if (first) {
-                                            first = false;
-                                        } else {
-                                            out.print(", ");
-                                        }
+                                        out.print(", ");
                                         out.print("{key : \"");
                                         out.print(StringEscapeUtils.escapeJavaScript(propertyAccessor.getName()));
                                         out.print("\"");

@@ -82,7 +82,7 @@ public class FileBlobFieldTest extends AbstractElementsTest {
     }
 
     public void testField1() throws IOException {
-        assertNull(field.getBlob());
+        assertNull(field.getValue());
 
         InputStream is =
                 new ByteArrayInputStream(sampleContent.getBytes());
@@ -99,7 +99,7 @@ public class FileBlobFieldTest extends AbstractElementsTest {
 
         form.readFromRequest(req);
 
-        Blob blob = field.getBlob();
+        Blob blob = field.getValue();
         assertNotNull(blob);
         assertEquals(sampleFilename, blob.getFilename());
         assertEquals(sampleContent.length(), blob.getSize());
