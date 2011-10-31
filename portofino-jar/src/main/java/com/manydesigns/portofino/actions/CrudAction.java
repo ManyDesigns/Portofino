@@ -73,6 +73,10 @@ import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.collections.MultiHashMap;
@@ -410,7 +414,7 @@ public class CrudAction extends PortletAction {
         }
     }
 
-    public Resolution jsonSearchData() throws JSONException {
+    public Resolution jsonSearchData() throws JSONException, JSQLParserException {
         setupSearchForm();
         loadObjects();
 
@@ -423,7 +427,7 @@ public class CrudAction extends PortletAction {
                 application.mergeQuery(crud.getQuery(), criteria, this);
 
         String queryString = query.getQueryString();
-        String totalRecordsQueryString = "select count(*) " + queryString;
+        String totalRecordsQueryString = generateCountQuery(queryString);
         String qualifiedTableName =
                 crud.getActualTable().getQualifiedName();
         List<Object> result = application.runHqlQuery
@@ -466,6 +470,15 @@ public class CrudAction extends PortletAction {
         js.endObject();
         String jsonText = js.toString();
         return new StreamingResolution("application/json", jsonText);
+    }
+
+    protected String generateCountQuery(String queryString) throws JSQLParserException {
+        CCJSqlParserManager parserManager = new CCJSqlParserManager();
+        queryString = "SELECT count(*) " + queryString;
+        PlainSelect plainSelect =
+                (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
+        plainSelect.setOrderByElements(null);
+        return plainSelect.toString();
     }
 
     public Resolution resetSearch() {
