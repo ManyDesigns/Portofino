@@ -444,7 +444,7 @@ public class CrudAction extends PortletAction {
                 .array();
         for (TableForm.Row row : tableForm.getRows()) {
             js.object()
-                    .key("rowKey")
+                    .key("__rowKey")
                     .value(row.getKey());
             for (Field field : row) {
                 Object value = field.getValue();

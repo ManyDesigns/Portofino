@@ -17,6 +17,7 @@
         <button name="configure" class="wrench">Configure</button>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
+        <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
         <c:if test="${not empty actionBean.searchForm}">
             <div class="yui-gc">
                 <div class="yui-u first">
@@ -25,8 +26,8 @@
         <c:if test="${empty actionBean.searchForm}">
                     <div class="search_results">
         </c:if>
-                        <div id="myMarkedUpContainer">
-                            <table id="myTable">
+                        <div id="<c:out value="tableContainer-${pageId}" />">
+                            <table id="<c:out value="table-${pageId}" />">
                                 <thead>
                                 <tr>
                                     <%
@@ -74,7 +75,7 @@
                                         jsonWriter.array();
                                         jsonWriter.object();
                                         jsonWriter.key("key");
-                                        jsonWriter.value("rowKey");
+                                        jsonWriter.value("__rowKey");
                                         jsonWriter.endObject();
                                         for (TableForm.Column column : columns) {
                                             PropertyAccessor propertyAccessor = column.getPropertyAccessor();
@@ -92,7 +93,7 @@
                             };
 
                             var myColumnDefs = [
-                                {key: 'rowKey', label: '', formatter: selectionFormatter}
+                                {key: '__rowKey', label: '', formatter: selectionFormatter}
                                 <%
                                     for (TableForm.Column column : columns) {
                                         PropertyAccessor propertyAccessor = column.getPropertyAccessor();
@@ -126,7 +127,7 @@
 
                             var myConfigs = {
                                 generateRequest: generateRequest,
-                    	        initialRequest: generateRequest(),
+                                initialRequest: generateRequest(),
                                 dynamicData: true,
                                 paginator : new YAHOO.widget.Paginator({
                                     rowsPerPage: 10
@@ -134,11 +135,15 @@
                             };
 
                             var myDataTable = new YAHOO.widget.DataTable(
-                                    "myMarkedUpContainer", myColumnDefs, myDataSource, myConfigs);
+                                    "<c:out value="tableContainer-${pageId}" />", myColumnDefs, myDataSource, myConfigs);
                             myDataTable.doBeforeLoadData = function(oRequest, oResponse, oPayload) {
                                 oPayload.totalRecords = oResponse.meta.totalRecords;
                                 oPayload.pagination.recordOffset = oResponse.meta.startIndex;
                                 return oPayload;
+                            };
+                            myDataTable.doBeforePaginatorChange = function(oPaginatorState) {
+                                //Disable loading message
+                                return true;
                             };
                         </script>
                         <stripes:submit name="create" value="Create new" class="portletButton"/>
