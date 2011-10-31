@@ -183,7 +183,7 @@ public class BooleanField extends AbstractField {
             xb.openElement("a");
             xb.addAttribute("href", href);
         }
-        xb.write(getLabelValue());
+        xb.write(getDisplayValue());
         if (href != null) {
             xb.closeElement("a");
         }
@@ -200,7 +200,8 @@ public class BooleanField extends AbstractField {
         }
     }
 
-    protected String getLabelValue() {
+    @Override
+    public String getDisplayValue() {
         String labelI18N;
         if (booleanValue == null) {
             labelI18N = NULL_LABEL_I18N;

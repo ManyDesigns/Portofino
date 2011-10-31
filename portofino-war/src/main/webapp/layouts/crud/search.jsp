@@ -52,10 +52,10 @@
                                 var href = sData.href;
                                 if (href) {
                                     elCell.innerHTML = '<a href="' + htmlEscape(href) + '">' +
-                                            htmlEscape(sData.stringValue) +
+                                            htmlEscape(sData.displayValue) +
                                             '</a>';
                                 } else {
-                                    elCell.innerHTML = sData.stringValue;
+                                    elCell.innerHTML = sData.displayValue;
                                 }
                             };
 

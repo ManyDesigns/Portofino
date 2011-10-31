@@ -448,14 +448,14 @@ public class CrudAction extends PortletAction {
                     .value(row.getKey());
             for (Field field : row) {
                 Object value = field.getValue();
-                String stringValue = field.getStringValue();
+                String displayValue = field.getDisplayValue();
                 String href = field.getHref();
                 js.key(field.getPropertyAccessor().getName());
                 js.object()
                         .key("value")
                         .value(value)
-                        .key("stringValue")
-                        .value(stringValue)
+                        .key("displayValue")
+                        .value(displayValue)
                         .key("href")
                         .value(href)
                         .endObject();
