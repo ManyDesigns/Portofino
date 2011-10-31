@@ -76,6 +76,8 @@ public class Crud implements ModelObject {
     protected String editTitle;
     protected String variable;
 
+    protected boolean largeResultSet;
+
     //**************************************************************************
     // Fields for wire-up
     //**************************************************************************
@@ -275,5 +277,14 @@ public class Crud implements ModelObject {
     })
     public List<SelectionProviderReference> getSelectionProviders() {
         return selectionProviders;
+    }
+
+    @XmlAttribute(required = true)
+    public boolean isLargeResultSet() {
+        return largeResultSet;
+    }
+
+    public void setLargeResultSet(boolean largeResultSet) {
+        this.largeResultSet = largeResultSet;
     }
 }

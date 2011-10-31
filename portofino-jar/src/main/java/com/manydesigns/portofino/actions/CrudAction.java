@@ -475,17 +475,12 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     public Resolution read() {
-        setupSearchForm();
-        loadObjects();
-
-        if (!objects.contains(object)) {
-            // TODO: gestire situazione:
-            // pratiche da approvare; seleziono una pratica; la approvo;
-            // la pratica "esce" dallo use case perché lo stato non è più
-            // "in approvazione". Prima dava "object not found".
-            // Adesso dovrebbe tornare alla ricerca o comunque non dare errore.
-            //throw new Error("Object not found");
+        if(!crud.isLargeResultSet()) {
+            //setupSearchForm(); apparentemente non serve
+            loadObjects();
+            setupPagination();
         }
+
         setupForm(Mode.VIEW);
         form.readFromObject(object);
         refreshBlobDownloadHref();
@@ -499,8 +494,6 @@ public class CrudAction extends PortletAction {
                 Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
                 .addParameter("searchString", searchString)
                 .toString();
-
-        setupPagination();
 
         setupReturnToParentTarget();
 
@@ -1517,7 +1510,8 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     public static final String[][] CRUD_CONFIGURATION_FIELDS =
-            {{"name", "table", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable"}};
+            {{"name", "table", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
+              "largeResultSet"}};
 
     public Form crudConfigurationForm;
     public TableForm propertiesTableForm;
