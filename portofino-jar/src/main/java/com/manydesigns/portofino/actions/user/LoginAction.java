@@ -125,7 +125,7 @@ public class LoginAction extends AbstractActionBean {
 
     protected void prepareScript() {
         storageDirFile = application.getAppStorageDir();
-        File file = ScriptingUtil.getGroovyScriptFile(storageDirFile, "login");
+        File file = new File(storageDirFile, "security.groovy");
         if(file.exists()) {
             try {
                 FileReader fr = new FileReader(file);

@@ -1,5 +1,3 @@
-import com.manydesigns.elements.messages.SessionMessages
-
 def createSetup(object) {
     object.status = 1;
 }

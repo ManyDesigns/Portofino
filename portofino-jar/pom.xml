@@ -315,10 +315,15 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-          <groupId>jsqlparser</groupId>
-          <artifactId>jsqlparser</artifactId>
-          <version>0.7.0</version>
+            <groupId>jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+            <version>0.7.0</version>
         </dependency>
+        <!--<dependency>
+            <groupId>com.unboundid</groupId>
+            <artifactId>unboundid-ldapsdk</artifactId>
+            <version>2.2.0</version>
+        </dependency>-->
     </dependencies>
     <build>
         <resources>
