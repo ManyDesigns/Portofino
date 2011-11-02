@@ -2,7 +2,7 @@
     <div class="portletTitle">
         <h1>
         <stripes:layout-component name="portletTitle">
-            <stripes:text name="title" value="${actionBean.title}"/>
+            <input type="text" name="title" value="<c:out value="${actionBean.title}"/>"/>
         </stripes:layout-component>
         </h1>
     </div>
