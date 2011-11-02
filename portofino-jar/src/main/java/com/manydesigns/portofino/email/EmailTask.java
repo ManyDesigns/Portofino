@@ -30,14 +30,14 @@ package com.manydesigns.portofino.email;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.logic.DataModelLogic;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.TableCriteria;
+import com.manydesigns.portofino.logic.DataModelLogic;
+import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.User;
-import com.manydesigns.portofino.system.model.users.UserUtils;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +72,7 @@ public class EmailTask extends TimerTask {
     protected static final Logger logger =
             LoggerFactory.getLogger(TimerTask.class);
     protected final Application application;
-    private static final String USERTABLE = UserUtils.USERTABLE;
+    private static final String USERTABLE = SecurityLogic.USERTABLE;
 
     public EmailTask(Application application) {
         this.application = application;

@@ -1,4 +1,4 @@
-<%@ page import="com.manydesigns.portofino.system.model.users.UserUtils" %>
+<%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java" pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
@@ -21,7 +21,7 @@
                     href="/user/Settings.action"><fmt:message key="skins.default.header.settings" /></stripes:link> -
             <stripes:link
                     href="/user/Help.action"><fmt:message key="skins.default.header.help" /></stripes:link> -
-            <% if(UserUtils.isAdministrator(request)) { %>
+            <% if(SecurityLogic.isAdministrator(request)) { %>
                 <stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction"><fmt:message key="skins.default.header.administration"/></stripes:link> -
             <% } %>
             <stripes:link beanclass="com.manydesigns.portofino.actions.user.LoginAction">
