@@ -232,7 +232,7 @@ public class LoginAction extends AbstractActionBean {
         if (session != null) {
             session.invalidate();
         }
-        SessionMessages.addInfoMessage("User disconnetected");
+        SessionMessages.addInfoMessage("User disconnected");
 
         return new RedirectResolution("/");
     }
