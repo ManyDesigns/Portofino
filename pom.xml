@@ -38,7 +38,7 @@
         <jfreechart.version>1.0.12</jfreechart.version>
         <joda-time.version>1.6.2</joda-time.version>
         <groovy.version>1.8.0</groovy.version>
-        <json.version>1.8.0</json.version>
+        <json.version>20111031</json.version>
     </properties>
     <modules>
         <module>elements</module>
