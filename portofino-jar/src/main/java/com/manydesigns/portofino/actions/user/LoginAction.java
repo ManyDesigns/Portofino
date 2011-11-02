@@ -70,6 +70,7 @@ import java.util.Date;
 public class LoginAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
+    public static final String LOGIN_ACTION_NAME = "loginAction";
 
     //**************************************************************************
     // Injections
@@ -134,7 +135,7 @@ public class LoginAction extends AbstractActionBean {
                 groovyObject = ScriptingUtil.getGroovyObject(script, file.getAbsolutePath());
                 Script scriptObject = (Script) groovyObject;
                 Binding binding = new Binding(ElementsThreadLocals.getOgnlContext());
-                binding.setVariable("loginAction", this);
+                binding.setVariable(LOGIN_ACTION_NAME, this);
                 scriptObject.setBinding(binding);
             } catch (Exception e) {
                 logger.warn("Couldn't load script for login page", e);
@@ -146,14 +147,14 @@ public class LoginAction extends AbstractActionBean {
         boolean enc = portofinoConfiguration.getBoolean(
                 PortofinoProperties.PWD_ENCRYPTED, true);
 
-        if (enc) {
-            pwd = SecurityLogic.encryptPassword(pwd);
-        }
         User user;
         prepareScript();
         if(groovyObject != null) {
             user = (User) groovyObject.invokeMethod("login", new Object[] { userName, pwd });
         } else {
+            if (enc) {
+                pwd = SecurityLogic.encryptPassword(pwd);
+            }
             user = SecurityLogic.defaultLogin(application, userName, pwd);
         }
 
