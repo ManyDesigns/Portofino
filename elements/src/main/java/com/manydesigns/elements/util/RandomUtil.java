@@ -62,7 +62,11 @@ public class RandomUtil {
     }
 
     public static String createRandomId() {
-        return RandomStringUtils.random(RANDOM_CODE_LENGTH, "abcdefghijklmnopqrstuvwxyz0123456789");
+        return createRandomId(RANDOM_CODE_LENGTH);
+    }
+
+    public static String createRandomId(int length) {
+        return RandomStringUtils.random(length, "abcdefghijklmnopqrstuvwxyz0123456789");
     }
 
     public static File getTempCodeFile(String fileNameFormat,

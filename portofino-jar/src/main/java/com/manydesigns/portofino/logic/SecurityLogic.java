@@ -60,6 +60,9 @@ public class SecurityLogic {
     public static final String USERTABLE = "portofino.public.users";
     public static final String GROUPTABLE = "portofino.public.groups";
 
+    public static final String USER_ENTITY_NAME = "portofino_public_users";
+    public static final String GROUP_ENTITY_NAME = "portofino_public_groups";
+
     public static final String PASSWORD = "pwd";
     public static final String GROUPS = "groups";
 

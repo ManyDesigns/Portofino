@@ -3,7 +3,7 @@ import com.manydesigns.portofino.logic.SecurityLogic
 
 def login(username, password) {
     if("guest".equalsIgnoreCase(username)) {
-        User guestUser = new User("__guest__");
+        User guestUser = new User();
         guestUser.setAgreedToTerms(true);
         guestUser.setUserName("guest");
         guestUser.setState(SecurityLogic.ACTIVE);

@@ -1037,46 +1037,25 @@ public class HibernateApplicationImpl implements Application {
     public User findUserByEmail(String email) {
         String qualifiedTableName = SecurityLogic.USERTABLE;
         Session session = getSession(qualifiedTableName);
-        org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
+        org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("email", email));
-        @SuppressWarnings({"unchecked"})
-        List<Object> result = (List<Object>) criteria.list();
-
-        if (result.size() == 1) {
-            return (User) result.get(0);
-        } else {
-            return null;
-        }
+        return (User) criteria.uniqueResult();
     }
 
     public User findUserByUserName(String username) {
         String qualifiedTableName = SecurityLogic.USERTABLE;
         Session session = getSession(qualifiedTableName);
-        org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
+        org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
-        @SuppressWarnings({"unchecked"})
-        List<Object> result = (List<Object>) criteria.list();
-
-        if (result.size() == 1) {
-            return (User) result.get(0);
-        } else {
-            return null;
-        }
+        return (User) criteria.uniqueResult();
     }
 
     public User findUserByToken(String token) {
         String qualifiedTableName = SecurityLogic.USERTABLE;
         Session session = getSession(qualifiedTableName);
-        org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
+        org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("token", token));
-        @SuppressWarnings({"unchecked"})
-        List<Object> result = (List<Object>) criteria.list();
-
-        if (result.size() == 1) {
-            return (User) result.get(0);
-        } else {
-            return null;
-        }
+        return (User) criteria.uniqueResult();
     }
 
     public Group getAnonymousGroup() {

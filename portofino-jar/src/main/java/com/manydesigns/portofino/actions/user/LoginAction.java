@@ -30,6 +30,7 @@ package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
@@ -173,11 +174,11 @@ public class LoginAction extends AbstractActionBean {
             return new ForwardResolution("/layouts/user/login.jsp");
         }
 
+        updateUser(user);
         logger.info("User {} login", user.getUserName());
         HttpSession session = context.getRequest().getSession(true);
         session.setAttribute(SessionAttributes.USER_ID, user.getUserId());
         session.setAttribute(SessionAttributes.USER_NAME, user.getUserName());
-        updateUser(user);
 
         if (StringUtils.isEmpty(returnUrl)) {
             returnUrl = "/";
@@ -205,9 +206,25 @@ public class LoginAction extends AbstractActionBean {
         user.setToken(null);
         Session session = application.getSessionByDatabaseName("portofino");
         Transaction tx = session.beginTransaction();
-        session.saveOrUpdate("portofino_public_users", user);
-        session.flush();
-        tx.commit();
+        try {
+            User existingUser = application.findUserByUserName(user.getUserName());
+            if(existingUser != null) {
+                logger.debug("Updating existing user {} (userId: {})",
+                        existingUser.getUserName(), existingUser.getUserId());
+                user.setUserId(existingUser.getUserId());
+                session.merge(SecurityLogic.USER_ENTITY_NAME, user);
+            } else {
+                user.setUserId(RandomUtil.createRandomId(20));
+                logger.debug("Importing user {} (userId: {})",
+                        user.getUserName(), user.getUserId());
+                session.save(SecurityLogic.USER_ENTITY_NAME, user);
+            }
+            session.flush();
+            tx.commit();
+        } catch (RuntimeException e) {
+            tx.rollback();
+            throw e;
+        }
     }
 
     public Resolution logout() {

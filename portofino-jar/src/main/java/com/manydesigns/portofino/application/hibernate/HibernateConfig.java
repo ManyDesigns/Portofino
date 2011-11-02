@@ -338,6 +338,11 @@ public class HibernateConfig {
         primaryKey.setTable(tab);
         tab.setPrimaryKey(primaryKey);
 
+        //Make the defaults explicit. See section 5.1.4.5. Assigned identifiers in the Hibernate reference
+        //(http://docs.jboss.org/hibernate/core/3.3/reference/en/html/mapping.html)
+        id.setIdentifierGeneratorStrategy("assigned");
+        id.setNullValue("undefined");
+
         id.setTypeName(column.getColumnType());
         Column col = new Column();
         col.setName(escapeName(column.getColumnName()));
