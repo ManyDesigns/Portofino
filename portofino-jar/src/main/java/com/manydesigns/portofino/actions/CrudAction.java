@@ -43,6 +43,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
@@ -72,6 +73,10 @@ import jxl.Workbook;
 import jxl.write.*;
 import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.collections.MultiHashMap;
@@ -85,6 +90,8 @@ import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONException;
+import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,7 +130,8 @@ public class CrudAction extends PortletAction {
     public MultiMap availableSelectionProviders; //List<String> -> DatabaseSelectionProvider
     public String pk;
 
-    public final static String prefix = null;
+    public final static String prefix = "";
+    public final static String searchPrefix = prefix + "search_";
 
     //--------------------------------------------------------------------------
     // Web parameters
@@ -132,6 +140,8 @@ public class CrudAction extends PortletAction {
     public String[] selection;
     public String searchString;
     public String successReturnUrl;
+    public Integer firstResult;
+    public Integer maxResults;
 
     //--------------------------------------------------------------------------
     // UI forms
@@ -370,7 +380,7 @@ public class CrudAction extends PortletAction {
 
         try {
             setupSearchForm();
-            loadObjects();
+//            loadObjects();
             setupTableForm(Mode.VIEW);
 
             String fwd = crudPage.getSearchUrl();
@@ -405,6 +415,73 @@ public class CrudAction extends PortletAction {
         }
     }
 
+    public Resolution jsonSearchData() throws JSONException, JSQLParserException {
+        setupSearchForm();
+        loadObjects();
+
+        // calculate totalRecords
+        TableCriteria criteria = new TableCriteria(baseTable);
+        if(searchForm != null) {
+            searchForm.configureCriteria(criteria);
+        }
+        QueryStringWithParameters query =
+                application.mergeQuery(crud.getQuery(), criteria, this);
+
+        String queryString = query.getQueryString();
+        String totalRecordsQueryString = generateCountQuery(queryString);
+        String qualifiedTableName =
+                crud.getActualTable().getQualifiedName();
+        List<Object> result = application.runHqlQuery
+                (qualifiedTableName, totalRecordsQueryString,
+                 query.getParamaters());
+        long totalRecords = (Long) result.get(0);
+
+        setupTableForm(Mode.VIEW);
+        JSONStringer js = new JSONStringer();
+        js.object()
+                .key("recordsReturned")
+                .value(objects.size())
+                .key("totalRecords")
+                .value(totalRecords)
+                .key("startIndex")
+                .value(firstResult == null ? 0 : firstResult)
+                .key("Result")
+                .array();
+        for (TableForm.Row row : tableForm.getRows()) {
+            js.object()
+                    .key("__rowKey")
+                    .value(row.getKey());
+            for (Field field : row) {
+                Object value = field.getValue();
+                String displayValue = field.getDisplayValue();
+                String href = field.getHref();
+                js.key(field.getPropertyAccessor().getName());
+                js.object()
+                        .key("value")
+                        .value(value)
+                        .key("displayValue")
+                        .value(displayValue)
+                        .key("href")
+                        .value(href)
+                        .endObject();
+            }
+            js.endObject();
+        }
+        js.endArray();
+        js.endObject();
+        String jsonText = js.toString();
+        return new StreamingResolution("application/json", jsonText);
+    }
+
+    protected String generateCountQuery(String queryString) throws JSQLParserException {
+        CCJSqlParserManager parserManager = new CCJSqlParserManager();
+        queryString = "SELECT count(*) " + queryString;
+        PlainSelect plainSelect =
+                (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
+        plainSelect.setOrderByElements(null);
+        return plainSelect.toString();
+    }
+
     public Resolution resetSearch() {
         return new RedirectResolution(dispatch.getOriginalPath());
     }
@@ -414,17 +491,12 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     public Resolution read() {
-        setupSearchForm();
-        loadObjects();
-
-        if (!objects.contains(object)) {
-            // TODO: gestire situazione:
-            // pratiche da approvare; seleziono una pratica; la approvo;
-            // la pratica "esce" dallo use case perché lo stato non è più
-            // "in approvazione". Prima dava "object not found".
-            // Adesso dovrebbe tornare alla ricerca o comunque non dare errore.
-            //throw new Error("Object not found");
+        if(!crud.isLargeResultSet()) {
+            //setupSearchForm(); apparentemente non serve
+            loadObjects();
+            setupPagination();
         }
+
         setupForm(Mode.VIEW);
         form.readFromObject(object);
         refreshBlobDownloadHref();
@@ -438,8 +510,6 @@ public class CrudAction extends PortletAction {
                 Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
                 .addParameter("searchString", searchString)
                 .toString();
-
-        setupPagination();
 
         setupReturnToParentTarget();
 
@@ -455,7 +525,7 @@ public class CrudAction extends PortletAction {
             for (Field field : fieldSet) {
                 if (field instanceof FileBlobField) {
                     FileBlobField fileBlobField = (FileBlobField) field;
-                    Blob blob = fileBlobField.getBlob();
+                    Blob blob = fileBlobField.getValue();
                     if (blob != null) {
                         String url = getBlobDownloadUrl(blob.getCode());
                         field.setHref(url);
@@ -821,7 +891,7 @@ public class CrudAction extends PortletAction {
         }
 
         searchForm = searchFormBuilder
-                .configPrefix(prefix)
+                .configPrefix(searchPrefix)
                 .build();
 
         if (StringUtils.isBlank(searchString)) {
@@ -895,14 +965,23 @@ public class CrudAction extends PortletAction {
                     property.getName(), hrefFormat);
         }
 
+        int nRows;
+        if (objects == null) {
+            nRows = 0;
+        } else {
+            nRows = objects.size();
+        }
+
         tableForm = tableFormBuilder
                 .configPrefix(prefix)
-                .configNRows(objects.size())
+                .configNRows(nRows)
                 .configMode(mode)
                 .build();
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
         tableForm.setSelectable(true);
-        tableForm.readFromObject(objects);
+        if (objects != null) {
+            tableForm.readFromObject(objects);
+        }
     }
 
     protected String getReadLinkExpression() {
@@ -941,7 +1020,8 @@ public class CrudAction extends PortletAction {
             if(searchForm != null) {
                 searchForm.configureCriteria(criteria);
             }
-            objects = application.getObjects(crud.getQuery(), criteria, this, null, null);
+            objects = application.getObjects(
+                    crud.getQuery(), criteria, this, firstResult, maxResults);
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
             logger.warn("Incorrect Field Type", e);
@@ -961,7 +1041,7 @@ public class CrudAction extends PortletAction {
     public void exportSearchExcel(File fileTemp) {
         setupSearchForm();
         loadObjects();
-        setupTableForm(Mode.VIEW);
+//        setupTableForm(Mode.VIEW);
 
         writeFileSearchExcel(fileTemp);
     }
@@ -1013,7 +1093,7 @@ public class CrudAction extends PortletAction {
 
         loadObjects();
 
-        setupTableForm(Mode.VIEW);
+//        setupTableForm(Mode.VIEW);
         setupForm(Mode.VIEW);
         form.readFromObject(object);
 
@@ -1103,9 +1183,9 @@ public class CrudAction extends PortletAction {
                                 Field field) throws WriteException {
         if (field instanceof NumericField) {
             NumericField numField = (NumericField) field;
-            if (numField.getDecimalValue() != null) {
+            if (numField.getValue() != null) {
                 Number number;
-                BigDecimal decimalValue = numField.getDecimalValue();
+                BigDecimal decimalValue = numField.getValue();
                 if (numField.getDecimalFormat() == null) {
                     number = new Number(j, i,
                             decimalValue == null
@@ -1129,15 +1209,15 @@ public class CrudAction extends PortletAction {
         } else if (field instanceof DateField) {
             DateField dateField = (DateField) field;
             DateTime dateCell;
-            Date date = dateField.getDateValue();
+            Date date = dateField.getValue();
             if (date != null) {
                 DateFormat dateFormat = new DateFormat(
                         dateField.getDatePattern());
                 WritableCellFormat wDateFormat =
                         new WritableCellFormat(dateFormat);
                 dateCell = new DateTime(j, i,
-                        dateField.getDateValue() == null
-                                ? null : dateField.getDateValue(),
+                        dateField.getValue() == null
+                                ? null : dateField.getValue(),
                         wDateFormat);
                 sheet.addCell(dateCell);
             }
@@ -1446,7 +1526,8 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     public static final String[][] CRUD_CONFIGURATION_FIELDS =
-            {{"name", "table", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable"}};
+            {{"name", "table", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
+              "largeResultSet"}};
 
     public Form crudConfigurationForm;
     public TableForm propertiesTableForm;
@@ -1812,14 +1893,6 @@ public class CrudAction extends PortletAction {
         this.searchForm = searchForm;
     }
 
-    public TableForm getTableForm() {
-        return tableForm;
-    }
-
-    public void setTableForm(TableForm tableForm) {
-        this.tableForm = tableForm;
-    }
-
     public List getObjects() {
         return objects;
     }
@@ -1864,6 +1937,14 @@ public class CrudAction extends PortletAction {
         this.form = form;
     }
 
+    public TableForm getTableForm() {
+        return tableForm;
+    }
+
+    public void setTableForm(TableForm tableForm) {
+        this.tableForm = tableForm;
+    }
+
     public TableForm getSelectionProvidersForm() {
         return selectionProvidersForm;
     }
@@ -1874,5 +1955,21 @@ public class CrudAction extends PortletAction {
 
     public void setScript(String script) {
         this.script = script;
+    }
+
+    public Integer getFirstResult() {
+        return firstResult;
+    }
+
+    public void setFirstResult(Integer firstResult) {
+        this.firstResult = firstResult;
+    }
+
+    public Integer getMaxResults() {
+        return maxResults;
+    }
+
+    public void setMaxResults(Integer maxResults) {
+        this.maxResults = maxResults;
     }
 }

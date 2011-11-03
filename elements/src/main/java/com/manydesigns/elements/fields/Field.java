@@ -96,4 +96,8 @@ public interface Field extends Element {
 
     boolean isUpdatable();
     void setUpdatable(boolean updatable);
+
+    Object getValue();
+
+    String getDisplayValue();
 }

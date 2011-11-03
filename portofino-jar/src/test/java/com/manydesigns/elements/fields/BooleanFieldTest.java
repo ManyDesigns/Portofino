@@ -76,7 +76,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
         booleanField.setRequired(true);
         assertTrue(booleanField.isRequired());
 
-        assertNull(booleanField.getBooleanValue());
+        assertNull(booleanField.getValue());
         String text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
@@ -84,8 +84,8 @@ public class BooleanFieldTest extends AbstractElementsTest {
                 "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\" />" +
                 "</td>", text);
 
-        booleanField.setBooleanValue(false);
-        assertFalse(booleanField.getBooleanValue());
+        booleanField.setValue(false);
+        assertFalse(booleanField.getValue());
         text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
@@ -93,8 +93,8 @@ public class BooleanFieldTest extends AbstractElementsTest {
                 "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\" />" +
                 "</td>", text);
 
-        booleanField.setBooleanValue(true);
-        assertTrue(booleanField.getBooleanValue());
+        booleanField.setValue(true);
+        assertTrue(booleanField.getValue());
         text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
@@ -122,31 +122,31 @@ public class BooleanFieldTest extends AbstractElementsTest {
 
         DummyHttpServletRequest req = new DummyHttpServletRequest();
 
-        booleanField.setBooleanValue(true);
-        assertTrue(booleanField.getBooleanValue());
+        booleanField.setValue(true);
+        assertTrue(booleanField.getValue());
 
         req.setParameter("myBoolean", "");
         booleanField.readFromRequest(req);
-        assertFalse(booleanField.getBooleanValue());
+        assertFalse(booleanField.getValue());
 
         req.setParameter("myBoolean", "true");
         booleanField.readFromRequest(req);
-        assertTrue(booleanField.getBooleanValue());
+        assertTrue(booleanField.getValue());
 
         req.setParameter("myBoolean", "false");
         booleanField.readFromRequest(req);
-        assertFalse(booleanField.getBooleanValue());
+        assertFalse(booleanField.getValue());
 
         req.setParameter("myBoolean", null);
         req.setParameter(BooleanField.CHECK_PREFIX + "myBoolean", "true");
         booleanField.readFromRequest(req);
-        assertFalse(booleanField.getBooleanValue());
+        assertFalse(booleanField.getValue());
 
-        booleanField.setBooleanValue(true);
+        booleanField.setValue(true);
         req.setParameter("myBoolean", null);
         req.setParameter(BooleanField.CHECK_PREFIX + "myBoolean", null);
         booleanField.readFromRequest(req);
-        assertTrue(booleanField.getBooleanValue());
+        assertTrue(booleanField.getValue());
     }
 
 
@@ -161,7 +161,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
         booleanField.setRequired(false);
         assertFalse(booleanField.isRequired());
 
-        assertNull(booleanField.getBooleanValue());
+        assertNull(booleanField.getValue());
         String text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
@@ -171,8 +171,8 @@ public class BooleanFieldTest extends AbstractElementsTest {
                 "<option value=\"false\">No</option>" +
                 "</select></td>", text);
 
-        booleanField.setBooleanValue(false);
-        assertFalse(booleanField.getBooleanValue());
+        booleanField.setValue(false);
+        assertFalse(booleanField.getValue());
         text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
@@ -182,8 +182,8 @@ public class BooleanFieldTest extends AbstractElementsTest {
                 "<option value=\"false\" selected=\"selected\">No</option>" +
                 "</select></td>", text);
 
-        booleanField.setBooleanValue(true);
-        assertTrue(booleanField.getBooleanValue());
+        booleanField.setValue(true);
+        assertTrue(booleanField.getValue());
         text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
@@ -212,31 +212,31 @@ public class BooleanFieldTest extends AbstractElementsTest {
 
         DummyHttpServletRequest req = new DummyHttpServletRequest();
 
-        booleanField.setBooleanValue(true);
-        assertTrue(booleanField.getBooleanValue());
+        booleanField.setValue(true);
+        assertTrue(booleanField.getValue());
 
         req.setParameter("myBoolean", "");
         booleanField.readFromRequest(req);
-        assertNull(booleanField.getBooleanValue());
+        assertNull(booleanField.getValue());
 
         req.setParameter("myBoolean", "true");
         booleanField.readFromRequest(req);
-        assertTrue(booleanField.getBooleanValue());
+        assertTrue(booleanField.getValue());
 
         req.setParameter("myBoolean", "false");
         booleanField.readFromRequest(req);
-        assertFalse(booleanField.getBooleanValue());
+        assertFalse(booleanField.getValue());
 
         req.setParameter("myBoolean", null);
         req.setParameter(BooleanField.CHECK_PREFIX + "myBoolean", "true");
         booleanField.readFromRequest(req);
-        assertNull(booleanField.getBooleanValue());
+        assertNull(booleanField.getValue());
 
-        booleanField.setBooleanValue(true);
+        booleanField.setValue(true);
         req.setParameter("myBoolean", null);
         req.setParameter(BooleanField.CHECK_PREFIX + "myBoolean", null);
         booleanField.readFromRequest(req);
-        assertTrue(booleanField.getBooleanValue());
+        assertTrue(booleanField.getValue());
     }
 
     //--------------------------------------------------------------------------
@@ -244,7 +244,7 @@ public class BooleanFieldTest extends AbstractElementsTest {
     //--------------------------------------------------------------------------
 
     protected void checkPreview() {
-        assertNull(booleanField.getBooleanValue());
+        assertNull(booleanField.getValue());
         String text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
@@ -253,8 +253,8 @@ public class BooleanFieldTest extends AbstractElementsTest {
                 "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\" />" +
                 "</td>", text);
 
-        booleanField.setBooleanValue(false);
-        assertFalse(booleanField.getBooleanValue());
+        booleanField.setValue(false);
+        assertFalse(booleanField.getValue());
         text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +
@@ -263,8 +263,8 @@ public class BooleanFieldTest extends AbstractElementsTest {
                 "<input type=\"hidden\" name=\"__checkbox_myBoolean\" value=\"true\" />" +
                 "</td>", text);
 
-        booleanField.setBooleanValue(true);
-        assertTrue(booleanField.getBooleanValue());
+        booleanField.setValue(true);
+        assertTrue(booleanField.getValue());
         text = Util.elementToString(booleanField);
         assertEquals("<th><label for=\"myBoolean\" class=\"field\">" +
                 "My boolean:</label></th><td>" +

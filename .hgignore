@@ -7,6 +7,7 @@
 ^elements-struts2/target
 ^elements-extras/target
 ^out/
+^portofino-war/src/main/webapp/apps/hrgest
 derby.log
 syntax: glob
 *.DS_Store

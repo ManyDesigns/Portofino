@@ -225,11 +225,11 @@ public class DateField extends AbstractTextField {
     // Getters/getters
     //**************************************************************************
 
-    public Date getDateValue() {
+    public Date getValue() {
         return dateValue;
     }
 
-    public void setDateValue(Date dateValue) {
+    public void setValue(Date dateValue) {
         this.dateValue = dateValue;
     }
 

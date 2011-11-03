@@ -17,7 +17,11 @@
             <div class="yui-gc">
                 <div class="yui-u first">
                     <div class="search_results withSearchForm">
-                        <mde:write name="actionBean" property="tableForm"/>
+        </c:if>
+        <c:if test="${empty actionBean.searchForm}">
+                    <div class="search_results">
+        </c:if>
+                        <%@include file="datatable.jsp"%>
                         <stripes:submit name="create" value="Create new" class="portletButton"/>
                         <stripes:submit name="bulkEdit" value="Edit" class="portletButton"/>
                         <stripes:submit name="bulkDelete" value="Delete"  class="portletButton" onclick="return confirm ('Are you sure?');"/>
@@ -26,6 +30,7 @@
                         <stripes:submit name="exportSearchPdf" value="Pdf" class="portletButton" disabled="true"/>
                     </div>
                     <!-- TODO custom buttons -->
+        <c:if test="${not empty actionBean.searchForm}">
                 </div>
                 <div class="yui-u">
                         <div class="search_form">
@@ -36,18 +41,8 @@
                             </div>
                         </div>
                 </div>
+                <div style="clear: both;">&nbsp;</div>
             </div>
-        </c:if><c:if test="${empty actionBean.searchForm}">
-            <div class="search_results">
-                <mde:write name="actionBean" property="tableForm"/>
-                <stripes:submit name="create" value="Create new" class="portletButton"/>
-                <stripes:submit name="bulkEdit" value="Edit" class="portletButton"/>
-                <stripes:submit name="bulkDelete" value="Delete"  class="portletButton" onclick="return confirm ('Are you sure?');"/>
-                <stripes:submit name="print" value="Print" disabled="true" class="portletButton"/>
-                <stripes:submit name="exportSearchExcel" value="Excel" class="portletButton" disabled="true"/>
-                <stripes:submit name="exportSearchPdf" value="Pdf" class="portletButton" disabled="true"/>
-            </div>
-            <!-- TODO custom buttons -->
         </c:if>
 
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>

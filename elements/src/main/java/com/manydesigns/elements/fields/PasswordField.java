@@ -187,7 +187,7 @@ public class PasswordField extends TextField {
             xb.addAttribute("name", actualInputName);
             xb.addAttribute("value", actualStringValue);
             if (maxLength != null) {
-                int textInputSize = (maxLength > size)
+                int textInputSize = (size != null) && (maxLength > size)
                         ? size
                         : maxLength;
                 xb.addAttribute("maxlength",

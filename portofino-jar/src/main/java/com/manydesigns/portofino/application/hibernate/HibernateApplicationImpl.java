@@ -44,18 +44,17 @@ import com.manydesigns.portofino.connections.Connections;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.logic.DataModelLogic;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
-import com.manydesigns.portofino.system.model.users.UserUtils;
 import liquibase.Liquibase;
-import liquibase.database.*;
+import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
@@ -129,7 +128,6 @@ public class HibernateApplicationImpl implements Application {
 
     public static final Logger logger =
             LoggerFactory.getLogger(HibernateApplicationImpl.class);
-    private static final String PORTOFINO_PUBLIC_USERS = "portofino.public.users";
 
     //**************************************************************************
     // Constructors
@@ -268,6 +266,16 @@ public class HibernateApplicationImpl implements Application {
                     .equals(ConnectionProvider.STATUS_CONNECTED)) {
                 HibernateConfig builder =
                         new HibernateConfig(connectionProvider);
+                String trueString = database.getTrueString();
+                if(trueString != null) {
+                    builder.setTrueString(
+                            "null".equalsIgnoreCase(trueString) ? null : trueString);
+                }
+                String falseString = database.getFalseString();
+                if(falseString != null) {
+                    builder.setFalseString(
+                            "null".equalsIgnoreCase(falseString) ? null : falseString);
+                }
                 Configuration configuration =
                         builder.buildSessionFactory(database);
                 SessionFactoryImpl sessionFactory =
@@ -445,10 +453,14 @@ public class HibernateApplicationImpl implements Application {
         return result;
     }
 
-    protected Session getSession(String qualifiedTableName) {
+    public Session getSession(String qualifiedTableName) {
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, qualifiedTableName);
         String databaseName = table.getDatabaseName();
+        return getSessionByDatabaseName(databaseName);
+    }
+
+    public Session getSessionByDatabaseName(String databaseName) {
         return setups.get(databaseName).getThreadSession();
     }
 
@@ -661,6 +673,13 @@ public class HibernateApplicationImpl implements Application {
                                    @Nullable Object rootObject,
                                    @Nullable Integer firstResult,
                                    @Nullable Integer maxResults) {
+        QueryStringWithParameters result = mergeQuery(queryString, criteria, rootObject);
+
+        return runHqlQuery(result.getQueryString(), result.getParamaters(), firstResult, maxResults);
+    }
+
+    public QueryStringWithParameters mergeQuery
+            (String queryString, TableCriteria criteria, Object rootObject) {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
         String formatString = sqlFormat.getFormatString();
         Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
@@ -706,7 +725,7 @@ public class HibernateApplicationImpl implements Application {
         Object[] mergedParameters = new Object[mergedParametersList.size()];
         mergedParametersList.toArray(mergedParameters);
 
-        return runHqlQuery(fullQueryString, mergedParameters, firstResult, maxResults);
+        return new QueryStringWithParameters(fullQueryString, mergedParameters);
     }
 
     public List<Object> runHqlQuery(
@@ -1024,66 +1043,29 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
     // User
     //**************************************************************************
-    public User login(String username, String password) {
-        String qualifiedTableName = PORTOFINO_PUBLIC_USERS;
-        Session session = getSession(qualifiedTableName);
-        org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
-        criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
-        criteria.add(Restrictions.eq(UserUtils.PASSWORD, password));
-
-        @SuppressWarnings({"unchecked"})
-        List<Object> result = (List<Object>) criteria.list();
-
-        if (result.size() == 1) {
-            return (User) result.get(0);
-        } else {
-            return null;
-        }
-    }
 
     public User findUserByEmail(String email) {
-        String qualifiedTableName = PORTOFINO_PUBLIC_USERS;
+        String qualifiedTableName = SecurityLogic.USERTABLE;
         Session session = getSession(qualifiedTableName);
-        org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
+        org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("email", email));
-        @SuppressWarnings({"unchecked"})
-        List<Object> result = (List<Object>) criteria.list();
-
-        if (result.size() == 1) {
-            return (User) result.get(0);
-        } else {
-            return null;
-        }
+        return (User) criteria.uniqueResult();
     }
 
     public User findUserByUserName(String username) {
-        String qualifiedTableName = PORTOFINO_PUBLIC_USERS;
+        String qualifiedTableName = SecurityLogic.USERTABLE;
         Session session = getSession(qualifiedTableName);
-        org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
+        org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
-        @SuppressWarnings({"unchecked"})
-        List<Object> result = (List<Object>) criteria.list();
-
-        if (result.size() == 1) {
-            return (User) result.get(0);
-        } else {
-            return null;
-        }
+        return (User) criteria.uniqueResult();
     }
 
     public User findUserByToken(String token) {
-        String qualifiedTableName = PORTOFINO_PUBLIC_USERS;
+        String qualifiedTableName = SecurityLogic.USERTABLE;
         Session session = getSession(qualifiedTableName);
-        org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
+        org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("token", token));
-        @SuppressWarnings({"unchecked"})
-        List<Object> result = (List<Object>) criteria.list();
-
-        if (result.size() == 1) {
-            return (User) result.get(0);
-        } else {
-            return null;
-        }
+        return (User) criteria.uniqueResult();
     }
 
     public Group getAnonymousGroup() {
@@ -1113,12 +1095,12 @@ public class HibernateApplicationImpl implements Application {
     }
 
     protected Group getGroup(String name) {
-        TableAccessor table = getTableAccessor(UserUtils.GROUPTABLE);
+        TableAccessor table = getTableAccessor(SecurityLogic.GROUPTABLE);
         assert table != null;
 
         String actualEntityName = table.getTable().getActualEntityName();
         List result = runHqlQuery
-                (UserUtils.GROUPTABLE,
+                (SecurityLogic.GROUPTABLE,
                 "FROM " + actualEntityName + " WHERE name = ?",
                 new Object[] { name });
         if(result.isEmpty()) {

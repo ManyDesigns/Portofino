@@ -42,9 +42,9 @@ import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
-import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.configuration.Configuration;
@@ -112,8 +112,8 @@ public class ProfileAction extends AbstractActionBean {
 
     private Resolution read() {
         User thisUser =
-            (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
-        ClassAccessor accessor = application.getTableAccessor(UserUtils.USERTABLE);
+            (User) application.getObjectByPk(SecurityLogic.USERTABLE, new User(userId));
+        ClassAccessor accessor = application.getTableAccessor(SecurityLogic.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         formBuilder.configFields("email", "userName", "firstName",
                 "middleName", "lastName", "creationDate");
@@ -134,9 +134,9 @@ public class ProfileAction extends AbstractActionBean {
     public Resolution edit() {
         userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
-            (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
+            (User) application.getObjectByPk(SecurityLogic.USERTABLE, new User(userId));
 
-        ClassAccessor accessor = application.getTableAccessor(UserUtils.USERTABLE);
+        ClassAccessor accessor = application.getTableAccessor(SecurityLogic.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
                 .configFields("email", "userName", "firstName",
@@ -150,8 +150,8 @@ public class ProfileAction extends AbstractActionBean {
     public Resolution update() {
         userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
-            (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
-        ClassAccessor accessor = application.getTableAccessor(UserUtils.USERTABLE);
+            (User) application.getObjectByPk(SecurityLogic.USERTABLE, new User(userId));
+        ClassAccessor accessor = application.getTableAccessor(SecurityLogic.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
                 .configFields("email", "userName", "firstName",
@@ -163,7 +163,7 @@ public class ProfileAction extends AbstractActionBean {
         
         if(form.validate()){
             form.writeToObject(thisUser);
-            application.updateObject(UserUtils.USERTABLE, thisUser);
+            application.updateObject(SecurityLogic.USERTABLE, thisUser);
             application.commit("portofino");
             logger.debug("User {} updated", thisUser.getEmail());
             SessionMessages.addInfoMessage("Utente aggiornato correttamente");
@@ -184,7 +184,7 @@ public class ProfileAction extends AbstractActionBean {
     public Resolution updatePwd() {
         userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
-            (User) application.getObjectByPk(UserUtils.USERTABLE, new User(userId));
+            (User) application.getObjectByPk(SecurityLogic.USERTABLE, new User(userId));
 
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)
@@ -212,12 +212,12 @@ public class ProfileAction extends AbstractActionBean {
             if(encOldPwd.equals(thisUser.getPwd())) {
                 thisUser.setPwd(bean.pwd);
                 if (enc) {
-                    thisUser.setPwd(UserUtils.encryptPassword(bean.pwd));
+                    thisUser.setPwd(SecurityLogic.encryptPassword(bean.pwd));
                 } else {
                     thisUser.setPwd(bean.pwd);
                 }
                 thisUser.setPwdModDate(new Timestamp(new Date().getTime()));
-                application.updateObject(UserUtils.USERTABLE, thisUser);
+                application.updateObject(SecurityLogic.USERTABLE, thisUser);
                 application.commit("portofino");
 
                 logger.debug("User {} updated", thisUser.getEmail());

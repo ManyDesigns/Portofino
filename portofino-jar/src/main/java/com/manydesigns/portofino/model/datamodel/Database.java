@@ -61,6 +61,9 @@ public class Database implements ModelObject {
 
     protected String databaseName;
 
+    protected String trueString = null;
+    protected String falseString = null;
+
     
     //**************************************************************************
     // Logging
@@ -217,4 +220,21 @@ public class Database implements ModelObject {
         return MessageFormat.format("database {0}", getQualifiedName());
     }
 
+    @XmlAttribute(required = false)
+    public String getTrueString() {
+        return trueString;
+    }
+
+    public void setTrueString(String trueString) {
+        this.trueString = trueString;
+    }
+
+    @XmlAttribute(required = false)
+    public String getFalseString() {
+        return falseString;
+    }
+
+    public void setFalseString(String falseString) {
+        this.falseString = falseString;
+    }
 }

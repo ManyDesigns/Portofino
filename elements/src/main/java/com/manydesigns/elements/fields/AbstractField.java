@@ -305,6 +305,10 @@ public abstract class AbstractField implements Field {
     public void readFromObject(Object obj) {
     }
 
+    public String getDisplayValue() {
+        return getStringValue();
+    }
+
     //**************************************************************************
     // Getters/setters
     //**************************************************************************

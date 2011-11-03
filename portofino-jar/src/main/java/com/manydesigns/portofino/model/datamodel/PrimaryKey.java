@@ -123,7 +123,7 @@ public class PrimaryKey implements ModelObject {
             Column column = pkc.getActualColumn();
             if (column == null) {
                 valid = false;
-                logger.warn("Invalid primary key column: {}-{}",
+                logger.error("Invalid primary key column: {}-{}",
                         getQualifiedName(), pkc.getColumnName());
             } else {
                 columns.add(column);

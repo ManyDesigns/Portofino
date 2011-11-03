@@ -312,11 +312,11 @@ public class FileBlobField extends AbstractField
         }
     }
 
-    public Blob getBlob() {
+    public Blob getValue() {
         return blob;
     }
 
-    public void setBlob(Blob blob) {
+    public void setValue(Blob blob) {
         this.blob = blob;
     }
 

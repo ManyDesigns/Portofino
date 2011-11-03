@@ -20,7 +20,7 @@
                      type="com.manydesigns.portofino.dispatcher.Dispatch"/>
         <title><c:out value="${dispatch.lastPageInstance.page.description}"/></title>
     </head>
-    <body>
+    <body class="yui-skin-sam">
     <div id="doc3" class="yui-t2">
         <stripes:url var="profileUrl" value="/Profile.action"/>
         <jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration"/>

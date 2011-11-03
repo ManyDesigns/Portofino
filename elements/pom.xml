@@ -88,6 +88,11 @@
             <artifactId>annotations</artifactId>
             <version>7.0.3</version>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
+        </dependency>
         <!-- Struts 1 dependencies (provided) -->
         <dependency>
             <groupId>org.apache.struts</groupId>

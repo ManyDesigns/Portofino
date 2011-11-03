@@ -29,6 +29,10 @@
 
 package com.manydesigns.portofino.database;
 
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.math.BigDecimal;
 import java.sql.Types;
 import java.util.Date;
@@ -42,6 +46,12 @@ import java.util.Date;
 public class Type {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
+
+    //**************************************************************************
+    // Logger
+    //**************************************************************************
+
+    public final static Logger logger = LoggerFactory.getLogger(Type.class);
 
     //**************************************************************************
     // Fields
@@ -125,7 +135,7 @@ public class Type {
         return getDefaultJavaType(jdbcType);
     }
 
-    public static Class getDefaultJavaType(int jdbcType) {
+    public static @Nullable Class getDefaultJavaType(int jdbcType) {
         switch (jdbcType) {
             case Types.BIGINT:
                 return Long.class;
@@ -185,7 +195,8 @@ public class Type {
             case Types.STRUCT:
                 return java.sql.Struct.class;
             default:
-                throw new Error("Unsupported type: " + jdbcType);
+                logger.warn("Unsupported jdbc type: {}", jdbcType);
+                return null;
         }
     }
 

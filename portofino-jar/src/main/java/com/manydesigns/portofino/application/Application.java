@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.application;
 
+import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
@@ -38,6 +39,7 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import org.apache.commons.configuration.Configuration;
+import org.hibernate.Session;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -114,6 +116,10 @@ public interface Application {
     // Persistance
     //**************************************************************************
 
+    Session getSessionByDatabaseName(String databaseName);
+
+    Session getSession(String qualifiedTableName);
+
     Object getObjectByPk(String qualifiedTableName, Serializable pk);
 
     Object getObjectByPk(String qualifiedTableName, Serializable pk, String queryString, Object rootObject);
@@ -166,8 +172,6 @@ public interface Application {
     // User
     //**************************************************************************
 
-    User login(String username, String password);
-
     public User findUserByEmail(String email);
 
     public User findUserByUserName(String username);
@@ -206,4 +210,7 @@ public interface Application {
             @Nullable Integer firstResult,
             @Nullable Integer maxResults
     );
+
+    QueryStringWithParameters mergeQuery
+            (String queryString, TableCriteria criteria, Object rootObject);
 }

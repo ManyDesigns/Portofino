@@ -22,7 +22,7 @@
             </stripes:layout-component>
         </title>
     </head>
-    <body>
+    <body class="yui-skin-sam">
     <div id="doc3" class="yui-t2">
         <div id="hd">
             <jsp:include page="header.jsp"/>

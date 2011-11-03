@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.sync;
 
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.application.hibernate.HibernateConfig;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
@@ -108,7 +109,7 @@ public class DatabaseSyncer {
             DatabaseSnapshotGeneratorFactory dsgf =
                     DatabaseSnapshotGeneratorFactory.getInstance();
             for (String schemaName : schemaNames) {
-                logger.debug("Processing schema: {}", schemaName);
+                logger.info("Processing schema: {}", schemaName);
                 Schema sourceSchema =
                         DataModelLogic.findSchemaByName(
                                 sourceDatabase, schemaName);
@@ -160,47 +161,129 @@ public class DatabaseSyncer {
             String fkName = liquibaseFK.getName();
 
             Table targetFromTable = DataModelLogic.findTableByName(targetSchema, fkTableName);
+            if (targetFromTable == null) {
+                logger.error("Table '{}' not found in schema '{}'. Skipping foreign key: {}",
+                        new Object[] {
+                                fkTableName,
+                                targetSchema.getSchemaName(),
+                                fkName
+                        });
+                continue;
+            }
 
             ForeignKey targetFK = new ForeignKey(targetFromTable);
             targetFK.setName(fkName);
 
-            liquibase.database.structure.Table pkTable = liquibaseFK.getPrimaryKeyTable();
+            liquibase.database.structure.Table liquibasePkTable =
+                    liquibaseFK.getPrimaryKeyTable();
+
             targetFK.setToDatabase(targetSchema.getDatabaseName());
-            targetFK.setToSchema(pkTable.getSchema());
-            targetFK.setToTableName(pkTable.getName());
+
+            String pkSchemaName = liquibasePkTable.getSchema();
+            String pkTableName = liquibasePkTable.getName();
+            targetFK.setToSchema(pkSchemaName);
+            targetFK.setToTableName(pkTableName);
+            if (pkSchemaName == null || pkTableName == null) {
+                logger.error("Null schema or table name: foreign key " +
+                        "(schema: {}, table: {}, fk: {}) " +
+                        "references primary key (schema: {}, table{}). Skipping foreign key.",
+                        new Object[] {
+                            targetFromTable.getSchemaName(),
+                            targetFromTable.getTableName(),
+                            fkName,
+                            pkSchemaName,
+                            pkTableName
+                        }
+                );
+                continue;
+            }
+
+            Database targetDatabase = targetSchema.getDatabase();
+            Schema pkSchema = DataModelLogic.findSchemaByName(
+                    targetDatabase, pkSchemaName);
+            if (pkSchema == null) {
+                logger.error("Cannot find referenced schema: {}. Skipping foreign key.", pkSchemaName);
+                continue;
+            }
+            Table pkTable =
+                    DataModelLogic.findTableByName(pkSchema, pkTableName);
+            if (pkTable == null) {
+                logger.error("Cannot find referenced table (schema: {}, table: {}). Skipping foreign key.",
+                        pkSchemaName, pkTableName);
+                continue;
+            }
 
             ForeignKeyConstraintType updateRule =
                     liquibaseFK.getUpdateRule();
             if (updateRule == null) {
-                logger.warn("Foreign key with null update rule: {}", fkName);
-                targetFK.setOnUpdate(ForeignKeyConstraintType.importedKeyRestrict.name());
-            } else {
-                targetFK.setOnUpdate(updateRule.name());
+                updateRule = ForeignKeyConstraintType.importedKeyRestrict;
+                logger.warn("Foreign key '{}' with null update rule. Using: {}",
+                        fkName, updateRule.name());
             }
+            targetFK.setOnUpdate(updateRule.name());
 
             ForeignKeyConstraintType deleteRule =
                     liquibaseFK.getDeleteRule();
             if (deleteRule == null) {
-                logger.warn("Foreign key with null delete rule: {}", fkName);
-                targetFK.setOnDelete(ForeignKeyConstraintType.importedKeyRestrict.name());
-            } else {
-                targetFK.setOnDelete(deleteRule.name());
+                deleteRule = ForeignKeyConstraintType.importedKeyRestrict;
+                logger.warn("Foreign key '{}' with null delete rule. Using: {}",
+                        fkName, deleteRule.name());
             }
+            targetFK.setOnDelete(deleteRule.name());
 
-            String[] fromColumns = liquibaseFK.getForeignKeyColumns().split(",");
-            String[] toColumns = liquibaseFK.getPrimaryKeyColumns().split(",");
-            if(fromColumns.length != toColumns.length) {
+            String[] fromColumnNames = liquibaseFK.getForeignKeyColumns().split(",");
+            String[] toColumnNames = liquibaseFK.getPrimaryKeyColumns().split(",");
+            if(fromColumnNames.length != toColumnNames.length) {
                 logger.error("Invalid foreign key {} - columns don't match", fkName);
                 continue;
             }
-            for(int i = 0; i < fromColumns.length; i++) {
+
+            boolean referencesHaveErrors = false;
+            for(int i = 0; i < fromColumnNames.length; i++) {
+                String fromColumnName = fromColumnNames[i].trim();
+                String toColumnName = toColumnNames[i].trim();
+
+                Column fromColumn =
+                        DataModelLogic.findColumnByName(
+                                targetFromTable, fromColumnName);
+                if (fromColumn == null) {
+                    logger.error("Cannot find from column (schema: {}, table: {}, column: {}).",
+                            new Object[] {
+                                    targetFromTable.getSchemaName(),
+                                    targetFromTable.getTableName(),
+                                    fromColumnName
+                            });
+                    referencesHaveErrors = true;
+                }
+
+                Column toColumn =
+                        DataModelLogic.findColumnByName(pkTable, toColumnName);
+                if (toColumn == null) {
+                    logger.error("Cannot find to column (schema: {}, table: {}, column: {}).",
+                            new Object[] {
+                                    pkTable.getSchemaName(),
+                                    pkTable.getTableName(),
+                                    toColumn
+                            });
+                    referencesHaveErrors = true;
+                }
+
                 Reference reference = new Reference();
                 reference.setOwner(targetFK);
-                reference.setFromColumn(fromColumns[i]);
-                reference.setToColumn(toColumns[i]);
+                reference.setFromColumn(fromColumnName);
+                reference.setToColumn(toColumnName);
                 targetFK.getReferences().add(reference);
             }
-            targetFromTable.getForeignKeys().add(targetFK);
+
+            if (referencesHaveErrors) {
+                logger.error("Skipping foreign key (schema: {}, table: {}, fk: {}) because of errors.",
+                        new Object[] {
+                                pkTable.getSchemaName(),
+                                pkTable.getTableName(),
+                                fkName
+                        });
+                continue;
+            }
 
             //TODO ricercare per struttura? Es. rename
             ForeignKey sourceFK;
@@ -215,6 +298,8 @@ public class DatabaseSyncer {
                 targetFK.setOnePropertyName(sourceFK.getOnePropertyName());
             }
 
+            logger.debug("FK creation successfull. Adding FK to table.");
+            targetFromTable.getForeignKeys().add(targetFK);
         }
     }
 
@@ -232,13 +317,41 @@ public class DatabaseSyncer {
             }
 
             Table targetTable = DataModelLogic.findTableByName(targetSchema, pkTableName);
-            PrimaryKey targetPK = new PrimaryKey(targetTable);
-            targetPK.setPrimaryKeyName(liquibasePK.getName());
-            targetTable.setPrimaryKey(targetPK);
+            if (targetTable == null) {
+                logger.error("Coud not find table: {}. Skipping PK.",
+                        pkTableName
+                );
+            }
 
-            for(String columnName : liquibasePK.getColumnNamesAsList()) {
+            PrimaryKey targetPK = new PrimaryKey(targetTable);
+            String primaryKeyName = liquibasePK.getName();
+            targetPK.setPrimaryKeyName(primaryKeyName);
+
+            List<String> columnNamesAsList = liquibasePK.getColumnNamesAsList();
+            if (columnNamesAsList == null || columnNamesAsList.isEmpty()) {
+                logger.error("Primary key (table: {}, pk: {}) has no columns. Skipping PK.",
+                        pkTableName,
+                        primaryKeyName
+                );
+                continue;
+            }
+
+            boolean pkColumnsHaveErrors = false;
+            for(String columnName : columnNamesAsList) {
                 PrimaryKeyColumn targetPKColumn = new PrimaryKeyColumn(targetPK);
                 targetPKColumn.setColumnName(columnName);
+
+                Column pkColumn = targetTable.findColumnByName(columnName);
+                if (pkColumn == null) {
+                    logger.error("Primary key (table: {}, pk: {}) has invalid column: {}",
+                            new Object[] {
+                                pkTableName,
+                                primaryKeyName,
+                                columnName
+                            }
+                    );
+                    pkColumnsHaveErrors = true;
+                }
 
                 if(sourcePK != null) {
                     PrimaryKeyColumn sourcePKColumn =
@@ -265,6 +378,17 @@ public class DatabaseSyncer {
 
                 targetPK.getPrimaryKeyColumns().add(targetPKColumn);
             }
+
+            if (pkColumnsHaveErrors) {
+                logger.error("Primary key (table: {}, pk: {}) has problems with columns. Skipping PK.",
+                        pkTableName,
+                        primaryKeyName
+                );
+                continue;
+            }
+
+            logger.debug("PK creation successfull. Installing PK in table.");
+            targetTable.setPrimaryKey(targetPK);
         }
     }
 
@@ -321,15 +445,15 @@ public class DatabaseSyncer {
         for(liquibase.database.structure.Column liquibaseColumn : liquibaseTable.getColumns()) {
             logger.debug("Processing column: {}", liquibaseColumn.getName());
 
-            boolean columnHasErrors = false;
-
             Column targetColumn = new Column(targetTable);
 
             targetColumn.setColumnName(liquibaseColumn.getName());
 
             logger.debug("Merging column attributes and annotations");
             targetColumn.setAutoincrement(liquibaseColumn.isAutoIncrement());
-            targetColumn.setJdbcType(liquibaseColumn.getDataType());
+            int jdbcType = liquibaseColumn.getDataType();
+            String typeName = liquibaseColumn.getTypeName();
+            targetColumn.setJdbcType(jdbcType);
             targetColumn.setColumnType(liquibaseColumn.getTypeName());
             targetColumn.setLength(liquibaseColumn.getColumnSize());
             targetColumn.setNullable(liquibaseColumn.isNullable());
@@ -343,28 +467,36 @@ public class DatabaseSyncer {
                 copyAnnotations(sourceColumn, targetColumn);
             }
             if(targetColumn.getJavaType() == null) {
-                String liquibaseColumnType = liquibaseColumn.getTypeName();
-                int jdbcType = liquibaseColumn.getDataType();
-                targetColumn.setJavaType(Type.getDefaultJavaType(jdbcType).getName());
-//                Type type = connectionProvider.getTypeByName(liquibaseColumnType);
-//                if (type != null) {
-//                    targetColumn.setJavaType(type.getDefaultJavaType().getName());
-//                } else {
-//                    columnHasErrors = true;
-//                    logger.error("Cannot find JDBC type for table {}, column {}, type {}",
-//                            new Object[]{targetTable.getTableName(),
-//                                    targetColumn.getColumnName(),
-//                                    liquibaseColumnType});
-//                }
+                Class defaultJavaType = Type.getDefaultJavaType(jdbcType);
+
+                if (defaultJavaType != null) {
+                    targetColumn.setJavaType(defaultJavaType.getName());
+                } else {
+                    logger.error("Cannot find Java type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
+                            new Object[]{targetTable.getTableName(),
+                                    targetColumn.getColumnName(),
+                                    jdbcType,
+                                    typeName
+                            });
+                    continue;
+                }
+
+                boolean hibernateTypeOk =
+                        HibernateConfig.setHibernateType(null, targetColumn, jdbcType);
+                if (!hibernateTypeOk) {
+                    logger.error("Cannot find Hibernate type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
+                            new Object[]{targetTable.getTableName(),
+                                    targetColumn.getColumnName(),
+                                    jdbcType,
+                                    typeName
+                            });
+                    continue;
+                }
+
             }
 
-            if (columnHasErrors) {
-                logger.warn("Skipping column because of errors: {}.{}",
-                        new Object[]{targetTable.getTableName(),
-                                targetColumn.getColumnName()});
-            } else {
-                targetTable.getColumns().add(targetColumn);
-            }
+            logger.debug("Column creation successfull. Adding column to table.");
+            targetTable.getColumns().add(targetColumn);
         }
     }
 

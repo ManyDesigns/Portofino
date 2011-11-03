@@ -74,7 +74,7 @@ public class CrudPageInstance extends PageInstance {
                 tmpBaseTable = crud.getActualTable();
                 tmpPkHelper = new PkHelper(tmpClassAccessor);
             } catch (Exception e) {
-                logger.debug("Crud threw exception (probably not configured).");
+                logger.warn("Crud threw exception (probably not configured).", e);
                 tmpClassAccessor = null;
                 tmpBaseTable = null;
                 tmpPkHelper = null;

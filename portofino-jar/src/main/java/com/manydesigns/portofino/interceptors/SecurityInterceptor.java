@@ -36,8 +36,8 @@ import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.pages.Page;
-import com.manydesigns.portofino.system.model.users.UserUtils;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.ErrorResolution;
@@ -108,7 +108,7 @@ public class
         MDC.put(SessionAttributes.USER_NAME, userName);
 
         logger.debug("Retrieving groups");
-        List<String> groups = UserUtils.manageGroups(application, userId);
+        List<String> groups = SecurityLogic.manageGroups(application, userId);
         request.setAttribute(RequestAttributes.GROUPS, groups);
 
         logger.debug("Checking if action or method required administrator",
@@ -131,7 +131,7 @@ public class
             }
         }
 
-        if (requiresAdministrator && !UserUtils.isAdministrator(request)) {
+        if (requiresAdministrator && !SecurityLogic.isAdministrator(request)) {
             logger.info("User is not an administrator");
             return handleAnonymousOrUnauthorized(userId, request);
         }

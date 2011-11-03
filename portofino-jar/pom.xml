@@ -78,6 +78,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>taglibs</groupId>
+            <artifactId>standard</artifactId>
+            <version>${jstl.version}</version>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <version>${jstl.version}</version>
@@ -309,6 +314,16 @@
             <version>1.2.126</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+            <version>0.7.0</version>
+        </dependency>
+        <!--<dependency>
+            <groupId>com.unboundid</groupId>
+            <artifactId>unboundid-ldapsdk</artifactId>
+            <version>2.2.0</version>
+        </dependency>-->
     </dependencies>
     <build>
         <resources>

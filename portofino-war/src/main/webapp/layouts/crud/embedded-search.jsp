@@ -17,7 +17,7 @@
     <stripes:layout-component name="portletBody">
         <div class="embedded-content">
             <div class="search_results">
-                <mde:write name="actionBean" property="tableForm"/>
+                <%@include file="datatable.jsp"%>
                 <stripes:link href="${actionBean.dispatch.originalPath}">&gt;&gt; <fmt:message key="commons.advanced_search"/></stripes:link>
             </div>
         </div>
