@@ -29,16 +29,23 @@
 package com.manydesigns.portofino.actions.user.admin;
 
 
+import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.servlet.ServletUtils;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.CrudAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.Before;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import org.apache.commons.lang.StringUtils;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -58,7 +65,7 @@ public class UserAdminAction extends CrudAction {
 
     public static final String ACTION_PATH = "/admin/users.action";
 
-    private static final String userTable = "portofino.public.users";
+    private static final String userTable = SecurityLogic.USERTABLE;
     private static final String groupTable = "portofino.public.groups";
     private static final String usersGroupsTable = "portofino.public.users_groups";
     /*private final int pwdLength;
@@ -87,13 +94,57 @@ public class UserAdminAction extends CrudAction {
         Crud crud = new Crud();
         crud.setTable(userTable);
         crud.setQuery("FROM portofino_public_users");
+        crud.setSearchTitle("Users");
+        crud.setCreateTitle("Create user");
+        crud.setEditTitle("Edit user");
+        crud.setReadTitle("User");
         crudPage.setCrud(crud);
+        crudPage.setSearchUrl("/layouts/admin/users/userSearch.jsp");
+        crudPage.setReadUrl("/layouts/admin/users/userRead.jsp");
+        crudPage.setEditUrl("/layouts/admin/users/userEdit.jsp");
         model.init(crudPage);
-        pageInstance = new CrudPageInstance(application, crudPage, CrudPage.MODE_SEARCH, null);
+        String mode;
+        if (StringUtils.isEmpty(pk)) {
+            mode = CrudPage.MODE_SEARCH;
+        } else {
+            mode = CrudPage.MODE_DETAIL;
+        }
+        pageInstance = new CrudPageInstance(application, crudPage, mode, pk);
+        pageInstance.realize();
         PageInstance rootPageInstance = new PageInstance(application, model.getRootPage(), null);
-        dispatch = new Dispatch(context.getRequest(), ACTION_PATH, ACTION_PATH, rootPageInstance, pageInstance);
+        String originalPath = ServletUtils.getOriginalPath(context.getRequest());
+        dispatch = new Dispatch(context.getRequest(), originalPath, originalPath, rootPageInstance, pageInstance);
         context.getRequest().setAttribute(RequestAttributes.DISPATCH, dispatch);
         super.prepare();
+    }
+
+    @Override
+    protected String getReadLinkExpression() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(dispatch.getOriginalPath());
+        sb.append("?pk=");
+        boolean first = true;
+
+        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(",");
+            }
+            sb.append("%{");
+            sb.append(property.getName());
+            sb.append("}");
+        }
+        if (searchString != null) {
+            sb.append("&searchString=");
+            sb.append(Util.urlencode(searchString));
+        }
+        return sb.toString();
+    }
+
+    @Override
+    protected Resolution forwardToPortletPage(String pageJsp) {
+        return new ForwardResolution(pageJsp);
     }
 
     //**************************************************************************

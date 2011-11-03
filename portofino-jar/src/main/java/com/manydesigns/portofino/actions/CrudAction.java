@@ -578,7 +578,7 @@ public class CrudAction extends PortletAction {
                 }
                 pk = pkHelper.generatePkString(object);
                 SessionMessages.addInfoMessage("SAVE avvenuto con successo");
-                String url = dispatch.getOriginalPath() + "/" + pk;
+                String url = getReadLinkExpression();
                 return new RedirectResolution(url);
             }
         }
@@ -593,7 +593,11 @@ public class CrudAction extends PortletAction {
         setupForm(Mode.EDIT);
         editSetup(object);
         form.readFromObject(object);
-        return new ForwardResolution("/layouts/crud/edit.jsp");
+        String fwd = crudPage.getEditUrl();
+        if(StringUtils.isEmpty(fwd)) {
+            fwd = "/layouts/crud/edit.jsp";
+        }
+        return new ForwardResolution(fwd);
     }
 
     public Resolution update() {
