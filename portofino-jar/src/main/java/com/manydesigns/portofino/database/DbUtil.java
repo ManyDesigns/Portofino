@@ -181,7 +181,9 @@ public class DbUtil {
         } else if (javaType == byte[].class) {
             return Hibernate.BLOB;
         } else {
-            throw new Error("Unsupported java type: " + javaType);
+            logger.warn("Unsupported type (java type: {}, jdbc type: {}",
+                    javaType, jdbcType);
+            return null;
         }
     }
 

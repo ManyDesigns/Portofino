@@ -246,9 +246,16 @@ public class HibernateConfig {
         value.setTable(tab);
         String hibernateTypeName =
                 getHibernateTypeName(column.getActualJavaType(), jdbcType);
-        if (hibernateTypeName != null) {
-            value.setTypeName(hibernateTypeName);
+        if (hibernateTypeName == null) {
+            logger.error("Unsupported type (java type: {}, jdbc type: {}) " +
+                    "for column '{}'. Skipping column.",
+                    new Object[] {
+                            column.getActualJavaType(),
+                            jdbcType,
+                            column.getColumnName()
+                    });
         }
+        value.setTypeName(hibernateTypeName);
         value.addColumn(col);
         clazz.addProperty(prop);
         prop.setValue(value);
@@ -512,8 +519,19 @@ public class HibernateConfig {
 
         PersistentClass clazzOne =
                 config.getClassMapping(oneMDQualifiedTableName);
+        if (clazzOne == null) {
+            logger.error("Cannot find table '{}' as 'one' side of foreign key '{}'. Skipping relationship.",
+                    oneMDQualifiedTableName, relationship.getName());
+            return;
+        }
+
         PersistentClass clazzMany =
                 config.getClassMapping(manyMDQualifiedTableName);
+        if (clazzMany == null) {
+            logger.error("Cannot find table '{}' as 'many' side of foreign key '{}'. Skipping relationship.",
+                    manyMDQualifiedTableName, relationship.getName());
+            return;
+        }
 
         //Uso i Bag perché i set non funzionano con i componenti dinamici
         Bag set = new Bag(clazzOne);
