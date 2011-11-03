@@ -252,7 +252,7 @@ public class HibernateConfig {
         SimpleValue value = new SimpleValue();
         value.setTable(tab);
 
-        if (!setHibernateType(value, column, jdbcType)) {
+        if (!setHibernateType(value, column, column.getActualJavaType(), jdbcType)) {
             logger.error("Skipping column");
             return;
         }
@@ -311,10 +311,10 @@ public class HibernateConfig {
             SimpleValue value = new SimpleValue();
             value.setTable(tab);
 
-            hasErrors = setHibernateType(value, column, jdbcType) || hasErrors;
+            hasErrors = !setHibernateType(value, column, column.getActualJavaType(), jdbcType) || hasErrors;
 
             value.addColumn(col);
-            tab.getPrimaryKey().addColumn(col);
+            primaryKey.addColumn(col);
             tab.addColumn(col);
             Property prop = new Property();
             prop.setName(column.getActualPropertyName());
@@ -327,7 +327,7 @@ public class HibernateConfig {
         }
         if (hasErrors) {
             // TODO PAOLO: se la PK non è buona, tutta la tabella dovrebbe saltare
-            logger.error("Skipping column");
+            logger.error("Skipping foreign key");
             return;
         }
 
@@ -371,9 +371,9 @@ public class HibernateConfig {
 
         col.setSqlTypeCode(jdbcType);
         col.setSqlType(columnType);
-        if (!setHibernateType(id, column, jdbcType)) {
+        if (!setHibernateType(id, column, column.getActualJavaType(), jdbcType)) {
             // TODO PAOLO: se la PK non è buona, tutta la tabella dovrebbe saltare
-            logger.error("Skipping column");
+            logger.error("Skipping foreign key");
             return;
         }
 
@@ -749,8 +749,8 @@ public class HibernateConfig {
 
     public static boolean setHibernateType(@Nullable SimpleValue value,
                                  com.manydesigns.portofino.model.datamodel.Column column,
+                                 Class javaType,
                                  final int jdbcType) {
-        Class javaType = column.getActualJavaType();
         String typeName;
         Properties typeParams = null;
         if (javaType == Long.class) {
@@ -809,7 +809,7 @@ public class HibernateConfig {
 
         if (typeName == null) {
             logger.error("Unsupported type (java type: {}, jdbc type: {}) " +
-                    "for column '{}'. Skipping column.",
+                    "for column '{}'.",
                     new Object[] {
                             javaType,
                             jdbcType,

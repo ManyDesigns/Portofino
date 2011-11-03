@@ -482,7 +482,7 @@ public class DatabaseSyncer {
                 }
 
                 boolean hibernateTypeOk =
-                        HibernateConfig.setHibernateType(null, targetColumn, jdbcType);
+                        HibernateConfig.setHibernateType(null, targetColumn, defaultJavaType, jdbcType);
                 if (!hibernateTypeOk) {
                     logger.error("Cannot find Hibernate type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
                             new Object[]{targetTable.getTableName(),
