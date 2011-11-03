@@ -83,7 +83,9 @@ public class StringBooleanType implements UserType, ParameterizedType {
             } else if(value.trim().equalsIgnoreCase(falseString)) {
                 return Boolean.FALSE;
             } else {
-                throw new HibernateException("Invalid boolean value: " + value);
+                throw new HibernateException(
+                        "Invalid boolean value: " + value + "; possible values are " + trueString + ", " +
+                        falseString + ", null");
             }
         } else {
             if(trueString == null) {
