@@ -33,11 +33,14 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.connections.JdbcConnectionProvider;
+import com.manydesigns.portofino.database.DbUtil;
+import com.manydesigns.portofino.database.StringBooleanType;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import liquibase.database.structure.ForeignKeyConstraintType;
 import org.apache.commons.lang.BooleanUtils;
 import org.hibernate.FetchMode;
+import org.hibernate.Hibernate;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Mappings;
 import org.hibernate.id.IncrementGenerator;
@@ -51,12 +54,12 @@ import org.hibernate.mapping.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Types;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.List;
-
-import static com.manydesigns.portofino.database.DbUtil.getHibernateType;
-import static com.manydesigns.portofino.database.DbUtil.getHibernateTypeName;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -71,6 +74,9 @@ public class HibernateConfig {
     public static final Logger logger =
             LoggerFactory.getLogger(HibernateConfig.class);
 
+    //String values for the mapping of boolean values to CHAR/VARCHAR columns
+    private String trueString = "T";
+    private String falseString = "F";
 
     public HibernateConfig(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
@@ -244,11 +250,7 @@ public class HibernateConfig {
 
         SimpleValue value = new SimpleValue();
         value.setTable(tab);
-        String hibernateTypeName =
-                getHibernateTypeName(column.getActualJavaType(), jdbcType);
-        if (hibernateTypeName != null) {
-            value.setTypeName(hibernateTypeName);
-        }
+        setHibernateType(value, column.getActualJavaType(), jdbcType);
         value.addColumn(col);
         clazz.addProperty(prop);
         prop.setValue(value);
@@ -302,9 +304,7 @@ public class HibernateConfig {
             primaryKey.addColumn(col);
             SimpleValue value = new SimpleValue();
             value.setTable(tab);
-            org.hibernate.type.Type hibernateType =
-                    getHibernateType(column.getActualJavaType(), jdbcType);
-            value.setTypeName(hibernateType.getName());
+            setHibernateType(value, column.getActualJavaType(), jdbcType);
 
             value.addColumn(col);
             tab.getPrimaryKey().addColumn(col);
@@ -343,7 +343,7 @@ public class HibernateConfig {
         id.setIdentifierGeneratorStrategy("assigned");
         id.setNullValue("undefined");
 
-        id.setTypeName(column.getColumnType());
+        id.setTypeName(column.getColumnType()); //TODO alessio serve? viene sovrascritto sotto
         Column col = new Column();
         col.setName(escapeName(column.getColumnName()));
         String columnType = column.getColumnType();
@@ -356,9 +356,7 @@ public class HibernateConfig {
 
         col.setSqlTypeCode(jdbcType);
         col.setSqlType(columnType);
-        org.hibernate.type.Type hibernateType =
-                getHibernateType(column.getActualJavaType(), jdbcType);
-        id.setTypeName(hibernateType.getName());
+        setHibernateType(id, column.getActualJavaType(), jdbcType);
 
 
         mappings.addColumnBinding(column.getColumnName(),
@@ -717,5 +715,83 @@ public class HibernateConfig {
     private String escapeName(String name) {
         return name;
 //        return "`"+name+"`";
+    }
+
+    public void setHibernateType(SimpleValue value, Class javaType, final int jdbcType) {
+        String typeName;
+        Properties typeParams = null;
+        if (javaType == Long.class) {
+            typeName = Hibernate.LONG.getName();
+        } else if (javaType == Short.class) {
+            typeName = Hibernate.SHORT.getName();
+        } else if (javaType == Integer.class) {
+            typeName = Hibernate.INTEGER.getName();
+        } else if (javaType == Byte.class) {
+            typeName = Hibernate.BYTE.getName();
+        } else if (javaType == Float.class) {
+            typeName = Hibernate.FLOAT.getName();
+        } else if (javaType == Double.class) {
+            typeName = Hibernate.DOUBLE.getName();
+        } else if (javaType == Character.class) {
+            typeName = Hibernate.CHARACTER.getName();
+        } else if (javaType == String.class) {
+            typeName = Hibernate.STRING.getName();
+        } else if (java.util.Date.class.isAssignableFrom(javaType)) {
+            switch (jdbcType) {
+                case Types.DATE:
+                    typeName = Hibernate.DATE.getName();
+                    break;
+                case Types.TIME:
+                    typeName = Hibernate.TIME.getName();
+                    break;
+                case Types.TIMESTAMP:
+                    typeName = Hibernate.TIMESTAMP.getName();
+                    break;
+                default:
+                    throw new Error("Unsupported date type: " + jdbcType);
+            }
+        } else if (javaType == Boolean.class) {
+            if(jdbcType == Types.BIT || jdbcType == Types.BOOLEAN) {
+                typeName = Hibernate.BOOLEAN.getName();
+            } else if(jdbcType == Types.NUMERIC || jdbcType == Types.DECIMAL) {
+                typeName = DbUtil.NUMERIC_BOOLEAN.getName();
+            } else if(jdbcType == Types.CHAR || jdbcType == Types.VARCHAR) {
+                typeName = StringBooleanType.class.getName();
+                typeParams = new Properties();
+                typeParams.setProperty("true", trueString != null ? trueString : StringBooleanType.NULL);
+                typeParams.setProperty("false", falseString != null ? falseString : StringBooleanType.NULL);
+                typeParams.setProperty("sqlType", String.valueOf(jdbcType));
+            } else {
+                throw new Error("Unsupported boolean type: " + jdbcType);
+            }
+        } else if (javaType == BigDecimal.class) {
+            typeName = Hibernate.BIG_DECIMAL.getName();
+        } else if (javaType == BigInteger.class) {
+            typeName = Hibernate.BIG_INTEGER.getName();
+        } else if (javaType == byte[].class) {
+            typeName = Hibernate.BLOB.getName();
+        } else {
+            throw new Error("Unsupported java type: " + javaType);
+        }
+        value.setTypeName(typeName);
+        if(typeParams != null) {
+            value.setTypeParameters(typeParams);
+        }
+    }
+
+    public String getTrueString() {
+        return trueString;
+    }
+
+    public void setTrueString(String trueString) {
+        this.trueString = trueString;
+    }
+
+    public String getFalseString() {
+        return falseString;
+    }
+
+    public void setFalseString(String falseString) {
+        this.falseString = falseString;
     }
 }
