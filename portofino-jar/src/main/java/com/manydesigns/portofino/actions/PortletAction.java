@@ -52,6 +52,8 @@ public class PortletAction extends AbstractActionBean {
     public static final String PAGE_PORTLET_NOT_CONFIGURED = "/layouts/portlet-not-configured.jsp";
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
+    public static final String CONF_FORM_PREFIX = "config";
+
     //--------------------------------------------------------------------------
     // Properties
     //--------------------------------------------------------------------------
@@ -447,6 +449,7 @@ public class PortletAction extends AbstractActionBean {
 
         boolean isTopLevelPage = pageInstance.getPage().getParent() instanceof RootPage;
         pageConfigurationForm = new FormBuilder(EditPage.class)
+                .configPrefix(CONF_FORM_PREFIX)
                 .configFields(isTopLevelPage ? TOP_LEVEL_PAGE_CONFIGURATION_FIELDS : PAGE_CONFIGURATION_FIELDS)
                 .configFieldSetNames("Page")
                 .build();

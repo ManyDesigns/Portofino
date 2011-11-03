@@ -30,17 +30,12 @@
 package com.manydesigns.portofino.database;
 
 import org.apache.commons.dbutils.DbUtils;
-import org.hibernate.Hibernate;
 import org.hibernate.type.NumericBooleanType;
-import org.hibernate.type.TypeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.sql.Types;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -65,126 +60,4 @@ public class DbUtil {
             logger.debug("Could not close statement", e);
         }
     }
-
-
-    /**
-     * See getHibernateType(Class javaType, int jdbcType)
-     * @param jdbcType jdbc type
-     * @return the Hibernate type
-     */
-    @Deprecated()
-    public static org.hibernate.type.Type getHibernateType(int jdbcType) {
-        switch (jdbcType) {
-            case Types.BIGINT:
-                return Hibernate.LONG;
-            case Types.BIT:
-            case Types.BOOLEAN:
-                return Hibernate.BOOLEAN;
-            case Types.CHAR:
-            case Types.VARCHAR:
-                return Hibernate.STRING;
-            case Types.DATE:
-                return Hibernate.DATE;
-            case Types.TIME:
-                return Hibernate.TIME;
-            case Types.TIMESTAMP:
-                return Hibernate.TIMESTAMP;
-            case Types.DECIMAL:
-            case Types.NUMERIC:
-                return Hibernate.BIG_DECIMAL;
-            case Types.DOUBLE:
-            case Types.REAL:
-                return Hibernate.DOUBLE;
-            case Types.FLOAT:
-                return Hibernate.FLOAT;
-            case Types.INTEGER:
-                return Hibernate.INTEGER;
-            case Types.SMALLINT:
-                return Hibernate.SHORT;
-            case Types.TINYINT:
-                return Hibernate.BYTE;
-            case Types.ARRAY:
-            case Types.BINARY:
-            case Types.BLOB:
-            case Types.CLOB:
-            case Types.LONGVARBINARY:
-            case Types.LONGVARCHAR:
-            case Types.VARBINARY:
-                return Hibernate.CLOB;
-            case Types.DATALINK:
-            case Types.DISTINCT:
-            case Types.JAVA_OBJECT:
-            case Types.NULL:
-            case Types.OTHER:
-            case Types.REF:
-            case Types.STRUCT:
-            default:
-                throw new Error("Unsupported type: " + jdbcType);
-        }
-    }
-
-    public static String getHibernateTypeName(Class javaType, final int jdbcType) {
-        org.hibernate.type.Type type = getHibernateType(javaType, jdbcType);
-        if(type == null) {
-            return null;
-        }
-        org.hibernate.type.Type basicType = TypeFactory.basic(type.getName());
-        if(basicType != null) {
-            return basicType.getName();
-        } else {
-            return type.getClass().getName();
-        }
-    }
-
-    public static org.hibernate.type.Type getHibernateType(Class javaType, final int jdbcType) {
-        if (javaType == Long.class) {
-            return Hibernate.LONG;
-        } else if (javaType == Short.class) {
-            return Hibernate.SHORT;
-        } else if (javaType == Integer.class) {
-            return Hibernate.INTEGER;
-        } else if (javaType == Byte.class) {
-            return Hibernate.BYTE;
-        } else if (javaType == Float.class) {
-            return Hibernate.FLOAT;
-        } else if (javaType == Double.class) {
-            return Hibernate.DOUBLE;
-        } else if (javaType == Character.class) {
-            return Hibernate.CHARACTER;
-        } else if (javaType == String.class) {
-            return Hibernate.STRING;
-        } else if (java.util.Date.class.isAssignableFrom(javaType)) {
-            switch (jdbcType) {
-                case Types.DATE:
-                    return Hibernate.DATE;
-                case Types.TIME:
-                    return Hibernate.TIME;
-                case Types.TIMESTAMP:
-                    return Hibernate.TIMESTAMP;
-                default:
-                    throw new Error("Unsupported date type: " + jdbcType);
-            }
-        } else if (javaType == Boolean.class) {
-            if(jdbcType == Types.BIT || jdbcType == Types.BOOLEAN) {
-                return Hibernate.BOOLEAN;
-            } else if(jdbcType == Types.NUMERIC || jdbcType == Types.DECIMAL) {
-                return NUMERIC_BOOLEAN;
-            } else if(jdbcType == Types.CHAR || jdbcType == Types.VARCHAR) {
-                return Hibernate.TRUE_FALSE;
-            } else {
-                throw new Error("Unsupported boolean type: " + jdbcType);
-            }
-        } else if (javaType == BigDecimal.class) {
-            return Hibernate.BIG_DECIMAL;
-        } else if (javaType == BigInteger.class) {
-            return Hibernate.BIG_INTEGER;
-        } else if (javaType == byte[].class) {
-            return Hibernate.BLOB;
-        } else {
-            logger.warn("Unsupported type (java type: {}, jdbc type: {}",
-                    javaType, jdbcType);
-            return null;
-        }
-    }
-
 }

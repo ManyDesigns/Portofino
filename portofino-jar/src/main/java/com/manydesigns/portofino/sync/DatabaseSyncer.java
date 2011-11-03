@@ -30,8 +30,8 @@
 package com.manydesigns.portofino.sync;
 
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.application.hibernate.HibernateConfig;
 import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.logic.DataModelLogic;
@@ -481,9 +481,9 @@ public class DatabaseSyncer {
                     continue;
                 }
 
-                org.hibernate.type.Type hibernateType =
-                        DbUtil.getHibernateType(defaultJavaType, jdbcType);
-                if (hibernateType == null) {
+                boolean hibernateTypeOk =
+                        HibernateConfig.setHibernateType(null, targetColumn, jdbcType);
+                if (!hibernateTypeOk) {
                     logger.error("Cannot find Hibernate type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
                             new Object[]{targetTable.getTableName(),
                                     targetColumn.getColumnName(),

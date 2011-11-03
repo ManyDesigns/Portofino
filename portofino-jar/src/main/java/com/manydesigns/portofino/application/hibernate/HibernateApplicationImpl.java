@@ -266,6 +266,16 @@ public class HibernateApplicationImpl implements Application {
                     .equals(ConnectionProvider.STATUS_CONNECTED)) {
                 HibernateConfig builder =
                         new HibernateConfig(connectionProvider);
+                String trueString = database.getTrueString();
+                if(trueString != null) {
+                    builder.setTrueString(
+                            "null".equalsIgnoreCase(trueString) ? null : trueString);
+                }
+                String falseString = database.getFalseString();
+                if(falseString != null) {
+                    builder.setFalseString(
+                            "null".equalsIgnoreCase(falseString) ? null : falseString);
+                }
                 Configuration configuration =
                         builder.buildSessionFactory(database);
                 SessionFactoryImpl sessionFactory =
