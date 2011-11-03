@@ -130,7 +130,8 @@ public class CrudAction extends PortletAction {
     public MultiMap availableSelectionProviders; //List<String> -> DatabaseSelectionProvider
     public String pk;
 
-    public final static String prefix = null;
+    public final static String prefix = "";
+    public final static String searchPrefix = prefix + "search_";
 
     //--------------------------------------------------------------------------
     // Web parameters
@@ -890,7 +891,7 @@ public class CrudAction extends PortletAction {
         }
 
         searchForm = searchFormBuilder
-                .configPrefix(prefix)
+                .configPrefix(searchPrefix)
                 .build();
 
         if (StringUtils.isBlank(searchString)) {
