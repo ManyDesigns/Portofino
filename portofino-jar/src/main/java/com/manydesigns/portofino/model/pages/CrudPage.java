@@ -67,6 +67,7 @@ public class CrudPage extends Page {
     protected String searchUrl;
     protected String embeddedSearchUrl;
     protected String readUrl;
+    protected String editUrl;
 
     public CrudPage() {
         super();
@@ -192,5 +193,14 @@ public class CrudPage extends Page {
 
     public void setReadUrl(String readUrl) {
         this.readUrl = readUrl;
+    }
+
+    @XmlAttribute
+    public String getEditUrl() {
+        return editUrl;
+    }
+
+    public void setEditUrl(String editUrl) {
+        this.editUrl = editUrl;
     }
 }

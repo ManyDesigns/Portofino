@@ -109,6 +109,12 @@ public class Model {
         visit(new LinkVisitor());
     }
 
+    public void init(ModelObject rootObject) {
+        new ResetVisitor().visit(rootObject);
+        new InitVisitor().visit(rootObject);
+        new LinkVisitor().visit(rootObject);
+    }
+
     protected void visit(ModelVisitor visitor) {
         // databases
         for (Database database : databases) {

@@ -97,7 +97,7 @@
                         <ul>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Users"
-                                                   link="/"/>
+                                                   link="/admin/users.action"/>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Groups"
                                                    link="/"/>

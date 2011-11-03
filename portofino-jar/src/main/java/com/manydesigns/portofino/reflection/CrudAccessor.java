@@ -115,7 +115,8 @@ public class CrudAccessor
 
     public CrudPropertyAccessor getProperty(String propertyName) throws NoSuchFieldException {
         for (CrudPropertyAccessor current : propertyAccessors) {
-            if (current.getName().equals(propertyName)) {
+            //XXX Alessio verificare
+            if (current.getName().equalsIgnoreCase(propertyName)) {
                 return current;
             }
         }
