@@ -168,6 +168,9 @@ public class UserAdminAction extends CrudAction {
     @Override
     protected boolean editValidate(Object object) {
         User user = (User) object;
+
+        user.setModifiedDate(new Timestamp(System.currentTimeMillis()));
+
         ArrayList<String> names = new ArrayList<String>();
         if(groupNames != null) {
             for(String groupName : groupNames) {
@@ -324,12 +327,17 @@ public class UserAdminAction extends CrudAction {
         crud.getProperties().add(property);
     }
 
+    public Resolution returnToPages() {
+        return new RedirectResolution("/");
+    }
+
     @Override
     public Resolution delete() {
         super.delete();
         return new RedirectResolution(ACTION_PATH);
     }
 
+    @Override
     public Resolution bulkDelete() {
         super.bulkDelete();
         return new RedirectResolution(ACTION_PATH);

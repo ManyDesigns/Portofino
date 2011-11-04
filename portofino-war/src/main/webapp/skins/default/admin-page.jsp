@@ -100,7 +100,7 @@
                                                    link="/admin/users.action"/>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Groups"
-                                                   link="/"/>
+                                                   link="/admin/groups.action"/>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Root permissions"
                                                    link="/admin/root-permissions.action"/>
