@@ -40,12 +40,19 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.crud.Crud;
+import com.manydesigns.portofino.model.pages.crud.CrudProperty;
+import com.manydesigns.portofino.system.model.users.Group;
+import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.system.model.users.UsersGroups;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
-import net.sourceforge.stripes.action.Before;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -65,11 +72,12 @@ public class UserAdminAction extends CrudAction {
 
     public static final String ACTION_PATH = "/admin/users.action";
 
-    private static final String userTable = SecurityLogic.USERTABLE;
-    private static final String groupTable = "portofino.public.groups";
-    private static final String usersGroupsTable = "portofino.public.users_groups";
     /*private final int pwdLength;
     private final Boolean enc;*/
+
+    protected List<Group> availableUserGroups;
+    protected List<Group> userGroups;
+    protected List<String> groupNames;
 
     //**************************************************************************
     // Injections
@@ -92,16 +100,12 @@ public class UserAdminAction extends CrudAction {
     public void prepare() {
         crudPage = new CrudPage();
         Crud crud = new Crud();
-        crud.setTable(userTable);
-        crud.setQuery("FROM portofino_public_users");
-        crud.setSearchTitle("Users");
-        crud.setCreateTitle("Create user");
-        crud.setEditTitle("Edit user");
-        crud.setReadTitle("User");
+        configureCrud(crud);
         crudPage.setCrud(crud);
         crudPage.setSearchUrl("/layouts/admin/users/userSearch.jsp");
         crudPage.setReadUrl("/layouts/admin/users/userRead.jsp");
         crudPage.setEditUrl("/layouts/admin/users/userEdit.jsp");
+        crudPage.setCreateUrl("/layouts/admin/users/userCreate.jsp");
         model.init(crudPage);
         String mode;
         if (StringUtils.isEmpty(pk)) {
@@ -116,6 +120,211 @@ public class UserAdminAction extends CrudAction {
         dispatch = new Dispatch(context.getRequest(), originalPath, originalPath, rootPageInstance, pageInstance);
         context.getRequest().setAttribute(RequestAttributes.DISPATCH, dispatch);
         super.prepare();
+    }
+
+    @Override
+    public Resolution read() {
+        setupUserGroups();
+        return super.read();
+    }
+
+    @Override
+    public Resolution edit() {
+        setupUserGroups();
+        return super.edit();
+    }
+
+    protected void setupUserGroups() {
+        List<Group> groups = new ArrayList<Group>();
+        groups.addAll(application.getAllObjects(SecurityLogic.GROUPTABLE));
+        availableUserGroups = new ArrayList<Group>();
+
+        Group anonymous = application.getAnonymousGroup();
+        Group registered = application.getRegisteredGroup();
+
+        userGroups = new ArrayList<Group>();
+        User user = (User) object;
+        for(UsersGroups ug : user.getGroups()) {
+            if(ug.getDeletionDate() == null) {
+                userGroups.add(ug.getGroup());
+            }
+        }
+
+        for (Group group : groups) {
+            if (!userGroups.contains(group) && !anonymous.equals(group) && !registered.equals(group)) {
+                availableUserGroups.add(group);
+            }
+        }
+    }
+
+    @Override
+    protected boolean editValidate(Object object) {
+        User user = (User) object;
+        ArrayList<String> names = new ArrayList<String>();
+        if(groupNames != null) {
+            for(String groupName : groupNames) {
+                names.add(groupName.substring("group_".length()));
+            }
+        }
+        for(UsersGroups ug : user.getGroups()) {
+            if(ug.getDeletionDate() == null) {
+                Group group = ug.getGroup();
+                String groupName = group.getName();
+                if(names.contains(groupName)) {
+                    names.remove(groupName);
+                } else {
+                    ug.setDeletionDate(new Timestamp(System.currentTimeMillis()));
+                }
+            }
+        }
+        for(String groupName : names) {
+            Session session = application.getSessionByDatabaseName("portofino");
+            Group group = (Group) session
+                    .createCriteria(SecurityLogic.GROUP_ENTITY_NAME)
+                    .add(Restrictions.eq("name", groupName))
+                    .uniqueResult();
+            UsersGroups ug = new UsersGroups();
+            ug.setCreationDate(new Timestamp(System.currentTimeMillis()));
+            ug.setUser(user);
+            ug.setUserid(user.getUserId());
+            ug.setGroup(group);
+            ug.setGroupid(group.getGroupId());
+            user.getGroups().add(ug);
+            session.save("portofino_public_users_groups", ug);
+            session.update(SecurityLogic.USER_ENTITY_NAME, user);
+        }
+
+        return true;
+    }
+
+    protected void configureCrud(Crud crud) {
+        crud.setTable(SecurityLogic.USERTABLE);
+        crud.setQuery("FROM portofino_public_users");
+        crud.setSearchTitle("Users");
+        crud.setCreateTitle("Create user");
+        crud.setEditTitle("Edit user");
+        crud.setReadTitle("User");
+
+        CrudProperty property;
+
+        property = new CrudProperty();
+        property.setName("creationDate");
+        property.setEnabled(true);
+        property.setInSummary(true);
+        property.setLabel("Creation date");
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("middleName");
+        property.setEnabled(true);
+        property.setInsertable(true);
+        property.setUpdatable(true);
+        property.setLabel("Creation date");
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("modifiedDate");
+        property.setEnabled(true);
+        property.setLabel("Modified date");
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("deletionDate");
+        property.setEnabled(true);
+        property.setLabel("Deletion date");
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("pwd");
+        property.setEnabled(true);
+        property.setInsertable(true);
+        property.setUpdatable(true);
+        property.setLabel("Password");
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("extAuth");
+        property.setEnabled(true);
+        property.setInsertable(true);
+        property.setUpdatable(true);
+        property.setLabel("Ext auth");
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("pwdModDate");
+        property.setEnabled(true);
+        property.setLabel("Pwd mod date");
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("defaultUser");
+        property.setEnabled(true);
+        property.setInsertable(true);
+        property.setUpdatable(true);
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("bounced");
+        property.setEnabled(true);
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("jobTitle");
+        property.setEnabled(true);
+        property.setInsertable(true);
+        property.setUpdatable(true);
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("lastLoginDate");
+        property.setEnabled(true);
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("lastFailedLoginDate");
+        property.setEnabled(true);
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("failedLoginAttempts");
+        property.setEnabled(true);
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("remQuestion");
+        property.setEnabled(false);
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("remans");
+        property.setEnabled(false);
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("graceLoginCount");
+        property.setEnabled(true);
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("agreedToTerms");
+        property.setEnabled(true);
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("token");
+        property.setEnabled(true);
+        crud.getProperties().add(property);
+    }
+
+    @Override
+    public Resolution delete() {
+        super.delete();
+        return new RedirectResolution(ACTION_PATH);
+    }
+
+    public Resolution bulkDelete() {
+        super.bulkDelete();
+        return new RedirectResolution(ACTION_PATH);
     }
 
     @Override
@@ -145,6 +354,22 @@ public class UserAdminAction extends CrudAction {
     @Override
     protected Resolution forwardToPortletPage(String pageJsp) {
         return new ForwardResolution(pageJsp);
+    }
+
+    public List<Group> getAvailableUserGroups() {
+        return availableUserGroups;
+    }
+
+    public List<Group> getUserGroups() {
+        return userGroups;
+    }
+
+    public List<String> getGroupNames() {
+        return groupNames;
+    }
+
+    public void setGroupNames(List<String> groupNames) {
+        this.groupNames = groupNames;
     }
 
     //**************************************************************************

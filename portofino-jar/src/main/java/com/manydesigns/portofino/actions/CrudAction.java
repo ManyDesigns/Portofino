@@ -553,7 +553,11 @@ public class CrudAction extends PortletAction {
         createSetup(object);
         form.readFromObject(object);
 
-        return new ForwardResolution("/layouts/crud/create.jsp");
+        String fwd = crudPage.getCreateUrl();
+        if(StringUtils.isEmpty(fwd)) {
+            fwd = "/layouts/crud/create.jsp";
+        }
+        return new ForwardResolution(fwd);
     }
 
     public Resolution save() {
@@ -582,7 +586,12 @@ public class CrudAction extends PortletAction {
                 return new RedirectResolution(url);
             }
         }
-        return new ForwardResolution("/layouts/crud/create.jsp");
+
+        String fwd = crudPage.getCreateUrl();
+        if(StringUtils.isEmpty(fwd)) {
+            fwd = "/layouts/crud/create.jsp";
+        }
+        return new ForwardResolution(fwd);
     }
 
     //**************************************************************************
@@ -606,8 +615,8 @@ public class CrudAction extends PortletAction {
         form.readFromObject(object);
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
+            form.writeToObject(object);
             if(editValidate(object)) {
-                form.writeToObject(object);
                 application.updateObject(baseTable.getQualifiedName(), object);
                 editPostProcess(object);
                 try {

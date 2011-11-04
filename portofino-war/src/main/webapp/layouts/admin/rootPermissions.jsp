@@ -62,9 +62,9 @@
             $("input[name=updatePagePermissions]").click(function() {
                 $('.groupBox').each( function(index, element) {
                     var wrapper = $(element);
-                    var toAttay = wrapper.sortable('toArray');
+                    var toArray = wrapper.sortable('toArray');
                     var hidden = wrapper.siblings('input');
-                    hidden.val(toAttay);
+                    hidden.val(toArray);
                 });
                 return true;
             });

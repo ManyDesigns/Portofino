@@ -7,10 +7,10 @@
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
     <stripes:layout-component name="pageTitle">
-        Users
+        <c:out value="${actionBean.crud.searchTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Users
+        <c:out value="${actionBean.crud.searchTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader"><br />
     </stripes:layout-component>
