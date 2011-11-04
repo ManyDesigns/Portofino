@@ -100,7 +100,7 @@ public class HibernateApplicationImpl implements Application {
 
     protected static final String WHERE_STRING = " WHERE ";
     protected static final Pattern FROM_PATTERN =
-            Pattern.compile("(SELECT\\s+.*\\s+)?FROM\\s+([a-z_$\\u0080-\\ufffe]{1}[a-z_$1-9\\u0080-\\ufffe]*).*",
+            Pattern.compile("(SELECT\\s+.*\\s+)?FROM\\s+([a-z_$\\u0080-\\ufffe]{1}[a-z_$0-9\\u0080-\\ufffe]*).*",
                             Pattern.CASE_INSENSITIVE | Pattern.DOTALL); //. (dot) matches newlines
 
 
