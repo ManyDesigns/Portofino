@@ -68,6 +68,7 @@ public class CrudPage extends Page {
     protected String embeddedSearchUrl;
     protected String readUrl;
     protected String editUrl;
+    protected String bulkEditUrl;
     protected String createUrl;
 
     public CrudPage() {
@@ -212,5 +213,13 @@ public class CrudPage extends Page {
 
     public void setCreateUrl(String createUrl) {
         this.createUrl = createUrl;
+    }
+
+    public String getBulkEditUrl() {
+        return bulkEditUrl;
+    }
+
+    public void setBulkEditUrl(String bulkEditUrl) {
+        this.bulkEditUrl = bulkEditUrl;
     }
 }

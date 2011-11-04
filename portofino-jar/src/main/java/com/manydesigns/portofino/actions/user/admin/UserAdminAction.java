@@ -105,6 +105,7 @@ public class UserAdminAction extends CrudAction {
         crudPage.setSearchUrl("/layouts/admin/users/userSearch.jsp");
         crudPage.setReadUrl("/layouts/admin/users/userRead.jsp");
         crudPage.setEditUrl("/layouts/admin/users/userEdit.jsp");
+        crudPage.setBulkEditUrl("/layouts/admin/users/userBulkEdit.jsp");
         crudPage.setCreateUrl("/layouts/admin/users/userCreate.jsp");
         model.init(crudPage);
         String mode;
@@ -155,6 +156,13 @@ public class UserAdminAction extends CrudAction {
                 availableUserGroups.add(group);
             }
         }
+    }
+
+    @Override
+    protected boolean createValidate(Object object) {
+        User user = (User) object;
+        user.setCreationDate(new Timestamp(System.currentTimeMillis()));
+        return true;
     }
 
     @Override
@@ -325,6 +333,19 @@ public class UserAdminAction extends CrudAction {
     public Resolution bulkDelete() {
         super.bulkDelete();
         return new RedirectResolution(ACTION_PATH);
+    }
+
+    public Resolution bulkEdit() {
+        Resolution res = super.bulkEdit();
+        if (selection.length == 1) {
+            String url = dispatch.getOriginalPath();
+            return new RedirectResolution(url)
+                    .addParameter("pk", pk)
+                    .addParameter("cancelReturnUrl", cancelReturnUrl)
+                    .addParameter("edit");
+        } else {
+            return res;
+        }
     }
 
     @Override

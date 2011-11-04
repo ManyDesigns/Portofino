@@ -50,4 +50,5 @@
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
 
     </stripes:layout-component>
+    <stripes:layout-component name="contentFooter"><br /></stripes:layout-component>
 </stripes:layout-render>

@@ -553,6 +553,10 @@ public class CrudAction extends PortletAction {
         createSetup(object);
         form.readFromObject(object);
 
+        return forwardToCreatePage();
+    }
+
+    protected Resolution forwardToCreatePage() {
         String fwd = crudPage.getCreateUrl();
         if(StringUtils.isEmpty(fwd)) {
             fwd = "/layouts/crud/create.jsp";
@@ -578,7 +582,7 @@ public class CrudAction extends PortletAction {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
                     SessionMessages.addErrorMessage(rootCauseMessage);
-                    return new ForwardResolution("/layouts/crud/create.jsp");
+                    return forwardToCreatePage();
                 }
                 pk = pkHelper.generatePkString(object);
                 SessionMessages.addInfoMessage("SAVE avvenuto con successo");
@@ -587,11 +591,7 @@ public class CrudAction extends PortletAction {
             }
         }
 
-        String fwd = crudPage.getCreateUrl();
-        if(StringUtils.isEmpty(fwd)) {
-            fwd = "/layouts/crud/create.jsp";
-        }
-        return new ForwardResolution(fwd);
+        return forwardToCreatePage();
     }
 
     //**************************************************************************
@@ -602,6 +602,10 @@ public class CrudAction extends PortletAction {
         setupForm(Mode.EDIT);
         editSetup(object);
         form.readFromObject(object);
+        return forwardToEditPage();
+    }
+
+    protected Resolution forwardToEditPage() {
         String fwd = crudPage.getEditUrl();
         if(StringUtils.isEmpty(fwd)) {
             fwd = "/layouts/crud/edit.jsp";
@@ -625,14 +629,14 @@ public class CrudAction extends PortletAction {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
                     SessionMessages.addErrorMessage(rootCauseMessage);
-                    return new ForwardResolution("/layouts/crud/edit.jsp");
+                    return forwardToEditPage();
                 }
                 SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
                 return new RedirectResolution(dispatch.getOriginalPath())
                         .addParameter(SEARCH_STRING_PARAM, searchString);
             }
         }
-        return new ForwardResolution("/layouts/crud/edit.jsp");
+        return forwardToEditPage();
     }
 
     //**************************************************************************
@@ -656,7 +660,11 @@ public class CrudAction extends PortletAction {
 
         setupForm(Mode.BULK_EDIT);
 
-        return new ForwardResolution("/layouts/crud/bulk-edit.jsp");
+        String fwd = crudPage.getBulkEditUrl();
+        if(StringUtils.isEmpty(fwd)) {
+            fwd = "/layouts/crud/bulk-edit.jsp";
+        }
+        return new ForwardResolution(fwd);
     }
 
     public Resolution bulkUpdate() {
