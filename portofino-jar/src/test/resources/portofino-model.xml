@@ -612,6 +612,11 @@
                             <primaryKey primaryKeyName="userstate_pkey">
                                 <column columnName="id"/>
                             </primaryKey>
+                            <annotations>
+                                <annotation type="com.manydesigns.elements.annotations.ShortName">
+                                    <value>%{name}</value>
+                                </annotation>
+                            </annotations>
                         </table>
                     </tables>
                 </schema>

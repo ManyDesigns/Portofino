@@ -39,9 +39,8 @@ import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.CrudPage;
-import com.manydesigns.portofino.model.pages.crud.Crud;
-import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
@@ -52,6 +51,9 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +81,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
 
     protected List<Group> availableUserGroups;
     protected List<Group> userGroups;
-    protected List<String> groupNames;
+    protected String groupNames;
 
     //**************************************************************************
     // Injections
@@ -100,19 +102,19 @@ public class UserAdminAction extends CrudAction implements AdminAction {
     @Override
     @Before
     public void prepare() {
-        crudPage = new CrudPage();
-        Crud crud = new Crud();
-        configureCrud(crud);
-        crudPage.setCrud(crud);
-        crudPage.setSearchUrl("/layouts/admin/users/userSearch.jsp");
-        crudPage.setReadUrl("/layouts/admin/users/userRead.jsp");
-        crudPage.setEditUrl("/layouts/admin/users/userEdit.jsp");
-        crudPage.setBulkEditUrl("/layouts/admin/users/userBulkEdit.jsp");
-        crudPage.setCreateUrl("/layouts/admin/users/userCreate.jsp");
-        crudPage.setFragment(BASE_PATH.substring(1));
-        crudPage.setTitle("Users");
-        crudPage.setDescription("Users administration");
-        model.init(crudPage);
+        Model myModel;
+        try {
+            JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
+            Unmarshaller unmarshaller = jc.createUnmarshaller();
+            myModel = (Model) unmarshaller.unmarshal(getClass().getResourceAsStream("users.xml"));
+            myModel.getDatabases().addAll(model.getDatabases());
+            myModel.init(myModel.getRootPage());
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
+
+        crudPage = (CrudPage) myModel.getRootPage().findDescendantPageById("users");
+
         String mode;
         if (StringUtils.isEmpty(pk)) {
             mode = CrudPage.MODE_SEARCH;
@@ -182,7 +184,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
 
         ArrayList<String> names = new ArrayList<String>();
         if(groupNames != null) {
-            for(String groupName : groupNames) {
+            for(String groupName : groupNames.split(",")) {
                 names.add(groupName.substring("group_".length()));
             }
         }
@@ -217,151 +219,6 @@ public class UserAdminAction extends CrudAction implements AdminAction {
         return true;
     }
 
-    protected void configureCrud(Crud crud) {
-        crud.setTable(SecurityLogic.USERTABLE);
-        crud.setQuery("FROM portofino_public_users");
-        crud.setSearchTitle("Users");
-        crud.setCreateTitle("Create user");
-        crud.setEditTitle("Edit user");
-        crud.setReadTitle("User");
-
-        CrudProperty property;
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("userId");
-        property.setEnabled(true);
-        property.setInSummary(true);
-        property.setLabel("Id");
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("creationDate");
-        property.setEnabled(true);
-        property.setInSummary(true);
-        property.setLabel("Creation date");
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("middleName");
-        property.setEnabled(true);
-        property.setInsertable(true);
-        property.setUpdatable(true);
-        property.setLabel("Creation date");
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("modifiedDate");
-        property.setEnabled(true);
-        property.setLabel("Modified date");
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("deletionDate");
-        property.setEnabled(true);
-        property.setLabel("Deletion date");
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("pwd");
-        property.setEnabled(true);
-        property.setInsertable(true);
-        property.setUpdatable(true);
-        property.setLabel("Password");
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("extAuth");
-        property.setEnabled(true);
-        property.setInsertable(true);
-        property.setUpdatable(true);
-        property.setLabel("Ext auth");
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("pwdModDate");
-        property.setEnabled(true);
-        property.setLabel("Pwd mod date");
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("defaultUser");
-        property.setEnabled(true);
-        property.setInsertable(true);
-        property.setUpdatable(true);
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("bounced");
-        property.setEnabled(true);
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("jobTitle");
-        property.setEnabled(true);
-        property.setInsertable(true);
-        property.setUpdatable(true);
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("lastLoginDate");
-        property.setEnabled(true);
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("lastFailedLoginDate");
-        property.setEnabled(true);
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("failedLoginAttempts");
-        property.setEnabled(true);
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("remQuestion");
-        property.setEnabled(false);
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("remans");
-        property.setEnabled(false);
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("graceLoginCount");
-        property.setEnabled(true);
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("agreedToTerms");
-        property.setEnabled(true);
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("token");
-        property.setEnabled(true);
-        crud.getProperties().add(property);
-    }
-
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }
@@ -379,11 +236,11 @@ public class UserAdminAction extends CrudAction implements AdminAction {
         return userGroups;
     }
 
-    public List<String> getGroupNames() {
+    public String getGroupNames() {
         return groupNames;
     }
 
-    public void setGroupNames(List<String> groupNames) {
+    public void setGroupNames(String groupNames) {
         this.groupNames = groupNames;
     }
 

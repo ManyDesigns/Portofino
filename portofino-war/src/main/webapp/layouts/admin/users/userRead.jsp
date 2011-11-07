@@ -29,7 +29,7 @@
                 <h2>Groups</h2>
                 <ul>
                     <c:forEach items="${actionBean.userGroups}" var="group">
-                        <li><c:out value="${group.name}" /></li>
+                        <li><a href="${actionBean.context.request.contextPath}/actions/admin/groups/${group.groupId}"><c:out value="${group.name}" /></a></li>
                     </c:forEach>
                 </ul>
             </div>
@@ -43,11 +43,6 @@
     <stripes:layout-component name="portletFooter">
         <stripes:submit name="edit" value="Edit" class="portletButton"/>
         <stripes:submit name="delete" value="Delete" onclick="return confirm ('Are you sure?');" class="portletButton"/>
-        <stripes:submit name="duplicate" value="Duplicate" disabled="true" class="portletButton"/>
-        <stripes:submit name="print" value="Print" disabled="true" class="portletButton"/>
-        <stripes:submit name="exportReadExcel" value="Excel" disabled="true" class="portletButton"/>
-        <stripes:submit name="exportReadPdf" value="Pdf" disabled="false" class="portletButton"/>
-        <!-- TODO custom buttons -->
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter"></stripes:layout-component>
 </stripes:layout-render>

@@ -28,8 +28,10 @@
  */
 package com.manydesigns.portofino.actions.user.admin;
 
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.RandomUtil;
+import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.CrudAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
@@ -37,16 +39,18 @@ import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.CrudPage;
-import com.manydesigns.portofino.model.pages.crud.Crud;
-import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.sql.Timestamp;
 
 /*
@@ -66,19 +70,19 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
     @Override
     @Before
     public void prepare() {
-        crudPage = new CrudPage();
-        Crud crud = new Crud();
-        configureCrud(crud);
-        crudPage.setCrud(crud);
-        crudPage.setSearchUrl("/layouts/admin/groups/groupSearch.jsp");
-        crudPage.setReadUrl("/layouts/admin/groups/groupRead.jsp");
-        crudPage.setEditUrl("/layouts/admin/groups/groupEdit.jsp");
-        crudPage.setBulkEditUrl("/layouts/admin/groups/groupBulkEdit.jsp");
-        crudPage.setCreateUrl("/layouts/admin/groups/groupCreate.jsp");
-        crudPage.setFragment(BASE_PATH.substring(1));
-        crudPage.setTitle("Groups");
-        crudPage.setDescription("Groups administration");
-        model.init(crudPage);
+        Model myModel;
+        try {
+            JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
+            Unmarshaller unmarshaller = jc.createUnmarshaller();
+            myModel = (Model) unmarshaller.unmarshal(getClass().getResourceAsStream("users.xml"));
+            myModel.getDatabases().addAll(model.getDatabases());
+            myModel.init(myModel.getRootPage());
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
+
+        crudPage = (CrudPage) myModel.getRootPage().findDescendantPageById("groups");
+
         String mode;
         if (StringUtils.isEmpty(pk)) {
             mode = CrudPage.MODE_SEARCH;
@@ -102,70 +106,20 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
         Group group = (Group) object;
         group.setCreationDate(new Timestamp(System.currentTimeMillis()));
         group.setGroupId(RandomUtil.createRandomId(20));
+        HttpSession session = context.getRequest().getSession();
+        group.setCreatorId((String) session.getAttribute(SessionAttributes.USER_ID));
         return true;
     }
 
-    private void configureCrud(Crud crud) {
-        crud.setTable(SecurityLogic.GROUPTABLE);
-        crud.setQuery("FROM portofino_public_groups");
-
-        crud.setSearchTitle("Groups");
-        crud.setCreateTitle("Create group");
-        crud.setEditTitle("Edit group");
-        crud.setReadTitle("Group");
-
-        CrudProperty property;
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("groupId");
-        property.setEnabled(true);
-        property.setInSummary(true);
-        property.setLabel("Id");
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("creatorId");
-        property.setEnabled(true);
-        property.setLabel("Creator");
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("name");
-        property.setEnabled(true);
-        property.setInSummary(true);
-        property.setInsertable(true);
-        property.setUpdatable(true);
-        property.setSearchable(true);
-        property.setLabel("Name");
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("description");
-        property.setEnabled(true);
-        property.setInsertable(true);
-        property.setUpdatable(true);
-        property.setSearchable(true);
-        property.setLabel("Description");
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("creationDate");
-        property.setEnabled(true);
-        property.setInSummary(true);
-        property.setLabel("Creation date");
-        crud.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setCrud(crud);
-        property.setName("deletionDate");
-        property.setEnabled(false);
-        property.setLabel("Deletion date");
-        crud.getProperties().add(property);
+    @Override
+    protected void setupForm(Mode mode) {
+        super.setupForm(mode);
+        Group group = (Group) object;
+        if(group != null) {
+            String contextPath = getContext().getRequest().getContextPath();
+            String usersPath = contextPath + UserAdminAction.BASE_PATH + "/";
+            form.findFieldByPropertyName("creatorId").setHref(usersPath + group.getCreatorId());
+        }
     }
 
     public Resolution returnToPages() {

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model>
+    <databases/>
+    <rootPage fragment="" title="" description="">
+        <childPages>
+            <crudPage id="users"
+                      createUrl="/layouts/admin/users/userCreate.jsp" editUrl="/layouts/admin/users/userEdit.jsp"
+                      readUrl="/layouts/admin/users/userRead.jsp" searchUrl="/layouts/admin/users/userSearch.jsp"
+                      description="Users administration" fragment="actions/admin/users"
+                      title="Users">
+                <childPages/>
+                <permissions>
+                    <allow/>
+                    <deny/>
+                </permissions>
+                <crud createTitle="Create user" editTitle="Edit user" largeResultSet="false"
+                      query="FROM portofino_public_users" readTitle="User" searchTitle="Users"
+                      table="portofino.public.users">
+                    <buttons/>
+                    <annotations/>
+                    <properties>
+                        <property enabled="true" inSummary="true" insertable="false" label="Id" name="userId"
+                                  searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="true" insertable="false" label="Creation date"
+                                  name="creationDate" searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="true" label="Creation date"
+                                  name="middleName" searchable="false" updatable="true">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="false" label="Modified date"
+                                  name="modifiedDate" searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="false" label="Deletion date"
+                                  name="deletionDate" searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="true" label="Password" name="pwd"
+                                  searchable="false" updatable="true">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="true" label="Ext auth" name="extAuth"
+                                  searchable="false" updatable="true">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="false" label="Pwd mod date"
+                                  name="pwdModDate" searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="true" name="defaultUser"
+                                  searchable="false" updatable="true">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="false" name="bounced" searchable="false"
+                                  updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="true" name="jobTitle" searchable="false"
+                                  updatable="true">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="false" name="lastLoginDate"
+                                  searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="false" name="lastFailedLoginDate"
+                                  searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="false" name="failedLoginAttempts"
+                                  searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="false" inSummary="false" insertable="false" name="remQuestion"
+                                  searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="false" inSummary="false" insertable="false" name="remans" searchable="false"
+                                  updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="false" name="graceLoginCount"
+                                  searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="false" name="agreedToTerms"
+                                  searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="false" name="token" searchable="false"
+                                  updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="true" insertable="true" name="state" searchable="true"
+                                  updatable="true">
+                            <annotations/>
+                        </property>
+                    </properties>
+                    <selectionProviders/>
+                </crud>
+                <detailChildPages/>
+            </crudPage>
+            <crudPage id="groups"
+                      createUrl="/layouts/admin/groups/groupCreate.jsp" editUrl="/layouts/admin/groups/groupEdit.jsp"
+                      readUrl="/layouts/admin/groups/groupRead.jsp" searchUrl="/layouts/admin/groups/groupSearch.jsp"
+                      description="Groups administration" fragment="actions/admin/groups" showInNavigation="true"
+                      variable="group" title="Groups">
+                <childPages />
+                <permissions>
+                    <allow/>
+                    <deny/>
+                </permissions>
+                <crud createTitle="Create group" editTitle="Edit group" largeResultSet="false"
+                      query="FROM portofino_public_groups" readTitle="Group" searchTitle="Groups"
+                      table="portofino.public.groups">
+                    <buttons/>
+                    <annotations/>
+                    <properties>
+                        <property enabled="true" inSummary="true" insertable="false" label="Id" name="groupId"
+                                  searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="false" label="Creator" name="creatorId"
+                                  searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="true" insertable="true" label="Name" name="name"
+                                  searchable="true" updatable="true">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="false" insertable="true" label="Description"
+                                  name="description" searchable="true" updatable="true">
+                            <annotations/>
+                        </property>
+                        <property enabled="true" inSummary="true" insertable="false" label="Creation date"
+                                  name="creationDate" searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                        <property enabled="false" inSummary="false" insertable="false" label="Deletion date"
+                                  name="deletionDate" searchable="false" updatable="false">
+                            <annotations/>
+                        </property>
+                    </properties>
+                    <selectionProviders/>
+                </crud>
+                <detailChildPages/>
+            </crudPage>
+        </childPages>
+        <permissions>
+            <allow/>
+            <deny/>
+        </permissions>
+    </rootPage>
+</model>

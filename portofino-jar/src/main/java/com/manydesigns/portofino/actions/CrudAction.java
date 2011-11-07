@@ -276,7 +276,8 @@ public class CrudAction extends PortletAction {
         int i = 0;
         for (Reference reference : references) {
             Column column = reference.getActualFromColumn();
-            fieldNames[i] = column.getColumnName();
+            String propertyName = column.getPropertyName();
+            fieldNames[i] = propertyName != null ? propertyName : column.getColumnName();
             fieldTypes[i] = column.getActualJavaType();
             i++;
         }

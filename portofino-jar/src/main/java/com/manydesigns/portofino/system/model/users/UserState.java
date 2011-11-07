@@ -28,6 +28,8 @@
  */
 package com.manydesigns.portofino.system.model.users;
 
+import com.manydesigns.elements.annotations.ShortName;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -37,6 +39,7 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@ShortName("%{name}")
 public class UserState implements Serializable{
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

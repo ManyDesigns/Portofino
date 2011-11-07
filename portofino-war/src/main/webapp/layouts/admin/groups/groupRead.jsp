@@ -31,11 +31,6 @@
     <stripes:layout-component name="portletFooter">
         <stripes:submit name="edit" value="Edit" class="portletButton"/>
         <stripes:submit name="delete" value="Delete" onclick="return confirm ('Are you sure?');" class="portletButton"/>
-        <stripes:submit name="duplicate" value="Duplicate" disabled="true" class="portletButton"/>
-        <stripes:submit name="print" value="Print" disabled="true" class="portletButton"/>
-        <stripes:submit name="exportReadExcel" value="Excel" disabled="true" class="portletButton"/>
-        <stripes:submit name="exportReadPdf" value="Pdf" disabled="false" class="portletButton"/>
-        <!-- TODO custom buttons -->
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter"></stripes:layout-component>
 </stripes:layout-render>
