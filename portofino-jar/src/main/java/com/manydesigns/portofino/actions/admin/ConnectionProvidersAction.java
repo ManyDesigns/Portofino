@@ -113,7 +113,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
 
         OgnlTextFormat hrefFormat =
                 OgnlTextFormat.create(
-                        "/admin/connection-providers.action?" +
+                        "/actions/admin/connection-providers?" +
                                 "databaseName=%{databaseName}");
         hrefFormat.setUrl(true);
 

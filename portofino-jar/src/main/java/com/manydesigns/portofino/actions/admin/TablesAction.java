@@ -59,6 +59,7 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.controller.ActionResolver;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -84,7 +85,7 @@ import java.util.Set;
 */
 @RequiresAdministrator
 @UrlBinding("/actions/admin/tables")
-public class TablesAction extends AbstractActionBean {
+public class TablesAction extends AbstractActionBean implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -837,5 +838,8 @@ public class TablesAction extends AbstractActionBean {
         return createJsonArray(annotations);
     }
 
+    public String getActionPath() {
+        return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
+    }
 }
 
