@@ -52,7 +52,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @RequiresAdministrator
-@UrlBinding("/admin/model-definition.action")
+@UrlBinding("/actions/admin/model-definition")
 public class DDLAction extends AbstractActionBean {
 
     public static final String copyright =

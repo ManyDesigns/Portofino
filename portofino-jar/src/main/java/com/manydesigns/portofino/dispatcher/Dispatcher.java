@@ -113,17 +113,17 @@ public class Dispatcher {
         String rewrittenPath = page.getUrl();
         if (rewrittenPath == null) {
             if (page instanceof TextPage) {
-                rewrittenPath = "/text.action";
+                rewrittenPath = "/actions/text";
             } else if (page instanceof ChartPage) {
-                rewrittenPath = "/chart.action";
+                rewrittenPath = "/actions/chart";
             } else if (page instanceof FolderPage) {
-                rewrittenPath = "/index.action";
+                rewrittenPath = "/actions/index";
             } else if (page instanceof CrudPage) {
-                rewrittenPath = "/crud.action";
+                rewrittenPath = "/actions/crud";
             } else if (page instanceof JspPage) {
-                rewrittenPath = "/jsp.action";
+                rewrittenPath = "/actions/jsp";
             } else if (page instanceof PageReference) {
-                rewrittenPath = "/ref.action";
+                rewrittenPath = "/actions/ref";
             } else if (page instanceof RootPage) {
                 rewrittenPath = "/";
             } else {

@@ -31,7 +31,6 @@ package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
@@ -59,7 +58,7 @@ import java.io.FileFilter;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresAdministrator
-@UrlBinding("/admin/settings.action")
+@UrlBinding("/actions/admin/settings")
 public class SettingsAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

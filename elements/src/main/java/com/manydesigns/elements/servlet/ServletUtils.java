@@ -57,7 +57,12 @@ public class ServletUtils {
                 "javax.servlet.forward.servlet_path");
         }
         if (originalPath == null) {
-            originalPath = request.getServletPath();
+            originalPath = request.getRequestURI();
+            String contextPath = request.getContextPath();
+            if(!"".equals(contextPath) &&
+               originalPath.startsWith(contextPath)) {
+                originalPath = originalPath.substring(contextPath.length());
+            }
         }
         return originalPath;
     }

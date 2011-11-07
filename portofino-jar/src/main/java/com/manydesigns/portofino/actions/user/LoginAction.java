@@ -66,7 +66,7 @@ import java.util.Date;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@UrlBinding("/user/login.action")
+@UrlBinding("/actions/user/login")
 public class LoginAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

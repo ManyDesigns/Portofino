@@ -48,7 +48,7 @@ import net.sourceforge.stripes.action.UrlBinding;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@UrlBinding("/Page.action")
+@UrlBinding("/actions/page")
 public class PageAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

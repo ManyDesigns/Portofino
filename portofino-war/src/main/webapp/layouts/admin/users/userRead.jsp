@@ -8,7 +8,11 @@
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.user.admin.UserAdminAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:submit name="cancel" class="contentButton"><fmt:message key="commons.cancel"/></stripes:submit>
+        <div class="breadcrumbs">
+            <div class="inner">
+                <mde:write name="breadcrumbs"/>
+            </div>
+        </div>
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.crud.readTitle}"/>
@@ -45,7 +49,5 @@
         <stripes:submit name="exportReadPdf" value="Pdf" disabled="false" class="portletButton"/>
         <!-- TODO custom buttons -->
     </stripes:layout-component>
-    <stripes:layout-component name="contentFooter">
-        <stripes:submit name="cancel" class="contentButton"><fmt:message key="commons.cancel"/></stripes:submit>
-    </stripes:layout-component>
+    <stripes:layout-component name="contentFooter"></stripes:layout-component>
 </stripes:layout-render>

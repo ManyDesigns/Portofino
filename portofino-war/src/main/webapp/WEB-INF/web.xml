@@ -81,7 +81,7 @@
 
 	<servlet-mapping>
 		<servlet-name>StripesDispatcher</servlet-name>
-		<url-pattern>*.action</url-pattern>
+		<url-pattern>/actions/*</url-pattern>
 	</servlet-mapping>
     
 <!--

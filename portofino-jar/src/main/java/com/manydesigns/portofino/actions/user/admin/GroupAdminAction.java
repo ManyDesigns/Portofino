@@ -28,11 +28,10 @@
  */
 package com.manydesigns.portofino.actions.user.admin;
 
-import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.CrudAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -45,6 +44,7 @@ import com.manydesigns.portofino.system.model.users.annotations.RequiresAdminist
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 
 /*
@@ -54,12 +54,12 @@ import java.sql.Timestamp;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @RequiresAdministrator
-@UrlBinding(GroupAdminAction.ACTION_PATH)
+@UrlBinding(GroupAdminAction.BASE_PATH + "/{pk}")
 public class GroupAdminAction extends CrudAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public static final String ACTION_PATH = "/admin/groups.action";
+    public static final String BASE_PATH = "/actions/admin/groups";
 
     @Override
     @Before
@@ -73,6 +73,8 @@ public class GroupAdminAction extends CrudAction {
         crudPage.setEditUrl("/layouts/admin/groups/groupEdit.jsp");
         crudPage.setBulkEditUrl("/layouts/admin/groups/groupBulkEdit.jsp");
         crudPage.setCreateUrl("/layouts/admin/groups/groupCreate.jsp");
+        crudPage.setFragment(BASE_PATH);
+        crudPage.setTitle("Groups");
         model.init(crudPage);
         String mode;
         if (StringUtils.isEmpty(pk)) {
@@ -83,9 +85,12 @@ public class GroupAdminAction extends CrudAction {
         pageInstance = new CrudPageInstance(application, crudPage, mode, pk);
         pageInstance.realize();
         PageInstance rootPageInstance = new PageInstance(application, model.getRootPage(), null);
-        String originalPath = ServletUtils.getOriginalPath(context.getRequest());
-        dispatch = new Dispatch(context.getRequest(), originalPath, originalPath, rootPageInstance, pageInstance);
-        context.getRequest().setAttribute(RequestAttributes.DISPATCH, dispatch);
+        HttpServletRequest request = context.getRequest();
+        String originalPath = ServletUtils.getOriginalPath(request);
+        dispatch = new Dispatch(request, originalPath, originalPath, rootPageInstance, pageInstance);
+        Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
+        request.setAttribute(RequestAttributes.DISPATCH, dispatch);
+        request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
         super.prepare();
     }
 
@@ -163,101 +168,8 @@ public class GroupAdminAction extends CrudAction {
     //**************************************************************************
 
     @Override
-    public Resolution delete() {
-        super.delete();
-        return new RedirectResolution(ACTION_PATH);
-    }
-
-    @Override
-    public Resolution bulkDelete() {
-        super.bulkDelete();
-        return new RedirectResolution(ACTION_PATH);
-    }
-
-    public Resolution bulkEdit() {
-        Resolution res = super.bulkEdit();
-        if (selection.length == 1) {
-            String url = dispatch.getOriginalPath();
-            return new RedirectResolution(url)
-                    .addParameter("pk", pk)
-                    .addParameter("cancelReturnUrl", cancelReturnUrl)
-                    .addParameter("edit");
-        } else {
-            return res;
-        }
-    }
-
-    @Override
-    protected String getReadLinkExpression() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(dispatch.getOriginalPath());
-        sb.append("?pk=");
-        boolean first = true;
-
-        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(",");
-            }
-            sb.append("%{");
-            sb.append(property.getName());
-            sb.append("}");
-        }
-        if (searchString != null) {
-            sb.append("&searchString=");
-            sb.append(Util.urlencode(searchString));
-        }
-        return sb.toString();
-    }
-
-    @Override
     protected Resolution forwardToPortletPage(String pageJsp) {
         return new ForwardResolution(pageJsp);
     }
-
-    //**************************************************************************
-    // Delete
-    //**************************************************************************
-/*
-    public String delete() {
-        Group pkGrp = new Group(Long.parseLong(pk));
-        Group aGroup = (Group) application.getObjectByPk(UserUtils.GROUPTABLE, pkGrp);
-        aGroup.setDeletionDate(new Timestamp(System.currentTimeMillis()));
-        application.saveObject(UserUtils.GROUPTABLE, aGroup);
-        String databaseName = model.findTableByQualifiedName(UserUtils.GROUPTABLE)
-                .getDatabaseName();
-        application.commit(databaseName);
-        SessionMessages.addInfoMessage("DELETE avvenuto con successo");
-        return PortofinoAction.RETURN_TO_READ;
-    }
-
-    public String bulkDelete() {        
-        if (selection == null) {
-            SessionMessages.addWarningMessage(
-                    "DELETE non avvenuto: nessun oggetto selezionato");
-            return PortofinoAction.CANCEL;
-        }
-        for (String current : selection) {
-            Group pkGrp = new Group(new Long(current));
-            Group aGroup = (Group) application
-                    .getObjectByPk(UserUtils.GROUPTABLE, pkGrp);
-            aGroup.setDeletionDate(new Timestamp(System.currentTimeMillis()));
-            application.saveObject(UserUtils.GROUPTABLE, aGroup);
-            String databaseName = model
-                    .findTableByQualifiedName(UserUtils.GROUPTABLE)
-                    .getDatabaseName();
-            SessionMessages.addInfoMessage("DELETE avvenuto con successo");
-        }
-        String databaseName = model
-                .findTableByQualifiedName(UserUtils.GROUPTABLE)
-                .getDatabaseName();
-        application.commit(databaseName);
-        SessionMessages.addInfoMessage(MessageFormat.format(
-                "DELETE di {0} oggetti avvenuto con successo",
-                selection.length));
-        return PortofinoAction.RETURN_TO_SEARCH;
-    }
-*/
 
 }

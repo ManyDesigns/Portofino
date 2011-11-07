@@ -50,7 +50,7 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@UrlBinding("/jsp.action")
+@UrlBinding("/actions/jsp")
 public class JspAction extends PortletAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

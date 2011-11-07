@@ -29,11 +29,10 @@
 package com.manydesigns.portofino.actions.user.admin;
 
 
-import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.actions.CrudAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -50,6 +49,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @RequiresAdministrator
-@UrlBinding(UserAdminAction.ACTION_PATH)
+@UrlBinding(UserAdminAction.BASE_PATH + "/{pk}")
 public class UserAdminAction extends CrudAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
@@ -70,7 +70,7 @@ public class UserAdminAction extends CrudAction {
     // Constants
     //**************************************************************************
 
-    public static final String ACTION_PATH = "/admin/users.action";
+    public static final String BASE_PATH = "/actions/admin/users";
 
     /*private final int pwdLength;
     private final Boolean enc;*/
@@ -107,6 +107,8 @@ public class UserAdminAction extends CrudAction {
         crudPage.setEditUrl("/layouts/admin/users/userEdit.jsp");
         crudPage.setBulkEditUrl("/layouts/admin/users/userBulkEdit.jsp");
         crudPage.setCreateUrl("/layouts/admin/users/userCreate.jsp");
+        crudPage.setFragment(BASE_PATH);
+        crudPage.setTitle("Users");
         model.init(crudPage);
         String mode;
         if (StringUtils.isEmpty(pk)) {
@@ -117,9 +119,12 @@ public class UserAdminAction extends CrudAction {
         pageInstance = new CrudPageInstance(application, crudPage, mode, pk);
         pageInstance.realize();
         PageInstance rootPageInstance = new PageInstance(application, model.getRootPage(), null);
-        String originalPath = ServletUtils.getOriginalPath(context.getRequest());
-        dispatch = new Dispatch(context.getRequest(), originalPath, originalPath, rootPageInstance, pageInstance);
-        context.getRequest().setAttribute(RequestAttributes.DISPATCH, dispatch);
+        HttpServletRequest request = context.getRequest();
+        String originalPath = ServletUtils.getOriginalPath(request);
+        dispatch = new Dispatch(request, originalPath, originalPath, rootPageInstance, pageInstance);
+        Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
+        request.setAttribute(RequestAttributes.DISPATCH, dispatch);
+        request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
         super.prepare();
     }
 
@@ -332,55 +337,6 @@ public class UserAdminAction extends CrudAction {
     }
 
     @Override
-    public Resolution delete() {
-        super.delete();
-        return new RedirectResolution(ACTION_PATH);
-    }
-
-    @Override
-    public Resolution bulkDelete() {
-        super.bulkDelete();
-        return new RedirectResolution(ACTION_PATH);
-    }
-
-    public Resolution bulkEdit() {
-        Resolution res = super.bulkEdit();
-        if (selection.length == 1) {
-            String url = dispatch.getOriginalPath();
-            return new RedirectResolution(url)
-                    .addParameter("pk", pk)
-                    .addParameter("cancelReturnUrl", cancelReturnUrl)
-                    .addParameter("edit");
-        } else {
-            return res;
-        }
-    }
-
-    @Override
-    protected String getReadLinkExpression() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(dispatch.getOriginalPath());
-        sb.append("?pk=");
-        boolean first = true;
-
-        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(",");
-            }
-            sb.append("%{");
-            sb.append(property.getName());
-            sb.append("}");
-        }
-        if (searchString != null) {
-            sb.append("&searchString=");
-            sb.append(Util.urlencode(searchString));
-        }
-        return sb.toString();
-    }
-
-    @Override
     protected Resolution forwardToPortletPage(String pageJsp) {
         return new ForwardResolution(pageJsp);
     }
@@ -401,104 +357,4 @@ public class UserAdminAction extends CrudAction {
         this.groupNames = groupNames;
     }
 
-    //**************************************************************************
-    // Remove user from Group
-    //**************************************************************************
-
-    /*
-    public String removeGroups() throws NoSuchFieldException {
-        if (null==subCrudUnits.get(1).selection) {
-            SessionMessages.addInfoMessage("No group selected");
-            return PortofinoAction.RETURN_TO_READ;
-        }
-        for (String current : rootCrudUnit.subCrudUnits.get(1).selection) {
-            TableAccessor ugAccessor = context.getTableAccessor(usersGroupsTable);
-
-            TableCriteria criteria = new TableCriteria(ugAccessor.getTable());
-            criteria.eq(ugAccessor.getProperty("userid"), Long.parseLong(pk));
-            criteria.eq(ugAccessor.getProperty("groupid"), Long.parseLong(current));
-            criteria.isNull(ugAccessor.getProperty("deletionDate"));
-            
-            List<Object> ugList = context.getObjects(criteria);
-            for(Object obj : ugList) {
-                UsersGroups ug = (UsersGroups) obj;
-                ug.setDeletionDate(new Timestamp(new Date().getTime()));
-                context.updateObject(usersGroupsTable, ug);
-            }
-        }
-        context.commit("portofino");
-        SessionMessages.addInfoMessage("Group(s) removed");
-        return PortofinoAction.RETURN_TO_READ;
-    }
-
-    //**************************************************************************
-    // Add user to Group
-    //**************************************************************************
-
-    public String addGroups(){
-        String pk = rootCrudUnit.pk;
-        if (null==rootCrudUnit.subCrudUnits.get(0).selection) {
-            SessionMessages.addInfoMessage("No group selected");
-            return PortofinoAction.RETURN_TO_READ;
-        }
-        for (String current : rootCrudUnit.subCrudUnits.get(0).selection) {
-            UsersGroups newUg = new UsersGroups();
-            newUg.setCreationDate(new Timestamp(new Date().getTime()));
-            newUg.setGroupid(Long.valueOf(current));
-            Group pkGrp = new Group(Long.valueOf(current));
-            newUg.setGroup((Group) context.getObjectByPk(groupTable, pkGrp));
-            newUg.setUserid(Long.valueOf(pk));
-            User pkUsr = new User(Long.valueOf(pk));
-            newUg.setUser((User) context.getObjectByPk(userTable, pkUsr));
-
-            context.saveObject(usersGroupsTable, newUg);
-        }
-        context.commit("portofino");
-        SessionMessages.addInfoMessage("Group added");
-        return PortofinoAction.RETURN_TO_READ;
-    }
-
-
-    //**************************************************************************
-    // ResetPassword
-    //**************************************************************************
-
-    public String resetPassword() {
-
-        String pk = rootCrudUnit.pk;
-        Serializable pkObject = rootCrudUnit.pkHelper.parsePkString(pk);
-        User user =  (User)context.getObjectByPk(userTable, pkObject);
-        user.passwordGenerator(pwdLength);
-        String generatedPwd = user.getPwd();
-
-        final Properties properties = PortofinoProperties.getProperties();
-
-        boolean mailEnabled = Boolean.parseBoolean(
-                properties.getProperty(PortofinoProperties.MAIL_ENABLED,
-                        "false"));
-
-        if (mailEnabled) {
-            String msg = "La tua nuova password è " + generatedPwd;
-            Long userId = (Long) session.getAttribute(UserUtils.USERID);
-            User thisUser =
-            (User) context.getObjectByPk(UserUtils.USERTABLE, new User(userId));
-            EmailBean email = new EmailBean("new password", msg,
-                    user.getEmail(), thisUser.getEmail());
-            context.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
-        } else {
-           SessionMessages.addInfoMessage("La nuova password per l'utente è "
-                   +generatedPwd);
-        }
-        if (enc){
-            user.encryptPwd();
-        }
-        String databaseName = model
-                .findTableByQualifiedName(userTable).getDatabaseName();
-        context.updateObject(userTable, user);
-        context.commit(databaseName);
-
-        SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
-        return PortofinoAction.RETURN_TO_READ;
-    }
-    */
 }

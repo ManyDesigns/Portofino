@@ -32,7 +32,6 @@ package com.manydesigns.portofino.actions.admin;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.PortletAction;
 import com.manydesigns.portofino.model.pages.Page;
-import com.manydesigns.portofino.model.pages.RootPage;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import org.slf4j.Logger;
@@ -45,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresAdministrator
-@UrlBinding("/admin/root-permissions.action")
+@UrlBinding("/actions/admin/root-permissions")
 public class RootPermissionsAction extends PortletAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

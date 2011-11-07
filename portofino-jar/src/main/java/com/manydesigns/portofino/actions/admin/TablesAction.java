@@ -83,7 +83,7 @@ import java.util.Set;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @RequiresAdministrator
-@UrlBinding("/admin/tables.action")
+@UrlBinding("/actions/admin/tables")
 public class TablesAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

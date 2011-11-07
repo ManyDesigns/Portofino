@@ -97,13 +97,13 @@
                         <ul>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Users"
-                                                   link="/admin/users.action"/>
+                                                   link="/actions/admin/users"/>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Groups"
-                                                   link="/admin/groups.action"/>
+                                                   link="/actions/admin/groups"/>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Root permissions"
-                                                   link="/admin/root-permissions.action"/>
+                                                   link="/actions/admin/root-permissions"/>
                         </ul>
                     </li>
                     <li>
@@ -111,7 +111,7 @@
                         <ul>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Settings"
-                                                   link="/admin/settings.action"/>
+                                                   link="/actions/admin/settings"/>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Email"
                                                    link="/"/>
@@ -122,10 +122,10 @@
                         <ul>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Connection providers"
-                                                   link="/admin/connection-providers.action"/>
+                                                   link="/actions/admin/connection-providers"/>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Tables"
-                                                   link="/admin/tables.action"/>
+                                                   link="/actions/admin/tables"/>
                         </ul>
                     </li>
                 </ul>

@@ -6,9 +6,13 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request"
-                 type="com.manydesigns.portofino.actions.user.admin.UserAdminAction"/>
+                 type="com.manydesigns.portofino.actions.user.admin.GroupAdminAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:submit name="cancel" class="contentButton"><fmt:message key="commons.cancel"/></stripes:submit>
+        <div class="breadcrumbs">
+            <div class="inner">
+                <mde:write name="breadcrumbs"/>
+            </div>
+        </div>
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.crud.readTitle}"/>
@@ -17,19 +21,7 @@
         <c:out value="${actionBean.crud.readTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <div class="yui-gc">
-            <div class="yui-u first">
-                <mde:write name="actionBean" property="form"/>
-            </div>
-            <div class="yui-u">
-                <h2>Groups</h2>
-                <ul>
-                    <c:forEach items="${actionBean.userGroups}" var="group">
-                        <li><c:out value="${group.name}" /></li>
-                    </c:forEach>
-                </ul>
-            </div>
-        </div>
+        <mde:write name="actionBean" property="form"/>
         <input type="hidden" name="pk" value="<c:out value="${actionBean.pk}"/>"/>
         <c:if test="${not empty actionBean.searchString}">
             <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
@@ -45,7 +37,5 @@
         <stripes:submit name="exportReadPdf" value="Pdf" disabled="false" class="portletButton"/>
         <!-- TODO custom buttons -->
     </stripes:layout-component>
-    <stripes:layout-component name="contentFooter">
-        <stripes:submit name="cancel" class="contentButton"><fmt:message key="commons.cancel"/></stripes:submit>
-    </stripes:layout-component>
+    <stripes:layout-component name="contentFooter"></stripes:layout-component>
 </stripes:layout-render>

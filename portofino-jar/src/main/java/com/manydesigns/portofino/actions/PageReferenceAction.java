@@ -51,7 +51,7 @@ import java.util.Locale;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@UrlBinding("/ref.action")
+@UrlBinding("/actions/ref")
 public class PageReferenceAction extends PortletAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

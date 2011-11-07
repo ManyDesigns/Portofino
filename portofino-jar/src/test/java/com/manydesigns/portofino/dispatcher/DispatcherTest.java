@@ -47,8 +47,8 @@ import java.util.List;
 */
 public class DispatcherTest extends AbstractPortofinoTest {
 
-    public static final String CRUD_ACTION = "/crud.action";
-    public static final String CHART_ACTION = "/chart.action";
+    public static final String CRUD_ACTION = "/actions/crud";
+    public static final String CHART_ACTION = "/actions/chart";
 
     Dispatcher dispatcher;
 

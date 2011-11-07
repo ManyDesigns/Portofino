@@ -22,7 +22,7 @@
     </head>
     <body class="yui-skin-sam">
     <div id="doc3" class="yui-t2">
-        <stripes:url var="profileUrl" value="/Profile.action"/>
+        <stripes:url var="profileUrl" value="/actions/profile"/>
         <jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration"/>
         <div id="hd">
             <jsp:include page="header.jsp"/>

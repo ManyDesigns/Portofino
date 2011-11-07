@@ -60,7 +60,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @RequiresAdministrator
-@UrlBinding("/admin/connection-providers.action")
+@UrlBinding("/actions/admin/connection-providers")
 public class ConnectionProvidersAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
