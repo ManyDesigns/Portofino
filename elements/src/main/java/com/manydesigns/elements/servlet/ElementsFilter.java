@@ -30,12 +30,14 @@
 package com.manydesigns.elements.servlet;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import ognl.OgnlContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /*
@@ -45,11 +47,23 @@ import java.io.IOException;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class ElementsFilter implements Filter {
+    public static final String copyright =
+            "Copyright (c) 2005-2011, ManyDesigns srl";
+
+    //--------------------------------------------------------------------------
+    // Constants
+    //--------------------------------------------------------------------------
+
+    public static final String REQUEST_OGNL_ATTRIBUTE = "request";
+    public static final String SESSION_OGNL_ATTRIBUTE = "session";
+    public static final String SERVLET_CONTEXT_OGNL_ATTRIBUTE = "servletContext";
+
     //--------------------------------------------------------------------------
     // Fields
     //--------------------------------------------------------------------------
 
-    protected FilterConfig config;
+    protected FilterConfig filterConfig;
+    protected ServletContext servletContext;
 
 
     //--------------------------------------------------------------------------
@@ -59,8 +73,13 @@ public class ElementsFilter implements Filter {
     public final static Logger logger =
             LoggerFactory.getLogger(ElementsFilter.class);
 
+    //--------------------------------------------------------------------------
+    // Filter implementation
+    //--------------------------------------------------------------------------
+
     public void init(FilterConfig filterConfig) throws ServletException {
-        this.config = filterConfig;
+        this.filterConfig = filterConfig;
+        this.servletContext = filterConfig.getServletContext();
         logger.info("ElementsFilter initialized");
     }
 
@@ -78,17 +97,46 @@ public class ElementsFilter implements Filter {
         }
     }
 
+    public void destroy() {
+        logger.info("ElementsFilter destroyed");
+    }
+
+    //--------------------------------------------------------------------------
+    // methods
+    //--------------------------------------------------------------------------
+
     protected void doHttpFilter(HttpServletRequest req,
                                 HttpServletResponse res,
                                 FilterChain filterChain)
             throws IOException, ServletException {
-        ServletContext context = config.getServletContext();
+        ServletContext context = filterConfig.getServletContext();
 
         try {
             WebFramework webFramework = WebFramework.getWebFramework();
             req = webFramework.wrapRequest(req);
 
+            HttpSession session = req.getSession(false);
+
+            logger.debug("Setting up default OGNL context");
             ElementsThreadLocals.setupDefaultElementsContext();
+            OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+
+            logger.debug("Creating request attribute mapper");
+            AttributeMap requestAttributeMap =
+                    AttributeMap.createAttributeMap(req);
+            ognlContext.put(REQUEST_OGNL_ATTRIBUTE, requestAttributeMap);
+
+            logger.debug("Creating session attribute mapper");
+            AttributeMap sessionAttributeMap =
+                    AttributeMap.createAttributeMap(session);
+            ognlContext.put(SESSION_OGNL_ATTRIBUTE, sessionAttributeMap);
+
+            logger.debug("Creating servlet context attribute mapper");
+            AttributeMap servletContextAttributeMap =
+                    AttributeMap.createAttributeMap(servletContext);
+            ognlContext.put(SERVLET_CONTEXT_OGNL_ATTRIBUTE,
+                    servletContextAttributeMap);
+
 
             ElementsThreadLocals.setHttpServletRequest(req);
             ElementsThreadLocals.setHttpServletResponse(res);
@@ -100,7 +148,4 @@ public class ElementsFilter implements Filter {
         }
     }
 
-    public void destroy() {
-        logger.info("ElementsFilter destroyed");
-    }
 }
