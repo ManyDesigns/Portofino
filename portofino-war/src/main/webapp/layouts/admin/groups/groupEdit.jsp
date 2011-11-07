@@ -6,7 +6,7 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request"
-                 type="com.manydesigns.portofino.actions.user.admin.UserAdminAction"/>
+                 type="com.manydesigns.portofino.actions.user.admin.GroupAdminAction"/>
     <stripes:layout-component name="contentHeader">
         <stripes:submit name="update" class="contentButton"><fmt:message key="commons.update"/></stripes:submit>
         <stripes:submit name="cancel" class="contentButton"><fmt:message key="commons.cancel"/></stripes:submit>

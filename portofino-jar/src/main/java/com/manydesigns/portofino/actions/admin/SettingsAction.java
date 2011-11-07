@@ -45,6 +45,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.RootPage;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.controller.ActionResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +60,7 @@ import java.io.FileFilter;
  */
 @RequiresAdministrator
 @UrlBinding("/actions/admin/settings")
-public class SettingsAction extends AbstractActionBean {
+public class SettingsAction extends AbstractActionBean implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -166,5 +167,9 @@ public class SettingsAction extends AbstractActionBean {
 
     public Form getForm() {
         return form;
+    }
+
+    public String getActionPath() {
+        return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
     }
 }

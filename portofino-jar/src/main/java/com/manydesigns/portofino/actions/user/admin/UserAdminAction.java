@@ -30,8 +30,10 @@ package com.manydesigns.portofino.actions.user.admin;
 
 
 import com.manydesigns.elements.servlet.ServletUtils;
+import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.actions.CrudAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -62,7 +64,7 @@ import java.util.List;
 */
 @RequiresAdministrator
 @UrlBinding(UserAdminAction.BASE_PATH + "/{pk}")
-public class UserAdminAction extends CrudAction {
+public class UserAdminAction extends CrudAction implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -107,8 +109,9 @@ public class UserAdminAction extends CrudAction {
         crudPage.setEditUrl("/layouts/admin/users/userEdit.jsp");
         crudPage.setBulkEditUrl("/layouts/admin/users/userBulkEdit.jsp");
         crudPage.setCreateUrl("/layouts/admin/users/userCreate.jsp");
-        crudPage.setFragment(BASE_PATH);
+        crudPage.setFragment(BASE_PATH.substring(1));
         crudPage.setTitle("Users");
+        crudPage.setDescription("Users administration");
         model.init(crudPage);
         String mode;
         if (StringUtils.isEmpty(pk)) {
@@ -167,6 +170,7 @@ public class UserAdminAction extends CrudAction {
     protected boolean createValidate(Object object) {
         User user = (User) object;
         user.setCreationDate(new Timestamp(System.currentTimeMillis()));
+        user.setUserId(RandomUtil.createRandomId(20));
         return true;
     }
 
@@ -224,6 +228,15 @@ public class UserAdminAction extends CrudAction {
         CrudProperty property;
 
         property = new CrudProperty();
+        property.setCrud(crud);
+        property.setName("userId");
+        property.setEnabled(true);
+        property.setInSummary(true);
+        property.setLabel("Id");
+        crud.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("creationDate");
         property.setEnabled(true);
         property.setInSummary(true);
@@ -231,6 +244,7 @@ public class UserAdminAction extends CrudAction {
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("middleName");
         property.setEnabled(true);
         property.setInsertable(true);
@@ -239,18 +253,21 @@ public class UserAdminAction extends CrudAction {
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("modifiedDate");
         property.setEnabled(true);
         property.setLabel("Modified date");
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("deletionDate");
         property.setEnabled(true);
         property.setLabel("Deletion date");
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("pwd");
         property.setEnabled(true);
         property.setInsertable(true);
@@ -259,6 +276,7 @@ public class UserAdminAction extends CrudAction {
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("extAuth");
         property.setEnabled(true);
         property.setInsertable(true);
@@ -267,12 +285,14 @@ public class UserAdminAction extends CrudAction {
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("pwdModDate");
         property.setEnabled(true);
         property.setLabel("Pwd mod date");
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("defaultUser");
         property.setEnabled(true);
         property.setInsertable(true);
@@ -280,11 +300,13 @@ public class UserAdminAction extends CrudAction {
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("bounced");
         property.setEnabled(true);
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("jobTitle");
         property.setEnabled(true);
         property.setInsertable(true);
@@ -292,41 +314,49 @@ public class UserAdminAction extends CrudAction {
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("lastLoginDate");
         property.setEnabled(true);
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("lastFailedLoginDate");
         property.setEnabled(true);
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("failedLoginAttempts");
         property.setEnabled(true);
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("remQuestion");
         property.setEnabled(false);
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("remans");
         property.setEnabled(false);
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("graceLoginCount");
         property.setEnabled(true);
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("agreedToTerms");
         property.setEnabled(true);
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("token");
         property.setEnabled(true);
         crud.getProperties().add(property);
@@ -357,4 +387,7 @@ public class UserAdminAction extends CrudAction {
         this.groupNames = groupNames;
     }
 
+    public String getActionPath() {
+        return dispatch.getAbsoluteOriginalPath();
+    }
 }

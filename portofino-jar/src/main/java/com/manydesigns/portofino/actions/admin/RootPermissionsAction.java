@@ -34,6 +34,7 @@ import com.manydesigns.portofino.actions.PortletAction;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.controller.ActionResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 @RequiresAdministrator
 @UrlBinding("/actions/admin/root-permissions")
-public class RootPermissionsAction extends PortletAction {
+public class RootPermissionsAction extends PortletAction implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -84,5 +85,9 @@ public class RootPermissionsAction extends PortletAction {
 
     public void dereferencePageInstance() {
         /* DO NOTHING */
+    }
+
+    public String getActionPath() {
+        return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
     }
 }

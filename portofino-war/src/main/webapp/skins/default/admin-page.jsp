@@ -30,8 +30,8 @@
         <div id="bd">
             <div id="yui-main">
                 <div id="content" class="yui-b">
-                    <jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean"/>
-                    <stripes:form action="${requestScope.__stripes_resolved_action}" method="post" enctype="multipart/form-data">
+                    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.AdminAction"/>
+                    <stripes:form action="${actionBean.actionPath}" method="post" enctype="multipart/form-data">
                         <div class="contentHeader">
                             <stripes:layout-component name="contentHeader">
                                 Content header

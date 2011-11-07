@@ -47,6 +47,7 @@ import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.controller.ActionResolver;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,7 @@ import java.util.List;
 */
 @RequiresAdministrator
 @UrlBinding("/actions/admin/connection-providers")
-public class ConnectionProvidersAction extends AbstractActionBean {
+public class ConnectionProvidersAction extends AbstractActionBean implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -334,6 +335,10 @@ public class ConnectionProvidersAction extends AbstractActionBean {
 
     public Resolution returnToPages() {
         return new RedirectResolution("/");
+    }
+
+    public String getActionPath() {
+        return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
     }
 
     public String getDatabaseName() {

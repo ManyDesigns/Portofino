@@ -29,8 +29,10 @@
 package com.manydesigns.portofino.actions.user.admin;
 
 import com.manydesigns.elements.servlet.ServletUtils;
+import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.actions.CrudAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -55,7 +57,7 @@ import java.sql.Timestamp;
 */
 @RequiresAdministrator
 @UrlBinding(GroupAdminAction.BASE_PATH + "/{pk}")
-public class GroupAdminAction extends CrudAction {
+public class GroupAdminAction extends CrudAction implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -73,8 +75,9 @@ public class GroupAdminAction extends CrudAction {
         crudPage.setEditUrl("/layouts/admin/groups/groupEdit.jsp");
         crudPage.setBulkEditUrl("/layouts/admin/groups/groupBulkEdit.jsp");
         crudPage.setCreateUrl("/layouts/admin/groups/groupCreate.jsp");
-        crudPage.setFragment(BASE_PATH);
+        crudPage.setFragment(BASE_PATH.substring(1));
         crudPage.setTitle("Groups");
+        crudPage.setDescription("Groups administration");
         model.init(crudPage);
         String mode;
         if (StringUtils.isEmpty(pk)) {
@@ -98,6 +101,7 @@ public class GroupAdminAction extends CrudAction {
     protected boolean createValidate(Object object) {
         Group group = (Group) object;
         group.setCreationDate(new Timestamp(System.currentTimeMillis()));
+        group.setGroupId(RandomUtil.createRandomId(20));
         return true;
     }
 
@@ -113,6 +117,7 @@ public class GroupAdminAction extends CrudAction {
         CrudProperty property;
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("groupId");
         property.setEnabled(true);
         property.setInSummary(true);
@@ -120,12 +125,14 @@ public class GroupAdminAction extends CrudAction {
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("creatorId");
         property.setEnabled(true);
         property.setLabel("Creator");
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("name");
         property.setEnabled(true);
         property.setInSummary(true);
@@ -136,6 +143,7 @@ public class GroupAdminAction extends CrudAction {
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("description");
         property.setEnabled(true);
         property.setInsertable(true);
@@ -145,6 +153,7 @@ public class GroupAdminAction extends CrudAction {
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("creationDate");
         property.setEnabled(true);
         property.setInSummary(true);
@@ -152,9 +161,9 @@ public class GroupAdminAction extends CrudAction {
         crud.getProperties().add(property);
 
         property = new CrudProperty();
+        property.setCrud(crud);
         property.setName("deletionDate");
-        property.setEnabled(true);
-        property.setInSummary(true);
+        property.setEnabled(false);
         property.setLabel("Deletion date");
         crud.getProperties().add(property);
     }
@@ -172,4 +181,7 @@ public class GroupAdminAction extends CrudAction {
         return new ForwardResolution(pageJsp);
     }
 
+    public String getActionPath() {
+        return dispatch.getAbsoluteOriginalPath();
+    }
 }
