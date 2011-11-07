@@ -94,15 +94,23 @@ public class AttributeMap implements Map<String, Object> {
     //--------------------------------------------------------------------------
 
     protected Enumeration getAttributeNames() {
+        if (wrappedObject == null) {
+            logger.debug("Null wrapped object");
+            return null;
+        }
         try {
             return (Enumeration) attributeNamesGetter.invoke(wrappedObject);
         } catch (Throwable e) {
             logger.warn("Invocation error", e);
-            return null;
+            return Collections.enumeration(Collections.EMPTY_LIST);
         }
     }
 
     protected Object getAttribute(String name) {
+        if (wrappedObject == null) {
+            logger.debug("Null wrapped object");
+            return null;
+        }
         try {
             return attributeGetter.invoke(wrappedObject, name);
         } catch (Throwable e) {
@@ -112,6 +120,10 @@ public class AttributeMap implements Map<String, Object> {
     }
 
     protected void setAttribute(String name, Object value) {
+        if (wrappedObject == null) {
+            logger.debug("Null wrapped object");
+            return;
+        }
         try {
             attributeSetter.invoke(wrappedObject, name, value);
         } catch (Throwable e) {

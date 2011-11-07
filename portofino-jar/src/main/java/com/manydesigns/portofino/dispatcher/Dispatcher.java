@@ -92,8 +92,10 @@ public class Dispatcher {
             return null;
         }
 
-        // must contain root page and some child page at least
-        assert path.size() > 1;
+        // check path contains root page and some child page at least
+        if (path.size() <= 1) {
+            return null;
+        }
 
         PageInstance pageInstance = path.get(path.size() - 1);
         Page page = pageInstance.getPage();
