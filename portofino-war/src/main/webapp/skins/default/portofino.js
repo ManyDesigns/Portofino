@@ -22,7 +22,7 @@ function fixSideBar() {
 
 function confirmDeletePage(pageId, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/Page.action?confirmDelete&pageId=" + pageId, function() {
+    dialogDiv.load(contextPath + "/actions/page?confirmDelete&pageId=" + pageId, function() {
         dialogDiv.find("#dialog-confirm-delete-page").dialog({
             modal: true,
             buttons: {
@@ -47,7 +47,7 @@ function confirmDeletePage(pageId, contextPath) {
 
 function showMovePageDialog(pageId, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/Page.action?chooseNewLocation&pageId=" + pageId, function() {
+    dialogDiv.load(contextPath + "/actions/page?chooseNewLocation&pageId=" + pageId, function() {
         dialogDiv.find("#dialog-move-page").dialog({
             modal: true,
             width: 500,
