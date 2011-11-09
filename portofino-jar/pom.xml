@@ -88,6 +88,12 @@
             <version>${jstl.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>${jsp.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!--
         <dependency>

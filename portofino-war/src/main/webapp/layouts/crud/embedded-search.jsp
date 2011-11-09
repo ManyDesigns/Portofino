@@ -3,16 +3,14 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.crud.searchTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletHeaderButtons">
-        <button name="configure" class="wrench"><fmt:message key="commons.configure"/></button>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletHeaderButtons">
-        <button name="configure" class="wrench"><fmt:message key="commons.configure"/></button>
+        <portofino:buttons list="portletHeaderButtons" bean="${actionBean}" />
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <div class="embedded-content">

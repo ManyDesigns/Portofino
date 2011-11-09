@@ -3,13 +3,14 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
+<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.crud.readTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletHeaderButtons">
-        <button name="configure" class="wrench">Configure</button>
+        <portofino:buttons list="portletHeaderButtons" bean="${actionBean}" />
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>
@@ -20,12 +21,17 @@
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
-        <stripes:submit name="edit" value="Edit" class="portletButton"/>
-        <stripes:submit name="delete" value="Delete" onclick="return confirm ('Are you sure?');" class="portletButton"/>
-        <stripes:submit name="duplicate" value="Duplicate" disabled="true" class="portletButton"/>
+        <div class="crudReadButtons">
+            <portofino:buttons list="crud-read" bean="${actionBean}" cssClass="portletButton" />
+        </div>
+        <!--<stripes:submit name="duplicate" value="Duplicate" disabled="true" class="portletButton"/>
         <stripes:submit name="print" value="Print" disabled="true" class="portletButton"/>
         <stripes:submit name="exportReadExcel" value="Excel" disabled="true" class="portletButton"/>
-        <stripes:submit name="exportReadPdf" value="Pdf" disabled="false" class="portletButton"/>
-        <!-- TODO custom buttons -->
+        <stripes:submit name="exportReadPdf" value="Pdf" disabled="false" class="portletButton"/>-->
     </stripes:layout-component>
+    <script type="text/javascript">
+        $(".crudReadButtons button[name=delete]").click(function() {
+            return confirm ('Are you sure?');
+        });
+    </script>
 </stripes:layout-render>

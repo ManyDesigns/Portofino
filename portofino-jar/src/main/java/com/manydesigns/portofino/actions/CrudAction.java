@@ -50,13 +50,14 @@ import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
 import com.manydesigns.portofino.actions.forms.CrudSelectionProviderEdit;
 import com.manydesigns.portofino.application.TableCriteria;
+import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.CrudLogic;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.pages.CrudPage;
-import com.manydesigns.portofino.model.pages.crud.Button;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import com.manydesigns.portofino.model.pages.crud.SelectionProviderReference;
@@ -367,6 +368,7 @@ public class CrudAction extends PortletAction {
     // Search
     //**************************************************************************
 
+    @Button(list = "crud-search-form", key = "commons.search", order = 1)
     public Resolution search() {
         cancelReturnUrl = new UrlBuilder(
                     Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
@@ -483,6 +485,7 @@ public class CrudAction extends PortletAction {
         return plainSelect.toString();
     }
 
+    @Button(list = "crud-search-form", key = "commons.resetSearch", order = 2)
     public Resolution resetSearch() {
         return new RedirectResolution(dispatch.getOriginalPath());
     }
@@ -548,6 +551,7 @@ public class CrudAction extends PortletAction {
     // Create/Save
     //**************************************************************************
 
+    @Button(list = "crud-search", key = "commons.create", order = 1)
     public Resolution create() {
         setupForm(Mode.CREATE);
         object = classAccessor.newInstance();
@@ -565,6 +569,7 @@ public class CrudAction extends PortletAction {
         return new ForwardResolution(fwd);
     }
 
+    @Button(list = "crud-create", key = "commons.create", order = 1)
     public Resolution save() {
         setupForm(Mode.CREATE);
         object = classAccessor.newInstance();
@@ -599,6 +604,7 @@ public class CrudAction extends PortletAction {
     // Edit/Update
     //**************************************************************************
 
+    @Button(list = "crud-read", key = "commons.edit", order = 1)
     public Resolution edit() {
         setupForm(Mode.EDIT);
         editSetup(object);
@@ -614,6 +620,7 @@ public class CrudAction extends PortletAction {
         return new ForwardResolution(fwd);
     }
 
+    @Button(list = "crud-edit", key = "commons.update", order = 1)
     public Resolution update() {
         setupForm(Mode.EDIT);
         editSetup(object);
@@ -644,6 +651,7 @@ public class CrudAction extends PortletAction {
     // Bulk Edit/Update
     //**************************************************************************
 
+    @Button(list = "crud-search", key = "commons.edit", order = 2)
     public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage(
@@ -668,6 +676,7 @@ public class CrudAction extends PortletAction {
         return new ForwardResolution(fwd);
     }
 
+    @Button(list = "crud-bulk-edit", key = "commons.update", order = 1)
     public Resolution bulkUpdate() {
         setupForm(Mode.BULK_EDIT);
         form.readFromRequest(context.getRequest());
@@ -699,6 +708,7 @@ public class CrudAction extends PortletAction {
     // Delete
     //**************************************************************************
 
+    @Button(list = "crud-read", key = "commons.delete", order = 2)
     public Resolution delete() {
         Object pkObject = pkHelper.parsePkString(pk);
         application.deleteObject(baseTable.getQualifiedName(), pkObject);
@@ -719,6 +729,7 @@ public class CrudAction extends PortletAction {
                 .addParameter(SEARCH_STRING_PARAM, searchString);
     }
 
+    @Button(list = "crud-search", key = "commons.delete", order = 3)
     public Resolution bulkDelete() {
         if (selection == null) {
             SessionMessages.addWarningMessage(
@@ -749,7 +760,7 @@ public class CrudAction extends PortletAction {
     // Button
     //**************************************************************************
 
-    public String button() throws Exception {
+    /*public String button() throws Exception {
         String value = context.getRequest().getParameter("method:button");
         for (CrudButton crudButton : crudButtons) {
             Button button = crudButton.getButton();
@@ -760,7 +771,7 @@ public class CrudAction extends PortletAction {
             }
         }
         throw new Error("No button found");
-    }
+    }*/
 
     //**************************************************************************
     // Return to parent
@@ -790,6 +801,16 @@ public class CrudAction extends PortletAction {
         }
 
         return resolution;
+    }
+
+    @Override
+    @Buttons({
+        @Button(list = "crud-edit", key = "commons.cancel", order = 99),
+        @Button(list = "crud-create", key = "commons.cancel", order = 99),
+        @Button(list = "crud-bulk-edit", key = "commons.cancel", order = 99)
+    })
+    public Resolution cancel() {
+        return super.cancel();
     }
 
     //**************************************************************************
@@ -1557,6 +1578,7 @@ public class CrudAction extends PortletAction {
     public TableForm selectionProvidersForm;
     public CrudSelectionProviderEdit[] selectionProviderEdits;
 
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1)
     public Resolution configure() {
         prepareConfigurationForms();
 

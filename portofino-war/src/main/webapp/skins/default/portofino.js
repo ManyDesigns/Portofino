@@ -84,7 +84,7 @@ $(function() {
     
     $("input:submit.portletButton, button.portletButton").button();
 
-    $("input:submit.wrench, button.wrench").button({
+    $(".portletHeaderButtons button[name=configure]").button({
             icons: {
                 primary: "ui-icon-wrench"
             },
