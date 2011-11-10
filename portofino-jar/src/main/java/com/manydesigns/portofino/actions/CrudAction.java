@@ -497,7 +497,7 @@ public class CrudAction extends PortletAction {
 
     public Resolution read() {
         if(!crud.isLargeResultSet()) {
-            //setupSearchForm(); apparentemente non serve
+            setupSearchForm(); // serve per la navigazione del result set
             loadObjects();
             setupPagination();
         }

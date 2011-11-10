@@ -108,10 +108,13 @@
             var results = (oState.pagination) ? oState.pagination.rowsPerPage : 10;
 
             // Build custom request
-            return  "&firstResult=" + startIndex +
-                    "&maxResults=10" +
-                    "&searchString=" + encodeURIComponent(
-                        '<%= StringEscapeUtils.escapeJavaScript(actionBean.getSearchString()) %>');
+            var url = "&firstResult=" + startIndex +
+                    "&maxResults=10";
+            <c:if test="${not empty actionBean.searchString}">
+                url = url + "&searchString=" + encodeURIComponent(
+                    '<%= StringEscapeUtils.escapeJavaScript(actionBean.getSearchString()) %>');
+            </c:if>
+            return url;
         };
 
         var myConfigs = {
