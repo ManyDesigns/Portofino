@@ -102,7 +102,7 @@ $(function() {
             },
             text: false
         });
-    $("input:submit.link, button.link").button({
+    $(".portletHeaderButtons button[name=manageAttachments]").button({
             icons: {
                 primary: "ui-icon-link"
             },

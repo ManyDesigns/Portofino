@@ -39,6 +39,7 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.actions.PortletAction;
+import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.chart.ChartGenerator;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.datamodel.Database;
@@ -248,9 +249,9 @@ public class ChartAction extends PortletAction {
         }
     }
 
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1)
     public Resolution configure() {
         prepareConfigurationForms();
-
         return new ForwardResolution("/layouts/chart/configure.jsp");
     }
 

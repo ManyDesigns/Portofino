@@ -3,13 +3,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
+<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.pageInstance.page.title}"/>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletHeaderButtons">
-        <button name="configure" class="wrench">Configure</button>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <div class=".ui-state-error">

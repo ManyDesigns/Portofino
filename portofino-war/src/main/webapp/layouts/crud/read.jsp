@@ -9,9 +9,6 @@
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.crud.readTitle}"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletHeaderButtons">
-        <portofino:buttons list="portletHeaderButtons" bean="${actionBean}" />
-    </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>
         <input type="hidden" name="pk" value="<c:out value="${actionBean.pk}"/>"/>

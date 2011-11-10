@@ -178,11 +178,11 @@ Portlet
 }
 
 /* page hader/footer buttons*/
-input.contentButton, input.contentButton, .portletHeaderButtons button {
+input.contentButton, button.contentButton, .portletHeaderButtons button {
     border: 1px solid #D6D6E6;
     background: #EEEEFF;
 }
-input.contentButton.ui-button.ui-state-hover, input.contentButton.ui-button.ui-state-hover, .portletHeaderButtons button.ui-state-hover {
+input.contentButton.ui-button.ui-state-hover, button.contentButton.ui-button.ui-state-hover, .portletHeaderButtons button.ui-state-hover {
     border: 1px solid #7171B0;
     background: #65a7db url(images/ui-bg_glass_75_a8a8e6_1x400.png) 50% 50% repeat-x;
     font-weight: normal; color: #212121;

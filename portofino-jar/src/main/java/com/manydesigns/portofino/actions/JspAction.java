@@ -34,6 +34,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.model.pages.JspPage;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
@@ -85,6 +86,7 @@ public class JspAction extends PortletAction {
         }
     }
 
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1)
     public Resolution configure() {
         prepareConfigurationForms();
         return new ForwardResolution("/layouts/jsp/configure.jsp");

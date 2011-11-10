@@ -9,9 +9,6 @@
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.crud.searchTitle}"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletHeaderButtons">
-        <portofino:buttons list="portletHeaderButtons" bean="${actionBean}" />
-    </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <div class="embedded-content">
             <div class="search_results">

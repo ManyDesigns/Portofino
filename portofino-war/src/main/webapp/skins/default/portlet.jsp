@@ -4,6 +4,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@taglib prefix="mde" uri="/manydesigns-elements" %>
+<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
 <stripes:layout-definition>
     <div class="portlet">
         <jsp:useBean id="actionBean" scope="request"
@@ -20,7 +21,9 @@
                         </div>
                         <div class="portletHeaderButtons">
                             <% if(SecurityLogic.isAdministrator(request)) { %>
-                                <stripes:layout-component name="portletHeaderButtons"/>
+                                <stripes:layout-component name="portletHeaderButtons">
+                                    <portofino:buttons list="portletHeaderButtons" bean="${actionBean}" />
+                                </stripes:layout-component>
                             <% } %>
                         </div>
                     </div>

@@ -136,6 +136,6 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
     }
 
     public String getActionPath() {
-        return dispatch.getAbsoluteOriginalPath();
+        return dispatch.getOriginalPath();
     }
 }

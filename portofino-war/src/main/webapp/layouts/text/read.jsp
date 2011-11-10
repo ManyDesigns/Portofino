@@ -6,14 +6,11 @@
 %><%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
 %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.TextAction"/>
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.textPage.title}"/>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletHeaderButtons">
-        <button name="configure" class="wrench">Configure</button>
-        <button name="manageAttachments" class="link">Manage attachments</button>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:out value="${actionBean.content}" escapeXml="false"/>

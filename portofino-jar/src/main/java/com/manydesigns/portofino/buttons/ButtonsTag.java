@@ -79,10 +79,10 @@ public class ButtonsTag extends TagSupport {
                 buffer.openElement("button");
                 buffer.addAttribute("name", button.getName());
                 String value = getValue(button, localizationContext, prefix);
-                buffer.addAttribute("value", value);
                 if(cssClass != null) {
                     buffer.addAttribute("class", cssClass);
                 }
+                buffer.addAttribute("type", "submit");
                 buffer.write(value);
                 buffer.closeElement("button");
             }

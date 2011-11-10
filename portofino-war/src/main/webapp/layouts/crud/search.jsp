@@ -10,9 +10,6 @@
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.crud.searchTitle}"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletHeaderButtons">
-        <portofino:buttons list="portletHeaderButtons" bean="${actionBean}" />
-    </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:if test="${not empty actionBean.searchForm}">
             <div class="yui-gc">

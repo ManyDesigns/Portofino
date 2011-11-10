@@ -15,9 +15,6 @@
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.jspPage.title}"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletHeaderButtons">
-        <button name="configure" class="wrench">Configure</button>
-    </stripes:layout-component>
     <stripes:layout-component name="portletBody">
 
             <%

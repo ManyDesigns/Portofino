@@ -30,6 +30,7 @@ package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
+import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.logic.TextLogic;
 import com.manydesigns.portofino.model.pages.Attachment;
 import com.manydesigns.portofino.model.pages.TextPage;
@@ -138,6 +139,7 @@ public class TextAction extends PortletAction {
                 new ByteArrayInputStream(contentByteArray), new FileOutputStream(dataFile));
     }
 
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1)
     public Resolution configure() throws IOException {
         prepareConfigurationForms();
         loadContent();
@@ -270,6 +272,7 @@ public class TextAction extends PortletAction {
         return new ForwardResolution("/layouts/text/browse.jsp");
     }
 
+    @Button(list = "portletHeaderButtons", key = "layouts.text.manage-attachments.manage_attachments_for_page", order = 2)
     public Resolution manageAttachments() {
         logger.info("Manage attachments");
         return new ForwardResolution("/layouts/text/manage-attachments.jsp");
