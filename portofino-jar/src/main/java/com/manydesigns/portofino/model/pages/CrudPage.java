@@ -215,6 +215,7 @@ public class CrudPage extends Page {
         this.createUrl = createUrl;
     }
 
+    @XmlAttribute
     public String getBulkEditUrl() {
         return bulkEditUrl;
     }

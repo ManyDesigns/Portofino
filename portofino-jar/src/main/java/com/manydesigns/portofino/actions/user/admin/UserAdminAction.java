@@ -35,6 +35,7 @@ import com.manydesigns.portofino.actions.CrudAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
+import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -140,6 +141,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
     }
 
     @Override
+    @Button(list = "crud-read", key = "commons.edit", order = 1)
     public Resolution edit() {
         setupUserGroups();
         return super.edit();
@@ -219,8 +221,15 @@ public class UserAdminAction extends CrudAction implements AdminAction {
         return true;
     }
 
+    @Button(list = "contentButtons", key = "commons.returnToPages", order = 1)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
+    }
+
+    //Do not show the configure button
+    @Override
+    public Resolution configure() {
+        return super.configure();
     }
 
     @Override

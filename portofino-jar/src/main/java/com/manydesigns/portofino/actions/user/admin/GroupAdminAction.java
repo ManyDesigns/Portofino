@@ -36,6 +36,7 @@ import com.manydesigns.portofino.actions.CrudAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
+import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -66,6 +67,15 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public static final String BASE_PATH = "/actions/admin/groups";
+
+    @Button(list = "contentButtons", key = "commons.returnToPages", order = 1)
+    public Resolution returnToPages() {
+        return new RedirectResolution("/");
+    }
+
+    //**************************************************************************
+    // Overrides
+    //**************************************************************************
 
     @Override
     @Before
@@ -122,13 +132,11 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
         }
     }
 
-    public Resolution returnToPages() {
-        return new RedirectResolution("/");
+    //Do not show the configure button
+    @Override
+    public Resolution configure() {
+        return super.configure();
     }
-
-    //**************************************************************************
-    // Overrides
-    //**************************************************************************
 
     @Override
     protected Resolution forwardToPortletPage(String pageJsp) {

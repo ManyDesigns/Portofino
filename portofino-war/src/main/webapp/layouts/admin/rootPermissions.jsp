@@ -5,14 +5,14 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.RootPermissionsAction"/>
     <stripes:layout-component name="pageTitle">
         Root permission
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <stripes:submit name="updatePagePermissions" value="Update" class="contentButton"/>
-        <stripes:submit name="returnToPages" value="Return to pages" class="contentButton"/>
+        <portofino:buttons list="root-permissions" bean="${actionBean}" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         Root permission
@@ -49,8 +49,7 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <stripes:submit name="updatePagePermissions" value="Update" class="contentButton"/>
-        <stripes:submit name="returnToPages" value="Return to pages" class="contentButton"/>
+        <portofino:buttons list="root-permissions" bean="${actionBean}" cssClass="contentButton" />
         <script type="text/javascript">
             $(".groupBox").sortable({
                 connectWith: ".groupBox",

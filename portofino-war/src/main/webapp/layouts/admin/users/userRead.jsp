@@ -4,6 +4,7 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.user.admin.UserAdminAction"/>
@@ -41,8 +42,14 @@
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
-        <stripes:submit name="edit" value="Edit" class="portletButton"/>
-        <stripes:submit name="delete" value="Delete" onclick="return confirm ('Are you sure?');" class="portletButton"/>
+        <div class="crudReadButtons">
+            <portofino:buttons list="crud-read" bean="${actionBean}" cssClass="portletButton" />
+        </div>
     </stripes:layout-component>
-    <stripes:layout-component name="contentFooter"></stripes:layout-component>
+    <stripes:layout-component name="contentFooter" />
+    <script type="text/javascript">
+        $(".crudReadButtons button[name=delete]").click(function() {
+            return confirm ('Are you sure?');
+        });
+    </script>
 </stripes:layout-render>

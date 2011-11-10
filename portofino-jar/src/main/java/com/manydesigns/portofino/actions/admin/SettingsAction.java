@@ -39,6 +39,7 @@ import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ServerInfo;
+import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.model.Model;
@@ -111,6 +112,7 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
         form.readFromObject(rootPage);
     }
 
+    @Button(list = "settings", key = "commons.update", order = 1)
     public Resolution update() {
         synchronized (application) {
             setupFormAndBean();
@@ -129,6 +131,7 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
         }
     }
 
+    @Button(list = "settings", key = "commons.returnToPages", order = 2)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

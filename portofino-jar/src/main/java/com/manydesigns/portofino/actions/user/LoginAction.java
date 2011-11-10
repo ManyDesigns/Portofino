@@ -37,6 +37,7 @@ import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
@@ -143,7 +144,8 @@ public class LoginAction extends AbstractActionBean {
         }
     }
 
-    public Resolution login () {
+    @Button(list = "login-buttons", key = "commons.login", order = 1)
+    public Resolution login() {
         boolean enc = portofinoConfiguration.getBoolean(
                 PortofinoProperties.PWD_ENCRYPTED, true);
 

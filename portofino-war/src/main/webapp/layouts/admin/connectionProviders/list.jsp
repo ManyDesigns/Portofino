@@ -5,17 +5,14 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.ConnectionProvidersAction"/>
     <stripes:layout-component name="pageTitle">
         Connection providers
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <stripes:submit name="create" value="Create new" class="contentButton"/>
-        <stripes:submit name="bulkDelete" value="Delete"
-                        onclick="return confirm ('Are you sure?');"
-                        class="contentButton"/>
-        <stripes:submit name="returnToPages" value="Return to pages" class="contentButton"/>
+        <portofino:buttons list="connectionProviders-search" bean="${actionBean}" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         Connection providers
@@ -26,10 +23,11 @@
         <mde:write name="actionBean" property="databasePlatformsTableForm"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <stripes:submit name="create" value="Create new" class="contentButton"/>
-        <stripes:submit name="bulkDelete" value="Delete"
-                        onclick="return confirm ('Are you sure?');"
-                        class="contentButton"/>
-        <stripes:submit name="returnToPages" value="Return to pages" class="contentButton"/>
+        <portofino:buttons list="connectionProviders-search" bean="${actionBean}" cssClass="contentButton" />
     </stripes:layout-component>
+    <script type="text/javascript">
+        $("button[name=bulkDelete]").click(function() {
+            return confirm ('Are you sure?');
+        });
+    </script>
 </stripes:layout-render>

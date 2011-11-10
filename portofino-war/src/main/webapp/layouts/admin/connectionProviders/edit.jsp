@@ -5,14 +5,14 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.ConnectionProvidersAction"/>
     <stripes:layout-component name="pageTitle">
         <fmt:message key="layouts.admin.connectionProviders.edit.select_provider_type"/>: <c:out value="${actionBean.databaseName}"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <stripes:submit name="update" value="Update" class="contentButton"/>
-        <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
+        <portofino:buttons list="connectionProviders-edit" bean="${actionBean}" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <fmt:message key="layouts.admin.connectionProviders.edit.select_provider_type"/>: <c:out value="${actionBean.databaseName}"/>
@@ -25,7 +25,6 @@
         <stripes:hidden name="databaseName" value="${actionBean.databaseName}"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <stripes:submit name="update" value="Update" class="contentButton"/>
-        <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
+        <portofino:buttons list="connectionProviders-edit" bean="${actionBean}" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>
