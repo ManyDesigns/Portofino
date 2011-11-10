@@ -49,16 +49,14 @@ import com.manydesigns.portofino.actions.model.PrimaryKeyColumnModel;
 import com.manydesigns.portofino.actions.model.PrimaryKeyModel;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ModelObjectNotFoundError;
+import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -265,6 +263,11 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return table;
     }
 
+    @Button(list = "tables-list", key = "commons.returnToPages", order = 3)
+    public Resolution returnToPages() {
+        return new RedirectResolution("/");
+    }
+
     //**************************************************************************
     // Cancel
     //**************************************************************************
@@ -277,7 +280,8 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     // Drop
     //**************************************************************************
 
-    public String drop() {
+    @Button(list = "tables-list", key = "commons.delete", order = 2)
+    public String bulkDelete() {
         return "drop";
     }
 
@@ -285,6 +289,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     // Add new Column
     //**************************************************************************
 
+    @Button(list = "tables-list", key = "commons.create", order = 1)
     public String create() throws CloneNotSupportedException {
         /*CreateTableStatement cts = new CreateTableStatement("pubLic", "teZt");
         cts.addColumn("a1", new VarcharType());

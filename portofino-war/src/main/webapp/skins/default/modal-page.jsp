@@ -5,13 +5,11 @@
     response.addHeader("Cache-Control", "no-cache");
     response.addHeader("Cache-Control", "no-store");
     response.setDateHeader("Expires", 0);
-%>
-<%@ page contentType="text/html;charset=ISO-8859-1" language="java" pageEncoding="ISO-8859-1"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
-<%@ taglib prefix="mde" uri="/manydesigns-elements"%>
-<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
-<stripes:layout-definition><%--
+%><%@ page contentType="text/html;charset=ISO-8859-1" language="java" pageEncoding="ISO-8859-1"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+%><%@ taglib prefix="mde" uri="/manydesigns-elements"
+%><stripes:layout-definition><%--
 --%><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
     <head>
@@ -49,9 +47,7 @@
                                                     </h1>
                                                 </div>
                                                 <div class="portletHeaderButtons">
-                                                    <stripes:layout-component name="portletHeaderButtons">
-                                                        <portofino:buttons list="portletHeaderButtons" bean="${actionBean}" />
-                                                    </stripes:layout-component>
+                                                    <stripes:layout-component name="portletHeaderButtons" />
                                                 </div>
                                             </div>
                                             <div class="portletHeaderSeparator"></div>
