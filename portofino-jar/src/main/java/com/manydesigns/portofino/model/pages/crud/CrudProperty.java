@@ -190,7 +190,7 @@ public class CrudProperty implements ModelObject {
     }
 
     @XmlElementWrapper(name="annotations")
-    @XmlElement(name="annotaion",type=Annotation.class)
+    @XmlElement(name="annotation",type=Annotation.class)
     public List<Annotation> getAnnotations() {
         return annotations;
     }

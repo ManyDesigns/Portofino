@@ -125,5 +125,12 @@
             <version>${struts2.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Struts 2 dependencies (provided) -->
+        <dependency>
+            <groupId>net.sourceforge.stripes</groupId>
+            <artifactId>stripes</artifactId>
+            <version>${stripes.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

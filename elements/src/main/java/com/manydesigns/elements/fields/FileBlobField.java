@@ -29,7 +29,7 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.ElementsProperties;
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
@@ -39,13 +39,11 @@ import com.manydesigns.elements.servlet.WebFramework;
 import com.manydesigns.elements.util.MemoryUtil;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -70,7 +68,6 @@ public class FileBlobField extends AbstractField
     protected String operationInputName;
     protected String codeInputName;
 
-    protected final BlobManager blobManager;
     protected Blob blob;
     protected String blobError;
 
@@ -86,27 +83,9 @@ public class FileBlobField extends AbstractField
                          @Nullable String prefix) {
         super(accessor, mode, prefix);
 
-        blobManager = createBlobsManager();
-
         innerId = id + INNER_SUFFIX;
         operationInputName = inputName + OPERATION_SUFFIX;
         codeInputName = inputName + CODE_SUFFIX;
-    }
-
-    public static BlobManager createBlobsManager() {
-        Configuration elementsConfiguration =
-                ElementsProperties.getConfiguration();
-        String storageDir =
-                elementsConfiguration.getString(
-                        ElementsProperties.BLOBS_DIR);
-        String metaFilenamePattern =
-                elementsConfiguration.getString(
-                        ElementsProperties.BLOBS_META_FILENAME_PATTERN);
-        String dataFilenamePattern =
-                elementsConfiguration.getString(
-                        ElementsProperties.BLOBS_DATA_FILENAME_PATTERN);
-        return new BlobManager(
-                storageDir, metaFilenamePattern, dataFilenamePattern);
     }
 
     //**************************************************************************
@@ -127,7 +106,11 @@ public class FileBlobField extends AbstractField
     }
 
     public String getStringValue() {
-        return null;
+        if (blob == null) {
+            return null;
+        } else {
+            return blob.getFilename();
+        }
     }
 
     public void valueToXhtmlPreview(XhtmlBuffer xb) {
@@ -247,6 +230,13 @@ public class FileBlobField extends AbstractField
 
     private void saveUpload(HttpServletRequest req) {
         WebFramework webFramework = WebFramework.getWebFramework();
+
+        BlobManager blobManager = ElementsThreadLocals.getBlobManager();
+        if (blobManager == null) {
+            logger.warn("No blob manager found. Cannot save upload.");
+            throw new Error("No blob manager found. Cannot save upload.");
+        }
+
         try {
             Upload upload = webFramework.getUpload(req, inputName);
             if (upload == null) {
@@ -262,7 +252,7 @@ public class FileBlobField extends AbstractField
             }
         } catch (Throwable e) {
             logger.warn("Cannot save upload", e);
-            throw new Error(e);
+            throw new Error("Cannot save upload", e);
         }
     }
 
@@ -293,12 +283,17 @@ public class FileBlobField extends AbstractField
         if (code == null) {
             blob = null;
         } else {
+            BlobManager blobManager = ElementsThreadLocals.getBlobManager();
+            if (blobManager == null) {
+                logger.warn("No blob manager found. Cannot load blob with code '{}'.", code);
+                return;
+            }
             try {
                 blob = blobManager.loadBlob(code);
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 blob = null;
                 blobError = "Cannot load blob";
-                logger.warn("Cannot load blob with code {}. Cause: {}",
+                logger.warn("Cannot load blob with code '{}'. Cause: {}",
                         code, e.getMessage());
             }
         }

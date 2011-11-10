@@ -67,7 +67,7 @@ public class Struts2WebFramework extends WebFramework {
     }
 
     @Override
-    public Upload getUpload(HttpServletRequest req, String parameter) {
+    public Upload getUpload(HttpServletRequest req, String parameterName) {
         Class reqClass = req.getClass();
         if (StrutsRequestWrapper.class.equals(reqClass)) {
             logger.warn("Request of type {} does not support uploads. " +
@@ -84,9 +84,9 @@ public class Struts2WebFramework extends WebFramework {
 
         MultiPartRequestWrapper mprw = (MultiPartRequestWrapper) req;
 
-        File[] files = mprw.getFiles(parameter);
-        String[] fileNames = mprw.getFileNames(parameter);
-        String[] contentTypes = mprw.getContentTypes(parameter);
+        File[] files = mprw.getFiles(parameterName);
+        String[] fileNames = mprw.getFileNames(parameterName);
+        String[] contentTypes = mprw.getContentTypes(parameterName);
         if (files == null || files.length == 0) {
             return null;
         }

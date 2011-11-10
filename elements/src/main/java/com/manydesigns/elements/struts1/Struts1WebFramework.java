@@ -71,7 +71,7 @@ public class Struts1WebFramework extends WebFramework {
 
 
     @Override
-    public Upload getUpload(HttpServletRequest req, String parameter) {
+    public Upload getUpload(HttpServletRequest req, String parameterName) {
         Class reqClass = req.getClass();
         if (!(req instanceof MultipartRequestWrapper)) {
             logger.warn("Request is not an instance of {}. Actual type: {}",
@@ -100,7 +100,7 @@ public class Struts1WebFramework extends WebFramework {
                 actionForm.getMultipartRequestHandler();
 
         Hashtable fileElements = handler.getFileElements();
-        FormFile formFile = (FormFile) fileElements.get(parameter);
+        FormFile formFile = (FormFile) fileElements.get(parameterName);
         if (formFile == null) {
             return null;
         }

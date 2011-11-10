@@ -74,8 +74,6 @@ public class FileBlobFieldTest extends AbstractElementsTest {
                 com.manydesigns.elements.servlet.WebFramework.class.getName());
         setUpSingletons();
 
-        manager = FileBlobField.createBlobsManager();
-
         form = new FormBuilder(Bean.class)
                 .build();
         field = (FileBlobField) form.get(0).get(0);

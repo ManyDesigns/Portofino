@@ -29,7 +29,9 @@
 
 package com.manydesigns.elements.blobs;
 
+import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.util.RandomUtil;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -59,21 +61,47 @@ public class BlobManager {
     // Fields
     //**************************************************************************
 
-    protected final File blobsDirFile;
-    protected final String metaFileNamePattern;
-    protected final String dataFileNamePattern;
+    protected File blobsDir;
+    protected String metaFileNamePattern;
+    protected String dataFileNamePattern;
 
     //**************************************************************************
     // Constructors and initialization
     //**************************************************************************
 
-    public BlobManager(String blobsDir,
+
+    public BlobManager() {}
+
+    public BlobManager(File blobsDir,
                        String metaFileNamePattern,
                        String dataFileNamePattern) {
-        blobsDirFile = new File(blobsDir);
+        this.blobsDir = blobsDir;
         this.metaFileNamePattern = metaFileNamePattern;
         this.dataFileNamePattern = dataFileNamePattern;
     }
+
+    public static BlobManager createDefaultBlobManager() {
+        Configuration elementsConfiguration =
+                ElementsProperties.getConfiguration();
+        String blobsDirPath =
+                elementsConfiguration.getString(
+                        ElementsProperties.BLOBS_DIR);
+        File blobsDir;
+        if (blobsDirPath == null) {
+            blobsDir = null;
+        } else {
+            blobsDir = new File(blobsDirPath);
+        }
+        String metaFilenamePattern =
+                elementsConfiguration.getString(
+                        ElementsProperties.BLOBS_META_FILENAME_PATTERN);
+        String dataFilenamePattern =
+                elementsConfiguration.getString(
+                        ElementsProperties.BLOBS_DATA_FILENAME_PATTERN);
+        return new BlobManager(
+                blobsDir, metaFilenamePattern, dataFilenamePattern);
+    }
+
 
     //**************************************************************************
     // Methods
@@ -108,9 +136,9 @@ public class BlobManager {
         ensureValidCode(code);
 
         File metaFile =
-                RandomUtil.getCodeFile(blobsDirFile, metaFileNamePattern, code);
+                RandomUtil.getCodeFile(blobsDir, metaFileNamePattern, code);
         File dataFile =
-                RandomUtil.getCodeFile(blobsDirFile, dataFileNamePattern, code);
+                RandomUtil.getCodeFile(blobsDir, dataFileNamePattern, code);
         Blob blob = new Blob(metaFile, dataFile);
 
         // copy the data
@@ -165,9 +193,9 @@ public class BlobManager {
         ensureValidCode(code);
 
         File metaFile =
-                RandomUtil.getCodeFile(blobsDirFile, metaFileNamePattern, code);
+                RandomUtil.getCodeFile(blobsDir, metaFileNamePattern, code);
         File dataFile =
-                RandomUtil.getCodeFile(blobsDirFile, dataFileNamePattern, code);
+                RandomUtil.getCodeFile(blobsDir, dataFileNamePattern, code);
         Blob blob = new Blob(metaFile, dataFile);
 
         blob.loadMetaProperties();
@@ -179,9 +207,9 @@ public class BlobManager {
         ensureValidCode(code);
 
         File metaFile =
-                RandomUtil.getCodeFile(blobsDirFile, metaFileNamePattern, code);
+                RandomUtil.getCodeFile(blobsDir, metaFileNamePattern, code);
         File dataFile =
-                RandomUtil.getCodeFile(blobsDirFile, dataFileNamePattern, code);
+                RandomUtil.getCodeFile(blobsDir, dataFileNamePattern, code);
         boolean success = true;
         try {
             success = metaFile.delete() && success;
@@ -199,19 +227,31 @@ public class BlobManager {
     }
 
     //**************************************************************************
-    // Getters
+    // Getters/setters
     //**************************************************************************
 
-    public File getBlobsDirFile() {
-        return blobsDirFile;
+
+    public File getBlobsDir() {
+        return blobsDir;
+    }
+
+    public void setBlobsDir(File blobsDir) {
+        this.blobsDir = blobsDir;
     }
 
     public String getMetaFileNamePattern() {
         return metaFileNamePattern;
     }
 
+    public void setMetaFileNamePattern(String metaFileNamePattern) {
+        this.metaFileNamePattern = metaFileNamePattern;
+    }
+
     public String getDataFileNamePattern() {
         return dataFileNamePattern;
     }
 
+    public void setDataFileNamePattern(String dataFileNamePattern) {
+        this.dataFileNamePattern = dataFileNamePattern;
+    }
 }
