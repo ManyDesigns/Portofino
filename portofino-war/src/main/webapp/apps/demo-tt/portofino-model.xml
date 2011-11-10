@@ -1923,9 +1923,7 @@
                             <annotations/>
                         </property>
                         <property enabled="true" inSummary="true" insertable="true" label="" name="description" searchable="false" updatable="true">
-                            <annotations>
-                                <annotation type="com.manydesigns.elements.annotations.FileBlob"/>
-                            </annotations>
+                            <annotations/>
                         </property>
                         <property enabled="true" inSummary="false" insertable="false" label="" name="homepage" searchable="false" updatable="false">
                             <annotations/>
