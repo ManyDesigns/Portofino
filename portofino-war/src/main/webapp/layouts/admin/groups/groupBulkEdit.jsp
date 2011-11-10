@@ -5,11 +5,11 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:submit name="bulkUpdate" value="Update" class="contentButton"/>
-        <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
+        <portofino:buttons list="crud-bulk-edit" bean="${actionBean}" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.crud.editTitle}"/>
@@ -28,7 +28,6 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">
-        <stripes:submit name="bulkUpdate" value="Update" class="contentButton"/>
-        <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
+        <portofino:buttons list="crud-bulk-edit" bean="${actionBean}" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>

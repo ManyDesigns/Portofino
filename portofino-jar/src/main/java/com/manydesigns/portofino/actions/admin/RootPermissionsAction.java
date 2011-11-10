@@ -31,6 +31,7 @@ package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.actions.PortletAction;
+import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
@@ -68,6 +69,7 @@ public class RootPermissionsAction extends PortletAction implements AdminAction 
         return new ForwardResolution("/layouts/admin/rootPermissions.jsp");
     }
 
+    @Button(list = "root-permissions", key = "commons.update", order = 1)
     public Resolution updatePagePermissions() {
         Page page = model.getRootPage();
         synchronized (application) {
@@ -79,6 +81,7 @@ public class RootPermissionsAction extends PortletAction implements AdminAction 
         return new RedirectResolution(this.getClass());
     }
 
+    @Button(list = "root-permissions", key = "commons.returnToPages", order = 2)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

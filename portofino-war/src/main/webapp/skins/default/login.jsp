@@ -64,8 +64,9 @@
                                         <tr>
                                             <th></th>
                                             <td>
-                                                <stripes:submit name="login"  class="portletButton"><fmt:message key="commons.login"/></stripes:submit>
-                                                <stripes:submit name="cancel" class="portletButton"><fmt:message key="commons.cancel"/></stripes:submit>
+                                                <portofino:buttons list="login-buttons" bean="${actionBean}" cssClass="portletButton" />
+                                                <!--<stripes:submit name="login"  class="portletButton"><fmt:message key="commons.login"/></stripes:submit>
+                                                <stripes:submit name="cancel" class="portletButton"><fmt:message key="commons.cancel"/></stripes:submit>-->
                                             </td>
                                         </tr>
                                         <c:if test="recoverPwd">

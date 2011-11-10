@@ -39,6 +39,8 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.connections.JdbcConnectionProvider;
 import com.manydesigns.portofino.connections.JndiConnectionProvider;
@@ -212,6 +214,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         detectedValuesForm.readFromObject(connectionProvider);
     }
 
+    @Button(list = "connectionProviders-read", key = "layouts.admin.connectionProviders.list.test", order = 3)
     public Resolution test() {
         connectionProvider = application.getConnectionProvider(databaseName);
         connectionProvider.init(application.getDatabasePlatformsManager());
@@ -227,6 +230,11 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
                 .addParameter("databaseName", databaseName);
     }
 
+    @Buttons({
+        @Button(list = "connectionProviders-search", key = "commons.create", order = 1),
+        @Button(list = "connectionProviders-select-type",
+                key = "layouts.admin.connectionProviders.edit.select_provider_type", order = 1)
+    })
     public Resolution create() {
         if (!createConnectionProvider()) {
             return new ForwardResolution("/layouts/admin/connectionProviders/createSelectType.jsp");
@@ -246,6 +254,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         return true;
     }
 
+    @Button(list = "connectionProviders-create", key = "commons.save", order = 1)
     public Resolution save() {
         if (!createConnectionProvider()) {
             return new ForwardResolution("/layouts/admin/connectionProviders/createSelectType.jsp");
@@ -265,6 +274,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         }
     }
 
+    @Button(list = "connectionProviders-read", key = "commons.edit", order = 2)
     public Resolution edit() {
         connectionProvider = application.getConnectionProvider(databaseName);
         databasePlatform = connectionProvider.getDatabasePlatform();
@@ -275,6 +285,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         return new ForwardResolution("/layouts/admin/connectionProviders/edit.jsp");
     }
 
+    @Button(list = "connectionProviders-edit", key = "commons.update", order = 1)
     public Resolution update() {
         connectionProvider = application.getConnectionProvider(databaseName);
         databasePlatform = connectionProvider.getDatabasePlatform();
@@ -293,6 +304,15 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
                 .addParameter("databaseName", databaseName);
     }
 
+    @Buttons({
+        @Button(list = "connectionProviders-edit", key = "commons.cancel", order = 2),
+        @Button(list = "connectionProviders-create", key = "commons.cancel", order = 2)
+    })
+    public Resolution cancel() {
+        return execute();
+    }
+
+    @Button(list = "connectionProviders-read", key = "commons.delete", order = 5)
     public Resolution delete(){
         if(null!=databaseName){
             application.deleteConnectionProvider(databaseName);
@@ -302,6 +322,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         return new RedirectResolution(this.getClass());
     }
 
+    @Button(list = "connectionProviders-search", key = "commons.delete", order = 2)
     public Resolution bulkDelete() {
 
         if(null!=selection && 0!=selection.length){
@@ -314,6 +335,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         return new RedirectResolution(this.getClass());
     }
 
+    @Button(list = "connectionProviders-read", key = "layouts.admin.connectionProviders.list.synchronize", order = 4)
     public Resolution sync() {
         try {
             application.syncDataModel(databaseName);
@@ -329,10 +351,15 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
                 .addParameter("databaseName", databaseName);
     }
 
+    @Buttons({
+        @Button(list = "connectionProviders-read", key = "commons.returnToList", order = 1),
+        @Button(list = "connectionProviders-select-type-content-buttons", key = "commons.returnToList", order = 1)
+    })
     public Resolution returnToList() {
         return new RedirectResolution(ConnectionProvidersAction.class);
     }
 
+    @Button(list = "connectionProviders-search", key = "commons.returnToPages", order = 3)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

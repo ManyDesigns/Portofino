@@ -6,6 +6,7 @@
             <crudPage id="users"
                       createUrl="/layouts/admin/users/userCreate.jsp" editUrl="/layouts/admin/users/userEdit.jsp"
                       readUrl="/layouts/admin/users/userRead.jsp" searchUrl="/layouts/admin/users/userSearch.jsp"
+                      bulkEditUrl="/layouts/admin/users/userBulkEdit.jsp"
                       description="Users administration" fragment="actions/admin/users"
                       title="Users">
                 <childPages/>
@@ -107,6 +108,7 @@
             <crudPage id="groups"
                       createUrl="/layouts/admin/groups/groupCreate.jsp" editUrl="/layouts/admin/groups/groupEdit.jsp"
                       readUrl="/layouts/admin/groups/groupRead.jsp" searchUrl="/layouts/admin/groups/groupSearch.jsp"
+                      bulkEditUrl="/layouts/admin/groups/groupBulkEdit.jsp"
                       description="Groups administration" fragment="actions/admin/groups" showInNavigation="true"
                       variable="group" title="Groups">
                 <childPages />

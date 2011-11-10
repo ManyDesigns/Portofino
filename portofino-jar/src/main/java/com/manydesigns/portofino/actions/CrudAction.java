@@ -569,7 +569,7 @@ public class CrudAction extends PortletAction {
         return new ForwardResolution(fwd);
     }
 
-    @Button(list = "crud-create", key = "commons.create", order = 1)
+    @Button(list = "crud-create", key = "commons.save", order = 1)
     public Resolution save() {
         setupForm(Mode.CREATE);
         object = classAccessor.newInstance();
