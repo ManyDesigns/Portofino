@@ -882,6 +882,10 @@ public class HibernateApplicationImpl implements Application {
             Session session = current.getThreadSession(false);
             if (session != null) {
                 try {
+                    Transaction transaction = session.getTransaction();
+                    if(transaction != null) {
+                        transaction.rollback();
+                    }
                     session.close();
                 } catch (Throwable e) {
                     logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
