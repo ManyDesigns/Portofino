@@ -15,12 +15,12 @@
 <div id="globalLinks">
     <c:if test="${mde:getBoolean(portofinoConfiguration, 'user.enabled')}">
         <c:if test="${not empty userId}">
-            <stripes:link href="/actions/profile"><c:out
+            <!--<stripes:link href="/actions/profile"><c:out
                     value="${userName}"/></stripes:link> -
             <stripes:link
                     href="/actions/user/settings"><fmt:message key="skins.default.header.settings" /></stripes:link> -
             <stripes:link
-                    href="/actions/user/help"><fmt:message key="skins.default.header.help" /></stripes:link> -
+                    href="/actions/user/help"><fmt:message key="skins.default.header.help" /></stripes:link> - -->
             <% if(SecurityLogic.isAdministrator(request)) { %>
                 <stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction"><fmt:message key="skins.default.header.administration"/></stripes:link> -
             <% } %>
@@ -29,12 +29,12 @@
                 <fmt:message key="skins.default.header.log_out"/>
             </stripes:link>
         </c:if><c:if test="${empty userId}">
-        <stripes:link href="/actions/user/help"><fmt:message key="skins.default.header.help" /></stripes:link> -
-        <stripes:link beanclass="com.manydesigns.portofino.actions.user.LoginAction">
-            <stripes:param name="returnUrl" value="${actionBean.originalPath}"/>
-            <fmt:message key="skins.default.header.log_in"/>
-        </stripes:link>
-    </c:if>
+            <!-- <stripes:link href="/actions/user/help"><fmt:message key="skins.default.header.help" /></stripes:link> - -->
+            <stripes:link beanclass="com.manydesigns.portofino.actions.user.LoginAction">
+                <stripes:param name="returnUrl" value="${actionBean.originalPath}"/>
+                <fmt:message key="skins.default.header.log_in"/>
+            </stripes:link>
+        </c:if>
     </c:if><c:if
         test="${not mde:getBoolean(portofinoConfiguration, 'user.enabled')}">
         <stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction"><fmt:message key="skins.default.header.administration"/></stripes:link> -

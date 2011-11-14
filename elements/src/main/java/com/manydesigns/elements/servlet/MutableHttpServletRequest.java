@@ -63,6 +63,7 @@ public class MutableHttpServletRequest implements MultipartRequest {
     private String method;
     private String contextPath;
     private String servletPath;
+    private String requestURI;
 
     //**************************************************************************
     // Constructor
@@ -235,7 +236,11 @@ public class MutableHttpServletRequest implements MultipartRequest {
     }
 
     public String getRequestURI() {
-        throw new UnsupportedOperationException();
+        return requestURI;
+    }
+
+    public void setRequestURI(String requestURI) {
+        this.requestURI = requestURI;
     }
 
     public StringBuffer getRequestURL() {
