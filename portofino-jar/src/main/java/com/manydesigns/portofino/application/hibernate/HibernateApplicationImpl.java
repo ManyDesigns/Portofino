@@ -883,7 +883,7 @@ public class HibernateApplicationImpl implements Application {
             if (session != null) {
                 try {
                     Transaction transaction = session.getTransaction();
-                    if(transaction != null) {
+                    if(transaction != null && transaction.isActive()) {
                         transaction.rollback();
                     }
                     session.close();
