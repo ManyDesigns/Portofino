@@ -111,8 +111,7 @@ public class
         List<String> groups = SecurityLogic.manageGroups(application, userId);
         request.setAttribute(RequestAttributes.GROUPS, groups);
 
-        logger.debug("Checking if action or method required administrator",
-                RequiresAdministrator.class.getClass());
+        logger.debug("Checking if action or method required administrator");
         boolean requiresAdministrator = false;
         Method handler = context.getHandler();
         if (handler.isAnnotationPresent(RequiresAdministrator.class)) {

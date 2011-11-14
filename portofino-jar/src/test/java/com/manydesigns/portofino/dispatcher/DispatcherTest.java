@@ -72,7 +72,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
     public void testProjectSearch() {
         System.out.println("*** testProjectSearch");
         String originalPath = "/projects";
-        req.setServletPath(originalPath);
+        req.setRequestURI(originalPath);
         Dispatch dispatch = dispatcher.createDispatch(req);
         assertNotNull(dispatch);
 
@@ -90,7 +90,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNull(pageInstance.getPk());
 
         Navigation navigation =
-                new Navigation(application, dispatch, Collections.EMPTY_LIST);
+                new Navigation(application, dispatch, Collections.<String>emptyList());
         /*
         List<NavigationNode> rootPages = navigation.getRootNodes();
 
@@ -118,7 +118,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         try {
             System.out.println("*** testProjectNew");
             String originalPath = "/projects/new";
-            req.setServletPath(originalPath);
+            req.setRequestURI(originalPath);
             Dispatch dispatch = dispatcher.createDispatch(req);
             assertNotNull(dispatch);
 
@@ -136,9 +136,9 @@ public class DispatcherTest extends AbstractPortofinoTest {
             assertNull(pageInstance.getPk());
 
             Navigation navigation =
-                    new Navigation(application, dispatch, Collections.EMPTY_LIST);
+                    new Navigation(application, dispatch, Collections.<String>emptyList());
         } catch (Throwable e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         /*
         List<NavigationNode> rootPages = navigation.getRootNodes();
@@ -163,7 +163,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
     public void testProjectReport() {
         System.out.println("*** testProjectReport");
         String originalPath = "/projects/report";
-        req.setServletPath(originalPath);
+        req.setRequestURI(originalPath);
         Dispatch dispatch = dispatcher.createDispatch(req);
         assertNotNull(dispatch);
 
@@ -209,7 +209,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
 
     public void testProjectDetail() {
         String originalPath = "/projects/10";
-        req.setServletPath(originalPath);
+        req.setRequestURI(originalPath);
         Dispatch dispatch = dispatcher.createDispatch(req);
         assertNotNull(dispatch);
 
@@ -248,7 +248,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNull(pageInstance.getPk());
 
         Navigation navigation =
-                new Navigation(application, dispatch, Collections.EMPTY_LIST);
+                new Navigation(application, dispatch, Collections.<String>emptyList());
         /*
         List<NavigationNode> rootPages = navigation.getRootNodes();
 
@@ -281,7 +281,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
     public void testTicketSearch() {
         System.out.println("*** testTicketSearch");
         String originalPath = "/projects/10/issues";
-        req.setServletPath(originalPath);
+        req.setRequestURI(originalPath);
         Dispatch dispatch = dispatcher.createDispatch(req);
         assertNotNull(dispatch);
 
@@ -293,7 +293,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(3, pageInstancePath.length);
 
         Navigation navigation =
-                new Navigation(application, dispatch, Collections.EMPTY_LIST);
+                new Navigation(application, dispatch, Collections.<String>emptyList());
         /*
         List<NavigationNode> rootPages = navigation.getRootNodes();
         */
@@ -337,7 +337,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
     public void testTicketDetail() {
         System.out.println("*** testTicketDetail");
         String originalPath = "/projects/10/issues/20";
-        req.setServletPath(originalPath);
+        req.setRequestURI(originalPath);
         Dispatch dispatch = dispatcher.createDispatch(req);
         assertNotNull(dispatch);
 
@@ -364,7 +364,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
     public void testIllegal1() {
         System.out.println("*** testIllegal1");
         String originalPath = "/projects/issues/bla";
-        req.setServletPath(originalPath);
+        req.setRequestURI(originalPath);
         Dispatch dispatch = dispatcher.createDispatch(req);
         assertNull(dispatch);
     }
@@ -372,7 +372,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
     public void testIllegal2() {
         System.out.println("*** testIllegal2");
         String originalPath = "/projects/new/issues/bla";
-        req.setServletPath(originalPath);
+        req.setRequestURI(originalPath);
         Dispatch dispatch = dispatcher.createDispatch(req);
         assertNull(dispatch);
     }

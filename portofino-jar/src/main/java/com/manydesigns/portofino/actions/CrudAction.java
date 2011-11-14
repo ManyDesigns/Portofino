@@ -591,7 +591,6 @@ public class CrudAction extends PortletAction {
                     return forwardToCreatePage();
                 }
                 pk = pkHelper.generatePkString(object);
-                SessionMessages.addInfoMessage("SAVE avvenuto con successo");
                 String url = dispatch.getOriginalPath() + "/" + pk;
                 return new RedirectResolution(url);
             }
