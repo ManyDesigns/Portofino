@@ -106,7 +106,7 @@ public class WebFramework {
         return PLAIN_SERVLET_API_NAME;
     }
 
-    public Upload getUpload(HttpServletRequest req, String parameter) {
+    public Upload getUpload(HttpServletRequest req, String parameterName) {
         if (!(req instanceof MultipartRequest)) {
             logger.warn("Request is not an instance of {}. Actual type: {}",
                     MultipartRequest.class.getName(),
@@ -116,7 +116,7 @@ public class WebFramework {
 
         MultipartRequest request = (MultipartRequest)req;
 
-        FileItem fileItem = request.getFileItem(parameter);
+        FileItem fileItem = request.getFileItem(parameterName);
         if (fileItem == null) {
             return null;
         } else {

@@ -33,6 +33,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.blobs.Blob;
+import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.SessionMessages;
@@ -41,7 +42,6 @@ import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.struts2.Struts2Utils;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
@@ -130,6 +130,7 @@ public class CrudAction extends PortletAction {
     public List<CrudSelectionProvider> crudSelectionProviders;
     public MultiMap availableSelectionProviders; //List<String> -> DatabaseSelectionProvider
     public String pk;
+    public String propertyName;
 
     public final static String prefix = "";
     public final static String searchPrefix = prefix + "search_";
@@ -496,7 +497,7 @@ public class CrudAction extends PortletAction {
 
     public Resolution read() {
         if(!crud.isLargeResultSet()) {
-            //setupSearchForm(); apparentemente non serve
+            setupSearchForm(); // serve per la navigazione del result set
             loadObjects();
             setupPagination();
         }
@@ -531,7 +532,8 @@ public class CrudAction extends PortletAction {
                     FileBlobField fileBlobField = (FileBlobField) field;
                     Blob blob = fileBlobField.getValue();
                     if (blob != null) {
-                        String url = getBlobDownloadUrl(blob.getCode());
+                        String url = getBlobDownloadUrl(
+                                fileBlobField.getPropertyAccessor());
                         field.setHref(url);
                     }
                 }
@@ -539,13 +541,31 @@ public class CrudAction extends PortletAction {
         }
     }
 
-    public String getBlobDownloadUrl(String code) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(Struts2Utils.buildActionUrl("downloadBlob"));
-        sb.append("?code=");
-        sb.append(Util.urlencode(code));
-        return Util.getAbsoluteUrl(sb.toString());
+    public String getBlobDownloadUrl(PropertyAccessor propertyAccessor) {
+        UrlBuilder urlBuilder = new UrlBuilder(
+                Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
+                .addParameter("downloadBlob","")
+                .addParameter("propertyName", propertyAccessor.getName());
+        return urlBuilder.toString();
     }
+
+    public Resolution downloadBlob() throws IOException, NoSuchFieldException {
+        PropertyAccessor propertyAccessor =
+                classAccessor.getProperty(propertyName);
+        String code = (String) propertyAccessor.get(object);
+
+        BlobManager blobManager = ElementsThreadLocals.getBlobManager();
+        Blob blob = blobManager.loadBlob(code);
+        long contentLength = blob.getSize();
+        String contentType = blob.getContentType();
+        InputStream inputStream = new FileInputStream(blob.getDataFile());
+        String fileName = blob.getFilename();
+        return new StreamingResolution(contentType, inputStream)
+                .setFilename(fileName)
+                .setLength(contentLength);
+    }
+
+
 
     //**************************************************************************
     // Create/Save
@@ -2014,5 +2034,13 @@ public class CrudAction extends PortletAction {
 
     public void setMaxResults(Integer maxResults) {
         this.maxResults = maxResults;
+    }
+
+    public String getPropertyName() {
+        return propertyName;
+    }
+
+    public void setPropertyName(String propertyName) {
+        this.propertyName = propertyName;
     }
 }

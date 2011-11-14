@@ -29,9 +29,9 @@
 
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
-import com.manydesigns.elements.fields.FileBlobField;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
 import jxl.Workbook;
@@ -191,7 +191,7 @@ public abstract class  AbstractCrudAction {
     //**************************************************************************
 
     public String downloadBlob() throws IOException {
-        BlobManager blobManager = FileBlobField.createBlobsManager();
+        BlobManager blobManager = ElementsThreadLocals.getBlobManager();
         Blob blob = blobManager.loadBlob(code);
         contentLength = blob.getSize();
         contentType = blob.getContentType();

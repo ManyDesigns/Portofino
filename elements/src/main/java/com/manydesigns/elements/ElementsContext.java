@@ -29,13 +29,13 @@
 
 package com.manydesigns.elements;
 
+import com.manydesigns.elements.blobs.BlobManager;
+import com.manydesigns.elements.i18n.TextProvider;
 import ognl.OgnlContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.manydesigns.elements.i18n.TextProvider;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,6 +52,7 @@ public class ElementsContext {
     protected HttpServletResponse httpServletResponse;
     protected ServletContext servletContext;
     protected OgnlContext ognlContext;
+    protected BlobManager blobManager;
 
     //**************************************************************************
     // Constructors
@@ -100,5 +101,13 @@ public class ElementsContext {
 
     public void setOgnlContext(OgnlContext ognlContext) {
         this.ognlContext = ognlContext;
+    }
+
+    public BlobManager getBlobManager() {
+        return blobManager;
+    }
+
+    public void setBlobManager(BlobManager blobManager) {
+        this.blobManager = blobManager;
     }
 }
