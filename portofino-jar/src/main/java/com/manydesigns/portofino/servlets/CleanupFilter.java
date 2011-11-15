@@ -51,13 +51,16 @@ public class CleanupFilter implements Filter {
     }
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        Application application =
-            (Application) request.getAttribute(RequestAttributes.APPLICATION);
-        MDC.clear();
-        if (application !=null && application.getModel() != null) {
-            application.closeSessions();
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            Application application =
+                (Application) request.getAttribute(RequestAttributes.APPLICATION);
+            MDC.clear();
+            if (application !=null && application.getModel() != null) {
+                application.closeSessions();
+            }
         }
-        chain.doFilter(request, response);
     }
 
     public void destroy() {
