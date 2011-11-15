@@ -42,6 +42,18 @@
     </filter-mapping>
 
     <filter>
+        <filter-name>persistence-filter</filter-name>
+        <filter-class>
+            com.manydesigns.portofino.servlets.PersistenceFilter
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>persistence-filter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+    <filter>
 		<display-name>Stripes Filter</display-name>
 		<filter-name>StripesFilter</filter-name>
 		<filter-class>net.sourceforge.stripes.controller.StripesFilter</filter-class>
@@ -54,8 +66,7 @@
             <param-value>
                 com.manydesigns.portofino.interceptors.SecurityInterceptor,
                 com.manydesigns.portofino.interceptors.ApplicationInterceptor,
-                com.manydesigns.portofino.interceptors.InjectionInterceptor,
-                com.manydesigns.portofino.interceptors.CleanUpInterceptor
+                com.manydesigns.portofino.interceptors.InjectionInterceptor
             </param-value>
         </init-param>
         <init-param>

@@ -786,7 +786,6 @@ public class HibernateApplicationImpl implements Application {
 
     public void saveObject(String qualifiedTableName, Object obj) {
         Session session = getSession(qualifiedTableName);
-        session.beginTransaction();
 
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, qualifiedTableName);
@@ -796,7 +795,7 @@ public class HibernateApplicationImpl implements Application {
             session.save(actualEntityName, obj);
             //session.getTransaction().commit();
         } catch (HibernateException e) {
-            session.getTransaction().rollback();
+            closeSession(qualifiedTableName);
             throw e;
         }
     }
@@ -804,7 +803,6 @@ public class HibernateApplicationImpl implements Application {
 
     public void updateObject(String qualifiedTableName, Object obj) {
         Session session = getSession(qualifiedTableName);
-        session.beginTransaction();
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, qualifiedTableName);
         String actualEntityName = table.getActualEntityName();
@@ -813,14 +811,13 @@ public class HibernateApplicationImpl implements Application {
             session.update(actualEntityName, obj);
             //session.getTransaction().commit();
         } catch (HibernateException e) {
-            session.getTransaction().rollback();
+            closeSession(qualifiedTableName);
             throw e;
         }
     }
 
     public void deleteObject(String qualifiedTableName, Object obj) {
         Session session = getSession(qualifiedTableName);
-        session.beginTransaction();
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, qualifiedTableName);
         String actualEntityName = table.getActualEntityName();
@@ -828,7 +825,7 @@ public class HibernateApplicationImpl implements Application {
             Object obj2 = getObjectByPk(qualifiedTableName, (Serializable) obj);
             session.delete(actualEntityName, obj2);
         } catch (HibernateException e) {
-            session.getTransaction().rollback();
+            closeSession(qualifiedTableName);
             throw e;
         }
     }
@@ -856,21 +853,23 @@ public class HibernateApplicationImpl implements Application {
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
                 PreparedStatement stmt = connection.prepareStatement(formatString);
-                for (int i = 0; i < parameters.length; i++) {
-                    stmt.setObject(i + 1, parameters[i]);
-                }
-                ResultSet rs = stmt.executeQuery();
-                ResultSetMetaData md = rs.getMetaData();
-                int cc = md.getColumnCount();
-                while(rs.next()) {
-                    Object[] current = new Object[cc];
-                    for(int i = 0; i < cc; i++) {
-                        current[i] = rs.getObject(i + 1);
+                try {
+                    for (int i = 0; i < parameters.length; i++) {
+                        stmt.setObject(i + 1, parameters[i]);
                     }
-                    result.add(current);
+                    ResultSet rs = stmt.executeQuery();
+                    ResultSetMetaData md = rs.getMetaData();
+                    int cc = md.getColumnCount();
+                    while(rs.next()) {
+                        Object[] current = new Object[cc];
+                        for(int i = 0; i < cc; i++) {
+                            current[i] = rs.getObject(i + 1);
+                        }
+                        result.add(current);
+                    }
+                } finally {
+                    stmt.close(); //Chiude anche il result set
                 }
-                rs.close();
-                stmt.close();
             }
         });
 
@@ -879,17 +878,32 @@ public class HibernateApplicationImpl implements Application {
 
     public void closeSessions() {
         for (HibernateDatabaseSetup current : setups.values()) {
-            Session session = current.getThreadSession(false);
-            if (session != null) {
-                try {
-                    Transaction transaction = session.getTransaction();
-                    if(transaction != null && transaction.isActive()) {
-                        transaction.rollback();
-                    }
-                    session.close();
-                } catch (Throwable e) {
-                    logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
+            closeSession(current);
+        }
+    }
+
+    public void closeSession(String qualifiedTableName) {
+        Table table = DataModelLogic.findTableByQualifiedName(
+                model, qualifiedTableName);
+        String databaseName = table.getDatabaseName();
+        closeSessionByDatabaseName(databaseName);
+    }
+
+    public void closeSessionByDatabaseName(String databaseName) {
+        closeSession(setups.get(databaseName));
+    }
+
+    protected void closeSession(HibernateDatabaseSetup current) {
+        Session session = current.getThreadSession(false);
+        if (session != null) {
+            try {
+                Transaction transaction = session.getTransaction();
+                if(transaction != null && transaction.isActive()) {
+                    transaction.rollback();
                 }
+                session.close();
+            } catch (Throwable e) {
+                logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
             }
             current.removeThreadSession();
         }

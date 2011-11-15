@@ -142,6 +142,10 @@ public interface Application {
 
     List<Object[]> runSql(String databaseName, String sql);
 
+    void closeSession(String qualifiedTableName);
+
+    void closeSessionByDatabaseName(String databaseName);
+
     void closeSessions();
 
     void commit(String databaseName);

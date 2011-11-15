@@ -1,6 +1,5 @@
 <?xml version="1.0" ?>
 <connections>
-    <!--url="jdbc:mysql://192.168.1.8/redmine"-->
     <jdbcConnection
             databaseName="redmine"
             driver="org.h2.Driver"
@@ -19,4 +18,23 @@
             includeSchemas="PUBLIC"
             excludeSchemas=""
             />
+<!--
+    <jdbcConnection
+            databaseName="portofino"
+            driver="com.mysql.jdbc.Driver"
+            url="jdbc:mysql://localhost/public"
+            username="manydesigns"
+            password=""
+            includeSchemas="public"
+            excludeSchemas=""
+            />
+    <jdbcConnection
+            databaseName="redmine"
+            driver="com.mysql.jdbc.Driver"
+            url="jdbc:mysql://localhost/redmine"
+            username="manydesigns"
+            password=""
+            includeSchemas="redmine"
+            excludeSchemas=""
+            />-->
 </connections>

@@ -82,6 +82,7 @@ public class HibernateDatabaseSetup {
                 logger.debug("Creating thread-local session for {}", Thread.currentThread());
             }
             session = sessionFactory.openSession();
+            session.beginTransaction();
             threadSessions.set(session);
         }
         return session;

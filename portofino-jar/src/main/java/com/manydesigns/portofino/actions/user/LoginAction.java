@@ -208,7 +208,7 @@ public class LoginAction extends AbstractActionBean {
         user.setLastLoginDate(new Timestamp(new Date().getTime()));
         user.setToken(null);
         Session session = application.getSessionByDatabaseName("portofino");
-        Transaction tx = session.beginTransaction();
+        Transaction tx = session.getTransaction();
         try {
             User existingUser = application.findUserByUserName(user.getUserName());
             if(existingUser != null) {
@@ -225,7 +225,7 @@ public class LoginAction extends AbstractActionBean {
             session.flush();
             tx.commit();
         } catch (RuntimeException e) {
-            tx.rollback();
+            //Session will be closed by the filter
             throw e;
         }
     }
