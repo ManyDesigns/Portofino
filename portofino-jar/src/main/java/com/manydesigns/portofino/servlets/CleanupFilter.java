@@ -42,7 +42,7 @@ import java.io.IOException;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class PersistenceFilter implements Filter {
+public class CleanupFilter implements Filter {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -52,8 +52,7 @@ public class PersistenceFilter implements Filter {
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         Application application =
-                (Application) request.getAttribute(RequestAttributes.APPLICATION);
-
+            (Application) request.getAttribute(RequestAttributes.APPLICATION);
         MDC.clear();
         if (application !=null && application.getModel() != null) {
             application.closeSessions();

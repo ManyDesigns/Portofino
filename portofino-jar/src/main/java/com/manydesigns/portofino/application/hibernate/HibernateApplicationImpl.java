@@ -461,7 +461,7 @@ public class HibernateApplicationImpl implements Application {
     }
 
     public Session getSessionByDatabaseName(String databaseName) {
-        return setups.get(databaseName).getThreadSession();
+        return ensureDatabaseSetup(databaseName).getThreadSession();
     }
 
     public QueryStringWithParameters getQueryStringWithParametersForCriteria(
@@ -831,10 +831,7 @@ public class HibernateApplicationImpl implements Application {
     }
 
     public List<Object[]> runSql(String databaseName, String sql) {
-        HibernateDatabaseSetup setup = setups.get(databaseName);
-        if (setup == null) {
-            throw new Error("No setup exists for database: " + databaseName);
-        }
+        HibernateDatabaseSetup setup = ensureDatabaseSetup(databaseName);
         Session session = setup.getThreadSession();
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
         final String formatString = sqlFormat.getFormatString();
@@ -876,6 +873,14 @@ public class HibernateApplicationImpl implements Application {
         return result;
     }
 
+    protected HibernateDatabaseSetup ensureDatabaseSetup(String databaseName) {
+        HibernateDatabaseSetup setup = setups.get(databaseName);
+        if (setup == null) {
+            throw new Error("No setup exists for database: " + databaseName);
+        }
+        return setup;
+    }
+
     public void closeSessions() {
         for (HibernateDatabaseSetup current : setups.values()) {
             closeSession(current);
@@ -890,7 +895,7 @@ public class HibernateApplicationImpl implements Application {
     }
 
     public void closeSessionByDatabaseName(String databaseName) {
-        closeSession(setups.get(databaseName));
+        closeSession(ensureDatabaseSetup(databaseName));
     }
 
     protected void closeSession(HibernateDatabaseSetup current) {
@@ -910,7 +915,7 @@ public class HibernateApplicationImpl implements Application {
     }
 
     public void commit(String databaseName) {
-        Session session = setups.get(databaseName).getThreadSession();
+        Session session = ensureDatabaseSetup(databaseName).getThreadSession();
         try {
             session.getTransaction().commit();
         } catch (HibernateException e) {
@@ -920,7 +925,7 @@ public class HibernateApplicationImpl implements Application {
     }
 
     public void rollback(String databaseName) {
-        Session session = setups.get(databaseName).getThreadSession();
+        Session session = ensureDatabaseSetup(databaseName).getThreadSession();
         session.getTransaction().rollback();
     }
     
@@ -998,7 +1003,7 @@ public class HibernateApplicationImpl implements Application {
         List<String> result = new ArrayList<String>();
         for (Database db : model.getDatabases()) {
             result.add("-- DB: " + db.getDatabaseName());
-            HibernateDatabaseSetup setup = setups.get(db.getDatabaseName());
+            HibernateDatabaseSetup setup = ensureDatabaseSetup(db.getDatabaseName());
             ConnectionProvider connectionProvider =
                     getConnectionProvider(db.getDatabaseName());
             DatabasePlatform platform = connectionProvider.getDatabasePlatform();
@@ -1015,7 +1020,7 @@ public class HibernateApplicationImpl implements Application {
 
 
         for (Database db : model.getDatabases()) {
-            HibernateDatabaseSetup setup = setups.get(db.getDatabaseName());
+            HibernateDatabaseSetup setup = ensureDatabaseSetup(db.getDatabaseName());
             DatabaseMetadata databaseMetadata;
             ConnectionProvider provider =
                     getConnectionProvider(db.getDatabaseName());
