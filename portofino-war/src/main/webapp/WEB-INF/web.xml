@@ -29,6 +29,18 @@
     </filter-mapping>
 
     <filter>
+        <filter-name>cleanup-filter</filter-name>
+        <filter-class>
+            com.manydesigns.portofino.servlets.CleanupFilter
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>cleanup-filter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+    <filter>
         <filter-name>portofino-dispatcher</filter-name>
         <filter-class>
             com.manydesigns.portofino.dispatcher.DispatcherFilter
@@ -71,18 +83,6 @@
         <dispatcher>FORWARD</dispatcher>
 	</filter-mapping>
 
-    <filter>
-        <filter-name>cleanup-filter</filter-name>
-        <filter-class>
-            com.manydesigns.portofino.servlets.CleanupFilter
-        </filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>cleanup-filter</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-    </filter-mapping>
-
 	<servlet>
 		<servlet-name>StripesDispatcher</servlet-name>
 		<servlet-class>net.sourceforge.stripes.controller.DispatcherServlet</servlet-class>
@@ -94,32 +94,6 @@
 		<url-pattern>/actions/*</url-pattern>
 	</servlet-mapping>
     
-<!--
-    <filter>
-        <filter-name>struts2</filter-name>
-        <filter-class>
-            org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter
-        </filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>struts2</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-    </filter-mapping>
--->
-<!--
-    <servlet>
-        <servlet-name>LoginErrorPage</servlet-name>
-        <servlet-class>com.manydesigns.portofino.methods.users.LoginErrorPage
-        </servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>LoginErrorPage</servlet-name>
-        <url-pattern>/LoginErrorPage</url-pattern>
-    </servlet-mapping>
--->
     <context-param>
       <param-name>
         javax.servlet.jsp.jstl.fmt.localizationContext
@@ -134,18 +108,6 @@
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
-    <!--
-    <jsp-config>
-        <taglib>
-            <taglib-uri>/manydesigns-elements-struts2</taglib-uri>
-            <taglib-location>/WEB-INF/manydesigns-elements-struts2.tld</taglib-location>
-        </taglib>
-        <jsp-property-group>
-            <url-pattern>*.jsp</url-pattern>
-            <page-encoding>ISO-8859-1</page-encoding>
-        </jsp-property-group>
-    </jsp-config>
-    -->
     <!-- Uncomment and configure this section to enable container-managed security
         <security-constraint>
             <web-resource-collection>
