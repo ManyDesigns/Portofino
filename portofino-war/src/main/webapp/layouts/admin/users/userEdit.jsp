@@ -65,7 +65,7 @@
                 revert: true, // moves the portlet to its new position with a smooth transition
                 tolerance: "pointer" // mouse pointer overlaps the droppable
             }).disableSelection();
-            $("input[name=update]").click(function() {
+            $("button[name=update]").click(function() {
                 $('.groupBox').each( function(index, element) {
                     var wrapper = $(element);
                     var toArray = wrapper.sortable('toArray');
