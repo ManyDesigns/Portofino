@@ -43,7 +43,7 @@
                         <td>
                             <select name="permissions[${group.name}]">
                                 <option value="__inherited">
-                                    Default - View
+                                    ---
                                 </option>
                                 <option value="__deny"
                                         <%
