@@ -101,7 +101,10 @@ public class Permissions implements ModelObject {
             Map<String, Set<String>> parentPermissions =
                         ancestor.getPermissions().getActualPermissions();
             for(Map.Entry<String, Set<String>> entry : actualPermissions.entrySet()) {
-                entry.getValue().addAll(parentPermissions.get(entry.getKey()));
+                Set<String> set = entry.getValue();
+                if(set.isEmpty()) {
+                    set.addAll(parentPermissions.get(entry.getKey()));
+                }
             }
         }
 
