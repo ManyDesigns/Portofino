@@ -39,8 +39,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,32 +51,66 @@ import java.util.List;
 public class Permissions implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
+    public static final String VIEW = "view";
+    public static final String EDIT = "edit";
+    public static final String DENY = "__deny";
 
     //**************************************************************************
     // Fields
     //**************************************************************************
 
-    protected final List<String> allow;
-    protected final List<String> deny;
+    protected final Set<String> view;
+    protected final Set<String> edit;
+    protected final Set<String> deny;
+
+    protected WithPermissions parent;
+
+    protected Map<String, Set<String>> actualPermissions;
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
     public Permissions() {
-        allow = new ArrayList<String>();
-        deny = new ArrayList<String>();
+        view = new HashSet<String>();
+        edit = new HashSet<String>();
+        deny = new HashSet<String>();
     }
 
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
 
-    public void afterUnmarshal(Unmarshaller u, Object parent) {}
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        this.parent = (WithPermissions) parent;
+    }
 
-    public void reset() {}
+    public void reset() {
+        actualPermissions = null;
+    }
 
-    public void init(Model model) {}
+    public void init(Model model) {
+        actualPermissions = new HashMap<String, Set<String>>();
+        actualPermissions.put(DENY, new HashSet<String>(deny));
+        actualPermissions.put(VIEW, new HashSet<String>(view));
+        actualPermissions.put(EDIT, new HashSet<String>(edit));
+
+        //Inherited permissions
+        WithPermissions ancestor = (parent != null) ? parent.getParent() : null;
+        if(ancestor != null) {
+            Map<String, Set<String>> parentPermissions =
+                        ancestor.getPermissions().getActualPermissions();
+            for(Map.Entry<String, Set<String>> entry : actualPermissions.entrySet()) {
+                entry.getValue().addAll(parentPermissions.get(entry.getKey()));
+            }
+        }
+
+        //Edit implies view
+        Set<String> view = actualPermissions.get(VIEW);
+        if(!view.isEmpty()) {
+            view.addAll(actualPermissions.get(EDIT));
+        }
+    }
 
     public void link(Model model) {}
 
@@ -91,32 +124,49 @@ public class Permissions implements ModelObject {
     // Permission verification
     //**************************************************************************
 
-    public boolean isAllowed(List<String> groups) {
-        if (CollectionUtils.containsAny(deny, groups)) {
+    public boolean isAllowed(String operation, List<String> groups) {
+        if (CollectionUtils.containsAny(actualPermissions.get(DENY), groups)) {
             return false;
         }
 
-        //noinspection SimplifiableIfStatement
-        if (allow.isEmpty()) {
-            return true;
+        Set<String> perm = actualPermissions.get(operation);
+
+        if(perm == null || perm.isEmpty()) {
+            //View by default is allowed
+            return VIEW.equals(operation);
         }
 
-        return CollectionUtils.containsAny(allow, groups);
+        return CollectionUtils.containsAny(perm, groups);
     }
 
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
 
-    @XmlElementWrapper(name="allow")
+    @XmlElementWrapper(name="view")
     @XmlElement(name = "group", type = java.lang.String.class)
-    public List<String> getAllow() {
-        return allow;
+    public Set<String> getView() {
+        return view;
     }
+
+    @XmlElementWrapper(name="edit")
+    @XmlElement(name = "group", type = java.lang.String.class)
+    public Set<String> getEdit() {
+        return edit;
+    }
+
 
     @XmlElementWrapper(name="deny")
     @XmlElement(name = "group", type = java.lang.String.class)
-    public List<String> getDeny() {
+    public Set<String> getDeny() {
         return deny;
+    }
+
+    public WithPermissions getParent() {
+        return parent;
+    }
+
+    public Map<String, Set<String>> getActualPermissions() {
+        return actualPermissions;
     }
 }

@@ -1,3 +1,10 @@
+<%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
+<%@ page import="com.manydesigns.portofino.model.pages.Page" %>
+<%@ page import="com.manydesigns.portofino.model.pages.Permissions" %>
+<%@ page import="com.manydesigns.portofino.model.pages.RootPage" %>
+<%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
+<%@ page import="java.util.Arrays" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -18,55 +25,75 @@
         Root permission
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
+        <%
+            RootPage rootPage = actionBean.getApplication().getModel().getRootPage();
+        %>
         <div class="yui-gb">
-            <div class="yui-u first">
-                <div class="groupBoxTitle"><fmt:message key="layouts.admin.rootPermissions.allow_groups"/></div>
-                <ul class="groupBox">
-                    <c:forEach var="group" items="${actionBean.allowGroups}">
-                        <li id="group_<c:out value='${group.name}'/>" class="group ui-state-default"><c:out value="${group.name}"/></li>
-                    </c:forEach>
-                </ul>
-                <input type="hidden" name="allowGroupNames"/>
-            </div>
+            <table class="yui-u first">
+                <c:forEach var="group" items="${actionBean.groups}">
+                    <%
+                        Group group = (Group) pageContext.getAttribute("group");
+                        String groupName = group.getName();
+                        String permissionLevel = actionBean.getPermissionLevelName(rootPage, groupName);
+                    %>
+                    <tr>
+                        <td>
+                            <c:out value="${group.name}"/>
+                        </td>
+                        <td>
+                            <select name="permissions[${group.name}]">
+                                <option value="__inherited">
+                                    Default - View
+                                </option>
+                                <option value="__deny"
+                                        <%
+                                            if (Permissions.DENY.equals(permissionLevel)) {
+                                                out.print("selected='selected'");
+                                            }
+                                        %>>
+                                    Deny
+                                </option>
+                                <option value="view"
+                                        <%
+                                            if (Permissions.VIEW.equals(permissionLevel)) {
+                                                out.print("selected='selected'");
+                                            }
+                                        %>>
+                                    View
+                                </option>
+                                <option value="edit"
+                                        <%
+                                            if (Permissions.EDIT.equals(permissionLevel)) {
+                                                out.print("selected='selected'");
+                                            }
+                                        %>>
+                                    Edit
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </table>
+
             <div class="yui-u">
-                <div class="groupBoxTitle"><fmt:message key="layouts.admin.rootPermissions.deny_groups"/></div>
-                <ul class="groupBox">
-                    <c:forEach var="group" items="${actionBean.denyGroups}">
-                        <li id="group_<c:out value='${group.name}'/>" class="group ui-state-default"><c:out value="${group.name}"/></li>
-                    </c:forEach>
-                </ul>
-                <input type="hidden" name="denyGroupNames"/>
-            </div>
-            <div class="yui-u">
-                <div class="groupBoxTitle"><fmt:message key="layouts.admin.rootPermissions.available_groups"/></div>
-                <ul class="groupBox">
-                    <c:forEach var="group" items="${actionBean.availableGroups}">
-                        <li id="group_<c:out value='${group.name}'/>" class="group ui-state-default"><c:out value="${group.name}"/></li>
-                    </c:forEach>
-                </ul>
-                <input type="hidden" name="availableGroupNames"/>
+                <h3>Effective permissions</h3>
+                <c:forEach var="group" items="${actionBean.groups}">
+                    <div>
+                        <c:out value="${group.name}"/>: <%
+                            Group group = (Group) pageContext.getAttribute("group");
+                            String groupName = group.getName();
+
+                            String permissionLevel = actionBean.getEffectivePermissionLevel(rootPage, groupName);
+
+                            out.print(permissionLevel);
+                        %>
+                    </div>
+                </c:forEach>
             </div>
         </div>
+
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
         <portofino:buttons list="root-permissions" bean="${actionBean}" cssClass="contentButton" />
-        <script type="text/javascript">
-            $(".groupBox").sortable({
-                connectWith: ".groupBox",
-                placeholder: "groupPlaceholder",
-                cursor: "move", // cursor image
-                revert: true, // moves the portlet to its new position with a smooth transition
-                tolerance: "pointer" // mouse pointer overlaps the droppable
-            }).disableSelection();
-            $("input[name=updatePagePermissions]").click(function() {
-                $('.groupBox').each( function(index, element) {
-                    var wrapper = $(element);
-                    var toArray = wrapper.sortable('toArray');
-                    var hidden = wrapper.siblings('input');
-                    hidden.val(toArray);
-                });
-                return true;
-            });
-        </script>
     </stripes:layout-component>
 </stripes:layout-render>

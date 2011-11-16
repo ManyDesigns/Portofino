@@ -50,7 +50,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
-public abstract class Page implements ModelObject {
+public abstract class Page implements ModelObject, WithPermissions {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -126,6 +126,7 @@ public abstract class Page implements ModelObject {
     public void link(Model model) {}
 
     public void visitChildren(ModelVisitor visitor) {
+        visitor.visit(permissions);
         for (Page childPage : childPages) {
             visitor.visit(childPage);
         }
@@ -307,19 +308,11 @@ public abstract class Page implements ModelObject {
     *  dei permessi. Lasciare le classi in in model il più possibile passive
     **/
     public boolean isAllowed(List<String> groups) {
-        boolean parentAllowed= true;
-        if (parent != null){
-            parentAllowed= parent.isAllowed(groups);
-        }
-        if (!parentAllowed) {
-            return false;
-        }
+        return isAllowed(Permissions.VIEW, groups);
+    }
 
-        boolean result = true;
-        if (permissions != null) {
-            result = permissions.isAllowed(groups);
-        }
-        return result;
+    public boolean isAllowed(String operation, List<String> groups) {
+        return permissions.isAllowed(operation, groups);
     }
 
     public Integer getActualLayoutOrderInParent() {

@@ -1,13 +1,20 @@
+<%@ page import="com.manydesigns.portofino.model.pages.Page" %>
+<%@ page import="com.manydesigns.portofino.model.pages.Permissions" %>
+<%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
+<%@ page import="java.util.Arrays" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><stripes:layout-render name="/skins/${skin}/modal-page.jsp">
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
+<stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:submit name="updatePagePermissions" value="Save" class="contentButton"/>
-        <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
+        <portofino:buttons list="page-permissions-edit" bean="${actionBean}" cssClass="contentButton" />
         <div class="breadcrumbs">
             <div class="inner">
                 <mde:write name="breadcrumbs"/>
@@ -18,75 +25,83 @@
         Page permissions for: <c:out value="${actionBean.pageInstance.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
+        <%
+            Page currentPage = actionBean.getPageInstance().getPage();
+        %>
         <div class="yui-gb">
-            <div class="yui-u first">
-                <div class="groupBoxTitle">Allow groups</div>
-                <ul class="groupBox">
-                    <c:forEach var="group" items="${actionBean.allowGroups}">
-                        <li id="group_<c:out value='${group.name}'/>" class="group ui-state-default"><c:out value="${group.name}"/></li>
-                    </c:forEach>
-                </ul>
-                <input type="hidden" name="allowGroupNames"/>
-            </div>
+            <table class="yui-u first">
+                <c:forEach var="group" items="${actionBean.groups}">
+                    <%
+                        Group group = (Group) pageContext.getAttribute("group");
+                        String groupName = group.getName();
+                        String permissionLevel = actionBean.getPermissionLevelName(currentPage, groupName);
+                        String parentPermissionLevel = null;
+                        Page parentPage = currentPage.getParent();
+                        while(parentPermissionLevel == null && parentPage != null) {
+                            parentPermissionLevel = actionBean.getEffectivePermissionLevel(parentPage, groupName);
+                            parentPage = parentPage.getParent();
+                        }
+                    %>
+                    <tr>
+                        <td>
+                            <c:out value="${group.name}"/>
+                        </td>
+                        <td>
+                            <select name="permissions[${group.name}]">
+                                <option value="__inherited">
+                                    Inherited - <%= parentPermissionLevel %>
+                                </option>
+                                <option value="__deny"
+                                        <%
+                                            if (Permissions.DENY.equals(permissionLevel)) {
+                                                out.print("selected='selected'");
+                                            }
+                                        %>>
+                                    Deny
+                                </option>
+                                <option value="view"
+                                        <%
+                                            if (Permissions.VIEW.equals(permissionLevel)) {
+                                                out.print("selected='selected'");
+                                            }
+                                        %>>
+                                    View
+                                </option>
+                                <option value="edit"
+                                        <%
+                                            if (Permissions.EDIT.equals(permissionLevel)) {
+                                                out.print("selected='selected'");
+                                            }
+                                        %>>
+                                    Edit
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </table>
+
             <div class="yui-u">
-                <div class="groupBoxTitle">Deny groups</div>
-                <ul class="groupBox">
-                    <c:forEach var="group" items="${actionBean.denyGroups}">
-                        <li id="group_<c:out value='${group.name}'/>" class="group ui-state-default"><c:out value="${group.name}"/></li>
-                    </c:forEach>
-                </ul>
-                <input type="hidden" name="denyGroupNames"/>
-            </div>
-            <div class="yui-u">
-                <div class="groupBoxTitle">Available groups</div>
-                <ul class="groupBox">
-                    <c:forEach var="group" items="${actionBean.availableGroups}">
-                        <li id="group_<c:out value='${group.name}'/>" class="group ui-state-default"><c:out value="${group.name}"/></li>
-                    </c:forEach>
-                </ul>
-                <input type="hidden" name="availableGroupNames"/>
+                <h3>Effective permissions</h3>
+                <c:forEach var="group" items="${actionBean.groups}">
+                    <div>
+                        <c:out value="${group.name}"/>: <%
+                            Group group = (Group) pageContext.getAttribute("group");
+                            String groupName = group.getName();
+
+                            String permissionLevel = actionBean.getEffectivePermissionLevel(currentPage, groupName);
+
+                            out.print(permissionLevel);
+                        %>
+                    </div>
+                </c:forEach>
             </div>
         </div>
-        <div class="horizontalSeparator"></div>
-        Inherited permissions:
-        <c:forEach var="currentPage" items="${actionBean.inheritedPages}">
-            <div class="inheritedPermission">
-                <span class="inheritedPageName"><c:out value="${currentPage.title}"/></span>
-                <br/>Allow groups:
-                <c:forEach var="group" varStatus="status" items="${currentPage.permissions.allow}">
-                    <b></b><c:out value="${group}"/></b><c:if test="${not status.last}">,</c:if>
-                </c:forEach>
-                <br/>Deny groups:
-                <c:forEach var="group" varStatus="status" items="${currentPage.permissions.deny}">
-                    <b><c:out value="${group}"/></b><c:if test="${not status.last}">,</c:if>
-                </c:forEach>
-        </c:forEach>
-        <c:forEach var="currentPage" items="${actionBean.inheritedPages}">
-            </div>
-        </c:forEach>
+
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">
-        <stripes:submit name="updatePagePermissions" value="Save" class="contentButton"/>
-        <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
-        <script type="text/javascript">
-            $(".groupBox").sortable({
-                connectWith: ".groupBox",
-                placeholder: "groupPlaceholder",
-                cursor: "move", // cursor image
-                revert: true, // moves the portlet to its new position with a smooth transition
-                tolerance: "pointer" // mouse pointer overlaps the droppable
-            }).disableSelection();
-            $("input[name=updatePagePermissions]").click(function() {
-                $('.groupBox').each( function(index, element) {
-                    var wrapper = $(element);
-                    var toAttay = wrapper.sortable('toArray');
-                    var hidden = wrapper.siblings('input');
-                    hidden.val(toAttay);
-                });
-                return true;
-            });
-        </script>
+        <portofino:buttons list="page-permissions-edit" bean="${actionBean}" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>

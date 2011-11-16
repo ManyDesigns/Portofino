@@ -87,7 +87,7 @@ public class PageTest extends TestCase {
         n1_1.setTitle("homepage title");
         n1_1.setFragment("homepage");
 
-        n1_1_perm.getAllow().add("anonymous");
+        n1_1_perm.getView().add("anonymous");
 
         //1.2
         n1_2 = new FolderPage();
@@ -98,7 +98,7 @@ public class PageTest extends TestCase {
         n1_2.setTitle("Model title");
         n1_2.setFragment("model");
 
-        n1_2_perm.getAllow().add("registered");
+        n1_2_perm.getView().add("registered");
 
         n1_2_1 = new CustomFolderPage();
         n1_2_1.setParent(n1_2);
@@ -111,7 +111,7 @@ public class PageTest extends TestCase {
         n1_2_1.setUrl("/model/TableData.action");
         n1_2.getChildPages().add(n1_2_1);
 
-        n1_2_1_perm.getAllow().add("admins");
+        n1_2_1_perm.getView().add("admins");
 
         n1_2_2 = new CustomFolderPage();
         n1_2_2.setParent(n1_2);
@@ -149,7 +149,7 @@ public class PageTest extends TestCase {
         n1_3.setUrl("/Profile.action");
 
         n1_3_perm.getDeny().add("cattivi");
-        n1_3_perm.getAllow().add("buoni");
+        n1_3_perm.getView().add("buoni");
 
         //1.4
         n1_4 = new FolderPage();
@@ -172,14 +172,14 @@ public class PageTest extends TestCase {
 
 
         permissions = new Permissions();
-        permissions.getAllow().add("buoni");
+        permissions.getView().add("buoni");
         permissions.getDeny().add("cattivi");
 
         permissions2 = new Permissions();
         permissions2.getDeny().add("cattivi");
 
         permissions3 = new Permissions();
-        permissions3.getAllow().add("buoni");
+        permissions3.getView().add("buoni");
 
         groups = new ArrayList<String>();
 
@@ -296,62 +296,62 @@ public class PageTest extends TestCase {
 
     // test su permissions (con liste allow e deny entrambe riempite)
     public void testPermissions1_1() {
-        assertFalse(permissions.isAllowed(groups));
+        assertFalse(permissions.isAllowed(Permissions.VIEW, groups));
     }
 
     public void testPermissions1_2() {
         groups.add("buoni");
-        assertTrue(permissions.isAllowed(groups));
+        assertTrue(permissions.isAllowed(Permissions.VIEW, groups));
     }
 
     public void testPermissions1_3() {
         groups.add("cattivi");
-        assertFalse(permissions.isAllowed(groups));
+        assertFalse(permissions.isAllowed(Permissions.VIEW, groups));
     }
 
     public void testPermissions1_4() {
         groups.add("buoni");
         groups.add("cattivi");
-        assertFalse(permissions.isAllowed(groups));
+        assertFalse(permissions.isAllowed(Permissions.VIEW, groups));
     }
 
     public void testPermissions1_5() {
         groups.add("altro");
-        assertFalse(permissions.isAllowed(groups));
+        assertFalse(permissions.isAllowed(Permissions.VIEW, groups));
     }
 
 
 
     // test su permissions (con solo lista deny riempita)
     public void testPermissions2_1() {
-        assertTrue(permissions2.isAllowed(groups));
+        assertTrue(permissions2.isAllowed(Permissions.VIEW, groups));
     }
 
     public void testPermissions2_3() {
         groups.add("cattivi");
-        assertFalse(permissions2.isAllowed(groups));
+        assertFalse(permissions2.isAllowed(Permissions.VIEW, groups));
     }
 
     public void testPermissions2_5() {
         groups.add("altro");
-        assertTrue(permissions2.isAllowed(groups));
+        assertTrue(permissions2.isAllowed(Permissions.VIEW, groups));
     }
 
 
     
     // test su permissions (con solo lista allow riempita)
     public void testPermissions3_1() {
-        assertFalse(permissions3.isAllowed(groups));
+        assertFalse(permissions3.isAllowed(Permissions.VIEW, groups));
     }
 
     public void testPermissions3_2() {
         groups.add("buoni");
-        assertTrue(permissions3.isAllowed(groups));
+        assertTrue(permissions3.isAllowed(Permissions.VIEW, groups));
     }
 
     public void testPermissions3_5() {
         groups.add("altro");
-        assertFalse(permissions3.isAllowed(groups));
+        assertFalse(permissions3.isAllowed(Permissions.VIEW, groups));
     }
 
 

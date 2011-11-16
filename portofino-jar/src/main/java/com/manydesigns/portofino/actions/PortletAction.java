@@ -13,6 +13,7 @@ import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.forms.EditPage;
 import com.manydesigns.portofino.actions.forms.NewPage;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -34,13 +35,14 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.*;
 
 public class PortletAction extends AbstractActionBean {
@@ -203,13 +205,9 @@ public class PortletAction extends AbstractActionBean {
     // Page permisssions
     //--------------------------------------------------------------------------
 
-    List<Group> allowGroups;
-    List<Group> denyGroups;
-    List<Group> availableGroups;
+    List<Group> groups;
 
-    String allowGroupNames;
-    String denyGroupNames;
-    String availableGroupNames;
+    Map<String, String> permissions = new HashMap<String, String>();
 
     List<Page> inheritedPages;
 
@@ -230,29 +228,13 @@ public class PortletAction extends AbstractActionBean {
     }
 
     public void setupGroups(Page page) {
-        List<Group> groups = new ArrayList<Group>();
-        groups.addAll(application.getAllObjects(SecurityLogic.GROUPTABLE));
-        allowGroups = new ArrayList<Group>();
-        denyGroups = new ArrayList<Group>();
-        availableGroups = new ArrayList<Group>();
-
-        List<String> allow = page.getPermissions().getAllow();
-        List<String> deny = page.getPermissions().getDeny();
-
-        for (Group group : groups) {
-            if (allow.contains(group.getName())) {
-                allowGroups.add(group);
-            } else if (deny.contains(group.getName())) {
-                denyGroups.add(group);
-            } else {
-                availableGroups.add(group);
-            }
-        }
+        groups = new ArrayList<Group>(application.getAllObjects(SecurityLogic.GROUPTABLE));
     }
 
     static final String[] emptyStringArray = new String[0];
 
     @RequiresAdministrator
+    @Button(list = "page-permissions-edit", key = "commons.update", order = 1)
     public Resolution updatePagePermissions() {
         Page page = pageInstance.getPage();
         synchronized (application) {
@@ -265,7 +247,23 @@ public class PortletAction extends AbstractActionBean {
     }
 
     public void updatePagePermissions(Page page) {
-        String[] allowNameArray = StringUtils.split(allowGroupNames, ',');
+        Permissions pagePermissions = page.getPermissions();
+        pagePermissions.getView().clear();
+        pagePermissions.getEdit().clear();
+        pagePermissions.getDeny().clear();
+
+        for(Map.Entry<String, String> entry : permissions.entrySet()) {
+            if(Permissions.VIEW.equals(entry.getValue())) {
+                pagePermissions.getView().add(entry.getKey());
+            } else if(Permissions.EDIT.equals(entry.getValue())) {
+                pagePermissions.getEdit().add(entry.getKey());
+            } else if(Permissions.DENY.equals(entry.getValue())) {
+                pagePermissions.getDeny().add(entry.getKey());
+            } else {
+                //TODO custom permissions
+            }
+        }
+        /*String[] allowNameArray = StringUtils.split(allowGroupNames, ',');
         if (allowNameArray == null) {
             allowNameArray = emptyStringArray;
         }
@@ -275,7 +273,7 @@ public class PortletAction extends AbstractActionBean {
         }
 
         // clean old lists
-        List<String> allow = page.getPermissions().getAllow();
+        List<String> allow = page.getPermissions().getView();
         List<String> deny = page.getPermissions().getDeny();
         allow.clear();
         deny.clear();
@@ -291,52 +289,57 @@ public class PortletAction extends AbstractActionBean {
             } else if (ArrayUtils.contains(denyNameArray, comparableName)) {
                 deny.add(groupName);
             }
+        }*/
+    }
+
+    public String getPermissionLevelName(Page currentPage, String groupName) {
+        Permissions currentPagePermissions = currentPage.getPermissions();
+        if(currentPagePermissions.getDeny().contains(groupName)) {
+            return Permissions.DENY;
+        } else if(currentPagePermissions.getEdit().contains(groupName)) {
+            return Permissions.EDIT;
+        } else if(currentPagePermissions.getView().contains(groupName)) {
+            return Permissions.VIEW;
+        } else {
+            return null; //Inherited
         }
     }
 
-    public List<Group> getAllowGroups() {
-        return allowGroups;
+    public String getEffectivePermissionLevel(Page currentPage, String groupName) {
+        String permissionLevel;
+        List<String> groupNames = Arrays.asList(groupName);
+        if(currentPage.isAllowed(Permissions.EDIT, groupNames)) {
+            permissionLevel = "Edit";
+        } else if(currentPage.isAllowed(Permissions.VIEW, groupNames)) {
+            permissionLevel = "View";
+        } else {
+            permissionLevel = "Deny";
+            if(!currentPage.getPermissions().getDeny().contains(groupName)) {
+                permissionLevel += " (implicit)";
+            }
+        }
+        return permissionLevel;
     }
 
-    public List<Group> getDenyGroups() {
-        return denyGroups;
-    }
+    //--------------------------------------------------------------------------
+    // Getters/Setters
+    //--------------------------------------------------------------------------
 
-    public List<Group> getAvailableGroups() {
-        return availableGroups;
-    }
-
-    public String getAllowGroupNames() {
-        return allowGroupNames;
-    }
-
-    public void setAllowGroupNames(String allowGroupNames) {
-        this.allowGroupNames = allowGroupNames;
-    }
-
-    public String getDenyGroupNames() {
-        return denyGroupNames;
-    }
-
-    public void setDenyGroupNames(String denyGroupNames) {
-        this.denyGroupNames = denyGroupNames;
-    }
-
-    public String getAvailableGroupNames() {
-        return availableGroupNames;
-    }
-
-    public void setAvailableGroupNames(String availableGroupNames) {
-        this.availableGroupNames = availableGroupNames;
+    public List<Group> getGroups() {
+        return groups;
     }
 
     public List<Page> getInheritedPages() {
         return inheritedPages;
     }
 
-    //--------------------------------------------------------------------------
-    // Getters/Setters
-    //--------------------------------------------------------------------------
+    public Map<String, String> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Map<String, String> permissions) {
+        this.permissions = permissions;
+    }
 
     public Dispatch getDispatch() {
         return dispatch;
@@ -403,6 +406,7 @@ public class PortletAction extends AbstractActionBean {
         return new ForwardResolution("/layouts/portlet-page.jsp");
     }
 
+    @Button(list = "page-permissions-edit", key = "commons.cancel", order = 99)
     public Resolution cancel() {
         if (StringUtils.isEmpty(cancelReturnUrl)) {
             String url = dispatch.getOriginalPath();

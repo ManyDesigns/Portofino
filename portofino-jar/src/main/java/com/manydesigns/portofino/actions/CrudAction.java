@@ -826,7 +826,8 @@ public class CrudAction extends PortletAction {
     @Buttons({
         @Button(list = "crud-edit", key = "commons.cancel", order = 99),
         @Button(list = "crud-create", key = "commons.cancel", order = 99),
-        @Button(list = "crud-bulk-edit", key = "commons.cancel", order = 99)
+        @Button(list = "crud-bulk-edit", key = "commons.cancel", order = 99),
+        @Button(list = "page-permissions-edit", key = "commons.cancel", order = 99)
     })
     public Resolution cancel() {
         return super.cancel();
