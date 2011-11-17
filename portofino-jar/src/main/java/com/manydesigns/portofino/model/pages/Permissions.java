@@ -102,7 +102,9 @@ public class Permissions implements ModelObject {
                         ancestor.getPermissions().getActualPermissions();
             for(Map.Entry<String, Set<String>> entry : actualPermissions.entrySet()) {
                 Set<String> set = entry.getValue();
-                if(set.isEmpty()) {
+                //DENY is always inherited. Other permissions are only if they're not
+                //locally overridden.
+                if(DENY.equals(entry.getKey()) || set.isEmpty()) {
                     set.addAll(parentPermissions.get(entry.getKey()));
                 }
             }
