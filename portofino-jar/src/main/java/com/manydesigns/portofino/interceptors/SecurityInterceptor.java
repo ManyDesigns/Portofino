@@ -72,7 +72,7 @@ public class
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    private static final int UNAUTHORIZED = 401;
+    private static final int UNAUTHORIZED = 403;
 
     public final static Logger logger =
             LoggerFactory.getLogger(SecurityInterceptor.class);

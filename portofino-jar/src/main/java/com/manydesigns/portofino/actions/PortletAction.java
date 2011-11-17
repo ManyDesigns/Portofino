@@ -207,9 +207,10 @@ public class PortletAction extends AbstractActionBean {
 
     List<Group> groups;
 
+    //<group, permission>
     Map<String, String> permissions = new HashMap<String, String>();
-
-    List<Page> inheritedPages;
+    //<permission, groups>
+    Map<String, List<String>> customPermissions = new HashMap<String, List<String>>();
 
     @RequiresAdministrator
     public Resolution pagePermissions() {
@@ -217,21 +218,16 @@ public class PortletAction extends AbstractActionBean {
 
         setupGroups(page);
 
-        inheritedPages = new ArrayList<Page>();
-        Page current = page.getParent();
-        while (current != null) {
-            inheritedPages.add(current);
-            current = current.getParent();
-        }
-        Collections.reverse(inheritedPages);
+        return forwardToPagePermissions();
+    }
+
+    protected Resolution forwardToPagePermissions() {
         return new ForwardResolution("/layouts/page/permissions.jsp");
     }
 
     public void setupGroups(Page page) {
         groups = new ArrayList<Group>(application.getAllObjects(SecurityLogic.GROUPTABLE));
     }
-
-    static final String[] emptyStringArray = new String[0];
 
     @RequiresAdministrator
     @Button(list = "page-permissions-edit", key = "commons.update", order = 1)
@@ -248,48 +244,32 @@ public class PortletAction extends AbstractActionBean {
 
     public void updatePagePermissions(Page page) {
         Permissions pagePermissions = page.getPermissions();
+
         pagePermissions.getView().clear();
         pagePermissions.getEdit().clear();
         pagePermissions.getDeny().clear();
 
         for(Map.Entry<String, String> entry : permissions.entrySet()) {
-            if(Permissions.VIEW.equals(entry.getValue())) {
-                pagePermissions.getView().add(entry.getKey());
-            } else if(Permissions.EDIT.equals(entry.getValue())) {
-                pagePermissions.getEdit().add(entry.getKey());
-            } else if(DENY.equals(entry.getValue())) {
-                pagePermissions.getDeny().add(entry.getKey());
+            String perm = entry.getValue();
+            String group = entry.getKey();
+            if(Permissions.VIEW.equals(perm)) {
+                pagePermissions.getView().add(group);
+            } else if(Permissions.EDIT.equals(perm)) {
+                pagePermissions.getEdit().add(group);
+            } else if(DENY.equals(perm)) {
+                pagePermissions.getDeny().add(group);
             } else {
-                //TODO custom permissions
+                logger.warn("Unrecognized page permission: {}", perm);
             }
         }
-        /*String[] allowNameArray = StringUtils.split(allowGroupNames, ',');
-        if (allowNameArray == null) {
-            allowNameArray = emptyStringArray;
+
+        pagePermissions.getCustomPermissions().clear();
+        for(Map.Entry<String, List<String>> custPerm : customPermissions.entrySet()) {
+            Permission permission = new Permission();
+            permission.setName(custPerm.getKey());
+            permission.getGroups().addAll(custPerm.getValue());
+            pagePermissions.getCustomPermissions().add(permission);
         }
-        String[] denyNameArray = StringUtils.split(denyGroupNames, ',');
-        if (denyNameArray == null) {
-            denyNameArray = emptyStringArray;
-        }
-
-        // clean old lists
-        List<String> allow = page.getPermissions().getView();
-        List<String> deny = page.getPermissions().getDeny();
-        allow.clear();
-        deny.clear();
-
-        List<Group> groups = new ArrayList<Group>();
-        groups.addAll(application.getAllObjects(SecurityLogic.GROUPTABLE));
-
-        for (Group group : groups) {
-            String groupName = group.getName();
-            String comparableName = "group_" + groupName;
-            if (ArrayUtils.contains(allowNameArray, comparableName)) {
-                allow.add(groupName);
-            } else if (ArrayUtils.contains(denyNameArray, comparableName)) {
-                deny.add(groupName);
-            }
-        }*/
     }
 
     public String getPermissionLevelName(Page currentPage, String groupName) {
@@ -329,16 +309,20 @@ public class PortletAction extends AbstractActionBean {
         return groups;
     }
 
-    public List<Page> getInheritedPages() {
-        return inheritedPages;
-    }
-
     public Map<String, String> getPermissions() {
         return permissions;
     }
 
     public void setPermissions(Map<String, String> permissions) {
         this.permissions = permissions;
+    }
+
+    public Map<String, List<String>> getCustomPermissions() {
+        return customPermissions;
+    }
+
+    public void setCustomPermissions(Map<String, List<String>> customPermissions) {
+        this.customPermissions = customPermissions;
     }
 
     public Dispatch getDispatch() {

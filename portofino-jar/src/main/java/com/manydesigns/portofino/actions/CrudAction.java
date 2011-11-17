@@ -778,21 +778,13 @@ public class CrudAction extends PortletAction {
     }
 
     //**************************************************************************
-    // Button
+    // Permissions
     //**************************************************************************
 
-    /*public String button() throws Exception {
-        String value = context.getRequest().getParameter("method:button");
-        for (CrudButton crudButton : crudButtons) {
-            Button button = crudButton.getButton();
-            if (button.getLabel().equals(value)) {
-                String script = button.getScript();
-                String scriptLanguage = button.getActualScriptLanguage();
-                return (String) ScriptingUtil.runScript(script, scriptLanguage, this);
-            }
-        }
-        throw new Error("No button found");
-    }*/
+    @Override
+    protected Resolution forwardToPagePermissions() {
+        return new ForwardResolution("/layouts/crud/permissions.jsp");
+    }
 
     //**************************************************************************
     // Return to parent
