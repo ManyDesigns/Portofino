@@ -64,6 +64,7 @@ import com.manydesigns.portofino.model.pages.crud.SelectionProviderReference;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
+import com.manydesigns.portofino.system.model.users.annotations.RequiresPermission;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
 import groovy.lang.Binding;
@@ -572,6 +573,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     @Button(list = "crud-search", key = "commons.create", order = 1)
+    @RequiresPermission("create")
     public Resolution create() {
         setupForm(Mode.CREATE);
         object = classAccessor.newInstance();

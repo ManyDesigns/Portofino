@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.model.pages;
 
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
@@ -62,6 +63,8 @@ public class Permissions implements ModelObject {
     protected final Set<String> edit;
     protected final Set<String> deny;
 
+    protected final List<Permission> customPermissions;
+
     protected WithPermissions parent;
 
     protected final Set<String> actualDeny;
@@ -76,6 +79,8 @@ public class Permissions implements ModelObject {
         edit = new HashSet<String>();
         deny = new HashSet<String>();
 
+        customPermissions = new ArrayList<Permission>();
+        
         actualPermissions = new HashMap<String, Set<String>>();
         actualDeny = new HashSet<String>();
     }
@@ -121,6 +126,12 @@ public class Permissions implements ModelObject {
         if(!view.isEmpty()) {
             view.addAll(actualPermissions.get(EDIT));
         }
+
+        //Custom permissions
+        for(Permission perm : customPermissions) {
+            //TODO check std permissions clash?
+            actualPermissions.put(perm.getName(), perm.getGroups());
+        }
     }
 
     public void link(Model model) {}
@@ -136,6 +147,12 @@ public class Permissions implements ModelObject {
     //**************************************************************************
 
     public boolean isAllowed(String operation, List<String> groups) {
+        //Administrators are always allowed
+        if(groups.contains(SecurityLogic.ADMINISTRATORS_GROUP_ID)) {
+            return true;
+        }
+
+        //Deny wins over any other permission
         if (CollectionUtils.containsAny(actualDeny, groups)) {
             return false;
         }
@@ -171,6 +188,11 @@ public class Permissions implements ModelObject {
     @XmlElement(name = "group", type = java.lang.String.class)
     public Set<String> getDeny() {
         return deny;
+    }
+
+    @XmlElement(name = "permission", type = Permission.class)
+    public List<Permission> getCustomPermissions() {
+        return customPermissions;
     }
 
     public WithPermissions getParent() {

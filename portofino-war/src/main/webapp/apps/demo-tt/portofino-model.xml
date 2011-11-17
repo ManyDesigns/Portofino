@@ -1911,6 +1911,9 @@
                 <permissions>
                     <allow/>
                     <deny/>
+                    <permission name="create">
+                        <group>administrators</group>
+                    </permission>
                 </permissions>
                 <crud createTitle="New project" editTitle="Edit project" name="projects" query="FROM redmine_public_projects ORDER BY name" readTitle="Overview" searchTitle="Projects" table="redmine.PUBLIC.projects" variable="project">
                     <buttons/>

@@ -39,6 +39,7 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
+import com.manydesigns.portofino.system.model.users.annotations.RequiresPermission;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
@@ -57,9 +58,7 @@ import org.slf4j.MDC;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -145,6 +144,33 @@ public class
                 logger.info("User does not match page permissions. User's groups: {}",
                         ArrayUtils.toString(groups));
                 return handleAnonymousOrUnauthorized(userId, request);
+            }
+
+            logger.debug("Checking action permissions");
+            RequiresPermission requiresPermission = handler.getAnnotation(RequiresPermission.class);
+            if (requiresPermission != null) {
+                logger.debug("Action method requires specific permissions: {}", handler);
+            } else {
+                Class actionClass = context.getActionBean().getClass();
+                while (actionClass != null) {
+                    requiresPermission = handler.getAnnotation(RequiresPermission.class);
+                    if (requiresPermission != null) {
+                        logger.debug("Action class requires specific permissions: {}",
+                        actionClass);
+                        break;
+                    }
+                    actionClass = actionClass.getSuperclass();
+                }
+            }
+            if(requiresPermission != null) {
+                List<String> requiredPermissions = Arrays.asList(requiresPermission.value());
+                for(String operation : requiredPermissions) {
+                    if(!page.isAllowed(operation, groups)) {
+                        logger.info("User does not match action permissions. User's groups: {}",
+                        ArrayUtils.toString(groups));
+                        return handleAnonymousOrUnauthorized(userId, request);
+                    }
+                }
             }
         }
 
