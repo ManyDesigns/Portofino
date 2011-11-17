@@ -3,6 +3,7 @@
 <%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
 <%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.manydesigns.portofino.actions.PortletAction" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -51,15 +52,15 @@
                                 <option value="__inherited">
                                     Inherited - <%= parentPermissionLevel %>
                                 </option>
-                                <option value="__deny"
+                                <option value="<%= PortletAction.DENY %>"
                                         <%
-                                            if (Permissions.DENY.equals(permissionLevel)) {
+                                            if (PortletAction.DENY.equals(permissionLevel)) {
                                                 out.print("selected='selected'");
                                             }
                                         %>>
                                     Deny
                                 </option>
-                                <option value="view"
+                                <option value="<%= Permissions.VIEW %>"
                                         <%
                                             if (Permissions.VIEW.equals(permissionLevel)) {
                                                 out.print("selected='selected'");
@@ -67,7 +68,7 @@
                                         %>>
                                     View
                                 </option>
-                                <option value="edit"
+                                <option value="<%= Permissions.EDIT %>"
                                         <%
                                             if (Permissions.EDIT.equals(permissionLevel)) {
                                                 out.print("selected='selected'");

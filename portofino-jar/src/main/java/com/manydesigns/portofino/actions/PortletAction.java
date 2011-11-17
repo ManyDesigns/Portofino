@@ -40,9 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.util.*;
 
 public class PortletAction extends AbstractActionBean {
@@ -205,6 +203,8 @@ public class PortletAction extends AbstractActionBean {
     // Page permisssions
     //--------------------------------------------------------------------------
 
+    public static final String DENY = "__deny";
+
     List<Group> groups;
 
     Map<String, String> permissions = new HashMap<String, String>();
@@ -257,7 +257,7 @@ public class PortletAction extends AbstractActionBean {
                 pagePermissions.getView().add(entry.getKey());
             } else if(Permissions.EDIT.equals(entry.getValue())) {
                 pagePermissions.getEdit().add(entry.getKey());
-            } else if(Permissions.DENY.equals(entry.getValue())) {
+            } else if(DENY.equals(entry.getValue())) {
                 pagePermissions.getDeny().add(entry.getKey());
             } else {
                 //TODO custom permissions
@@ -295,7 +295,7 @@ public class PortletAction extends AbstractActionBean {
     public String getPermissionLevelName(Page currentPage, String groupName) {
         Permissions currentPagePermissions = currentPage.getPermissions();
         if(currentPagePermissions.getDeny().contains(groupName)) {
-            return Permissions.DENY;
+            return DENY;
         } else if(currentPagePermissions.getEdit().contains(groupName)) {
             return Permissions.EDIT;
         } else if(currentPagePermissions.getView().contains(groupName)) {

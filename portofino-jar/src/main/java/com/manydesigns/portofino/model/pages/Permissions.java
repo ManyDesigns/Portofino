@@ -53,7 +53,6 @@ public class Permissions implements ModelObject {
             "Copyright (c) 2005-2011, ManyDesigns srl";
     public static final String VIEW = "view";
     public static final String EDIT = "edit";
-    public static final String DENY = "__deny";
 
     //**************************************************************************
     // Fields
@@ -65,7 +64,8 @@ public class Permissions implements ModelObject {
 
     protected WithPermissions parent;
 
-    protected Map<String, Set<String>> actualPermissions;
+    protected final Set<String> actualDeny;
+    protected final Map<String, Set<String>> actualPermissions;
 
     //**************************************************************************
     // Constructors
@@ -75,6 +75,9 @@ public class Permissions implements ModelObject {
         view = new HashSet<String>();
         edit = new HashSet<String>();
         deny = new HashSet<String>();
+
+        actualPermissions = new HashMap<String, Set<String>>();
+        actualDeny = new HashSet<String>();
     }
 
     //**************************************************************************
@@ -86,25 +89,28 @@ public class Permissions implements ModelObject {
     }
 
     public void reset() {
-        actualPermissions = null;
+        actualPermissions.clear();
+        actualDeny.clear();
     }
 
     public void init(Model model) {
-        actualPermissions = new HashMap<String, Set<String>>();
-        actualPermissions.put(DENY, new HashSet<String>(deny));
         actualPermissions.put(VIEW, new HashSet<String>(view));
         actualPermissions.put(EDIT, new HashSet<String>(edit));
+
+        actualDeny.addAll(deny);
 
         //Inherited permissions
         WithPermissions ancestor = (parent != null) ? parent.getParent() : null;
         if(ancestor != null) {
+            //DENY is always inherited. Other permissions are only if they're not
+            //locally overridden.
+            actualDeny.addAll(ancestor.getPermissions().getActualDeny());
+            
             Map<String, Set<String>> parentPermissions =
                         ancestor.getPermissions().getActualPermissions();
             for(Map.Entry<String, Set<String>> entry : actualPermissions.entrySet()) {
                 Set<String> set = entry.getValue();
-                //DENY is always inherited. Other permissions are only if they're not
-                //locally overridden.
-                if(DENY.equals(entry.getKey()) || set.isEmpty()) {
+                if(set.isEmpty()) {
                     set.addAll(parentPermissions.get(entry.getKey()));
                 }
             }
@@ -130,7 +136,7 @@ public class Permissions implements ModelObject {
     //**************************************************************************
 
     public boolean isAllowed(String operation, List<String> groups) {
-        if (CollectionUtils.containsAny(actualPermissions.get(DENY), groups)) {
+        if (CollectionUtils.containsAny(actualDeny, groups)) {
             return false;
         }
 
@@ -171,7 +177,15 @@ public class Permissions implements ModelObject {
         return parent;
     }
 
+    public void setParent(WithPermissions parent) {
+        this.parent = parent;
+    }
+
     public Map<String, Set<String>> getActualPermissions() {
         return actualPermissions;
+    }
+
+    public Set<String> getActualDeny() {
+        return actualDeny;
     }
 }

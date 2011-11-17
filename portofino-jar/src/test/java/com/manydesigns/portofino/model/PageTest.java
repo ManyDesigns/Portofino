@@ -83,6 +83,7 @@ public class PageTest extends TestCase {
         n1_1.setParent(root);
         n1_1_perm = new Permissions();
         n1_1.setPermissions(n1_1_perm);
+        n1_1_perm.setParent(n1_1);
         n1_1.setDescription("homepage description");
         n1_1.setTitle("homepage title");
         n1_1.setFragment("homepage");
@@ -94,6 +95,7 @@ public class PageTest extends TestCase {
         n1_2.setParent(root);
         n1_2_perm = new Permissions();
         n1_2.setPermissions(n1_2_perm);
+        n1_2_perm.setParent(n1_2);
         n1_2.setDescription("Model description");
         n1_2.setTitle("Model title");
         n1_2.setFragment("model");
@@ -104,6 +106,7 @@ public class PageTest extends TestCase {
         n1_2_1.setParent(n1_2);
         n1_2_1_perm = new Permissions();
         n1_2_1.setPermissions(n1_2_1_perm);
+        n1_2_1_perm.setParent(n1_2_1);
         n1_2_1.setType("table-data");
         n1_2_1.setDescription("TableData description");
         n1_2_1.setTitle("TableData title");
@@ -117,6 +120,7 @@ public class PageTest extends TestCase {
         n1_2_2.setParent(n1_2);
         n1_2_2_perm = new Permissions();
         n1_2_2.setPermissions(n1_2_2_perm);
+        n1_2_2_perm.setParent(n1_2_2);
         n1_2_2.setType("table-design");
         n1_2_2.setDescription("TableData design description");
         n1_2_2.setTitle("TableData design title");
@@ -130,6 +134,7 @@ public class PageTest extends TestCase {
         n1_2_3.setParent(n1_2);
         n1_2_3_perm = new Permissions();
         n1_2_3.setPermissions(n1_2_3_perm);
+        n1_2_3_perm.setParent(n1_2_3);
         n1_2_3.setDescription("Somewhere description");
         n1_2_3.setTitle("Somewhere");
         n1_2_3.setFragment("somewhere");
@@ -143,6 +148,7 @@ public class PageTest extends TestCase {
         n1_3.setParent(root);
         n1_3_perm = new Permissions();
         n1_3.setPermissions(n1_3_perm);
+        n1_3_perm.setParent(n1_3);
         n1_3.setDescription("Profile");
         n1_3.setTitle("Profile");
         n1_3.setFragment("Profile");
@@ -156,6 +162,7 @@ public class PageTest extends TestCase {
         n1_4.setParent(root);
         n1_4_perm = new Permissions();
         n1_4.setPermissions(n1_4_perm);
+        n1_4_perm.setParent(n1_4);
         n1_4.setDescription("user administration");
         n1_4.setTitle("user admin");
         n1_4.setFragment("userAdmin");
@@ -174,12 +181,15 @@ public class PageTest extends TestCase {
         permissions = new Permissions();
         permissions.getView().add("buoni");
         permissions.getDeny().add("cattivi");
+        permissions.init(null);
 
         permissions2 = new Permissions();
         permissions2.getDeny().add("cattivi");
+        permissions2.init(null);
 
         permissions3 = new Permissions();
         permissions3.getView().add("buoni");
+        permissions3.init(null);
 
         groups = new ArrayList<String>();
 
