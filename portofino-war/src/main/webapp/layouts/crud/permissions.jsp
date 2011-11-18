@@ -49,7 +49,7 @@
                             name="/layouts/page/pagePermissionRow.jsp"
                             currentPage="<%= currentPage %>"
                             group="${group}"/>
-                    <td><input type="checkbox" name="customPermissions[create]"
+                    <td><input type="checkbox" name="customPermissions[crud-create]"
                                value="${group.name}"
                                <%
                                    if(currentPage.isAllowed("create", Collections.singletonList(group.getName()))) {
@@ -57,7 +57,7 @@
                                    }
                                %>/>
                     </td>
-                    <td><input type="checkbox" name="customPermissions[edit]"
+                    <td><input type="checkbox" name="customPermissions[crud-edit]"
                                value="${group.name}"
                                <%
                                    if(currentPage.isAllowed("edit", Collections.singletonList(group.getName()))) {
@@ -65,7 +65,7 @@
                                    }
                                %> />
                     </td>
-                    <td><input type="checkbox" name="customPermissions[delete]"
+                    <td><input type="checkbox" name="customPermissions[crud-delete]"
                                value="${group.name}"
                                <%
                                    if(currentPage.isAllowed("delete", Collections.singletonList(group.getName()))) {

@@ -75,6 +75,10 @@ public class PageTest extends TestCase {
         root.setFragment("/");
         root.setTitle("portofino4");
         root.setDescription("portofino application");
+        Permissions rootPerms = new Permissions();
+        rootPerms.setParent(root);
+        rootPerms.getView().add("all");
+        root.setPermissions(rootPerms);
 
         //Nessun permesso
 
@@ -88,8 +92,6 @@ public class PageTest extends TestCase {
         n1_1.setTitle("homepage title");
         n1_1.setFragment("homepage");
 
-        n1_1_perm.getView().add("anonymous");
-
         //1.2
         n1_2 = new FolderPage();
         n1_2.setParent(root);
@@ -100,6 +102,7 @@ public class PageTest extends TestCase {
         n1_2.setTitle("Model title");
         n1_2.setFragment("model");
 
+        n1_2_perm.getNone().add("all");
         n1_2_perm.getView().add("registered");
 
         n1_2_1 = new CustomFolderPage();
@@ -114,6 +117,7 @@ public class PageTest extends TestCase {
         n1_2_1.setUrl("/model/TableData.action");
         n1_2.getChildPages().add(n1_2_1);
 
+        n1_2_1_perm.getNone().add("registered");
         n1_2_1_perm.getView().add("admins");
 
         n1_2_2 = new CustomFolderPage();
@@ -155,6 +159,7 @@ public class PageTest extends TestCase {
         n1_3.setUrl("/Profile.action");
 
         n1_3_perm.getDeny().add("cattivi");
+        n1_3_perm.getNone().add("all");
         n1_3_perm.getView().add("buoni");
 
         //1.4
@@ -179,15 +184,18 @@ public class PageTest extends TestCase {
 
 
         permissions = new Permissions();
+        permissions.getNone().add("all");
         permissions.getView().add("buoni");
         permissions.getDeny().add("cattivi");
         permissions.init(null);
 
         permissions2 = new Permissions();
+        permissions2.getView().add("all");
         permissions2.getDeny().add("cattivi");
         permissions2.init(null);
 
         permissions3 = new Permissions();
+        permissions3.getNone().add("all");
         permissions3.getView().add("buoni");
         permissions3.init(null);
 
@@ -197,6 +205,7 @@ public class PageTest extends TestCase {
 
 
     public void testAnonymous() {
+        groups.add("all");
         groups.add("anonymous");
 
         assertTrue(root.isAllowed(groups));
@@ -212,7 +221,7 @@ public class PageTest extends TestCase {
     }
 
     public void testRegistered() {
-        groups.add("anonymous");
+        groups.add("all");
         groups.add("registered");
 
         assertTrue(root.isAllowed(groups));
@@ -228,7 +237,7 @@ public class PageTest extends TestCase {
     }
 
     public void testAdmins() {
-        groups.add("anonymous");
+        groups.add("all");
         groups.add("registered");
         groups.add("admins");
 
@@ -247,7 +256,7 @@ public class PageTest extends TestCase {
     }
 
     public void testCattivi() {
-        groups.add("anonymous");
+        groups.add("all");
         groups.add("registered");
         groups.add("cattivi");
 
@@ -266,7 +275,7 @@ public class PageTest extends TestCase {
     }
 
     public void testBuoni() {
-        groups.add("anonymous");
+        groups.add("all");
         groups.add("registered");
         groups.add("buoni");
 
@@ -284,7 +293,7 @@ public class PageTest extends TestCase {
     }
 
     public void testBuoniCattivi() {
-        groups.add("anonymous");
+        groups.add("all");
         groups.add("registered");
         groups.add("buoni");
         groups.add("cattivi");
@@ -334,15 +343,18 @@ public class PageTest extends TestCase {
 
     // test su permissions (con solo lista deny riempita)
     public void testPermissions2_1() {
+        groups.add("all");
         assertTrue(permissions2.isAllowed(Permissions.VIEW, groups));
     }
 
     public void testPermissions2_3() {
+        groups.add("all");
         groups.add("cattivi");
         assertFalse(permissions2.isAllowed(Permissions.VIEW, groups));
     }
 
     public void testPermissions2_5() {
+        groups.add("all");
         groups.add("altro");
         assertTrue(permissions2.isAllowed(Permissions.VIEW, groups));
     }
