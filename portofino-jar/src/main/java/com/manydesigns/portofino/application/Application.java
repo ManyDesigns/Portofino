@@ -182,6 +182,8 @@ public interface Application {
 
     public User findUserByToken(String token);
 
+    Group getAllGroup();
+
     Group getAnonymousGroup();
 
     Group getRegisteredGroup();

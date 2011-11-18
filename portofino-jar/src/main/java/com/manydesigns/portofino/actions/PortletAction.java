@@ -245,6 +245,7 @@ public class PortletAction extends AbstractActionBean {
     public void updatePagePermissions(Page page) {
         Permissions pagePermissions = page.getPermissions();
 
+        pagePermissions.getNone().clear();
         pagePermissions.getView().clear();
         pagePermissions.getEdit().clear();
         pagePermissions.getDeny().clear();
@@ -256,6 +257,8 @@ public class PortletAction extends AbstractActionBean {
                 pagePermissions.getView().add(group);
             } else if(Permissions.EDIT.equals(perm)) {
                 pagePermissions.getEdit().add(group);
+            } else if(Permissions.NONE.equals(perm)) {
+                pagePermissions.getNone().add(group);
             } else if(DENY.equals(perm)) {
                 pagePermissions.getDeny().add(group);
             } else {
@@ -272,13 +275,15 @@ public class PortletAction extends AbstractActionBean {
         }
     }
 
-    public String getPermissionLevelName(Page currentPage, String groupName) {
+    public String getPermissionLevelName(Page currentPage, String groupId) {
         Permissions currentPagePermissions = currentPage.getPermissions();
-        if(currentPagePermissions.getDeny().contains(groupName)) {
+        if(currentPagePermissions.getDeny().contains(groupId)) {
             return DENY;
-        } else if(currentPagePermissions.getEdit().contains(groupName)) {
+        } else if(currentPagePermissions.getNone().contains(groupId)) {
+            return Permissions.NONE;
+        } else if(currentPagePermissions.getEdit().contains(groupId)) {
             return Permissions.EDIT;
-        } else if(currentPagePermissions.getView().contains(groupName)) {
+        } else if(currentPagePermissions.getView().contains(groupId)) {
             return Permissions.VIEW;
         } else {
             return null; //Inherited
@@ -292,11 +297,13 @@ public class PortletAction extends AbstractActionBean {
             permissionLevel = "Edit";
         } else if(currentPage.isAllowed(Permissions.VIEW, groupNames)) {
             permissionLevel = "View";
-        } else {
+        } else if(currentPage.getPermissions().getActualDeny().contains(groupName)) {
             permissionLevel = "Deny";
-            if(!currentPage.getPermissions().getDeny().contains(groupName)) {
-                permissionLevel += " (implicit)";
-            }
+        } else if(currentPage.getPermissions().getActualPermissions()
+                    .get(Permissions.NONE).contains(groupName)) {
+            permissionLevel = "None";
+        } else {
+            permissionLevel = null;
         }
         return permissionLevel;
     }

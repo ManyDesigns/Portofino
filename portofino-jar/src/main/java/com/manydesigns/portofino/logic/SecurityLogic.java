@@ -29,12 +29,14 @@
 
 package com.manydesigns.portofino.logic;
 
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
+import org.apache.commons.configuration.Configuration;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import sun.misc.BASE64Encoder;
@@ -54,9 +56,6 @@ public class SecurityLogic {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public static final String ANONYMOUS_GROUP_ID = "anonymous";
-    public static final String REGISTERED_GROUP_ID = "registered";
-    public static final String ADMINISTRATORS_GROUP_ID = "administrators";
     public static final String USERTABLE = "portofino.public.users";
     public static final String GROUPTABLE = "portofino.public.groups";
 
@@ -73,17 +72,18 @@ public class SecurityLogic {
 
     public static List<String> manageGroups(Application application, String userId) {
         List<String> groups = new ArrayList<String>();
+        Configuration conf = application.getPortofinoProperties();
+        groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
         if (userId == null) {
-            groups.add(application.getAnonymousGroup().getName());
+            groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         } else {
             User u = (User) application.getObjectByPk(USERTABLE,
                     new User(userId));
-            groups.add(application.getAnonymousGroup().getName());
-            groups.add(application.getRegisteredGroup().getName());
+            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
 
             for (UsersGroups ug : u.getGroups()) {
                 if (ug.getDeletionDate() == null) {
-                    groups.add(ug.getGroup().getName());
+                    groups.add(ug.getGroup().getGroupId());
                 }
             }
         }
@@ -102,12 +102,12 @@ public class SecurityLogic {
     }
 
     public static boolean isUserInGroup(ServletRequest request, Group group) {
-        return isUserInGroup(request, group.getName());
+        return isUserInGroup(request, group.getGroupId());
     }
 
-    public static boolean isUserInGroup(ServletRequest request, String name) {
+    public static boolean isUserInGroup(ServletRequest request, String groupId) {
         List<String> groups = (List<String>) request.getAttribute(RequestAttributes.GROUPS);
-        return groups.contains(name);
+        return groups.contains(groupId);
     }
 
     public static boolean isRegisteredUser(ServletRequest request) {
@@ -120,18 +120,6 @@ public class SecurityLogic {
         Application appl = (Application) request.getAttribute(RequestAttributes.APPLICATION);
         Group administratorsGroup = appl.getAdministratorsGroup();
         return isUserInGroup(request, administratorsGroup);
-    }
-
-    public static Group findAnonymousGroup(Application application) {
-        return findGroupById(application, ANONYMOUS_GROUP_ID);
-    }
-
-    public static Group findRegisteredGroup(Application application) {
-        return findGroupById(application, REGISTERED_GROUP_ID);
-    }
-
-    public static Group findAdministratorsGroup(Application application) {
-        return findGroupById(application, ADMINISTRATORS_GROUP_ID);
     }
 
     private static Group findGroupById(Application application, String groupId) {

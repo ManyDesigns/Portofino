@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.model.pages;
 
-import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
@@ -52,6 +51,8 @@ import java.util.*;
 public class Permissions implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
+
+    public static final String NONE = "none";
     public static final String VIEW = "view";
     public static final String EDIT = "edit";
 
@@ -59,6 +60,7 @@ public class Permissions implements ModelObject {
     // Fields
     //**************************************************************************
 
+    protected final Set<String> none;
     protected final Set<String> view;
     protected final Set<String> edit;
     protected final Set<String> deny;
@@ -75,6 +77,7 @@ public class Permissions implements ModelObject {
     //**************************************************************************
 
     public Permissions() {
+        none = new HashSet<String>();
         view = new HashSet<String>();
         edit = new HashSet<String>();
         deny = new HashSet<String>();
@@ -99,6 +102,7 @@ public class Permissions implements ModelObject {
     }
 
     public void init(Model model) {
+        actualPermissions.put(NONE, new HashSet<String>(none));
         actualPermissions.put(VIEW, new HashSet<String>(view));
         actualPermissions.put(EDIT, new HashSet<String>(edit));
 
@@ -107,17 +111,14 @@ public class Permissions implements ModelObject {
         //Inherited permissions
         WithPermissions ancestor = (parent != null) ? parent.getParent() : null;
         if(ancestor != null) {
-            //DENY is always inherited. Other permissions are only if they're not
-            //locally overridden.
             actualDeny.addAll(ancestor.getPermissions().getActualDeny());
             
             Map<String, Set<String>> parentPermissions =
                         ancestor.getPermissions().getActualPermissions();
             for(Map.Entry<String, Set<String>> entry : actualPermissions.entrySet()) {
                 Set<String> set = entry.getValue();
-                if(set.isEmpty()) {
-                    set.addAll(parentPermissions.get(entry.getKey()));
-                }
+                String key = entry.getKey();
+                set.addAll(parentPermissions.get(key));
             }
         }
 
@@ -125,6 +126,16 @@ public class Permissions implements ModelObject {
         Set<String> view = actualPermissions.get(VIEW);
         if(!view.isEmpty()) {
             view.addAll(actualPermissions.get(EDIT));
+        }
+
+        //None
+        Set<String> actualNone = actualPermissions.get(NONE);
+        for(Map.Entry<String, Set<String>> entry : actualPermissions.entrySet()) {
+            Set<String> set = entry.getValue();
+            String key = entry.getKey();
+            if(!NONE.equals(key)) {
+                set.removeAll(actualNone);
+            }
         }
 
         //Custom permissions
@@ -147,10 +158,10 @@ public class Permissions implements ModelObject {
     //**************************************************************************
 
     public boolean isAllowed(String operation, List<String> groups) {
-        //Administrators are always allowed
-        if(groups.contains(SecurityLogic.ADMINISTRATORS_GROUP_ID)) {
+        //Administrators are always allowed?
+        /*if(groups.contains(SecurityLogic.ADMINISTRATORS_GROUP_ID)) {
             return true;
-        }
+        }*/
 
         //Deny wins over any other permission
         if (CollectionUtils.containsAny(actualDeny, groups)) {
@@ -160,8 +171,7 @@ public class Permissions implements ModelObject {
         Set<String> perm = actualPermissions.get(operation);
 
         if(perm == null || perm.isEmpty()) {
-            //View by default is allowed
-            return VIEW.equals(operation);
+            return false;
         }
 
         return CollectionUtils.containsAny(perm, groups);
@@ -170,6 +180,12 @@ public class Permissions implements ModelObject {
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
+
+    @XmlElementWrapper(name="none")
+    @XmlElement(name = "group", type = java.lang.String.class)
+    public Set<String> getNone() {
+        return none;
+    }
 
     @XmlElementWrapper(name="view")
     @XmlElement(name = "group", type = java.lang.String.class)

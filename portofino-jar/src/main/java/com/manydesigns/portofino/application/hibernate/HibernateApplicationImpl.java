@@ -1091,6 +1091,11 @@ public class HibernateApplicationImpl implements Application {
         return (User) criteria.uniqueResult();
     }
 
+    public Group getAllGroup() {
+        String name = portofinoConfiguration.getString(PortofinoProperties.GROUP_ALL);
+        return getGroup(name);
+    }
+
     public Group getAnonymousGroup() {
         String name = portofinoConfiguration.getString(PortofinoProperties.GROUP_ANONYMOUS);
         return getGroup(name);

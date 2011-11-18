@@ -25,49 +25,54 @@
         Page permissions for: <c:out value="${actionBean.pageInstance.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <%@include file="/layouts/page/pagePermissions.jsp"%>
-        <div class="horizontalSeparator"></div>
-        <h3>Crud permissions</h3>
-        <table>
-            <tr>
-                <th>Group</th>
-                <th>Create</th>
-                <th>Edit</th>
-                <th>Delete</th>
-            </tr>
-            <c:forEach var="group" items="${actionBean.groups}">
-                <%
-                    Group group = (Group) pageContext.getAttribute("group");
-                %>
-                <tr>
-                    <td><c:out value="${group.name}" /></td>
-                    <td><input type="checkbox" name="customPermissions[create]"
-                               value="${group.name}"
-                               <%
-                                   if(currentPage.isAllowed("create", Collections.singletonList(group.getName()))) {
-                                       out.print("checked='checked'");
-                                   }
-                               %>/>
-                    </td>
-                    <td><input type="checkbox" name="customPermissions[edit]"
-                               value="${group.name}"
-                               <%
-                                   if(currentPage.isAllowed("edit", Collections.singletonList(group.getName()))) {
-                                       out.print("checked='checked'");
-                                   }
-                               %> />
-                    </td>
-                    <td><input type="checkbox" name="customPermissions[delete]"
-                               value="${group.name}"
-                               <%
-                                   if(currentPage.isAllowed("delete", Collections.singletonList(group.getName()))) {
-                                       out.print("checked='checked'");
-                                   }
-                               %> />
-                    </td>
-                </tr>
-            </c:forEach>
-        </table>
+        <div class="yui-gb">
+            <div class="yui-u first">
+                <%@include file="/layouts/page/pagePermissions.jsp"%>
+            </div>
+            <div class="yui-u">
+                <h3>Crud permissions</h3>
+                <table>
+                    <tr>
+                        <th>Group</th>
+                        <th>Create</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                    <c:forEach var="group" items="${actionBean.groups}">
+                        <%
+                            Group group = (Group) pageContext.getAttribute("group");
+                        %>
+                        <tr>
+                            <td><c:out value="${group.name}" /></td>
+                            <td><input type="checkbox" name="customPermissions[create]"
+                                       value="${group.name}"
+                                       <%
+                                           if(currentPage.isAllowed("create", Collections.singletonList(group.getName()))) {
+                                               out.print("checked='checked'");
+                                           }
+                                       %>/>
+                            </td>
+                            <td><input type="checkbox" name="customPermissions[edit]"
+                                       value="${group.name}"
+                                       <%
+                                           if(currentPage.isAllowed("edit", Collections.singletonList(group.getName()))) {
+                                               out.print("checked='checked'");
+                                           }
+                                       %> />
+                            </td>
+                            <td><input type="checkbox" name="customPermissions[delete]"
+                                       value="${group.name}"
+                                       <%
+                                           if(currentPage.isAllowed("delete", Collections.singletonList(group.getName()))) {
+                                               out.print("checked='checked'");
+                                           }
+                                       %> />
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </table>
+            </div>
+        </div>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">

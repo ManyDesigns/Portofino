@@ -156,7 +156,7 @@ public class
                     requiresPermission = handler.getAnnotation(RequiresPermission.class);
                     if (requiresPermission != null) {
                         logger.debug("Action class requires specific permissions: {}",
-                        actionClass);
+                                     actionClass);
                         break;
                     }
                     actionClass = actionClass.getSuperclass();
@@ -167,7 +167,7 @@ public class
                 for(String operation : requiredPermissions) {
                     if(!page.isAllowed(operation, groups)) {
                         logger.info("User does not match action permissions. User's groups: {}",
-                        ArrayUtils.toString(groups));
+                                    ArrayUtils.toString(groups));
                         return handleAnonymousOrUnauthorized(userId, request);
                     }
                 }
