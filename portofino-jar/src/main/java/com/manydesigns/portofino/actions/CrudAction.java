@@ -573,7 +573,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     @Button(list = "crud-search", key = "commons.create", order = 1)
-    @RequiresPermission("crud-create")
+    @RequiresPermission(PERMISSION_CREATE)
     public Resolution create() {
         setupForm(Mode.CREATE);
         object = classAccessor.newInstance();
@@ -592,7 +592,7 @@ public class CrudAction extends PortletAction {
     }
 
     @Button(list = "crud-create", key = "commons.save", order = 1)
-    @RequiresPermission("crud-create")
+    @RequiresPermission(PERMISSION_CREATE)
     public Resolution save() {
         setupForm(Mode.CREATE);
         object = classAccessor.newInstance();
@@ -627,7 +627,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     @Button(list = "crud-read", key = "commons.edit", order = 1)
-    @RequiresPermission("crud-edit")
+    @RequiresPermission(PERMISSION_EDIT)
     public Resolution edit() {
         setupForm(Mode.EDIT);
         editSetup(object);
@@ -644,7 +644,7 @@ public class CrudAction extends PortletAction {
     }
 
     @Button(list = "crud-edit", key = "commons.update", order = 1)
-    @RequiresPermission("crud-edit")
+    @RequiresPermission(PERMISSION_EDIT)
     public Resolution update() {
         setupForm(Mode.EDIT);
         editSetup(object);
@@ -783,6 +783,10 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
     // Permissions
     //**************************************************************************
+
+    public static final String PERMISSION_CREATE = "crud-create";
+    public static final String PERMISSION_EDIT = "crud-edit";
+    public static final String PERMISSION_DELETE = "crud-delete";
 
     @Override
     protected Resolution forwardToPagePermissions() {

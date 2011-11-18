@@ -291,4 +291,15 @@
             <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
         </insert>
     </changeSet>
+
+
+    <changeSet author="portofino" id="insert-group-all">
+        <insert tableName="groups">
+            <column name="groupid" value="all" />
+            <column name="creatorid" value="1" />
+            <column name="name" value="All" />
+            <column name="description" value="All users" />
+            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
+        </insert>
+    </changeSet>
 </databaseChangeLog>

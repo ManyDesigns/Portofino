@@ -3,6 +3,8 @@
 <%@ page import="com.manydesigns.portofino.model.pages.Permissions" %>
 <%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
 <%@ page import="java.util.Collections" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.manydesigns.portofino.actions.CrudAction" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -43,6 +45,7 @@
             <c:forEach var="group" items="${actionBean.groups}">
                 <%
                     Group group = (Group) pageContext.getAttribute("group");
+                    List<String> groups = Collections.singletonList(group.getName());
                 %>
                 <tr>
                     <stripes:layout-render
@@ -52,7 +55,7 @@
                     <td><input type="checkbox" name="customPermissions[crud-create]"
                                value="${group.name}"
                                <%
-                                   if(currentPage.isAllowed("create", Collections.singletonList(group.getName()))) {
+                                   if(currentPage.isAllowed(CrudAction.PERMISSION_CREATE, groups)) {
                                        out.print("checked='checked'");
                                    }
                                %>/>
@@ -60,7 +63,7 @@
                     <td><input type="checkbox" name="customPermissions[crud-edit]"
                                value="${group.name}"
                                <%
-                                   if(currentPage.isAllowed("edit", Collections.singletonList(group.getName()))) {
+                                   if(currentPage.isAllowed(CrudAction.PERMISSION_EDIT, groups)) {
                                        out.print("checked='checked'");
                                    }
                                %> />
@@ -68,7 +71,7 @@
                     <td><input type="checkbox" name="customPermissions[crud-delete]"
                                value="${group.name}"
                                <%
-                                   if(currentPage.isAllowed("delete", Collections.singletonList(group.getName()))) {
+                                   if(currentPage.isAllowed(CrudAction.PERMISSION_DELETE, groups)) {
                                        out.print("checked='checked'");
                                    }
                                %> />
