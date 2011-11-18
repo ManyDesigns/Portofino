@@ -1,4 +1,4 @@
-<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
+
 <div class="yui-g">
     <div class="portletTitle">
         <h1>
@@ -9,7 +9,7 @@
     </div>
     <div class="portletHeaderButtons">
         <stripes:layout-component name="portletHeaderButtons">
-            <portofino:buttons list="portletHeaderButtons" bean="${actionBean}" />
+            <stripes:layout-render name="/layouts/page/buttons.jsp" list="portletHeaderButtons" />
         </stripes:layout-component>
     </div>
 </div>

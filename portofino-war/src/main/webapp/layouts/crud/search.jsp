@@ -2,9 +2,9 @@
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
+<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
-<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
+
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
     <stripes:layout-component name="portletTitle">
@@ -20,7 +20,7 @@
                     <div class="search_results">
         </c:if>
                         <%@include file="datatable.jsp"%>
-                        <portofino:buttons list="crud-search" bean="${actionBean}" cssClass="portletButton" />
+                        <stripes:layout-render name="/layouts/page/buttons.jsp" list="crud-search" cssClass="portletButton" />
                     </div>
         <c:if test="${not empty actionBean.searchForm}">
                 </div>
@@ -28,7 +28,7 @@
                         <div class="search_form">
                             <mde:write name="actionBean" property="searchForm"/>
                             <div class="searchFormButtons">
-                                <portofino:buttons list="crud-search-form" bean="${actionBean}" cssClass="portletButton" />
+                                <stripes:layout-render name="/layouts/page/buttons.jsp" list="crud-search-form" cssClass="portletButton" />
                             </div>
                         </div>
                 </div>

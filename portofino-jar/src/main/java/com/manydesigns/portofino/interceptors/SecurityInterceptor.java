@@ -39,11 +39,7 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresPermission;
-import net.sourceforge.stripes.action.ActionBeanContext;
-import net.sourceforge.stripes.action.ErrorResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
@@ -58,7 +54,9 @@ import org.slf4j.MDC;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -112,6 +110,7 @@ public class
 
         logger.debug("Checking if action or method required administrator");
         boolean requiresAdministrator = false;
+        ActionBean actionBean = context.getActionBean();
         Method handler = context.getHandler();
         if (handler.isAnnotationPresent(RequiresAdministrator.class)) {
             logger.debug("Action method requires administrator: {}", handler);
@@ -129,7 +128,8 @@ public class
             }
         }
 
-        if (requiresAdministrator && !SecurityLogic.isAdministrator(request)) {
+        boolean isNotAdmin = !SecurityLogic.isAdministrator(request);
+        if (requiresAdministrator && isNotAdmin) {
             logger.info("User is not an administrator");
             return handleAnonymousOrUnauthorized(userId, request);
         }
@@ -137,7 +137,7 @@ public class
         logger.debug("Checking page permissions");
         Dispatch dispatch =
                 (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
-        if (dispatch != null) {
+        if (dispatch != null && isNotAdmin) {
             PageInstance pageInstance = dispatch.getLastPageInstance();
             Page page = pageInstance.getPage();
             if (!page.isAllowed(groups)){
@@ -146,8 +146,11 @@ public class
                 return handleAnonymousOrUnauthorized(userId, request);
             }
 
-            logger.debug("Checking action permissions");
-            RequiresPermission requiresPermission = handler.getAnnotation(RequiresPermission.class);
+            if(!SecurityLogic.isMethodAllowed(actionBean.getClass(), handler, page, groups)) {
+                return handleAnonymousOrUnauthorized(userId, request);
+            }
+
+            /*RequiresPermission requiresPermission = handler.getAnnotation(RequiresPermission.class);
             if (requiresPermission != null) {
                 logger.debug("Action method requires specific permissions: {}", handler);
             } else {
@@ -171,7 +174,7 @@ public class
                         return handleAnonymousOrUnauthorized(userId, request);
                     }
                 }
-            }
+            }*/
         }
 
         logger.debug("Security check passed.");

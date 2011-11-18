@@ -43,10 +43,12 @@ public class ButtonInfo {
 
     private final String name;
     private final Button button;
+    private final boolean allowed;
 
-    public ButtonInfo(String name, Button button) {
+    public ButtonInfo(String name, Button button, boolean allowed) {
         this.name = name;
         this.button = button;
+        this.allowed = allowed;
     }
 
     public String getName() {
@@ -55,5 +57,9 @@ public class ButtonInfo {
 
     public Button getButton() {
         return button;
+    }
+
+    public boolean isAllowed() {
+        return allowed;
     }
 }

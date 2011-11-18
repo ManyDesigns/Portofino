@@ -2,15 +2,15 @@
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %>
-<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
+
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.user.admin.UserAdminAction"/>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="crud-edit" bean="${actionBean}" cssClass="contentButton" />
+        <stripes:layout-render name="/layouts/page/buttons.jsp" list="crud-edit" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.crud.editTitle}"/>
@@ -56,7 +56,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="crud-edit" bean="${actionBean}" cssClass="contentButton" />
+        <stripes:layout-render name="/layouts/page/buttons.jsp" list="crud-edit" cssClass="contentButton" />
         <script type="text/javascript">
             $(".groupBox").sortable({
                 connectWith: ".groupBox",

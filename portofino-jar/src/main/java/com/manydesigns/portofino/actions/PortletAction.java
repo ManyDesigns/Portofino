@@ -412,6 +412,10 @@ public class PortletAction extends AbstractActionBean {
         return pageInstance;
     }
 
+    public Page getPage() {
+        return getPageInstance().getPage();
+    }
+
     public void setPageInstance(PageInstance pageInstance) {
         this.pageInstance = pageInstance;
     }

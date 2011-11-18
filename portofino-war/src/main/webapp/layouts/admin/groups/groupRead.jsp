@@ -1,10 +1,10 @@
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
+<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
+
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.user.admin.GroupAdminAction"/>
@@ -31,7 +31,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
         <div class="crudReadButtons">
-            <portofino:buttons list="crud-read" bean="${actionBean}" cssClass="portletButton" />
+            <stripes:layout-render name="/layouts/page/buttons.jsp" list="crud-read" cssClass="portletButton" />
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter" />

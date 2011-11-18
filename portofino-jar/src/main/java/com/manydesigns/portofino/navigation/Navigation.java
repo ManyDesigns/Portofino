@@ -58,6 +58,7 @@ public class Navigation implements XhtmlFragment {
     protected final Application application;
     protected final Dispatch dispatch;
     protected final List<String> groups;
+    protected final boolean admin;
 
     public static final Logger logger =
             LoggerFactory.getLogger(Navigation.class);
@@ -66,10 +67,13 @@ public class Navigation implements XhtmlFragment {
     // Constructors
     //**************************************************************************
 
-    public Navigation(Application application, Dispatch dispatch, List<String> groups) {
+    public Navigation(
+            Application application, Dispatch dispatch, List<String> groups,
+            boolean admin) {
         this.application = application;
         this.dispatch = dispatch;
         this.groups = groups;
+        this.admin = admin;
         //TODO gestire deploy sotto ROOT
     }
 
@@ -94,7 +98,7 @@ public class Navigation implements XhtmlFragment {
         PageInstance expand = null;
         for (PageInstance current : pageInstances) {
             Page page = current.getPage();
-            if (!page.isAllowed(groups)) {
+            if (!admin && !page.isAllowed(groups)) {
                 continue;
             }
             if(!page.isShowInNavigation()) {
@@ -159,5 +163,9 @@ public class Navigation implements XhtmlFragment {
 
     public List<String> getGroups() {
         return groups;
+    }
+
+    public boolean isAdmin() {
+        return admin;
     }
 }

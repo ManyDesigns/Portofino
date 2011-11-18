@@ -181,11 +181,6 @@ public class Permissions implements ModelObject {
     //**************************************************************************
 
     public boolean isAllowed(String operation, List<String> groups) {
-        //Administrators are always allowed?
-        /*if(groups.contains(SecurityLogic.ADMINISTRATORS_GROUP_ID)) {
-            return true;
-        }*/
-
         //Deny wins over any other permission
         if (CollectionUtils.containsAny(actualDeny, groups)) {
             return false;

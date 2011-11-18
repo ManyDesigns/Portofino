@@ -8,15 +8,15 @@
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="portofino" uri="/manydesigns-portofino" %>
+
 <stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="page-permissions-edit" bean="${actionBean}" cssClass="contentButton" />
+        <stripes:layout-render name="/layouts/page/buttons.jsp" list="page-permissions-edit" cssClass="contentButton" />
         <div class="breadcrumbs">
             <div class="inner">
                 <mde:write name="breadcrumbs"/>
@@ -45,7 +45,7 @@
             <c:forEach var="group" items="${actionBean.groups}">
                 <%
                     Group group = (Group) pageContext.getAttribute("group");
-                    List<String> groups = Collections.singletonList(group.getName());
+                    List<String> groups = Collections.singletonList(group.getGroupId());
                 %>
                 <tr>
                     <stripes:layout-render
@@ -53,7 +53,7 @@
                             currentPage="<%= currentPage %>"
                             group="${group}"/>
                     <td><input type="checkbox" name="customPermissions[crud-create]"
-                               value="${group.name}"
+                               value="${group.groupId}"
                                <%
                                    if(currentPage.isAllowed(CrudAction.PERMISSION_CREATE, groups)) {
                                        out.print("checked='checked'");
@@ -61,7 +61,7 @@
                                %>/>
                     </td>
                     <td><input type="checkbox" name="customPermissions[crud-edit]"
-                               value="${group.name}"
+                               value="${group.groupId}"
                                <%
                                    if(currentPage.isAllowed(CrudAction.PERMISSION_EDIT, groups)) {
                                        out.print("checked='checked'");
@@ -69,7 +69,7 @@
                                %> />
                     </td>
                     <td><input type="checkbox" name="customPermissions[crud-delete]"
-                               value="${group.name}"
+                               value="${group.groupId}"
                                <%
                                    if(currentPage.isAllowed(CrudAction.PERMISSION_DELETE, groups)) {
                                        out.print("checked='checked'");
@@ -83,6 +83,6 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="page-permissions-edit" bean="${actionBean}" cssClass="contentButton" />
+        <stripes:layout-render name="/layouts/page/buttons.jsp" list="page-permissions-edit" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>

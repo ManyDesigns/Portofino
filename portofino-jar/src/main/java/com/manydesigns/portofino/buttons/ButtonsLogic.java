@@ -31,6 +31,8 @@ package com.manydesigns.portofino.buttons;
 
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
+import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.model.pages.Page;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -41,7 +43,7 @@ import java.util.*;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class Logic {
+public class ButtonsLogic {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -51,34 +53,32 @@ public class Logic {
         }
     }
 
-    public static Map<String, List<ButtonInfo>> getButtonsForClass(Class<?> someClass) {
-        Map<String, List<ButtonInfo>> buttonsMap = new HashMap<String, List<ButtonInfo>>();
+    public static List<ButtonInfo> getButtonsForClass
+            (Class<?> someClass, String list, List<String> groups, Page page) {
+        List<ButtonInfo> buttons = new ArrayList<ButtonInfo>();
         for(Method method : someClass.getMethods()) {
-            for(ButtonInfo button : getButtonsForMethod(method)) {
-                List<ButtonInfo> buttons = buttonsMap.get(button.getButton().list());
-                if(buttons == null) {
-                    buttons = new ArrayList<ButtonInfo>();
-                    buttonsMap.put(button.getButton().list(), buttons);
+            boolean allowed =
+                    page == null || SecurityLogic.isMethodAllowed(someClass, method, page, groups);
+            for(ButtonInfo button : getButtonsForMethod(method, allowed)) {
+                if(list.equals(button.getButton().list())) {
+                    buttons.add(button);
                 }
-                buttons.add(button);
             }
         }
-        for(List<ButtonInfo> buttons : buttonsMap.values()) {
-            Collections.sort(buttons, new ButtonComparatorByOrder());
-        }
-        return buttonsMap;
+        Collections.sort(buttons, new ButtonComparatorByOrder());
+        return buttons;
     }
 
-    private static Iterable<? extends ButtonInfo> getButtonsForMethod(Method method) {
+    private static Iterable<? extends ButtonInfo> getButtonsForMethod(Method method, boolean allowed) {
         List<ButtonInfo> buttonsList = new ArrayList<ButtonInfo>();
         Button button = method.getAnnotation(Button.class);
         if(button != null) {
-            buttonsList.add(new ButtonInfo(getEventName(method), button));
+            buttonsList.add(new ButtonInfo(getEventName(method), button, allowed));
         } else {
             Buttons buttons = method.getAnnotation(Buttons.class);
             if(buttons != null) {
                 for(Button b : buttons.value()) {
-                    buttonsList.add(new ButtonInfo(getEventName(method), b));
+                    buttonsList.add(new ButtonInfo(getEventName(method), b, allowed));
                 }
             }
         }

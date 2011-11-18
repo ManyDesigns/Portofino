@@ -676,6 +676,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     @Button(list = "crud-search", key = "commons.edit", order = 2)
+    @RequiresPermission(PERMISSION_EDIT)
     public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage(
@@ -733,6 +734,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     @Button(list = "crud-read", key = "commons.delete", order = 2)
+    @RequiresPermission(PERMISSION_DELETE)
     public Resolution delete() {
         Object pkObject = pkHelper.parsePkString(pk);
         application.deleteObject(baseTable.getQualifiedName(), pkObject);
@@ -754,6 +756,7 @@ public class CrudAction extends PortletAction {
     }
 
     @Button(list = "crud-search", key = "commons.delete", order = 3)
+    @RequiresPermission(PERMISSION_DELETE)
     public Resolution bulkDelete() {
         if (selection == null) {
             SessionMessages.addWarningMessage(
