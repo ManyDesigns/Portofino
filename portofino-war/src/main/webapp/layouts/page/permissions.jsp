@@ -31,7 +31,6 @@
             <tr>
                 <th>Group</th>
                 <th>Page permissions</th>
-                <th>Effective permissions</th>
             </tr>
             <c:forEach var="group" items="${actionBean.groups}">
                 <tr>

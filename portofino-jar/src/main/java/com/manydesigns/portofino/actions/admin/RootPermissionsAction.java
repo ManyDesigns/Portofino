@@ -93,4 +93,9 @@ public class RootPermissionsAction extends PortletAction implements AdminAction 
     public String getActionPath() {
         return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
     }
+
+    @Override
+    public Page getPage() {
+        return model.getRootPage();
+    }
 }

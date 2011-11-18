@@ -58,6 +58,7 @@ import com.manydesigns.portofino.logic.CrudLogic;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.pages.CrudPage;
+import com.manydesigns.portofino.model.pages.Permissions;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import com.manydesigns.portofino.model.pages.crud.SelectionProviderReference;
@@ -627,7 +628,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     @Button(list = "crud-read", key = "commons.edit", order = 1)
-    @RequiresPermission(PERMISSION_EDIT)
+    @RequiresPermission({Permissions.VIEW, PERMISSION_EDIT})
     public Resolution edit() {
         setupForm(Mode.EDIT);
         editSetup(object);

@@ -55,6 +55,7 @@ public class Permissions implements ModelObject {
     public static final String NONE = "none";
     public static final String VIEW = "view";
     public static final String EDIT = "edit";
+    public static final String MANAGE = "manage";
 
     //**************************************************************************
     // Fields

@@ -12,10 +12,6 @@
     Page currentPage = (Page) pageContext.getAttribute("currentPage");
     String groupId = group.getGroupId();
     String permissionLevel = actionBean.getPermissionLevelName(currentPage, groupId);
-    String effectivePermissionLevel = actionBean.getEffectivePermissionLevel(currentPage, groupId);
-    if(effectivePermissionLevel == null) {
-        effectivePermissionLevel = "None";
-    }
     String parentPermissionLevel = null;
     Page parentPage = currentPage.getParent();
     while(parentPermissionLevel == null && parentPage != null) {
@@ -73,5 +69,4 @@
             </option>
         </select>
     </td>
-    <td><%= effectivePermissionLevel %></td>
 </stripes:layout-definition>

@@ -34,7 +34,6 @@
             <tr>
                 <th rowspan="2">Group</th>
                 <th rowspan="2">Page permissions</th>
-                <th rowspan="2">Effective permissions</th>
                 <th colspan="3">Crud permissions</th>
             </tr>
             <tr>
