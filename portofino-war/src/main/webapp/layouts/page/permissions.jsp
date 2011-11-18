@@ -5,7 +5,7 @@
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -24,7 +24,25 @@
         Page permissions for: <c:out value="${actionBean.pageInstance.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <%@include file="pagePermissions.jsp"%>
+        <%
+            Page currentPage = actionBean.getPageInstance().getPage();
+        %>
+        <table>
+            <tr>
+                <th>Group</th>
+                <th>Page permissions</th>
+                <th>Effective permissions</th>
+            </tr>
+            <c:forEach var="group" items="${actionBean.groups}">
+                <tr>
+                    <stripes:layout-render
+                            name="pagePermissionRow.jsp"
+                            currentPage="<%= currentPage %>"
+                            group="${group}"/>
+                </tr>
+            </c:forEach>
+        </table>
+        <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">

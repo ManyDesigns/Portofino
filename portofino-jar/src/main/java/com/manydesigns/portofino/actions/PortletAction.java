@@ -239,7 +239,8 @@ public class PortletAction extends AbstractActionBean {
             SessionMessages.addInfoMessage("Page permissions saved successfully.");
         }
 
-        return new RedirectResolution(dispatch.getOriginalPath());
+        return new RedirectResolution(dispatch.getOriginalPath())
+                .addParameter("pagePermissions");
     }
 
     public void updatePagePermissions(Page page) {
