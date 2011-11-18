@@ -70,6 +70,7 @@ public class Permissions implements ModelObject {
     protected WithPermissions parent;
 
     protected final Set<String> actualDeny;
+    //<action, set<group>>
     protected final Map<String, Set<String>> actualPermissions;
 
     //**************************************************************************
@@ -102,45 +103,67 @@ public class Permissions implements ModelObject {
     }
 
     public void init(Model model) {
-        actualPermissions.put(NONE, new HashSet<String>(none));
-        actualPermissions.put(VIEW, new HashSet<String>(view));
-        actualPermissions.put(EDIT, new HashSet<String>(edit));
-
         actualDeny.addAll(deny);
+
+        //<group, set<permission>>
+        Map<String, Set<String>> calculatedPermissions =
+                new HashMap<String, Set<String>>();
 
         //Inherited permissions
         WithPermissions ancestor = (parent != null) ? parent.getParent() : null;
         if(ancestor != null) {
             actualDeny.addAll(ancestor.getPermissions().getActualDeny());
-            
+
+            //<action, set<group>>
             Map<String, Set<String>> parentPermissions =
                         ancestor.getPermissions().getActualPermissions();
-            for(Map.Entry<String, Set<String>> entry : actualPermissions.entrySet()) {
-                Set<String> set = entry.getValue();
-                String key = entry.getKey();
-                set.addAll(parentPermissions.get(key));
+            for(Map.Entry<String, Set<String>> entry : parentPermissions.entrySet()) {
+                for(String group : entry.getValue()) {
+                    Set<String> perms = calculatedPermissions.get(group);
+                    if(perms == null) {
+                        perms = new HashSet<String>();
+                        calculatedPermissions.put(group, perms);
+                    }
+                    perms.add(entry.getKey());
+                }
             }
         }
 
-        //Edit implies view
-        Set<String> view = actualPermissions.get(VIEW);
-        if(!view.isEmpty()) {
-            view.addAll(actualPermissions.get(EDIT));
+        //Local overrides
+        for(String group : none) {
+            HashSet<String> set = new HashSet<String>();
+            set.add(NONE);
+            calculatedPermissions.put(group, set);
+        }
+        for(String group : view) {
+            HashSet<String> set = new HashSet<String>();
+            set.add(VIEW);
+            calculatedPermissions.put(group, set);
+        }
+        for(String group : edit) {
+            HashSet<String> set = new HashSet<String>();
+            set.add(VIEW);
+            set.add(EDIT);
+            calculatedPermissions.put(group, set);
         }
 
-        //None
-        Set<String> actualNone = actualPermissions.get(NONE);
-        for(Map.Entry<String, Set<String>> entry : actualPermissions.entrySet()) {
-            Set<String> set = entry.getValue();
-            String key = entry.getKey();
-            if(!NONE.equals(key)) {
-                set.removeAll(actualNone);
+        //Reverse map: <group, set<permission>> --> <permission, set<group>>
+        //(easier to check)
+        actualPermissions.put(NONE, new HashSet<String>());
+        actualPermissions.put(VIEW, new HashSet<String>());
+        actualPermissions.put(EDIT, new HashSet<String>());
+
+        for (Map.Entry<String, Set<String>> entry : calculatedPermissions.entrySet()) {
+            for(String permission : entry.getValue()) {
+                Set<String> groups = actualPermissions.get(permission);
+                if(groups != null) {
+                    groups.add(entry.getKey());
+                } //else skip (custom permissions)
             }
         }
 
         //Custom permissions
         for(Permission perm : customPermissions) {
-            //TODO check std permissions clash?
             actualPermissions.put(perm.getName(), perm.getGroups());
         }
     }
