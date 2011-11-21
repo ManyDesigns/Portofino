@@ -1,9 +1,13 @@
-<%@ page import="com.manydesigns.portofino.actions.PortletAction" %>
+<%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
+<%@ page import="com.manydesigns.portofino.model.pages.AccessLevel" %>
 <%@ page import="com.manydesigns.portofino.model.pages.Page" %>
 <%@ page import="com.manydesigns.portofino.model.pages.Permissions" %>
 <%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.List" %>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <stripes:layout-definition>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
@@ -11,62 +15,79 @@
     Group group = (Group) pageContext.getAttribute("group");
     Page currentPage = (Page) pageContext.getAttribute("currentPage");
     String groupId = group.getGroupId();
-    String permissionLevel = actionBean.getPermissionLevelName(currentPage, groupId);
-    String parentPermissionLevel = null;
+    AccessLevel localAccessLevel = actionBean.getLocalAccessLevel(currentPage, groupId);
+    AccessLevel parentAccessLevel = null;
     Page parentPage = currentPage.getParent();
-    while(parentPermissionLevel == null && parentPage != null) {
-        parentPermissionLevel = actionBean.getEffectivePermissionLevel(parentPage, groupId);
-        parentPage = parentPage.getParent();
+    if(parentPage != null) {
+        parentAccessLevel = parentPage.getPermissions().getActualLevels().get(groupId);
     }
-    if(parentPermissionLevel == null) {
-        parentPermissionLevel = "None";
+    if(parentAccessLevel == null) {
+        parentAccessLevel = AccessLevel.NONE;
     }
+    Permissions permissions = currentPage.getPermissions();
+    List<String> groupIdList = Collections.singletonList(groupId);
 %>
     <td>
         <c:out value="${group.name}"/>
     </td>
     <td>
-        <select name="permissions[${group.groupId}]"
+        <select name="accessLevels[${group.groupId}]"
                 <%
-                    if("Deny".equals(parentPermissionLevel)) {
+                    if(AccessLevel.DENY.equals(parentAccessLevel)) {
                         out.print("disabled='disabled'");
                     }
                 %>>
-            <option value="__inherited">
-                Inherited (<%= parentPermissionLevel %>)
+            <option value="">
+                <fmt:message key='<%= "permissions.level." + parentAccessLevel.name().toLowerCase() %>'
+                             var="parentAccessLevelName" />
+                <fmt:message key="permissions.level.inherited">
+                    <fmt:param value="${parentAccessLevelName}" />
+                </fmt:message>
             </option>
-            <option value="<%= Permissions.NONE %>"
+            <option value="<%= AccessLevel.NONE.name() %>"
                     <%
-                        if (Permissions.NONE.equals(permissionLevel)) {
+                        if (AccessLevel.NONE.equals(localAccessLevel)) {
                             out.print("selected='selected'");
                         }
                     %>>
-                ---
+                <fmt:message key="permissions.level.none" />
             </option>
-            <option value="<%= Permissions.VIEW %>"
+            <option value="<%= AccessLevel.VIEW.name() %>"
                     <%
-                        if (Permissions.VIEW.equals(permissionLevel)) {
+                        if (AccessLevel.VIEW.equals(localAccessLevel)) {
                             out.print("selected='selected'");
                         }
                     %>>
-                View
+                <fmt:message key="permissions.level.view" />
             </option>
-            <option value="<%= Permissions.EDIT %>"
+            <option value="<%= AccessLevel.EDIT.name() %>"
                     <%
-                        if (Permissions.EDIT.equals(permissionLevel)) {
+                        if (AccessLevel.EDIT.equals(localAccessLevel)) {
                             out.print("selected='selected'");
                         }
                     %>>
-                Edit
+                <fmt:message key="permissions.level.edit" />
             </option>
-            <option value="<%= PortletAction.DENY %>"
+            <option value="<%= AccessLevel.DENY.name() %>"
                     <%
-                        if (PortletAction.DENY.equals(permissionLevel)) {
+                        if (AccessLevel.DENY.equals(localAccessLevel)) {
                             out.print("selected='selected'");
                         }
                     %>>
-                Deny
+                <fmt:message key="permissions.level.deny" />
             </option>
         </select>
     </td>
+    <c:forEach var="perm" items="${supportedPermissions}">
+        <td>
+            <input type="checkbox" name="permissions[<%= groupId %>]"
+                   value="${perm}"
+                   <%
+                       if(SecurityLogic.hasPermissions(permissions, groupIdList, null,
+                                                       (String) pageContext.getAttribute("perm"))) {
+                           out.print("checked='checked'");
+                       }
+                   %>/>
+        </td>
+    </c:forEach>
 </stripes:layout-definition>

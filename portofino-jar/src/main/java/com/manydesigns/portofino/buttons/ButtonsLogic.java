@@ -33,6 +33,8 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -57,36 +59,43 @@ public class ButtonsLogic {
             (Class<?> someClass, String list, List<String> groups, Page page) {
         List<ButtonInfo> buttons = new ArrayList<ButtonInfo>();
         for(Method method : someClass.getMethods()) {
-            boolean allowed =
-                    page == null || SecurityLogic.isMethodAllowed(someClass, method, page, groups);
-            for(ButtonInfo button : getButtonsForMethod(method, allowed)) {
-                if(list.equals(button.getButton().list())) {
-                    buttons.add(button);
-                }
+            Button button = getButtonForMethod(method, list);
+            if(button != null) {
+                ButtonInfo buttonInfo = new ButtonInfo(button,method, someClass);
+                buttons.add(buttonInfo);
             }
         }
         Collections.sort(buttons, new ButtonComparatorByOrder());
         return buttons;
     }
 
-    private static Iterable<? extends ButtonInfo> getButtonsForMethod(Method method, boolean allowed) {
+    private static Button getButtonForMethod(Method method, String list) {
         List<ButtonInfo> buttonsList = new ArrayList<ButtonInfo>();
         Button button = method.getAnnotation(Button.class);
-        if(button != null) {
-            buttonsList.add(new ButtonInfo(getEventName(method), button, allowed));
+        if(button != null && list.equals(button.list())) {
+            return button;
         } else {
             Buttons buttons = method.getAnnotation(Buttons.class);
             if(buttons != null) {
                 for(Button b : buttons.value()) {
-                    buttonsList.add(new ButtonInfo(getEventName(method), b, allowed));
+                    if(list.equals(b.list())) {
+                        return b;
+                    }
                 }
             }
         }
-        return buttonsList;
+        return null;
     }
 
-    private static String getEventName(Method method) {
-        return method.getName();
+    public static boolean hasPermissions
+            (@NotNull ButtonInfo button, @NotNull Page page, @NotNull Collection<String> groupIds) {
+        RequiresPermissions requiresPermissions =
+                    SecurityLogic.getRequiresPermissionsAnnotation(button.getMethod(), button.getFallbackClass());
+        if(requiresPermissions != null) {
+            return SecurityLogic.hasPermissions(page.getPermissions(), groupIds, requiresPermissions);
+        } else {
+            return true;
+        }
     }
 
 }

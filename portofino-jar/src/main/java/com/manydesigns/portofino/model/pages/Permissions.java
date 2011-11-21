@@ -32,13 +32,11 @@ package com.manydesigns.portofino.model.pages;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
-import org.apache.commons.collections.CollectionUtils;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.*;
 
 /*
@@ -52,26 +50,16 @@ public class Permissions implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public static final String NONE = "none";
-    public static final String VIEW = "view";
-    public static final String EDIT = "edit";
-    public static final String MANAGE = "manage";
-
     //**************************************************************************
     // Fields
     //**************************************************************************
 
-    protected final Set<String> none;
-    protected final Set<String> view;
-    protected final Set<String> edit;
-    protected final Set<String> deny;
-
-    protected final List<Permission> customPermissions;
+    protected final List<Group> groups;
 
     protected WithPermissions parent;
 
-    protected final Set<String> actualDeny;
-    //<action, set<group>>
+    protected final Map<String, AccessLevel> actualLevels;
+    //<group, set<permission>>
     protected final Map<String, Set<String>> actualPermissions;
 
     //**************************************************************************
@@ -79,15 +67,10 @@ public class Permissions implements ModelObject {
     //**************************************************************************
 
     public Permissions() {
-        none = new HashSet<String>();
-        view = new HashSet<String>();
-        edit = new HashSet<String>();
-        deny = new HashSet<String>();
+        groups = new ArrayList<Group>();
 
-        customPermissions = new ArrayList<Permission>();
-        
+        actualLevels = new HashMap<String, AccessLevel>();
         actualPermissions = new HashMap<String, Set<String>>();
-        actualDeny = new HashSet<String>();
     }
 
     //**************************************************************************
@@ -99,135 +82,49 @@ public class Permissions implements ModelObject {
     }
 
     public void reset() {
+        actualLevels.clear();
         actualPermissions.clear();
-        actualDeny.clear();
     }
 
-    public void init(Model model) {
-        actualDeny.addAll(deny);
+    public void init(Model model) {}
 
-        //<group, set<permission>>
-        Map<String, Set<String>> calculatedPermissions =
-                new HashMap<String, Set<String>>();
+    public void link(Model model) {
+        for(Group group : groups) {
+            actualLevels.put(group.getName(), group.getActualAccessLevel());
+            actualPermissions.put(group.getName(), group.getPermissions());
+        }
 
         //Inherited permissions
         WithPermissions ancestor = (parent != null) ? parent.getParent() : null;
         if(ancestor != null) {
-            actualDeny.addAll(ancestor.getPermissions().getActualDeny());
-
-            //<action, set<group>>
-            Map<String, Set<String>> parentPermissions =
-                        ancestor.getPermissions().getActualPermissions();
-            for(Map.Entry<String, Set<String>> entry : parentPermissions.entrySet()) {
-                for(String group : entry.getValue()) {
-                    Set<String> perms = calculatedPermissions.get(group);
-                    if(perms == null) {
-                        perms = new HashSet<String>();
-                        calculatedPermissions.put(group, perms);
-                    }
-                    perms.add(entry.getKey());
+            Map<String, AccessLevel> parentLevels = ancestor.getPermissions().getActualLevels();
+            for(Map.Entry<String, AccessLevel> entry : parentLevels.entrySet()) {
+                String key = entry.getKey();
+                AccessLevel value = entry.getValue();
+                if(value == AccessLevel.DENY || actualLevels.get(key) == null) {
+                    actualLevels.put(key, value);
                 }
             }
         }
-
-        //Local overrides
-        for(String group : none) {
-            HashSet<String> set = new HashSet<String>();
-            set.add(NONE);
-            calculatedPermissions.put(group, set);
-        }
-        for(String group : view) {
-            HashSet<String> set = new HashSet<String>();
-            set.add(VIEW);
-            calculatedPermissions.put(group, set);
-        }
-        for(String group : edit) {
-            HashSet<String> set = new HashSet<String>();
-            set.add(VIEW);
-            set.add(EDIT);
-            calculatedPermissions.put(group, set);
-        }
-
-        //Reverse map: <group, set<permission>> --> <permission, set<group>>
-        //(easier to check)
-        actualPermissions.put(NONE, new HashSet<String>());
-        actualPermissions.put(VIEW, new HashSet<String>());
-        actualPermissions.put(EDIT, new HashSet<String>());
-
-        for (Map.Entry<String, Set<String>> entry : calculatedPermissions.entrySet()) {
-            for(String permission : entry.getValue()) {
-                Set<String> groups = actualPermissions.get(permission);
-                if(groups != null) {
-                    groups.add(entry.getKey());
-                } //else skip (custom permissions)
-            }
-        }
-
-        //Custom permissions
-        for(Permission perm : customPermissions) {
-            actualPermissions.put(perm.getName(), perm.getGroups());
-        }
     }
 
-    public void link(Model model) {}
-
-    public void visitChildren(ModelVisitor visitor) {}
+    public void visitChildren(ModelVisitor visitor) {
+        for(Group group : groups) {
+            visitor.visit(group);
+        }
+    }
 
     public String getQualifiedName() {
         return null;
     }
 
     //**************************************************************************
-    // Permission verification
-    //**************************************************************************
-
-    public boolean isAllowed(String operation, List<String> groups) {
-        //Deny wins over any other permission
-        if (CollectionUtils.containsAny(actualDeny, groups)) {
-            return false;
-        }
-
-        Set<String> perm = actualPermissions.get(operation);
-
-        if(perm == null || perm.isEmpty()) {
-            return false;
-        }
-
-        return CollectionUtils.containsAny(perm, groups);
-    }
-
-    //**************************************************************************
     // Getters/setters
     //**************************************************************************
 
-    @XmlElementWrapper(name="none")
-    @XmlElement(name = "group", type = java.lang.String.class)
-    public Set<String> getNone() {
-        return none;
-    }
-
-    @XmlElementWrapper(name="view")
-    @XmlElement(name = "group", type = java.lang.String.class)
-    public Set<String> getView() {
-        return view;
-    }
-
-    @XmlElementWrapper(name="edit")
-    @XmlElement(name = "group", type = java.lang.String.class)
-    public Set<String> getEdit() {
-        return edit;
-    }
-
-
-    @XmlElementWrapper(name="deny")
-    @XmlElement(name = "group", type = java.lang.String.class)
-    public Set<String> getDeny() {
-        return deny;
-    }
-
-    @XmlElement(name = "permission", type = Permission.class)
-    public List<Permission> getCustomPermissions() {
-        return customPermissions;
+    @XmlElement(name = "group", type = Group.class)
+    public List<Group> getGroups() {
+        return groups;
     }
 
     public WithPermissions getParent() {
@@ -242,7 +139,7 @@ public class Permissions implements ModelObject {
         return actualPermissions;
     }
 
-    public Set<String> getActualDeny() {
-        return actualDeny;
+    public Map<String, AccessLevel> getActualLevels() {
+        return actualLevels;
     }
 }

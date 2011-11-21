@@ -33,11 +33,15 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.model.pages.Permissions;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresPermission;
+import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.ArrayUtils;
 import org.hibernate.Session;
@@ -49,9 +53,7 @@ import sun.misc.BASE64Encoder;
 import javax.servlet.ServletRequest;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -99,35 +101,88 @@ public class SecurityLogic {
         return groups;
     }
 
-    public static boolean isMethodAllowed
-            (Class<?> theClass, Method handler, Page page, List<String> groups) {
+    public static boolean hasPermissions
+            (ServletRequest request, AccessLevel level, String... permissions) {
+        boolean isNotAdmin = !SecurityLogic.isAdministrator(request);
+        Dispatch dispatch =
+                (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
+        if (isNotAdmin && dispatch != null) {
+            List<String> groups = (List<String>) request.getAttribute(RequestAttributes.GROUPS);
+            PageInstance pageInstance = dispatch.getLastPageInstance();
+            Page page = pageInstance.getPage();
+            return hasPermissions(page.getPermissions(), groups, level, permissions);
+        } else {
+            return true;
+        }
+    }
+
+    public static boolean hasPermissions
+            (Permissions configuration, Collection<String> groups, Method handler, Class<?> theClass) {
         logger.debug("Checking action permissions");
-        RequiresPermission requiresPermission = handler.getAnnotation(RequiresPermission.class);
-        if (requiresPermission != null) {
+        RequiresPermissions requiresPermissions = getRequiresPermissionsAnnotation(handler, theClass);
+        if(requiresPermissions != null) {
+            return hasPermissions(configuration, groups, requiresPermissions);
+        } else {
+            return true;
+        }
+    }
+
+    public static boolean hasPermissions
+            (Permissions configuration, Collection<String> groups, RequiresPermissions thing) {
+        if(!hasPermissions(configuration, groups,
+                           thing.level(), thing.permissions())) {
+            logger.info("User does not match action permissions. User's groups: {}",
+                        ArrayUtils.toString(groups));
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public static RequiresPermissions getRequiresPermissionsAnnotation(Method handler, Class<?> theClass) {
+        RequiresPermissions requiresPermissions = handler.getAnnotation(RequiresPermissions.class);
+        if (requiresPermissions != null) {
             logger.debug("Action method requires specific permissions: {}", handler);
         } else {
-            Class actionClass = theClass;
-            while (actionClass != null) {
-                requiresPermission = handler.getAnnotation(RequiresPermission.class);
-                if (requiresPermission != null) {
-                    logger.debug("Action class requires specific permissions: {}",
-                                 actionClass);
-                    break;
-                }
-                actionClass = actionClass.getSuperclass();
+            requiresPermissions = theClass.getAnnotation(RequiresPermissions.class);
+            if (requiresPermissions != null) {
+                logger.debug("Action class requires specific permissions: {}",
+                             theClass);
             }
         }
-        if(requiresPermission != null) {
-            List<String> requiredPermissions = Arrays.asList(requiresPermission.value());
-            for(String operation : requiredPermissions) {
-                if(!page.isAllowed(operation, groups)) {
-                    logger.info("User does not match action permissions. User's groups: {}",
-                                ArrayUtils.toString(groups));
-                    return false;
+        return requiresPermissions;
+    }
+
+    public static boolean hasPermissions
+            (Permissions configuration, Collection<String> groups, AccessLevel level, String... permissions) {
+        boolean hasLevel = level == null;
+        boolean hasPermissions = true;
+        Map<String, Boolean> permMap = new HashMap<String, Boolean>(permissions.length);
+        for(String group : groups) {
+            AccessLevel actualLevel = configuration.getActualLevels().get(group);
+            if(actualLevel == AccessLevel.DENY) {
+                return false;
+            } else if(!hasLevel &&
+                      actualLevel != null &&
+                      actualLevel.isGreaterThanOrEqual(level)) {
+                hasLevel = true;
+            }
+
+            Set<String> perms = configuration.getActualPermissions().get(group);
+            if(perms != null) {
+                for(String permission : permissions) {
+                    if(perms.contains(permission)) {
+                        permMap.put(permission, true);
+                    }
                 }
             }
         }
-        return true;
+
+        for(String permission : permissions) {
+            hasPermissions &= permMap.containsKey(permission);
+        }
+
+        return hasLevel && hasPermissions;
     }
 
     public static String encryptPassword(String password) {

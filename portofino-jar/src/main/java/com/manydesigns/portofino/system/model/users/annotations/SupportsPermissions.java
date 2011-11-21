@@ -27,11 +27,12 @@
 *
 */
 
-package com.manydesigns.portofino.buttons;
+package com.manydesigns.portofino.system.model.users.annotations;
 
-import com.manydesigns.portofino.buttons.annotations.Button;
-
-import java.lang.reflect.Method;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -39,29 +40,12 @@ import java.lang.reflect.Method;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class ButtonInfo {
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface SupportsPermissions {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    private final Method method;
-    private final Button button;
-    private final Class fallbackClass;
+    String[] value() default {};
 
-    public ButtonInfo(Button button, Method method, Class fallbackClass) {
-        this.button = button;
-        this.method = method;
-        this.fallbackClass = fallbackClass;
-    }
-
-    public Button getButton() {
-        return button;
-    }
-
-    public Method getMethod() {
-        return method;
-    }
-
-    public Class getFallbackClass() {
-        return fallbackClass;
-    }
 }

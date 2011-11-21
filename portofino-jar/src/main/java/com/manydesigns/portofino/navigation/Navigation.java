@@ -34,6 +34,8 @@ import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.Page;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -98,7 +100,7 @@ public class Navigation implements XhtmlFragment {
         PageInstance expand = null;
         for (PageInstance current : pageInstances) {
             Page page = current.getPage();
-            if (!admin && !page.isAllowed(groups)) {
+            if (!admin && !SecurityLogic.hasPermissions(page.getPermissions(), groups, AccessLevel.VIEW)) {
                 continue;
             }
             if(!page.isShowInNavigation()) {

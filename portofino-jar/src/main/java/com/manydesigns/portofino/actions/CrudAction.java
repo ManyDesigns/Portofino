@@ -56,16 +56,18 @@ import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.CrudLogic;
 import com.manydesigns.portofino.logic.DataModelLogic;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.datamodel.*;
+import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.CrudPage;
-import com.manydesigns.portofino.model.pages.Permissions;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import com.manydesigns.portofino.model.pages.crud.SelectionProviderReference;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresPermission;
+import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
+import com.manydesigns.portofino.system.model.users.annotations.SupportsPermissions;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
 import groovy.lang.Binding;
@@ -116,6 +118,8 @@ import java.util.regex.Pattern;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @UrlBinding("/actions/crud")
+@SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
+@RequiresPermissions(level = AccessLevel.VIEW)
 public class CrudAction extends PortletAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
@@ -574,7 +578,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     @Button(list = "crud-search", key = "commons.create", order = 1)
-    @RequiresPermission(PERMISSION_CREATE)
+    @RequiresPermissions(permissions = PERMISSION_CREATE)
     public Resolution create() {
         setupForm(Mode.CREATE);
         object = classAccessor.newInstance();
@@ -593,7 +597,7 @@ public class CrudAction extends PortletAction {
     }
 
     @Button(list = "crud-create", key = "commons.save", order = 1)
-    @RequiresPermission(PERMISSION_CREATE)
+    @RequiresPermissions(permissions = PERMISSION_CREATE)
     public Resolution save() {
         setupForm(Mode.CREATE);
         object = classAccessor.newInstance();
@@ -628,7 +632,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     @Button(list = "crud-read", key = "commons.edit", order = 1)
-    @RequiresPermission({Permissions.VIEW, PERMISSION_EDIT})
+    @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution edit() {
         setupForm(Mode.EDIT);
         editSetup(object);
@@ -645,7 +649,7 @@ public class CrudAction extends PortletAction {
     }
 
     @Button(list = "crud-edit", key = "commons.update", order = 1)
-    @RequiresPermission(PERMISSION_EDIT)
+    @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution update() {
         setupForm(Mode.EDIT);
         editSetup(object);
@@ -677,7 +681,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     @Button(list = "crud-search", key = "commons.edit", order = 2)
-    @RequiresPermission(PERMISSION_EDIT)
+    @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage(
@@ -703,6 +707,7 @@ public class CrudAction extends PortletAction {
     }
 
     @Button(list = "crud-bulk-edit", key = "commons.update", order = 1)
+    @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkUpdate() {
         setupForm(Mode.BULK_EDIT);
         form.readFromRequest(context.getRequest());
@@ -735,7 +740,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     @Button(list = "crud-read", key = "commons.delete", order = 2)
-    @RequiresPermission(PERMISSION_DELETE)
+    @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
         Object pkObject = pkHelper.parsePkString(pk);
         application.deleteObject(baseTable.getQualifiedName(), pkObject);
@@ -757,7 +762,7 @@ public class CrudAction extends PortletAction {
     }
 
     @Button(list = "crud-search", key = "commons.delete", order = 3)
-    @RequiresPermission(PERMISSION_DELETE)
+    @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution bulkDelete() {
         if (selection == null) {
             SessionMessages.addWarningMessage(
@@ -791,11 +796,6 @@ public class CrudAction extends PortletAction {
     public static final String PERMISSION_CREATE = "crud-create";
     public static final String PERMISSION_EDIT = "crud-edit";
     public static final String PERMISSION_DELETE = "crud-delete";
-
-    @Override
-    protected Resolution forwardToPagePermissions() {
-        return new ForwardResolution("/layouts/crud/permissions.jsp");
-    }
 
     //**************************************************************************
     // Return to parent
@@ -1046,7 +1046,10 @@ public class CrudAction extends PortletAction {
                 .configMode(mode)
                 .build();
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
-        tableForm.setSelectable(true);
+        boolean selectable = false;
+        selectable = selectable || SecurityLogic.hasPermissions(context.getRequest(), null, PERMISSION_EDIT);
+        selectable = selectable || SecurityLogic.hasPermissions(context.getRequest(), null, PERMISSION_DELETE);
+        tableForm.setSelectable(selectable);
         if (objects != null) {
             tableForm.readFromObject(objects);
         }

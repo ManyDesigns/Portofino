@@ -27,11 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.buttons;
-
-import com.manydesigns.portofino.buttons.annotations.Button;
-
-import java.lang.reflect.Method;
+package com.manydesigns.portofino.model.pages;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -39,29 +35,20 @@ import java.lang.reflect.Method;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class ButtonInfo {
-    public static final String copyright =
+public enum AccessLevel {
+
+    NONE(0), VIEW(1), EDIT(2), DENY(Integer.MAX_VALUE);
+
+    private AccessLevel(int level) {
+        this.level = level;
+    }
+
+    public boolean isGreaterThanOrEqual(AccessLevel accessLevel) {
+        return level >= accessLevel.level;
+    }
+
+    private final int level;
+
+    public static final String copyright=
             "Copyright (c) 2005-2011, ManyDesigns srl";
-
-    private final Method method;
-    private final Button button;
-    private final Class fallbackClass;
-
-    public ButtonInfo(Button button, Method method, Class fallbackClass) {
-        this.button = button;
-        this.method = method;
-        this.fallbackClass = fallbackClass;
-    }
-
-    public Button getButton() {
-        return button;
-    }
-
-    public Method getMethod() {
-        return method;
-    }
-
-    public Class getFallbackClass() {
-        return fallbackClass;
-    }
 }

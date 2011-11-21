@@ -23,8 +23,8 @@ import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
-import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
+import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+@RequiresPermissions(level = AccessLevel.VIEW)
 public class PortletAction extends AbstractActionBean {
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
@@ -203,14 +204,12 @@ public class PortletAction extends AbstractActionBean {
     // Page permisssions
     //--------------------------------------------------------------------------
 
-    public static final String DENY = "__deny";
+    List<com.manydesigns.portofino.system.model.users.Group> groups;
 
-    List<Group> groups;
-
-    //<group, permission>
-    Map<String, String> permissions = new HashMap<String, String>();
-    //<permission, groups>
-    Map<String, List<String>> customPermissions = new HashMap<String, List<String>>();
+    //<group, level>
+    Map<String, String> accessLevels = new HashMap<String, String>();
+    //<group, permissions>
+    Map<String, List<String>> permissions = new HashMap<String, List<String>>();
 
     @RequiresAdministrator
     public Resolution pagePermissions() {
@@ -226,7 +225,7 @@ public class PortletAction extends AbstractActionBean {
     }
 
     public void setupGroups(Page page) {
-        groups = new ArrayList<Group>(application.getAllObjects(SecurityLogic.GROUPTABLE));
+        groups = new ArrayList<com.manydesigns.portofino.system.model.users.Group>(application.getAllObjects(SecurityLogic.GROUPTABLE));
     }
 
     @RequiresAdministrator
@@ -246,91 +245,65 @@ public class PortletAction extends AbstractActionBean {
     public void updatePagePermissions(Page page) {
         Permissions pagePermissions = page.getPermissions();
 
-        pagePermissions.getNone().clear();
-        pagePermissions.getView().clear();
-        pagePermissions.getEdit().clear();
-        pagePermissions.getDeny().clear();
+        pagePermissions.getGroups().clear();
 
-        for(Map.Entry<String, String> entry : permissions.entrySet()) {
-            String perm = entry.getValue();
-            String group = entry.getKey();
-            if(Permissions.VIEW.equals(perm)) {
-                pagePermissions.getView().add(group);
-            } else if(Permissions.EDIT.equals(perm)) {
-                pagePermissions.getEdit().add(group);
-            } else if(Permissions.NONE.equals(perm)) {
-                pagePermissions.getNone().add(group);
-            } else if(DENY.equals(perm)) {
-                pagePermissions.getDeny().add(group);
-            } else {
-                logger.warn("Unrecognized page permission: {}", perm);
+        Map<String, Group> groups = new HashMap<String, Group>();
+
+        for(Map.Entry<String, String> entry : accessLevels.entrySet()) {
+            Group group = new Group();
+            group.setName(entry.getKey());
+            group.setAccessLevel(entry.getValue());
+            groups.put(group.getName(), group);
+        }
+
+        for(Map.Entry<String, List<String>> custPerm : permissions.entrySet()) {
+            String groupId = custPerm.getKey();
+            Group group = groups.get(groupId);
+            if(group == null) {
+                group = new Group();
+                group.setName(groupId);
+                groups.put(groupId, group);
+            }
+            group.getPermissions().addAll(custPerm.getValue());
+        }
+
+        for(Group group : groups.values()) {
+            pagePermissions.getGroups().add(group);
+        }
+    }
+
+    public AccessLevel getLocalAccessLevel(Page currentPage, String groupId) {
+        Permissions currentPagePermissions = currentPage.getPermissions();
+        for(Group group : currentPagePermissions.getGroups()) {
+            if(groupId.equals(group.getName())) {
+                return group.getActualAccessLevel();
             }
         }
-
-        pagePermissions.getCustomPermissions().clear();
-        for(Map.Entry<String, List<String>> custPerm : customPermissions.entrySet()) {
-            Permission permission = new Permission();
-            permission.setName(custPerm.getKey());
-            permission.getGroups().addAll(custPerm.getValue());
-            pagePermissions.getCustomPermissions().add(permission);
-        }
-    }
-
-    public String getPermissionLevelName(Page currentPage, String groupId) {
-        Permissions currentPagePermissions = currentPage.getPermissions();
-        if(currentPagePermissions.getDeny().contains(groupId)) {
-            return DENY;
-        } else if(currentPagePermissions.getNone().contains(groupId)) {
-            return Permissions.NONE;
-        } else if(currentPagePermissions.getEdit().contains(groupId)) {
-            return Permissions.EDIT;
-        } else if(currentPagePermissions.getView().contains(groupId)) {
-            return Permissions.VIEW;
-        } else {
-            return null; //Inherited
-        }
-    }
-
-    public String getEffectivePermissionLevel(Page currentPage, String groupName) {
-        String permissionLevel;
-        List<String> groupNames = Arrays.asList(groupName);
-        if(currentPage.isAllowed(Permissions.EDIT, groupNames)) {
-            permissionLevel = "Edit";
-        } else if(currentPage.isAllowed(Permissions.VIEW, groupNames)) {
-            permissionLevel = "View";
-        } else if(currentPage.getPermissions().getActualDeny().contains(groupName)) {
-            permissionLevel = "Deny";
-        } else if(currentPage.getPermissions().getActualPermissions()
-                    .get(Permissions.NONE).contains(groupName)) {
-            permissionLevel = "None";
-        } else {
-            permissionLevel = null;
-        }
-        return permissionLevel;
+        return null;
     }
 
     //--------------------------------------------------------------------------
     // Getters/Setters
     //--------------------------------------------------------------------------
 
-    public List<Group> getGroups() {
+    public List<com.manydesigns.portofino.system.model.users.Group> getGroups() {
         return groups;
     }
 
-    public Map<String, String> getPermissions() {
+    public Map<String, String> getAccessLevels() {
+        return accessLevels;
+    }
+
+    public void setAccessLevels(Map<String, String> accessLevels) {
+        this.accessLevels = accessLevels;
+    }
+
+    public Map<String, List<String>> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(Map<String, String> permissions) {
+    public void setPermissions(Map<String, List<String>> permissions) {
         this.permissions = permissions;
-    }
-
-    public Map<String, List<String>> getCustomPermissions() {
-        return customPermissions;
-    }
-
-    public void setCustomPermissions(Map<String, List<String>> customPermissions) {
-        this.customPermissions = customPermissions;
     }
 
     public Dispatch getDispatch() {

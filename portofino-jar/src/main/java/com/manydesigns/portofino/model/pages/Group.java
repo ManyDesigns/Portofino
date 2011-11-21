@@ -29,17 +29,16 @@
 
 package com.manydesigns.portofino.model.pages;
 
-import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.*;
 
 /*
@@ -49,7 +48,7 @@ import java.util.*;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public class Permission implements ModelObject {
+public class Group implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -57,15 +56,18 @@ public class Permission implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected final Set<String> groups;
+    protected final Set<String> permissions;
+    protected String accessLevel;
     protected String name;
+
+    protected AccessLevel actualAccessLevel;
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public Permission() {
-        groups = new HashSet<String>();
+    public Group() {
+        permissions = new HashSet<String>();
     }
 
     //**************************************************************************
@@ -74,9 +76,15 @@ public class Permission implements ModelObject {
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {}
 
-    public void reset() {}
+    public void reset() {
+        actualAccessLevel = null;
+    }
 
-    public void init(Model model) {}
+    public void init(Model model) {
+        if(!StringUtils.isEmpty(accessLevel)) {
+            actualAccessLevel = AccessLevel.valueOf(accessLevel);
+        }
+    }
 
     public void link(Model model) {}
 
@@ -90,16 +98,30 @@ public class Permission implements ModelObject {
     // Getters/setters
     //**************************************************************************
 
-    @XmlElement(name = "group", type = String.class)
-    public Set<String> getGroups() {
-        return groups;
+    @XmlElement(name = "permission", type = String.class)
+    public Set<String> getPermissions() {
+        return permissions;
     }
 
+    @XmlAttribute
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @XmlAttribute(name = "level")
+    public String getAccessLevel() {
+        return accessLevel;
+    }
+
+    public void setAccessLevel(String accessLevel) {
+        this.accessLevel = accessLevel;
+    }
+
+    public AccessLevel getActualAccessLevel() {
+        return actualAccessLevel;
     }
 }

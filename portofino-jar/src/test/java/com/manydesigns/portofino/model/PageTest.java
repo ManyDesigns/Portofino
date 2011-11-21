@@ -28,6 +28,7 @@
  */
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.pages.*;
 import junit.framework.TestCase;
 
@@ -77,7 +78,7 @@ public class PageTest extends TestCase {
         root.setDescription("portofino application");
         Permissions rootPerms = new Permissions();
         rootPerms.setParent(root);
-        rootPerms.getView().add("all");
+        addGroup(rootPerms, "all", AccessLevel.VIEW);
         root.setPermissions(rootPerms);
 
         //Nessun permesso
@@ -102,8 +103,8 @@ public class PageTest extends TestCase {
         n1_2.setTitle("Model title");
         n1_2.setFragment("model");
 
-        n1_2_perm.getNone().add("all");
-        n1_2_perm.getView().add("registered");
+        addGroup(n1_2_perm, "all", AccessLevel.NONE);
+        addGroup(n1_2_perm, "registered", AccessLevel.VIEW);
 
         n1_2_1 = new CustomFolderPage();
         n1_2_1.setParent(n1_2);
@@ -117,8 +118,8 @@ public class PageTest extends TestCase {
         n1_2_1.setUrl("/model/TableData.action");
         n1_2.getChildPages().add(n1_2_1);
 
-        n1_2_1_perm.getNone().add("registered");
-        n1_2_1_perm.getView().add("admins");
+        addGroup(n1_2_1_perm, "registered", AccessLevel.NONE);
+        addGroup(n1_2_1_perm, "admins", AccessLevel.VIEW);
 
         n1_2_2 = new CustomFolderPage();
         n1_2_2.setParent(n1_2);
@@ -145,7 +146,7 @@ public class PageTest extends TestCase {
         n1_2_3.setUrl("http://www.manydesigns.com/");
         n1_2.getChildPages().add(n1_2_3);
 
-        n1_2_3_perm.getDeny().add("cattivi");
+        addGroup(n1_2_3_perm, "cattivi", AccessLevel.DENY);
 
         //1.3
         n1_3 = new CustomPage();
@@ -158,9 +159,9 @@ public class PageTest extends TestCase {
         n1_3.setFragment("Profile");
         n1_3.setUrl("/Profile.action");
 
-        n1_3_perm.getDeny().add("cattivi");
-        n1_3_perm.getNone().add("all");
-        n1_3_perm.getView().add("buoni");
+        addGroup(n1_3_perm, "cattivi", AccessLevel.DENY);
+        addGroup(n1_3_perm, "all", AccessLevel.NONE);
+        addGroup(n1_3_perm, "buoni", AccessLevel.VIEW);
 
         //1.4
         n1_4 = new FolderPage();
@@ -184,23 +185,31 @@ public class PageTest extends TestCase {
 
 
         permissions = new Permissions();
-        permissions.getNone().add("all");
-        permissions.getView().add("buoni");
-        permissions.getDeny().add("cattivi");
+        addGroup(permissions, "all", AccessLevel.NONE);
+        addGroup(permissions, "buoni", AccessLevel.VIEW);
+        addGroup(permissions, "cattivi", AccessLevel.DENY);
         permissions.init(null);
 
         permissions2 = new Permissions();
-        permissions2.getView().add("all");
-        permissions2.getDeny().add("cattivi");
+        addGroup(permissions2, "all", AccessLevel.VIEW);
+        addGroup(permissions2, "cattivi", AccessLevel.DENY);
         permissions2.init(null);
 
         permissions3 = new Permissions();
-        permissions3.getNone().add("all");
-        permissions3.getView().add("buoni");
+        addGroup(permissions3, "all", AccessLevel.NONE);
+        addGroup(permissions3, "buoni", AccessLevel.VIEW);
         permissions3.init(null);
 
         groups = new ArrayList<String>();
 
+    }
+
+    private void addGroup(Permissions perms, String groupId, AccessLevel accessLevel) {
+        Group group = new Group();
+        group.setName(groupId);
+        group.setAccessLevel(accessLevel.name());
+        perms.getGroups().add(group);
+        group.init(null);
     }
 
 
@@ -208,32 +217,33 @@ public class PageTest extends TestCase {
         groups.add("all");
         groups.add("anonymous");
 
-        assertTrue(root.isAllowed(groups));
-        assertTrue(n1_1.isAllowed(groups));
-        assertFalse(n1_2.isAllowed(groups));
+        assertTrue(SecurityLogic.hasPermissions(root.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_1.getPermissions(), groups, AccessLevel.VIEW));
+        assertFalse(SecurityLogic.hasPermissions(n1_2.getPermissions(), groups, AccessLevel.VIEW));
 
-        assertFalse(n1_2_1.isAllowed(groups));
-        assertFalse(n1_2_2.isAllowed(groups));
-        assertFalse(n1_2_3.isAllowed(groups));
+        assertFalse(SecurityLogic.hasPermissions(n1_2_1.getPermissions(), groups, AccessLevel.VIEW));
+        assertFalse(SecurityLogic.hasPermissions(n1_2_2.getPermissions(), groups, AccessLevel.VIEW));
+        assertFalse(SecurityLogic.hasPermissions(n1_2_3.getPermissions(), groups, AccessLevel.VIEW));
 
-        assertFalse(n1_3.isAllowed(groups));
-        assertTrue(n1_4.isAllowed(groups));
+        assertFalse(SecurityLogic.hasPermissions(n1_3.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_4.getPermissions(), groups, AccessLevel.VIEW));
     }
 
     public void testRegistered() {
         groups.add("all");
         groups.add("registered");
 
-        assertTrue(root.isAllowed(groups));
-        assertTrue(n1_1.isAllowed(groups));
-        assertTrue(n1_2.isAllowed(groups));
+        assertTrue(SecurityLogic.hasPermissions(root.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_1.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_2.getPermissions(), groups, AccessLevel.VIEW));
 
-        assertFalse(n1_2_1.isAllowed(groups));
-        assertTrue(n1_2_2.isAllowed(groups));
-        assertTrue(n1_2_3.isAllowed(groups));
+        assertFalse(SecurityLogic.hasPermissions(n1_2_1.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_2_2.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_2_3.getPermissions(), groups, AccessLevel.VIEW));
 
-        assertFalse(n1_3.isAllowed(groups));
-        assertTrue(n1_4.isAllowed(groups));
+
+        assertFalse(SecurityLogic.hasPermissions(n1_3.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_4.getPermissions(), groups, AccessLevel.VIEW));
     }
 
     public void testAdmins() {
@@ -241,18 +251,18 @@ public class PageTest extends TestCase {
         groups.add("registered");
         groups.add("admins");
 
-        assertTrue(root.isAllowed(groups));
-        assertTrue(n1_1.isAllowed(groups));
-        assertTrue(n1_2.isAllowed(groups));
+        assertTrue(SecurityLogic.hasPermissions(root.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_1.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_2.getPermissions(), groups, AccessLevel.VIEW));
 
         //allow solo admins
-        assertTrue(n1_2_1.isAllowed(groups));
+        assertTrue(SecurityLogic.hasPermissions(n1_2_1.getPermissions(), groups, AccessLevel.VIEW));
 
-        assertTrue(n1_2_2.isAllowed(groups));
-        assertTrue(n1_2_3.isAllowed(groups));
+        assertTrue(SecurityLogic.hasPermissions(n1_2_2.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_2_3.getPermissions(), groups, AccessLevel.VIEW));
 
-        assertFalse(n1_3.isAllowed(groups));
-        assertTrue(n1_4.isAllowed(groups));
+        assertFalse(SecurityLogic.hasPermissions(n1_3.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_4.getPermissions(), groups, AccessLevel.VIEW));
     }
 
     public void testCattivi() {
@@ -260,18 +270,18 @@ public class PageTest extends TestCase {
         groups.add("registered");
         groups.add("cattivi");
 
-        assertTrue(root.isAllowed(groups));
-        assertTrue(n1_1.isAllowed(groups));
-        assertTrue(n1_2.isAllowed(groups));
+        assertTrue(SecurityLogic.hasPermissions(root.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_1.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_2.getPermissions(), groups, AccessLevel.VIEW));
 
-        assertFalse(n1_2_1.isAllowed(groups));
-        assertTrue(n1_2_2.isAllowed(groups));
+        assertFalse(SecurityLogic.hasPermissions(n1_2_1.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_2_2.getPermissions(), groups, AccessLevel.VIEW));
 
         //deny
-        assertFalse(n1_2_3.isAllowed(groups));
+        assertFalse(SecurityLogic.hasPermissions(n1_2_3.getPermissions(), groups, AccessLevel.VIEW));
 
-        assertFalse(n1_3.isAllowed(groups));
-        assertTrue(n1_4.isAllowed(groups));
+        assertFalse(SecurityLogic.hasPermissions(n1_3.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_4.getPermissions(), groups, AccessLevel.VIEW));
     }
 
     public void testBuoni() {
@@ -279,17 +289,17 @@ public class PageTest extends TestCase {
         groups.add("registered");
         groups.add("buoni");
 
-        assertTrue(root.isAllowed(groups));
-        assertTrue(n1_1.isAllowed(groups));
-        assertTrue(n1_2.isAllowed(groups));
+        assertTrue(SecurityLogic.hasPermissions(root.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_1.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_2.getPermissions(), groups, AccessLevel.VIEW));
 
-        assertFalse(n1_2_1.isAllowed(groups));
-        assertTrue(n1_2_2.isAllowed(groups));
-        assertTrue(n1_2_3.isAllowed(groups));
+        assertFalse(SecurityLogic.hasPermissions(n1_2_1.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_2_2.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_2_3.getPermissions(), groups, AccessLevel.VIEW));
 
         //Vede questo in più di un registered
-        assertTrue(n1_3.isAllowed(groups));
-        assertTrue(n1_4.isAllowed(groups));
+        assertTrue(SecurityLogic.hasPermissions(n1_3.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_4.getPermissions(), groups, AccessLevel.VIEW));
     }
 
     public void testBuoniCattivi() {
@@ -298,45 +308,45 @@ public class PageTest extends TestCase {
         groups.add("buoni");
         groups.add("cattivi");
 
-        assertTrue(root.isAllowed(groups));
-        assertTrue(n1_1.isAllowed(groups));
-        assertTrue(n1_2.isAllowed(groups));
+        assertTrue(SecurityLogic.hasPermissions(root.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_1.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_2.getPermissions(), groups, AccessLevel.VIEW));
 
-        assertFalse(n1_2_1.isAllowed(groups));
-        assertTrue(n1_2_2.isAllowed(groups));
-        
+        assertFalse(SecurityLogic.hasPermissions(n1_2_1.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_2_2.getPermissions(), groups, AccessLevel.VIEW));
+
         //deny su cattivi
-        assertFalse(n1_2_3.isAllowed(groups));
+        assertFalse(SecurityLogic.hasPermissions(n1_2_3.getPermissions(), groups, AccessLevel.VIEW));
 
         //Pue essendo buono, essendo anche cattivo non vede il nodo 1.3
-        assertFalse(n1_3.isAllowed(groups));
-        assertTrue(n1_4.isAllowed(groups));
+        assertFalse(SecurityLogic.hasPermissions(n1_3.getPermissions(), groups, AccessLevel.VIEW));
+        assertTrue(SecurityLogic.hasPermissions(n1_4.getPermissions(), groups, AccessLevel.VIEW));
     }
 
     // test su permissions (con liste allow e deny entrambe riempite)
     public void testPermissions1_1() {
-        assertFalse(permissions.isAllowed(Permissions.VIEW, groups));
+        assertFalse(SecurityLogic.hasPermissions(permissions, groups, AccessLevel.VIEW));
     }
 
     public void testPermissions1_2() {
         groups.add("buoni");
-        assertTrue(permissions.isAllowed(Permissions.VIEW, groups));
+        assertTrue(SecurityLogic.hasPermissions(permissions, groups, AccessLevel.VIEW));
     }
 
     public void testPermissions1_3() {
         groups.add("cattivi");
-        assertFalse(permissions.isAllowed(Permissions.VIEW, groups));
+        assertFalse(SecurityLogic.hasPermissions(permissions, groups, AccessLevel.VIEW));
     }
 
     public void testPermissions1_4() {
         groups.add("buoni");
         groups.add("cattivi");
-        assertFalse(permissions.isAllowed(Permissions.VIEW, groups));
+        assertFalse(SecurityLogic.hasPermissions(permissions, groups, AccessLevel.VIEW));
     }
 
     public void testPermissions1_5() {
         groups.add("altro");
-        assertFalse(permissions.isAllowed(Permissions.VIEW, groups));
+        assertFalse(SecurityLogic.hasPermissions(permissions, groups, AccessLevel.VIEW));
     }
 
 
@@ -344,36 +354,36 @@ public class PageTest extends TestCase {
     // test su permissions (con solo lista deny riempita)
     public void testPermissions2_1() {
         groups.add("all");
-        assertTrue(permissions2.isAllowed(Permissions.VIEW, groups));
+        assertTrue(SecurityLogic.hasPermissions(permissions2, groups, AccessLevel.VIEW));
     }
 
     public void testPermissions2_3() {
         groups.add("all");
         groups.add("cattivi");
-        assertFalse(permissions2.isAllowed(Permissions.VIEW, groups));
+        assertFalse(SecurityLogic.hasPermissions(permissions2, groups, AccessLevel.VIEW));
     }
 
     public void testPermissions2_5() {
         groups.add("all");
         groups.add("altro");
-        assertTrue(permissions2.isAllowed(Permissions.VIEW, groups));
+        assertTrue(SecurityLogic.hasPermissions(permissions2, groups, AccessLevel.VIEW));
     }
 
 
     
     // test su permissions (con solo lista allow riempita)
     public void testPermissions3_1() {
-        assertFalse(permissions3.isAllowed(Permissions.VIEW, groups));
+        assertFalse(SecurityLogic.hasPermissions(permissions3, groups, AccessLevel.VIEW));
     }
 
     public void testPermissions3_2() {
         groups.add("buoni");
-        assertTrue(permissions3.isAllowed(Permissions.VIEW, groups));
+        assertTrue(SecurityLogic.hasPermissions(permissions3, groups, AccessLevel.VIEW));
     }
 
     public void testPermissions3_5() {
         groups.add("altro");
-        assertFalse(permissions3.isAllowed(Permissions.VIEW, groups));
+        assertFalse(SecurityLogic.hasPermissions(permissions3, groups, AccessLevel.VIEW));
     }
 
 

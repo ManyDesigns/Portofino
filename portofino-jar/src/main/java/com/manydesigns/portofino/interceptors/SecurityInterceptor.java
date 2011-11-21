@@ -140,41 +140,11 @@ public class
         if (dispatch != null && isNotAdmin) {
             PageInstance pageInstance = dispatch.getLastPageInstance();
             Page page = pageInstance.getPage();
-            if (!page.isAllowed(groups)){
+            if(!SecurityLogic.hasPermissions(page.getPermissions(), groups, handler, actionBean.getClass())) {
                 logger.info("User does not match page permissions. User's groups: {}",
                         ArrayUtils.toString(groups));
                 return handleAnonymousOrUnauthorized(userId, request);
             }
-
-            if(!SecurityLogic.isMethodAllowed(actionBean.getClass(), handler, page, groups)) {
-                return handleAnonymousOrUnauthorized(userId, request);
-            }
-
-            /*RequiresPermission requiresPermission = handler.getAnnotation(RequiresPermission.class);
-            if (requiresPermission != null) {
-                logger.debug("Action method requires specific permissions: {}", handler);
-            } else {
-                Class actionClass = context.getActionBean().getClass();
-                while (actionClass != null) {
-                    requiresPermission = handler.getAnnotation(RequiresPermission.class);
-                    if (requiresPermission != null) {
-                        logger.debug("Action class requires specific permissions: {}",
-                                     actionClass);
-                        break;
-                    }
-                    actionClass = actionClass.getSuperclass();
-                }
-            }
-            if(requiresPermission != null) {
-                List<String> requiredPermissions = Arrays.asList(requiresPermission.value());
-                for(String operation : requiredPermissions) {
-                    if(!page.isAllowed(operation, groups)) {
-                        logger.info("User does not match action permissions. User's groups: {}",
-                                    ArrayUtils.toString(groups));
-                        return handleAnonymousOrUnauthorized(userId, request);
-                    }
-                }
-            }*/
         }
 
         logger.debug("Security check passed.");

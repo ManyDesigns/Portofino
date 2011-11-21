@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.system.model.users.annotations;
 
+import com.manydesigns.portofino.model.pages.AccessLevel;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -42,9 +44,10 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RequiresPermission {
+public @interface RequiresPermissions {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    String[] value();
+    AccessLevel level() default AccessLevel.VIEW;
+    String[] permissions() default {};
 }

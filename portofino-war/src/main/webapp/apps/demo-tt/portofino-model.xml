@@ -1845,51 +1845,30 @@
                 <childPages>
                     <jspPage jsp="/latestProjects.jsp" description="Latest Projects" fragment="latestProjects" id="6d1mqw9vkwkc1fgqpae4i2d6m" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="4" showInNavigation="false" title="Latest Projects">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                     </jspPage>
                     <chartPage database="redmine" legend="Workload" name="Workload" orientation="HORIZONTAL" query="select u.id, count(issues.id), login from issues join users u on assigned_to_id = u.id group by u.id, u.login" type="PIE3D" urlExpression="/people/%{key}" description="Workload" fragment="workload" id="4xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="1" showInNavigation="false" title="workload">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                     </chartPage>
                     <chartPage database="redmine" legend="Issues by project/status" name="Issues by project/status" orientation="VERTICAL" query="select count(*), status_id, project_id, status.name, projects.name from issues join issue_statuses status on status_id = status.id join projects on project_id = projects.id group by status_id, project_id" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?status_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/status" fragment="issues-by-status-bar" id="9xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="5" showInNavigation="false" title="Issues by project/status">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                     </chartPage>
                     <chartPage database="redmine" legend="Issues by project/tracker" name="Issues by project/tracker" orientation="VERTICAL" query="select count(*), tracker_id, project_id, t.name, projects.name from issues join trackers t on tracker_id = t.id join projects on project_id = projects.id group by tracker_id, project_id" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?tracker_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/tracker" fragment="issues-by-tracker-bar" id="6xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="3" showInNavigation="false" title="Issues by project/tracker">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                     </chartPage>
                     <chartPage database="redmine" legend="Issues by project/priority" name="Issues by project/priority" orientation="VERTICAL" query="select count(*), priority_id, issues.project_id, priority.name, projects.name from issues join enumerations priority on priority_id = priority.id join projects on issues.project_id = projects.id group by priority_id, issues.project_id" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?priority_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/priority" fragment="issues-by-priority-bar" id="7xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="7" showInNavigation="false" title="Issues by project/priority">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                     </chartPage>
                     <jspPage jsp="/projects/projectStatus.jsp" description="project status" fragment="prjstatus" id="mdo74idvku47ma3odo40en0ah" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="3" showInNavigation="false" title="Projects">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                     </jspPage>
                 </childPages>
-                <permissions>
-                    <view/>
-                    <deny/>
-                </permissions>
+                <permissions />
                 <attachments>
                     <attachment contentType="image/gif" filename="calendar.gif" id="7i2kiqdyrcui58ufgossg5mk2" size="268"/>
                     <attachment contentType="image/gif" filename="flag_green.gif" id="yvy0xe6zxhi963nzhx53qbcdf" size="245"/>
@@ -1902,18 +1881,11 @@
                 <childPages>
                     <chartPage database="redmine" legend="issues" name="Issues by status" orientation="HORIZONTAL" query="select status_id, count(*), status.name&#xD;&#xA;from issues join issue_statuses status on status_id = status.id&#xD;&#xA;group by status_id" type="PIE" urlExpression="" description="Issues by status" fragment="report" id="wkqw5aqvlad9yphty2o0qbl8l" layoutContainer="default" layoutOrder="0" showInNavigation="true" title="report">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                     </chartPage>
                 </childPages>
                 <permissions>
-                    <view/>
-                    <deny/>
-                    <permission name="create">
-                        <group>administrators</group>
-                    </permission>
+                    <permissions />
                 </permissions>
                 <crud createTitle="New project" editTitle="Edit project" name="projects" query="FROM redmine_public_projects ORDER BY name" readTitle="Overview" searchTitle="Projects" table="redmine.PUBLIC.projects" variable="project">
                     <buttons/>
@@ -1961,10 +1933,7 @@
                 <detailChildPages>
                     <crudPage description="Issues" fragment="issues" id="3" layoutContainer="default" showInNavigation="true" title="Issues">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                         <crud createTitle="Create issue" editTitle="Edit issue" name="issue" query="FROM redmine_public_issues WHERE project_id = %{#project.id}" readTitle="Issue" searchTitle="Issues" table="redmine.PUBLIC.issues" variable="issue">
                             <buttons/>
                             <annotations/>
@@ -2046,60 +2015,36 @@
                     </crudPage>
                     <jspPage jsp="/issues/summary.jsp" description="Issue tracking" fragment="issueSummary" id="t7ki2cz4dpyuhuodamjuuoe1e" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="1" showInNavigation="false" title="Issue tracking">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                     </jspPage>
                     <jspPage jsp="/projects/memberSummary.jsp" description="Summary of project's members" fragment="memberSummary" id="bse6c8595zv1tty06eahfc1aa" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="2" showInNavigation="false" title="Members">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                     </jspPage>
                     <textPage description="Latest News" fragment="latestNews" id="dwd0mzli5ri4imwtsucczfgaa" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="8" showInNavigation="false" title="Latest News">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                         <attachments/>
                     </textPage>
                     <chartPage database="redmine" legend="Issues by priority" name="Issues by priority" query="select priority_id, count(*), priority.name from issues join enumerations priority on issues.priority_id = priority.id where issues.project_id = %{#project.id} group by priority.id" type="PIE3D" urlExpression="/projects/%{#project.id}/issues?search=&amp;priority_id=%{key}" description="Issues by priority" fragment="issues-by-priority" id="i26pvpicb8oyapl6anyqsunaj" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="4" showInNavigation="false" title="Issues by priority">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                     </chartPage>
                     <chartPage database="redmine" legend="Issues by status" name="Issues by status" query="select status_id, count(*), status.name&#xD;&#xA;from issues join issue_statuses status on status_id = status.id&#xD;&#xA;where project_id = %{#project.id}&#xD;&#xA;group by status_id" type="PIE3D" urlExpression="/projects/%{#project.id}/issues?search=&amp;status_id=%{key}" description="Issues by status" fragment="issues-by-status" id="2xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="6" showInNavigation="false" title="Issues by status">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                     </chartPage>
                     <chartPage database="redmine" legend="Issues by tracker/status" name="Issues by tracker/status" orientation="VERTICAL" query="select count(*), status_id, tracker_id, status.name, tracker.name&#xD;&#xA;from issues join issue_statuses status on status_id = status.id join trackers tracker on tracker_id = tracker.id&#xD;&#xA;where project_id = %{#project.id}&#xD;&#xA;group by status_id, tracker_id" type="STACKED_BAR_3D" urlExpression="/projects/%{#project.id}/issues?search=&amp;status_id=%{series}&amp;tracker_id=%{category}" xAxisName="Tracker" yAxisName="Number of issues" description="Issues by tracker/status" fragment="issues-by-status-bar" id="3xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="2" showInNavigation="false" title="Issues by tracker/status">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                     </chartPage>
                     <chartPage database="redmine" legend="Issues by date" name="Issues by date" orientation="VERTICAL" query="select count(*), 'anno-mese', concat(Year(created_on),'-',  Month(created_on)) data   from issues where project_id = %{#project.id} group by created_on order by created_on" type="BAR" urlExpression="/projects/%{#project.id}/issues?search=&amp;status_id=%{series}&amp;tracker_id=%{category}" xAxisName="Tracker" yAxisName="Number of issues" description="Issues by date" fragment="issues-by-date-bar" id="3yozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="4" showInNavigation="false" title="Issues by date">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                     </chartPage>
                     <crudPage description="Projects versions" fragment="versions" id="bdua1jepekzaqnt5bylc6gjuz" layoutContainer="default" layoutOrder="1" showInNavigation="true" title="Version">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                         <crud createTitle="Create new version" editTitle="Version" name="Versions" query="FROM redmine_public_versions WHERE project_id = %{#project.id}" readTitle="Version" searchTitle="Versions" table="redmine.PUBLIC.versions" variable="version">
                             <buttons/>
                             <annotations/>
@@ -2143,10 +2088,7 @@
             </crudPage>
             <crudPage detailLayoutContainer="default" detailLayoutOrder="2" description="People" fragment="people" id="fwyg067k9g0mpoq8e9ingwwu5" layoutContainer="default" layoutOrder="0" showInNavigation="true" title="People">
                 <childPages/>
-                <permissions>
-                    <view/>
-                    <deny/>
-                </permissions>
+                <permissions />
                 <crud createTitle="Create person" editTitle="Edit person" name="People" query="from redmine_public_users" readTitle="View person" searchTitle="People" table="redmine.PUBLIC.users" variable="person">
                     <buttons/>
                     <annotations/>
@@ -2205,10 +2147,7 @@
                 <detailChildPages>
                     <crudPage description="Tickets" fragment="tickets" id="9io5kz207horijtmtea2ntywz" layoutContainer="default" layoutContainerInParent="contentLayoutBottom" layoutOrder="0" layoutOrderInParent="0" showInNavigation="false" title="Tickets">
                         <childPages/>
-                        <permissions>
-                            <view/>
-                            <deny/>
-                        </permissions>
+                        <permissions />
                         <crud createTitle="Create issue" editTitle="Edit issue" name="Tickets" query="from redmine_public_issues where assigned_to_id = %{#person.id}" readTitle="Issue" searchTitle="Issues" table="redmine.PUBLIC.issues" variable="issue">
                             <buttons/>
                             <annotations/>
@@ -2292,10 +2231,7 @@
             </crudPage>
         </childPages>
         <permissions>
-            <view>
-                    <group>all</group>
-            </view>
-            <deny/>
+            <group name="all" level="VIEW" />
         </permissions>
     </rootPage>
 </model>

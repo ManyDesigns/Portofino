@@ -35,7 +35,9 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.JspPage;
+import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -52,6 +54,7 @@ import java.util.List;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @UrlBinding("/actions/jsp")
+@RequiresPermissions(level = AccessLevel.VIEW)
 public class JspAction extends PortletAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

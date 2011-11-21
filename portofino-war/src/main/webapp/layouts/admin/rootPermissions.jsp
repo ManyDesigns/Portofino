@@ -1,5 +1,4 @@
-<%@ page import="com.manydesigns.portofino.actions.PortletAction" %>
-<%@ page import="com.manydesigns.portofino.model.pages.Permissions" %>
+<%@ page import="com.manydesigns.portofino.model.pages.AccessLevel" %>
 <%@ page import="com.manydesigns.portofino.model.pages.RootPage" %>
 <%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
@@ -7,9 +6,7 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
+%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.RootPermissionsAction"/>
     <stripes:layout-component name="pageTitle">
@@ -28,51 +25,51 @@
         <table>
             <tr>
                 <th>Group</th>
-                <th>Permissions</th>
+                <th>Access Level</th>
             </tr>
             <c:forEach var="group" items="${actionBean.groups}">
-                <%
-                    Group group = (Group) pageContext.getAttribute("group");
-                    String groupId = group.getGroupId();
-                    String permissionLevel = actionBean.getPermissionLevelName(rootPage, groupId);
-                %>
                 <tr>
+                    <%
+                        Group group = (Group) pageContext.getAttribute("group");
+                        String groupId = group.getGroupId();
+                        AccessLevel localAccessLevel = actionBean.getLocalAccessLevel(rootPage, groupId);
+                    %>
                     <td>
                         <c:out value="${group.name}"/>
                     </td>
                     <td>
-                        <select name="permissions[${group.groupId}]">
-                            <option value="<%= Permissions.NONE %>"
+                        <select name="accessLevels[${group.groupId}]">
+                            <option value="<%= AccessLevel.NONE.name() %>"
                                     <%
-                                        if (Permissions.NONE.equals(permissionLevel)) {
+                                        if (AccessLevel.NONE.equals(localAccessLevel)) {
                                             out.print("selected='selected'");
                                         }
                                     %>>
-                                ---
+                                <fmt:message key="permissions.level.none" />
                             </option>
-                            <option value="<%= Permissions.VIEW %>"
+                            <option value="<%= AccessLevel.VIEW.name() %>"
                                     <%
-                                        if (Permissions.VIEW.equals(permissionLevel)) {
+                                        if (AccessLevel.VIEW.equals(localAccessLevel)) {
                                             out.print("selected='selected'");
                                         }
                                     %>>
-                                View
+                                <fmt:message key="permissions.level.view" />
                             </option>
-                            <option value="<%= Permissions.EDIT %>"
+                            <option value="<%= AccessLevel.EDIT.name() %>"
                                     <%
-                                        if (Permissions.EDIT.equals(permissionLevel)) {
+                                        if (AccessLevel.EDIT.equals(localAccessLevel)) {
                                             out.print("selected='selected'");
                                         }
                                     %>>
-                                Edit
+                                <fmt:message key="permissions.level.edit" />
                             </option>
-                            <option value="<%= PortletAction.DENY %>"
+                            <option value="<%= AccessLevel.DENY.name() %>"
                                     <%
-                                        if (PortletAction.DENY.equals(permissionLevel)) {
+                                        if (AccessLevel.DENY.equals(localAccessLevel)) {
                                             out.print("selected='selected'");
                                         }
                                     %>>
-                                Deny
+                                <fmt:message key="permissions.level.deny" />
                             </option>
                         </select>
                     </td>

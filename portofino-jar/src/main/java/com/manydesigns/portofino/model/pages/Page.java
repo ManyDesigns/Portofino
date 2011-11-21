@@ -304,17 +304,6 @@ public abstract class Page implements ModelObject, WithPermissions {
         this.showInNavigation = showInNavigation;
     }
 
-    /* TODO: spostare quaesto metodo nella classe che gestisce la logica
-    *  dei permessi. Lasciare le classi in in model il più possibile passive
-    **/
-    public boolean isAllowed(List<String> groups) {
-        return isAllowed(Permissions.VIEW, groups);
-    }
-
-    public boolean isAllowed(String operation, List<String> groups) {
-        return permissions.isAllowed(operation, groups);
-    }
-
     public Integer getActualLayoutOrderInParent() {
         return actualLayoutOrderInParent;
     }

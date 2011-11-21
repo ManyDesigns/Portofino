@@ -1,14 +1,14 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
+<%@ page import="com.manydesigns.portofino.actions.PortletAction" %>
+<%@ page import="com.manydesigns.portofino.actions.RequestAttributes" %>
 <%@ page import="com.manydesigns.portofino.buttons.ButtonInfo" %>
 <%@ page import="com.manydesigns.portofino.buttons.ButtonsLogic" %>
+<%@ page import="com.manydesigns.portofino.model.pages.Page" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.taglibs.standard.tag.common.fmt.BundleSupport" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocalizationContext" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.MissingResourceException" %>
-<%@ page import="com.manydesigns.portofino.actions.RequestAttributes" %>
-<%@ page import="com.manydesigns.portofino.actions.PortletAction" %>
-<%@ page import="com.manydesigns.portofino.model.pages.Page" %>
 <%@taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
 <stripes:layout-definition>
 <%
@@ -27,12 +27,12 @@
             ButtonsLogic.getButtonsForClass(actionBean.getClass(), list, groups, currentPage);
     if(buttons != null) {
         for(ButtonInfo button : buttons) {
-            if(!button.isAllowed()) {
+            if(currentPage != null && !ButtonsLogic.hasPermissions(button, currentPage, groups)) {
                 continue;
             }
             XhtmlBuffer buffer = new XhtmlBuffer(out);
             buffer.openElement("button");
-            buffer.addAttribute("name", button.getName());
+            buffer.addAttribute("name", button.getMethod().getName());
             String value = getValue(button, localizationContext);
             if(cssClass != null) {
                 buffer.addAttribute("class", cssClass);
@@ -53,7 +53,7 @@
                 //ignore
             }
         }
-        return button.getName();
+        return button.getMethod().getName();
     }
 %>
 </stripes:layout-definition>

@@ -37,7 +37,9 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.logic.PageLogic;
+import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.PageReference;
+import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.slf4j.Logger;
@@ -52,6 +54,7 @@ import java.util.Locale;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @UrlBinding("/actions/ref")
+@RequiresPermissions(level = AccessLevel.VIEW)
 public class PageReferenceAction extends PortletAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

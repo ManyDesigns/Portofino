@@ -32,8 +32,10 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.logic.TextLogic;
+import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.Attachment;
 import com.manydesigns.portofino.model.pages.TextPage;
+import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -50,6 +52,7 @@ import java.io.*;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @UrlBinding("/actions/text")
+@RequiresPermissions(level = AccessLevel.VIEW)
 public class TextAction extends PortletAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
@@ -102,6 +105,7 @@ public class TextAction extends PortletAction {
 
 
     @DefaultHandler
+    @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution execute() throws IOException {
         loadContent();
         if (StringUtils.isEmpty(content)) {
@@ -140,12 +144,14 @@ public class TextAction extends PortletAction {
     }
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1)
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configure() throws IOException {
         prepareConfigurationForms();
         loadContent();
         return new ForwardResolution("/layouts/text/configure.jsp");
     }
 
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updateConfiguration() throws IOException {
         synchronized (application) {
             prepareConfigurationForms();
@@ -164,6 +170,7 @@ public class TextAction extends PortletAction {
 
     }
 
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution uploadAttachment() {
         if (upload == null) {
             SessionMessages.addWarningMessage("No file selected for upload");
@@ -181,6 +188,7 @@ public class TextAction extends PortletAction {
                 .addParameter("cancelReturnUrl", cancelReturnUrl);
     }
 
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution uploadAttachmentFromCKEditor() {
         try {
             commonUploadAttachment();
@@ -216,6 +224,7 @@ public class TextAction extends PortletAction {
         }
     }
 
+    @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution viewAttachment() {
         // find the attachment
         Attachment attachment =
@@ -241,6 +250,7 @@ public class TextAction extends PortletAction {
         }
     }
 
+    @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution downloadAttachment() {
         // find the attachment
         Attachment attachment =
@@ -267,17 +277,20 @@ public class TextAction extends PortletAction {
         }
     }
 
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution browse() throws IOException {
         logger.info("Browse");
         return new ForwardResolution("/layouts/text/browse.jsp");
     }
 
     @Button(list = "portletHeaderButtons", key = "layouts.text.manage-attachments.manage_attachments_for_page", order = 2)
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution manageAttachments() {
         logger.info("Manage attachments");
         return new ForwardResolution("/layouts/text/manage-attachments.jsp");
     }
 
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution deleteAttachments() {
         if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage("No attachments selected");
