@@ -189,16 +189,19 @@ public class PageTest extends TestCase {
         addGroup(permissions, "buoni", AccessLevel.VIEW);
         addGroup(permissions, "cattivi", AccessLevel.DENY);
         permissions.init(null);
+        permissions.link(null);
 
         permissions2 = new Permissions();
         addGroup(permissions2, "all", AccessLevel.VIEW);
         addGroup(permissions2, "cattivi", AccessLevel.DENY);
         permissions2.init(null);
+        permissions2.link(null);
 
         permissions3 = new Permissions();
         addGroup(permissions3, "all", AccessLevel.NONE);
         addGroup(permissions3, "buoni", AccessLevel.VIEW);
         permissions3.init(null);
+        permissions3.link(null);
 
         groups = new ArrayList<String>();
 
