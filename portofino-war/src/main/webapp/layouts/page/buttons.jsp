@@ -9,6 +9,7 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocalizationContext" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.MissingResourceException" %>
+<%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
 <%@taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
 <stripes:layout-definition>
 <%
@@ -27,7 +28,8 @@
             ButtonsLogic.getButtonsForClass(actionBean.getClass(), list, groups, currentPage);
     if(buttons != null) {
         for(ButtonInfo button : buttons) {
-            if(currentPage != null && !ButtonsLogic.hasPermissions(button, currentPage, groups)) {
+            boolean isAdmin = SecurityLogic.isAdministrator(request);
+            if(currentPage != null && !isAdmin && !ButtonsLogic.hasPermissions(button, currentPage, groups)) {
                 continue;
             }
             XhtmlBuffer buffer = new XhtmlBuffer(out);
