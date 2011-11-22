@@ -1,9 +1,11 @@
 <%@ page import="com.manydesigns.portofino.application.Application" %>
 <%@ page import="org.apache.commons.collections.MultiHashMap" %>
 <%@ page import="org.apache.commons.collections.MultiMap" %>
+<%@ page import="org.hibernate.Session" %>
 <%@ page import="java.util.Collection" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="com.manydesigns.portofino.database.QueryUtils" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -18,14 +20,15 @@
         <ul>
             <%
                 Application appl = (Application) request.getAttribute("application");
-                List<?> objects = appl.getObjects(
+                Session hSession = appl.getSession("redmine");
+                List<?> objects = QueryUtils.getObjects(hSession,
                         "SELECT r.name, u.login " +
-                        "FROM public_members m, public_users u, " +
-                        "     public_roles r, public_member_roles mr " +
-                        "WHERE m.project_id = %{#project.id}" +
-                        "  AND m.user_id = u.id " +
-                        "  AND mr.member_id = m.id " +
-                        "  AND mr.role_id = r.id ", null, null);
+                                "FROM public_members m, public_users u, " +
+                                "     public_roles r, public_member_roles mr " +
+                                "WHERE m.project_id = %{#project.id}" +
+                                "  AND m.user_id = u.id " +
+                                "  AND mr.member_id = m.id " +
+                                "  AND mr.role_id = r.id ", null, null);
                 MultiMap mm = new MultiHashMap();
                 for(Object obj : objects) {
                     Object[] obArr = (Object[]) obj;
