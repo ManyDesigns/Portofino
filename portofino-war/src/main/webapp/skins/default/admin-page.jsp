@@ -79,7 +79,7 @@
             </div>
             <div id="sidebar" class="yui-b adminSidebar">
                 <ul>
-                    <li>
+                    <%--<li>
                         <div class="navigationHeader first">Site content</div>
                         <ul>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
@@ -92,7 +92,7 @@
                                                    text="Attachments"
                                                    link="/"/>
                         </ul>
-                    </li>
+                    </li>--%>
                     <li>
                         <div class="navigationHeader">Security</div>
                         <ul>
