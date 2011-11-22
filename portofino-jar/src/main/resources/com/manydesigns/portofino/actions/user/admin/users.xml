@@ -15,7 +15,7 @@
                     <deny/>
                 </permissions>
                 <crud createTitle="Create user" editTitle="Edit user" largeResultSet="false"
-                      query="FROM portofino_public_users" readTitle="User" searchTitle="Users"
+                      query="FROM public_users" readTitle="User" searchTitle="Users"
                       table="portofino.public.users">
                     <buttons/>
                     <annotations/>
@@ -117,7 +117,7 @@
                     <deny/>
                 </permissions>
                 <crud createTitle="Create group" editTitle="Edit group" largeResultSet="false"
-                      query="FROM portofino_public_groups" readTitle="Group" searchTitle="Groups"
+                      query="FROM public_groups" readTitle="Group" searchTitle="Groups"
                       table="portofino.public.groups">
                     <buttons/>
                     <annotations/>

@@ -133,7 +133,9 @@ public class Table implements ModelObject, Annotated {
         actualJavaClass = ReflectionUtil.loadClass(javaClass);
 
         if (entityName == null) {
-            actualEntityName = defineEntityName(this.getQualifiedName());
+            int dotIndex = getQualifiedName().indexOf('.') + 1;
+            String tableNameInDatabase = getQualifiedName().substring(dotIndex);
+            actualEntityName = defineEntityName(tableNameInDatabase);
         } else {
             actualEntityName = defineEntityName(entityName);
         }

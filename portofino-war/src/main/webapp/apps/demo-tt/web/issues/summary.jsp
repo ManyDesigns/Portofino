@@ -2,6 +2,8 @@
 <%@ page import="com.manydesigns.portofino.application.Application" %>
 <%@ page import="ognl.Ognl" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.manydesigns.portofino.database.QueryUtils" %>
+<%@ page import="org.hibernate.Session" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -16,13 +18,14 @@
         <ul>
             <%
                 Application appl = (Application) request.getAttribute("application");
-                List<?> objects = appl.getObjects(
+                Session hSession = appl.getSession("redmine");
+                List<?> objects = QueryUtils.getObjects(hSession,
                         "SELECT t.name, sum(1 - st.is_closed) as sum, count(*) as count " +
-                        "FROM redmine_public_issues i, redmine_public_trackers t, redmine_public_issue_statuses st " +
-                        "WHERE t.id = i.tracker_id " +
-                        "  AND i.project_id = %{#project.id} " +
-                        "  AND i.status_id = st.id " +
-                        "GROUP BY t.name", null, null);
+                                "FROM public_issues i, public_trackers t, public_issue_statuses st " +
+                                "WHERE t.id = i.tracker_id " +
+                                "  AND i.project_id = %{#project.id} " +
+                                "  AND i.status_id = st.id " +
+                                "GROUP BY t.name", null, null);
                 for(Object obj : objects) {
                     Object[] obArr = (Object[]) obj;
                     out.print(obArr[0] + ": " + obArr[1] + " open / " + obArr[2] + "<br />");

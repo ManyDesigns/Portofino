@@ -658,17 +658,17 @@
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders>
-<query hql="from redmine_public_trackers" name="sp_issue_tracker" toDatabase="redmine" toSchema="PUBLIC" toTable="trackers">
+<query hql="from public_trackers" name="sp_issue_tracker" toDatabase="redmine" toSchema="PUBLIC" toTable="trackers">
     <references>
         <reference fromColumn="tracker_id"/>
     </references>
 </query>
-<query hql="from redmine_public_issue_statuses" name="sp_issue_status" toDatabase="redmine" toSchema="PUBLIC" toTable="issue_statuses">
+<query hql="from public_issue_statuses" name="sp_issue_status" toDatabase="redmine" toSchema="PUBLIC" toTable="issue_statuses">
     <references>
         <reference fromColumn="status_id"/>
     </references>
 </query>
-<query hql="from redmine_public_enumerations where type = 'IssuePriority'" name="sp_issue_priority" toDatabase="redmine" toSchema="PUBLIC" toTable="issue_statuses">
+<query hql="from public_enumerations where type = 'IssuePriority'" name="sp_issue_priority" toDatabase="redmine" toSchema="PUBLIC" toTable="issue_statuses">
     <references>
         <reference fromColumn="priority_id"/>
     </references>
@@ -1517,7 +1517,7 @@
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey manyPropertyName="oldPwds" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="user" hql="from portofino_public_users" name="FK_OLDPWD_1" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
+<foreignKey manyPropertyName="oldPwds" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="user" hql="from public_users" name="FK_OLDPWD_1" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
     <references>
         <reference fromColumn="USERID" toColumn="USERID"/>
     </references>
@@ -1554,17 +1554,17 @@
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey manyPropertyName="messageOut" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="to" hql="from portofino_public_users" name="FK_MSG_3" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
+<foreignKey manyPropertyName="messageOut" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="to" hql="from public_users" name="FK_MSG_3" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
     <references>
         <reference fromColumn="TO_" toColumn="USERID"/>
     </references>
 </foreignKey>
-<foreignKey manyPropertyName="messages" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="state" hql="from portofino_public_msgstate" name="FK_MSG_1" toDatabase="portofino" toSchema="PUBLIC" toTable="MSGSTATE">
+<foreignKey manyPropertyName="messages" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="state" hql="from public_msgstate" name="FK_MSG_1" toDatabase="portofino" toSchema="PUBLIC" toTable="MSGSTATE">
     <references>
         <reference fromColumn="STATE" toColumn="ID"/>
     </references>
 </foreignKey>
-<foreignKey manyPropertyName="messageIn" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="from" hql="from portofino_public_users" name="FK_MSG_2" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
+<foreignKey manyPropertyName="messageIn" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="from" hql="from public_users" name="FK_MSG_2" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
     <references>
         <reference fromColumn="FROM_" toColumn="USERID"/>
     </references>
@@ -1660,7 +1660,7 @@
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey manyPropertyName="users" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="state" hql="from portofino_public_userstate" name="FK_USER_1" toDatabase="portofino" toSchema="PUBLIC" toTable="USERSTATE">
+<foreignKey manyPropertyName="users" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="state" hql="from public_userstate" name="FK_USER_1" toDatabase="portofino" toSchema="PUBLIC" toTable="USERSTATE">
     <references>
         <reference fromColumn="STATE" toColumn="ID"/>
     </references>
@@ -1723,7 +1723,7 @@
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey manyPropertyName="groupsCreated" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="creatorId" hql="from portofino_public_users" name="FK_GROUP_1" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
+<foreignKey manyPropertyName="groupsCreated" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="creatorId" hql="from public_users" name="FK_GROUP_1" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
     <references>
         <reference fromColumn="CREATORID" toColumn="USERID"/>
     </references>
@@ -1788,7 +1788,7 @@
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" hql="from portofino_public_emailstate" name="FK_EMAILQUEUE_1" toDatabase="portofino" toSchema="PUBLIC" toTable="EMAILSTATE">
+<foreignKey onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" hql="from public_emailstate" name="FK_EMAILQUEUE_1" toDatabase="portofino" toSchema="PUBLIC" toTable="EMAILSTATE">
     <references>
         <reference fromColumn="STATE" toColumn="ID"/>
     </references>
@@ -1816,12 +1816,12 @@
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey manyPropertyName="users" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="group" hql="from portofino_public_groups" name="FK_USERSGROUPS_2" toDatabase="portofino" toSchema="PUBLIC" toTable="GROUPS">
+<foreignKey manyPropertyName="users" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="group" hql="from public_groups" name="FK_USERSGROUPS_2" toDatabase="portofino" toSchema="PUBLIC" toTable="GROUPS">
     <references>
         <reference fromColumn="GROUPID" toColumn="GROUPID"/>
     </references>
 </foreignKey>
-<foreignKey manyPropertyName="groups" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="user" hql="from portofino_public_users" name="FK_USERSGROUPS_1" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
+<foreignKey manyPropertyName="groups" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="user" hql="from public_users" name="FK_USERSGROUPS_1" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
     <references>
         <reference fromColumn="USERID" toColumn="USERID"/>
     </references>
@@ -1887,7 +1887,7 @@
                 <permissions>
                     <permissions />
                 </permissions>
-                <crud createTitle="New project" editTitle="Edit project" name="projects" query="FROM redmine_public_projects ORDER BY name" readTitle="Overview" searchTitle="Projects" database="redmine" variable="project">
+                <crud createTitle="New project" editTitle="Edit project" name="projects" query="FROM public_projects ORDER BY name" readTitle="Overview" searchTitle="Projects" database="redmine" variable="project">
                     <buttons/>
                     <annotations/>
                     <properties>
@@ -1934,7 +1934,7 @@
                     <crudPage description="Issues" fragment="issues" id="3" layoutContainer="default" showInNavigation="true" title="Issues">
                         <childPages/>
                         <permissions />
-                        <crud createTitle="Create issue" editTitle="Edit issue" name="issue" query="FROM redmine_public_issues WHERE project_id = %{#project.id}" readTitle="Issue" searchTitle="Issues" database="redmine" variable="issue">
+                        <crud createTitle="Create issue" editTitle="Edit issue" name="issue" query="FROM public_issues WHERE project_id = %{#project.id}" readTitle="Issue" searchTitle="Issues" database="redmine" variable="issue">
                             <buttons/>
                             <annotations/>
                             <properties>
@@ -2045,7 +2045,7 @@
                     <crudPage description="Projects versions" fragment="versions" id="bdua1jepekzaqnt5bylc6gjuz" layoutContainer="default" layoutOrder="1" showInNavigation="true" title="Version">
                         <childPages/>
                         <permissions />
-                        <crud createTitle="Create new version" editTitle="Version" name="Versions" query="FROM redmine_public_versions WHERE project_id = %{#project.id}" readTitle="Version" searchTitle="Versions" database="redmine" variable="version">
+                        <crud createTitle="Create new version" editTitle="Version" name="Versions" query="FROM public_versions WHERE project_id = %{#project.id}" readTitle="Version" searchTitle="Versions" database="redmine" variable="version">
                             <buttons/>
                             <annotations/>
                             <properties>
@@ -2089,7 +2089,7 @@
             <crudPage detailLayoutContainer="default" detailLayoutOrder="2" description="People" fragment="people" id="fwyg067k9g0mpoq8e9ingwwu5" layoutContainer="default" layoutOrder="0" showInNavigation="true" title="People">
                 <childPages/>
                 <permissions />
-                <crud createTitle="Create person" editTitle="Edit person" name="People" query="from redmine_public_users" readTitle="View person" searchTitle="People" database="redmine" variable="person">
+                <crud createTitle="Create person" editTitle="Edit person" name="People" query="from public_users" readTitle="View person" searchTitle="People" database="redmine" variable="person">
                     <buttons/>
                     <annotations/>
                     <properties>
@@ -2148,7 +2148,7 @@
                     <crudPage description="Tickets" fragment="tickets" id="9io5kz207horijtmtea2ntywz" layoutContainer="default" layoutContainerInParent="contentLayoutBottom" layoutOrder="0" layoutOrderInParent="0" showInNavigation="false" title="Tickets">
                         <childPages/>
                         <permissions />
-                        <crud createTitle="Create issue" editTitle="Edit issue" name="Tickets" query="from redmine_public_issues where assigned_to_id = %{#person.id}" readTitle="Issue" searchTitle="Issues" database="redmine" variable="issue">
+                        <crud createTitle="Create issue" editTitle="Edit issue" name="Tickets" query="from public_issues where assigned_to_id = %{#person.id}" readTitle="Issue" searchTitle="Issues" database="redmine" variable="issue">
                             <buttons/>
                             <annotations/>
                             <properties>

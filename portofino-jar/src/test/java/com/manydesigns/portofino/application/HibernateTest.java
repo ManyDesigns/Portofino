@@ -304,7 +304,7 @@ public class HibernateTest extends AbstractPortofinoTest {
             "123456789012345678901234567890123456789012345678901234567890" +
             "123456789012345678901234567890123456789012345678901234567890");
 
-            session.save("portofino_public_users", user);
+            session.save("public_users", user);
             session.getTransaction().commit();
 
             fail();

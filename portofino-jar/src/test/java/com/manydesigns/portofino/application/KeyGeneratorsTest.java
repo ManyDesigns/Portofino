@@ -174,7 +174,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         myGroup.setName("testGroup");
         myGroup.setDescription("this is a description");
         Session session = application.getSession("portofino");
-        session.save("portofino_public_groups", myGroup);
+        session.save("public_groups", myGroup);
         session.getTransaction().commit();
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, "portofino.public.groups");

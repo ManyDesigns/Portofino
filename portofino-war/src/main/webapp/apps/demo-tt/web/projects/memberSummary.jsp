@@ -20,8 +20,8 @@
                 Application appl = (Application) request.getAttribute("application");
                 List<?> objects = appl.getObjects(
                         "SELECT r.name, u.login " +
-                        "FROM redmine_public_members m, redmine_public_users u, " +
-                        "     redmine_public_roles r, redmine_public_member_roles mr " +
+                        "FROM public_members m, public_users u, " +
+                        "     public_roles r, public_member_roles mr " +
                         "WHERE m.project_id = %{#project.id}" +
                         "  AND m.user_id = u.id " +
                         "  AND mr.member_id = m.id " +

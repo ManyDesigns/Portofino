@@ -75,8 +75,8 @@ public class SecurityLogic {
     public static final String USERTABLE = "portofino.public.users";
     public static final String GROUPTABLE = "portofino.public.groups";
 
-    public static final String USER_ENTITY_NAME = "portofino_public_users";
-    public static final String GROUP_ENTITY_NAME = "portofino_public_groups";
+    public static final String USER_ENTITY_NAME = "public_users";
+    public static final String GROUP_ENTITY_NAME = "public_groups";
 
     public static final String PASSWORD = "pwd";
     public static final String GROUPS = "groups";
@@ -229,7 +229,7 @@ public class SecurityLogic {
     public static User defaultLogin(Application application, String username, String password) {
         String qualifiedTableName = USERTABLE;
         Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
-        org.hibernate.Criteria criteria = session.createCriteria("portofino_public_users");
+        org.hibernate.Criteria criteria = session.createCriteria("public_users");
         criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
         criteria.add(Restrictions.eq(PASSWORD, password));
 
