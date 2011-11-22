@@ -108,7 +108,7 @@ public class SecurityLogic {
 
     public static boolean hasPermissions
             (ServletRequest request, AccessLevel level, String... permissions) {
-        boolean isNotAdmin = !SecurityLogic.isAdministrator(request);
+        boolean isNotAdmin = !isAdministrator(request);
         Dispatch dispatch =
                 (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
         if (isNotAdmin && dispatch != null) {

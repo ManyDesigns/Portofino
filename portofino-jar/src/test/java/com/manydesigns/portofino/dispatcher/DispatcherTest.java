@@ -90,7 +90,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNull(pageInstance.getPk());
 
         Navigation navigation =
-                new Navigation(application, dispatch, Collections.<String>emptyList(), false);
+                new Navigation(application, dispatch, Collections.<String>emptyList(), true);
         /*
         List<NavigationNode> rootPages = navigation.getRootNodes();
 
@@ -136,7 +136,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
             assertNull(pageInstance.getPk());
 
             Navigation navigation =
-                    new Navigation(application, dispatch, Collections.<String>emptyList(), false);
+                    new Navigation(application, dispatch, Collections.<String>emptyList(), true);
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -248,7 +248,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNull(pageInstance.getPk());
 
         Navigation navigation =
-                new Navigation(application, dispatch, Collections.<String>emptyList(), false);
+                new Navigation(application, dispatch, Collections.<String>emptyList(), true);
         /*
         List<NavigationNode> rootPages = navigation.getRootNodes();
 
@@ -293,7 +293,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertEquals(3, pageInstancePath.length);
 
         Navigation navigation =
-                new Navigation(application, dispatch, Collections.<String>emptyList(), false);
+                new Navigation(application, dispatch, Collections.<String>emptyList(), true);
         /*
         List<NavigationNode> rootPages = navigation.getRootNodes();
         */

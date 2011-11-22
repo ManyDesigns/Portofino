@@ -1270,8 +1270,8 @@
                          id="userAdmin"
                          description="user administration" url="/usersAdmin/Users.action">
                 <crud name = "users"
-                         table="portofino.PUBLIC.users"
-                         query="FROM portofino.PUBLIC.users"
+                         database="portofino"
+                         query="FROM public_users"
                          searchTitle="Users"
                          createTitle="Create new user"
                          readTitle="User"
@@ -1310,8 +1310,8 @@
                     </buttons>
                     <subCruds>
                         <crud name="active"
-                                 table="portofino.PUBLIC.groups"
-                                 query="FROM portofino.PUBLIC.groups groups WHERE groups.groupId NOT IN (SELECT groups2.groupId FROM portofino.PUBLIC.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
+                                 database="portofino"
+                                 query="FROM public_groups groups WHERE groups.groupId NOT IN (SELECT groups2.groupId FROM portofino.PUBLIC.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
                                  searchTitle="Active groups">
                             <properties>
                                 <property name="groupId"/>
@@ -1320,8 +1320,8 @@
                             </properties>
                         </crud>
                         <crud name="current"
-                                 table="portofino.PUBLIC.groups"
-                                 query="FROM portofino.PUBLIC.groups groups WHERE groups.groupId in (SELECT groups2.groupId FROM portofino.PUBLIC.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
+                                 database="portofino"
+                                 query="FROM public_groups groups WHERE groups.groupId in (SELECT groups2.groupId FROM portofino.PUBLIC.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
                                  searchTitle="Current groups">
                             <properties>
                                 <property name="groupId"/>
@@ -1331,8 +1331,8 @@
                         </crud>
 
                         <crud name="past"
-                                 table="portofino.PUBLIC.users_groups"
-                                 query="FROM portofino.PUBLIC.users_groups ug WHERE ug.userid=%{userId} AND ug.deletionDate IS NOT null"
+                                 database="portofino"
+                                 query="FROM public_users_groups ug WHERE ug.userid=%{userId} AND ug.deletionDate IS NOT null"
                                  searchTitle="Past groups">
                             <properties>
                                 <property name="userid"/>
@@ -1348,8 +1348,8 @@
                          id="groupAdmin"
                          description="groups administration" url="/usersAdmin/Groups.action">
                 <crud name="groupAdmin"
-                         table="portofino.PUBLIC.groups"
-                         query="from portofino.PUBLIC.groups"
+                         database="portofino"
+                         query="from public_groups"
                          searchTitle="Groups"
                          createTitle="Create new group"
                          readTitle="Group"

@@ -1912,7 +1912,7 @@
                     <allow/>
                     <deny/>
                 </permissions>
-                <crud createTitle="New project" editTitle="Edit project" name="projects" query="FROM public_projects ORDER BY name" readTitle="Overview" searchTitle="Projects" table="redmine.PUBLIC.projects" variable="project">
+                <crud createTitle="New project" editTitle="Edit project" name="projects" query="FROM public_projects ORDER BY name" readTitle="Overview" searchTitle="Projects" database="redmine" variable="project">
                     <buttons/>
                     <annotations/>
                     <properties>
@@ -1962,7 +1962,7 @@
                             <allow/>
                             <deny/>
                         </permissions>
-                        <crud createTitle="Create issue" editTitle="Edit issue" name="issue" query="FROM public_issues WHERE project_id = %{#project.id}" readTitle="Issue" searchTitle="Issues" table="redmine.PUBLIC.issues" variable="issue">
+                        <crud createTitle="Create issue" editTitle="Edit issue" name="issue" query="FROM public_issues WHERE project_id = %{#project.id}" readTitle="Issue" searchTitle="Issues" database="redmine" variable="issue">
                             <buttons/>
                             <annotations/>
                             <properties>
@@ -2097,7 +2097,7 @@
                             <allow/>
                             <deny/>
                         </permissions>
-                        <crud createTitle="Create new version" editTitle="Version" name="Versions" query="FROM public_versions WHERE project_id = %{#project.id}" readTitle="Version" searchTitle="Versions" table="redmine.PUBLIC.versions" variable="version">
+                        <crud createTitle="Create new version" editTitle="Version" name="Versions" query="FROM public_versions WHERE project_id = %{#project.id}" readTitle="Version" searchTitle="Versions" database="redmine" variable="version">
                             <buttons/>
                             <annotations/>
                             <properties>
@@ -2144,7 +2144,7 @@
                     <allow/>
                     <deny/>
                 </permissions>
-                <crud createTitle="Create person" editTitle="Edit person" name="People" query="from public_users" readTitle="View person" searchTitle="People" table="redmine.PUBLIC.users" variable="person">
+                <crud createTitle="Create person" editTitle="Edit person" name="People" query="from public_users" readTitle="View person" searchTitle="People" database="redmine" variable="person">
                     <buttons/>
                     <annotations/>
                     <properties>
@@ -2206,7 +2206,7 @@
                             <allow/>
                             <deny/>
                         </permissions>
-                        <crud createTitle="Create issue" editTitle="Edit issue" name="Tickets" query="from public_issues where assigned_to_id = %{#person.id}" readTitle="Issue" searchTitle="Issues" table="redmine.PUBLIC.issues" variable="issue">
+                        <crud createTitle="Create issue" editTitle="Edit issue" name="Tickets" query="from public_issues where assigned_to_id = %{#person.id}" readTitle="Issue" searchTitle="Issues" database="redmine" variable="issue">
                             <buttons/>
                             <annotations/>
                             <properties>
