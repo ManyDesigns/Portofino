@@ -36,6 +36,7 @@ import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.database.SessionUtils;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -149,7 +150,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
 
     protected void setupUserGroups() {
         List<Group> groups = new ArrayList<Group>();
-        groups.addAll(application.getAllObjects(SecurityLogic.GROUPTABLE));
+        groups.addAll(SessionUtils.getAllObjects(application, SecurityLogic.GROUPTABLE));
         availableUserGroups = new ArrayList<Group>();
 
         Group anonymous = application.getAnonymousGroup();
@@ -202,7 +203,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
             }
         }
         for(String groupName : names) {
-            Session session = application.getSessionByDatabaseName("portofino");
+            Session session = application.getSession("portofino");
             Group group = (Group) session
                     .createCriteria(SecurityLogic.GROUP_ENTITY_NAME)
                     .add(Restrictions.eq("name", groupName))

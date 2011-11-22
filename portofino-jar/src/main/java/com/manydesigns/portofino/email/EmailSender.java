@@ -33,6 +33,7 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.mail.*;
+import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +61,7 @@ public class EmailSender implements Runnable{
     }
 
     public void run() {
+        Session session = application.getSessionByQualifiedTableName(EmailUtils.EMAILQUEUE_TABLE);
         try {
             Configuration configuration = application.getPortofinoProperties();
             String server = configuration
@@ -103,17 +105,18 @@ public class EmailSender implements Runnable{
 
             if (keepSent) {
                 emailBean.setState(EmailUtils.SENT);
-                application.updateObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
+                session.update(EmailUtils.EMAILQUEUE_ENTITY, emailBean);
             } else {
-                application.deleteObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
+                session.delete(EmailUtils.EMAILQUEUE_ENTITY, emailBean);
             }
-            application.commit(EmailUtils.PORTOFINO);
+            session.getTransaction().commit();
         } catch (Throwable e) {
+            //TODO gestire HibernateException
             logger.warn("Cannot send email with id " + emailBean.getId(), e);
             emailBean.setState(EmailUtils.TOBESENT);
             if (application != null){
-                application.updateObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
-                application.commit(EmailUtils.PORTOFINO);
+                session.update(EmailUtils.EMAILQUEUE_ENTITY, emailBean);
+                session.getTransaction().commit();
             }
         }finally {
             if (application != null)

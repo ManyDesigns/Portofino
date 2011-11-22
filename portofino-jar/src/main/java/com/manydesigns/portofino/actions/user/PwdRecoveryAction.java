@@ -34,11 +34,13 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.database.SessionUtils;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.email.EmailUtils;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.User;
 import org.apache.commons.configuration.Configuration;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +78,7 @@ public class PwdRecoveryAction extends AbstractActionBean implements LoginUnAwar
 
     public String send(){
         User user;
+        Session session = application.getSession("portofino");
         try {
 
             user = application.findUserByEmail(email);
@@ -84,8 +87,34 @@ public class PwdRecoveryAction extends AbstractActionBean implements LoginUnAwar
                 return INPUT;
             }
             user.tokenGenerator();
-            application.updateObject("portofino.public.users", user);
-            application.commit("portofino");
+            session.update("portofino_public_users", user);
+            HttpServletRequest req = context.getRequest();
+            String port = (req.getServerPort()!=0)?":"+req.getServerPort():"";
+
+
+            String url = MessageFormat.format("{0}://{1}{2}{3}?token={4}",
+                    req.getScheme(),
+                    req.getServerName(),
+                    port,
+                    com.manydesigns.elements.util.Util.getAbsoluteUrl(req,
+                            "user/LostPasswordChange.action"),
+                    user.getToken());
+            String from = portofinoConfiguration.getString(
+                    PortofinoProperties.MAIL_SMTP_SENDER);
+            String subject = "Password recovery";
+            String body = new StringBuilder().append("Someone has requested a reset of your password, ")
+                    .append("if it isn't you simply ignore this email.\n")
+                    .append("othrewise go to this url ")
+                    .append(url)
+                    .append(" to insert a new one. \n\n")
+                    .append("Thank you.").toString();
+            EmailBean emailBean = new EmailBean(subject, body, email , from);
+            session.save(EmailUtils.EMAILQUEUE_ENTITY, emailBean);
+            session.getTransaction().commit();
+            SessionMessages.addInfoMessage("An email was sent to your address. " +
+                    "Please check your email.");
+            SessionUtils.commit(application, "portofino");
+            return SUCCESS;
         } catch (Exception e) {
             final String errore = "Errore nella verifica della email. " +
                     "L'email non è stata inviata";
@@ -94,32 +123,5 @@ public class PwdRecoveryAction extends AbstractActionBean implements LoginUnAwar
             logger.warn(errore, e);
             return INPUT;
         }
-
-        HttpServletRequest req = context.getRequest();
-        String port = (req.getServerPort()!=0)?":"+req.getServerPort():"";
-
-
-        String url = MessageFormat.format("{0}://{1}{2}{3}?token={4}",
-                req.getScheme(),
-                req.getServerName(),
-                port,
-                com.manydesigns.elements.util.Util.getAbsoluteUrl(req,
-                        "user/LostPasswordChange.action"),
-                user.getToken());
-        String from = portofinoConfiguration.getString(
-                PortofinoProperties.MAIL_SMTP_SENDER);
-        String subject = "Password recovery";
-        String body = new StringBuilder().append("Someone has requested a reset of your password, ")
-                .append("if it isn't you simply ignore this email.\n")
-                .append("othrewise go to this url ")
-                .append(url)
-                .append(" to insert a new one. \n\n")
-                .append("Thank you.").toString();
-        EmailBean emailBean = new EmailBean(subject, body, email , from);
-        application.saveObject(EmailUtils.EMAILQUEUE_TABLE, emailBean);
-        SessionMessages.addInfoMessage("An email was sent to your address. " +
-                "Please check your email.");
-        application.commit();
-        return SUCCESS;
     }
 }

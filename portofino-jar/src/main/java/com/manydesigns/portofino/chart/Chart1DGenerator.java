@@ -30,8 +30,10 @@
 package com.manydesigns.portofino.chart;
 
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.database.SessionUtils;
 import com.manydesigns.portofino.model.pages.ChartPage;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
+import org.hibernate.Session;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.DrawingSupplier;
 import org.jfree.chart.plot.PiePlot;
@@ -70,7 +72,8 @@ public abstract class Chart1DGenerator extends AbstractChartGenerator {
         DefaultPieDataset dataset = new DefaultPieDataset();
         java.util.List<Object[]> result;
         String query = chartPage.getQuery();
-        result = application.runSql(chartPage.getDatabase(), query);
+        Session session = application.getSession(chartPage.getDatabase());
+        result = SessionUtils.runSql(session, query);
         for (Object[] current : result) {
             ComparableWrapper value = new ComparableWrapper((Comparable)current[0]);
             dataset.setValue(value, (Number)current[1]);

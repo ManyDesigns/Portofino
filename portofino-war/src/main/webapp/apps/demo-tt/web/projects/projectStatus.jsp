@@ -5,6 +5,8 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="ognl.Ognl" %>
+<%@ page import="org.hibernate.Session" %>
+<%@ page import="com.manydesigns.portofino.database.SessionUtils" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -19,7 +21,12 @@
 
             <%
                 Application appl = (Application) request.getAttribute("application");
-                List<?> objects = appl.runSql("redmine", "select count(*), project_id, status.name, projects.name from issues join issue_statuses status on status_id = status.id join projects on project_id = projects.id group by status_id, project_id order by project_id");%>
+                Session hSession = appl.getSession("redmine");
+                List<?> objects = SessionUtils.runSql
+                        (hSession, "select count(*), project_id, status.name, projects.name " +
+                                   "from issues join issue_statuses status on status_id = status.id " +
+                                   "join projects on project_id = projects.id " +
+                                   "group by status_id, project_id order by project_id");%>
             <table id="projectTree">
             <tr width="100%" style="background-color: #ECEEF0">
                 <th width="40%">Project</th>

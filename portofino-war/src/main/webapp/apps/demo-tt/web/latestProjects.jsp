@@ -1,10 +1,11 @@
-<%@ page import="com.manydesigns.portofino.application.hibernate.HibernateApplicationImpl" %>
+<%@ page import="com.manydesigns.portofino.application.Application" %>
 <%@ page import="org.apache.commons.lang.time.FastDateFormat" %>
+<%@ page import="org.hibernate.Session" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="com.manydesigns.portofino.application.Application" %>
+<%@ page import="com.manydesigns.portofino.database.SessionUtils" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -21,7 +22,8 @@
             <%
                 Application appl = (Application) request.getAttribute("application");
                 String queryString = "FROM redmine_public_projects order by updated_on desc, created_on desc";
-                List objects = appl.runHqlQuery(queryString, new Object[0], 0, 3);
+                Session hSession = appl.getSession("redmine");
+                List objects = SessionUtils.runHqlQuery(hSession, queryString, new Object[0], 0, 3);
                 for(Object obj : objects) {
                     Map map = (Map) obj;
                     %>

@@ -28,8 +28,8 @@
  */
 package com.manydesigns.portofino.email;
 
-import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.system.model.email.EmailBean;
+import org.hibernate.Session;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -58,15 +58,16 @@ public class EmailUtils {
     public static final String ATTACHMENT_DESCRIPTION = "attachmentDescription";
     public static final String ATTACHMENT_NAME = "attachmentName";
     public static final String EMAILQUEUE_TABLE = "portofino.public.emailqueue";
+    public static final String EMAILQUEUE_ENTITY = "portofino_public_emailqueue";
     public static final String PORTOFINO = "portofino";
 
 
 
-    public static synchronized void addEmail(Application application, String subject, String body,
+    public static synchronized void addEmail(Session session, String subject, String body,
     String to, String from) {
         EmailBean email = new EmailBean(subject, body, to,
                 from);
-        application.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
+        session.save(EMAILQUEUE_ENTITY, email);
     }
 
 }

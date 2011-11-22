@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.application;
 
-import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
@@ -40,10 +39,8 @@ import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import org.apache.commons.configuration.Configuration;
 import org.hibernate.Session;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.List;
 
 
@@ -116,54 +113,15 @@ public interface Application {
     // Persistance
     //**************************************************************************
 
-    Session getSessionByDatabaseName(String databaseName);
+    Session getSession(String databaseName);
 
-    Session getSession(String qualifiedTableName);
+    Session getSessionByQualifiedTableName(String qualifiedTableName);
 
-    Object getObjectByPk(String qualifiedTableName, Serializable pk);
+    void closeSessionByQualifiedTableName(String qualifiedTableName);
 
-    Object getObjectByPk(String qualifiedTableName, Serializable pk, String queryString, Object rootObject);
-
-    List getAllObjects(String qualifiedTableName);
-
-    List<Object> getObjects(TableCriteria criteria, @Nullable Integer firstResult, @Nullable Integer maxResults);
-
-    List<Object> getObjects(String queryString, Object rootObject, @Nullable Integer firstResult, @Nullable Integer maxResults);
-
-    List<Object> getObjects(String queryString, @Nullable Integer firstResult, @Nullable Integer maxResults);
-
-    List<Object> getObjects(String queryString, TableCriteria criteria, Object rootObject, @Nullable Integer firstResult, @Nullable Integer maxResults);
-
-    void saveObject(String qualifiedTableName, Object obj);
-
-    void updateObject(String qualifiedTableName, Object obj);
-
-    void deleteObject(String qualifiedTableName, Object obj);
-
-    List<Object[]> runSql(String databaseName, String sql);
-
-    void closeSession(String qualifiedTableName);
-
-    void closeSessionByDatabaseName(String databaseName);
+    void closeSession(String databaseName);
 
     void closeSessions();
-
-    void commit(String databaseName);
-
-    void rollback(String databaseName);
-
-    void commit();
-
-    void rollback();
-
-    String getQualifiedTableNameFromQueryString(String queryString);
-
-    List<Object> getRelatedObjects(String qualifiedTableName,
-            Object obj, String oneToManyRelationshipName);
-
-    List<String> getDDLCreate();
-
-    List<String> getDDLUpdate();
 
     //**************************************************************************
     // ClassAccessors management
@@ -192,31 +150,4 @@ public interface Application {
 
     void shutdown();
 
-    List<Object> runHqlQuery(
-            String queryString,
-            @Nullable Object[] parameters
-    );
-
-    List<Object> runHqlQuery(
-            String queryString,
-            @Nullable Object[] parameters,
-            @Nullable Integer firstResult,
-            @Nullable Integer maxResults
-    );
-
-    List<Object> runHqlQuery(String qualifiedTableName,
-                             String queryString,
-                             @Nullable Object[] parameters
-    );
-
-    List<Object> runHqlQuery(
-            String qualifiedTableName,
-            String queryString,
-            @Nullable Object[] parameters,
-            @Nullable Integer firstResult,
-            @Nullable Integer maxResults
-    );
-
-    QueryStringWithParameters mergeQuery
-            (String queryString, TableCriteria criteria, Object rootObject);
 }

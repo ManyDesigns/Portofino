@@ -69,8 +69,7 @@ public class ButtonsLogic {
         return buttons;
     }
 
-    private static Button getButtonForMethod(Method method, String list) {
-        List<ButtonInfo> buttonsList = new ArrayList<ButtonInfo>();
+    public static Button getButtonForMethod(Method method, String list) {
         Button button = method.getAnnotation(Button.class);
         if(button != null && list.equals(button.list())) {
             return button;

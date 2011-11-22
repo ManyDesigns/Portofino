@@ -37,7 +37,9 @@ import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.system.model.users.User;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,8 +90,9 @@ public class LostPwdChangeAction extends AbstractActionBean implements LoginUnAw
                 User user = application.findUserByToken(token);
                 user.setPwd(pwd.pwd);
                 user.setPwdModDate(new Timestamp(new Date().getTime()));
-                application.updateObject("portofino.public.users", user);
-                application.commit("portofino");
+                Session session = application.getSessionByQualifiedTableName(SecurityLogic.USERTABLE);
+                session.update(SecurityLogic.USER_ENTITY_NAME, user);
+                session.getTransaction().commit();
                 logger.debug("User {} updated", user.getEmail());
                 SessionMessages.addInfoMessage("Password updated");
                 return SUCCESS;

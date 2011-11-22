@@ -29,11 +29,13 @@
 package com.manydesigns.portofino.application;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
+import com.manydesigns.portofino.database.SessionUtils;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
+import org.hibernate.Session;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -70,8 +72,9 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         supplier.put("$type$", supplierEntity);
         supplier.put("status", "99");
         supplier.put("name", "Giampiero");
-        application.saveObject(supplierTable,supplier);
-        application.commit("jpetstore");
+        Session session = application.getSession("jpetstore");
+        session.save(supplierEntity, supplier);
+        session.getTransaction().commit();
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, supplierTable);
         TableAccessor tableAccessor = new TableAccessor(table);
@@ -79,7 +82,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         final int expectedId = 3;
         try {
             criteria.eq(tableAccessor.getProperty("suppid"), expectedId);
-            List listObjs = application.getObjects(criteria, null, null);
+            List listObjs = SessionUtils.getObjects(session, criteria, null, null);
             assertEquals(1, listObjs.size());
             Map<String,String> supp = (Map<String, String>) listObjs.get(0);
             String name = supp.get("name");
@@ -95,8 +98,9 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         final String testTable = "hibernatetest.PUBLIC.test";
         final String testEntity = "hibernatetest_public_test";
         supplier.put("$type$", testEntity);
-        application.saveObject(testTable,supplier);
-        application.commit("hibernatetest");
+        Session session = application.getSession("hibernatetest");
+        session.save(testEntity, supplier);
+        session.getTransaction().commit();
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, testTable);
         TableAccessor tableAccessor = new TableAccessor(table);
@@ -104,7 +108,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         final long expectedId = 1;
         try {
             criteria.eq(tableAccessor.getProperty("id"), expectedId);
-            List listObjs = application.getObjects(criteria, null, null);
+            List listObjs = SessionUtils.getObjects(session, criteria, null, null);
             assertEquals(1, listObjs.size());
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
@@ -116,7 +120,8 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         Map<String, Object> order = new HashMap<String, Object>();
         final int expectedId = 1000;
         final String ordersTable = "jpetstore.PUBLIC.orders";
-        order.put("$type$", "jpetstore_public_orders");
+        String ordersEntity = "jpetstore_public_orders";
+        order.put("$type$", ordersEntity);
         order.put("userid", "99");
         order.put("orderdate", new Date());
         order.put("shipaddr1", "99");
@@ -142,15 +147,16 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         order.put("exprdate", "99");
         order.put("cardtype", "99");
         order.put("locale", "99");
-        application.saveObject(ordersTable,order);
-        application.commit("jpetstore");
+        Session session = application.getSession("jpetstore");
+        session.save(ordersEntity ,order);
+        SessionUtils.commit(application, "jpetstore");
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, ordersTable);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         try {
             criteria.eq(tableAccessor.getProperty("orderid"), expectedId);
-            List listObjs = application.getObjects(criteria, null, null);
+            List listObjs = SessionUtils.getObjects(session, criteria, null, null);
             assertEquals(1, listObjs.size());
             Map<String,String> supp = (Map<String, String>) listObjs.get(0);
             String name = supp.get("userid");
@@ -167,8 +173,9 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         myGroup.setCreationDate(new Timestamp(new Date().getTime()));
         myGroup.setName("testGroup");
         myGroup.setDescription("this is a description");
-        application.saveObject("portofino.public.groups", myGroup);
-        application.commit("portofino");
+        Session session = application.getSession("portofino");
+        session.save("portofino_public_groups", myGroup);
+        session.getTransaction().commit();
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, "portofino.public.groups");
         TableAccessor tableAccessor = new TableAccessor(table);
@@ -176,7 +183,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         final long expectedId = 3L;
         try {
             criteria.eq(tableAccessor.getProperty("groupId"), expectedId);
-            List<Object> listObjs = application.getObjects(criteria, null, null);
+            List<Object> listObjs = SessionUtils.getObjects(session, criteria, null, null);
             assertEquals(1, listObjs.size());
             myGroup = (Group) listObjs.get(0);
             String name = myGroup.getName();

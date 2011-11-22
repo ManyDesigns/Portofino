@@ -29,24 +29,19 @@
 
 package com.manydesigns.portofino.application.hibernate;
 
-import com.manydesigns.elements.fields.search.Criterion;
-import com.manydesigns.elements.fields.search.TextMatchMode;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.text.OgnlSqlFormat;
-import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.application.TableCriteria;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.connections.Connections;
+import com.manydesigns.portofino.database.SessionUtils;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.datamodel.*;
+import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -62,29 +57,27 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.impl.SessionFactoryImpl;
-import org.hibernate.jdbc.Work;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.*;
-import java.sql.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -97,12 +90,6 @@ public class HibernateApplicationImpl implements Application {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public final static String changelogFileNameTemplate = "{0}-changelog.xml";
-
-    protected static final String WHERE_STRING = " WHERE ";
-    protected static final Pattern FROM_PATTERN =
-            Pattern.compile("(SELECT\\s+.*\\s+)?FROM\\s+([a-z_$\\u0080-\\ufffe]{1}[a-z_$0-9\\u0080-\\ufffe]*).*",
-                            Pattern.CASE_INSENSITIVE | Pattern.DOTALL); //. (dot) matches newlines
-
 
     //**************************************************************************
     // Fields
@@ -388,489 +375,15 @@ public class HibernateApplicationImpl implements Application {
     // Persistance
     //**************************************************************************
 
-    public Object getObjectByPk(String qualifiedTableName,
-                                Serializable pk) {
-        Session session = getSession(qualifiedTableName);
-        TableAccessor table = getTableAccessor(qualifiedTableName);
-        String actualEntityName = table.getTable().getActualEntityName();
-        Object result;
-        PropertyAccessor[] keyProperties = table.getKeyProperties();
-        int size = keyProperties.length;
-        if (size > 1) {
-            result = session.load(actualEntityName, pk);
-            return result;
-        }
-        PropertyAccessor propertyAccessor = keyProperties[0];
-        Serializable key = (Serializable) propertyAccessor.get(pk);
-        result = session.load(actualEntityName, key);
-        return result;
-    }
-
-    public Object getObjectByPk(String qualifiedTableName,
-                                Serializable pk, String queryString, Object rootObject) {
-        if(queryString.toUpperCase().indexOf("WHERE") == -1) {
-            return getObjectByPk(qualifiedTableName, pk);
-        }
-        TableAccessor table = getTableAccessor(qualifiedTableName);
-        List<Object> result;
-        PropertyAccessor[] keyProperties = table.getKeyProperties();
-        OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
-        String formatString = sqlFormat.getFormatString();
-        Object[] ognlParameters = sqlFormat.evaluateOgnlExpressions(rootObject);
-        int i = keyProperties.length;
-        int p = ognlParameters.length;
-        Object[] parameters = new Object[p + i];
-        System.arraycopy(ognlParameters, 0, parameters, i, p);
-        int indexOfWhere = formatString.toUpperCase().indexOf("WHERE") + 5; //5 = "WHERE".length()
-        String formatStringPrefix = formatString.substring(0, indexOfWhere);
-        formatString = formatString.substring(indexOfWhere);
-
-        for(PropertyAccessor propertyAccessor : keyProperties) {
-            i--;
-            formatString = propertyAccessor.getName() + " = ? AND " + formatString;
-            parameters[i] = propertyAccessor.get(pk);
-        }
-        formatString = formatStringPrefix + " " + formatString;
-        result = runHqlQuery(qualifiedTableName, formatString, parameters);
-        if(result != null && !result.isEmpty()) {
-            return result.get(0);
-        } else {
-            return null;
-        }
-    }
-
-    public List getAllObjects(String qualifiedTableName) {
-        Session session = getSession(qualifiedTableName);
-
-        org.hibernate.Criteria hibernateCriteria;
-        Table table = DataModelLogic.findTableByQualifiedName(
-                model, qualifiedTableName);
-        String actualEntityName = table.getActualEntityName();
-
-        hibernateCriteria = session.createCriteria(actualEntityName);
-        //noinspection unchecked
-        List result = hibernateCriteria.list();
-        return result;
-    }
-
-    public Session getSession(String qualifiedTableName) {
+    public Session getSessionByQualifiedTableName(String qualifiedTableName) {
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, qualifiedTableName);
         String databaseName = table.getDatabaseName();
-        return getSessionByDatabaseName(databaseName);
+        return getSession(databaseName);
     }
 
-    public Session getSessionByDatabaseName(String databaseName) {
+    public Session getSession(String databaseName) {
         return ensureDatabaseSetup(databaseName).getThreadSession();
-    }
-
-    public QueryStringWithParameters getQueryStringWithParametersForCriteria(
-            TableCriteria criteria) {
-        if (criteria == null) {
-            return new QueryStringWithParameters("", new Object[0]);
-        }
-        Table table = criteria.getTable();
-        String actualEntityName = table.getActualEntityName();
-
-        ArrayList<Object> parametersList = new ArrayList<Object>();
-        StringBuilder whereBuilder = new StringBuilder();
-        for (Criterion criterion : criteria) {
-            PropertyAccessor accessor = criterion.getPropertyAccessor();
-            String hqlFormat;
-            if (criterion instanceof TableCriteria.EqCriterion) {
-                TableCriteria.EqCriterion eqCriterion =
-                        (TableCriteria.EqCriterion) criterion;
-                Object value = eqCriterion.getValue();
-                hqlFormat = "{0} = ?";
-                parametersList.add(value);
-            } else if (criterion instanceof TableCriteria.InCriterion) {
-                TableCriteria.InCriterion inCriterion =
-                        (TableCriteria.InCriterion) criterion;
-                Object[] values = inCriterion.getValues();
-                StringBuffer params = new StringBuffer();
-                if (values != null){
-                    boolean first = true;
-                    for (Object value : values){
-                        if (!first){
-                            params.append(", ?");
-                        } else {
-                            params.append("?");
-                            first = false;
-                        }
-                        parametersList.add(value);
-                    }
-                    hqlFormat = "{0} in ("+params.toString()+")";
-                } else {
-                    hqlFormat = null;
-                }
-            } else if (criterion instanceof TableCriteria.NeCriterion) {
-                TableCriteria.NeCriterion neCriterion =
-                        (TableCriteria.NeCriterion) criterion;
-                Object value = neCriterion.getValue();
-                hqlFormat = "{0} <> ?";
-                parametersList.add(value);
-            } else if (criterion instanceof TableCriteria.BetweenCriterion) {
-                TableCriteria.BetweenCriterion betweenCriterion =
-                        (TableCriteria.BetweenCriterion) criterion;
-                Object min = betweenCriterion.getMin();
-                Object max = betweenCriterion.getMax();
-                hqlFormat = "{0} >= ? AND {0} <= ?";
-                parametersList.add(min);
-                parametersList.add(max);
-            } else if (criterion instanceof TableCriteria.GtCriterion) {
-                TableCriteria.GtCriterion gtCriterion =
-                        (TableCriteria.GtCriterion) criterion;
-                Object value = gtCriterion.getValue();
-                hqlFormat = "{0} > ?";
-                parametersList.add(value);
-            } else if (criterion instanceof TableCriteria.GeCriterion) {
-                TableCriteria.GeCriterion gtCriterion =
-                        (TableCriteria.GeCriterion) criterion;
-                Object value = gtCriterion.getValue();
-                hqlFormat = "{0} >= ?";
-                parametersList.add(value);
-            } else if (criterion instanceof TableCriteria.LtCriterion) {
-                TableCriteria.LtCriterion ltCriterion =
-                        (TableCriteria.LtCriterion) criterion;
-                Object value = ltCriterion.getValue();
-                hqlFormat = "{0} < ?";
-                parametersList.add(value);
-            } else if (criterion instanceof TableCriteria.LeCriterion) {
-                TableCriteria.LeCriterion leCriterion =
-                        (TableCriteria.LeCriterion) criterion;
-                Object value = leCriterion.getValue();
-                hqlFormat = "{0} <= ?";
-                parametersList.add(value);
-            } else if (criterion instanceof TableCriteria.LikeCriterion) {
-                TableCriteria.LikeCriterion likeCriterion =
-                        (TableCriteria.LikeCriterion) criterion;
-                String value = (String) likeCriterion.getValue();
-                String pattern = processTextMatchMode(
-                        likeCriterion.getTextMatchMode(), value);
-                hqlFormat = "{0} like ?";
-                parametersList.add(pattern);
-            } else if (criterion instanceof TableCriteria.IlikeCriterion) {
-                TableCriteria.IlikeCriterion ilikeCriterion =
-                        (TableCriteria.IlikeCriterion) criterion;
-                String value = (String) ilikeCriterion.getValue();
-                String pattern = processTextMatchMode(
-                        ilikeCriterion.getTextMatchMode(), value);
-                hqlFormat = "lower({0}) like lower(?)";
-                parametersList.add(pattern);
-            } else if (criterion instanceof TableCriteria.IsNullCriterion) {
-                hqlFormat = "{0} is null";
-            } else if (criterion instanceof TableCriteria.IsNotNullCriterion) {
-                hqlFormat = "{0} is not null";
-            } else {
-                logger.error("Unrecognized criterion: {}", criterion);
-                throw new InternalError("Unrecognied criterion");
-            }
-
-            if (hqlFormat == null) {
-                continue;
-            }
-
-            String hql = MessageFormat.format(hqlFormat,
-                    accessor.getName());
-
-            if (whereBuilder.length() > 0) {
-                whereBuilder.append(" AND ");
-            }
-            whereBuilder.append(hql);
-        }
-        String whereClause = whereBuilder.toString();
-        String queryString;
-        if (whereClause.length() > 0) {
-            queryString = MessageFormat.format(
-                    "FROM {0}" + WHERE_STRING + "{1}",
-                    actualEntityName,
-                    whereClause);
-        } else {
-            queryString = MessageFormat.format(
-                    "FROM {0}",
-                    actualEntityName);
-        }
-
-        Object[] parameters = new Object[parametersList.size()];
-        parametersList.toArray(parameters);
-
-        return new QueryStringWithParameters(queryString, parameters);
-    }
-
-    protected String processTextMatchMode(TextMatchMode textMatchMode,
-                                          String value) {
-        String pattern;
-        switch (textMatchMode) {
-            case EQUALS:
-                pattern = value;
-                break;
-            case CONTAINS:
-                pattern = "%" + value + "%";
-                break;
-            case STARTS_WITH:
-                pattern = value + "%";
-                break;
-            case ENDS_WITH:
-                pattern = "%" + value;
-                break;
-            default:
-                String msg = MessageFormat.format(
-                        "Unrecognized text match mode: {0}",
-                        textMatchMode);
-                logger.error(msg);
-                throw new InternalError(msg);
-        }
-        return pattern;
-    }
-
-    public List<Object> getObjects(TableCriteria criteria,
-                                   @Nullable Integer firstResult,
-                                   @Nullable Integer maxResults) {
-        QueryStringWithParameters queryStringWithParameters =
-                getQueryStringWithParametersForCriteria(criteria);
-
-        return runHqlQuery(
-                queryStringWithParameters.getQueryString(),
-                queryStringWithParameters.getParamaters(),
-                firstResult,
-                maxResults
-        );
-    }
-
-
-    public List<Object> getObjects(String queryString,
-                                   Object rootObject,
-                                   @Nullable Integer firstResult,
-                                   @Nullable Integer maxResults) {
-        OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
-        String formatString = sqlFormat.getFormatString();
-        Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
-
-        return runHqlQuery(formatString, parameters, firstResult, maxResults);
-    }
-
-    public List<Object> getObjects(String queryString,
-                                   @Nullable Integer firstResult,
-                                   @Nullable Integer maxResults) {
-        return getObjects(queryString, (TableCriteria) null, null, firstResult, maxResults);
-    }
-
-    public String getQualifiedTableNameFromQueryString(String queryString) {
-        Matcher matcher = FROM_PATTERN.matcher(queryString);
-        String entityName;
-        if (matcher.matches()) {
-            entityName =  matcher.group(2);
-        } else {
-            return null;
-        }
-
-        Table table = model.findTableByEntityName(entityName);
-        return table.getQualifiedName();
-    }
-
-    public List<Object> getObjects(String queryString,
-                                   TableCriteria criteria,
-                                   @Nullable Object rootObject,
-                                   @Nullable Integer firstResult,
-                                   @Nullable Integer maxResults) {
-        QueryStringWithParameters result = mergeQuery(queryString, criteria, rootObject);
-
-        return runHqlQuery(result.getQueryString(), result.getParamaters(), firstResult, maxResults);
-    }
-
-    public QueryStringWithParameters mergeQuery
-            (String queryString, TableCriteria criteria, Object rootObject) {
-        OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
-        String formatString = sqlFormat.getFormatString();
-        Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
-        boolean formatStringContainsWhere = formatString.toUpperCase().contains(WHERE_STRING);
-
-        QueryStringWithParameters criteriaQuery =
-                getQueryStringWithParametersForCriteria(criteria);
-        String criteriaQueryString = criteriaQuery.getQueryString();
-        Object[] criteriaParameters = criteriaQuery.getParamaters();
-
-        // merge the hql strings
-        int whereIndex = criteriaQueryString.toUpperCase().indexOf(WHERE_STRING);
-        String criteriaWhereClause;
-        if (whereIndex >= 0) {
-            criteriaWhereClause =
-                    criteriaQueryString.substring(
-                            whereIndex + WHERE_STRING.length());
-        } else {
-            criteriaWhereClause = "";
-        }
-
-        String fullQueryString;
-        if (criteriaWhereClause.length() > 0) {
-            if (formatStringContainsWhere) {
-                fullQueryString = MessageFormat.format(
-                        "{0} AND {1}",
-                        formatString,
-                        criteriaWhereClause);
-            } else {
-                fullQueryString = MessageFormat.format(
-                        "{0} WHERE {1}",
-                        formatString,
-                        criteriaWhereClause);
-            }
-        } else {
-            fullQueryString = formatString;
-        }
-
-        // merge the parameters
-        ArrayList<Object> mergedParametersList = new ArrayList<Object>();
-        mergedParametersList.addAll(Arrays.asList(parameters));
-        mergedParametersList.addAll(Arrays.asList(criteriaParameters));
-        Object[] mergedParameters = new Object[mergedParametersList.size()];
-        mergedParametersList.toArray(mergedParameters);
-
-        return new QueryStringWithParameters(fullQueryString, mergedParameters);
-    }
-
-    public List<Object> runHqlQuery(
-            String queryString,
-            @Nullable Object[] parameters
-    ) {
-        return runHqlQuery(queryString, parameters, null, null);
-    }
-
-    public List<Object> runHqlQuery(
-            String queryString,
-            @Nullable Object[] parameters,
-            @Nullable Integer firstResult,
-            @Nullable Integer maxResults
-    ) {
-        String qualifiedName =
-                getQualifiedTableNameFromQueryString(queryString);
-
-        return runHqlQuery(qualifiedName, queryString, parameters, firstResult, maxResults);
-    }
-
-    public List<Object> runHqlQuery(
-            String qualifiedTableName,
-            String queryString,
-            @Nullable Object[] parameters
-    ) {
-        return runHqlQuery(qualifiedTableName, queryString, parameters, null, null);
-    }
-
-    public List<Object> runHqlQuery(
-            String qualifiedTableName,
-            String queryString,
-            @Nullable Object[] parameters,
-            @Nullable Integer firstResult,
-            @Nullable Integer maxResults) {
-        Session session = getSession(qualifiedTableName);
-
-        Query query = session.createQuery(queryString);
-        if (parameters != null) {
-            for (int i = 0; i < parameters.length; i++) {
-                query.setParameter(i, parameters[i]);
-            }
-        }
-
-        if (firstResult != null) {
-            query.setFirstResult(firstResult);
-        }
-
-        if(maxResults != null) {
-            query.setMaxResults(maxResults);
-        }
-
-        //noinspection unchecked
-        List<Object> result = query.list();
-        return result;
-    }
-
-
-    public void saveObject(String qualifiedTableName, Object obj) {
-        Session session = getSession(qualifiedTableName);
-
-        Table table = DataModelLogic.findTableByQualifiedName(
-                model, qualifiedTableName);
-        String actualEntityName = table.getActualEntityName();
-
-        try {
-            session.save(actualEntityName, obj);
-            //session.getTransaction().commit();
-        } catch (HibernateException e) {
-            closeSession(qualifiedTableName);
-            throw e;
-        }
-    }
-
-
-    public void updateObject(String qualifiedTableName, Object obj) {
-        Session session = getSession(qualifiedTableName);
-        Table table = DataModelLogic.findTableByQualifiedName(
-                model, qualifiedTableName);
-        String actualEntityName = table.getActualEntityName();
-
-        try {
-            session.update(actualEntityName, obj);
-            //session.getTransaction().commit();
-        } catch (HibernateException e) {
-            closeSession(qualifiedTableName);
-            throw e;
-        }
-    }
-
-    public void deleteObject(String qualifiedTableName, Object obj) {
-        Session session = getSession(qualifiedTableName);
-        Table table = DataModelLogic.findTableByQualifiedName(
-                model, qualifiedTableName);
-        String actualEntityName = table.getActualEntityName();
-        try {
-            Object obj2 = getObjectByPk(qualifiedTableName, (Serializable) obj);
-            session.delete(actualEntityName, obj2);
-        } catch (HibernateException e) {
-            closeSession(qualifiedTableName);
-            throw e;
-        }
-    }
-
-    public List<Object[]> runSql(String databaseName, String sql) {
-        HibernateDatabaseSetup setup = ensureDatabaseSetup(databaseName);
-        Session session = setup.getThreadSession();
-        OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
-        final String formatString = sqlFormat.getFormatString();
-        final Object[] parameters = sqlFormat.evaluateOgnlExpressions(null);
-
-        /*SQLQuery query = session.createSQLQuery(formatString);
-        for (int i = 0; i < parameters.length; i++) {
-            query.setParameter(i, parameters[i]);
-        }*/
-
-        //noinspection unchecked
-        //List<Object[]> result = query.list();
-
-        final List<Object[]> result = new ArrayList<Object[]>();
-
-        session.doWork(new Work() {
-            public void execute(Connection connection) throws SQLException {
-                PreparedStatement stmt = connection.prepareStatement(formatString);
-                try {
-                    for (int i = 0; i < parameters.length; i++) {
-                        stmt.setObject(i + 1, parameters[i]);
-                    }
-                    ResultSet rs = stmt.executeQuery();
-                    ResultSetMetaData md = rs.getMetaData();
-                    int cc = md.getColumnCount();
-                    while(rs.next()) {
-                        Object[] current = new Object[cc];
-                        for(int i = 0; i < cc; i++) {
-                            current[i] = rs.getObject(i + 1);
-                        }
-                        result.add(current);
-                    }
-                } finally {
-                    stmt.close(); //Chiude anche il result set
-                }
-            }
-        });
-
-        return result;
     }
 
     protected HibernateDatabaseSetup ensureDatabaseSetup(String databaseName) {
@@ -887,14 +400,14 @@ public class HibernateApplicationImpl implements Application {
         }
     }
 
-    public void closeSession(String qualifiedTableName) {
+    public void closeSessionByQualifiedTableName(String qualifiedTableName) {
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, qualifiedTableName);
         String databaseName = table.getDatabaseName();
-        closeSessionByDatabaseName(databaseName);
+        closeSession(databaseName);
     }
 
-    public void closeSessionByDatabaseName(String databaseName) {
+    public void closeSession(String databaseName) {
         closeSession(ensureDatabaseSetup(databaseName));
     }
 
@@ -913,21 +426,6 @@ public class HibernateApplicationImpl implements Application {
             current.removeThreadSession();
         }
     }
-
-    public void commit(String databaseName) {
-        Session session = ensureDatabaseSetup(databaseName).getThreadSession();
-        try {
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            session.getTransaction().rollback();
-            throw e;
-        }
-    }
-
-    public void rollback(String databaseName) {
-        Session session = ensureDatabaseSetup(databaseName).getThreadSession();
-        session.getTransaction().rollback();
-    }
     
     public void commit() {
         for (HibernateDatabaseSetup current : setups.values()) {
@@ -938,7 +436,7 @@ public class HibernateApplicationImpl implements Application {
                     try {
                         tx.commit();
                     } catch (HibernateException e) {
-                        tx.rollback();
+                        closeSession(current);
                         throw e;
                     }
                 }
@@ -956,43 +454,6 @@ public class HibernateApplicationImpl implements Application {
                 }
             }
         }
-    }
-
-    @SuppressWarnings({"unchecked"})
-    public List<Object> getRelatedObjects(String qualifiedTableName,
-                                          Object obj,
-                                          String oneToManyRelationshipName) {
-        ForeignKey relationship =
-                DataModelLogic.findOneToManyRelationship(model,
-                        qualifiedTableName, oneToManyRelationshipName);
-        //Table toTable = relationship.getActualToTable();
-        Table fromTable = relationship.getFromTable();
-        Session session = getSession(fromTable.getQualifiedName());
-
-        ClassAccessor toAccessor = getTableAccessor(qualifiedTableName);
-
-        try {
-            org.hibernate.Criteria criteria =
-                    session.createCriteria(fromTable.getActualEntityName());
-            for (Reference reference : relationship.getReferences()) {
-                Column fromColumn = reference.getActualFromColumn();
-                Column toColumn = reference.getActualToColumn();
-                PropertyAccessor toPropertyAccessor
-                        = toAccessor.getProperty(toColumn.getActualPropertyName());
-                Object toValue = toPropertyAccessor.get(obj);
-                criteria.add(Restrictions.eq(fromColumn.getActualPropertyName(),
-                        toValue));
-            }
-            //noinspection unchecked
-            List<Object> result = criteria.list();
-            return result;
-        } catch (Throwable e) {
-            String msg = String.format(
-                    "Cannot access relationship %s on table %s",
-                    oneToManyRelationshipName, qualifiedTableName);
-            logger.warn(msg, e);
-        }
-        return null;
     }
 
     //**************************************************************************
@@ -1069,7 +530,7 @@ public class HibernateApplicationImpl implements Application {
 
     public User findUserByEmail(String email) {
         String qualifiedTableName = SecurityLogic.USERTABLE;
-        Session session = getSession(qualifiedTableName);
+        Session session = getSessionByQualifiedTableName(qualifiedTableName);
         org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("email", email));
         return (User) criteria.uniqueResult();
@@ -1077,7 +538,7 @@ public class HibernateApplicationImpl implements Application {
 
     public User findUserByUserName(String username) {
         String qualifiedTableName = SecurityLogic.USERTABLE;
-        Session session = getSession(qualifiedTableName);
+        Session session = getSessionByQualifiedTableName(qualifiedTableName);
         org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
         return (User) criteria.uniqueResult();
@@ -1085,7 +546,7 @@ public class HibernateApplicationImpl implements Application {
 
     public User findUserByToken(String token) {
         String qualifiedTableName = SecurityLogic.USERTABLE;
-        Session session = getSession(qualifiedTableName);
+        Session session = getSessionByQualifiedTableName(qualifiedTableName);
         org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("token", token));
         return (User) criteria.uniqueResult();
@@ -1127,8 +588,9 @@ public class HibernateApplicationImpl implements Application {
         assert table != null;
 
         String actualEntityName = table.getTable().getActualEntityName();
-        List result = runHqlQuery
-                (SecurityLogic.GROUPTABLE,
+        Session session = getSessionByQualifiedTableName(SecurityLogic.GROUPTABLE);
+        List result = SessionUtils.runHqlQuery
+                (session,
                 "FROM " + actualEntityName + " WHERE name = ?",
                 new Object[] { name });
         if(result.isEmpty()) {

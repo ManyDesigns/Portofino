@@ -52,6 +52,7 @@ import com.manydesigns.portofino.actions.forms.CrudSelectionProviderEdit;
 import com.manydesigns.portofino.application.TableCriteria;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
+import com.manydesigns.portofino.database.SessionUtils;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.CrudLogic;
@@ -94,6 +95,7 @@ import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
+import org.hibernate.Session;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONStringer;
@@ -132,7 +134,6 @@ public class CrudAction extends PortletAction {
     public ClassAccessor classAccessor;
     public Table baseTable;
     public PkHelper pkHelper;
-    public List<CrudButton> crudButtons;
     public List<CrudSelectionProvider> crudSelectionProviders;
     public MultiMap availableSelectionProviders; //List<String> -> DatabaseSelectionProvider
     public String pk;
@@ -165,6 +166,7 @@ public class CrudAction extends PortletAction {
 
     public List objects;
     public Object object;
+    public Session session;
 
     //**************************************************************************
     // Logging
@@ -204,8 +206,8 @@ public class CrudAction extends PortletAction {
         if(crud != null) {
             classAccessor = crudPageInstance.getClassAccessor();
             baseTable = crudPageInstance.getBaseTable();
+            session = application.getSessionByQualifiedTableName(crud.getTable());
             pkHelper = crudPageInstance.getPkHelper();
-            crudButtons = new ArrayList<CrudButton>();
             crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
             object = crudPageInstance.getObject();
 
@@ -325,14 +327,16 @@ public class CrudAction extends PortletAction {
         String hql = current.getHql();
 
         if (sql != null) {
-            Collection<Object[]> objects = application.runSql(database, sql);
+            Session session = application.getSession(database);
+            Collection<Object[]> objects = SessionUtils.runSql(session, sql);
             selectionProvider = DefaultSelectionProvider.create(
                     name, fieldNames.length, fieldTypes, objects);
             selectionProvider.setDisplayMode(dm);
         } else if (hql != null) {
-            Collection<Object> objects = application.getObjects(hql, null, null);
             String qualifiedTableName =
-                    application.getQualifiedTableNameFromQueryString(hql);
+                    SessionUtils.getQualifiedTableNameFromQueryString(application, hql);
+            Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
+            Collection<Object> objects = SessionUtils.getObjects(session, hql, null, null);
             TableAccessor tableAccessor =
                     application.getTableAccessor(qualifiedTableName);
             ShortName shortNameAnnotation =
@@ -435,14 +439,12 @@ public class CrudAction extends PortletAction {
             searchForm.configureCriteria(criteria);
         }
         QueryStringWithParameters query =
-                application.mergeQuery(crud.getQuery(), criteria, this);
+                SessionUtils.mergeQuery(crud.getQuery(), criteria, this);
 
         String queryString = query.getQueryString();
         String totalRecordsQueryString = generateCountQuery(queryString);
-        String qualifiedTableName =
-                crud.getActualTable().getQualifiedName();
-        List<Object> result = application.runHqlQuery
-                (qualifiedTableName, totalRecordsQueryString,
+        List<Object> result = SessionUtils.runHqlQuery
+                (session, totalRecordsQueryString,
                  query.getParamaters());
         long totalRecords = (Long) result.get(0);
 
@@ -511,11 +513,6 @@ public class CrudAction extends PortletAction {
         setupForm(Mode.VIEW);
         form.readFromObject(object);
         refreshBlobDownloadHref();
-
-        // refresh crud buttons (enabled/disabled)
-        for (CrudButton crudButton : crudButtons) {
-            crudButton.runGuard(this);
-        }
 
         cancelReturnUrl = new UrlBuilder(
                 Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
@@ -608,10 +605,10 @@ public class CrudAction extends PortletAction {
         if (form.validate()) {
             form.writeToObject(object);
             if(createValidate(object)) {
-                application.saveObject(baseTable.getQualifiedName(), object);
+                session.save(baseTable.getActualEntityName(), object);
                 createPostProcess(object);
                 try {
-                    application.commit(baseTable.getDatabaseName());
+                    session.getTransaction().commit();
                 } catch (Throwable e) {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
@@ -658,10 +655,10 @@ public class CrudAction extends PortletAction {
         if (form.validate()) {
             form.writeToObject(object);
             if(editValidate(object)) {
-                application.updateObject(baseTable.getQualifiedName(), object);
+                session.update(baseTable.getActualEntityName(), object);
                 editPostProcess(object);
                 try {
-                    application.commit(baseTable.getDatabaseName());
+                    session.getTransaction().commit();
                 } catch (Throwable e) {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
@@ -715,10 +712,10 @@ public class CrudAction extends PortletAction {
             for (String current : selection) {
                 loadObject(current);
                 form.writeToObject(object);
-                application.updateObject(baseTable.getQualifiedName(), object);
+                session.update(baseTable.getActualEntityName(), object);
             }
             try {
-                application.commit(baseTable.getDatabaseName());
+                session.getTransaction().commit();
             } catch (Throwable e) {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
@@ -742,10 +739,9 @@ public class CrudAction extends PortletAction {
     @Button(list = "crud-read", key = "commons.delete", order = 2)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
-        Object pkObject = pkHelper.parsePkString(pk);
-        application.deleteObject(baseTable.getQualifiedName(), pkObject);
+        session.delete(baseTable.getActualEntityName(), object);
         try {
-            application.commit(baseTable.getDatabaseName());
+            session.getTransaction().commit();
             SessionMessages.addInfoMessage("DELETE avvenuto con successo");
 
             // invalidate the pk on this crud unit
@@ -771,18 +767,18 @@ public class CrudAction extends PortletAction {
                     .addParameter(SEARCH_STRING_PARAM, searchString);
         }
         for (String current : selection) {
-            Object pkObject = pkHelper.parsePkString(current);
-            application.deleteObject(baseTable.getQualifiedName(), pkObject);
-
+            Serializable pkObject = pkHelper.parsePkString(current);
+            Object obj = SessionUtils.getObjectByPk(application, baseTable.getQualifiedName(), pkObject);
+            session.delete(baseTable.getActualEntityName(), obj);
         }
         try {
-                application.commit(baseTable.getDatabaseName());
-                SessionMessages.addInfoMessage(MessageFormat.format(
-                "DELETE di {0} oggetti avvenuto con successo",
-                selection.length));
-            } catch (Exception e) {
-                logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
-                SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
+            session.getTransaction().commit();
+            SessionMessages.addInfoMessage(MessageFormat.format(
+            "DELETE di {0} oggetti avvenuto con successo",
+            selection.length));
+        } catch (Exception e) {
+            logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
+            SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
         }
 
         return new RedirectResolution(dispatch.getOriginalPath())
@@ -1091,7 +1087,9 @@ public class CrudAction extends PortletAction {
             if(searchForm != null) {
                 searchForm.configureCriteria(criteria);
             }
-            objects = application.getObjects(
+            String qualifiedTableName = crud.getActualTable().getQualifiedName();
+            Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
+            objects = SessionUtils.getObjects(session,
                     crud.getQuery(), criteria, this, firstResult, maxResults);
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
@@ -1102,7 +1100,7 @@ public class CrudAction extends PortletAction {
 
     private void loadObject(String pk) {
         Serializable pkObject = pkHelper.parsePkString(pk);
-        object = application.getObjectByPk(baseTable.getQualifiedName(), pkObject);
+        object = SessionUtils.getObjectByPk(application, baseTable.getQualifiedName(), pkObject);
     }
 
     //**************************************************************************
@@ -1907,14 +1905,6 @@ public class CrudAction extends PortletAction {
 
     public void setPkHelper(PkHelper pkHelper) {
         this.pkHelper = pkHelper;
-    }
-
-    public List<CrudButton> getCrudButtons() {
-        return crudButtons;
-    }
-
-    public void setCrudButtons(List<CrudButton> crudButtons) {
-        this.crudButtons = crudButtons;
     }
 
     public List<CrudSelectionProvider> getCrudSelectionProviders() {

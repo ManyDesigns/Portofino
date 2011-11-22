@@ -32,6 +32,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.TableCriteria;
+import com.manydesigns.portofino.database.SessionUtils;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
@@ -39,6 +40,7 @@ import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.User;
 import org.apache.commons.configuration.Configuration;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,7 +132,9 @@ public class EmailTask extends TimerTask {
                     model, EmailUtils.EMAILQUEUE_TABLE);
             TableCriteria criteria = new TableCriteria(table);
             criteria.eq(accessor.getProperty("state"), EmailUtils.TOBESENT);
-            List<Object> emails = application.getObjects(
+            Session session = application.getSessionByQualifiedTableName(EmailUtils.EMAILQUEUE_TABLE);
+            List<Object> emails = SessionUtils.getObjects(
+                    session,
                     criteria.eq(accessor.getProperty("state"),
                             EmailUtils.TOBESENT), null, null);
             for (Object obj : emails) {
@@ -139,8 +143,8 @@ public class EmailTask extends TimerTask {
                 EmailBean email = emailSender.getEmailBean();
                 try {
                     email.setState(EmailUtils.SENDING);
-                    application.saveObject(EmailUtils.EMAILQUEUE_TABLE, email);
-                    application.commit(EmailUtils.PORTOFINO);
+                    session.save(EmailUtils.EMAILQUEUE_TABLE, email);
+                    session.getTransaction().commit();
                 } catch (Throwable e) {
                     logger.warn("cannot store email state", e);
                 }
@@ -154,14 +158,16 @@ public class EmailTask extends TimerTask {
 
     private synchronized void checkBounce() {
         if (client != null) {
+            Session session = application.getSessionByQualifiedTableName(USERTABLE);
             Set<String> emails = client.read();
             for (String email : emails) {
-                incrementBounce(email);
+                incrementBounce(session, email);
             }
+            session.getTransaction().commit();
         }
     }
 
-    private void incrementBounce(String email) {
+    private void incrementBounce(Session session, String email) {
         try {
             Model model = application.getModel();
             Table table = DataModelLogic.findTableByQualifiedName(
@@ -169,7 +175,7 @@ public class EmailTask extends TimerTask {
             TableCriteria criteria = new TableCriteria(table);
 
             ClassAccessor accessor = application.getTableAccessor(USERTABLE);
-            List<Object> users = application.getObjects(
+            List<Object> users = SessionUtils.getObjects(session,
                     criteria.gt(accessor.getProperty("email"), email), null, null);
             if (users.size() == 0) {
                 logger.warn("no user found for email {}", email);
@@ -183,7 +189,7 @@ public class EmailTask extends TimerTask {
                 value++;
             }
             user.setBounced(value);
-            application.saveObject(USERTABLE, user);
+            session.save(USERTABLE, user);
         } catch (NoSuchFieldException e) {
             logger.warn("cannot increment bounce for user", e);
         }

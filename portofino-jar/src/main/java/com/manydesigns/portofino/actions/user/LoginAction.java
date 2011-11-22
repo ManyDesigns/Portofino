@@ -199,15 +199,16 @@ public class LoginAction extends AbstractActionBean {
         user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
         int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
         user.setFailedLoginAttempts(failedAttempts+1);
-        application.updateObject(SecurityLogic.USERTABLE, user);
-        application.commit("portofino");
+        Session session = application.getSessionByQualifiedTableName(SecurityLogic.USERTABLE);
+        session.update(user);
+        session.getTransaction().commit();
     }
 
     private void updateUser(User user) {
         user.setFailedLoginAttempts(0);
         user.setLastLoginDate(new Timestamp(new Date().getTime()));
         user.setToken(null);
-        Session session = application.getSessionByDatabaseName("portofino");
+        Session session = application.getSession("portofino");
         Transaction tx = session.getTransaction();
         try {
             User existingUser = application.findUserByUserName(user.getUserName());

@@ -14,6 +14,7 @@ import com.manydesigns.portofino.actions.forms.EditPage;
 import com.manydesigns.portofino.actions.forms.NewPage;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.database.SessionUtils;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -36,6 +37,7 @@ import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -225,7 +227,7 @@ public class PortletAction extends AbstractActionBean {
     }
 
     public void setupGroups(Page page) {
-        groups = new ArrayList<com.manydesigns.portofino.system.model.users.Group>(application.getAllObjects(SecurityLogic.GROUPTABLE));
+        groups = new ArrayList(SessionUtils.getAllObjects(application, SecurityLogic.GROUPTABLE));
     }
 
     @RequiresAdministrator
