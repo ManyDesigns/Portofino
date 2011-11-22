@@ -3,7 +3,7 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%>
+%><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.TablesAction"/>
@@ -11,7 +11,7 @@
         Tables
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <stripes:layout-render name="/layouts/page/buttons.jsp" list="tables-list" cssClass="contentButton" />
+        <portofino:buttons list="tables-list" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         Tables
@@ -20,7 +20,7 @@
         <mde:write name="actionBean" property="multilineForm"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <stripes:layout-render name="/layouts/page/buttons.jsp" list="tables-list" cssClass="contentButton" />
+        <portofino:buttons list="tables-list" cssClass="contentButton" />
     </stripes:layout-component>
     <script type="text/javascript">
         $("button[name=bulkDelete]").click(function() {

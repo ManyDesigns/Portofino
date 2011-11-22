@@ -34,7 +34,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.database.SessionUtils;
+import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.email.EmailUtils;
 import com.manydesigns.portofino.system.model.email.EmailBean;
@@ -113,7 +113,7 @@ public class PwdRecoveryAction extends AbstractActionBean implements LoginUnAwar
             session.getTransaction().commit();
             SessionMessages.addInfoMessage("An email was sent to your address. " +
                     "Please check your email.");
-            SessionUtils.commit(application, "portofino");
+            QueryUtils.commit(application, "portofino");
             return SUCCESS;
         } catch (Exception e) {
             final String errore = "Errore nella verifica della email. " +

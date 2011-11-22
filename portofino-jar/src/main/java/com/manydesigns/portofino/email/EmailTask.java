@@ -32,7 +32,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.TableCriteria;
-import com.manydesigns.portofino.database.SessionUtils;
+import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
@@ -133,7 +133,7 @@ public class EmailTask extends TimerTask {
             TableCriteria criteria = new TableCriteria(table);
             criteria.eq(accessor.getProperty("state"), EmailUtils.TOBESENT);
             Session session = application.getSessionByQualifiedTableName(EmailUtils.EMAILQUEUE_TABLE);
-            List<Object> emails = SessionUtils.getObjects(
+            List<Object> emails = QueryUtils.getObjects(
                     session,
                     criteria.eq(accessor.getProperty("state"),
                             EmailUtils.TOBESENT), null, null);
@@ -175,7 +175,7 @@ public class EmailTask extends TimerTask {
             TableCriteria criteria = new TableCriteria(table);
 
             ClassAccessor accessor = application.getTableAccessor(USERTABLE);
-            List<Object> users = SessionUtils.getObjects(session,
+            List<Object> users = QueryUtils.getObjects(session,
                     criteria.gt(accessor.getProperty("email"), email), null, null);
             if (users.size() == 0) {
                 logger.warn("no user found for email {}", email);

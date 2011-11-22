@@ -34,7 +34,7 @@ import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.connections.Connections;
-import com.manydesigns.portofino.database.SessionUtils;
+import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.logic.DataModelLogic;
@@ -519,8 +519,7 @@ public class HibernateApplicationImpl implements Application {
     }
 
     public @NotNull CrudAccessor getCrudAccessor(@NotNull Crud crud) {
-        String qualifiedTableName = crud.getTable();
-        TableAccessor tableAccessor = getTableAccessor(qualifiedTableName);
+        TableAccessor tableAccessor = new TableAccessor(crud.getActualTable());
         return new CrudAccessor(crud, tableAccessor);
     }
 
@@ -589,10 +588,10 @@ public class HibernateApplicationImpl implements Application {
 
         String actualEntityName = table.getTable().getActualEntityName();
         Session session = getSessionByQualifiedTableName(SecurityLogic.GROUPTABLE);
-        List result = SessionUtils.runHqlQuery
+        List result = QueryUtils.runHqlQuery
                 (session,
-                "FROM " + actualEntityName + " WHERE name = ?",
-                new Object[] { name });
+                        "FROM " + actualEntityName + " WHERE name = ?",
+                        new Object[]{name});
         if(result.isEmpty()) {
             throw new IllegalStateException("Group " + name + " not found");
         } else if(result.size() == 1) {

@@ -32,7 +32,7 @@ package com.manydesigns.portofino.dispatcher;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.database.SessionUtils;
+import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.Page;
@@ -100,7 +100,7 @@ public class CrudPageInstance extends PageInstance {
 
     private void loadObject(String pk) {
         Serializable pkObject = pkHelper.parsePkString(pk);
-        object = SessionUtils.getObjectByPk(
+        object = QueryUtils.getObjectByPk(
                 application,
                 baseTable.getQualifiedName(), pkObject,
                 crud.getQuery(), null);

@@ -4,13 +4,13 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%>
+%><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.user.admin.GroupAdminAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:layout-render name="/layouts/page/buttons.jsp" list="crud-edit" cssClass="contentButton" />
+        <portofino:buttons list="crud-edit" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.crud.editTitle}"/>
@@ -31,6 +31,6 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">
-        <stripes:layout-render name="/layouts/page/buttons.jsp" list="crud-edit" cssClass="contentButton" />
+        <portofino:buttons list="crud-edit" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>

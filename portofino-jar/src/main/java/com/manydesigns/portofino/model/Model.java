@@ -30,8 +30,6 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.datamodel.Schema;
-import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.pages.RootPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,17 +145,4 @@ public class Model {
         this.rootPage = rootPage;
     }
 
-    public Table findTableByEntityName(String entityName) {
-        for(Database db : this.getDatabases()) {
-            for(Schema schema : db.getSchemas()){
-                for (Table tb : schema.getTables()){
-                    if(entityName.equalsIgnoreCase(tb.getActualEntityName())){
-                        return tb;
-                    }
-                }
-            }
-
-        }
-        return null;
-    }
 }

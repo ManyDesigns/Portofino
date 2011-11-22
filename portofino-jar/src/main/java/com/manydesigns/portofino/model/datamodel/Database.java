@@ -195,6 +195,18 @@ public class Database implements ModelObject {
         return null;
     }
 
+
+    public Table findTableByEntityName(String entityName) {
+        for(Schema schema : getSchemas()) {
+            for(Table table : schema.getTables()) {
+                if(table.getActualEntityName().equalsIgnoreCase(entityName)) {
+                    return table;
+                }
+            }
+        }
+        return null;
+    }
+
     public Column findColumnByQualifiedName(String qualifiedColumnName) {
         int lastDot = qualifiedColumnName.lastIndexOf(".");
         String qualifiedTableName = qualifiedColumnName.substring(0, lastDot);

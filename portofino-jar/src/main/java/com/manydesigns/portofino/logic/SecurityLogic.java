@@ -33,7 +33,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.database.SessionUtils;
+import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.interceptors.SecurityInterceptor;
@@ -93,7 +93,7 @@ public class SecurityLogic {
         if (userId == null) {
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         } else {
-            User u = (User) SessionUtils.getObjectByPk(application, USERTABLE,
+            User u = (User) QueryUtils.getObjectByPk(application, USERTABLE,
                     new User(userId));
             groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
 
@@ -223,7 +223,7 @@ public class SecurityLogic {
     }
 
     private static Group findGroupById(Application application, String groupId) {
-        return (Group) SessionUtils.getObjectByPk(application, "portofino.public.groups", groupId);
+        return (Group) QueryUtils.getObjectByPk(application, "portofino.public.groups", groupId);
     }
 
     public static User defaultLogin(Application application, String username, String password) {

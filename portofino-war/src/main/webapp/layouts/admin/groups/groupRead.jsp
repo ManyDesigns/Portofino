@@ -4,7 +4,7 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
+<%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.user.admin.GroupAdminAction"/>
@@ -31,7 +31,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
         <div class="crudReadButtons">
-            <stripes:layout-render name="/layouts/page/buttons.jsp" list="crud-read" cssClass="portletButton" />
+            <portofino:buttons list="crud-read" cssClass="portletButton" />
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter" />

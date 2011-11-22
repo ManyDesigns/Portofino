@@ -39,10 +39,7 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.TableCriteria;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.datamodel.Column;
-import com.manydesigns.portofino.model.datamodel.ForeignKey;
-import com.manydesigns.portofino.model.datamodel.Reference;
-import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -68,7 +65,7 @@ import java.util.regex.Pattern;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class SessionUtils {
+public class QueryUtils {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -77,7 +74,7 @@ public class SessionUtils {
             Pattern.compile("(SELECT\\s+.*\\s+)?FROM\\s+([a-z_$\\u0080-\\ufffe]{1}[a-z_$0-9\\u0080-\\ufffe]*).*",
                             Pattern.CASE_INSENSITIVE | Pattern.DOTALL); //. (dot) matches newlines
 
-    protected static final Logger logger = LoggerFactory.getLogger(SessionUtils.class);
+    protected static final Logger logger = LoggerFactory.getLogger(QueryUtils.class);
 
     public static List getAllObjects(Application application, String qualifiedTableName) {
         Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
@@ -330,7 +327,7 @@ public class SessionUtils {
         return pattern;
     }
 
-    public static String getQualifiedTableNameFromQueryString(Application application, String queryString) {
+    public static Table getTableFromQueryString(Database database, String queryString) {
         Matcher matcher = FROM_PATTERN.matcher(queryString);
         String entityName;
         if (matcher.matches()) {
@@ -339,8 +336,8 @@ public class SessionUtils {
             return null;
         }
 
-        Table table = application.getModel().findTableByEntityName(entityName);
-        return table.getQualifiedName();
+        Table table = database.findTableByEntityName(entityName);
+        return table;
     }
 
     public static List<Object> getObjects(

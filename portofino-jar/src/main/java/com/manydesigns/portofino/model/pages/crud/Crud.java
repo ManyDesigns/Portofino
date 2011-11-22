@@ -30,11 +30,13 @@
 package com.manydesigns.portofino.model.pages.crud;
 
 import com.manydesigns.elements.annotations.Multiline;
+import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.annotations.Annotation;
+import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.xml.Identifier;
 
@@ -68,7 +70,7 @@ public class Crud implements ModelObject {
     protected final List<SelectionProviderReference> selectionProviders;
 
     protected String name;
-    protected String table;
+    protected String database;
     protected String query;
     protected String searchTitle;
     protected String createTitle;
@@ -83,6 +85,7 @@ public class Crud implements ModelObject {
     //**************************************************************************
 
     protected Table actualTable;
+    protected Database actualDatabase;
 
     //**************************************************************************
     // Constructors
@@ -101,12 +104,12 @@ public class Crud implements ModelObject {
     }
 
     public Crud(Crud parentCrud,
-                String name, String table, String query,
+                String name, String database, String query,
                 String searchTitle, String createTitle,
                 String readTitle, String editTitle) {
         this(parentCrud);
         this.name = name;
-        this.table = table;
+        this.database = database;
         this.query = query;
         this.searchTitle = searchTitle;
         this.createTitle = createTitle;
@@ -123,10 +126,12 @@ public class Crud implements ModelObject {
 
     public void reset() {
         actualTable = null;
+        actualDatabase = null;
     }
 
     public void init(Model model) {
-        actualTable = DataModelLogic.findTableByQualifiedName(model, table);
+        actualDatabase = DataModelLogic.findDatabaseByName(model, database);
+        actualTable = QueryUtils.getTableFromQueryString(actualDatabase, query);
     }
 
     public void link(Model model) {}
@@ -196,20 +201,20 @@ public class Crud implements ModelObject {
     }
 
     @XmlAttribute(required = true)
-    public String getTable() {
-        return table;
+    public String getDatabase() {
+        return database;
     }
 
-    public void setTable(String table) {
-        this.table = table;
+    public void setDatabase(String database) {
+        this.database = database;
     }
 
-    public Table getActualTable() {
-        return actualTable;
+    public Database getActualDatabase() {
+        return actualDatabase;
     }
 
-    public void setActualTable(Table actualTable) {
-        this.actualTable = actualTable;
+    public void setActualDatabase(Database actualDatabase) {
+        this.actualDatabase = actualDatabase;
     }
 
     @Multiline
@@ -286,5 +291,9 @@ public class Crud implements ModelObject {
 
     public void setLargeResultSet(boolean largeResultSet) {
         this.largeResultSet = largeResultSet;
+    }
+
+    public Table getActualTable() {
+        return actualTable;
     }
 }

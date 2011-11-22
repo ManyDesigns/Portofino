@@ -1,4 +1,4 @@
-
+<%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <div class="yui-g">
     <div class="portletTitle">
         <h1>
@@ -9,7 +9,7 @@
     </div>
     <div class="portletHeaderButtons">
         <stripes:layout-component name="portletHeaderButtons">
-            <stripes:layout-render name="/layouts/page/buttons.jsp" list="portletHeaderButtons" />
+            <portofino:buttons list="portletHeaderButtons" />
         </stripes:layout-component>
     </div>
 </div>

@@ -90,6 +90,7 @@ public class JspAction extends PortletAction {
     }
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1)
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configure() {
         prepareConfigurationForms();
         return new ForwardResolution("/layouts/jsp/configure.jsp");

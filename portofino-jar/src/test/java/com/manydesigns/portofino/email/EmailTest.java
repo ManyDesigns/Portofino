@@ -32,7 +32,7 @@ import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.database.SessionUtils;
+import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import org.hibernate.Session;
 
@@ -162,7 +162,7 @@ public class EmailTest extends AbstractPortofinoTest {
         }
         assertEquals(10, server.getReceivedEmailSize());
         List<Object> emailList =
-                SessionUtils.getAllObjects(application, "portofino.public.emailqueue");
+                QueryUtils.getAllObjects(application, "portofino.public.emailqueue");
         assertEquals(0, emailList.size());
     }
 
@@ -175,7 +175,7 @@ public class EmailTest extends AbstractPortofinoTest {
             EmailUtils.addEmail(session, "subj:" + i,
                     "body:" + i, "granatella@gmail.com",
                     "spammer@spam.it");
-            SessionUtils.commit(application, "portofino");
+            QueryUtils.commit(application, "portofino");
         }
         try {
             scheduler.schedule(new EmailTask(application), 0, 10);
@@ -202,7 +202,7 @@ public class EmailTest extends AbstractPortofinoTest {
         }
         assertEquals(0, server.getReceivedEmailSize());
         List<Object> emailList =
-                SessionUtils.getAllObjects(application, "portofino.public.emailqueue");
+                QueryUtils.getAllObjects(application, "portofino.public.emailqueue");
         assertEquals(10, emailList.size());
     }
 

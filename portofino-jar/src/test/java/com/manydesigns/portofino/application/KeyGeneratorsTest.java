@@ -29,7 +29,7 @@
 package com.manydesigns.portofino.application;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
-import com.manydesigns.portofino.database.SessionUtils;
+import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
@@ -82,7 +82,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         final int expectedId = 3;
         try {
             criteria.eq(tableAccessor.getProperty("suppid"), expectedId);
-            List listObjs = SessionUtils.getObjects(session, criteria, null, null);
+            List listObjs = QueryUtils.getObjects(session, criteria, null, null);
             assertEquals(1, listObjs.size());
             Map<String,String> supp = (Map<String, String>) listObjs.get(0);
             String name = supp.get("name");
@@ -108,7 +108,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         final long expectedId = 1;
         try {
             criteria.eq(tableAccessor.getProperty("id"), expectedId);
-            List listObjs = SessionUtils.getObjects(session, criteria, null, null);
+            List listObjs = QueryUtils.getObjects(session, criteria, null, null);
             assertEquals(1, listObjs.size());
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
@@ -149,14 +149,14 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         order.put("locale", "99");
         Session session = application.getSession("jpetstore");
         session.save(ordersEntity ,order);
-        SessionUtils.commit(application, "jpetstore");
+        QueryUtils.commit(application, "jpetstore");
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, ordersTable);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         try {
             criteria.eq(tableAccessor.getProperty("orderid"), expectedId);
-            List listObjs = SessionUtils.getObjects(session, criteria, null, null);
+            List listObjs = QueryUtils.getObjects(session, criteria, null, null);
             assertEquals(1, listObjs.size());
             Map<String,String> supp = (Map<String, String>) listObjs.get(0);
             String name = supp.get("userid");
@@ -183,7 +183,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         final long expectedId = 3L;
         try {
             criteria.eq(tableAccessor.getProperty("groupId"), expectedId);
-            List<Object> listObjs = SessionUtils.getObjects(session, criteria, null, null);
+            List<Object> listObjs = QueryUtils.getObjects(session, criteria, null, null);
             assertEquals(1, listObjs.size());
             myGroup = (Group) listObjs.get(0);
             String name = myGroup.getName();

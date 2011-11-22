@@ -36,7 +36,7 @@ import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.database.SessionUtils;
+import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -150,7 +150,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
 
     protected void setupUserGroups() {
         List<Group> groups = new ArrayList<Group>();
-        groups.addAll(SessionUtils.getAllObjects(application, SecurityLogic.GROUPTABLE));
+        groups.addAll(QueryUtils.getAllObjects(application, SecurityLogic.GROUPTABLE));
         availableUserGroups = new ArrayList<Group>();
 
         Group anonymous = application.getAnonymousGroup();

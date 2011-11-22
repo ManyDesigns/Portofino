@@ -4,7 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
-
+<%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
     <stripes:layout-component name="portletTitle">
@@ -20,7 +20,7 @@
                     <div class="search_results">
         </c:if>
                         <%@include file="datatable.jsp"%>
-                        <stripes:layout-render name="/layouts/page/buttons.jsp" list="crud-search" cssClass="portletButton" />
+                        <portofino:buttons list="crud-search" cssClass="portletButton" />
                     </div>
         <c:if test="${not empty actionBean.searchForm}">
                 </div>
@@ -28,7 +28,7 @@
                         <div class="search_form">
                             <mde:write name="actionBean" property="searchForm"/>
                             <div class="searchFormButtons">
-                                <stripes:layout-render name="/layouts/page/buttons.jsp" list="crud-search-form" cssClass="portletButton" />
+                                <portofino:buttons list="crud-search-form" cssClass="portletButton" />
                             </div>
                         </div>
                 </div>

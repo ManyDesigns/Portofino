@@ -52,7 +52,7 @@ import com.manydesigns.portofino.actions.forms.CrudSelectionProviderEdit;
 import com.manydesigns.portofino.application.TableCriteria;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
-import com.manydesigns.portofino.database.SessionUtils;
+import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.CrudLogic;
@@ -206,7 +206,7 @@ public class CrudAction extends PortletAction {
         if(crud != null) {
             classAccessor = crudPageInstance.getClassAccessor();
             baseTable = crudPageInstance.getBaseTable();
-            session = application.getSessionByQualifiedTableName(crud.getTable());
+            session = application.getSession(crud.getDatabase());
             pkHelper = crudPageInstance.getPkHelper();
             crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
             object = crudPageInstance.getObject();
@@ -322,21 +322,22 @@ public class CrudAction extends PortletAction {
              Class[] fieldTypes, DisplayMode dm) {
         DefaultSelectionProvider selectionProvider = null;
         String name = current.getName();
-        String database = current.getToDatabase();
+        String databaseName = current.getToDatabase();
         String sql = current.getSql();
         String hql = current.getHql();
 
         if (sql != null) {
-            Session session = application.getSession(database);
-            Collection<Object[]> objects = SessionUtils.runSql(session, sql);
+            Session session = application.getSession(databaseName);
+            Collection<Object[]> objects = QueryUtils.runSql(session, sql);
             selectionProvider = DefaultSelectionProvider.create(
                     name, fieldNames.length, fieldTypes, objects);
             selectionProvider.setDisplayMode(dm);
         } else if (hql != null) {
-            String qualifiedTableName =
-                    SessionUtils.getQualifiedTableNameFromQueryString(application, hql);
+            Database database = DataModelLogic.findDatabaseByName(model, databaseName);
+            Table table = QueryUtils.getTableFromQueryString(database, hql);
+            String qualifiedTableName = table.getQualifiedName();
             Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
-            Collection<Object> objects = SessionUtils.getObjects(session, hql, null, null);
+            Collection<Object> objects = QueryUtils.getObjects(session, hql, null, null);
             TableAccessor tableAccessor =
                     application.getTableAccessor(qualifiedTableName);
             ShortName shortNameAnnotation =
@@ -439,13 +440,13 @@ public class CrudAction extends PortletAction {
             searchForm.configureCriteria(criteria);
         }
         QueryStringWithParameters query =
-                SessionUtils.mergeQuery(crud.getQuery(), criteria, this);
+                QueryUtils.mergeQuery(crud.getQuery(), criteria, this);
 
         String queryString = query.getQueryString();
         String totalRecordsQueryString = generateCountQuery(queryString);
-        List<Object> result = SessionUtils.runHqlQuery
+        List<Object> result = QueryUtils.runHqlQuery
                 (session, totalRecordsQueryString,
-                 query.getParamaters());
+                        query.getParamaters());
         long totalRecords = (Long) result.get(0);
 
         setupTableForm(Mode.VIEW);
@@ -768,7 +769,7 @@ public class CrudAction extends PortletAction {
         }
         for (String current : selection) {
             Serializable pkObject = pkHelper.parsePkString(current);
-            Object obj = SessionUtils.getObjectByPk(application, baseTable.getQualifiedName(), pkObject);
+            Object obj = QueryUtils.getObjectByPk(application, baseTable.getQualifiedName(), pkObject);
             session.delete(baseTable.getActualEntityName(), obj);
         }
         try {
@@ -1089,7 +1090,7 @@ public class CrudAction extends PortletAction {
             }
             String qualifiedTableName = crud.getActualTable().getQualifiedName();
             Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
-            objects = SessionUtils.getObjects(session,
+            objects = QueryUtils.getObjects(session,
                     crud.getQuery(), criteria, this, firstResult, maxResults);
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
@@ -1100,7 +1101,7 @@ public class CrudAction extends PortletAction {
 
     private void loadObject(String pk) {
         Serializable pkObject = pkHelper.parsePkString(pk);
-        object = SessionUtils.getObjectByPk(application, baseTable.getQualifiedName(), pkObject);
+        object = QueryUtils.getObjectByPk(application, baseTable.getQualifiedName(), pkObject);
     }
 
     //**************************************************************************
@@ -1595,7 +1596,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     public static final String[][] CRUD_CONFIGURATION_FIELDS =
-            {{"name", "table", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
+            {{"name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
               "largeResultSet"}};
 
     public Form crudConfigurationForm;
@@ -1605,6 +1606,7 @@ public class CrudAction extends PortletAction {
     public CrudSelectionProviderEdit[] selectionProviderEdits;
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1)
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configure() {
         prepareConfigurationForms();
 
@@ -1624,16 +1626,16 @@ public class CrudAction extends PortletAction {
     protected void prepareConfigurationForms() {
         super.prepareConfigurationForms();
 
-        SelectionProvider tableSelectionProvider =
-                DefaultSelectionProvider.create("table",
-                        DataModelLogic.getAllTables(model),
-                        Table.class,
+        SelectionProvider databaseSelectionProvider =
+                DefaultSelectionProvider.create("database",
+                        model.getDatabases(),
+                        Database.class,
                         null,
-                        "qualifiedName");
+                        "databaseName");
         crudConfigurationForm = new FormBuilder(Crud.class)
                 .configFields(CRUD_CONFIGURATION_FIELDS)
                 .configFieldSetNames("Crud")
-                .configSelectionProvider(tableSelectionProvider, "table")
+                .configSelectionProvider(databaseSelectionProvider, "database")
                 .build();
 
         setupEdits();

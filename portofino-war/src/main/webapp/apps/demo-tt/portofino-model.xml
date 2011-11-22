@@ -1887,7 +1887,7 @@
                 <permissions>
                     <permissions />
                 </permissions>
-                <crud createTitle="New project" editTitle="Edit project" name="projects" query="FROM redmine_public_projects ORDER BY name" readTitle="Overview" searchTitle="Projects" table="redmine.PUBLIC.projects" variable="project">
+                <crud createTitle="New project" editTitle="Edit project" name="projects" query="FROM redmine_public_projects ORDER BY name" readTitle="Overview" searchTitle="Projects" database="redmine" variable="project">
                     <buttons/>
                     <annotations/>
                     <properties>
@@ -1934,7 +1934,7 @@
                     <crudPage description="Issues" fragment="issues" id="3" layoutContainer="default" showInNavigation="true" title="Issues">
                         <childPages/>
                         <permissions />
-                        <crud createTitle="Create issue" editTitle="Edit issue" name="issue" query="FROM redmine_public_issues WHERE project_id = %{#project.id}" readTitle="Issue" searchTitle="Issues" table="redmine.PUBLIC.issues" variable="issue">
+                        <crud createTitle="Create issue" editTitle="Edit issue" name="issue" query="FROM redmine_public_issues WHERE project_id = %{#project.id}" readTitle="Issue" searchTitle="Issues" database="redmine" variable="issue">
                             <buttons/>
                             <annotations/>
                             <properties>
@@ -2045,7 +2045,7 @@
                     <crudPage description="Projects versions" fragment="versions" id="bdua1jepekzaqnt5bylc6gjuz" layoutContainer="default" layoutOrder="1" showInNavigation="true" title="Version">
                         <childPages/>
                         <permissions />
-                        <crud createTitle="Create new version" editTitle="Version" name="Versions" query="FROM redmine_public_versions WHERE project_id = %{#project.id}" readTitle="Version" searchTitle="Versions" table="redmine.PUBLIC.versions" variable="version">
+                        <crud createTitle="Create new version" editTitle="Version" name="Versions" query="FROM redmine_public_versions WHERE project_id = %{#project.id}" readTitle="Version" searchTitle="Versions" database="redmine" variable="version">
                             <buttons/>
                             <annotations/>
                             <properties>
@@ -2089,7 +2089,7 @@
             <crudPage detailLayoutContainer="default" detailLayoutOrder="2" description="People" fragment="people" id="fwyg067k9g0mpoq8e9ingwwu5" layoutContainer="default" layoutOrder="0" showInNavigation="true" title="People">
                 <childPages/>
                 <permissions />
-                <crud createTitle="Create person" editTitle="Edit person" name="People" query="from redmine_public_users" readTitle="View person" searchTitle="People" table="redmine.PUBLIC.users" variable="person">
+                <crud createTitle="Create person" editTitle="Edit person" name="People" query="from redmine_public_users" readTitle="View person" searchTitle="People" database="redmine" variable="person">
                     <buttons/>
                     <annotations/>
                     <properties>
@@ -2148,7 +2148,7 @@
                     <crudPage description="Tickets" fragment="tickets" id="9io5kz207horijtmtea2ntywz" layoutContainer="default" layoutContainerInParent="contentLayoutBottom" layoutOrder="0" layoutOrderInParent="0" showInNavigation="false" title="Tickets">
                         <childPages/>
                         <permissions />
-                        <crud createTitle="Create issue" editTitle="Edit issue" name="Tickets" query="from redmine_public_issues where assigned_to_id = %{#person.id}" readTitle="Issue" searchTitle="Issues" table="redmine.PUBLIC.issues" variable="issue">
+                        <crud createTitle="Create issue" editTitle="Edit issue" name="Tickets" query="from redmine_public_issues where assigned_to_id = %{#person.id}" readTitle="Issue" searchTitle="Issues" database="redmine" variable="issue">
                             <buttons/>
                             <annotations/>
                             <properties>

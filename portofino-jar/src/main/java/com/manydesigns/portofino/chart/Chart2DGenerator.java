@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.chart;
 
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.database.SessionUtils;
+import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.model.pages.ChartPage;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
 import org.hibernate.Session;
@@ -77,7 +77,7 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
         java.util.List<Object[]> result;
         String query = chartPage.getQuery();
         Session session = application.getSession(chartPage.getDatabase());
-        result = SessionUtils.runSql(session, query);
+        result = QueryUtils.runSql(session, query);
         for (Object[] current : result) {
             ComparableWrapper x = new ComparableWrapper((Comparable)current[1]);
             ComparableWrapper y = new ComparableWrapper((Comparable)current[2]);
