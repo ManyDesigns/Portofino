@@ -38,7 +38,7 @@ import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.pages.Page;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
+import com.manydesigns.portofino.model.pages.Permissions;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
@@ -108,39 +108,26 @@ public class
         List<String> groups = SecurityLogic.manageGroups(application, userId);
         request.setAttribute(RequestAttributes.GROUPS, groups);
 
-        logger.debug("Checking if action or method required administrator");
-        boolean requiresAdministrator = false;
         ActionBean actionBean = context.getActionBean();
         Method handler = context.getHandler();
-        if (handler.isAnnotationPresent(RequiresAdministrator.class)) {
-            logger.debug("Action method requires administrator: {}", handler);
-            requiresAdministrator = true;
-        } else {
-            Class actionClass = context.getActionBean().getClass();
-            while (actionClass != null) {
-                if (actionClass.isAnnotationPresent(RequiresAdministrator.class)) {
-                    logger.debug("Action class requires administrator: {}",
-                    actionClass);
-                    requiresAdministrator = true;
-                    break;
-                }
-                actionClass = actionClass.getSuperclass();
-            }
-        }
-
-        boolean isNotAdmin = !SecurityLogic.isAdministrator(request);
-        if (requiresAdministrator && isNotAdmin) {
-            logger.info("User is not an administrator");
+        if (!SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler)) {
             return handleAnonymousOrUnauthorized(userId, request);
         }
 
         logger.debug("Checking page permissions");
-        Dispatch dispatch =
+        boolean isNotAdmin = !SecurityLogic.isAdministrator(request);
+        if (isNotAdmin) {
+            Permissions permissions;
+            Dispatch dispatch =
                 (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
-        if (dispatch != null && isNotAdmin) {
-            PageInstance pageInstance = dispatch.getLastPageInstance();
-            Page page = pageInstance.getPage();
-            if(!SecurityLogic.hasPermissions(page.getPermissions(), groups, handler, actionBean.getClass())) {
+            if(dispatch != null) {
+                PageInstance pageInstance = dispatch.getLastPageInstance();
+                Page page = pageInstance.getPage();
+                permissions = page.getPermissions();
+            } else {
+                permissions = new Permissions();
+            }
+            if(!SecurityLogic.hasPermissions(permissions, groups, handler, actionBean.getClass())) {
                 logger.info("User does not match page permissions. User's groups: {}",
                         ArrayUtils.toString(groups));
                 return handleAnonymousOrUnauthorized(userId, request);

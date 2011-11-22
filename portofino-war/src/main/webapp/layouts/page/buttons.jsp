@@ -10,12 +10,14 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.MissingResourceException" %>
 <%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
+<%@ page import="net.sourceforge.stripes.action.ActionBean" %>
+<%@ page import="java.lang.reflect.Method" %>
 <%@taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
 <stripes:layout-definition>
 <%
     LocalizationContext localizationContext = BundleSupport.getLocalizationContext(pageContext);
 
-    Object actionBean = request.getAttribute("actionBean");
+    ActionBean actionBean = (ActionBean) request.getAttribute("actionBean");
     String list = (String) pageContext.getAttribute("list");
     List<String> groups = (List<String>) request.getAttribute(RequestAttributes.GROUPS);
     String cssClass = (String) pageContext.getAttribute("cssClass");
@@ -28,13 +30,16 @@
             ButtonsLogic.getButtonsForClass(actionBean.getClass(), list, groups, currentPage);
     if(buttons != null) {
         for(ButtonInfo button : buttons) {
+            Method handler = button.getMethod();
             boolean isAdmin = SecurityLogic.isAdministrator(request);
-            if(currentPage != null && !isAdmin && !ButtonsLogic.hasPermissions(button, currentPage, groups)) {
+            if(!isAdmin &&
+               ((currentPage != null && !ButtonsLogic.hasPermissions(button, currentPage, groups)) ||
+                !SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler))) {
                 continue;
             }
             XhtmlBuffer buffer = new XhtmlBuffer(out);
             buffer.openElement("button");
-            buffer.addAttribute("name", button.getMethod().getName());
+            buffer.addAttribute("name", handler.getName());
             String value = getValue(button, localizationContext);
             if(cssClass != null) {
                 buffer.addAttribute("class", cssClass);

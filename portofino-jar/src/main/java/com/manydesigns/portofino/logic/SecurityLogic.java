@@ -35,13 +35,16 @@ import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.interceptors.SecurityInterceptor;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.Permissions;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
+import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
+import net.sourceforge.stripes.action.ActionBean;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.ArrayUtils;
 import org.hibernate.Session;
@@ -51,6 +54,7 @@ import org.slf4j.LoggerFactory;
 import sun.misc.BASE64Encoder;
 
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.util.*;
@@ -129,13 +133,13 @@ public class SecurityLogic {
 
     public static boolean hasPermissions
             (Permissions configuration, Collection<String> groups, RequiresPermissions thing) {
-        if(!hasPermissions(configuration, groups,
-                           thing.level(), thing.permissions())) {
+        if(hasPermissions(configuration, groups,
+                          thing.level(), thing.permissions())) {
+            return true;
+        } else {
             logger.info("User does not match action permissions. User's groups: {}",
                         ArrayUtils.toString(groups));
             return false;
-        } else {
-            return true;
         }
     }
 
@@ -239,4 +243,31 @@ public class SecurityLogic {
         }
     }
 
+    public static boolean satisfiesRequiresAdministrator(HttpServletRequest request, ActionBean actionBean, Method handler) {
+        SecurityInterceptor.logger.debug("Checking if action or method required administrator");
+        boolean requiresAdministrator = false;
+        if (handler.isAnnotationPresent(RequiresAdministrator.class)) {
+            SecurityInterceptor.logger.debug("Action method requires administrator: {}", handler);
+            requiresAdministrator = true;
+        } else {
+            Class actionClass = actionBean.getClass();
+            while (actionClass != null) {
+                if (actionClass.isAnnotationPresent(RequiresAdministrator.class)) {
+                    SecurityInterceptor.logger.debug("Action class requires administrator: {}",
+                    actionClass);
+                    requiresAdministrator = true;
+                    break;
+                }
+                actionClass = actionClass.getSuperclass();
+            }
+        }
+
+        boolean isNotAdmin = !isAdministrator(request);
+        boolean doesNotSatisfy = requiresAdministrator && isNotAdmin;
+        if (doesNotSatisfy) {
+            SecurityInterceptor.logger.info("User is not an administrator");
+            return false;
+        }
+        return true;
+    }
 }
