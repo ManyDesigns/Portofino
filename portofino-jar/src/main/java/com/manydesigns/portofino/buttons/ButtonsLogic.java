@@ -29,8 +29,11 @@
 
 package com.manydesigns.portofino.buttons;
 
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
+import com.manydesigns.portofino.buttons.annotations.Guard;
+import com.manydesigns.portofino.buttons.annotations.Guards;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
@@ -95,6 +98,39 @@ public class ButtonsLogic {
         } else {
             return true;
         }
+    }
+
+    public static boolean doGuardsPass(Object actionBean, Method method) {
+        return doGuardsPass(actionBean, method, null);
+    }
+
+    public static boolean doGuardsPass(Object actionBean, Method method, GuardType type) {
+        List<Guard> guards = getGuards(method, type);
+        boolean pass = true;
+        HashMap ognlContext = new HashMap();
+        for(Guard guard : guards) {
+            Object result = OgnlUtils.getValueQuietly(guard.test(), ognlContext, actionBean);
+            pass &= result instanceof Boolean && ((Boolean) result);
+        }
+        return pass;
+    }
+
+    public static List<Guard> getGuards(Method method, GuardType type) {
+        List<Guard> guardList = new ArrayList<Guard>();
+        Guard guard = method.getAnnotation(Guard.class);
+        if(guard != null && (type == null || type == guard.type())) {
+            guardList.add(guard);
+        } else {
+            Guards guards = method.getAnnotation(Guards.class);
+            if(guards != null) {
+                for(Guard g : guards.value()) {
+                    if(type == null || type == g.type()) {
+                        guardList.add(g);
+                    }
+                }
+            }
+        }
+        return guardList;
     }
 
 }

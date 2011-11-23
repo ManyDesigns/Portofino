@@ -113,9 +113,9 @@
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Settings"
                                                    link="/actions/admin/settings"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                            <%--<stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Email"
-                                                   link="/"/>
+                                                   link="/"/>--%>
                         </ul>
                     </li>
                     <li>

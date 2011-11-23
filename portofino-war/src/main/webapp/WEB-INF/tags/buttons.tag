@@ -11,6 +11,7 @@
 <%@ tag import="java.lang.reflect.Method" %>
 <%@ tag import="java.util.List" %>
 <%@ tag import="java.util.MissingResourceException" %>
+<%@ tag import="com.manydesigns.portofino.buttons.GuardType" %>
 
 <%@ attribute name="list" required="true" %>
 <%@ attribute name="cssClass" required="false" %>
@@ -36,8 +37,14 @@
                 !SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler))) {
                 continue;
             }
+            if(!ButtonsLogic.doGuardsPass(actionBean, handler, GuardType.VISIBLE)) {
+                continue;
+            }
             XhtmlBuffer buffer = new XhtmlBuffer(out);
             buffer.openElement("button");
+            if(!ButtonsLogic.doGuardsPass(actionBean, handler, GuardType.ENABLED)) {
+                buffer.addAttribute("disabled", "disabled");
+            }
             buffer.addAttribute("name", handler.getName());
             %>
                 <fmt:message key="<%= button.getButton().key() %>" var="__buttonValue" scope="request" />
