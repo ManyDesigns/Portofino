@@ -1,174 +1,174 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
     <changeSet author="alessio (generated)" id="1313767352015-1">
-        <createTable tableName="emailqueue">
-            <column name="id" type="CHAR(25)">
+        <createTable tableName="EMAILQUEUE">
+            <column name="ID" type="CHAR(25)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="EmailQueue_pkey"/>
             </column>
-            <column name="subject" type="VARCHAR(100)"/>
-            <column name="body" type="VARCHAR(4000)"/>
-            <column name="to_" type="VARCHAR(100)"/>
-            <column name="from_" type="VARCHAR(100)"/>
-            <column name="createdate" type="DATE"/>
-            <column name="state" type="DECIMAL(10,0)"/>
-            <column name="attachmentpath" type="VARCHAR(255)"/>
-            <column name="attachmentdescription" type="VARCHAR(255)"/>
-            <column name="attachmentname" type="VARCHAR(255)"/>
+            <column name="SUBJECT" type="VARCHAR(100)"/>
+            <column name="BODY" type="VARCHAR(4000)"/>
+            <column name="TO_" type="VARCHAR(100)"/>
+            <column name="FROM_" type="VARCHAR(100)"/>
+            <column name="CREATEDATE" type="DATE"/>
+            <column name="STATE" type="DECIMAL(10,0)"/>
+            <column name="ATTACHMENTPATH" type="VARCHAR(255)"/>
+            <column name="ATTACHMENTDESCRIPTION" type="VARCHAR(255)"/>
+            <column name="ATTACHMENTNAME" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-2">
-        <createTable tableName="emailstate">
-            <column name="id" type="DECIMAL(10,0)">
+        <createTable tableName="EMAILSTATE">
+            <column name="ID" type="DECIMAL(10,0)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="emailstate_pkey"/>
             </column>
-            <column name="name" type="VARCHAR(75)">
+            <column name="NAME" type="VARCHAR(75)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="VARCHAR(255)"/>
+            <column name="DESCRIPTION" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-3">
-        <createTable tableName="groups">
-            <column name="groupid" type="CHAR(25)">
+        <createTable tableName="GROUPS">
+            <column name="GROUPID" type="CHAR(25)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="group_pkey"/>
             </column>
-            <column name="creatorid" type="CHAR(25)"/>
-            <column name="name" type="VARCHAR(50)"/>
-            <column name="description" type="VARCHAR(255)"/>
-            <column name="deletiondate" type="TIMESTAMP NULL"/>
-            <column name="creationdate" type="TIMESTAMP NULL"/>
+            <column name="CREATORID" type="CHAR(25)"/>
+            <column name="NAME" type="VARCHAR(50)"/>
+            <column name="DESCRIPTION" type="VARCHAR(255)"/>
+            <column name="DELETIONDATE" type="TIMESTAMP NULL"/>
+            <column name="CREATIONDATE" type="TIMESTAMP NULL"/>
         </createTable>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-4">
-        <createTable tableName="msg">
-            <column name="id" type="CHAR(25)">
+        <createTable tableName="MSG">
+            <column name="ID" type="CHAR(25)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="msg_pkey"/>
             </column>
-            <column name="subject" type="VARCHAR(255)"/>
-            <column name="body" type="VARCHAR(4000)"/>
-            <column name="to_" type="CHAR(25)"/>
-            <column name="from_" type="CHAR(25)"/>
-            <column name="creationdate" type="TIMESTAMP NULL"/>
-            <column name="state" type="DECIMAL(10,0)"/>
+            <column name="SUBJECT" type="VARCHAR(255)"/>
+            <column name="BODY" type="VARCHAR(4000)"/>
+            <column name="TO_" type="CHAR(25)"/>
+            <column name="FROM_" type="CHAR(25)"/>
+            <column name="CREATIONDATE" type="TIMESTAMP NULL"/>
+            <column name="STATE" type="DECIMAL(10,0)"/>
         </createTable>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-5">
-        <createTable tableName="msgstate">
-            <column name="id" type="DECIMAL(10,0)">
+        <createTable tableName="MSGSTATE">
+            <column name="ID" type="DECIMAL(10,0)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="msgstate_pkey"/>
             </column>
-            <column name="name" type="VARCHAR(50)">
+            <column name="NAME" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="VARCHAR(255)"/>
+            <column name="DESCRIPTION" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-6">
-        <createTable tableName="oldpwd">
-            <column name="id" type="CHAR(25)">
+        <createTable tableName="OLDPWD">
+            <column name="ID" type="CHAR(25)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="OldPwd_pkey"/>
             </column>
-            <column name="createdate" type="TIMESTAMP NULL"/>
-            <column name="password" type="VARCHAR(30)"/>
-            <column name="userid" type="CHAR(25)"/>
+            <column name="CREATEDATE" type="TIMESTAMP NULL"/>
+            <column name="PASSWORD" type="VARCHAR(30)"/>
+            <column name="USERID" type="CHAR(25)"/>
         </createTable>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-7">
-        <createTable tableName="users">
-            <column name="userid" type="CHAR(25)">
+        <createTable tableName="USERS">
+            <column name="USERID" type="CHAR(25)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="user_pkey"/>
             </column>
-            <column name="deletiondate" type="TIMESTAMP NULL"/>
-            <column name="creationdate" type="TIMESTAMP NULL"/>
-            <column name="modifieddate" type="TIMESTAMP NULL"/>
-            <column name="defaultuser" type="CHAR(1)"/>
-            <column name="extauth" type="CHAR(1)"/>
-            <column name="pwd" type="VARCHAR(50)"/>
-            <column name="lastpwdmoddate" type="TIMESTAMP NULL"/>
-            <column name="username" type="VARCHAR(50)">
+            <column name="DELETIONDATE" type="TIMESTAMP NULL"/>
+            <column name="CREATIONDATE" type="TIMESTAMP NULL"/>
+            <column name="MODIFIEDDATE" type="TIMESTAMP NULL"/>
+            <column name="DEFAULTUSER" type="CHAR(1)"/>
+            <column name="EXTAUTH" type="CHAR(1)"/>
+            <column name="PWD" type="VARCHAR(50)"/>
+            <column name="LASTPWDMODDATE" type="TIMESTAMP NULL"/>
+            <column name="USERNAME" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="emailaddress" type="VARCHAR(100)">
+            <column name="EMAILADDRESS" type="VARCHAR(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="firstname" type="VARCHAR(50)"/>
-            <column name="middlename" type="VARCHAR(50)"/>
-            <column name="lastname" type="VARCHAR(50)"/>
-            <column name="jobtitle" type="VARCHAR(50)"/>
-            <column name="lastlogindate" type="TIMESTAMP NULL"/>
-            <column name="lastfailedlogindate" type="TIMESTAMP NULL"/>
-            <column name="failedloginattempts" type="DECIMAL(10,0)"/>
-            <column name="agreedtoterms" type="CHAR(1)"/>
-            <column name="state" type="DECIMAL(10,0)">
+            <column name="FIRSTNAME" type="VARCHAR(50)"/>
+            <column name="MIDDLENAME" type="VARCHAR(50)"/>
+            <column name="LASTNAME" type="VARCHAR(50)"/>
+            <column name="JOBTITLE" type="VARCHAR(50)"/>
+            <column name="LASTLOGINDATE" type="TIMESTAMP NULL"/>
+            <column name="LASTFAILEDLOGINDATE" type="TIMESTAMP NULL"/>
+            <column name="FAILEDLOGINATTEMPTS" type="DECIMAL(10,0)"/>
+            <column name="AGREEDTOTERMS" type="CHAR(1)"/>
+            <column name="STATE" type="DECIMAL(10,0)">
                 <constraints nullable="false"/>
             </column>
-            <column name="bounced" type="DECIMAL(10,0)"/>
-            <column name="token" type="VARCHAR(100)"/>
-            <column name="remquestion" type="VARCHAR(255)"/>
-            <column name="remans" type="VARCHAR(255)"/>
-            <column name="gracelogincount" type="DECIMAL(10,0)"/>
+            <column name="BOUNCED" type="DECIMAL(10,0)"/>
+            <column name="TOKEN" type="VARCHAR(100)"/>
+            <column name="REMQUESTION" type="VARCHAR(255)"/>
+            <column name="REMANS" type="VARCHAR(255)"/>
+            <column name="GRACELOGINCOUNT" type="DECIMAL(10,0)"/>
         </createTable>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-8">
-        <createTable tableName="users_groups">
-            <column name="groupid" type="CHAR(25)">
+        <createTable tableName="USERS_GROUPS">
+            <column name="GROUPID" type="CHAR(25)">
                 <constraints nullable="false"/>
             </column>
-            <column name="userid" type="CHAR(25)">
+            <column name="USERID" type="CHAR(25)">
                 <constraints nullable="false"/>
             </column>
-            <column name="deletiondate" type="TIMESTAMP NULL"/>
-            <column name="creationdate" type="TIMESTAMP NULL">
+            <column name="DELETIONDATE" type="TIMESTAMP NULL"/>
+            <column name="CREATIONDATE" type="TIMESTAMP NULL">
                 <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-9">
-        <createTable tableName="userstate">
-            <column name="id" type="DECIMAL(10,0)">
+        <createTable tableName="USERSTATE">
+            <column name="ID" type="DECIMAL(10,0)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="userstate_pkey"/>
             </column>
-            <column name="name" type="VARCHAR(75)">
+            <column name="NAME" type="VARCHAR(75)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="VARCHAR(255)"/>
+            <column name="DESCRIPTION" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-10">
-        <addPrimaryKey columnNames="groupid, userid, creationdate" constraintName="users_groups_pkey" tableName="users_groups"/>
+        <addPrimaryKey columnNames="GROUPID, USERID, CREATIONDATE" constraintName="users_groups_pkey" tableName="USERS_GROUPS"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-11">
-        <addUniqueConstraint columnNames="name" constraintName="groups_name_key" disabled="false" tableName="groups"/>
+        <addUniqueConstraint columnNames="NAME" constraintName="groups_name_key" disabled="false" tableName="GROUPS"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-12">
-        <addUniqueConstraint columnNames="username" constraintName="users_username_key" disabled="false" tableName="users"/>
+        <addUniqueConstraint columnNames="USERNAME" constraintName="users_username_key" disabled="false" tableName="USERS"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-13">
-        <addForeignKeyConstraint baseColumnNames="state" baseTableName="emailqueue" constraintName="fk_emailqueue_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="emailstate" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="STATE" baseTableName="EMAILQUEUE" constraintName="fk_emailqueue_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="EMAILSTATE" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-14">
-        <addForeignKeyConstraint baseColumnNames="creatorid" baseTableName="groups" constraintName="fk_group_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="CREATORID" baseTableName="GROUPS" constraintName="fk_group_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="USERID" referencedTableName="USERS" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-15">
-        <addForeignKeyConstraint baseColumnNames="from_" baseTableName="msg" constraintName="fk_msg_2" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="FROM_" baseTableName="MSG" constraintName="fk_msg_2" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="USERID" referencedTableName="USERS" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-16">
-        <addForeignKeyConstraint baseColumnNames="state" baseTableName="msg" constraintName="fk_msg_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="msgstate" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="STATE" baseTableName="MSG" constraintName="fk_msg_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="MSGSTATE" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-17">
-        <addForeignKeyConstraint baseColumnNames="to_" baseTableName="msg" constraintName="fk_msg_3" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="TO_" baseTableName="MSG" constraintName="fk_msg_3" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="USERID" referencedTableName="USERS" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-18">
-        <addForeignKeyConstraint baseColumnNames="userid" baseTableName="oldpwd" constraintName="fk_oldpwd_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="USERID" baseTableName="OLDPWD" constraintName="fk_oldpwd_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="USERID" referencedTableName="USERS" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-19">
-        <addForeignKeyConstraint baseColumnNames="state" baseTableName="users" constraintName="fk_user_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="userstate" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="STATE" baseTableName="USERS" constraintName="fk_user_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="USERSTATE" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-20">
-        <addForeignKeyConstraint baseColumnNames="groupid" baseTableName="users_groups" constraintName="fk_usersgroups_2" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="groupid" referencedTableName="groups" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="GROUPID" baseTableName="USERS_GROUPS" constraintName="fk_usersgroups_2" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="GROUPID" referencedTableName="GROUPS" referencesUniqueColumn="false"/>
     </changeSet>
     <changeSet author="alessio (generated)" id="1313767352015-21">
-        <addForeignKeyConstraint baseColumnNames="userid" baseTableName="users_groups" constraintName="fk_usersgroups_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="userid" referencedTableName="users" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="USERID" baseTableName="USERS_GROUPS" constraintName="fk_usersgroups_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="USERID" referencedTableName="USERS" referencesUniqueColumn="false"/>
     </changeSet>
 
     <changeSet author="portofino" id="insert-userstates">
