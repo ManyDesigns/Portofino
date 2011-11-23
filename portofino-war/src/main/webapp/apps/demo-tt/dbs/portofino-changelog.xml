@@ -172,134 +172,134 @@
     </changeSet>
 
     <changeSet author="portofino" id="insert-userstates">
-        <insert tableName="userstate">
-            <column name="id" valueNumeric="1" />
-            <column name="name" value="active" />
-            <column name="description" />
+        <insert tableName="USERSTATE">
+            <column name="ID" valueNumeric="1" />
+            <column name="NAME" value="active" />
+            <column name="DESCRIPTION" />
         </insert>
-        <insert tableName="userstate">
-            <column name="id" valueNumeric="2" />
-            <column name="name" value="suspended" />
-            <column name="description" />
+        <insert tableName="USERSTATE">
+            <column name="ID" valueNumeric="2" />
+            <column name="NAME" value="suspended" />
+            <column name="DESCRIPTION" />
         </insert>
-        <insert tableName="userstate">
-            <column name="id" valueNumeric="3" />
-            <column name="name" value="banned" />
-            <column name="description" />
+        <insert tableName="USERSTATE">
+            <column name="ID" valueNumeric="3" />
+            <column name="NAME" value="banned" />
+            <column name="DESCRIPTION" />
         </insert>
-        <insert tableName="userstate">
-            <column name="id" valueNumeric="4" />
-            <column name="name" value="selfregistred" />
-            <column name="description" />
+        <insert tableName="USERSTATE">
+            <column name="ID" valueNumeric="4" />
+            <column name="NAME" value="selfregistred" />
+            <column name="DESCRIPTION" />
         </insert>
     </changeSet>
 
     <changeSet author="portofino" id="insert-emailstates">
-        <insert tableName="emailstate">
-            <column name="id" valueNumeric="0" />
-            <column name="name" value="sending" />
-            <column name="description" />
+        <insert tableName="EMAILSTATE">
+            <column name="ID" valueNumeric="0" />
+            <column name="NAME" value="sending" />
+            <column name="DESCRIPTION" />
         </insert>
-        <insert tableName="emailstate">
-            <column name="id" valueNumeric="1" />
-            <column name="name" value="to be sent" />
-            <column name="description" />
+        <insert tableName="EMAILSTATE">
+            <column name="ID" valueNumeric="1" />
+            <column name="NAME" value="to be sent" />
+            <column name="DESCRIPTION" />
         </insert>
-        <insert tableName="emailstate">
-            <column name="id" valueNumeric="2" />
-            <column name="name" value="sent" />
-            <column name="description" />
+        <insert tableName="EMAILSTATE">
+            <column name="ID" valueNumeric="2" />
+            <column name="NAME" value="sent" />
+            <column name="DESCRIPTION" />
         </insert>
-        <insert tableName="emailstate">
-            <column name="id" valueNumeric="3" />
-            <column name="name" value="rejected" />
-            <column name="description" />
+        <insert tableName="EMAILSTATE">
+            <column name="ID" valueNumeric="3" />
+            <column name="NAME" value="rejected" />
+            <column name="DESCRIPTION" />
         </insert>
-        <insert tableName="emailstate">
-            <column name="id" valueNumeric="4" />
-            <column name="name" value="bounced" />
-            <column name="description" />
+        <insert tableName="EMAILSTATE">
+            <column name="ID" valueNumeric="4" />
+            <column name="NAME" value="bounced" />
+            <column name="DESCRIPTION" />
         </insert>
     </changeSet>
 
     <changeSet author="portofino" id="insert-msgstates">
-        <insert tableName="msgstate">
-            <column name="id" valueNumeric="1" />
-            <column name="name" value="sent" />
-            <column name="description" />
+        <insert tableName="MSGSTATE">
+            <column name="ID" valueNumeric="1" />
+            <column name="NAME" value="sent" />
+            <column name="DESCRIPTION" />
         </insert>
-        <insert tableName="msgstate">
-            <column name="id" valueNumeric="2" />
-            <column name="name" value="read" />
-            <column name="description" />
+        <insert tableName="MSGSTATE">
+            <column name="ID" valueNumeric="2" />
+            <column name="NAME" value="read" />
+            <column name="DESCRIPTION" />
         </insert>
     </changeSet>
 
     <changeSet author="portofino" id="insert-users">
-        <insert tableName="users">
-            <column name="userid" value="1" />
-            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
-            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
-            <column name="pwd" value="admin" />
-            <column name="username" value="admin" />
-            <column name="emailaddress" value="admin@example.com" />
-            <column name="firstname" value="Ad" />
-            <column name="lastname" value="Min" />
-            <column name="state" valueNumeric="1" />
+        <insert tableName="USERS">
+            <column name="USERID" value="1" />
+            <column name="CREATIONDATE" valueDate="CURRENT_TIMESTAMP" />
+            <column name="CREATIONDATE" valueDate="CURRENT_TIMESTAMP" />
+            <column name="PWD" value="admin" />
+            <column name="USERNAME" value="admin" />
+            <column name="EMAILADDRESS" value="admin@example.com" />
+            <column name="FIRSTNAME" value="Ad" />
+            <column name="LASTNAME" value="Min" />
+            <column name="STATE" valueNumeric="1" />
         </insert>
-        <insert tableName="users">
-            <column name="userid" value="2" />
-            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
-            <column name="pwd" value="user" />
-            <column name="username" value="user" />
-            <column name="emailaddress" value="user@example.com" />
-            <column name="firstname" value="User" />
-            <column name="lastname" value="User" />
-            <column name="state" valueNumeric="1" />
+        <insert tableName="USERS">
+            <column name="USERID" value="2" />
+            <column name="CREATIONDATE" valueDate="CURRENT_TIMESTAMP" />
+            <column name="PWD" value="user" />
+            <column name="USERNAME" value="user" />
+            <column name="EMAILADDRESS" value="user@example.com" />
+            <column name="FIRSTNAME" value="User" />
+            <column name="LASTNAME" value="User" />
+            <column name="STATE" valueNumeric="1" />
         </insert>
     </changeSet>
 
     <changeSet author="portofino" id="insert-groups">
-        <insert tableName="groups">
-            <column name="groupid" value="anonymous" />
-            <column name="creatorid" value="1" />
-            <column name="name" value="anonymous" />
-            <column name="description" value="anonymous users" />
-            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
+        <insert tableName="GROUPS">
+            <column name="GROUPID" value="anonymous" />
+            <column name="CREATORID" value="1" />
+            <column name="NAME" value="anonymous" />
+            <column name="DESCRIPTION" value="anonymous users" />
+            <column name="CREATIONDATE" valueDate="CURRENT_TIMESTAMP" />
         </insert>
-        <insert tableName="groups">
-            <column name="groupid" value="registered" />
-            <column name="creatorid" value="1" />
-            <column name="name" value="registered" />
-            <column name="description" value="registered users" />
-            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
+        <insert tableName="GROUPS">
+            <column name="GROUPID" value="registered" />
+            <column name="CREATORID" value="1" />
+            <column name="NAME" value="registered" />
+            <column name="DESCRIPTION" value="registered users" />
+            <column name="CREATIONDATE" valueDate="CURRENT_TIMESTAMP" />
         </insert>
-        <insert tableName="groups">
-            <column name="groupid" value="administrators" />
-            <column name="creatorid" value="1" />
-            <column name="name" value="administrators" />
-            <column name="description" value="administrators" />
-            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
+        <insert tableName="GROUPS">
+            <column name="GROUPID" value="administrators" />
+            <column name="CREATORID" value="1" />
+            <column name="NAME" value="administrators" />
+            <column name="DESCRIPTION" value="administrators" />
+            <column name="CREATIONDATE" valueDate="CURRENT_TIMESTAMP" />
         </insert>
     </changeSet>
 
     <changeSet author="portofino" id="insert-users_groups">
-        <insert tableName="users_groups">
-            <column name="groupid" value="administrators"/>
-            <column name="userid" value="1"/>
-            <column name="deletiondate" />
-            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
+        <insert tableName="USERS_GROUPS">
+            <column name="GROUPID" value="administrators"/>
+            <column name="USERID" value="1"/>
+            <column name="DELETIONDATE" />
+            <column name="CREATIONDATE" valueDate="CURRENT_TIMESTAMP" />
         </insert>
     </changeSet>
 
 
     <changeSet author="portofino" id="insert-group-all">
-        <insert tableName="groups">
-            <column name="groupid" value="all" />
-            <column name="creatorid" value="1" />
-            <column name="name" value="All" />
-            <column name="description" value="All users" />
-            <column name="creationdate" valueDate="CURRENT_TIMESTAMP" />
+        <insert tableName="GROUPS">
+            <column name="GROUPID" value="all" />
+            <column name="CREATORID" value="1" />
+            <column name="NAME" value="All" />
+            <column name="DESCRIPTION" value="All users" />
+            <column name="CREATIONDATE" valueDate="CURRENT_TIMESTAMP" />
         </insert>
     </changeSet>
 </databaseChangeLog>
