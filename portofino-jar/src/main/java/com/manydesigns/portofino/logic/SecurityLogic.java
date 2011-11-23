@@ -84,7 +84,7 @@ public class SecurityLogic {
     public static final int ACTIVE = 1;
     public static final int SUSPENDED = 2;
     public static final int BANNED = 3;
-    public static final int SELFREGITRED = 4;
+    public static final int SELFREGISTERED = 4;
 
     public static List<String> manageGroups(Application application, String userId) {
         List<String> groups = new ArrayList<String>();
@@ -93,8 +93,8 @@ public class SecurityLogic {
         if (userId == null) {
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         } else {
-            User u = (User) QueryUtils.getObjectByPk(application, USERTABLE,
-                    new User(userId));
+            User u = (User) QueryUtils.getObjectByPk
+                    (application, "portofino", USER_ENTITY_NAME, new User(userId));
             groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
 
             for (UsersGroups ug : u.getGroups()) {
@@ -223,7 +223,7 @@ public class SecurityLogic {
     }
 
     private static Group findGroupById(Application application, String groupId) {
-        return (Group) QueryUtils.getObjectByPk(application, "portofino.public.groups", groupId);
+        return (Group) QueryUtils.getObjectByPk(application, "portofino", GROUP_ENTITY_NAME, groupId);
     }
 
     public static User defaultLogin(Application application, String username, String password) {

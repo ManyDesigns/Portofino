@@ -769,7 +769,7 @@ public class CrudAction extends PortletAction {
         }
         for (String current : selection) {
             Serializable pkObject = pkHelper.parsePkString(current);
-            Object obj = QueryUtils.getObjectByPk(application, baseTable.getQualifiedName(), pkObject);
+            Object obj = QueryUtils.getObjectByPk(application, baseTable, pkObject);
             session.delete(baseTable.getActualEntityName(), obj);
         }
         try {
@@ -1101,7 +1101,7 @@ public class CrudAction extends PortletAction {
 
     private void loadObject(String pk) {
         Serializable pkObject = pkHelper.parsePkString(pk);
-        object = QueryUtils.getObjectByPk(application, baseTable.getQualifiedName(), pkObject);
+        object = QueryUtils.getObjectByPk(application, baseTable, pkObject);
     }
 
     //**************************************************************************

@@ -102,7 +102,7 @@ public class CrudPageInstance extends PageInstance {
         Serializable pkObject = pkHelper.parsePkString(pk);
         object = QueryUtils.getObjectByPk(
                 application,
-                baseTable.getQualifiedName(), pkObject,
+                baseTable, pkObject,
                 crud.getQuery(), null);
     }
 

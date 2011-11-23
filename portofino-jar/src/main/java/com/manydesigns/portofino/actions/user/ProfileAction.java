@@ -114,7 +114,8 @@ public class ProfileAction extends AbstractActionBean {
 
     private Resolution read() {
         User thisUser =
-            (User) QueryUtils.getObjectByPk(application, SecurityLogic.USERTABLE, new User(userId));
+            (User) QueryUtils.getObjectByPk
+                    (application, "portofino", SecurityLogic.USER_ENTITY_NAME, new User(userId));
         ClassAccessor accessor = application.getTableAccessor(SecurityLogic.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         formBuilder.configFields("email", "userName", "firstName",
@@ -136,7 +137,8 @@ public class ProfileAction extends AbstractActionBean {
     public Resolution edit() {
         userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
-            (User) QueryUtils.getObjectByPk(application, SecurityLogic.USERTABLE, new User(userId));
+            (User) QueryUtils.getObjectByPk
+                (application, "portofino", SecurityLogic.USER_ENTITY_NAME, new User(userId));
 
         ClassAccessor accessor = application.getTableAccessor(SecurityLogic.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
@@ -152,7 +154,8 @@ public class ProfileAction extends AbstractActionBean {
     public Resolution update() {
         userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
-            (User) QueryUtils.getObjectByPk(application, SecurityLogic.USERTABLE, new User(userId));
+            (User) QueryUtils.getObjectByPk
+                (application, "portofino", SecurityLogic.USER_ENTITY_NAME, new User(userId));
         ClassAccessor accessor = application.getTableAccessor(SecurityLogic.USERTABLE);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
@@ -187,7 +190,8 @@ public class ProfileAction extends AbstractActionBean {
     public Resolution updatePwd() {
         userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
-            (User) QueryUtils.getObjectByPk(application, SecurityLogic.USERTABLE, new User(userId));
+            (User) QueryUtils.getObjectByPk
+                (application, "portofino", SecurityLogic.USER_ENTITY_NAME, new User(userId));
 
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)

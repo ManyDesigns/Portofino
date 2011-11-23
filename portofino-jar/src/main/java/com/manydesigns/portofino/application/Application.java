@@ -128,6 +128,7 @@ public interface Application {
     //**************************************************************************
 
     public TableAccessor getTableAccessor(String qualifiedTableName);
+    public TableAccessor getTableAccessor(String database, String entityName);
     public CrudAccessor getCrudAccessor(Crud crud);
 
     //**************************************************************************

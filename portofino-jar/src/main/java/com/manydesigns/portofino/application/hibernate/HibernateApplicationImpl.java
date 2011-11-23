@@ -518,6 +518,14 @@ public class HibernateApplicationImpl implements Application {
         return new TableAccessor(table);
     }
 
+    public @NotNull TableAccessor getTableAccessor(String databaseName, String entityName) {
+        Database database = DataModelLogic.findDatabaseByName(model, databaseName);
+        assert database != null;
+        Table table = DataModelLogic.findTableByEntityName(database, entityName);
+        assert table != null;
+        return new TableAccessor(table);
+    }
+
     public @NotNull CrudAccessor getCrudAccessor(@NotNull Crud crud) {
         TableAccessor tableAccessor = new TableAccessor(crud.getActualTable());
         return new CrudAccessor(crud, tableAccessor);

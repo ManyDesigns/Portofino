@@ -161,8 +161,8 @@ public class EmailTest extends AbstractPortofinoTest {
             fail();
         }
         assertEquals(10, server.getReceivedEmailSize());
-        List<Object> emailList =
-                QueryUtils.getAllObjects(application, "portofino.public.emailqueue");
+        Session session = application.getSession("portofino");
+        List<Object> emailList = session.createCriteria("public_emailqueue").list();
         assertEquals(0, emailList.size());
     }
 
@@ -170,7 +170,7 @@ public class EmailTest extends AbstractPortofinoTest {
         // imposta stmp port sbagliato
         portofinoConfiguration.setProperty(PortofinoProperties.MAIL_SMTP_PORT, 2025);
         Timer scheduler = new Timer(true);
-        Session session = application.getSessionByQualifiedTableName(EmailUtils.EMAILQUEUE_TABLE);
+        Session session = application.getSession("portofino");
         for (int i = 1; i <= 10; i++) {
             EmailUtils.addEmail(session, "subj:" + i,
                     "body:" + i, "granatella@gmail.com",
@@ -201,8 +201,7 @@ public class EmailTest extends AbstractPortofinoTest {
             fail();
         }
         assertEquals(0, server.getReceivedEmailSize());
-        List<Object> emailList =
-                QueryUtils.getAllObjects(application, "portofino.public.emailqueue");
+        List<Object> emailList = session.createCriteria("public_emailqueue").list();
         assertEquals(10, emailList.size());
     }
 

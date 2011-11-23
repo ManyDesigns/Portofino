@@ -221,4 +221,15 @@ public class DataModelLogic {
             fk.getRe
         }
     }*/
+
+    public static Table findTableByEntityName(Database database, String entityName) {
+        for(Schema schema : database.getSchemas()) {
+            for(Table table : schema.getTables()) {
+                if(table.getActualEntityName().equalsIgnoreCase(entityName)) {
+                    return table;
+                }
+            }
+        }
+        return null;
+    }
 }

@@ -36,7 +36,6 @@ import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -49,7 +48,9 @@ import com.manydesigns.portofino.system.model.users.UsersGroups;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import javax.servlet.http.HttpServletRequest;
@@ -149,8 +150,9 @@ public class UserAdminAction extends CrudAction implements AdminAction {
     }
 
     protected void setupUserGroups() {
-        List<Group> groups = new ArrayList<Group>();
-        groups.addAll(QueryUtils.getAllObjects(application, SecurityLogic.GROUPTABLE));
+        Session session = application.getSession("portofino");
+        Criteria criteria = session.createCriteria(SecurityLogic.GROUP_ENTITY_NAME);
+        List<Group> groups = new ArrayList(criteria.list());
         availableUserGroups = new ArrayList<Group>();
 
         Group anonymous = application.getAnonymousGroup();

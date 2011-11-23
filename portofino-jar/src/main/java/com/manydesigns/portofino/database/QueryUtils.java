@@ -76,24 +76,6 @@ public class QueryUtils {
 
     protected static final Logger logger = LoggerFactory.getLogger(QueryUtils.class);
 
-    public static List getAllObjects(Application application, String qualifiedTableName) {
-        Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
-        Model model = application.getModel();
-
-        org.hibernate.Criteria hibernateCriteria;
-        Table table = DataModelLogic.findTableByQualifiedName(
-                model, qualifiedTableName);
-        if(table == null) {
-            throw new IllegalArgumentException("Unknown table: " + qualifiedTableName);
-        }
-        String actualEntityName = table.getActualEntityName();
-
-        hibernateCriteria = session.createCriteria(actualEntityName);
-        //noinspection unchecked
-        List result = hibernateCriteria.list();
-        return result;
-    }
-
     public static List<Object[]> runSql(Session session, String sql) {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
         final String formatString = sqlFormat.getFormatString();
@@ -336,7 +318,7 @@ public class QueryUtils {
             return null;
         }
 
-        Table table = database.findTableByEntityName(entityName);
+        Table table = DataModelLogic.findTableByEntityName(database, entityName);
         return table;
     }
 
@@ -436,62 +418,10 @@ public class QueryUtils {
         return result;
     }
 
-
-    /*public static void saveObject(Application application, String qualifiedTableName, Object obj) {
-        Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
-        Model model = application.getModel();
-
-        Table table = DataModelLogic.findTableByQualifiedName(
-                model, qualifiedTableName);
-        String actualEntityName = table.getActualEntityName();
-
-        try {
-            session.save(actualEntityName, obj);
-            //session.getTransaction().commit();
-        } catch (HibernateException e) {
-            application.closeSession(qualifiedTableName);
-            throw e;
-        }
-    }
-
-
-    public static void updateObject(Application application, String qualifiedTableName, Object obj) {
-        Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
-        Model model = application.getModel();
-
-        Table table = DataModelLogic.findTableByQualifiedName(
-                model, qualifiedTableName);
-        String actualEntityName = table.getActualEntityName();
-
-        try {
-            session.update(actualEntityName, obj);
-            //session.getTransaction().commit();
-        } catch (HibernateException e) {
-            application.closeSession(qualifiedTableName);
-            throw e;
-        }
-    }
-
-    public static void deleteObject(Application application, String qualifiedTableName, Object obj) {
-        Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
-        Model model = application.getModel();
-
-        Table table = DataModelLogic.findTableByQualifiedName(
-                model, qualifiedTableName);
-        String actualEntityName = table.getActualEntityName();
-        try {
-            Object obj2 = getObjectByPk(application, qualifiedTableName, (Serializable) obj);
-            session.delete(actualEntityName, obj2);
-        } catch (HibernateException e) {
-            application.closeSession(qualifiedTableName);
-            throw e;
-        }
-    }*/
-
     public static Object getObjectByPk(
-            Application application, String qualifiedTableName, Serializable pk) {
-        Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
-        TableAccessor table = application.getTableAccessor(qualifiedTableName);
+            Application application, String database, String entityName, Serializable pk) {
+        Session session = application.getSession(database);
+        TableAccessor table = application.getTableAccessor(database, entityName);
         String actualEntityName = table.getTable().getActualEntityName();
         Object result;
         PropertyAccessor[] keyProperties = table.getKeyProperties();
@@ -506,13 +436,23 @@ public class QueryUtils {
         return result;
     }
 
+    public static Object getObjectByPk(Application application, Table baseTable, Serializable pkObject) {
+        return getObjectByPk
+                (application, baseTable.getDatabaseName(), baseTable.getActualEntityName(), pkObject);
+    }
+
+    public static Object getObjectByPk(Application application, Table baseTable, Serializable pkObject, String query, Object o) {
+        return getObjectByPk
+                (application, baseTable.getDatabaseName(), baseTable.getActualEntityName(), pkObject, query, o);
+    }
+
     public static Object getObjectByPk(
-            Application application, String qualifiedTableName,
+            Application application, String database, String entityName,
             Serializable pk, String queryString, Object rootObject) {
         if(queryString.toUpperCase().indexOf("WHERE") == -1) {
-            return getObjectByPk(application, qualifiedTableName, pk);
+            return getObjectByPk(application, database, entityName, pk);
         }
-        TableAccessor table = application.getTableAccessor(qualifiedTableName);
+        TableAccessor table = application.getTableAccessor(database, entityName);
         List<Object> result;
         PropertyAccessor[] keyProperties = table.getKeyProperties();
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
@@ -532,7 +472,7 @@ public class QueryUtils {
             parameters[i] = propertyAccessor.get(pk);
         }
         formatString = formatStringPrefix + " " + formatString;
-        Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
+        Session session = application.getSession(database);
         result = runHqlQuery(session, formatString, parameters);
         if(result != null && !result.isEmpty()) {
             return result.get(0);

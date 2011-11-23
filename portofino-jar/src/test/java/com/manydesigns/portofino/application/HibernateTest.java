@@ -31,14 +31,18 @@ package com.manydesigns.portofino.application;
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.logic.DataModelLogic;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.proxy.map.MapProxy;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,33 +65,39 @@ public class HibernateTest extends AbstractPortofinoTest {
     }
 
     public void testReadProdotti() {
-        List<Object> resultProd =
-                QueryUtils.getAllObjects(application, "jpetstore.PUBLIC.product");
+        Session session = application.getSession("jpetstore");
+        Criteria criteria = session.createCriteria("public_product");
+        List resultProd = new ArrayList(criteria.list());
+
         int sizePrd = resultProd.size();
         assertEquals("prodotti", 16, sizePrd);
     }
 
     public void testUsers() {
-        List<Object> groupList =
-                QueryUtils.getAllObjects(application, "portofino.public.groups");
+        Session session = application.getSession("portofino");
+        Criteria criteria = session.createCriteria(SecurityLogic.GROUP_ENTITY_NAME);
+        List<Group> groupList = new ArrayList(criteria.list());
         assertEquals( 2, groupList.size());
 
-        List<Object> usergroups =
-                QueryUtils.getAllObjects(application, "portofino.public.users_groups");
+        criteria = session.createCriteria(UsersGroups.class);
+        List<UsersGroups> usergroups = new ArrayList(criteria.list());
         assertEquals( 3, usergroups.size());
 
-        List<Object> users =
-                QueryUtils.getAllObjects(application, PORTOFINO_PUBLIC_USER);
+        criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
+        List<User> users = new ArrayList(criteria.list());
+
         assertEquals("numero utenti", 2, users.size());
-        User admin = (User) users.get(0);
+        User admin = users.get(0);
         List<UsersGroups> groups = admin.getGroups();
         assertEquals("numero gruppi per admin",  2, groups.size());
         
 
     }
     public void testSearchAndReadCategorieProdotti() {
-        List<Object> resultCat =
-                QueryUtils.getAllObjects(application, "jpetstore.PUBLIC.category");
+        Session session = application.getSession("jpetstore");
+        Criteria criteria = session.createCriteria("public_category");
+        List resultCat = new ArrayList(criteria.list());
+
 
         int sizeCat = resultCat.size();
         assertEquals("categorie", 5, sizeCat);
@@ -105,14 +115,14 @@ public class HibernateTest extends AbstractPortofinoTest {
         Map categoria4 = (Map<String, Object>)resultCat.get(4);
         assertNotNull(categoria0.get("name"));
 
-        List<Object> resultProd =
-                QueryUtils.getAllObjects(application, "jpetstore.PUBLIC.product");
+        criteria = session.createCriteria("public_product");
+        List resultProd = new ArrayList(criteria.list());
 
         Table table = DataModelLogic.findTableByQualifiedName(
                 application.getModel(), "jpetstore.PUBLIC.category");
         TableAccessor tableAccessor = new TableAccessor(table);
-        TableCriteria criteria = new TableCriteria(table);
-        HashMap<String, String> category= findCategory(tableAccessor, criteria);
+        TableCriteria tableCriteria = new TableCriteria(table);
+        HashMap<String, String> category= findCategory(tableAccessor, tableCriteria);
 
         int sizePrd = resultProd.size();
         assertEquals("prodotti", 16, sizePrd);
@@ -142,29 +152,30 @@ public class HibernateTest extends AbstractPortofinoTest {
         Table table = DataModelLogic.findTableByQualifiedName(
                 application.getModel(), "jpetstore.PUBLIC.category");
         TableAccessor tableAccessor = new TableAccessor(table);
-        TableCriteria criteria = new TableCriteria(table);
+        TableCriteria tableCriteria = new TableCriteria(table);
 
-        List<Object> resultCat =
-                QueryUtils.getAllObjects(application, "jpetstore.PUBLIC.category");
+        Session session = application.getSession("jpetstore");
+        Criteria criteria = session.createCriteria("public_category");
+        List resultCat = new ArrayList(criteria.list());
+
         int sizeCat = resultCat.size();
         assertEquals("categorie", 5, sizeCat);
-        Map<String, String> categoria0 =  findCategory(tableAccessor, criteria);
-        assertEquals("jpetstore_public_category", categoria0.get("$type$"));
+        Map<String, String> categoria0 =  findCategory(tableAccessor, tableCriteria);
+        assertEquals("public_category", categoria0.get("$type$"));
         assertEquals("Fish", categoria0.get("name"));
         categoria0.put("name", "Pesciu");
-        Session session = application.getSession("jpetstore");
-        session.update("jpetstore_PUBLIC_category", categoria0);
+        session.update("public_category", categoria0);
         session.getTransaction().commit();
         application.closeSessions();
 
         //Controllo l'aggiornamento e riporto le cose come stavano
-        criteria = new TableCriteria(table);
-        categoria0 =  findCategory(tableAccessor, criteria);
-        assertEquals("jpetstore_public_category", categoria0.get("$type$"));
+        tableCriteria = new TableCriteria(table);
+        categoria0 =  findCategory(tableAccessor, tableCriteria);
+        assertEquals("public_category", categoria0.get("$type$"));
         assertEquals("Pesciu", categoria0.get("name"));
         categoria0.put("name", "Fish");
         session = application.getSession("jpetstore");
-        session.update("jpetstore_PUBLIC_category", categoria0);
+        session.update("PUBLIC_category", categoria0);
         session.getTransaction().commit();
         application.closeSessions();
     }
@@ -179,7 +190,7 @@ public class HibernateTest extends AbstractPortofinoTest {
                   "Worms</font>");
 
         Session session = application.getSession("jpetstore");
-        session.save("jpetstore_PUBLIC_category", worms);
+        session.save("PUBLIC_category", worms);
         session.getTransaction().commit();
     }
 
@@ -194,7 +205,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         lineItem.put("unitprice", new BigDecimal(10.80));
 
         Session session = application.getSession("jpetstore");
-        session.save("jpetstore_PUBLIC_lineitem", lineItem);
+        session.save("PUBLIC_lineitem", lineItem);
         session.getTransaction().commit();
 
         application.closeSessions();
@@ -202,7 +213,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         //e ora cancello
         try {
             session = application.getSession("jpetstore");
-            session.delete("jpetstore_PUBLIC_lineitem", lineItem);
+            session.delete("PUBLIC_lineitem", lineItem);
             session.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -256,13 +267,16 @@ public class HibernateTest extends AbstractPortofinoTest {
             HashMap birdsPk = new HashMap();
             birdsPk.put("catid", "BIRDS");
             Session session = application.getSession("jpetstore");
-            Map<String, Object> birdCat = (Map<String, Object>) QueryUtils.getObjectByPk(application, "jpetstore.PUBLIC.category", birdsPk);
-            assertEquals(16, QueryUtils.getAllObjects(application, "jpetstore.PUBLIC.product").size());
+            Map<String, Object> birdCat =
+                    (Map<String, Object>) QueryUtils.getObjectByPk
+                            (application, "jpetstore", "public_category", birdsPk);
 
-            session.delete("jpetstore_PUBLIC_category", birdCat);
+            assertEquals(16, session.createCriteria("public_product").list().size());
+
+            session.delete("public_category", birdCat);
 
             //Perdo i due prodotti associati alla categoria Birds
-            assertEquals(14, QueryUtils.getAllObjects(application, "jpetstore.PUBLIC.product").size());
+            assertEquals(14, session.createCriteria("public_product").list().size());
 
 
             //test commit globale
@@ -314,10 +328,12 @@ public class HibernateTest extends AbstractPortofinoTest {
         application.closeSessions();
 
         //Faccio una seconda operazione
-        try{
-            List<Object> users= QueryUtils.getAllObjects(application, PORTOFINO_PUBLIC_USER);
+        try {
+            Session session = application.getSession("portofino");
+            Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
+            List<Object> users = criteria.list();
             assertNotNull(users);
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
             fail("La sessione è spaccata");
         }
@@ -328,7 +344,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         HashMap<String, Object> pk = new HashMap<String, Object>();
         pk.put("catid", "BIRDS");
         Object bird =  QueryUtils.getObjectByPk
-                (application, "jpetstore.PUBLIC.category", pk);
+                (application, "jpetstore", "public_category", pk);
         assertEquals("Birds", ((MapProxy) bird).get("name"));
 
         //Test Chiave composta
@@ -336,7 +352,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         pk.put("orderid", 1);
         pk.put("linenum", 1);
         Map lineItem = (Map) QueryUtils.getObjectByPk
-                (application, "jpetstore.PUBLIC.lineitem", pk);
+                (application, "jpetstore", "public_lineitem", pk);
         assertEquals("EST-1", lineItem.get("itemid"));
     }
 
@@ -344,7 +360,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         HashMap<String, Object> pk = new HashMap<String, Object>();
         pk.put("catid", "BIRDS");
         Object bird = QueryUtils.getObjectByPk
-                (application, "jpetstore.PUBLIC.category", pk);
+                (application, "jpetstore", "public_category", pk);
         assertEquals("Birds", ((MapProxy) bird).get("name"));
 
         List objs = QueryUtils.getRelatedObjects(application, "jpetstore.PUBLIC.category",
@@ -353,10 +369,9 @@ public class HibernateTest extends AbstractPortofinoTest {
     }
 
     public void testFkComposite(){
-        List<Object> list1 =
-                QueryUtils.getAllObjects(application, "hibernatetest.PUBLIC.table1");
-        List<Object> list2 =
-                QueryUtils.getAllObjects(application, "hibernatetest.PUBLIC.table2");
+        Session session = application.getSession("hibernatetest");
+        List<Object> list1 = session.createCriteria("public_table1").list();
+        List<Object> list2 = session.createCriteria("public_table2").list();
         HashMap map = (HashMap)list2.get(0);
         List obj =  (List) map.get("fk_tb_2");
         assertNotNull(obj);
@@ -364,16 +379,15 @@ public class HibernateTest extends AbstractPortofinoTest {
         Map obj2 = (Map) ((Map)obj.get(0)).get("fk_tb_2");
         assertNotNull(obj2);
         assertEquals(5, obj2.keySet().size());
-        List<Object> list3 =
-                QueryUtils.getAllObjects(application, "hibernatetest.PUBLIC.table3");
+        List<Object> list3 = session.createCriteria("public_table3").list();
 
 
-        List<Object> listu =
+        /*List<Object> listu =
                 QueryUtils.getAllObjects(application, PORTOFINO_PUBLIC_USER);
         List<Object> listg =
                 QueryUtils.getAllObjects(application, "portofino.public.groups");
         List<Object> listug =
-                QueryUtils.getAllObjects(application, "portofino.public.users_groups");
+                QueryUtils.getAllObjects(application, "portofino.public.users_groups");*/
     }
 }
 
