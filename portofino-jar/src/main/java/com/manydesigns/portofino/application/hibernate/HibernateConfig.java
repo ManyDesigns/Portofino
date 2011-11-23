@@ -743,8 +743,8 @@ public class HibernateConfig {
     }
 
     private String escapeName(String name) {
-        return name;
-//        return "`"+name+"`";
+//        return name;
+        return "`"+name+"`";
     }
 
     public static boolean setHibernateType(@Nullable SimpleValue value,
