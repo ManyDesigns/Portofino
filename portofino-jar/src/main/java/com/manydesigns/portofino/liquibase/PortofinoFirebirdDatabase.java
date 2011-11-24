@@ -27,41 +27,22 @@
  *
  */
 
-package com.manydesigns.portofino.database.platforms;
+package com.manydesigns.portofino.liquibase;
 
-import com.manydesigns.elements.annotations.Status;
-import com.manydesigns.portofino.connections.ConnectionProvider;
-import org.hibernate.dialect.Dialect;
+import liquibase.database.core.FirebirdDatabase;
 
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.util.List;
-
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-public interface DatabasePlatform {
+/**
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public class PortofinoFirebirdDatabase extends FirebirdDatabase {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    final static String STATUS_CREATED = "created";
-    final static String STATUS_OK = "ok";
-    final static String STATUS_DRIVER_NOT_FOUND = "driver not found";
-
-    String getDescription();
-    String getStandardDriverClassName();
-    Dialect getHibernateDialect();
-
-    @Status(red={}, amber={STATUS_CREATED, STATUS_DRIVER_NOT_FOUND}, green={STATUS_OK})
-    String getStatus();
-
-    void test();
-    boolean isApplicable(ConnectionProvider connectionProvider);
-    void shutdown(ConnectionProvider connectionProvider);
-
-    List<String> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException;
-
+    @Override
+    public String escapeDatabaseObject(String objectName) {
+        return LiquibaseUtils.escapeDatabaseObject(objectName, "\"");
+    }
 }

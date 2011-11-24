@@ -23,10 +23,10 @@
                 Application appl = (Application) request.getAttribute("application");
                 Session hSession = appl.getSession("redmine");
                 List<?> objects = com.manydesigns.portofino.database.QueryUtils.runSql
-                        (hSession, "select count(*), project_id, status.name, projects.name " +
-                                "from issues join issue_statuses status on status_id = status.id " +
-                                "join projects on project_id = projects.id " +
-                                "group by status_id, project_id order by project_id");%>
+                        (hSession, "select count(*), \"project_id\", status.\"name\", \"projects\".\"name\" " +
+                                "from \"issues\" join \"issue_statuses\" status on \"status_id\" = status.\"id\" " +
+                                "join \"projects\" on \"project_id\" = \"projects\".\"id\" " +
+                                "group by \"status_id\", \"project_id\" order by \"project_id\"");%>
             <table id="projectTree">
             <tr width="100%" style="background-color: #ECEEF0">
                 <th width="40%">Project</th>

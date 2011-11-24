@@ -35,6 +35,7 @@ import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.ApplicationStarter;
 import com.manydesigns.portofino.application.ServerInfo;
+import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -105,6 +106,8 @@ public class PortofinoListener
         servletContext.setAttribute(ApplicationAttributes.SERVER_INFO, serverInfo);
 
         setupCommonsConfiguration();
+
+        LiquibaseUtils.setupDatabaseFactory();
 
         elementsConfiguration = ElementsProperties.getConfiguration();
         servletContext.setAttribute(

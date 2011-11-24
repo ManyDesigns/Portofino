@@ -123,7 +123,7 @@ Struttura dell'XML:
 <column autoincrement="false" columnName="CREATEDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="createDate" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="password" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="true" propertyName="password" scale="0">
+<column autoincrement="false" columnName="PASSWORD" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="true" propertyName="password" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="USERID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="userId" scale="0">
@@ -385,7 +385,7 @@ Struttura dell'XML:
 <column autoincrement="false" columnName="FROM_" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="100" nullable="true" propertyName="from" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="CREATEDATE" columnType="DATE" javaType="java.sql.Date" jdbcType="91" length="8" nullable="true" propertyName="createDate" scale="0">
+<column autoincrement="false" columnName="CREATEDATE" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="true" propertyName="createDate" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="STATE" columnType="DECIMAL" javaType="java.lang.Integer" jdbcType="3" length="10" nullable="true" propertyName="state" scale="0">
@@ -458,5 +458,8 @@ Struttura dell'XML:
             <textPage description="Homepage" fragment="homepage" id="zpAUFstfgEUSzsEX9HoO" layoutContainer="default" showInNavigation="true" title="Homepage">
             </textPage>
         </childPages>
+        <permissions>
+            <group level="VIEW" name="all"/>
+        </permissions>
     </rootPage>
 </model>

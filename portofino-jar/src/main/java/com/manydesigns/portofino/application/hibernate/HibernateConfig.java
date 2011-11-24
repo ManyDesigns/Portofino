@@ -743,7 +743,7 @@ public class HibernateConfig {
     }
 
     private String escapeName(String name) {
-//        return name;
+        // Portofino handles all tables in a case-sensitive way
         return "`"+name+"`";
     }
 

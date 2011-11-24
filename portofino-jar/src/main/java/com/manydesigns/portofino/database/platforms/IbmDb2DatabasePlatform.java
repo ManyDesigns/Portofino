@@ -30,8 +30,6 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.connections.ConnectionProvider;
-import liquibase.database.Database;
-import liquibase.database.core.DB2Database;
 import org.hibernate.dialect.DB2Dialect;
 
 /*
@@ -66,10 +64,6 @@ public class IbmDb2DatabasePlatform extends AbstractDatabasePlatform {
 
     public String getStandardDriverClassName() {
         return STANDARD_DRIVER_CLASS_NAME;
-    }
-
-    public Database createLiquibaseDatabase() {
-        return new DB2Database();
     }
 
     public boolean isApplicable(ConnectionProvider connectionProvider) {

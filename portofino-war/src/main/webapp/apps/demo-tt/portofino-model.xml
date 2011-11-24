@@ -20,12 +20,12 @@
 <column autoincrement="false" columnName="custom_field_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="value" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="value" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_4">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -56,7 +56,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_7">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -84,7 +84,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_9">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -104,7 +104,7 @@
 <column autoincrement="false" columnName="issue_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="hours" columnType="FLOAT" javaType="java.lang.Double" jdbcType="7" length="12" nullable="false" scale="0">
+<column autoincrement="false" columnName="hours" columnType="DOUBLE" javaType="java.lang.Double" jdbcType="8" length="17" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="comments" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -113,7 +113,7 @@
 <column autoincrement="false" columnName="activity_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="spent_on" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="10" nullable="false" scale="0">
+<column autoincrement="false" columnName="spent_on" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="tyear" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
@@ -125,15 +125,15 @@
 <column autoincrement="false" columnName="tweek" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_3E">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -151,18 +151,18 @@
 <column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_in_chlog" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_in_chlog" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_in_roadmap" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_in_roadmap" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_4B">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -179,10 +179,10 @@
 <column autoincrement="false" columnName="action" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="path" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="false" scale="0">
+<column autoincrement="false" columnName="path" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="from_path" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="from_path" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="from_revision" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -196,7 +196,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_2">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -210,15 +210,15 @@
 <column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="value" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="value" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_55">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -243,7 +243,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_5">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -277,7 +277,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_A">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -297,7 +297,7 @@
 <column autoincrement="false" columnName="subject" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="content" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="content" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
@@ -309,13 +309,13 @@
 <column autoincrement="false" columnName="last_reply_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="locked" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="true" scale="0">
+<column autoincrement="false" columnName="locked" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="sticky" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
@@ -323,7 +323,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_E">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -346,15 +346,15 @@
 <column autoincrement="false" columnName="assoc_type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="server_url" columnType="BLOB" javaType="[B" jdbcType="-4" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="server_url" columnType="VARBINARY" javaType="[B" jdbcType="-3" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="secret" columnType="BLOB" javaType="[B" jdbcType="-4" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="secret" columnType="VARBINARY" javaType="[B" jdbcType="-3" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_A5">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -381,10 +381,10 @@
 <column autoincrement="false" columnName="user_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="others" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="others" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="hide_mail" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="true" scale="0">
+<column autoincrement="false" columnName="hide_mail" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="time_zone" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -392,7 +392,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_1">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -422,15 +422,15 @@
 <column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="mail_notification" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="mail_notification" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_38">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -450,13 +450,13 @@
 <column autoincrement="false" columnName="summary" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="description" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="comments_count" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
@@ -464,7 +464,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_33">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -484,12 +484,12 @@
 <column autoincrement="false" columnName="value" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="40" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_CC">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -515,13 +515,13 @@
 <column autoincrement="false" columnName="mail" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="60" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="admin" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="admin" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="status" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="last_login_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
+<column autoincrement="false" columnName="last_login_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="language" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="5" nullable="true" scale="0">
@@ -530,10 +530,10 @@
 <column autoincrement="false" columnName="auth_source_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -547,7 +547,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_6A">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -564,13 +564,13 @@
 <column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="text" columnType="LONGTEXT" javaType="java.lang.String" jdbcType="-1" length="2147483647" nullable="true" scale="0">
+<column autoincrement="false" columnName="text" columnType="LONGVARCHAR" javaType="java.lang.String" jdbcType="2005" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="comments" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="version" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
@@ -578,7 +578,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_58">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -598,10 +598,10 @@
 <column autoincrement="false" columnName="subject" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="description" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="due_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="10" nullable="true" scale="0">
+<column autoincrement="false" columnName="due_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="category_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
@@ -625,19 +625,19 @@
 <column autoincrement="false" columnName="lock_version" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="start_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="10" nullable="true" scale="0">
+<column autoincrement="false" columnName="start_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="done_ratio" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="estimated_hours" columnType="FLOAT" javaType="java.lang.Double" jdbcType="7" length="12" nullable="true" scale="0">
+<column autoincrement="false" columnName="estimated_hours" columnType="DOUBLE" javaType="java.lang.Double" jdbcType="8" length="17" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="parent_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
@@ -654,7 +654,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_B">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders>
@@ -690,13 +690,13 @@
 <column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="effective_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="10" nullable="true" scale="0">
+<column autoincrement="false" columnName="effective_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="wiki_page_title" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -710,7 +710,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_89">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -730,15 +730,15 @@
 <column autoincrement="false" columnName="title" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="60" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="description" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_3">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -756,10 +756,10 @@
 <column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_closed" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_closed" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_default" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_default" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
@@ -770,7 +770,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_FF">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -790,15 +790,15 @@
 <column autoincrement="false" columnName="user_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="notes" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="notes" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_C1">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -817,7 +817,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_C">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -838,13 +838,13 @@
 <column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_default" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_default" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="active" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="active" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
@@ -855,7 +855,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_86">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -885,18 +885,18 @@
 <column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="assignable" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="true" scale="0">
+<column autoincrement="false" columnName="assignable" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="builtin" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="permissions" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="permissions" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_6">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -916,12 +916,12 @@
 <column autoincrement="false" columnName="redirects_to" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_28">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -938,10 +938,10 @@
 <column autoincrement="false" columnName="title" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="protected" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="protected" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="parent_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
@@ -949,7 +949,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_24">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -969,18 +969,18 @@
 <column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="comments" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="comments" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_DC">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -997,19 +997,19 @@
 <column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="filters" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="filters" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="user_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_public" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_public" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="column_names" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="column_names" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="sort_criteria" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="sort_criteria" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="group_by" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -1017,7 +1017,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_27">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -1037,7 +1037,7 @@
 <column autoincrement="false" columnName="field_format" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="possible_values" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="possible_values" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="regexp" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -1049,33 +1049,33 @@
 <column autoincrement="false" columnName="max_length" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_required" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_required" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_for_all" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_for_all" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_filter" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_filter" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="searchable" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="true" scale="0">
+<column autoincrement="false" columnName="searchable" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="default_value" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="default_value" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="editable" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="true" scale="0">
+<column autoincrement="false" columnName="editable" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="visible" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="visible" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_2E">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -1097,7 +1097,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_F2">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -1119,7 +1119,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_6B">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -1139,7 +1139,7 @@
 <column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="data" columnType="LONGBLOB" javaType="[B" jdbcType="-4" length="2147483647" nullable="true" scale="0">
+<column autoincrement="false" columnName="data" columnType="VARBINARY" javaType="[B" jdbcType="-3" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="compression" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="6" nullable="true" scale="0">
@@ -1148,7 +1148,7 @@
 <column autoincrement="false" columnName="comments" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="version" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
@@ -1156,7 +1156,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_F7">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -1189,13 +1189,13 @@
 <column autoincrement="false" columnName="committer" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="committed_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="false" scale="0">
+<column autoincrement="false" columnName="committed_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="comments" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="comments" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="commit_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="10" nullable="true" scale="0">
+<column autoincrement="false" columnName="commit_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="scmid" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -1206,7 +1206,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_8">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -1273,15 +1273,15 @@
 <column autoincrement="false" columnName="attr_mail" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="onthefly_register" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="onthefly_register" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="tls" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="tls" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_F">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -1306,7 +1306,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_41">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -1344,7 +1344,7 @@
 <column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -1352,7 +1352,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_D">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -1374,7 +1374,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_20">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -1396,7 +1396,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_FD">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -1410,22 +1410,22 @@
 <column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="description" columnType="TEXT" javaType="java.lang.String" jdbcType="-1" length="65535" nullable="true" scale="0">
+<column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="homepage" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_public" columnType="BIT" javaType="java.lang.Boolean" jdbcType="-7" length="0" nullable="false" scale="0">
+<column autoincrement="false" columnName="is_public" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="parent_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="DATETIME" javaType="java.util.Date" jdbcType="93" length="19" nullable="true" scale="0">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="identifier" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -1442,7 +1442,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_C4">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -1464,7 +1464,7 @@
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey>
+                            <primaryKey primaryKeyName="CONSTRAINT_EA">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -1509,7 +1509,7 @@
 <column autoincrement="false" columnName="CREATEDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="createDate" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="password" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="true" propertyName="password" scale="0">
+<column autoincrement="false" columnName="PASSWORD" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="true" propertyName="password" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="USERID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="userId" scale="0">
@@ -1845,30 +1845,30 @@
                 <childPages>
                     <jspPage jsp="/latestProjects.jsp" description="Latest Projects" fragment="latestProjects" id="6d1mqw9vkwkc1fgqpae4i2d6m" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="4" showInNavigation="false" title="Latest Projects">
                         <childPages/>
-                        <permissions />
+                        <permissions/>
                     </jspPage>
-                    <chartPage database="redmine" legend="Workload" name="Workload" orientation="HORIZONTAL" query="select u.id, count(issues.id), login from issues join users u on assigned_to_id = u.id group by u.id, u.login" type="PIE3D" urlExpression="/people/%{key}" description="Workload" fragment="workload" id="4xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="1" showInNavigation="false" title="workload">
+                    <chartPage database="redmine" legend="Workload" name="Workload" orientation="HORIZONTAL" query="select u.&quot;id&quot;, count(&quot;issues&quot;.&quot;id&quot;), &quot;login&quot; from &quot;issues&quot; join &quot;users&quot; u on &quot;assigned_to_id&quot; = u.&quot;id&quot; group by u.&quot;id&quot;, u.&quot;login&quot;" type="PIE3D" urlExpression="/people/%{key}" description="Workload" fragment="workload" id="4xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="1" showInNavigation="false" title="workload">
                         <childPages/>
-                        <permissions />
+                        <permissions/>
                     </chartPage>
-                    <chartPage database="redmine" legend="Issues by project/status" name="Issues by project/status" orientation="VERTICAL" query="select count(*), status_id, project_id, status.name, projects.name from issues join issue_statuses status on status_id = status.id join projects on project_id = projects.id group by status_id, project_id" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?status_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/status" fragment="issues-by-status-bar" id="9xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="5" showInNavigation="false" title="Issues by project/status">
+                    <chartPage database="redmine" legend="Issues by project/status" name="Issues by project/status" orientation="VERTICAL" query="select count(*), &quot;status_id&quot;, &quot;project_id&quot;, status.&quot;name&quot;, &quot;projects&quot;.&quot;name&quot; from &quot;issues&quot; join &quot;issue_statuses&quot; status on &quot;status_id&quot; = status.&quot;id&quot; join &quot;projects&quot; on &quot;project_id&quot; = &quot;projects&quot;.&quot;id&quot; group by &quot;status_id&quot;, &quot;project_id&quot;" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?status_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/status" fragment="issues-by-status-bar" id="9xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="5" showInNavigation="false" title="Issues by project/status">
                         <childPages/>
-                        <permissions />
+                        <permissions/>
                     </chartPage>
-                    <chartPage database="redmine" legend="Issues by project/tracker" name="Issues by project/tracker" orientation="VERTICAL" query="select count(*), tracker_id, project_id, t.name, projects.name from issues join trackers t on tracker_id = t.id join projects on project_id = projects.id group by tracker_id, project_id" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?tracker_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/tracker" fragment="issues-by-tracker-bar" id="6xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="3" showInNavigation="false" title="Issues by project/tracker">
+                    <chartPage database="redmine" legend="Issues by project/tracker" name="Issues by project/tracker" orientation="VERTICAL" query="select count(*), &quot;tracker_id&quot;, &quot;project_id&quot;, t.&quot;name&quot;, &quot;projects&quot;.&quot;name&quot; from &quot;issues&quot; join &quot;trackers&quot; t on &quot;tracker_id&quot; = t.&quot;id&quot; join &quot;projects&quot; on &quot;project_id&quot; = &quot;projects&quot;.&quot;id&quot; group by &quot;tracker_id&quot;, &quot;project_id&quot;" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?tracker_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/tracker" fragment="issues-by-tracker-bar" id="6xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="3" showInNavigation="false" title="Issues by project/tracker">
                         <childPages/>
-                        <permissions />
+                        <permissions/>
                     </chartPage>
-                    <chartPage database="redmine" legend="Issues by project/priority" name="Issues by project/priority" orientation="VERTICAL" query="select count(*), priority_id, issues.project_id, priority.name, projects.name from issues join enumerations priority on priority_id = priority.id join projects on issues.project_id = projects.id group by priority_id, issues.project_id" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?priority_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/priority" fragment="issues-by-priority-bar" id="7xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="7" showInNavigation="false" title="Issues by project/priority">
+                    <chartPage database="redmine" legend="Issues by project/priority" name="Issues by project/priority" orientation="VERTICAL" query="select count(*), &quot;priority_id&quot;, &quot;issues&quot;.&quot;project_id&quot;, priority.&quot;name&quot;, &quot;projects&quot;.&quot;name&quot; from &quot;issues&quot; join &quot;enumerations&quot; priority on &quot;priority_id&quot; = priority.&quot;id&quot; join &quot;projects&quot; on &quot;issues&quot;.&quot;project_id&quot; = &quot;projects&quot;.&quot;id&quot; group by &quot;priority_id&quot;, &quot;issues&quot;.&quot;project_id&quot;" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?priority_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/priority" fragment="issues-by-priority-bar" id="7xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="7" showInNavigation="false" title="Issues by project/priority">
                         <childPages/>
-                        <permissions />
+                        <permissions/>
                     </chartPage>
                     <jspPage jsp="/projects/projectStatus.jsp" description="project status" fragment="prjstatus" id="mdo74idvku47ma3odo40en0ah" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="3" showInNavigation="false" title="Projects">
                         <childPages/>
-                        <permissions />
+                        <permissions/>
                     </jspPage>
                 </childPages>
-                <permissions />
+                <permissions/>
                 <attachments>
                     <attachment contentType="image/gif" filename="calendar.gif" id="7i2kiqdyrcui58ufgossg5mk2" size="268"/>
                     <attachment contentType="image/gif" filename="flag_green.gif" id="yvy0xe6zxhi963nzhx53qbcdf" size="245"/>
@@ -1881,13 +1881,11 @@
                 <childPages>
                     <chartPage database="redmine" legend="issues" name="Issues by status" orientation="HORIZONTAL" query="select status_id, count(*), status.name&#xD;&#xA;from issues join issue_statuses status on status_id = status.id&#xD;&#xA;group by status_id" type="PIE" urlExpression="" description="Issues by status" fragment="report" id="wkqw5aqvlad9yphty2o0qbl8l" layoutContainer="default" layoutOrder="0" showInNavigation="true" title="report">
                         <childPages/>
-                        <permissions />
+                        <permissions/>
                     </chartPage>
                 </childPages>
-                <permissions>
-                    <permissions />
-                </permissions>
-                <crud createTitle="New project" editTitle="Edit project" name="projects" query="FROM public_projects ORDER BY name" readTitle="Overview" searchTitle="Projects" database="redmine" variable="project">
+                <permissions/>
+                <crud createTitle="New project" database="redmine" editTitle="Edit project" largeResultSet="false" name="projects" query="FROM public_projects ORDER BY name" readTitle="Overview" searchTitle="Projects" variable="project">
                     <buttons/>
                     <annotations/>
                     <properties>
@@ -1933,8 +1931,8 @@
                 <detailChildPages>
                     <crudPage description="Issues" fragment="issues" id="3" layoutContainer="default" showInNavigation="true" title="Issues">
                         <childPages/>
-                        <permissions />
-                        <crud createTitle="Create issue" editTitle="Edit issue" name="issue" query="FROM public_issues WHERE project_id = %{#project.id}" readTitle="Issue" searchTitle="Issues" database="redmine" variable="issue">
+                        <permissions/>
+                        <crud createTitle="Create issue" database="redmine" editTitle="Edit issue" largeResultSet="false" name="issue" query="FROM public_issues WHERE project_id = %{#project.id}" readTitle="Issue" searchTitle="Issues" variable="issue">
                             <buttons/>
                             <annotations/>
                             <properties>
@@ -2015,37 +2013,37 @@
                     </crudPage>
                     <jspPage jsp="/issues/summary.jsp" description="Issue tracking" fragment="issueSummary" id="t7ki2cz4dpyuhuodamjuuoe1e" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="1" showInNavigation="false" title="Issue tracking">
                         <childPages/>
-                        <permissions />
+                        <permissions/>
                     </jspPage>
                     <jspPage jsp="/projects/memberSummary.jsp" description="Summary of project's members" fragment="memberSummary" id="bse6c8595zv1tty06eahfc1aa" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="2" showInNavigation="false" title="Members">
                         <childPages/>
-                        <permissions />
+                        <permissions/>
                     </jspPage>
                     <textPage description="Latest News" fragment="latestNews" id="dwd0mzli5ri4imwtsucczfgaa" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="8" showInNavigation="false" title="Latest News">
                         <childPages/>
-                        <permissions />
+                        <permissions/>
                         <attachments/>
                     </textPage>
-                    <chartPage database="redmine" legend="Issues by priority" name="Issues by priority" query="select priority_id, count(*), priority.name from issues join enumerations priority on issues.priority_id = priority.id where issues.project_id = %{#project.id} group by priority.id" type="PIE3D" urlExpression="/projects/%{#project.id}/issues?search=&amp;priority_id=%{key}" description="Issues by priority" fragment="issues-by-priority" id="i26pvpicb8oyapl6anyqsunaj" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="4" showInNavigation="false" title="Issues by priority">
+                    <chartPage database="redmine" legend="Issues by priority" name="Issues by priority" orientation="HORIZONTAL" query="select &quot;priority_id&quot;, count(*), priority.&quot;name&quot; from &quot;issues&quot; join &quot;enumerations&quot; priority on &quot;issues&quot;.&quot;priority_id&quot; = priority.&quot;id&quot; where &quot;issues&quot;.&quot;project_id&quot; = %{#project.id} group by priority.&quot;id&quot;" type="PIE3D" urlExpression="/projects/%{#project.id}/issues?search=&amp;priority_id=%{key}" description="Issues by priority" fragment="issues-by-priority" id="i26pvpicb8oyapl6anyqsunaj" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="4" showInNavigation="false" title="Issues by priority">
                         <childPages/>
-                        <permissions />
+                        <permissions/>
                     </chartPage>
-                    <chartPage database="redmine" legend="Issues by status" name="Issues by status" query="select status_id, count(*), status.name&#xD;&#xA;from issues join issue_statuses status on status_id = status.id&#xD;&#xA;where project_id = %{#project.id}&#xD;&#xA;group by status_id" type="PIE3D" urlExpression="/projects/%{#project.id}/issues?search=&amp;status_id=%{key}" description="Issues by status" fragment="issues-by-status" id="2xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="6" showInNavigation="false" title="Issues by status">
+                    <chartPage database="redmine" legend="Issues by status" name="Issues by status" orientation="HORIZONTAL" query="select &quot;status_id&quot;, count(*), status.&quot;name&quot;&#xD;&#xA;from &quot;issues&quot; join &quot;issue_statuses&quot; status on &quot;status_id&quot; = status.&quot;id&quot;&#xD;&#xA;where &quot;project_id&quot; = %{#project.id}&#xD;&#xA;group by &quot;status_id&quot;" type="PIE3D" urlExpression="/projects/%{#project.id}/issues?search=&amp;status_id=%{key}" description="Issues by status" fragment="issues-by-status" id="2xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="6" showInNavigation="false" title="Issues by status">
                         <childPages/>
-                        <permissions />
+                        <permissions/>
                     </chartPage>
-                    <chartPage database="redmine" legend="Issues by tracker/status" name="Issues by tracker/status" orientation="VERTICAL" query="select count(*), status_id, tracker_id, status.name, tracker.name&#xD;&#xA;from issues join issue_statuses status on status_id = status.id join trackers tracker on tracker_id = tracker.id&#xD;&#xA;where project_id = %{#project.id}&#xD;&#xA;group by status_id, tracker_id" type="STACKED_BAR_3D" urlExpression="/projects/%{#project.id}/issues?search=&amp;status_id=%{series}&amp;tracker_id=%{category}" xAxisName="Tracker" yAxisName="Number of issues" description="Issues by tracker/status" fragment="issues-by-status-bar" id="3xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="2" showInNavigation="false" title="Issues by tracker/status">
+                    <chartPage database="redmine" legend="Issues by tracker/status" name="Issues by tracker/status" orientation="VERTICAL" query="select count(*), &quot;status_id&quot;, &quot;tracker_id&quot;, status.&quot;name&quot;, tracker.&quot;name&quot;&#xD;&#xA;from &quot;issues&quot; join &quot;issue_statuses&quot; status on &quot;status_id&quot; = status.&quot;id&quot; join &quot;trackers&quot; tracker on &quot;tracker_id&quot; = tracker.&quot;id&quot;&#xD;&#xA;where &quot;project_id&quot; = %{#project.id}&#xD;&#xA;group by &quot;status_id&quot;, &quot;tracker_id&quot;" type="STACKED_BAR_3D" urlExpression="/projects/%{#project.id}/issues?search=&amp;status_id=%{series}&amp;tracker_id=%{category}" xAxisName="Tracker" yAxisName="Number of issues" description="Issues by tracker/status" fragment="issues-by-status-bar" id="3xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="2" showInNavigation="false" title="Issues by tracker/status">
                         <childPages/>
-                        <permissions />
+                        <permissions/>
                     </chartPage>
-                    <chartPage database="redmine" legend="Issues by date" name="Issues by date" orientation="VERTICAL" query="select count(*), 'anno-mese', concat(Year(created_on),'-',  Month(created_on)) data   from issues where project_id = %{#project.id} group by created_on order by created_on" type="BAR" urlExpression="/projects/%{#project.id}/issues?search=&amp;status_id=%{series}&amp;tracker_id=%{category}" xAxisName="Tracker" yAxisName="Number of issues" description="Issues by date" fragment="issues-by-date-bar" id="3yozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="4" showInNavigation="false" title="Issues by date">
+                    <chartPage database="redmine" legend="Issues by date" name="Issues by date" orientation="VERTICAL" query="select count(*), 'anno-mese', concat(Year(&quot;created_on&quot;),'-',  Month(&quot;created_on&quot;)) data   from &quot;issues&quot; where &quot;project_id&quot; = %{#project.id} group by &quot;created_on&quot; order by &quot;created_on&quot;" type="BAR" urlExpression="/projects/%{#project.id}/issues?search=&amp;status_id=%{series}&amp;tracker_id=%{category}" xAxisName="Tracker" yAxisName="Number of issues" description="Issues by date" fragment="issues-by-date-bar" id="3yozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="4" showInNavigation="false" title="Issues by date">
                         <childPages/>
-                        <permissions />
+                        <permissions/>
                     </chartPage>
                     <crudPage description="Projects versions" fragment="versions" id="bdua1jepekzaqnt5bylc6gjuz" layoutContainer="default" layoutOrder="1" showInNavigation="true" title="Version">
                         <childPages/>
-                        <permissions />
-                        <crud createTitle="Create new version" editTitle="Version" name="Versions" query="FROM public_versions WHERE project_id = %{#project.id}" readTitle="Version" searchTitle="Versions" database="redmine" variable="version">
+                        <permissions/>
+                        <crud createTitle="Create new version" database="redmine" editTitle="Version" largeResultSet="false" name="Versions" query="FROM public_versions WHERE project_id = %{#project.id}" readTitle="Version" searchTitle="Versions" variable="version">
                             <buttons/>
                             <annotations/>
                             <properties>
@@ -2088,8 +2086,8 @@
             </crudPage>
             <crudPage detailLayoutContainer="default" detailLayoutOrder="2" description="People" fragment="people" id="fwyg067k9g0mpoq8e9ingwwu5" layoutContainer="default" layoutOrder="0" showInNavigation="true" title="People">
                 <childPages/>
-                <permissions />
-                <crud createTitle="Create person" editTitle="Edit person" name="People" query="from public_users" readTitle="View person" searchTitle="People" database="redmine" variable="person">
+                <permissions/>
+                <crud createTitle="Create person" database="redmine" editTitle="Edit person" largeResultSet="false" name="People" query="from public_users" readTitle="View person" searchTitle="People" variable="person">
                     <buttons/>
                     <annotations/>
                     <properties>
@@ -2147,8 +2145,8 @@
                 <detailChildPages>
                     <crudPage description="Tickets" fragment="tickets" id="9io5kz207horijtmtea2ntywz" layoutContainer="default" layoutContainerInParent="contentLayoutBottom" layoutOrder="0" layoutOrderInParent="0" showInNavigation="false" title="Tickets">
                         <childPages/>
-                        <permissions />
-                        <crud createTitle="Create issue" editTitle="Edit issue" name="Tickets" query="from public_issues where assigned_to_id = %{#person.id}" readTitle="Issue" searchTitle="Issues" database="redmine" variable="issue">
+                        <permissions/>
+                        <crud createTitle="Create issue" database="redmine" editTitle="Edit issue" largeResultSet="false" name="Tickets" query="from public_issues where assigned_to_id = %{#person.id}" readTitle="Issue" searchTitle="Issues" variable="issue">
                             <buttons/>
                             <annotations/>
                             <properties>
@@ -2231,7 +2229,7 @@
             </crudPage>
         </childPages>
         <permissions>
-            <group name="all" level="VIEW" />
+            <group level="VIEW" name="all"/>
         </permissions>
     </rootPage>
 </model>

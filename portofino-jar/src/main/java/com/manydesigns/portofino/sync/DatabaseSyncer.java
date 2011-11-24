@@ -33,13 +33,13 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.application.hibernate.HibernateConfig;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.database.Type;
-import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.Annotated;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import liquibase.database.DatabaseConnection;
+import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.database.structure.ForeignKeyConstraintType;
 import liquibase.snapshot.DatabaseSnapshot;
@@ -108,6 +108,12 @@ public class DatabaseSyncer {
                     readSchemaNames(conn, connectionProvider, metadata);
             DatabaseSnapshotGeneratorFactory dsgf =
                     DatabaseSnapshotGeneratorFactory.getInstance();
+
+            logger.debug("Finding Liquibase database");
+            DatabaseFactory databaseFactory = DatabaseFactory.getInstance();
+            liquibase.database.Database liquibaseDatabase =
+                    databaseFactory.findCorrectDatabaseImplementation(liquibaseConnection);
+
             for (String schemaName : schemaNames) {
                 logger.info("Processing schema: {}", schemaName);
                 Schema sourceSchema =
@@ -118,13 +124,7 @@ public class DatabaseSyncer {
                     sourceSchema = new Schema();
                     sourceSchema.setSchemaName(schemaName);
                 }
-                logger.debug("Creating Liquibase database");
-                DatabasePlatform databasePlatform =
-                        connectionProvider.getDatabasePlatform();
 
-                liquibase.database.Database liquibaseDatabase =
-                        databasePlatform.createLiquibaseDatabase();
-                liquibaseDatabase.setConnection(liquibaseConnection);
                 logger.debug("Creating Liquibase database snapshot");
                 DatabaseSnapshot snapshot =
                         dsgf.createSnapshot(liquibaseDatabase, schemaName, null);

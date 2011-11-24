@@ -93,7 +93,7 @@ public abstract class Page implements ModelObject, WithPermissions {
 
     public Page() {
         childPages = new ArrayList<Page>();
-        permissions = new Permissions();
+        permissions = new Permissions(this);
     }
 
     //**************************************************************************

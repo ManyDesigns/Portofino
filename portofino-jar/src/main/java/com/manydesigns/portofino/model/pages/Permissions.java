@@ -73,6 +73,11 @@ public class Permissions implements ModelObject {
         actualPermissions = new HashMap<String, Set<String>>();
     }
 
+    public Permissions(WithPermissions parent) {
+        this();
+        this.parent = parent;
+    }
+
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
