@@ -57,20 +57,20 @@
             <c:forEach var="group" items="${actionBean.groups}">
                 <tr>
                     <%
-                    Group group = (Group) pageContext.getAttribute("group");
-                    String groupId = group.getGroupId();
-                    AccessLevel localAccessLevel = actionBean.getLocalAccessLevel(currentPage, groupId);
-                    AccessLevel parentAccessLevel = null;
-                    Page parentPage = currentPage.getParent();
-                    if(parentPage != null) {
-                        parentAccessLevel = parentPage.getPermissions().getActualLevels().get(groupId);
-                    }
-                    if(parentAccessLevel == null) {
-                        parentAccessLevel = AccessLevel.NONE;
-                    }
-                    Permissions permissions = currentPage.getPermissions();
-                    List<String> groupIdList = Collections.singletonList(groupId);
-                %>
+                        Group group = (Group) pageContext.getAttribute("group");
+                        String groupId = group.getGroupId();
+                        AccessLevel localAccessLevel = actionBean.getLocalAccessLevel(currentPage, groupId);
+                        AccessLevel parentAccessLevel = null;
+                        Page parentPage = currentPage.getParent();
+                        if(parentPage != null) {
+                            parentAccessLevel = parentPage.getPermissions().getActualLevels().get(groupId);
+                        }
+                        if(parentAccessLevel == null) {
+                            parentAccessLevel = AccessLevel.NONE;
+                        }
+                        Permissions permissions = currentPage.getPermissions();
+                        List<String> groupIdList = Collections.singletonList(groupId);
+                    %>
                     <td>
                         <c:out value="${group.name}"/>
                     </td>

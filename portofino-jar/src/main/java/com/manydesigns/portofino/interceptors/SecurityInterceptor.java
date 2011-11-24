@@ -34,7 +34,6 @@ import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
@@ -72,7 +71,6 @@ public class
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     private static final int UNAUTHORIZED = 403;
-    private static final int CONFLICT = 409;
 
     public final static Logger logger =
             LoggerFactory.getLogger(SecurityInterceptor.class);
@@ -80,6 +78,8 @@ public class
     public Resolution intercept(ExecutionContext context) throws Exception {
         logger.debug("Retrieving Stripes objects");
         ActionBeanContext actionContext = context.getActionBeanContext();
+        ActionBean actionBean = context.getActionBean();
+        Method handler = context.getHandler();
 
         logger.debug("Retrieving Servlet API objects");
         HttpServletRequest request = actionContext.getRequest();
@@ -110,8 +110,6 @@ public class
         List<String> groups = SecurityLogic.manageGroups(application, userId);
         request.setAttribute(RequestAttributes.GROUPS, groups);
 
-        ActionBean actionBean = context.getActionBean();
-        Method handler = context.getHandler();
         if (!SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler)) {
             return handleAnonymousOrUnauthorized(userId, request);
         }
@@ -134,11 +132,6 @@ public class
                         ArrayUtils.toString(groups));
                 return handleAnonymousOrUnauthorized(userId, request);
             }
-        }
-
-        if(!ButtonsLogic.doGuardsPass(actionBean, handler)) {
-            logger.warn("Operation not authorized.");
-            return new ErrorResolution(CONFLICT);
         }
 
         logger.debug("Security check passed.");

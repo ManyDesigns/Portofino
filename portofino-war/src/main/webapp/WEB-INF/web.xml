@@ -66,7 +66,8 @@
             <param-value>
                 com.manydesigns.portofino.interceptors.SecurityInterceptor,
                 com.manydesigns.portofino.interceptors.ApplicationInterceptor,
-                com.manydesigns.portofino.interceptors.InjectionInterceptor
+                com.manydesigns.portofino.interceptors.InjectionInterceptor,
+                com.manydesigns.portofino.interceptors.GuardsInterceptor
             </param-value>
         </init-param>
         <init-param>
