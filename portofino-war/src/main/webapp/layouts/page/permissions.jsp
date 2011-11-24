@@ -122,7 +122,7 @@
                             </option>
                         </select>
                     </td>
-                    <c:forEach var="perm" items="${supportedPermissions}">
+                    <c:forEach var="perm" items="<%= supportedPermissions %>">
                         <td>
                             <input type="checkbox" name="permissions[<%= groupId %>]"
                                    value="${perm}"
