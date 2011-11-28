@@ -103,7 +103,7 @@ public class HibernateTest extends AbstractPortofinoTest {
 
 
         Map categoria0 = (Map<String, Object>) resultCat.get(0);
-        assertEquals("jpetstore_public_category", categoria0.get("$type$"));
+        assertEquals("category", categoria0.get("$type$"));
         assertNotNull(categoria0.get("name"));
         Map categoria1 = (Map<String, Object>)resultCat.get(1);
         assertNotNull(categoria0.get("name"));
@@ -181,7 +181,7 @@ public class HibernateTest extends AbstractPortofinoTest {
 
     public void testSaveCategoria() {
         Map<String, Object> worms = new HashMap<String, Object>();
-        worms.put("$type$", "jpetstore.PUBLIC.category");
+        worms.put("$type$", "category");
         worms.put("catid", "VERMI");
         worms.put("name", "worms");
         worms.put("descn",
@@ -195,7 +195,7 @@ public class HibernateTest extends AbstractPortofinoTest {
 
     public void testSaveLineItem() {
         Map<String, Object> lineItem = new HashMap<String, Object>();
-        lineItem.put("$type$", "jpetstore.PUBLIC.lineitem");
+        lineItem.put("$type$", "lineitem");
         lineItem.put("orderid", 2);
         lineItem.put("linenum", 2);
         lineItem.put("itemid",
@@ -225,11 +225,11 @@ public class HibernateTest extends AbstractPortofinoTest {
     public void testSaveTestElement() {
         try {
             Map<String, Object> testItem = new HashMap<String, Object>();
-            testItem.put("$type$", "hibernatetest.PUBLIC.table1");
+            testItem.put("$type$", "table1");
             testItem.put("testo", "esempio");
             //salvo
             Session session = application.getSession("hibernatetest");
-            session.save("hibernatetest_PUBLIC_table1", testItem);
+            session.save("table1", testItem);
             session.getTransaction().commit();
 
         } catch (Exception e) {
@@ -241,7 +241,7 @@ public class HibernateTest extends AbstractPortofinoTest {
     public void testDeleteCategoria() {
         try {
             Map<String, Object> worms = new HashMap<String, Object>();
-            worms.put("$type$", "jpetstore.PUBLIC.category");
+            worms.put("$type$", "category");
             worms.put("catid", "VERMI");
             worms.put("name", "worms");
             worms.put("descn",
@@ -249,10 +249,10 @@ public class HibernateTest extends AbstractPortofinoTest {
                       "Worms</font>");
 
             Session session = application.getSession("jpetstore");
-            session.save("hibernatetest_PUBLIC_category", worms);
+            session.save("category", worms);
             session.getTransaction().commit();
             session.beginTransaction();
-            session.delete("hibernatetest_PUBLIC_category", worms);
+            session.delete("category", worms);
             session.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();

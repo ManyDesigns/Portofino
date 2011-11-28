@@ -19,6 +19,14 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>
+        <br />
+        <h4>SQL Query parameters</h4>
+        <ul>
+            <li><strong>1D Charts:</strong>
+                key, value, (optional) label</li>
+            <li><strong>2D Charts:</strong>
+                value, x axis key, y axis key, (optional) x axis label, (optional) y axis label</li>
+        </ul>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
