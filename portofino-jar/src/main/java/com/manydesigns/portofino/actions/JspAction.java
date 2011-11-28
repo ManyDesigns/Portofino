@@ -96,6 +96,8 @@ public class JspAction extends PortletAction {
         return new ForwardResolution("/layouts/jsp/configure.jsp");
     }
 
+    @Button(list = "configuration", key = "commons.updateConfiguration")
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updateConfiguration() {
         synchronized (application) {
             prepareConfigurationForms();

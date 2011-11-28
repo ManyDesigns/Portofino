@@ -3,17 +3,16 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<stripes:layout-render name="/skins/${skin}/modal-page.jsp">
+%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
+%><stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <stripes:layout-component name="customScripts">
         <script type="text/javascript" src="<stripes:url value="/ckeditor/ckeditor.js"/>"></script>
         <script type="text/javascript" src="<stripes:url value="/ckeditor/adapters/jquery.js"/>"></script>
     </stripes:layout-component>
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.TextAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:submit name="updateConfiguration" value="Save" class="contentButton"/>
-        <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
+        <portofino:buttons list="configuration" cssClass="contentButton" />
         <div class="breadcrumbs">
             <div class="inner">
                 <mde:write name="breadcrumbs"/>
@@ -45,7 +44,6 @@
         </script>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <stripes:submit name="updateConfiguration" value="Save" class="contentButton"/>
-        <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
+        <portofino:buttons list="configuration" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>

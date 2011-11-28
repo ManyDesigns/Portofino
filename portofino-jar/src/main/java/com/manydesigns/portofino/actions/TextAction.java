@@ -151,6 +151,7 @@ public class TextAction extends PortletAction {
         return new ForwardResolution("/layouts/text/configure.jsp");
     }
 
+    @Button(list = "configuration", key = "commons.updateConfiguration")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updateConfiguration() throws IOException {
         synchronized (application) {

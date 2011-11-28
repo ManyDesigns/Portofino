@@ -33,6 +33,7 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.Dispatcher;
@@ -97,6 +98,8 @@ public class PageReferenceAction extends PortletAction {
         }
     }
 
+    @Button(list = "configuration", key = "commons.updateConfiguration")
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configureReferencedPage() {
         if(pageReference.getToPage() == null) {
             SessionMessages.addErrorMessage("No referenced page specified");

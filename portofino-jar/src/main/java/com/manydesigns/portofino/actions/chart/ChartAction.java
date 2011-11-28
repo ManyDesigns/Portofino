@@ -285,6 +285,8 @@ public class ChartAction extends PortletAction {
         form.readFromObject(chartPage);
     }
 
+    @Button(list = "configuration", key = "commons.updateConfiguration")
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updateConfiguration() {
         synchronized (application) {
             prepareConfigurationForms();
