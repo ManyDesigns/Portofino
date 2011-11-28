@@ -50,11 +50,8 @@ import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
 import com.manydesigns.portofino.actions.forms.CrudSelectionProviderEdit;
 import com.manydesigns.portofino.application.TableCriteria;
-import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
-import com.manydesigns.portofino.buttons.annotations.Guard;
-import com.manydesigns.portofino.buttons.annotations.Guards;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -231,15 +228,21 @@ public class CrudAction extends PortletAction {
                 FileReader fr = new FileReader(file);
                 script = IOUtils.toString(fr);
                 IOUtils.closeQuietly(fr);
-                groovyObject = ScriptingUtil.getGroovyObject(script, file.getAbsolutePath());
-                Script scriptObject = (Script) groovyObject;
-                Binding binding = new Binding(ElementsThreadLocals.getOgnlContext());
-                binding.setVariable("actionBean", this);
-                scriptObject.setBinding(binding);
+                String path = file.getAbsolutePath();
+                groovyObject = compileScript(script, path);
             } catch (Exception e) {
                 logger.warn("Couldn't load script for crud page " + crudPage.getId(), e);
             }
         }
+    }
+
+    protected GroovyObject compileScript(String script, String path) {
+        GroovyObject groovyObject = ScriptingUtil.getGroovyObject(script, path);
+        Script scriptObject = (Script) groovyObject;
+        Binding binding = new Binding(ElementsThreadLocals.getOgnlContext());
+        binding.setVariable("actionBean", this);
+        scriptObject.setBinding(binding);
+        return groovyObject;
     }
 
     private void setupSelectionProviders() {
@@ -832,7 +835,8 @@ public class CrudAction extends PortletAction {
         @Button(list = "crud-edit", key = "commons.cancel", order = 99),
         @Button(list = "crud-create", key = "commons.cancel", order = 99),
         @Button(list = "crud-bulk-edit", key = "commons.cancel", order = 99),
-        @Button(list = "page-permissions-edit", key = "commons.cancel", order = 99)
+        @Button(list = "page-permissions-edit", key = "commons.cancel", order = 99),
+        @Button(list = "configuration", key = "commons.cancel", order = 99)
     })
     public Resolution cancel() {
         return super.cancel();
@@ -1551,8 +1555,7 @@ public class CrudAction extends PortletAction {
     protected boolean createValidate(Object object) {
         String methodName = "createValidate";
         Object methodArgs = new Object[] { object };
-        Boolean b = (Boolean) invokeGroovyMethod(methodName, methodArgs);
-        return (b == null) || b;
+        return invokeBooleanGroovyMethod(methodName, methodArgs);
     }
 
     protected void createPostProcess(Object object) {
@@ -1570,8 +1573,7 @@ public class CrudAction extends PortletAction {
     protected boolean editValidate(Object object) {
         String methodName = "editValidate";
         Object methodArgs = new Object[] { object };
-        Boolean b = (Boolean) invokeGroovyMethod(methodName, methodArgs);
-        return (b == null) || b;
+        return invokeBooleanGroovyMethod(methodName, methodArgs);
     }
 
     protected void editPostProcess(Object object) {
@@ -1592,6 +1594,11 @@ public class CrudAction extends PortletAction {
             logger.debug("No script for this page: {}", crudPage.getId());
         }
         return null;
+    }
+
+    protected boolean invokeBooleanGroovyMethod(String methodName, Object methodArgs) {
+        Object result = invokeGroovyMethod(methodName, methodArgs);
+        return !(result instanceof Boolean && (Boolean) result == false);
     }
 
     //**************************************************************************
@@ -1738,6 +1745,8 @@ public class CrudAction extends PortletAction {
         }
     }
 
+    @Button(list = "configuration", key = "commons.updateConfiguration")
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updateConfiguration() {
         synchronized (application) {
             prepareConfigurationForms();
@@ -1785,6 +1794,14 @@ public class CrudAction extends PortletAction {
                     try {
                         fw = new FileWriter(groovyScriptFile);
                         fw.write(script);
+                        try {
+                            compileScript(script, groovyScriptFile.getAbsolutePath());
+                        } catch (Exception e) {
+                            logger.warn("Couldn't compile script for crud page " + crudPage.getId(), e);
+                            String msg = "Couldn't compile script - see logs for details";
+                            SessionMessages.addErrorMessage(msg);
+                            return new ForwardResolution("/layouts/crud/configure.jsp");
+                        }
                     } catch (IOException e) {
                         logger.error("Error writing script to " + groovyScriptFile, e);
                     } finally {

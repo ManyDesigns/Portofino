@@ -7,12 +7,12 @@ def createSetup(object) {
     object.author_id = 1;
 }
 
-def createPostProcess(object) {
+def createValidate(object) {
     Date now = new Date();
     object.created_on = now;
     object.updated_on = now;
 }
 
-def editPostProcess(object) {
+def editValidate(object) {
     object.updated_on = new Date();
 }

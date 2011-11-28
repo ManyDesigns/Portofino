@@ -122,6 +122,7 @@ public class Table implements ModelObject, Annotated {
     }
 
     public void reset() {
+        actualEntityName = null;
         actualJavaClass = null;
         oneToManyRelationships.clear();
     }
