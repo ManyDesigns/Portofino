@@ -90,7 +90,7 @@ public class LostPwdChangeAction extends AbstractActionBean implements LoginUnAw
                 User user = application.findUserByToken(token);
                 user.setPwd(pwd.pwd);
                 user.setPwdModDate(new Timestamp(new Date().getTime()));
-                Session session = application.getSessionByQualifiedTableName(SecurityLogic.USERTABLE);
+                Session session = application.getSession("portofino");
                 session.update(SecurityLogic.USER_ENTITY_NAME, user);
                 session.getTransaction().commit();
                 logger.debug("User {} updated", user.getEmail());

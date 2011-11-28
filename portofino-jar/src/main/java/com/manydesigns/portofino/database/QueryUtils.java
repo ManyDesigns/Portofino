@@ -493,17 +493,17 @@ public class QueryUtils {
 
     @SuppressWarnings({"unchecked"})
     public static List<Object> getRelatedObjects(
-            Application application, String qualifiedTableName,
+            Application application, String databaseName, String entityName,
             Object obj, String oneToManyRelationshipName) {
         Model model = application.getModel();
         ForeignKey relationship =
-                DataModelLogic.findOneToManyRelationship(model,
-                        qualifiedTableName, oneToManyRelationshipName);
+                DataModelLogic.findOneToManyRelationship(model, databaseName,
+                        entityName, oneToManyRelationshipName);
         //Table toTable = relationship.getActualToTable();
         Table fromTable = relationship.getFromTable();
         Session session = application.getSessionByQualifiedTableName(fromTable.getQualifiedName());
 
-        ClassAccessor toAccessor = application.getTableAccessor(qualifiedTableName);
+        ClassAccessor toAccessor = application.getTableAccessor(databaseName, entityName);
 
         try {
             org.hibernate.Criteria criteria =
@@ -522,8 +522,8 @@ public class QueryUtils {
             return result;
         } catch (Throwable e) {
             String msg = String.format(
-                    "Cannot access relationship %s on table %s",
-                    oneToManyRelationshipName, qualifiedTableName);
+                    "Cannot access relationship %s on entity %s.%s",
+                    oneToManyRelationshipName, databaseName, entityName);
             logger.warn(msg, e);
         }
         return null;

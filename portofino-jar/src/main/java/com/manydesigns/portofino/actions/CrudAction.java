@@ -338,11 +338,11 @@ public class CrudAction extends PortletAction {
         } else if (hql != null) {
             Database database = DataModelLogic.findDatabaseByName(model, databaseName);
             Table table = QueryUtils.getTableFromQueryString(database, hql);
-            String qualifiedTableName = table.getQualifiedName();
-            Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
+            String entityName = table.getActualEntityName();
+            Session session = application.getSession(databaseName);
             Collection<Object> objects = QueryUtils.getObjects(session, hql, null, null);
             TableAccessor tableAccessor =
-                    application.getTableAccessor(qualifiedTableName);
+                    application.getTableAccessor(databaseName, entityName);
             ShortName shortNameAnnotation =
                     tableAccessor.getAnnotation(ShortName.class);
             TextFormat[] textFormats = null;
@@ -1091,8 +1091,8 @@ public class CrudAction extends PortletAction {
             if(searchForm != null) {
                 searchForm.configureCriteria(criteria);
             }
-            String qualifiedTableName = crud.getActualTable().getQualifiedName();
-            Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
+            String databaseName = crud.getActualTable().getDatabaseName();
+            Session session = application.getSession(databaseName);
             objects = QueryUtils.getObjects(session,
                     crud.getQuery(), criteria, this, firstResult, maxResults);
         } catch (ClassCastException e) {

@@ -199,7 +199,7 @@ public class LoginAction extends AbstractActionBean {
         user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
         int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
         user.setFailedLoginAttempts(failedAttempts+1);
-        Session session = application.getSessionByQualifiedTableName(SecurityLogic.USERTABLE);
+        Session session = application.getSession("portofino");
         session.update(user);
         session.getTransaction().commit();
     }

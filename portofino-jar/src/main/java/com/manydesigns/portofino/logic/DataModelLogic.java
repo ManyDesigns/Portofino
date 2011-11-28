@@ -214,6 +214,14 @@ public class DataModelLogic {
         return table.findOneToManyRelationshipByName(relationshipName);
     }
 
+    public static @Nullable ForeignKey findOneToManyRelationship(Model model,
+                                                String databaseName, String entityName,
+                                                String relationshipName) {
+        Database database = findDatabaseByName(model, databaseName);
+        Table table = findTableByEntityName(database, entityName);
+        assert table != null;
+        return table.findOneToManyRelationshipByName(relationshipName);
+    }
 
     /*public static Collection<? extends SelectionProvider> generateDefaultSelectionProviders(Table actualTable) {
         List<ForeignKey> foreignKeys = actualTable.getForeignKeys();

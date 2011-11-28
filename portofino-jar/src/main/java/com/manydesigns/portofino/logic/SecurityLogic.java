@@ -227,8 +227,7 @@ public class SecurityLogic {
     }
 
     public static User defaultLogin(Application application, String username, String password) {
-        String qualifiedTableName = USERTABLE;
-        Session session = application.getSessionByQualifiedTableName(qualifiedTableName);
+        Session session = application.getSession("portofino");
         org.hibernate.Criteria criteria = session.createCriteria("public_users");
         criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
         criteria.add(Restrictions.eq(PASSWORD, password));

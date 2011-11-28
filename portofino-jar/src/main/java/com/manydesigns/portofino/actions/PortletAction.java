@@ -112,7 +112,9 @@ public class PortletAction extends AbstractActionBean {
     }
 
     protected void dereferencePageInstance() {
-        pageInstance = pageInstance.dereference();
+        if(pageInstance != null) {
+            pageInstance = pageInstance.dereference();
+        }
     }
 
     public void setupReturnToParentTarget() {

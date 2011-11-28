@@ -363,7 +363,7 @@ public class HibernateTest extends AbstractPortofinoTest {
                 (application, "jpetstore", "public_category", pk);
         assertEquals("Birds", ((MapProxy) bird).get("name"));
 
-        List objs = QueryUtils.getRelatedObjects(application, "jpetstore.PUBLIC.category",
+        List objs = QueryUtils.getRelatedObjects(application, "jpetstore", "public_category",
                 bird, "fk_product_1");
         assertTrue(objs.size()>0);
     }

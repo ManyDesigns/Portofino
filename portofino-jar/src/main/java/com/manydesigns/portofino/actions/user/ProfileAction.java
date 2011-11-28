@@ -168,7 +168,7 @@ public class ProfileAction extends AbstractActionBean {
         
         if(form.validate()){
             form.writeToObject(thisUser);
-            Session session = application.getSessionByQualifiedTableName(SecurityLogic.USERTABLE);
+            Session session = application.getSession("portofino");
             session.update(SecurityLogic.USER_ENTITY_NAME, thisUser);
             session.getTransaction().commit();
             logger.debug("User {} updated", thisUser.getEmail());
@@ -225,7 +225,7 @@ public class ProfileAction extends AbstractActionBean {
                 }
                 thisUser.setPwdModDate(new Timestamp(new Date().getTime()));
 
-                Session session = application.getSessionByQualifiedTableName(SecurityLogic.USERTABLE);
+                Session session = application.getSession("portofino");
                 session.update(SecurityLogic.USER_ENTITY_NAME, thisUser);
                 session.getTransaction().commit();
                 logger.debug("User {} updated", thisUser.getEmail());
