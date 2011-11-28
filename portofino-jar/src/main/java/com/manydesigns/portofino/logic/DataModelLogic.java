@@ -223,17 +223,10 @@ public class DataModelLogic {
         return table.findOneToManyRelationshipByName(relationshipName);
     }
 
-    /*public static Collection<? extends SelectionProvider> generateDefaultSelectionProviders(Table actualTable) {
-        List<ForeignKey> foreignKeys = actualTable.getForeignKeys();
-        for(ForeignKey fk : foreignKeys) {
-            fk.getRe
-        }
-    }*/
-
     public static Table findTableByEntityName(Database database, String entityName) {
         for(Schema schema : database.getSchemas()) {
             for(Table table : schema.getTables()) {
-                if(table.getActualEntityName().equalsIgnoreCase(entityName)) {
+                if(entityName.equalsIgnoreCase(table.getActualEntityName())) {
                     return table;
                 }
             }

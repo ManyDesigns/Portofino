@@ -87,7 +87,7 @@ public class PwdRecoveryAction extends AbstractActionBean implements LoginUnAwar
                 return INPUT;
             }
             user.tokenGenerator();
-            session.update("public_users", user);
+            session.update("users", user);
             HttpServletRequest req = context.getRequest();
             String port = (req.getServerPort()!=0)?":"+req.getServerPort():"";
 

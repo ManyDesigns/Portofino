@@ -18,7 +18,7 @@
                 Application appl = (Application) request.getAttribute("application");
                 List<?> objects = appl.getObjects(
                         "SELECT t.name, sum(1 - st.is_closed) as sum, count(*) as count " +
-                        "FROM public_issues i, public_trackers t, public_issue_statuses st " +
+                        "FROM issues i, trackers t, issue_statuses st " +
                         "WHERE t.id = i.tracker_id " +
                         "  AND i.project_id = %{#project.id} " +
                         "  AND i.status_id = st.id " +

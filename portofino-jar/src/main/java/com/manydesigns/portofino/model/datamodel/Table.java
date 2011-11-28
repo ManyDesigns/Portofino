@@ -31,6 +31,7 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
@@ -132,13 +133,23 @@ public class Table implements ModelObject, Annotated {
         // wire up javaClass
         actualJavaClass = ReflectionUtil.loadClass(javaClass);
 
+        String baseEntityName;
         if (entityName == null) {
-            int dotIndex = getQualifiedName().indexOf('.') + 1;
-            String tableNameInDatabase = getQualifiedName().substring(dotIndex);
-            actualEntityName = defineEntityName(tableNameInDatabase);
+            baseEntityName = defineEntityName(getTableName());
         } else {
-            actualEntityName = defineEntityName(entityName);
+            baseEntityName = defineEntityName(entityName);
         }
+
+        String calculatedEntityName = baseEntityName;
+
+        int i = 2;
+        Database database = schema.getDatabase();
+        while(DataModelLogic.findTableByEntityName(database, calculatedEntityName) != null) {
+            logger.warn("Entity name {} already taken, generating a new one", calculatedEntityName);
+            calculatedEntityName = baseEntityName + "_" + (i++);
+        }
+
+        actualEntityName = calculatedEntityName;
     }
 
     public void link(Model model) {}

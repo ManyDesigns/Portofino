@@ -51,7 +51,6 @@ import java.util.Map;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class KeyGeneratorsTest extends AbstractPortofinoTest {
-    private static final String PORTOFINO_PUBLIC_USER = "portofino.PUBLIC.users";
 
     Model model;
 
@@ -174,7 +173,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         myGroup.setName("testGroup");
         myGroup.setDescription("this is a description");
         Session session = application.getSession("portofino");
-        session.save("public_groups", myGroup);
+        session.save("groups", myGroup);
         session.getTransaction().commit();
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, "portofino.public.groups");

@@ -23,8 +23,8 @@
                 Session hSession = appl.getSession("redmine");
                 List<?> objects = QueryUtils.getObjects(hSession,
                         "SELECT r.name, u.login " +
-                                "FROM public_members m, public_users u, " +
-                                "     public_roles r, public_member_roles mr " +
+                                "FROM members m, users u, " +
+                                "     roles r, member_roles mr " +
                                 "WHERE m.project_id = %{#project.id}" +
                                 "  AND m.user_id = u.id " +
                                 "  AND mr.member_id = m.id " +

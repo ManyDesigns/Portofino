@@ -162,7 +162,7 @@ public class EmailTest extends AbstractPortofinoTest {
         }
         assertEquals(10, server.getReceivedEmailSize());
         Session session = application.getSession("portofino");
-        List<Object> emailList = session.createCriteria("public_emailqueue").list();
+        List<Object> emailList = session.createCriteria("emailqueue").list();
         assertEquals(0, emailList.size());
     }
 
@@ -201,7 +201,7 @@ public class EmailTest extends AbstractPortofinoTest {
             fail();
         }
         assertEquals(0, server.getReceivedEmailSize());
-        List<Object> emailList = session.createCriteria("public_emailqueue").list();
+        List<Object> emailList = session.createCriteria("emailqueue").list();
         assertEquals(10, emailList.size());
     }
 

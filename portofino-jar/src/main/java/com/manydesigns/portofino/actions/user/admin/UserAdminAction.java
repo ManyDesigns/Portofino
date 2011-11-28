@@ -217,7 +217,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
             ug.setGroup(group);
             ug.setGroupid(group.getGroupId());
             user.getGroups().add(ug);
-            session.save("public_users_groups", ug);
+            session.save("users_groups", ug);
             session.update(SecurityLogic.USER_ENTITY_NAME, user);
         }
 

@@ -21,7 +21,7 @@
         <ul>
             <%
                 Application appl = (Application) request.getAttribute("application");
-                String queryString = "FROM public_projects order by updated_on desc, created_on desc";
+                String queryString = "FROM projects order by updated_on desc, created_on desc";
                 Session hSession = appl.getSession("redmine");
                 List objects = QueryUtils.runHqlQuery(hSession, queryString, new Object[0], 0, 3);
                 for(Object obj : objects) {
