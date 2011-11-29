@@ -27,7 +27,10 @@
 *
 */
 
-package com.manydesigns.portofino.model;
+package com.manydesigns.portofino.actions.forms;
+
+import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.Required;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -35,18 +38,16 @@ package com.manydesigns.portofino.model;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public abstract class ModelVisitor {
+public class CopyPage {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public void visitNodeBeforeChildren(ModelObject node) {}
+    @Required
+    @Label("Fragment")
+    public String fragment;
 
-    public void visitNodeAfterChildren(ModelObject node) {}
-
-    public void visit(ModelObject node) {
-        visitNodeBeforeChildren(node);
-        node.visitChildren(this);
-        visitNodeAfterChildren(node);
-    }
+    @Required
+    @Label("Copy to")
+    public String destinationPageId;
 
 }

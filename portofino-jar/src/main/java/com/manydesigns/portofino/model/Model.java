@@ -76,7 +76,7 @@ public class Model {
     protected class ResetVisitor extends ModelVisitor {
 
         @Override
-        public void visitNode(ModelObject node) {
+        public void visitNodeBeforeChildren(ModelObject node) {
             node.reset();
         }
     }
@@ -84,7 +84,7 @@ public class Model {
     protected class InitVisitor extends ModelVisitor {
 
         @Override
-        public void visitNode(ModelObject node) {
+        public void visitNodeBeforeChildren(ModelObject node) {
             node.init(Model.this);
         }
     }
@@ -92,7 +92,7 @@ public class Model {
     protected class LinkVisitor extends ModelVisitor {
 
         @Override
-        public void visitNode(ModelObject node) {
+        public void visitNodeBeforeChildren(ModelObject node) {
             node.link(Model.this);
         }
     }

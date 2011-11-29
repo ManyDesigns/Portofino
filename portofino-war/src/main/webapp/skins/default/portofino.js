@@ -62,9 +62,52 @@ function showMovePageDialog(pageId, contextPath) {
 
                     hiddenField = document.createElement("input");
                     hiddenField.setAttribute("type", "hidden");
-                    hiddenField.setAttribute("name", "movePageDestination");
+                    hiddenField.setAttribute("name", "destinationPageId");
                     hiddenField.setAttribute("value", $(this).find("#destinationPageId").val());
                     form.append(hiddenField);
+
+                    form.submit();
+                    $(this).dialog("close");
+                },
+                Cancel: function() {
+                    $(this).dialog("close");
+                    dialogDiv.remove();
+                }
+            }
+        });
+    });
+    return false;
+}
+
+function showCopyPageDialog(pageId, contextPath) {
+    var dialogDiv = $(document.createElement("div"));
+    dialogDiv.load(contextPath + "/actions/page?copyPageDialog&pageId=" + pageId, function() {
+        dialogDiv.find("#dialog-copy-page").dialog({
+            modal: true,
+            width: 500,
+            buttons: {
+                "Copy": function() {
+                    var form = $("#contentHeaderForm");
+
+                    /*var hiddenField = document.createElement("input");
+                    hiddenField.setAttribute("type", "hidden");
+                    hiddenField.setAttribute("name", "movePage");
+                    form.append(hiddenField);
+
+                    hiddenField = document.createElement("input");
+                    hiddenField.setAttribute("type", "hidden");
+                    hiddenField.setAttribute("name", "destinationPageId");
+                    hiddenField.setAttribute("value", $(this).find("#destinationPageId").val());
+                    form.append(hiddenField);*/
+
+                    $(this).find("input, select").each(function(index, elem) {
+                        elem = $(elem);
+                        var hiddenField = document.createElement("input");
+                        hiddenField.setAttribute("type", "hidden");
+                        hiddenField.setAttribute("name", elem.attr('name'));
+                        hiddenField.setAttribute("value", elem.val());
+                        form.append(hiddenField);
+                    });
 
                     form.submit();
                     $(this).dialog("close");
@@ -90,13 +133,13 @@ $(function() {
             },
             text: false
         });
-    $("input:submit.arrow-4, button.arrow-4").button({
+    $("button.arrow-4").button({
             icons: {
                 primary: "ui-icon-arrow-4"
             },
             text: false
         });
-    $("input:submit.refresh, button.refresh").button({
+    $("button.refresh").button({
             icons: {
                 primary: "ui-icon-refresh"
             },
@@ -108,25 +151,31 @@ $(function() {
             },
             text: false
         });
-    $("input:submit.person, button.person").button({
+    $("button.person").button({
             icons: {
                 primary: "ui-icon-person"
             },
             text: false
         });
-    $("input:submit.plusthick, button.plusthick").button({
+    $("button.copy").button({
+            icons: {
+                primary: "ui-icon-copy"
+            },
+            text: false
+        });
+    $("button.plusthick").button({
             icons: {
                 primary: "ui-icon-plusthick"
             },
             text: false
         });
-    $("input:submit.minusthick, button.minusthick").button({
+    $("button.minusthick").button({
             icons: {
                 primary: "ui-icon-minusthick"
             },
             text: false
         });
-    $("input:submit.transferthick-e-w, button.transferthick-e-w").button({
+    $("button.transferthick-e-w").button({
             icons: {
                 primary: "ui-icon-transferthick-e-w"
             },

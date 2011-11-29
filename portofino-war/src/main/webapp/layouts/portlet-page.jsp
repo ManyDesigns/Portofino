@@ -30,21 +30,22 @@
                                     class="arrow-4">Edit page layout</button>
                             <button name="reloadModel" class="refresh">Reload model</button>
                             <button name="pagePermissions" class="person">Page permissions</button>
+                            <%--<button class="copy"
+                                    onclick="showCopyPageDialog(
+                                                '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
+                                                '<%= request.getContextPath() %>');
+                                            return false;">Copy page</button>--%>
                             <button name="newPage" class="plusthick">Add page</button>
                             <button name="deletePage" class="minusthick"
                                     onclick="confirmDeletePage(
                                                 '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
                                                 '<%= request.getContextPath() %>');
-                                            return false;">
-                                Delete page
-                            </button>
-                            <button name="movePage" class="transferthick-e-w"
+                                            return false;">Delete page</button>
+                            <button class="transferthick-e-w"
                                     onclick="showMovePageDialog(
                                                 '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
                                                 '<%= request.getContextPath() %>');
-                                            return false;">
-                                Move page
-                            </button>
+                                            return false;">Move page</button>
                         </div>
                     <% } %>
                     <!-- End admin buttons -->

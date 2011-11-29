@@ -92,6 +92,16 @@ public class PortletAction extends AbstractActionBean {
     protected ResultSetNavigation resultSetNavigation;
     public String cancelReturnUrl;
 
+    //-----------------------1---------------------------------------------------
+    // Page crud fields
+    //--------------------------------------------------------------------------
+
+    protected static final String[][] NEW_PAGE_SETUP_FIELDS = {
+            {"pageClassName", "fragment", "title", "description", "insertPositionName"}};
+    protected Form newPageForm;
+    protected String destinationPageId;
+    protected String fragment;
+
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -592,7 +602,7 @@ public class PortletAction extends AbstractActionBean {
 
     @RequiresAdministrator
     public Resolution movePage() {
-        if(movePageDestination == null) {
+        if(destinationPageId == null) {
             SessionMessages.addErrorMessage("You must select a destination");
             return new RedirectResolution(dispatch.getOriginalPath());
         }
@@ -601,11 +611,11 @@ public class PortletAction extends AbstractActionBean {
             if(page.getParent() == null) {
                 SessionMessages.addErrorMessage("You can't move the root page!");
             } else {
-                boolean detail = movePageDestination.endsWith("-detail");
+                boolean detail = destinationPageId.endsWith("-detail");
                 if(detail) {
-                    movePageDestination = movePageDestination.substring(0, movePageDestination.length() - 7);
+                    destinationPageId = destinationPageId.substring(0, destinationPageId.length() - 7);
                 }
-                Page newParent = model.getRootPage().findDescendantPageById(movePageDestination);
+                Page newParent = model.getRootPage().findDescendantPageById(destinationPageId);
                 if(newParent != null) {
                     page.getParent().removeChild(page);
                     if(detail) {
@@ -616,7 +626,60 @@ public class PortletAction extends AbstractActionBean {
                     saveModel();
                     return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
                 } else {
-                    SessionMessages.addErrorMessage("Invalid destination: " + movePageDestination);
+                    SessionMessages.addErrorMessage("Invalid destination: " + destinationPageId);
+                }
+            }
+        }
+        return new RedirectResolution(dispatch.getOriginalPath());
+    }
+
+    @RequiresAdministrator
+    public Resolution copyPage() {
+        if(destinationPageId == null) {
+            SessionMessages.addErrorMessage("You must select a destination");
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
+        if(fragment == null) {
+            SessionMessages.addErrorMessage("You must select a fragment");
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
+        Page page = dispatch.getLastPageInstance().getPage();
+        synchronized (application) {
+            if(page.getParent() == null) {
+                SessionMessages.addErrorMessage("You can't copy the root page!");
+            } else {
+                boolean detail = destinationPageId.endsWith("-detail");
+                if(detail) {
+                    int length = "-detail".length();
+                    destinationPageId = destinationPageId.substring(0, destinationPageId.length() - length);
+                }
+                final Page newParent = model.getRootPage().findDescendantPageById(destinationPageId);
+                if(newParent != null) {
+                    Page newPage;
+                    try {
+
+
+                        newPage = page.getClass().newInstance();
+                        BeanUtils.copyProperties(newPage, page);
+                        String pageId = RandomUtil.createRandomId();
+                        newPage.setId(pageId);
+                        newPage.setLayoutContainer(DEFAULT_LAYOUT_CONTAINER);
+                        newPage.setLayoutOrder("0");
+                    } catch (Exception e) {
+                        SessionMessages.addErrorMessage("Error copying page");
+                        logger.error("Error copying page", e);
+                        return new RedirectResolution(dispatch.getOriginalPath());
+                    }
+                    if(detail) {
+                        ((CrudPage) newParent).addDetailChild(newPage);
+                    } else {
+                        newParent.addChild(newPage);
+                    }
+                    throw new UnsupportedOperationException("TODO deep copy");
+                    //saveModel();
+                    //return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
+                } else {
+                    SessionMessages.addErrorMessage("Invalid destination: " + destinationPageId);
                 }
             }
         }
@@ -659,21 +722,20 @@ public class PortletAction extends AbstractActionBean {
         return newPageForm;
     }
 
-    public String getMovePageDestination() {
-        return movePageDestination;
+    public String getDestinationPageId() {
+        return destinationPageId;
     }
 
-    public void setMovePageDestination(String movePageDestination) {
-        this.movePageDestination = movePageDestination;
+    public void setDestinationPageId(String destinationPageId) {
+        this.destinationPageId = destinationPageId;
     }
 
-    //--------------------------------------------------------------------------
-    // Page crud fields
-    //--------------------------------------------------------------------------
+    public String getFragment() {
+        return fragment;
+    }
 
-    protected static final String[][] NEW_PAGE_SETUP_FIELDS = {
-            {"pageClassName", "fragment", "title", "description", "insertPositionName"}};
-    protected Form newPageForm;
-    protected String movePageDestination;
+    public void setFragment(String fragment) {
+        this.fragment = fragment;
+    }
 
 }
