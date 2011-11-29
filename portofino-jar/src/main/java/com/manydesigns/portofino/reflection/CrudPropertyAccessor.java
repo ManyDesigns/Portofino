@@ -68,10 +68,32 @@ public class CrudPropertyAccessor
     //**************************************************************************
 
     public CrudPropertyAccessor(@Nullable CrudProperty crudProperty,
-                                PropertyAccessor nestedAccessor) {
+                                PropertyAccessor nestedAccessor,
+                                boolean inKey) {
         super((crudProperty == null) ? null : crudProperty.getAnnotations());
         this.crudProperty = crudProperty;
         this.nestedAccessor = nestedAccessor;
+
+        Enabled enabledAnn = nestedAccessor.getAnnotation(Enabled.class);
+        boolean accessorEnabled = (enabledAnn == null || enabledAnn.value());
+
+        Insertable insertableAnn = nestedAccessor.getAnnotation(Insertable.class);
+        boolean accessorInsertable = (insertableAnn == null || insertableAnn.value());
+
+        Updatable updatableAnn = nestedAccessor.getAnnotation(Updatable.class);
+        boolean accessorUpdatable = (updatableAnn == null || updatableAnn.value());
+
+        InSummary inSummaryAnn = nestedAccessor.getAnnotation(InSummary.class);
+        boolean accessorInSummary = (inSummaryAnn == null || inSummaryAnn.value());
+
+        Searchable searchableAnn = nestedAccessor.getAnnotation(Searchable.class);
+        boolean accessorSearchable = (searchableAnn == null || searchableAnn.value());
+
+        boolean crudEnabled;
+        boolean crudInsertable;
+        boolean crudUpdatable;
+        boolean crudInSummary;
+        boolean crudSearchable;
 
         if (crudProperty != null) {
             String label = crudProperty.getLabel();
@@ -79,31 +101,24 @@ public class CrudPropertyAccessor
                 annotations.put(Label.class,
                         new LabelImpl(label));
             }
-            annotations.put(Searchable.class,
-                    new SearchableImpl(crudProperty.isSearchable()));
-            annotations.put(InSummary.class,
-                    new InSummaryImpl(crudProperty.isInSummary()));
-            annotations.put(Enabled.class,
-                    new EnabledImpl(crudProperty.isEnabled()));
-
-            //If the nested accessor is not insertable, this one won't be as well
-            Insertable insertableAnn = nestedAccessor.getAnnotation(Insertable.class);
-            if(insertableAnn != null && !insertableAnn.value()) {
-                annotations.put(Insertable.class, new InsertableImpl(false));
-            } else {
-                annotations.put(Insertable.class,
-                        new InsertableImpl(crudProperty.isInsertable()));
-            }
-
-            //If the nested accessor is not updatable, this one won't be as well
-            Updatable updatableAnn = nestedAccessor.getAnnotation(Updatable.class);
-            if(updatableAnn != null && !updatableAnn.value()) {
-                annotations.put(Updatable.class, new UpdatableImpl(false));
-            } else {
-                annotations.put(Updatable.class,
-                        new UpdatableImpl(crudProperty.isUpdatable()));
-            }
+            crudEnabled    = crudProperty.isEnabled();
+            crudSearchable = crudProperty.isSearchable();
+            crudInSummary  = crudProperty.isInSummary();
+            crudInsertable = crudProperty.isInsertable();
+            crudUpdatable  = crudProperty.isUpdatable();
+        } else {
+            crudEnabled    = inKey;
+            crudSearchable = false;
+            crudInSummary  = inKey;
+            crudInsertable = false;
+            crudUpdatable  = false;
         }
+
+        annotations.put(Searchable.class, new SearchableImpl(crudSearchable && accessorSearchable));
+        annotations.put(InSummary.class, new InSummaryImpl(crudInSummary && accessorInSummary));
+        annotations.put(Enabled.class, new EnabledImpl(crudEnabled && accessorEnabled));
+        annotations.put(Insertable.class, new InsertableImpl(crudInsertable && accessorInsertable));
+        annotations.put(Updatable.class, new UpdatableImpl(crudUpdatable && accessorUpdatable));
     }
 
 

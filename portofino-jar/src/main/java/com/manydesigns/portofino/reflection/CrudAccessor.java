@@ -34,6 +34,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.logic.CrudLogic;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.model.pages.crud.CrudProperty;
+import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,8 +85,9 @@ public class CrudAccessor
             CrudProperty crudProperty =
                     CrudLogic.findCrudPropertyByName(
                             crud, columnAccessor.getName());
+            boolean inKey = ArrayUtils.contains(keyColumnAccessors, columnAccessor);
             CrudPropertyAccessor propertyAccessor =
-                        new CrudPropertyAccessor(crudProperty, columnAccessor);
+                        new CrudPropertyAccessor(crudProperty, columnAccessor, inKey);
             propertyAccessors[i] = propertyAccessor;
             i++;
         }

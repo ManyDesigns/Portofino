@@ -31,10 +31,12 @@ package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.ShortName;
+import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.fields.*;
+import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
@@ -55,7 +57,6 @@ import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.logic.CrudLogic;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.datamodel.*;
@@ -76,6 +77,7 @@ import groovy.lang.GroovyObject;
 import groovy.lang.MissingMethodException;
 import groovy.lang.Script;
 import jxl.Workbook;
+import jxl.write.DateFormat;
 import jxl.write.*;
 import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
@@ -1251,7 +1253,7 @@ public class CrudAction extends PortletAction {
         WritableCellFormat formatCell = headerExcel();
         int l = 0;
         for (TableForm.Column col : tableForm.getColumns()) {
-            sheet.addCell(new Label(l, 0, col.getLabel(), formatCell));
+            sheet.addCell(new jxl.write.Label(l, 0, col.getLabel(), formatCell));
             l++;
         }
     }
@@ -1280,7 +1282,7 @@ public class CrudAction extends PortletAction {
                 sheet.addCell(number);
             }
         } else if (field instanceof PasswordField) {
-            Label label = new Label(j, i,
+            jxl.write.Label label = new jxl.write.Label(j, i,
                     PasswordField.PASSWORD_PLACEHOLDER);
             sheet.addCell(label);
         } else if (field instanceof DateField) {
@@ -1299,7 +1301,7 @@ public class CrudAction extends PortletAction {
                 sheet.addCell(dateCell);
             }
         } else {
-            Label label = new Label(j, i, field.getStringValue());
+            jxl.write.Label label = new jxl.write.Label(j, i, field.getStringValue());
             sheet.addCell(label);
         }
     }
@@ -1696,27 +1698,19 @@ public class CrudAction extends PortletAction {
         for (int i = 0; i < propertyAccessors.length; i++) {
             CrudPropertyEdit edit = new CrudPropertyEdit();
             PropertyAccessor propertyAccessor = propertyAccessors[i];
-            CrudProperty crudProperty =
-                    CrudLogic.findCrudPropertyByName(
-                            crud, propertyAccessor.getName());
             edit.name = propertyAccessor.getName();
-            if (crudProperty == null) {
-                // default values
-                edit.label = null;
-                edit.searchable = false;
-                edit.inSummary = ArrayUtils.contains(
-                        classAccessor.getKeyProperties(), propertyAccessor);
-                edit.enabled = true;
-                edit.updatable = true;
-                edit.insertable = true;
-            } else {
-                edit.label = crudProperty.getLabel();
-                edit.searchable = crudProperty.isSearchable();
-                edit.inSummary = crudProperty.isInSummary();
-                edit.enabled = crudProperty.isEnabled();
-                edit.insertable = crudProperty.isInsertable();
-                edit.updatable = crudProperty.isUpdatable();
-            }
+            Label labelAnn = propertyAccessor.getAnnotation(Label.class);
+            edit.label = labelAnn != null ? labelAnn.value() : null;
+            Enabled enabledAnn = propertyAccessor.getAnnotation(Enabled.class);
+            edit.enabled = enabledAnn != null && enabledAnn.value();
+            InSummary inSummaryAnn = propertyAccessor.getAnnotation(InSummary.class);
+            edit.inSummary = inSummaryAnn != null && inSummaryAnn.value();
+            Insertable insertableAnn = propertyAccessor.getAnnotation(Insertable.class);
+            edit.insertable = insertableAnn != null && insertableAnn.value();
+            Updatable updatableAnn = propertyAccessor.getAnnotation(Updatable.class);
+            edit.updatable = updatableAnn != null && updatableAnn.value();
+            Searchable searchableAnn = propertyAccessor.getAnnotation(Searchable.class);
+            edit.searchable = searchableAnn != null && searchableAnn.value();
             edits[i] = edit;
         }
     }
