@@ -89,17 +89,6 @@ function showCopyPageDialog(pageId, contextPath) {
                 "Copy": function() {
                     var form = $("#contentHeaderForm");
 
-                    /*var hiddenField = document.createElement("input");
-                    hiddenField.setAttribute("type", "hidden");
-                    hiddenField.setAttribute("name", "movePage");
-                    form.append(hiddenField);
-
-                    hiddenField = document.createElement("input");
-                    hiddenField.setAttribute("type", "hidden");
-                    hiddenField.setAttribute("name", "destinationPageId");
-                    hiddenField.setAttribute("value", $(this).find("#destinationPageId").val());
-                    form.append(hiddenField);*/
-
                     $(this).find("input, select").each(function(index, elem) {
                         elem = $(elem);
                         var hiddenField = document.createElement("input");

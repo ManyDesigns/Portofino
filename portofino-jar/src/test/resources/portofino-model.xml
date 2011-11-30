@@ -475,14 +475,15 @@
                         </table>
                         <table tableName="emailqueue" javaClass="com.manydesigns.portofino.system.model.email.EmailBean">
                             <columns>
-                                <column columnName="id"
-                                        columnType="IDENTITY"
-                                        javaType="java.lang.Long"
-                                        length="10"
-                                        scale="0"
+                                <column columnName="ID"
+                                        columnType="CHAR"
+                                        javaType="java.lang.String"
+                                        autoincrement="false"
+                                        jdbcType="1"
+                                        length="25"
                                         nullable="false"
-                                        autoincrement="true"
-                                        searchable="false"/>
+                                        propertyName="id"
+                                        scale="0" />
                                 <column columnName="subject"
                                         columnType="varchar"
                                         javaType="java.lang.String"

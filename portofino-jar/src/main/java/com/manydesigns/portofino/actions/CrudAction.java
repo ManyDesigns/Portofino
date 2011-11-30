@@ -205,7 +205,7 @@ public class CrudAction extends PortletAction {
         crudPage = getPageInstance().getPage();
         crud = crudPage.getCrud();
         availableSelectionProviders = new MultiHashMap();
-        if(crud != null) {
+        if(crud != null && crud.getActualDatabase() != null) {
             classAccessor = crudPageInstance.getClassAccessor();
             baseTable = crudPageInstance.getBaseTable();
             session = application.getSession(crud.getDatabase());

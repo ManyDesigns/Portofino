@@ -370,7 +370,7 @@ Struttura dell'XML:
                         <table javaClass="com.manydesigns.portofino.system.model.email.EmailBean" tableName="EMAILQUEUE">
                             <annotations/>
                             <columns>
-<column autoincrement="false" columnName="ID" columnType="CHAR" javaType="java.lang.Integer" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
+<column autoincrement="false" columnName="ID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="SUBJECT" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="100" nullable="true" propertyName="subject" scale="0">
