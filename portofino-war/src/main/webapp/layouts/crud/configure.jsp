@@ -12,6 +12,8 @@
         <script src="<stripes:url value="/ace-0.2.0/mode-groovy.js" />" type="text/javascript" charset="utf-8"></script>
         <script type="text/javascript">
             $(function() {
+                $("#scriptEditor").css('display', 'block');
+
                 var editor = ace.edit("scriptEditor");
 
                 var GroovyMode = require("ace/mode/groovy").Mode;
@@ -20,7 +22,6 @@
                 var textarea = $("#scriptEditorTextArea");
 
                 textarea.css('display', 'none');
-                $("#scriptEditor").css('display', 'block');
 
                 editor.getSession().setValue(textarea.val());
                 $('button[name=updateConfiguration]').click(function() {
