@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import javax.servlet.http.HttpServletRequest;
+import net.sourceforge.stripes.action.ActionBean;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,18 +41,18 @@ public class Dispatch {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    protected final HttpServletRequest request;
+    protected final String contextPath;
     protected final String originalPath;
-    protected final String rewrittenPath;
+    protected final Class<? extends ActionBean> actionBeanClass;
     protected final PageInstance[] pageInstancePath;
 
-    public Dispatch(HttpServletRequest request,
+    public Dispatch(String contextPath,
                     String originalPath,
-                    String rewrittenPath,
+                    Class<? extends ActionBean> actionBeanClass,
                     PageInstance... pageInstancePath) {
-        this.request = request;
+        this.contextPath = contextPath;
         this.originalPath = originalPath;
-        this.rewrittenPath = rewrittenPath;
+        this.actionBeanClass = actionBeanClass;
         this.pageInstancePath = pageInstancePath;
 
         String pathUrl = getPathUrl();
@@ -60,12 +60,12 @@ public class Dispatch {
 
     }
 
-    public HttpServletRequest getRequest() {
-        return request;
+    public String getContextPath() {
+        return contextPath;
     }
 
-    public String getRewrittenPath() {
-        return rewrittenPath;
+    public Class<? extends ActionBean> getActionBeanClass() {
+        return actionBeanClass;
     }
 
     public PageInstance[] getPageInstancePath() {
@@ -85,7 +85,6 @@ public class Dispatch {
     }
 
     public String getAbsoluteOriginalPath() {
-        String contextPath = request.getContextPath();
         if ("/".equals(contextPath)) {
             return getOriginalPath();
         } else {

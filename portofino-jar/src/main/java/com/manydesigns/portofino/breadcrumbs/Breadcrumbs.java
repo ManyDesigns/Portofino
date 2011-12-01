@@ -76,7 +76,7 @@ public class Breadcrumbs implements XhtmlFragment {
         items = new ArrayList<BreadcrumbItem>();
 
         StringBuilder sb = new StringBuilder();
-        sb.append(dispatch.getRequest().getContextPath());
+        sb.append(dispatch.getContextPath());
         for (int i = 1; i < upto; i++) {
             PageInstance current = dispatch.getPageInstancePath()[i];
             //Resolve references to treat Crud pages differently below

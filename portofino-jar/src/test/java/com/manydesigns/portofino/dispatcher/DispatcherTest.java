@@ -31,6 +31,8 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.AbstractPortofinoTest;
+import com.manydesigns.portofino.actions.CrudAction;
+import com.manydesigns.portofino.actions.chart.ChartAction;
 import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.RootPage;
@@ -77,7 +79,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNotNull(dispatch);
 
         assertEquals(originalPath, dispatch.getOriginalPath());
-        assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
+        assertEquals(CrudAction.class, dispatch.getActionBeanClass());
 
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
@@ -123,7 +125,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
             assertNotNull(dispatch);
 
             assertEquals(originalPath, dispatch.getOriginalPath());
-            assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
+            assertEquals(CrudAction.class, dispatch.getActionBeanClass());
 
             PageInstance[] pageInstancePath =
                     dispatch.getPageInstancePath();
@@ -168,7 +170,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNotNull(dispatch);
 
         assertEquals(originalPath, dispatch.getOriginalPath());
-        assertEquals(CHART_ACTION, dispatch.getRewrittenPath());
+        assertEquals(ChartAction.class, dispatch.getActionBeanClass());
 
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
@@ -214,7 +216,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNotNull(dispatch);
 
         assertEquals(originalPath, dispatch.getOriginalPath());
-        assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
+        assertEquals(CrudAction.class, dispatch.getActionBeanClass());
 
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
@@ -286,7 +288,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNotNull(dispatch);
 
         assertEquals(originalPath, dispatch.getOriginalPath());
-        assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
+        assertEquals(CrudAction.class, dispatch.getActionBeanClass());
 
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
@@ -342,7 +344,7 @@ public class DispatcherTest extends AbstractPortofinoTest {
         assertNotNull(dispatch);
 
         assertEquals(originalPath, dispatch.getOriginalPath());
-        assertEquals(CRUD_ACTION, dispatch.getRewrittenPath());
+        assertEquals(CrudAction.class, dispatch.getActionBeanClass());
 
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();

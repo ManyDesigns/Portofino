@@ -84,7 +84,7 @@ public class Navigation implements XhtmlFragment {
     //**************************************************************************
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
-        String contextPath = dispatch.getRequest().getContextPath();
+        String contextPath = dispatch.getContextPath();
         PageInstance rootPageInstance = dispatch.getRootPageInstance();
         List<PageInstance> pageInstances =
                 rootPageInstance.getChildPageInstances();

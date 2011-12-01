@@ -36,17 +36,13 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.PageReference;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
-import net.sourceforge.stripes.util.UrlBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Locale;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -91,17 +87,18 @@ public class PageReferenceAction extends PortletAction {
                 return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
             }
         } else {
-            //Never embed in this case - the referenced action will take
+            /*//Never embed in this case - the referenced action will take
             //care of it.
             String fwd = Dispatcher.getRewrittenPath(pageReference.getToPage());
-            return new ForwardResolution(fwd);
+            return new ForwardResolution(fwd);*/
+            throw new UnsupportedOperationException("Not yet implemented");
         }
     }
 
     @Button(list = "configuration", key = "commons.updateConfiguration")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configureReferencedPage() {
-        if(pageReference.getToPage() == null) {
+        /*if(pageReference.getToPage() == null) {
             SessionMessages.addErrorMessage("No referenced page specified");
             return configure();
         } else {
@@ -113,7 +110,8 @@ public class PageReferenceAction extends PortletAction {
             context.getRequest().setAttribute
                     ("cancelReturnUrl", cancelReturnUrlBuilder.toString());
             return new ForwardResolution(fwd).addParameter("configure");
-        }
+        }*/
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     public Resolution configure() {

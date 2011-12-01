@@ -104,7 +104,7 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
         PageInstance rootPageInstance = new PageInstance(application, model.getRootPage(), null);
         HttpServletRequest request = context.getRequest();
         String originalPath = ServletUtils.getOriginalPath(request);
-        dispatch = new Dispatch(request, originalPath, originalPath, rootPageInstance, pageInstance);
+        dispatch = new Dispatch(request.getContextPath(), originalPath, getClass(), rootPageInstance, pageInstance);
         Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
         request.setAttribute(RequestAttributes.DISPATCH, dispatch);
         request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);

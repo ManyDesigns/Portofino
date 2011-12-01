@@ -34,7 +34,6 @@ import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ApplicationStarter;
 import com.manydesigns.portofino.model.Model;
-import net.sourceforge.stripes.controller.StripesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,15 +100,16 @@ public class DispatcherFilter implements Filter {
             return;
         }
 
-        String rewrittenPath = dispatch.getRewrittenPath();
+        /*String rewrittenPath = dispatch.getRewrittenPath();
         RequestDispatcher requestDispatcher =
-                servletContext.getRequestDispatcher(rewrittenPath);
+                servletContext.getRequestDispatcher(rewrittenPath);*/
 
         Map<String, Object> savedAttributes =
                 saveAndResetRequestAttributes(request);
         request.setAttribute(RequestAttributes.DISPATCH, dispatch);
+        Dispatcher.setThreadDispatch(dispatch);
         try {
-            if(request.getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) == null) {
+            /*if(request.getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) == null) {
                 logger.debug("Forwarding '{}' to '{}'",
                     dispatch.getOriginalPath(),
                     rewrittenPath);
@@ -119,9 +119,13 @@ public class DispatcherFilter implements Filter {
                     dispatch.getOriginalPath(),
                     rewrittenPath);
                 requestDispatcher.include(request, response);
-            }
+            }*/
+
+            //Handle through the ModelActionResolver
+            chain.doFilter(request, response);
         } finally {
             restoreRequestAttributes(request, savedAttributes);
+            Dispatcher.removeCurrentDispatch();
         }
     }
 
