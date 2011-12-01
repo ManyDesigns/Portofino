@@ -18,24 +18,30 @@ import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.ModelActionResolver;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import com.manydesigns.portofino.util.ShortNameUtils;
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.StripesConstants;
+import net.sourceforge.stripes.controller.StripesFilter;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -44,6 +50,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -103,6 +113,13 @@ public class PortletAction extends AbstractActionBean {
     protected String fragment;
 
     //**************************************************************************
+    // Scripting
+    //**************************************************************************
+
+    protected String script;
+    protected File storageDirFile;
+
+    //**************************************************************************
     // Logging
     //**************************************************************************
 
@@ -118,6 +135,7 @@ public class PortletAction extends AbstractActionBean {
 
     @Before
     protected void prepare() {
+        storageDirFile = application.getAppStorageDir();
         dereferencePageInstance();
     }
 
@@ -475,8 +493,6 @@ public class PortletAction extends AbstractActionBean {
         return valid;
     }
 
-
-
     protected void updatePageConfiguration() {
         EditPage edit = new EditPage();
         pageConfigurationForm.writeToObject(edit);
@@ -496,6 +512,8 @@ public class PortletAction extends AbstractActionBean {
             SessionMessages.addWarningMessage(
                     "The page is not embedded and not included in navigation - it will only be reachable by URL or explicit linking.");
         }
+
+        updateScript();
     }
 
     //--------------------------------------------------------------------------
@@ -736,6 +754,62 @@ public class PortletAction extends AbstractActionBean {
 
     public void setFragment(String fragment) {
         this.fragment = fragment;
+    }
+
+    //--------------------------------------------------------------------------
+    // Scripting
+    //--------------------------------------------------------------------------
+
+    protected void prepareScript() {
+        String pageId = pageInstance.getPage().getId();
+        File file = ScriptingUtil.getGroovyScriptFile(storageDirFile, pageId);
+        if(file.exists()) {
+            try {
+                FileReader fr = new FileReader(file);
+                script = IOUtils.toString(fr);
+                IOUtils.closeQuietly(fr);
+            } catch (Exception e) {
+                logger.warn("Couldn't load script for page " + pageId, e);
+            }
+        }
+    }
+
+    protected void updateScript() {
+        File groovyScriptFile =
+                ScriptingUtil.getGroovyScriptFile(storageDirFile, pageInstance.getPage().getId());
+        if(!StringUtils.isBlank(script)) {
+            FileWriter fw = null;
+            try {
+                fw = new FileWriter(groovyScriptFile);
+                fw.write(script);
+                try {
+                    GroovyClassLoader loader = new GroovyClassLoader();
+                    loader.parseClass(script, groovyScriptFile.getAbsolutePath());
+                    if(this instanceof GroovyObject) {
+                        //Attempt to remove old instance of custom action bean
+                        //not guaranteed to work
+                        try {
+                            ModelActionResolver actionResolver =
+                                    (ModelActionResolver) StripesFilter.getConfiguration().getActionResolver();
+                            actionResolver.removeActionBean(getClass());
+                        } catch (Exception e) {
+                            logger.warn("Couldn't remove action bean " + this, e);
+                        }
+                    }
+                } catch (Exception e) {
+                    String pageId = pageInstance.getPage().getId();
+                    logger.warn("Couldn't compile script for page " + pageId, e);
+                    String msg = "Couldn't compile script - see logs for details";
+                    SessionMessages.addErrorMessage(msg);
+                }
+            } catch (IOException e) {
+                logger.error("Error writing script to " + groovyScriptFile, e);
+            } finally {
+                IOUtils.closeQuietly(fw);
+            }
+        } else {
+            groovyScriptFile.delete();
+        }
     }
 
 }

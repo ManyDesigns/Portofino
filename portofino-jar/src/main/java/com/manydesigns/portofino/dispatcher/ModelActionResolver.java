@@ -33,6 +33,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ApplicationStarter;
+import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.config.Configuration;
 import net.sourceforge.stripes.controller.NameBasedActionResolver;
@@ -82,9 +83,30 @@ public class ModelActionResolver extends NameBasedActionResolver {
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
         Dispatch dispatch = dispatcher.createDispatch(request.getContextPath(), path);
         if(dispatch != null) {
-            return dispatch.getActionBeanClass();
+            Class<? extends ActionBean> actionBeanClass = dispatch.getActionBeanClass();
+            if(GroovyObject.class.isAssignableFrom(actionBeanClass)) {
+                synchronized (this) {
+                    addActionBean(actionBeanClass);
+                }
+            }
+            return actionBeanClass;
         } else {
             return super.getActionBeanType(path);
+        }
+    }
+
+    @Override
+    public synchronized void removeActionBean(Class<? extends ActionBean> clazz) {
+        super.removeActionBean(clazz);
+    }
+
+    @Override
+    public String getUrlBinding(Class<? extends ActionBean> clazz) {
+        if(GroovyObject.class.isAssignableFrom(clazz)) {
+            //Meglio evitare conflitti con action configurate normalmente
+            return super.getUrlBinding(clazz) + "__groovy__";
+        } else {
+            return super.getUrlBinding(clazz);
         }
     }
 }

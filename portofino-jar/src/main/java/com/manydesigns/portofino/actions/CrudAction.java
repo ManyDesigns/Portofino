@@ -56,6 +56,7 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
+import com.manydesigns.portofino.dispatcher.ModelActionResolver;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
@@ -73,8 +74,8 @@ import com.manydesigns.portofino.system.model.users.annotations.SupportsPermissi
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
 import groovy.lang.Binding;
+import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
-import groovy.lang.MissingMethodException;
 import groovy.lang.Script;
 import jxl.Workbook;
 import jxl.write.DateFormat;
@@ -86,11 +87,11 @@ import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.controller.StripesFilter;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fop.apps.FOPException;
@@ -108,7 +109,6 @@ import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.lang.Boolean;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.*;
@@ -185,14 +185,6 @@ public class CrudAction extends PortletAction {
     private static final String TEMPLATE_FOP_READ = "templateFOP-Read.xsl";
 
     //**************************************************************************
-    // Scripting
-    //**************************************************************************
-
-    protected GroovyObject groovyObject;
-    protected String script;
-    protected File storageDirFile;
-
-    //**************************************************************************
     // Setup
     //**************************************************************************
 
@@ -215,36 +207,6 @@ public class CrudAction extends PortletAction {
 
             setupSelectionProviders();
         }
-
-        storageDirFile = application.getAppStorageDir();
-
-        if(script == null) {
-            prepareScript();
-        }
-    }
-
-    protected void prepareScript() {
-        File file = ScriptingUtil.getGroovyScriptFile(storageDirFile, crudPage.getId());
-        if(file.exists()) {
-            try {
-                FileReader fr = new FileReader(file);
-                script = IOUtils.toString(fr);
-                IOUtils.closeQuietly(fr);
-                String path = file.getAbsolutePath();
-                groovyObject = compileScript(script, path);
-            } catch (Exception e) {
-                logger.warn("Couldn't load script for crud page " + crudPage.getId(), e);
-            }
-        }
-    }
-
-    protected GroovyObject compileScript(String script, String path) {
-        GroovyObject groovyObject = ScriptingUtil.getGroovyObject(script, path);
-        Script scriptObject = (Script) groovyObject;
-        Binding binding = new Binding(ElementsThreadLocals.getOgnlContext());
-        binding.setVariable("actionBean", this);
-        scriptObject.setBinding(binding);
-        return groovyObject;
     }
 
     private void setupSelectionProviders() {
@@ -1548,60 +1510,21 @@ public class CrudAction extends PortletAction {
     // Hooks/scripting
     //**************************************************************************
 
-    protected void createSetup(Object object) {
-        String methodName = "createSetup";
-        Object methodArgs = new Object[] { object };
-        invokeGroovyMethod(methodName, methodArgs);
-    }
+    protected void createSetup(Object object) {}
 
     protected boolean createValidate(Object object) {
-        String methodName = "createValidate";
-        Object methodArgs = new Object[] { object };
-        return invokeBooleanGroovyMethod(methodName, methodArgs);
+        return true;
     }
 
-    protected void createPostProcess(Object object) {
-        String methodName = "createPostProcess";
-        Object methodArgs = new Object[] { object };
-        invokeGroovyMethod(methodName, methodArgs);
-    }
+    protected void createPostProcess(Object object) {}
 
-    protected void editSetup(Object object) {
-        String methodName = "editSetup";
-        Object methodArgs = new Object[] { object };
-        invokeGroovyMethod(methodName, methodArgs);
-    }
+    protected void editSetup(Object object) {}
 
     protected boolean editValidate(Object object) {
-        String methodName = "editValidate";
-        Object methodArgs = new Object[] { object };
-        return invokeBooleanGroovyMethod(methodName, methodArgs);
+        return true;
     }
 
-    protected void editPostProcess(Object object) {
-        String methodName = "editPostProcess";
-        Object methodArgs = new Object[] { object };
-        invokeGroovyMethod(methodName, methodArgs);
-    }
-
-    protected Object invokeGroovyMethod(String methodName, Object methodArgs) {
-        if(groovyObject != null) {
-            try {
-                logger.debug("Invoking Groovy method {}", methodName);
-                return groovyObject.invokeMethod(methodName, methodArgs);
-            } catch(MissingMethodException e) {
-                logger.debug("The Groovy method {} is missing", methodName);
-            }
-        } else {
-            logger.debug("No script for this page: {}", crudPage.getId());
-        }
-        return null;
-    }
-
-    protected boolean invokeBooleanGroovyMethod(String methodName, Object methodArgs) {
-        Object result = invokeGroovyMethod(methodName, methodArgs);
-        return !(result instanceof Boolean && (Boolean) result == false);
-    }
+    protected void editPostProcess(Object object) {}
 
     //**************************************************************************
     // Configuration
@@ -1629,6 +1552,10 @@ public class CrudAction extends PortletAction {
 
         if(selectionProviderEdits != null) {
             selectionProvidersForm.readFromObject(selectionProviderEdits);
+        }
+
+        if(script == null) {
+            prepareScript();
         }
 
         return new ForwardResolution("/layouts/crud/configure.jsp");
@@ -1779,30 +1706,6 @@ public class CrudAction extends PortletAction {
 
                 if(!availableSelectionProviders.isEmpty()) {
                     updateSelectionProviders();
-                }
-
-                File groovyScriptFile =
-                        ScriptingUtil.getGroovyScriptFile(storageDirFile, crudPage.getId());
-                if(!StringUtils.isBlank(script)) {
-                    FileWriter fw = null;
-                    try {
-                        fw = new FileWriter(groovyScriptFile);
-                        fw.write(script);
-                        try {
-                            compileScript(script, groovyScriptFile.getAbsolutePath());
-                        } catch (Exception e) {
-                            logger.warn("Couldn't compile script for crud page " + crudPage.getId(), e);
-                            String msg = "Couldn't compile script - see logs for details";
-                            SessionMessages.addErrorMessage(msg);
-                            return new ForwardResolution("/layouts/crud/configure.jsp");
-                        }
-                    } catch (IOException e) {
-                        logger.error("Error writing script to " + groovyScriptFile, e);
-                    } finally {
-                        IOUtils.closeQuietly(fw);
-                    }
-                } else {
-                    groovyScriptFile.delete();
                 }
 
                 saveModel();

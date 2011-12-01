@@ -37,8 +37,10 @@ import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
 import groovy.lang.GroovyShell;
 import ognl.OgnlContext;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 
 /*
@@ -110,4 +112,19 @@ public class ScriptingUtil {
         return RandomUtil.getCodeFile(storageDir, GROOVY_FILE_NAME_PATTERN, pageId);
     }
 
+    public static final GroovyClassLoader GROOVY_CLASS_LOADER =
+            new GroovyClassLoader(ScriptingUtil.class.getClassLoader());
+
+    public static Class<?> getGroovyClass(File storageDirFile, String id) throws IOException {
+        File scriptFile = getGroovyScriptFile(storageDirFile, id);
+        if(!scriptFile.exists()) {
+            return null;
+        }
+        FileReader fr = new FileReader(scriptFile);
+        String script = IOUtils.toString(fr);
+        IOUtils.closeQuietly(fr);
+        String path = scriptFile.getAbsolutePath();
+        Class groovyClass = GROOVY_CLASS_LOADER.parseClass(script, path);
+        return groovyClass;
+    }
 }

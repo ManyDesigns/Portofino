@@ -38,12 +38,14 @@ import com.manydesigns.portofino.actions.chart.ChartAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.*;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
 import net.sourceforge.stripes.action.ActionBean;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -123,31 +125,62 @@ public class Dispatcher {
         return new Dispatch(contextPath, path, actionBeanClass, pageArray);
     }
 
-    public static Class<? extends ActionBean> getActionBeanClass(Page page) throws ClassNotFoundException {
+    public Class<? extends ActionBean> getActionBeanClass(Page page) throws ClassNotFoundException {
         if(page == null) {
             return null;
         }
-        String className = page.getUrl();
-        if (className == null) {
-            if (page instanceof TextPage) {
-                return TextAction.class;
-            } else if (page instanceof ChartPage) {
-                return ChartAction.class;
-            }/* else if (page instanceof FolderPage) {
-                className = "/actions/index";
-            }*/ else if (page instanceof CrudPage) {
-                return CrudAction.class;
-            } else if (page instanceof JspPage) {
-                return JspAction.class;
-            } else if (page instanceof PageReference) {
-                return PageReferenceAction.class;
-            } else if (page instanceof RootPage) {
-                return null;
-            } else {
-                throw new Error("Unrecognized page type: " + page.getClass().getName());
-            }
+        Class<?> actionClass = page.getActualActionClass();
+        if (!isValidActionClass(actionClass)) {
+            actionClass = getScriptActionClass(page);
+            page.setActualActionClass(actionClass);
         }
-        return (Class<? extends ActionBean>) Class.forName(className);
+        if (isValidActionClass(actionClass)) {
+            return (Class<? extends ActionBean>) actionClass;
+        } else {
+            return getDefaultActionClass(page);
+        }
+    }
+
+    protected boolean isValidActionClass(Class<?> actionClass) {
+        if(actionClass == null) {
+            return false;
+        }
+        if(!ActionBean.class.isAssignableFrom(actionClass)) {
+            logger.error("Action class must implement ActionBean: " + actionClass);
+            return false;
+        }
+        return true;
+    }
+
+    public Class<?> getScriptActionClass(Page page) {
+        try {
+            File storageDirFile = application.getAppStorageDir();
+            String id = page.getId();
+            return ScriptingUtil.getGroovyClass(storageDirFile, id);
+        } catch (Exception e) {
+            logger.error("Couldn't load script for " + page, e);
+            return null;
+        }
+    }
+
+    protected static Class<? extends ActionBean> getDefaultActionClass(Page page) {
+        if (page instanceof TextPage) {
+            return TextAction.class;
+        } else if (page instanceof ChartPage) {
+            return ChartAction.class;
+        }/* else if (page instanceof FolderPage) {
+            className = "/actions/index";
+        }*/ else if (page instanceof CrudPage) {
+            return CrudAction.class;
+        } else if (page instanceof JspPage) {
+            return JspAction.class;
+        } else if (page instanceof PageReference) {
+            return PageReferenceAction.class;
+        } else if (page instanceof RootPage) {
+            return null;
+        } else {
+            throw new Error("Unrecognized page type: " + page.getClass().getName());
+        }
     }
 
     private void visitPagesInPath(List<PageInstance> path,

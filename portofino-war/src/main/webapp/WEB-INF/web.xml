@@ -90,48 +90,6 @@
         <dispatcher>FORWARD</dispatcher>
         <dispatcher>INCLUDE</dispatcher>
     </filter-mapping>
-
-    <!--<filter>
-		<display-name>Stripes Filter</display-name>
-		<filter-name>StripesFilter</filter-name>
-		<filter-class>net.sourceforge.stripes.controller.StripesFilter</filter-class>
-		<init-param>
-			<param-name>ActionResolver.Packages</param-name>
-			<param-value>com.manydesigns.portofino.actions</param-value>
-		</init-param>
-        <init-param>
-            <param-name>Interceptor.Classes</param-name>
-            <param-value>
-                com.manydesigns.portofino.interceptors.SecurityInterceptor,
-                com.manydesigns.portofino.interceptors.ApplicationInterceptor,
-                com.manydesigns.portofino.interceptors.InjectionInterceptor,
-                com.manydesigns.portofino.interceptors.GuardsInterceptor
-            </param-value>
-        </init-param>
-        <init-param>
-            <param-name>LocalePicker.Locales</param-name>
-            <param-value>it_IT</param-value>
-        </init-param>
- 	</filter>
-
-    <filter-mapping>
-		<filter-name>StripesFilter</filter-name>
-		<servlet-name>StripesDispatcher</servlet-name>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-	</filter-mapping>
-
-	<servlet>
-		<servlet-name>StripesDispatcher</servlet-name>
-		<servlet-class>net.sourceforge.stripes.controller.DispatcherServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>StripesDispatcher</servlet-name>
-		<url-pattern>/actions/*</url-pattern>
-	</servlet-mapping>-->
     
     <context-param>
       <param-name>

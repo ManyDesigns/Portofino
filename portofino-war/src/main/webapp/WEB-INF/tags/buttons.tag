@@ -12,6 +12,7 @@
 <%@ tag import="java.util.List" %>
 <%@ tag import="java.util.MissingResourceException" %>
 <%@ tag import="com.manydesigns.portofino.buttons.GuardType" %>
+<%@ tag import="org.apache.taglibs.standard.tag.common.fmt.BundleSupport" %>
 
 <%@ attribute name="list" required="true" %>
 <%@ attribute name="cssClass" required="false" %>
@@ -47,9 +48,9 @@
             }
             buffer.addAttribute("name", handler.getName());
             %>
-                <fmt:message key="<%= button.getButton().key() %>" var="__buttonValue" scope="request" />
+                <fmt:message key="<%= button.getButton().key() %>" var="__buttonValue" scope="page" />
             <%
-            String value = (String) request.getAttribute("__buttonValue");
+            String value = (String) jspContext.getAttribute("__buttonValue");
             if(cssClass != null) {
                 buffer.addAttribute("class", cssClass);
             }
