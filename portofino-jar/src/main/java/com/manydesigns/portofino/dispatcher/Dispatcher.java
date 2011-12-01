@@ -64,8 +64,6 @@ public class Dispatcher {
 
     protected final Application application;
 
-    protected static final ThreadLocal<Dispatch> currentDispatch = new ThreadLocal<Dispatch>();
-
     public Dispatcher(Application application) {
         this.application = application;
     }
@@ -73,10 +71,10 @@ public class Dispatcher {
     public Dispatch createDispatch(HttpServletRequest request) {
         String originalPath = ServletUtils.getOriginalPath(request);
 
-        return createDispatch(request, originalPath);
+        return createDispatch(request.getContextPath(), originalPath);
     }
 
-    public Dispatch createDispatch(HttpServletRequest request, String path) {
+    public Dispatch createDispatch(String contextPath, String path) {
         if(path.endsWith(".jsp")) {
             logger.debug("Path is a JSP page ({}), not dispatching.", path);
             return null;
@@ -122,7 +120,7 @@ public class Dispatcher {
                 new PageInstance[pagePath.size()];
         pagePath.toArray(pageArray);
 
-        return new Dispatch(request.getContextPath(), path, actionBeanClass, pageArray);
+        return new Dispatch(contextPath, path, actionBeanClass, pageArray);
     }
 
     public static Class<? extends ActionBean> getActionBeanClass(Page page) throws ClassNotFoundException {
@@ -144,7 +142,7 @@ public class Dispatcher {
             } else if (page instanceof PageReference) {
                 return PageReferenceAction.class;
             } else if (page instanceof RootPage) {
-                return null; //TODO
+                return null;
             } else {
                 throw new Error("Unrecognized page type: " + page.getClass().getName());
             }
@@ -274,15 +272,4 @@ public class Dispatcher {
         }
     }
 
-    public static void setThreadDispatch(Dispatch dispatch) {
-        currentDispatch.set(dispatch);
-    }
-
-    public static Dispatch getCurrentDispatch() {
-        return currentDispatch.get();
-    }
-
-    public static void removeCurrentDispatch() {
-        currentDispatch.remove();
-    }
 }

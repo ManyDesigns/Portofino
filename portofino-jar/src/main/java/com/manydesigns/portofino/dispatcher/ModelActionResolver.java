@@ -29,15 +29,18 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.application.ApplicationStarter;
 import net.sourceforge.stripes.action.ActionBean;
-import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.config.Configuration;
 import net.sourceforge.stripes.controller.NameBasedActionResolver;
-import net.sourceforge.stripes.exception.StripesServletException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -52,34 +55,32 @@ public class ModelActionResolver extends NameBasedActionResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelActionResolver.class);
 
+    protected Dispatcher dispatcher;
+    protected ServletContext servletContext;
+
     @Override
     public void init(Configuration configuration) throws Exception {
         super.init(configuration);
-        configuration.getServletContext();
-    }
+        servletContext = configuration.getServletContext();
+        logger.debug("Retrieving application starter");
+        ApplicationStarter applicationStarter =
+                (ApplicationStarter) servletContext.getAttribute(
+                        ApplicationAttributes.APPLICATION_STARTER);
 
-    @Override
-    public ActionBean getActionBean(ActionBeanContext context, String urlBinding) throws StripesServletException {
-        HttpServletRequest request = context.getRequest();
-        Dispatch dispatch = (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
-        if(dispatch != null) {
-            Class<? extends ActionBean> actionBeanClass = dispatch.getActionBeanClass();
-            try {
-                ActionBean actionBean = makeNewActionBean(actionBeanClass, context);
-                setActionBeanContext(actionBean, context);
-                request.setAttribute(urlBinding, actionBean); //???
-                assertGetContextWorks(actionBean);
-                return actionBean;
-            } catch (Exception e) {
-                logger.error("Coulnd't instantiate action bean", e);
-            }
+        logger.debug("Retrieving application");
+        Application application;
+        try {
+            application = applicationStarter.getApplication();
+            dispatcher = new Dispatcher(application);
+        } catch (Exception e) {
+            throw new ServletException(e);
         }
-        return super.getActionBean(context, urlBinding);
     }
 
     @Override
     public Class<? extends ActionBean> getActionBeanType(String path) {
-        Dispatch dispatch = Dispatcher.getCurrentDispatch();
+        HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+        Dispatch dispatch = dispatcher.createDispatch(request.getContextPath(), path);
         if(dispatch != null) {
             return dispatch.getActionBeanClass();
         } else {
