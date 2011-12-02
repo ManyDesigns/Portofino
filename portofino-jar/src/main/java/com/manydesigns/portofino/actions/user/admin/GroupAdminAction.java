@@ -132,6 +132,31 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
         }
     }
 
+    @Override
+    protected String getEditView() {
+        return "/layouts/admin/groups/groupEdit.jsp";
+    }
+
+    @Override
+    protected String getBulkEditView() {
+        return "/layouts/admin/groups/groupBulkEdit.jsp";
+    }
+
+    @Override
+    protected String getCreateView() {
+        return "/layouts/admin/groups/groupCreate.jsp";
+    }
+
+    @Override
+    protected String getReadView() {
+        return "/layouts/admin/groups/groupRead.jsp";
+    }
+
+    @Override
+    protected String getSearchView() {
+        return "/layouts/admin/groups/groupSearch.jsp";
+    }
+
     //Do not show the configure button
     @Override
     public Resolution configure() {

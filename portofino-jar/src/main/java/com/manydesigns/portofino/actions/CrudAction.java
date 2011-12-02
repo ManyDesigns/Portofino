@@ -56,7 +56,6 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
-import com.manydesigns.portofino.dispatcher.ModelActionResolver;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
@@ -68,15 +67,10 @@ import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import com.manydesigns.portofino.model.pages.crud.SelectionProviderReference;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import com.manydesigns.portofino.system.model.users.annotations.SupportsPermissions;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
-import groovy.lang.Binding;
-import groovy.lang.GroovyClassLoader;
-import groovy.lang.GroovyObject;
-import groovy.lang.Script;
 import jxl.Workbook;
 import jxl.write.DateFormat;
 import jxl.write.*;
@@ -87,11 +81,9 @@ import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sourceforge.stripes.action.*;
-import net.sourceforge.stripes.controller.StripesFilter;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fop.apps.FOPException;
@@ -368,11 +360,7 @@ public class CrudAction extends PortletAction {
 //            loadObjects();
             setupTableForm(Mode.VIEW);
 
-            String fwd = crudPage.getSearchUrl();
-            if(StringUtils.isEmpty(fwd)) {
-                fwd = "/layouts/crud/search.jsp";
-            }
-            return forwardToPortletPage(fwd);
+            return forwardToPortletPage(getSearchView());
         } catch(Exception e) {
             logger.warn("Crud not correctly configured", e);
             return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
@@ -389,11 +377,7 @@ public class CrudAction extends PortletAction {
             loadObjects();
             setupTableForm(Mode.VIEW);
             tableForm.setSelectable(false);
-            String fwd = crudPage.getEmbeddedSearchUrl();
-            if(StringUtils.isEmpty(fwd)) {
-                fwd = "/layouts/crud/embedded-search.jsp";
-            }
-            return new ForwardResolution(fwd);
+            return new ForwardResolution(getEmbeddedSearchView());
         } catch(Exception e) {
             logger.error("Crud not correctly configured", e);
             return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
@@ -492,11 +476,7 @@ public class CrudAction extends PortletAction {
 
         setupReturnToParentTarget();
 
-        String fwd = crudPage.getReadUrl();
-        if(StringUtils.isEmpty(fwd)) {
-            fwd = "/layouts/crud/read.jsp";
-        }
-        return forwardToPortletPage(fwd);
+        return forwardToPortletPage(getReadView());
     }
 
     protected void refreshBlobDownloadHref() {
@@ -553,15 +533,7 @@ public class CrudAction extends PortletAction {
         createSetup(object);
         form.readFromObject(object);
 
-        return forwardToCreatePage();
-    }
-
-    protected Resolution forwardToCreatePage() {
-        String fwd = crudPage.getCreateUrl();
-        if(StringUtils.isEmpty(fwd)) {
-            fwd = "/layouts/crud/create.jsp";
-        }
-        return new ForwardResolution(fwd);
+        return new ForwardResolution(getCreateView());
     }
 
     @Button(list = "crud-create", key = "commons.save", order = 1)
@@ -584,7 +556,7 @@ public class CrudAction extends PortletAction {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
                     SessionMessages.addErrorMessage(rootCauseMessage);
-                    return forwardToCreatePage();
+                    return new ForwardResolution(getCreateView());
                 }
                 pk = pkHelper.generatePkString(object);
                 String url = dispatch.getOriginalPath() + "/" + pk;
@@ -592,7 +564,7 @@ public class CrudAction extends PortletAction {
             }
         }
 
-        return forwardToCreatePage();
+        return new ForwardResolution(getCreateView());
     }
 
     //**************************************************************************
@@ -605,15 +577,11 @@ public class CrudAction extends PortletAction {
         setupForm(Mode.EDIT);
         editSetup(object);
         form.readFromObject(object);
-        return forwardToEditPage();
+        return new ForwardResolution(getEditView());
     }
 
-    protected Resolution forwardToEditPage() {
-        String fwd = crudPage.getEditUrl();
-        if(StringUtils.isEmpty(fwd)) {
-            fwd = "/layouts/crud/edit.jsp";
-        }
-        return new ForwardResolution(fwd);
+    protected String getEditView() {
+        return "/layouts/crud/edit.jsp";
     }
 
     @Button(list = "crud-edit", key = "commons.update", order = 1)
@@ -634,14 +602,14 @@ public class CrudAction extends PortletAction {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
                     SessionMessages.addErrorMessage(rootCauseMessage);
-                    return forwardToEditPage();
+                    return new ForwardResolution(getEditView());
                 }
                 SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
                 return new RedirectResolution(dispatch.getOriginalPath())
                         .addParameter(SEARCH_STRING_PARAM, searchString);
             }
         }
-        return forwardToEditPage();
+        return new ForwardResolution(getEditView());
     }
 
     //**************************************************************************
@@ -667,11 +635,7 @@ public class CrudAction extends PortletAction {
 
         setupForm(Mode.BULK_EDIT);
 
-        String fwd = crudPage.getBulkEditUrl();
-        if(StringUtils.isEmpty(fwd)) {
-            fwd = "/layouts/crud/bulk-edit.jsp";
-        }
-        return new ForwardResolution(fwd);
+        return new ForwardResolution(getBulkEditView());
     }
 
     @Button(list = "crud-bulk-edit", key = "commons.update", order = 1)
@@ -1518,6 +1482,7 @@ public class CrudAction extends PortletAction {
 
     protected void createPostProcess(Object object) {}
 
+
     protected void editSetup(Object object) {}
 
     protected boolean editValidate(Object object) {
@@ -1525,6 +1490,26 @@ public class CrudAction extends PortletAction {
     }
 
     protected void editPostProcess(Object object) {}
+
+    protected String getBulkEditView() {
+        return "/layouts/crud/bulk-edit.jsp";
+    }
+
+    protected String getCreateView() {
+        return "/layouts/crud/create.jsp";
+    }
+
+    protected String getReadView() {
+        return "/layouts/crud/read.jsp";
+    }
+
+    protected String getSearchView() {
+        return "/layouts/crud/search.jsp";
+    }
+
+    protected String getEmbeddedSearchView() {
+        return "/layouts/crud/embedded-search.jsp";
+    }
 
     //**************************************************************************
     // Configuration

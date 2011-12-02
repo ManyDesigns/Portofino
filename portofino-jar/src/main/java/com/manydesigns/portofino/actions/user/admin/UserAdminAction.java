@@ -223,6 +223,31 @@ public class UserAdminAction extends CrudAction implements AdminAction {
         return true;
     }
 
+    @Override
+    protected String getEditView() {
+        return "/layouts/admin/users/userEdit.jsp";
+    }
+
+    @Override
+    protected String getBulkEditView() {
+        return "/layouts/admin/users/userBulkEdit.jsp";
+    }
+
+    @Override
+    protected String getCreateView() {
+        return "/layouts/admin/users/userCreate.jsp";
+    }
+
+    @Override
+    protected String getReadView() {
+        return "/layouts/admin/users/userRead.jsp";
+    }
+
+    @Override
+    protected String getSearchView() {
+        return "/layouts/admin/users/userSearch.jsp";
+    }
+
     @Button(list = "contentButtons", key = "commons.returnToPages", order = 1)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
