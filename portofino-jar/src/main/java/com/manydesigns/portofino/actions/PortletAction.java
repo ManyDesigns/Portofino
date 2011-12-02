@@ -38,6 +38,8 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.StripesConstants;
 import net.sourceforge.stripes.controller.StripesFilter;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.converters.ClassConverter;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
@@ -568,7 +570,7 @@ public class PortletAction extends AbstractActionBean {
                     InsertPosition.valueOf(newPage.getInsertPositionName());
             String pageClassName = newPage.getPageClassName();
             Page page = (Page) ReflectionUtil.newInstance(pageClassName);
-            BeanUtils.copyProperties(page, newPage);
+            copyPage(newPage, page);
             String pageId = RandomUtil.createRandomId();
             page.setId(pageId);
             page.setLayoutContainer(DEFAULT_LAYOUT_CONTAINER);
@@ -598,6 +600,12 @@ public class PortletAction extends AbstractActionBean {
         } else {
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
         }
+    }
+
+    protected void copyPage(Page src, Page dest) throws IllegalAccessException, InvocationTargetException {
+        //To handle actualActionClass = null, ClassConverter must have a null return value
+        BeanUtilsBean.getInstance().getConvertUtils().register(new ClassConverter(null), Class.class);
+        BeanUtils.copyProperties(dest, src);
     }
 
     @RequiresAdministrator
@@ -675,10 +683,8 @@ public class PortletAction extends AbstractActionBean {
                 if(newParent != null) {
                     Page newPage;
                     try {
-
-
                         newPage = page.getClass().newInstance();
-                        BeanUtils.copyProperties(newPage, page);
+                        copyPage(page, newPage);
                         String pageId = RandomUtil.createRandomId();
                         newPage.setId(pageId);
                         newPage.setLayoutContainer(DEFAULT_LAYOUT_CONTAINER);
@@ -710,8 +716,8 @@ public class PortletAction extends AbstractActionBean {
                         new String[] {
                                 CrudPage.class.getName(), ChartPage.class.getName(),
                                 TextPage.class.getName(), JspPage.class.getName(),
-                                PageReference.class.getName() },
-                        new String[] { "Crud", "Chart", "Text", "JSP", "Reference to another page" });
+                                /*PageReference.class.getName()*/ },
+                        new String[] { "Crud", "Chart", "Text", "JSP", /*"Reference to another page"*/ });
         //root + at least 1 child
         boolean includeSiblingOption = dispatch.getPageInstancePath().length > 2;
         int fieldCount = includeSiblingOption ? 3 : 2;

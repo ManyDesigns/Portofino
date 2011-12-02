@@ -76,8 +76,15 @@
 
         <fieldset id="crudSelectionProvidersFieldset" class="mde-form-fieldset"
                   style="padding-top: 1em; margin-top: 1em;">
-            <legend>Selection Providers</legend>
-            <mde:write name="actionBean" property="selectionProvidersForm"/>
+            <legend><fmt:message key="layouts.crud.configure.selectionProviders" /></legend>
+            <c:choose>
+                <c:when test="${not empty actionBean.selectionProvidersForm}">
+                    <mde:write name="actionBean" property="selectionProvidersForm"/>
+                </c:when>
+                <c:otherwise>
+                    <fmt:message key="layouts.crud.configure.noSelectionProviders" />
+                </c:otherwise>
+            </c:choose>
         </fieldset>
 
         <fieldset id="scriptFieldset" class="mde-form-fieldset"

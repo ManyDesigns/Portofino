@@ -646,8 +646,12 @@ public class CrudAction extends PortletAction {
         if (form.validate()) {
             for (String current : selection) {
                 loadObject(current);
+                editSetup(object);
                 form.writeToObject(object);
-                session.update(baseTable.getActualEntityName(), object);
+                if(editValidate(object)) {
+                    session.update(baseTable.getActualEntityName(), object);
+                }
+                editPostProcess(object);
             }
             try {
                 session.getTransaction().commit();
@@ -674,17 +678,20 @@ public class CrudAction extends PortletAction {
     @Button(list = "crud-read", key = "commons.delete", order = 2)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
-        session.delete(baseTable.getActualEntityName(), object);
-        try {
-            session.getTransaction().commit();
-            SessionMessages.addInfoMessage("DELETE avvenuto con successo");
+        if(deleteValidate(object)) {
+            session.delete(baseTable.getActualEntityName(), object);
+            try {
+                deletePostProcess(object);
+                session.getTransaction().commit();
+                SessionMessages.addInfoMessage("DELETE avvenuto con successo");
 
-            // invalidate the pk on this crud unit
-            pk = null;
-        } catch (Exception e) {
-            String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-            logger.debug(rootCauseMessage, e);
-            SessionMessages.addErrorMessage(rootCauseMessage);
+                // invalidate the pk on this crud unit
+                pk = null;
+            } catch (Exception e) {
+                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                logger.debug(rootCauseMessage, e);
+                SessionMessages.addErrorMessage(rootCauseMessage);
+            }
         }
         int lastSlashPos = dispatch.getOriginalPath().lastIndexOf("/");
         String url = dispatch.getOriginalPath().substring(0, lastSlashPos);
@@ -695,6 +702,7 @@ public class CrudAction extends PortletAction {
     @Button(list = "crud-search", key = "commons.delete", order = 3)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution bulkDelete() {
+        int deleted = 0;
         if (selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
@@ -704,13 +712,17 @@ public class CrudAction extends PortletAction {
         for (String current : selection) {
             Serializable pkObject = pkHelper.parsePkString(current);
             Object obj = QueryUtils.getObjectByPk(application, baseTable, pkObject);
-            session.delete(baseTable.getActualEntityName(), obj);
+            if(deleteValidate(obj)) {
+                session.delete(baseTable.getActualEntityName(), obj);
+                deletePostProcess(obj);
+                deleted++;
+            }
         }
         try {
             session.getTransaction().commit();
             SessionMessages.addInfoMessage(MessageFormat.format(
             "DELETE di {0} oggetti avvenuto con successo",
-            selection.length));
+            deleted));
         } catch (Exception e) {
             logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
             SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
@@ -1490,6 +1502,14 @@ public class CrudAction extends PortletAction {
     }
 
     protected void editPostProcess(Object object) {}
+
+
+    protected boolean deleteValidate(Object object) {
+        return true;
+    }
+
+    protected void deletePostProcess(Object object) {}
+    
 
     protected String getBulkEditView() {
         return "/layouts/crud/bulk-edit.jsp";
