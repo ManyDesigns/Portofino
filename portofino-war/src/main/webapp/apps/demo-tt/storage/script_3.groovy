@@ -1,18 +1,23 @@
-import java.util.Date;
+import com.manydesigns.portofino.actions.CrudAction
 
-def createSetup(object) {
-    object.project_id = project.id;
-    object.lock_version = 0;
-    object.done_ratio = 0;
-    object.author_id = 1;
-}
+class _3 extends CrudAction {
 
-def createValidate(object) {
-    Date now = new Date();
-    object.created_on = now;
-    object.updated_on = now;
-}
+    void createSetup(object) {
+        object.project_id = project.id;
+        object.lock_version = 0;
+        object.done_ratio = 0;
+        object.author_id = 1;
+    }
 
-def editValidate(object) {
-    object.updated_on = new Date();
+    boolean createValidate(object) {
+        Date now = new Date();
+        object.created_on = now;
+        object.updated_on = now;
+        return true;
+    }
+
+    boolean editValidate(object) {
+        object.updated_on = new Date();
+        return true;
+    }
 }

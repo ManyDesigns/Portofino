@@ -10,6 +10,7 @@
             <p>Deleting it will also delete its children:</p>
             <%= displayPageChildrenAsList(portofinoPage) %>
     <%  } %>
+    <input type="hidden" name="deletePage" value="action" />
 </div><%!
     private void displayPageChildrenAsList(Page portofinoPage, XhtmlBuffer buf) {
         if(!portofinoPage.getChildPages().isEmpty()) {

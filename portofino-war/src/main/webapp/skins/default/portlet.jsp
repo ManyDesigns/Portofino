@@ -9,7 +9,7 @@
     <div class="portlet">
         <jsp:useBean id="actionBean" scope="request"
                      type="com.manydesigns.portofino.actions.PortletAction"/>
-        <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post">
+        <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
             <div class="portletHeader">
                 <stripes:layout-component name="portletHeader">
                     <div class="yui-g">

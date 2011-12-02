@@ -20,6 +20,17 @@ function fixSideBar() {
     )
 }
 
+function copyFormAsHiddenFields(source, form) {
+    source.find("input, select").each(function(index, elem) {
+        elem = $(elem);
+        var hiddenField = document.createElement("input");
+        hiddenField.setAttribute("type", "hidden");
+        hiddenField.setAttribute("name", elem.attr('name'));
+        hiddenField.setAttribute("value", elem.val());
+        form.append(hiddenField);
+    });
+}
+
 function confirmDeletePage(pageId, contextPath) {
     var dialogDiv = $(document.createElement("div"));
     dialogDiv.load(contextPath + "/actions/page?confirmDelete&pageId=" + pageId, function() {
@@ -28,10 +39,7 @@ function confirmDeletePage(pageId, contextPath) {
             buttons: {
                 "Delete": function() {
                     var form = $("#contentHeaderForm");
-                    var hiddenField = document.createElement("input");
-                    hiddenField.setAttribute("type", "hidden");
-                    hiddenField.setAttribute("name", "deletePage");
-                    form.append(hiddenField);
+                    copyFormAsHiddenFields($(this), form);
                     form.submit();
                     $(this).dialog("close");
                 },
@@ -54,18 +62,7 @@ function showMovePageDialog(pageId, contextPath) {
             buttons: {
                 "Move": function() {
                     var form = $("#contentHeaderForm");
-
-                    var hiddenField = document.createElement("input");
-                    hiddenField.setAttribute("type", "hidden");
-                    hiddenField.setAttribute("name", "movePage");
-                    form.append(hiddenField);
-
-                    hiddenField = document.createElement("input");
-                    hiddenField.setAttribute("type", "hidden");
-                    hiddenField.setAttribute("name", "destinationPageId");
-                    hiddenField.setAttribute("value", $(this).find("#destinationPageId").val());
-                    form.append(hiddenField);
-
+                    copyFormAsHiddenFields($(this), form);
                     form.submit();
                     $(this).dialog("close");
                 },
@@ -88,16 +85,7 @@ function showCopyPageDialog(pageId, contextPath) {
             buttons: {
                 "Copy": function() {
                     var form = $("#contentHeaderForm");
-
-                    $(this).find("input, select").each(function(index, elem) {
-                        elem = $(elem);
-                        var hiddenField = document.createElement("input");
-                        hiddenField.setAttribute("type", "hidden");
-                        hiddenField.setAttribute("name", elem.attr('name'));
-                        hiddenField.setAttribute("value", elem.val());
-                        form.append(hiddenField);
-                    });
-
+                    copyFormAsHiddenFields($(this), form);
                     form.submit();
                     $(this).dialog("close");
                 },

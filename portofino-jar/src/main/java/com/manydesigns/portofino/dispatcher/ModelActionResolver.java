@@ -80,8 +80,7 @@ public class ModelActionResolver extends NameBasedActionResolver {
 
     @Override
     public Class<? extends ActionBean> getActionBeanType(String path) {
-        HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-        Dispatch dispatch = dispatcher.createDispatch(request.getContextPath(), path);
+        Dispatch dispatch = getDispatch(path);
         if(dispatch != null) {
             Class<? extends ActionBean> actionBeanClass = dispatch.getActionBeanClass();
             if(GroovyObject.class.isAssignableFrom(actionBeanClass)) {
@@ -93,6 +92,21 @@ public class ModelActionResolver extends NameBasedActionResolver {
         } else {
             return super.getActionBeanType(path);
         }
+    }
+
+    @Override
+    public String getUrlBindingFromPath(String path) {
+        Dispatch dispatch = getDispatch(path);
+        if(dispatch != null) {
+            return path;
+        } else {
+            return super.getUrlBindingFromPath(path);
+        }
+    }
+
+    protected Dispatch getDispatch(String path) {
+        HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+        return dispatcher.createDispatch(request.getContextPath(), path);
     }
 
     @Override
