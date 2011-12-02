@@ -6,7 +6,7 @@
     <groupId>com.manydesigns</groupId>
     <artifactId>portofino</artifactId>
     <packaging>pom</packaging>
-    <version>4.0.beta5</version>
+    <version>4.0.rc1</version>
     <name>manydesigns-portofino</name>
     <url>http://www.manydesigns.com/</url> 
     <properties>
