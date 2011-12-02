@@ -57,6 +57,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.*;
 
 @RequiresPermissions(level = AccessLevel.VIEW)
@@ -475,6 +476,10 @@ public class PortletAction extends AbstractActionBean {
         edit.showInNavigation = page.isShowInNavigation();
         pageConfigurationForm.readFromObject(edit);
         title = page.getTitle();
+
+        if(script == null) {
+            prepareScript();
+        }
     }
 
     protected void readPageConfigurationFromRequest() {
@@ -777,7 +782,24 @@ public class PortletAction extends AbstractActionBean {
             } catch (Exception e) {
                 logger.warn("Couldn't load script for page " + pageId, e);
             }
+        } else {
+            String template = getScriptTemplate();
+            String className = pageId;
+            if(Character.isDigit(className.charAt(0))) {
+                className = "_" + className;
+            }
+            if(template != null) {
+                try {
+                    script = template.replace("__CLASS_NAME__", className);
+                } catch (Exception e) {
+                    logger.warn("Invalid default script template: " + template, e);
+                }
+            }
         }
+    }
+
+    public String getScriptTemplate() {
+        return null;
     }
 
     protected void updateScript() {
@@ -816,6 +838,14 @@ public class PortletAction extends AbstractActionBean {
         } else {
             groovyScriptFile.delete();
         }
+    }
+
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
     }
 
 }

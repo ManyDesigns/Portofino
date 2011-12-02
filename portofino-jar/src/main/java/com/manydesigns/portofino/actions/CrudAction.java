@@ -84,6 +84,7 @@ import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fop.apps.FOPException;
@@ -161,6 +162,22 @@ public class CrudAction extends PortletAction {
     public List objects;
     public Object object;
     public Session session;
+
+    //--------------------------------------------------------------------------
+    // Scripting
+    //--------------------------------------------------------------------------
+
+    public static final String SCRIPT_TEMPLATE;
+
+    static {
+        String scriptTemplate;
+        try {
+            scriptTemplate = IOUtils.toString(CrudAction.class.getResourceAsStream("crud/script_template.txt"));
+        } catch (Exception e) {
+            scriptTemplate = null;
+        }
+        SCRIPT_TEMPLATE = scriptTemplate;
+    }
 
     //**************************************************************************
     // Logging
@@ -1486,6 +1503,11 @@ public class CrudAction extends PortletAction {
     // Hooks/scripting
     //**************************************************************************
 
+    @Override
+    public String getScriptTemplate() {
+        return SCRIPT_TEMPLATE;
+    }
+
     protected void createSetup(Object object) {}
 
     protected boolean createValidate(Object object) {
@@ -1557,10 +1579,6 @@ public class CrudAction extends PortletAction {
 
         if(selectionProviderEdits != null) {
             selectionProvidersForm.readFromObject(selectionProviderEdits);
-        }
-
-        if(script == null) {
-            prepareScript();
         }
 
         return new ForwardResolution("/layouts/crud/configure.jsp");
@@ -1934,15 +1952,7 @@ public class CrudAction extends PortletAction {
     public TableForm getSelectionProvidersForm() {
         return selectionProvidersForm;
     }
-
-    public String getScript() {
-        return script;
-    }
-
-    public void setScript(String script) {
-        this.script = script;
-    }
-
+    
     public Integer getFirstResult() {
         return firstResult;
     }
