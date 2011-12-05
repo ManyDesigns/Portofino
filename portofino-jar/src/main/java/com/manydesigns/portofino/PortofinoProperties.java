@@ -91,5 +91,9 @@ public final class PortofinoProperties {
     public static final String GROUP_REGISTERED = "group.registered";
     public static final String GROUP_ADMINISTRATORS = "group.administrators";
 
+    //Hibernate properties
+    public static final String HIBERNATE_SHOW_SQL = "hibernate.show_sql";
+
+
     private PortofinoProperties() {}
 }

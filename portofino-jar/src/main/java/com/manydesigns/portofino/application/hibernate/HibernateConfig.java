@@ -31,6 +31,7 @@ package com.manydesigns.portofino.application.hibernate;
 
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.connections.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
@@ -70,7 +71,7 @@ import java.util.List;
 public class HibernateConfig {
 
     protected final ConnectionProvider connectionProvider;
-    private static final String SHOW_SQL = "true";
+    protected final org.apache.commons.configuration.Configuration portofinoConfiguration;
     private static final boolean LAZY = true;
     public static final Logger logger =
             LoggerFactory.getLogger(HibernateConfig.class);
@@ -79,8 +80,10 @@ public class HibernateConfig {
     private static String trueString = "T";
     private static String falseString = "F";
 
-    public HibernateConfig(ConnectionProvider connectionProvider) {
+    public HibernateConfig(ConnectionProvider connectionProvider,
+                           org.apache.commons.configuration.Configuration portofinoConfiguration) {
         this.connectionProvider = connectionProvider;
+        this.portofinoConfiguration = portofinoConfiguration;
     }
 
     public Configuration buildSessionFactory(Database database) {
@@ -102,7 +105,9 @@ public class HibernateConfig {
                             "org.hibernate.context.ThreadLocalSessionContext")
                     .setProperty("org.hibernate.hql.ast.AST", "true")
                     .setProperty("hibernate.globally_quoted_identifiers", "false");
-            configuration.setProperty("hibernate.show_sql", SHOW_SQL);
+            configuration.setProperty("hibernate.show_sql",
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.HIBERNATE_SHOW_SQL));
             Mappings mappings = configuration.createMappings();
 
             //Class Mapping

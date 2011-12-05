@@ -1879,7 +1879,7 @@
             </textPage>
             <crudPage detailLayoutContainer="contentLayoutLeft" detailLayoutOrder="1" description="Projects" fragment="projects" id="1" layoutContainer="default" layoutOrder="2" showInNavigation="true" title="Projects">
                 <childPages>
-                    <chartPage database="redmine" legend="issues" name="Issues by status" orientation="HORIZONTAL" query="select status_id, count(*), status.name&#xD;&#xA;from issues join issue_statuses status on status_id = status.id&#xD;&#xA;group by status_id" type="PIE" urlExpression="" description="Issues by status" fragment="report" id="wkqw5aqvlad9yphty2o0qbl8l" layoutContainer="default" layoutOrder="0" showInNavigation="true" title="report">
+                    <chartPage database="redmine" legend="issues" name="Issues by status" orientation="HORIZONTAL" query="select &quot;status_id&quot;, count(*), status.&quot;name&quot;&#xD;&#xA;from &quot;issues&quot; join &quot;issue_statuses&quot; status on &quot;status_id&quot; = status.&quot;id&quot;&#xD;&#xA;group by &quot;status_id&quot;" type="PIE" urlExpression="" description="Issues by status" fragment="report" id="wkqw5aqvlad9yphty2o0qbl8l" layoutContainer="default" layoutOrder="0" showInNavigation="true" title="report">
                         <childPages/>
                         <permissions/>
                     </chartPage>

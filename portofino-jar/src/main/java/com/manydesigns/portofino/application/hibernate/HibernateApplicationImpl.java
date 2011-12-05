@@ -252,7 +252,7 @@ public class HibernateApplicationImpl implements Application {
             if (connectionProvider.getStatus()
                     .equals(ConnectionProvider.STATUS_CONNECTED)) {
                 HibernateConfig builder =
-                        new HibernateConfig(connectionProvider);
+                        new HibernateConfig(connectionProvider, portofinoConfiguration);
                 String trueString = database.getTrueString();
                 if(trueString != null) {
                     builder.setTrueString(
