@@ -43,33 +43,49 @@ public class RewriterTest extends TestCase {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public static final Pattern FILTER_PATTERN = Pattern.compile("^/apps/[^/]+/(?!web).*$");
+    public static final Pattern FILTER_NOT_WEB_PATTERN = Pattern.compile("^/apps/[^/]+/(?!web).*$");
+    public static final Pattern FILTER_PARENT_DIR_PATTERN = Pattern.compile("^/apps/(?=.*(\\.|%2e)(\\.|%2e)).*$");
 
-    public void testPattern() {
-        assertFalse(FILTER_PATTERN.matcher("/apps/test/web/test.jsp").matches());
-        assertFalse(FILTER_PATTERN.matcher("/apps/test/web/").matches());
-        assertFalse(FILTER_PATTERN.matcher("/apps/test/web").matches());
-        assertTrue(FILTER_PATTERN.matcher("/apps/test/groovy").matches());
-        assertTrue(FILTER_PATTERN.matcher("/apps/test/groovy/").matches());
-        assertTrue(FILTER_PATTERN.matcher("/apps/test/groovy/test.groovy").matches());
-        assertTrue(FILTER_PATTERN.matcher("/apps/test/groovy/web").matches());
+    public void testNotWebPattern() {
+        assertFalse(FILTER_NOT_WEB_PATTERN.matcher("/apps/test/web/test.jsp").matches());
+        assertFalse(FILTER_NOT_WEB_PATTERN.matcher("/apps/test/web/").matches());
+        assertFalse(FILTER_NOT_WEB_PATTERN.matcher("/apps/test/web").matches());
+        assertTrue(FILTER_NOT_WEB_PATTERN.matcher("/apps/test/groovy").matches());
+        assertTrue(FILTER_NOT_WEB_PATTERN.matcher("/apps/test/groovy/").matches());
+        assertTrue(FILTER_NOT_WEB_PATTERN.matcher("/apps/test/groovy/test.groovy").matches());
+        assertTrue(FILTER_NOT_WEB_PATTERN.matcher("/apps/test/groovy/web").matches());
 
-        assertFalse(FILTER_PATTERN.matcher("/apps/test-2/web/test.jsp").matches());
-        assertFalse(FILTER_PATTERN.matcher("/apps/test-2/web/").matches());
-        assertFalse(FILTER_PATTERN.matcher("/apps/test-2/web").matches());
-        assertTrue(FILTER_PATTERN.matcher("/apps/test-2/groovy").matches());
-        assertTrue(FILTER_PATTERN.matcher("/apps/test-2/groovy/").matches());
-        assertTrue(FILTER_PATTERN.matcher("/apps/test-2/groovy/test.groovy").matches());
-        assertTrue(FILTER_PATTERN.matcher("/apps/test-2/groovy/web").matches());
+        assertFalse(FILTER_NOT_WEB_PATTERN.matcher("/apps/test-2/web/test.jsp").matches());
+        assertFalse(FILTER_NOT_WEB_PATTERN.matcher("/apps/test-2/web/").matches());
+        assertFalse(FILTER_NOT_WEB_PATTERN.matcher("/apps/test-2/web").matches());
+        assertTrue(FILTER_NOT_WEB_PATTERN.matcher("/apps/test-2/groovy").matches());
+        assertTrue(FILTER_NOT_WEB_PATTERN.matcher("/apps/test-2/groovy/").matches());
+        assertTrue(FILTER_NOT_WEB_PATTERN.matcher("/apps/test-2/groovy/test.groovy").matches());
+        assertTrue(FILTER_NOT_WEB_PATTERN.matcher("/apps/test-2/groovy/web").matches());
 
-        assertFalse(FILTER_PATTERN.matcher("/apps/test_3/web/test.jsp").matches());
-        assertFalse(FILTER_PATTERN.matcher("/apps/test_3/web/").matches());
-        assertFalse(FILTER_PATTERN.matcher("/apps/test_3/web").matches());
-        assertTrue(FILTER_PATTERN.matcher("/apps/test_3/groovy").matches());
-        assertTrue(FILTER_PATTERN.matcher("/apps/test_3/groovy/").matches());
-        assertTrue(FILTER_PATTERN.matcher("/apps/test_3/groovy/test.groovy").matches());
-        assertTrue(FILTER_PATTERN.matcher("/apps/test_3/groovy/web").matches());
+        assertFalse(FILTER_NOT_WEB_PATTERN.matcher("/apps/test_3/web/test.jsp").matches());
+        assertFalse(FILTER_NOT_WEB_PATTERN.matcher("/apps/test_3/web/").matches());
+        assertFalse(FILTER_NOT_WEB_PATTERN.matcher("/apps/test_3/web").matches());
+        assertTrue(FILTER_NOT_WEB_PATTERN.matcher("/apps/test_3/groovy").matches());
+        assertTrue(FILTER_NOT_WEB_PATTERN.matcher("/apps/test_3/groovy/").matches());
+        assertTrue(FILTER_NOT_WEB_PATTERN.matcher("/apps/test_3/groovy/test.groovy").matches());
+        assertTrue(FILTER_NOT_WEB_PATTERN.matcher("/apps/test_3/groovy/web").matches());
     }
 
+    public void testParentDirPattern() {
+        assertTrue(FILTER_PARENT_DIR_PATTERN.matcher("/apps/test/web/../groovy").matches());
+        assertTrue(FILTER_PARENT_DIR_PATTERN.matcher("/apps/test/web/../groovy/").matches());
+        assertTrue(FILTER_PARENT_DIR_PATTERN.matcher("/apps/test/web/../groovy/test.groovy").matches());
+        assertTrue(FILTER_PARENT_DIR_PATTERN.matcher("/apps/test/web/../groovy/web").matches());
+
+        assertTrue(FILTER_PARENT_DIR_PATTERN.matcher("/apps/test/web/foo/../../groovy").matches());
+        assertTrue(FILTER_PARENT_DIR_PATTERN.matcher("/apps/test/web/foo/../../groovy/").matches());
+        assertTrue(FILTER_PARENT_DIR_PATTERN.matcher("/apps/test/web/foo/../../groovy/test.groovy").matches());
+        assertTrue(FILTER_PARENT_DIR_PATTERN.matcher("/apps/test/web/foo/../../groovy/web").matches());
+
+        assertTrue(FILTER_PARENT_DIR_PATTERN.matcher("/apps/test/web/%2e%2e/groovy").matches());
+        assertTrue(FILTER_PARENT_DIR_PATTERN.matcher("/apps/test/web/%2e./groovy").matches());
+        assertTrue(FILTER_PARENT_DIR_PATTERN.matcher("/apps/test/web/.%2e/groovy").matches());
+    }
 
 }
