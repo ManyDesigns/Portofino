@@ -69,7 +69,7 @@ public class CrudPageInstance extends PageInstance {
         ClassAccessor tmpClassAccessor = null;
         Table tmpBaseTable = null;
         PkHelper tmpPkHelper = null;
-        if(crud != null) {
+        if(crud != null && crud.getActualTable() != null) {
             try {
                 tmpClassAccessor = application.getCrudAccessor(crud);
                 tmpBaseTable = crud.getActualTable();

@@ -18,10 +18,12 @@ class _1 extends CrudAction {
         Date now = new Date();
         object.created_on = now;
         object.updated_on = now;
+        return true;
     }
     
     boolean editValidate(object) {
         object.updated_on = new Date();
+        return true;
     }
 
     @Button(list = "crud-search", key="Hello!")

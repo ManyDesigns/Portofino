@@ -131,7 +131,9 @@ public class Crud implements ModelObject {
 
     public void init(Model model) {
         actualDatabase = DataModelLogic.findDatabaseByName(model, database);
-        actualTable = QueryUtils.getTableFromQueryString(actualDatabase, query);
+        if(actualDatabase != null) {
+            actualTable = QueryUtils.getTableFromQueryString(actualDatabase, query);
+        }
     }
 
     public void link(Model model) {}
