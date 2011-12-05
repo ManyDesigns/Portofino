@@ -30,11 +30,11 @@
                                     class="arrow-4">Edit page layout</button>
                             <button name="reloadModel" class="refresh">Reload model</button>
                             <button name="pagePermissions" class="person">Page permissions</button>
-                            <%--<button class="copy"
+                            <button class="copy"
                                     onclick="showCopyPageDialog(
                                                 '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
                                                 '<%= request.getContextPath() %>');
-                                            return false;">Copy page</button>--%>
+                                            return false;">Copy page</button>
                             <button name="newPage" class="plusthick">Add page</button>
                             <button name="deletePage" class="minusthick"
                                     onclick="confirmDeletePage(

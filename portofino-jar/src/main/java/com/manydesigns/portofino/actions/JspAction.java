@@ -194,6 +194,10 @@ public class JspAction extends PortletAction {
         return jspPage;
     }
 
+    public String getJsp() {
+        return jsp;
+    }
+
     public Form getForm() {
         return form;
     }

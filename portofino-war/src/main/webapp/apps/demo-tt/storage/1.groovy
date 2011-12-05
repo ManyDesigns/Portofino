@@ -1,8 +1,13 @@
 import com.manydesigns.portofino.actions.CrudAction
 import com.manydesigns.portofino.buttons.annotations.Button
+import com.manydesigns.portofino.model.pages.AccessLevel
+import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions
+import com.manydesigns.portofino.system.model.users.annotations.SupportsPermissions
 import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
 
+@SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
+@RequiresPermissions(level = AccessLevel.VIEW)
 class _1 extends CrudAction {
 
     void createSetup(object) {

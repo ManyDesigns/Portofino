@@ -23,6 +23,8 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
@@ -52,12 +54,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
 import java.util.*;
 
 @RequiresPermissions(level = AccessLevel.VIEW)
@@ -575,7 +577,7 @@ public class PortletAction extends AbstractActionBean {
                     InsertPosition.valueOf(newPage.getInsertPositionName());
             String pageClassName = newPage.getPageClassName();
             Page page = (Page) ReflectionUtil.newInstance(pageClassName);
-            copyPage(newPage, page);
+            copyModelObject(newPage, page);
             String pageId = RandomUtil.createRandomId();
             page.setId(pageId);
             page.setLayoutContainer(DEFAULT_LAYOUT_CONTAINER);
@@ -607,7 +609,7 @@ public class PortletAction extends AbstractActionBean {
         }
     }
 
-    protected void copyPage(Page src, Page dest) throws IllegalAccessException, InvocationTargetException {
+    protected void copyModelObject(ModelObject src, ModelObject dest) throws IllegalAccessException, InvocationTargetException {
         //To handle actualActionClass = null, ClassConverter must have a null return value
         BeanUtilsBean.getInstance().getConvertUtils().register(new ClassConverter(null), Class.class);
         BeanUtils.copyProperties(dest, src);
@@ -687,26 +689,43 @@ public class PortletAction extends AbstractActionBean {
                 final Page newParent = model.getRootPage().findDescendantPageById(destinationPageId);
                 if(newParent != null) {
                     Page newPage;
-                    try {
+                    /*try {
                         newPage = page.getClass().newInstance();
-                        copyPage(page, newPage);
-                        String pageId = RandomUtil.createRandomId();
-                        newPage.setId(pageId);
+                        copyModelObject(page, newPage);
+                        //String pageId = RandomUtil.createRandomId();
+                        //newPage.setId(pageId);
                         newPage.setLayoutContainer(DEFAULT_LAYOUT_CONTAINER);
                         newPage.setLayoutOrder("0");
                     } catch (Exception e) {
                         SessionMessages.addErrorMessage("Error copying page");
                         logger.error("Error copying page", e);
                         return new RedirectResolution(dispatch.getOriginalPath());
+                    }*/
+                    Model tmpModel = new Model();
+                    tmpModel.setRootPage(new RootPage());
+                    tmpModel.getRootPage().getChildPages().add(page);
+                    try {
+                        JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
+                        Marshaller marshaller = jc.createMarshaller();
+                        StringWriter sw = new StringWriter();
+                        marshaller.marshal(tmpModel, sw);
+                        Unmarshaller unmarshaller = jc.createUnmarshaller();
+                        tmpModel = (Model) unmarshaller.unmarshal(new StringReader(sw.toString()));
+                    } catch (JAXBException e) {
+                        SessionMessages.addErrorMessage("Error copying page");
+                        logger.error("Error copying page", e);
+                        return new RedirectResolution(dispatch.getOriginalPath());
                     }
+                    newPage = tmpModel.getRootPage().getChildPages().get(0);
+                    newPage.setFragment(fragment);
+                    new CopyVisitor().visit(newPage);
                     if(detail) {
                         ((CrudPage) newParent).addDetailChild(newPage);
                     } else {
                         newParent.addChild(newPage);
                     }
-                    throw new UnsupportedOperationException("TODO deep copy");
-                    //saveModel();
-                    //return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
+                    saveModel();
+                    return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
                 } else {
                     SessionMessages.addErrorMessage("Invalid destination: " + destinationPageId);
                 }
@@ -714,6 +733,70 @@ public class PortletAction extends AbstractActionBean {
         }
         return new RedirectResolution(dispatch.getOriginalPath());
     }
+
+    protected class CopyVisitor extends ModelVisitor {
+
+        @Override
+        public void visitNodeBeforeChildren(ModelObject node) {
+            if(node instanceof Page) {
+                Page page = (Page) node;
+                final String oldPageId = page.getId();
+                final String pageId = RandomUtil.createRandomId();
+                page.setId(pageId);
+                File storageDirFile = application.getAppStorageDir();
+                File[] resources = storageDirFile.listFiles(new FilenameFilter() {
+                    public boolean accept(File dir, String name) {
+                        return name.startsWith(oldPageId + ".");
+                    }
+                });
+                for(File res : resources) {
+                    File dest = new File(storageDirFile, pageId + res.getName().substring(oldPageId.length()));
+                    FileInputStream fis = null;
+                    FileOutputStream fos = null;
+                    try {
+                        fis = new FileInputStream(res);
+                        fos = new FileOutputStream(dest);
+                        IOUtils.copy(fis, fos);
+                    } catch (IOException e) {
+                        logger.error("Couldn't copy resource file " + res + " to " + dest, e);
+                    } finally {
+                        IOUtils.closeQuietly(fis);
+                        IOUtils.closeQuietly(fos);
+                    }
+                }
+            }
+        }
+
+    }
+
+/*
+    //TODO copiare risorse (file)
+    protected class CopyVisitor extends ModelVisitor {
+
+        protected Deque<ModelObject> parents = new LinkedList<ModelObject>();
+
+        public CopyVisitor(ModelObject root) {
+            parents.push(root);
+        }
+
+        @Override
+        public void visitNodeBeforeChildren(ModelObject node) {
+            ModelObject newNode = (ModelObject) ReflectionUtil.newInstance(node.getClass());
+            try {
+                copyModelObject(node, newNode);
+                newNode.afterUnmarshal(null, parents.element());
+                parents.push(newNode);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void visitNodeAfterChildren(ModelObject node) {
+            parents.pop();
+        }
+    }
+    */
 
     private void prepareNewPageForm() {
         SelectionProvider classSelectionProvider =

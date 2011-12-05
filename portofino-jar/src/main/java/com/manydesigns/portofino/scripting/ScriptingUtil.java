@@ -53,7 +53,7 @@ public class ScriptingUtil {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public static final String GROOVY_FILE_NAME_PATTERN = "script_{0}.groovy";
+    public static final String GROOVY_FILE_NAME_PATTERN = "{0}.groovy";
 
     public static Object runScript(String script,
                                    String scriptLanguage,

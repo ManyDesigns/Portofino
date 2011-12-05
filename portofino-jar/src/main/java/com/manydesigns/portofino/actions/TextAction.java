@@ -58,8 +58,8 @@ public class TextAction extends PortletAction {
             "Copyright (c) 2005-2011, ManyDesigns srl";
     public static final String CONTENT_ENCODING = "UTF-8";
     public static final String EMPTY_STRING = "";
-    public static final String TEXT_FILE_NAME_PATTERN = "text-{0}.html";
-    public static final String ATTACHMENT_FILE_NAME_PATTERN = "attachment-{0}.data";
+    public static final String TEXT_FILE_NAME_PATTERN = "{0}.html";
+    public static final String ATTACHMENT_FILE_NAME_PATTERN = "{0}.data";
 
     public String content;
     public String[] selection;
