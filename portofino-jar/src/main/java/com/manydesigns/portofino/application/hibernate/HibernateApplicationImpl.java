@@ -56,6 +56,7 @@ import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -735,15 +736,18 @@ public class HibernateApplicationImpl implements Application {
         ConfigurationResourceBundle bundle = resourceBundles.get(locale);
         if(bundle == null) {
             ResourceBundle parentBundle = ResourceBundle.getBundle("portofino-messages", locale);
-            locale = parentBundle.getLocale();
-            org.apache.commons.configuration.Configuration configuration;
+            PropertiesConfiguration configuration;
             try {
-                String resourceName = getBundleFileName("portofino-messages", locale);
-                File bundleFile = new File(appDir, resourceName);
+                File bundleFile = getBundleFile(locale);
+                if(!bundleFile.exists() && !locale.equals(parentBundle.getLocale())) {
+                    bundleFile = getBundleFile(parentBundle.getLocale());
+                }
                 if(!bundleFile.exists()) {
                     return parentBundle;
                 }
                 configuration = new PropertiesConfiguration(bundleFile);
+                FileChangedReloadingStrategy reloadingStrategy = new FileChangedReloadingStrategy();
+                configuration.setReloadingStrategy(reloadingStrategy);
                 bundle = new ConfigurationResourceBundle(configuration);
                 bundle.setParent(parentBundle);
                 resourceBundles.put(locale, bundle);
@@ -753,6 +757,11 @@ public class HibernateApplicationImpl implements Application {
             }
         }
         return bundle;
+    }
+
+    protected File getBundleFile(Locale locale) {
+        String resourceName = getBundleFileName("portofino-messages", locale);
+        return new File(appDir, resourceName);
     }
 
 }
