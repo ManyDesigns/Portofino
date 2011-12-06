@@ -123,13 +123,12 @@
         <dispatcher>INCLUDE</dispatcher>
     </filter-mapping>
     
-    <context-param>
+    <!--<context-param>
       <param-name>
         javax.servlet.jsp.jstl.fmt.localizationContext
       </param-name>
       <param-value>StripesResources</param-value>
-    </context-param>
-
+    </context-param>-->
 
     <session-config>
         <session-timeout>60</session-timeout>

@@ -48,13 +48,17 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.util.ConfigurationResourceBundle;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -78,6 +82,8 @@ import java.io.OutputStream;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -689,4 +695,64 @@ public class HibernateApplicationImpl implements Application {
     public File getAppWebDir() {
         return appWebDir;
     }
+
+    //**************************************************************************
+    // I18n
+    //**************************************************************************
+
+    private final ConcurrentMap<Locale, ConfigurationResourceBundle> resourceBundles =
+            new ConcurrentHashMap<Locale, ConfigurationResourceBundle>();
+
+    protected String getBundleFileName(String baseName, Locale locale) {
+        return getBundleName(baseName, locale) + ".properties";
+    }
+
+    protected String getBundleName(String baseName, Locale locale) {
+        if(locale == Locale.ROOT) {
+            return baseName;
+        }
+
+        String language = locale.getLanguage();
+        String country = locale.getCountry();
+        String variant = locale.getVariant();
+
+        if (StringUtils.isBlank(language) && StringUtils.isBlank(country) && StringUtils.isBlank(variant)) {
+            return baseName;
+        }
+
+        String name = baseName + "_";
+        if (!StringUtils.isBlank(variant)) {
+            name += language + "_" + country + "_" + variant;
+        } else if (!StringUtils.isBlank(country)) {
+            name += language + "_" + country;
+        } else {
+            name += language;
+        }
+        return name;
+    }
+
+    public ResourceBundle getBundle(Locale locale) {
+        ConfigurationResourceBundle bundle = resourceBundles.get(locale);
+        if(bundle == null) {
+            ResourceBundle parentBundle = ResourceBundle.getBundle("portofino-messages", locale);
+            locale = parentBundle.getLocale();
+            org.apache.commons.configuration.Configuration configuration;
+            try {
+                String resourceName = getBundleFileName("portofino-messages", locale);
+                File bundleFile = new File(appDir, resourceName);
+                if(!bundleFile.exists()) {
+                    return parentBundle;
+                }
+                configuration = new PropertiesConfiguration(bundleFile);
+                bundle = new ConfigurationResourceBundle(configuration);
+                bundle.setParent(parentBundle);
+                resourceBundles.put(locale, bundle);
+            } catch (ConfigurationException e) {
+                logger.warn("Couldn't load app resource bundle for locale " + locale, e);
+                return parentBundle;
+            }
+        }
+        return bundle;
+    }
+
 }
