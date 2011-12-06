@@ -42,6 +42,8 @@ import org.hibernate.Session;
 
 import java.io.File;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 
 /*
@@ -151,4 +153,9 @@ public interface Application {
 
     void shutdown();
 
+    //**************************************************************************
+    // I18n
+    //**************************************************************************
+
+    ResourceBundle getBundle(Locale locale);
 }
