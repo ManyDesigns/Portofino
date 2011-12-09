@@ -26,10 +26,4 @@ class _1 extends CrudAction {
         return true;
     }
 
-    @Button(list = "crud-search", key="Hello!")
-    public Resolution doSomething() {
-        System.out.println("Funzioooona!");
-        return new RedirectResolution(dispatch.getOriginalPath());
-    }
-    
 }
