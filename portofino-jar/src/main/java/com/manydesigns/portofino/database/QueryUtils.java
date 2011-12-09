@@ -499,9 +499,11 @@ public class QueryUtils {
         ForeignKey relationship =
                 DataModelLogic.findOneToManyRelationship(model, databaseName,
                         entityName, oneToManyRelationshipName);
-        //Table toTable = relationship.getActualToTable();
+        if(relationship == null) {
+            throw new IllegalArgumentException("Relationship not defined: " + oneToManyRelationshipName);
+        }
         Table fromTable = relationship.getFromTable();
-        Session session = application.getSessionByQualifiedTableName(fromTable.getQualifiedName());
+        Session session = application.getSession(fromTable.getDatabaseName());
 
         ClassAccessor toAccessor = application.getTableAccessor(databaseName, entityName);
 

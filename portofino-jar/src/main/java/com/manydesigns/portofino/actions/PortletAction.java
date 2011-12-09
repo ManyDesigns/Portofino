@@ -18,24 +18,34 @@ import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.ModelActionResolver;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import com.manydesigns.portofino.util.ShortNameUtils;
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.StripesConstants;
+import net.sourceforge.stripes.controller.StripesFilter;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.converters.ClassConverter;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -44,6 +54,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -103,6 +118,13 @@ public class PortletAction extends AbstractActionBean {
     protected String fragment;
 
     //**************************************************************************
+    // Scripting
+    //**************************************************************************
+
+    protected String script;
+    protected File storageDirFile;
+
+    //**************************************************************************
     // Logging
     //**************************************************************************
 
@@ -118,6 +140,7 @@ public class PortletAction extends AbstractActionBean {
 
     @Before
     protected void prepare() {
+        storageDirFile = application.getAppStorageDir();
         dereferencePageInstance();
     }
 
@@ -455,6 +478,10 @@ public class PortletAction extends AbstractActionBean {
         edit.showInNavigation = page.isShowInNavigation();
         pageConfigurationForm.readFromObject(edit);
         title = page.getTitle();
+
+        if(script == null) {
+            prepareScript();
+        }
     }
 
     protected void readPageConfigurationFromRequest() {
@@ -475,8 +502,6 @@ public class PortletAction extends AbstractActionBean {
         return valid;
     }
 
-
-
     protected void updatePageConfiguration() {
         EditPage edit = new EditPage();
         pageConfigurationForm.writeToObject(edit);
@@ -496,6 +521,8 @@ public class PortletAction extends AbstractActionBean {
             SessionMessages.addWarningMessage(
                     "The page is not embedded and not included in navigation - it will only be reachable by URL or explicit linking.");
         }
+
+        updateScript();
     }
 
     //--------------------------------------------------------------------------
@@ -550,7 +577,7 @@ public class PortletAction extends AbstractActionBean {
                     InsertPosition.valueOf(newPage.getInsertPositionName());
             String pageClassName = newPage.getPageClassName();
             Page page = (Page) ReflectionUtil.newInstance(pageClassName);
-            BeanUtils.copyProperties(page, newPage);
+            copyModelObject(newPage, page);
             String pageId = RandomUtil.createRandomId();
             page.setId(pageId);
             page.setLayoutContainer(DEFAULT_LAYOUT_CONTAINER);
@@ -580,6 +607,12 @@ public class PortletAction extends AbstractActionBean {
         } else {
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
         }
+    }
+
+    protected void copyModelObject(ModelObject src, ModelObject dest) throws IllegalAccessException, InvocationTargetException {
+        //To handle actualActionClass = null, ClassConverter must have a null return value
+        BeanUtilsBean.getInstance().getConvertUtils().register(new ClassConverter(null), Class.class);
+        BeanUtils.copyProperties(dest, src);
     }
 
     @RequiresAdministrator
@@ -656,28 +689,43 @@ public class PortletAction extends AbstractActionBean {
                 final Page newParent = model.getRootPage().findDescendantPageById(destinationPageId);
                 if(newParent != null) {
                     Page newPage;
-                    try {
-
-
+                    /*try {
                         newPage = page.getClass().newInstance();
-                        BeanUtils.copyProperties(newPage, page);
-                        String pageId = RandomUtil.createRandomId();
-                        newPage.setId(pageId);
+                        copyModelObject(page, newPage);
+                        //String pageId = RandomUtil.createRandomId();
+                        //newPage.setId(pageId);
                         newPage.setLayoutContainer(DEFAULT_LAYOUT_CONTAINER);
                         newPage.setLayoutOrder("0");
                     } catch (Exception e) {
                         SessionMessages.addErrorMessage("Error copying page");
                         logger.error("Error copying page", e);
                         return new RedirectResolution(dispatch.getOriginalPath());
+                    }*/
+                    Model tmpModel = new Model();
+                    tmpModel.setRootPage(new RootPage());
+                    tmpModel.getRootPage().getChildPages().add(page);
+                    try {
+                        JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
+                        Marshaller marshaller = jc.createMarshaller();
+                        StringWriter sw = new StringWriter();
+                        marshaller.marshal(tmpModel, sw);
+                        Unmarshaller unmarshaller = jc.createUnmarshaller();
+                        tmpModel = (Model) unmarshaller.unmarshal(new StringReader(sw.toString()));
+                    } catch (JAXBException e) {
+                        SessionMessages.addErrorMessage("Error copying page");
+                        logger.error("Error copying page", e);
+                        return new RedirectResolution(dispatch.getOriginalPath());
                     }
+                    newPage = tmpModel.getRootPage().getChildPages().get(0);
+                    newPage.setFragment(fragment);
+                    new CopyVisitor().visit(newPage);
                     if(detail) {
                         ((CrudPage) newParent).addDetailChild(newPage);
                     } else {
                         newParent.addChild(newPage);
                     }
-                    throw new UnsupportedOperationException("TODO deep copy");
-                    //saveModel();
-                    //return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
+                    saveModel();
+                    return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
                 } else {
                     SessionMessages.addErrorMessage("Invalid destination: " + destinationPageId);
                 }
@@ -686,14 +734,78 @@ public class PortletAction extends AbstractActionBean {
         return new RedirectResolution(dispatch.getOriginalPath());
     }
 
+    protected class CopyVisitor extends ModelVisitor {
+
+        @Override
+        public void visitNodeBeforeChildren(ModelObject node) {
+            if(node instanceof Page) {
+                Page page = (Page) node;
+                final String oldPageId = page.getId();
+                final String pageId = RandomUtil.createRandomId();
+                page.setId(pageId);
+                File storageDirFile = application.getAppStorageDir();
+                File[] resources = storageDirFile.listFiles(new FilenameFilter() {
+                    public boolean accept(File dir, String name) {
+                        return name.startsWith(oldPageId + ".");
+                    }
+                });
+                for(File res : resources) {
+                    File dest = new File(storageDirFile, pageId + res.getName().substring(oldPageId.length()));
+                    FileInputStream fis = null;
+                    FileOutputStream fos = null;
+                    try {
+                        fis = new FileInputStream(res);
+                        fos = new FileOutputStream(dest);
+                        IOUtils.copy(fis, fos);
+                    } catch (IOException e) {
+                        logger.error("Couldn't copy resource file " + res + " to " + dest, e);
+                    } finally {
+                        IOUtils.closeQuietly(fis);
+                        IOUtils.closeQuietly(fos);
+                    }
+                }
+            }
+        }
+
+    }
+
+/*
+    //TODO copiare risorse (file)
+    protected class CopyVisitor extends ModelVisitor {
+
+        protected Deque<ModelObject> parents = new LinkedList<ModelObject>();
+
+        public CopyVisitor(ModelObject root) {
+            parents.push(root);
+        }
+
+        @Override
+        public void visitNodeBeforeChildren(ModelObject node) {
+            ModelObject newNode = (ModelObject) ReflectionUtil.newInstance(node.getClass());
+            try {
+                copyModelObject(node, newNode);
+                newNode.afterUnmarshal(null, parents.element());
+                parents.push(newNode);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void visitNodeAfterChildren(ModelObject node) {
+            parents.pop();
+        }
+    }
+    */
+
     private void prepareNewPageForm() {
         SelectionProvider classSelectionProvider =
                 DefaultSelectionProvider.create("pageClassName",
                         new String[] {
                                 CrudPage.class.getName(), ChartPage.class.getName(),
                                 TextPage.class.getName(), JspPage.class.getName(),
-                                PageReference.class.getName() },
-                        new String[] { "Crud", "Chart", "Text", "JSP", "Reference to another page" });
+                                /*PageReference.class.getName()*/ },
+                        new String[] { "Crud", "Chart", "Text", "JSP", /*"Reference to another page"*/ });
         //root + at least 1 child
         boolean includeSiblingOption = dispatch.getPageInstancePath().length > 2;
         int fieldCount = includeSiblingOption ? 3 : 2;
@@ -736,6 +848,87 @@ public class PortletAction extends AbstractActionBean {
 
     public void setFragment(String fragment) {
         this.fragment = fragment;
+    }
+
+    //--------------------------------------------------------------------------
+    // Scripting
+    //--------------------------------------------------------------------------
+
+    protected void prepareScript() {
+        String pageId = pageInstance.getPage().getId();
+        File file = ScriptingUtil.getGroovyScriptFile(storageDirFile, pageId);
+        if(file.exists()) {
+            try {
+                FileReader fr = new FileReader(file);
+                script = IOUtils.toString(fr);
+                IOUtils.closeQuietly(fr);
+            } catch (Exception e) {
+                logger.warn("Couldn't load script for page " + pageId, e);
+            }
+        } else {
+            String template = getScriptTemplate();
+            String className = pageId;
+            if(Character.isDigit(className.charAt(0))) {
+                className = "_" + className;
+            }
+            if(template != null) {
+                try {
+                    script = template.replace("__CLASS_NAME__", className);
+                } catch (Exception e) {
+                    logger.warn("Invalid default script template: " + template, e);
+                }
+            }
+        }
+    }
+
+    public String getScriptTemplate() {
+        return null;
+    }
+
+    protected void updateScript() {
+        File groovyScriptFile =
+                ScriptingUtil.getGroovyScriptFile(storageDirFile, pageInstance.getPage().getId());
+        if(!StringUtils.isBlank(script)) {
+            FileWriter fw = null;
+            try {
+                fw = new FileWriter(groovyScriptFile);
+                fw.write(script);
+                try {
+                    GroovyClassLoader loader = new GroovyClassLoader();
+                    loader.parseClass(script, groovyScriptFile.getAbsolutePath());
+                    if(this instanceof GroovyObject) {
+                        //Attempt to remove old instance of custom action bean
+                        //not guaranteed to work
+                        try {
+                            ModelActionResolver actionResolver =
+                                    (ModelActionResolver) StripesFilter.getConfiguration().getActionResolver();
+                            actionResolver.removeActionBean(getClass());
+                        } catch (Exception e) {
+                            logger.warn("Couldn't remove action bean " + this, e);
+                        }
+                    }
+                } catch (Exception e) {
+                    String pageId = pageInstance.getPage().getId();
+                    logger.warn("Couldn't compile script for page " + pageId, e);
+                    String msg = "Couldn't compile script - see logs for details";
+                    SessionMessages.addErrorMessage(msg);
+                }
+            } catch (IOException e) {
+                logger.error("Error writing script to " + groovyScriptFile, e);
+            } finally {
+                IOUtils.closeQuietly(fw);
+            }
+        } else {
+            groovyScriptFile.delete();
+        }
+    }
+
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
     }
 
 }

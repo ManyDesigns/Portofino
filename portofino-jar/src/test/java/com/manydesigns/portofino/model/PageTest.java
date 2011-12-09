@@ -115,7 +115,7 @@ public class PageTest extends TestCase {
         n1_2_1.setDescription("TableData description");
         n1_2_1.setTitle("TableData title");
         n1_2_1.setFragment("TableData");
-        n1_2_1.setUrl("/model/TableData.action");
+        n1_2_1.setActionClass("/model/TableData.action");
         n1_2.getChildPages().add(n1_2_1);
 
         addGroup(n1_2_1_perm, "registered", AccessLevel.NONE);
@@ -130,7 +130,7 @@ public class PageTest extends TestCase {
         n1_2_2.setDescription("TableData design description");
         n1_2_2.setTitle("TableData design title");
         n1_2_2.setFragment("TableDesign");
-        n1_2_2.setUrl("/model/TableDesign.action");
+        n1_2_2.setActionClass("/model/TableDesign.action");
         n1_2.getChildPages().add(n1_2_2);
 
 
@@ -143,7 +143,7 @@ public class PageTest extends TestCase {
         n1_2_3.setDescription("Somewhere description");
         n1_2_3.setTitle("Somewhere");
         n1_2_3.setFragment("somewhere");
-        n1_2_3.setUrl("http://www.manydesigns.com/");
+        n1_2_3.setActionClass("http://www.manydesigns.com/");
         n1_2.getChildPages().add(n1_2_3);
 
         addGroup(n1_2_3_perm, "cattivi", AccessLevel.DENY);
@@ -157,7 +157,7 @@ public class PageTest extends TestCase {
         n1_3.setDescription("Profile");
         n1_3.setTitle("Profile");
         n1_3.setFragment("Profile");
-        n1_3.setUrl("/Profile.action");
+        n1_3.setActionClass("/Profile.action");
 
         addGroup(n1_3_perm, "cattivi", AccessLevel.DENY);
         addGroup(n1_3_perm, "all", AccessLevel.NONE);

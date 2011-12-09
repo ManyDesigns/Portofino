@@ -48,13 +48,17 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.util.ConfigurationResourceBundle;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -72,12 +76,12 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -615,24 +619,19 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
 
     private void writeToConnectionFile() {
-        OutputStream os = null;
         try {
             File tempFile = File.createTempFile("portofino", "connections.xml");
-            os = new FileOutputStream(tempFile);
 
             JAXBContext jc = JAXBContext.newInstance(Connections.JAXB_CONNECTIONS_PACKAGES);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             m.marshal(connectionProviders, tempFile);
-            os.flush();
 
             moveFileSafely(tempFile, appConnectionsFile.getAbsolutePath());
 
             logger.info("Saved connections to file: {}", appConnectionsFile);
         } catch (Throwable e) {
             logger.error("Cannot save connections to file: " + appConnectionsFile, e);
-        } finally {
-            IOUtils.closeQuietly(os);
         }
     }
 
@@ -641,7 +640,7 @@ public class HibernateApplicationImpl implements Application {
         if(!destination.exists()) {
             FileUtils.moveFile(tempFile, destination);
         } else {
-            File backup = File.createTempFile(destination.getName(), ".backup");
+            File backup = File.createTempFile(destination.getName(), ".backup", destination.getParentFile());
             backup.delete();
             FileUtils.moveFile(destination, backup);
             FileUtils.moveFile(tempFile, destination);
@@ -689,4 +688,72 @@ public class HibernateApplicationImpl implements Application {
     public File getAppWebDir() {
         return appWebDir;
     }
+
+    //**************************************************************************
+    // I18n
+    //**************************************************************************
+
+    private final ConcurrentMap<Locale, ConfigurationResourceBundle> resourceBundles =
+            new ConcurrentHashMap<Locale, ConfigurationResourceBundle>();
+
+    protected String getBundleFileName(String baseName, Locale locale) {
+        return getBundleName(baseName, locale) + ".properties";
+    }
+
+    protected String getBundleName(String baseName, Locale locale) {
+        if(locale == Locale.ROOT) {
+            return baseName;
+        }
+
+        String language = locale.getLanguage();
+        String country = locale.getCountry();
+        String variant = locale.getVariant();
+
+        if (StringUtils.isBlank(language) && StringUtils.isBlank(country) && StringUtils.isBlank(variant)) {
+            return baseName;
+        }
+
+        String name = baseName + "_";
+        if (!StringUtils.isBlank(variant)) {
+            name += language + "_" + country + "_" + variant;
+        } else if (!StringUtils.isBlank(country)) {
+            name += language + "_" + country;
+        } else {
+            name += language;
+        }
+        return name;
+    }
+
+    public ResourceBundle getBundle(Locale locale) {
+        ConfigurationResourceBundle bundle = resourceBundles.get(locale);
+        if(bundle == null) {
+            ResourceBundle parentBundle = ResourceBundle.getBundle("portofino-messages", locale);
+            PropertiesConfiguration configuration;
+            try {
+                File bundleFile = getBundleFile(locale);
+                if(!bundleFile.exists() && !locale.equals(parentBundle.getLocale())) {
+                    bundleFile = getBundleFile(parentBundle.getLocale());
+                }
+                if(!bundleFile.exists()) {
+                    return parentBundle;
+                }
+                configuration = new PropertiesConfiguration(bundleFile);
+                FileChangedReloadingStrategy reloadingStrategy = new FileChangedReloadingStrategy();
+                configuration.setReloadingStrategy(reloadingStrategy);
+                bundle = new ConfigurationResourceBundle(configuration);
+                bundle.setParent(parentBundle);
+                resourceBundles.put(locale, bundle);
+            } catch (ConfigurationException e) {
+                logger.warn("Couldn't load app resource bundle for locale " + locale, e);
+                return parentBundle;
+            }
+        }
+        return bundle;
+    }
+
+    protected File getBundleFile(Locale locale) {
+        String resourceName = getBundleFileName("portofino-messages", locale);
+        return new File(appDir, resourceName);
+    }
+
 }

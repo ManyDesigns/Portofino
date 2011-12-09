@@ -8,7 +8,7 @@
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.PortletAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post" id="contentHeaderForm">
+        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" id="contentHeaderForm">
             <div class="yui-g">
                 <div class="contentBarLeft">
                     <c:if test="${not empty actionBean.returnToParentTarget}">
@@ -30,11 +30,11 @@
                                     class="arrow-4">Edit page layout</button>
                             <button name="reloadModel" class="refresh">Reload model</button>
                             <button name="pagePermissions" class="person">Page permissions</button>
-                            <%--<button class="copy"
+                            <button class="copy"
                                     onclick="showCopyPageDialog(
                                                 '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
                                                 '<%= request.getContextPath() %>');
-                                            return false;">Copy page</button>--%>
+                                            return false;">Copy page</button>
                             <button name="newPage" class="plusthick">Add page</button>
                             <button name="deletePage" class="minusthick"
                                     onclick="confirmDeletePage(

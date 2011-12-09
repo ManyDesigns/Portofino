@@ -50,7 +50,6 @@ import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import javax.servlet.http.HttpServletRequest;
@@ -129,7 +128,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
         PageInstance rootPageInstance = new PageInstance(application, model.getRootPage(), null);
         HttpServletRequest request = context.getRequest();
         String originalPath = ServletUtils.getOriginalPath(request);
-        dispatch = new Dispatch(request, originalPath, originalPath, rootPageInstance, pageInstance);
+        dispatch = new Dispatch(request.getContextPath(), originalPath, getClass(), rootPageInstance, pageInstance);
         Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
         request.setAttribute(RequestAttributes.DISPATCH, dispatch);
         request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
@@ -222,6 +221,31 @@ public class UserAdminAction extends CrudAction implements AdminAction {
         }
 
         return true;
+    }
+
+    @Override
+    protected String getEditView() {
+        return "/layouts/admin/users/userEdit.jsp";
+    }
+
+    @Override
+    protected String getBulkEditView() {
+        return "/layouts/admin/users/userBulkEdit.jsp";
+    }
+
+    @Override
+    protected String getCreateView() {
+        return "/layouts/admin/users/userCreate.jsp";
+    }
+
+    @Override
+    protected String getReadView() {
+        return "/layouts/admin/users/userRead.jsp";
+    }
+
+    @Override
+    protected String getSearchView() {
+        return "/layouts/admin/users/userSearch.jsp";
     }
 
     @Button(list = "contentButtons", key = "commons.returnToPages", order = 1)

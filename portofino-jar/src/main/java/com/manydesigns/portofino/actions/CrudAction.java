@@ -67,15 +67,10 @@ import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import com.manydesigns.portofino.model.pages.crud.SelectionProviderReference;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import com.manydesigns.portofino.system.model.users.annotations.SupportsPermissions;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
-import groovy.lang.Binding;
-import groovy.lang.GroovyObject;
-import groovy.lang.MissingMethodException;
-import groovy.lang.Script;
 import jxl.Workbook;
 import jxl.write.DateFormat;
 import jxl.write.*;
@@ -90,7 +85,6 @@ import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fop.apps.FOPException;
@@ -108,7 +102,6 @@ import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.lang.Boolean;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.*;
@@ -170,6 +163,22 @@ public class CrudAction extends PortletAction {
     public Object object;
     public Session session;
 
+    //--------------------------------------------------------------------------
+    // Scripting
+    //--------------------------------------------------------------------------
+
+    public static final String SCRIPT_TEMPLATE;
+
+    static {
+        String scriptTemplate;
+        try {
+            scriptTemplate = IOUtils.toString(CrudAction.class.getResourceAsStream("crud/script_template.txt"));
+        } catch (Exception e) {
+            scriptTemplate = null;
+        }
+        SCRIPT_TEMPLATE = scriptTemplate;
+    }
+
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -183,14 +192,6 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
     private static final String TEMPLATE_FOP_SEARCH = "templateFOP-Search.xsl";
     private static final String TEMPLATE_FOP_READ = "templateFOP-Read.xsl";
-
-    //**************************************************************************
-    // Scripting
-    //**************************************************************************
-
-    protected GroovyObject groovyObject;
-    protected String script;
-    protected File storageDirFile;
 
     //**************************************************************************
     // Setup
@@ -215,36 +216,6 @@ public class CrudAction extends PortletAction {
 
             setupSelectionProviders();
         }
-
-        storageDirFile = application.getAppStorageDir();
-
-        if(script == null) {
-            prepareScript();
-        }
-    }
-
-    protected void prepareScript() {
-        File file = ScriptingUtil.getGroovyScriptFile(storageDirFile, crudPage.getId());
-        if(file.exists()) {
-            try {
-                FileReader fr = new FileReader(file);
-                script = IOUtils.toString(fr);
-                IOUtils.closeQuietly(fr);
-                String path = file.getAbsolutePath();
-                groovyObject = compileScript(script, path);
-            } catch (Exception e) {
-                logger.warn("Couldn't load script for crud page " + crudPage.getId(), e);
-            }
-        }
-    }
-
-    protected GroovyObject compileScript(String script, String path) {
-        GroovyObject groovyObject = ScriptingUtil.getGroovyObject(script, path);
-        Script scriptObject = (Script) groovyObject;
-        Binding binding = new Binding(ElementsThreadLocals.getOgnlContext());
-        binding.setVariable("actionBean", this);
-        scriptObject.setBinding(binding);
-        return groovyObject;
     }
 
     private void setupSelectionProviders() {
@@ -406,11 +377,7 @@ public class CrudAction extends PortletAction {
 //            loadObjects();
             setupTableForm(Mode.VIEW);
 
-            String fwd = crudPage.getSearchUrl();
-            if(StringUtils.isEmpty(fwd)) {
-                fwd = "/layouts/crud/search.jsp";
-            }
-            return forwardToPortletPage(fwd);
+            return forwardToPortletPage(getSearchView());
         } catch(Exception e) {
             logger.warn("Crud not correctly configured", e);
             return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
@@ -427,11 +394,7 @@ public class CrudAction extends PortletAction {
             loadObjects();
             setupTableForm(Mode.VIEW);
             tableForm.setSelectable(false);
-            String fwd = crudPage.getEmbeddedSearchUrl();
-            if(StringUtils.isEmpty(fwd)) {
-                fwd = "/layouts/crud/embedded-search.jsp";
-            }
-            return new ForwardResolution(fwd);
+            return new ForwardResolution(getEmbeddedSearchView());
         } catch(Exception e) {
             logger.error("Crud not correctly configured", e);
             return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
@@ -530,11 +493,7 @@ public class CrudAction extends PortletAction {
 
         setupReturnToParentTarget();
 
-        String fwd = crudPage.getReadUrl();
-        if(StringUtils.isEmpty(fwd)) {
-            fwd = "/layouts/crud/read.jsp";
-        }
-        return forwardToPortletPage(fwd);
+        return forwardToPortletPage(getReadView());
     }
 
     protected void refreshBlobDownloadHref() {
@@ -591,15 +550,7 @@ public class CrudAction extends PortletAction {
         createSetup(object);
         form.readFromObject(object);
 
-        return forwardToCreatePage();
-    }
-
-    protected Resolution forwardToCreatePage() {
-        String fwd = crudPage.getCreateUrl();
-        if(StringUtils.isEmpty(fwd)) {
-            fwd = "/layouts/crud/create.jsp";
-        }
-        return new ForwardResolution(fwd);
+        return new ForwardResolution(getCreateView());
     }
 
     @Button(list = "crud-create", key = "commons.save", order = 1)
@@ -622,7 +573,7 @@ public class CrudAction extends PortletAction {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
                     SessionMessages.addErrorMessage(rootCauseMessage);
-                    return forwardToCreatePage();
+                    return new ForwardResolution(getCreateView());
                 }
                 pk = pkHelper.generatePkString(object);
                 String url = dispatch.getOriginalPath() + "/" + pk;
@@ -630,7 +581,7 @@ public class CrudAction extends PortletAction {
             }
         }
 
-        return forwardToCreatePage();
+        return new ForwardResolution(getCreateView());
     }
 
     //**************************************************************************
@@ -643,15 +594,11 @@ public class CrudAction extends PortletAction {
         setupForm(Mode.EDIT);
         editSetup(object);
         form.readFromObject(object);
-        return forwardToEditPage();
+        return new ForwardResolution(getEditView());
     }
 
-    protected Resolution forwardToEditPage() {
-        String fwd = crudPage.getEditUrl();
-        if(StringUtils.isEmpty(fwd)) {
-            fwd = "/layouts/crud/edit.jsp";
-        }
-        return new ForwardResolution(fwd);
+    protected String getEditView() {
+        return "/layouts/crud/edit.jsp";
     }
 
     @Button(list = "crud-edit", key = "commons.update", order = 1)
@@ -672,14 +619,14 @@ public class CrudAction extends PortletAction {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
                     SessionMessages.addErrorMessage(rootCauseMessage);
-                    return forwardToEditPage();
+                    return new ForwardResolution(getEditView());
                 }
                 SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
                 return new RedirectResolution(dispatch.getOriginalPath())
                         .addParameter(SEARCH_STRING_PARAM, searchString);
             }
         }
-        return forwardToEditPage();
+        return new ForwardResolution(getEditView());
     }
 
     //**************************************************************************
@@ -705,11 +652,7 @@ public class CrudAction extends PortletAction {
 
         setupForm(Mode.BULK_EDIT);
 
-        String fwd = crudPage.getBulkEditUrl();
-        if(StringUtils.isEmpty(fwd)) {
-            fwd = "/layouts/crud/bulk-edit.jsp";
-        }
-        return new ForwardResolution(fwd);
+        return new ForwardResolution(getBulkEditView());
     }
 
     @Button(list = "crud-bulk-edit", key = "commons.update", order = 1)
@@ -720,8 +663,12 @@ public class CrudAction extends PortletAction {
         if (form.validate()) {
             for (String current : selection) {
                 loadObject(current);
+                editSetup(object);
                 form.writeToObject(object);
-                session.update(baseTable.getActualEntityName(), object);
+                if(editValidate(object)) {
+                    session.update(baseTable.getActualEntityName(), object);
+                }
+                editPostProcess(object);
             }
             try {
                 session.getTransaction().commit();
@@ -748,17 +695,20 @@ public class CrudAction extends PortletAction {
     @Button(list = "crud-read", key = "commons.delete", order = 2)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
-        session.delete(baseTable.getActualEntityName(), object);
-        try {
-            session.getTransaction().commit();
-            SessionMessages.addInfoMessage("DELETE avvenuto con successo");
+        if(deleteValidate(object)) {
+            session.delete(baseTable.getActualEntityName(), object);
+            try {
+                deletePostProcess(object);
+                session.getTransaction().commit();
+                SessionMessages.addInfoMessage("DELETE avvenuto con successo");
 
-            // invalidate the pk on this crud unit
-            pk = null;
-        } catch (Exception e) {
-            String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-            logger.debug(rootCauseMessage, e);
-            SessionMessages.addErrorMessage(rootCauseMessage);
+                // invalidate the pk on this crud unit
+                pk = null;
+            } catch (Exception e) {
+                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                logger.debug(rootCauseMessage, e);
+                SessionMessages.addErrorMessage(rootCauseMessage);
+            }
         }
         int lastSlashPos = dispatch.getOriginalPath().lastIndexOf("/");
         String url = dispatch.getOriginalPath().substring(0, lastSlashPos);
@@ -769,6 +719,7 @@ public class CrudAction extends PortletAction {
     @Button(list = "crud-search", key = "commons.delete", order = 3)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution bulkDelete() {
+        int deleted = 0;
         if (selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
@@ -778,13 +729,17 @@ public class CrudAction extends PortletAction {
         for (String current : selection) {
             Serializable pkObject = pkHelper.parsePkString(current);
             Object obj = QueryUtils.getObjectByPk(application, baseTable, pkObject);
-            session.delete(baseTable.getActualEntityName(), obj);
+            if(deleteValidate(obj)) {
+                session.delete(baseTable.getActualEntityName(), obj);
+                deletePostProcess(obj);
+                deleted++;
+            }
         }
         try {
             session.getTransaction().commit();
             SessionMessages.addInfoMessage(MessageFormat.format(
             "DELETE di {0} oggetti avvenuto con successo",
-            selection.length));
+            deleted));
         } catch (Exception e) {
             logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
             SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
@@ -1548,59 +1503,54 @@ public class CrudAction extends PortletAction {
     // Hooks/scripting
     //**************************************************************************
 
-    protected void createSetup(Object object) {
-        String methodName = "createSetup";
-        Object methodArgs = new Object[] { object };
-        invokeGroovyMethod(methodName, methodArgs);
+    @Override
+    public String getScriptTemplate() {
+        return SCRIPT_TEMPLATE;
     }
+
+    protected void createSetup(Object object) {}
 
     protected boolean createValidate(Object object) {
-        String methodName = "createValidate";
-        Object methodArgs = new Object[] { object };
-        return invokeBooleanGroovyMethod(methodName, methodArgs);
+        return true;
     }
 
-    protected void createPostProcess(Object object) {
-        String methodName = "createPostProcess";
-        Object methodArgs = new Object[] { object };
-        invokeGroovyMethod(methodName, methodArgs);
-    }
+    protected void createPostProcess(Object object) {}
 
-    protected void editSetup(Object object) {
-        String methodName = "editSetup";
-        Object methodArgs = new Object[] { object };
-        invokeGroovyMethod(methodName, methodArgs);
-    }
+
+    protected void editSetup(Object object) {}
 
     protected boolean editValidate(Object object) {
-        String methodName = "editValidate";
-        Object methodArgs = new Object[] { object };
-        return invokeBooleanGroovyMethod(methodName, methodArgs);
+        return true;
     }
 
-    protected void editPostProcess(Object object) {
-        String methodName = "editPostProcess";
-        Object methodArgs = new Object[] { object };
-        invokeGroovyMethod(methodName, methodArgs);
+    protected void editPostProcess(Object object) {}
+
+
+    protected boolean deleteValidate(Object object) {
+        return true;
     }
 
-    protected Object invokeGroovyMethod(String methodName, Object methodArgs) {
-        if(groovyObject != null) {
-            try {
-                logger.debug("Invoking Groovy method {}", methodName);
-                return groovyObject.invokeMethod(methodName, methodArgs);
-            } catch(MissingMethodException e) {
-                logger.debug("The Groovy method {} is missing", methodName);
-            }
-        } else {
-            logger.debug("No script for this page: {}", crudPage.getId());
-        }
-        return null;
+    protected void deletePostProcess(Object object) {}
+    
+
+    protected String getBulkEditView() {
+        return "/layouts/crud/bulk-edit.jsp";
     }
 
-    protected boolean invokeBooleanGroovyMethod(String methodName, Object methodArgs) {
-        Object result = invokeGroovyMethod(methodName, methodArgs);
-        return !(result instanceof Boolean && (Boolean) result == false);
+    protected String getCreateView() {
+        return "/layouts/crud/create.jsp";
+    }
+
+    protected String getReadView() {
+        return "/layouts/crud/read.jsp";
+    }
+
+    protected String getSearchView() {
+        return "/layouts/crud/search.jsp";
+    }
+
+    protected String getEmbeddedSearchView() {
+        return "/layouts/crud/embedded-search.jsp";
     }
 
     //**************************************************************************
@@ -1779,30 +1729,6 @@ public class CrudAction extends PortletAction {
 
                 if(!availableSelectionProviders.isEmpty()) {
                     updateSelectionProviders();
-                }
-
-                File groovyScriptFile =
-                        ScriptingUtil.getGroovyScriptFile(storageDirFile, crudPage.getId());
-                if(!StringUtils.isBlank(script)) {
-                    FileWriter fw = null;
-                    try {
-                        fw = new FileWriter(groovyScriptFile);
-                        fw.write(script);
-                        try {
-                            compileScript(script, groovyScriptFile.getAbsolutePath());
-                        } catch (Exception e) {
-                            logger.warn("Couldn't compile script for crud page " + crudPage.getId(), e);
-                            String msg = "Couldn't compile script - see logs for details";
-                            SessionMessages.addErrorMessage(msg);
-                            return new ForwardResolution("/layouts/crud/configure.jsp");
-                        }
-                    } catch (IOException e) {
-                        logger.error("Error writing script to " + groovyScriptFile, e);
-                    } finally {
-                        IOUtils.closeQuietly(fw);
-                    }
-                } else {
-                    groovyScriptFile.delete();
                 }
 
                 saveModel();
@@ -2026,15 +1952,7 @@ public class CrudAction extends PortletAction {
     public TableForm getSelectionProvidersForm() {
         return selectionProvidersForm;
     }
-
-    public String getScript() {
-        return script;
-    }
-
-    public void setScript(String script) {
-        this.script = script;
-    }
-
+    
     public Integer getFirstResult() {
         return firstResult;
     }

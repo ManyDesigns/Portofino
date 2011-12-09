@@ -32,8 +32,8 @@ package com.manydesigns.portofino.interceptors;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.portofino.actions.RequestAttributes;
-import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
@@ -49,7 +49,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.jstl.core.Config;
+import javax.servlet.jsp.jstl.fmt.LocalizationContext;
 import java.util.List;
+import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -115,6 +118,13 @@ public class ApplicationInterceptor implements Interceptor {
             Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
             request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
         }
+
+        //I18n - TODO spostare
+        Locale locale = request.getLocale();
+        LocalizationContext localizationContext =
+                new LocalizationContext(application.getBundle(locale), locale);
+        request.setAttribute(Config.FMT_LOCALIZATION_CONTEXT + ".request", localizationContext);
+
         return context.proceed();
     }
 }

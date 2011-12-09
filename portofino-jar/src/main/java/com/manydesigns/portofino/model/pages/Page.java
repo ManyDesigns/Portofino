@@ -66,7 +66,7 @@ public abstract class Page implements ModelObject, WithPermissions {
     protected String fragment;
     protected String title;
     protected String description;
-    protected String url;
+    protected String actionClass;
     protected String layoutContainerInParent;
     protected String layoutOrderInParent;
     protected String layoutContainer;
@@ -80,6 +80,7 @@ public abstract class Page implements ModelObject, WithPermissions {
 
     protected Integer actualLayoutOrderInParent;
     protected int actualLayoutOrder;
+    protected Class<?> actualActionClass;
 
     //**************************************************************************
     // Logging
@@ -107,6 +108,7 @@ public abstract class Page implements ModelObject, WithPermissions {
     public void reset() {
         actualLayoutOrderInParent = null;
         actualLayoutOrder = 0;
+        actualActionClass = null;
     }
 
     public void init(Model model) {
@@ -120,6 +122,13 @@ public abstract class Page implements ModelObject, WithPermissions {
         }
         if(layoutOrder != null) {
             actualLayoutOrder = Integer.parseInt(layoutOrder);
+        }
+        if(actionClass != null) {
+            try {
+                actualActionClass = Class.forName(actionClass);
+            } catch (ClassNotFoundException e) {
+                logger.error("Couldn't find action class " + actionClass + " for page " + getQualifiedName(), e);
+            }
         }
     }
 
@@ -242,12 +251,12 @@ public abstract class Page implements ModelObject, WithPermissions {
     }
 
     @XmlAttribute()
-    public String getUrl() {
-        return url;
+    public String getActionClass() {
+        return actionClass;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setActionClass(String actionClass) {
+        this.actionClass = actionClass;
     }
 
     @XmlAttribute(required = false)
@@ -342,5 +351,13 @@ public abstract class Page implements ModelObject, WithPermissions {
         } else {
             return false;
         }
+    }
+
+    public Class<?> getActualActionClass() {
+        return actualActionClass;
+    }
+
+    public void setActualActionClass(Class<?> actualActionClass) {
+        this.actualActionClass = actualActionClass;
     }
 }

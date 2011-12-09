@@ -134,14 +134,7 @@ public class SecurityLogic {
 
     public static boolean hasPermissions
             (Permissions configuration, Collection<String> groups, RequiresPermissions thing) {
-        if(hasPermissions(configuration, groups,
-                          thing.level(), thing.permissions())) {
-            return true;
-        } else {
-            logger.info("User does not match action permissions. User's groups: {}",
-                        ArrayUtils.toString(groups));
-            return false;
-        }
+        return hasPermissions(configuration, groups, thing.level(), thing.permissions());
     }
 
     public static RequiresPermissions getRequiresPermissionsAnnotation(Method handler, Class<?> theClass) {
@@ -187,7 +180,11 @@ public class SecurityLogic {
             hasPermissions &= permMap.containsKey(permission);
         }
 
-        return hasLevel && hasPermissions;
+        hasPermissions = hasLevel && hasPermissions;
+        if(!hasPermissions) {
+            logger.debug("User does not have permissions. User's groups: {}", ArrayUtils.toString(groups));
+        }
+        return hasPermissions;
     }
 
     public static String encryptPassword(String password) {
