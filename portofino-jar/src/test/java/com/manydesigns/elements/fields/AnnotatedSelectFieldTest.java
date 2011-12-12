@@ -87,7 +87,7 @@ public class AnnotatedSelectFieldTest extends AbstractElementsTest {
         setupField(Mode.EDIT);
 
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
                 "<option value=\"\" selected=\"selected\">-- Select my text --</option>" +
                 "<option value=\"v1\">l1</option>" +
@@ -100,7 +100,7 @@ public class AnnotatedSelectFieldTest extends AbstractElementsTest {
 
         selectField.setValue("v2");
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\">l2</div></td>", text);
     }

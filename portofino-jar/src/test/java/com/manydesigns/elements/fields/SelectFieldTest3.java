@@ -95,7 +95,7 @@ public class SelectFieldTest3 extends AbstractElementsTest {
         setupSelectFields(Mode.EDIT);
 
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"longValue\" class=\"field\"><span class=\"required\">*</span>&nbsp;Long value:" +
+        assertEquals("<th><label for=\"longValue\" class=\"mde-field-label\"><span class=\"required\">*</span>&nbsp;Long value:" +
                 "</label></th><td><fieldset id=\"longValue\" class=\"radio\">" +
                 "<input type=\"radio\" id=\"longValue_0\" name=\"longValue\" value=\"1000\" />&nbsp;<label for=\"longValue_0\">label1</label><br />" +
                 "<input type=\"radio\" id=\"longValue_1\" name=\"longValue\" value=\"2000\" />&nbsp;<label for=\"longValue_1\">label2</label><br />" +
