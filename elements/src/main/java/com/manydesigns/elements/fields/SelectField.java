@@ -43,6 +43,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -98,13 +99,9 @@ public class SelectField extends AbstractField {
 
             assert(values.length == labels.length);
             if(values.length > 0) {
-                selectionProvider =
-                        DefaultSelectionProvider.create(
-                                accessor.getName(), values, labels);
+                selectionProvider = createValuesSelectionProvider(accessor, values, labels);
             } else if (accessor.getType().isEnum()) {
-                selectionProvider =
-                    DefaultSelectionProvider.create(
-                            accessor.getName(), accessor.getType());
+                selectionProvider = createEnumSelectionProvider(accessor);
             }
         } else {
             displayMode = selectionProvider.getDisplayMode();
@@ -127,6 +124,30 @@ public class SelectField extends AbstractField {
         }
         autocompleteId = id + AUTOCOMPLETE_SUFFIX;
         autocompleteInputName = inputName + AUTOCOMPLETE_SUFFIX;
+    }
+
+    public static SelectionProvider createEnumSelectionProvider(PropertyAccessor accessor) {
+        try {
+            Method valuesMethod = accessor.getType().getMethod("values");
+            Enum[] values = (Enum[]) valuesMethod.invoke(null);
+            String[] labels = new String[values.length];
+            for (int i = 0; i < values.length; i++) {
+                labels[i] = values[i].name();
+            }
+            return createValuesSelectionProvider(accessor, values, labels);
+        } catch (Exception e) {
+            logger.error("Cannot create Selection provider from enumeration", e);
+            throw new Error(e);
+        }
+    }
+
+    public static SelectionProvider createValuesSelectionProvider
+            (PropertyAccessor accessor, Object[] values, String[] labels) {
+        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider(accessor.getName(), 1);
+        for(int i = 0; i < values.length; i++) {
+            selectionProvider.appendRow(values[i], labels[i], true);
+        }
+        return selectionProvider;
     }
 
     //**************************************************************************

@@ -153,24 +153,20 @@ public class JspAction extends PortletAction {
 
     private SelectionProvider createJspSelectionProvider() {
         File appWebDir = application.getAppWebDir();
-        List<String> values = new ArrayList<String>();
-        List<String> labels = new ArrayList<String>();
         File[] files = appWebDir.listFiles();
-        visitJspFiles(appWebDir, files, values, labels);
-        String[] valuesArr = values.toArray(new String[values.size()]);
-        String[] labelsArr = labels.toArray(new String[labels.size()]);
-        return DefaultSelectionProvider.create("jsp", valuesArr, labelsArr);
+        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("jsp");
+        visitJspFiles(appWebDir, files, selectionProvider);
+        return selectionProvider;
     }
 
     private void visitJspFiles(File root, File[] files,
-                               List<String> values, List<String> labels) {
+                               DefaultSelectionProvider selectionProvider) {
         for(File file : files) {
             if(file.isFile() && file.getName().endsWith(".jsp")) {
                 String path = getRelativeFilePath(file, root);
-                values.add(path);
-                labels.add(path);
+                selectionProvider.appendRow(path, path, true);
             } else if(file.isDirectory()) {
-                visitJspFiles(root, file.listFiles(), values, labels);
+                visitJspFiles(root, file.listFiles(), selectionProvider);
             }
         }
     }

@@ -190,9 +190,10 @@ public class SearchFormTest extends AbstractElementsTest {
 
     //testo il form builder aggiungendo un selection provider su field2
     public void testForm5(){
-        String[] values = {"v1", "v2", "v3"};
-        String[] labels = {"ll", "l2", "l3"};
-        DefaultSelectionProvider provider = DefaultSelectionProvider.create("provider", values, labels);
+        DefaultSelectionProvider provider = new DefaultSelectionProvider("provider");
+        provider.appendRow("v1", "ll", true);
+        provider.appendRow("v2", "l2", true);
+        provider.appendRow("v3", "l3", true);
 
         SearchFormBuilder builder =
             new SearchFormBuilder(AnnotatedBean3.class);
@@ -268,9 +269,10 @@ public class SearchFormTest extends AbstractElementsTest {
 
     //testo il form builder aggiungendo un selection provider a cascata su field2
     public void testForm10(){
-        String[] values = {"v1", "v2", "v3"};
-        String[] labels = {"ll", "l2", "l3"};
-        DefaultSelectionProvider provider = DefaultSelectionProvider.create("provider", values, labels);
+        DefaultSelectionProvider provider = new DefaultSelectionProvider("provider");
+        provider.appendRow("v1", "ll", true);
+        provider.appendRow("v2", "l2", true);
+        provider.appendRow("v3", "l3", true);
 
         SearchFormBuilder builder =
             new SearchFormBuilder(AnnotatedBean3.class);

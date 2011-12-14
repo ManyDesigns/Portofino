@@ -8,7 +8,7 @@ import com.manydesigns.portofino.system.model.users.annotations.SupportsPermissi
 class bdua1jepekzaqnt5bylc6gjuz extends CrudAction {
 
     void createSetup(object) {
-        object.project_id = project.id;
+        object.project_id = ognlContext.project.id;
     }
 
 }

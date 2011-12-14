@@ -29,22 +29,13 @@
 
 package com.manydesigns.elements.options;
 
-import com.manydesigns.elements.ognl.OgnlUtils;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.JavaClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.text.TextFormat;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
-import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -62,7 +53,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
     protected final String name;
     protected final int fieldCount;
-    protected final Row[] rows;
+    protected final List<Row> rows;
 
     protected DisplayMode displayMode;
 
@@ -75,7 +66,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
     // Static builders
     //**************************************************************************
 
-    public static DefaultSelectionProvider create(String name,
+    /*public static DefaultSelectionProvider create(String name,
                                                   Object[] values,
                                                   String[] labels) {
         Row[] rows = new Row[values.length];
@@ -227,18 +218,37 @@ public class DefaultSelectionProvider implements SelectionProvider {
             i++;
         }
         return new DefaultSelectionProvider(name, fieldsCount, rows);
-    }
+    }*/
 
     //**************************************************************************
     // Constructor
     //**************************************************************************
 
-    protected DefaultSelectionProvider(String name,
+    public DefaultSelectionProvider(String name,
                                     int fieldCount,
                                     Row[] rows) {
+        this(name, fieldCount, new ArrayList<Row>(Arrays.asList(rows)));
+    }
+
+    public DefaultSelectionProvider(String name,
+                                    int fieldCount,
+                                    List<Row> rows) {
         this.name = name;
         this.fieldCount = fieldCount;
         this.rows = rows;
+    }
+
+    public DefaultSelectionProvider(String name,
+                                    int fieldCount) {
+        this(name, fieldCount, new Row[0]);
+    }
+
+    public DefaultSelectionProvider(String name) {
+        this(name, 1);
+    }
+
+    public DefaultSelectionProvider(DefaultSelectionProvider copy) {
+        this(copy.getName(), copy.getFieldCount(), new ArrayList<Row>(copy.rows));
     }
 
     //**************************************************************************
@@ -257,7 +267,51 @@ public class DefaultSelectionProvider implements SelectionProvider {
         return new DefaultSelectionModel();
     }
 
-    public static SelectionProvider create(String name, Class<? extends Enum> enumeration) {
+    public void appendRow(Row row) {
+        if(row.values.length != fieldCount) {
+            throw new IllegalArgumentException("Field count mismatch");
+        }
+        rows.add(row);
+    }
+
+    public void appendRow(Object[] values, String[] labels, boolean active) {
+        Row row = new Row(values, labels, active);
+        appendRow(row);
+    }
+
+    public void appendRow(Object value, String label, boolean active) {
+        appendRow(new Object[] { value }, new String[] { label }, active);
+    }
+
+    public Row ensureActive(Object[] values) {
+        Row row = null;
+        ListIterator<Row> iterator = rows.listIterator();
+        while(iterator.hasNext()) {
+            Row current = iterator.next();
+            boolean found = true;
+            for(int i = 0; i < fieldCount; i++) {
+                if(!ObjectUtils.equals(values[i], current.getValues()[i])) {
+                    found = false;
+                    break;
+                }
+            }
+            if(found) {
+                row = new Row(values, current.getLabels(), true);
+                iterator.set(row);
+                break;
+            }
+        }
+        if(row == null) {
+            String[] labels = new String[fieldCount];
+            for(int i = 0; i < fieldCount; i++) {
+                labels[i] = ObjectUtils.toString(values[i]);
+            }
+            row = new Row(values, labels, true);
+        }
+        return row;
+    }
+
+    /*public static SelectionProvider create(String name, Class<? extends Enum> enumeration) {
         try {
             Method valuesMethod = enumeration.getMethod("values");
             Enum[] values = (Enum[]) valuesMethod.invoke(null);
@@ -270,7 +324,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
             logger.error("Cannot create Selection provider from enumeration", e);
             throw new Error(e);
         }
-    }
+    }*/
 
     //**************************************************************************
     // inner class

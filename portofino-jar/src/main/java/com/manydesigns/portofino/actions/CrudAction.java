@@ -39,10 +39,12 @@ import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
@@ -102,6 +104,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.lang.Boolean;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.*;
@@ -307,8 +310,7 @@ public class CrudAction extends PortletAction {
         if (sql != null) {
             Session session = application.getSession(databaseName);
             Collection<Object[]> objects = QueryUtils.runSql(session, sql);
-            selectionProvider = DefaultSelectionProvider.create(
-                    name, fieldNames.length, fieldTypes, objects);
+            selectionProvider = createSelectionProvider(name, fieldNames.length, fieldTypes, objects);
             selectionProvider.setDisplayMode(dm);
         } else if (hql != null) {
             Database database = DataModelLogic.findDatabaseByName(model, databaseName);
@@ -327,8 +329,8 @@ public class CrudAction extends PortletAction {
                 };
             }
 
-            selectionProvider = DefaultSelectionProvider.create(
-                    name, objects, tableAccessor, textFormats);
+            selectionProvider = createSelectionProvider
+                    (name, objects, tableAccessor.getKeyProperties(), textFormats);
             selectionProvider.setDisplayMode(dm);
         } else {
             logger.warn("ModelSelection provider '{}':" +
@@ -1588,11 +1590,12 @@ public class CrudAction extends PortletAction {
         super.prepareConfigurationForms();
 
         SelectionProvider databaseSelectionProvider =
-                DefaultSelectionProvider.create("database",
+                createSelectionProvider(
+                        "database",
                         model.getDatabases(),
                         Database.class,
                         null,
-                        "databaseName");
+                        new String[] { "databaseName" });
         crudConfigurationForm = new FormBuilder(Crud.class)
                 .configFields(CRUD_CONFIGURATION_FIELDS)
                 .configFieldSetNames("Crud")
@@ -1620,18 +1623,12 @@ public class CrudAction extends PortletAction {
                 if(availableProviders == null || availableProviders.size() == 0) {
                     continue;
                 }
-                String[] availableProviderNames = new String[availableProviders.size() + 1];
-                String[] availableProviderValues = new String[availableProviderNames.length];
-                availableProviderNames[0] = "None";
-                int j = 1;
-                for(ModelSelectionProvider sp : availableProviders) {
-                    availableProviderNames[j] = sp.getName();
-                    availableProviderValues[j] = sp.getName();
-                    j++;
-                }
                 DefaultSelectionProvider selectionProvider =
-                        DefaultSelectionProvider.create
-                                (selectionProviderEdits[i].columns, availableProviderValues, availableProviderNames);
+                        new DefaultSelectionProvider(selectionProviderEdits[i].columns);
+                selectionProvider.appendRow(null, "None", true);
+                for(ModelSelectionProvider sp : availableProviders) {
+                    selectionProvider.appendRow(sp.getName(), sp.getName(), true);
+                }
                 tableFormBuilder.configSelectionProvider(i, selectionProvider, "selectionProvider");
             }
             selectionProvidersForm = tableFormBuilder.build();

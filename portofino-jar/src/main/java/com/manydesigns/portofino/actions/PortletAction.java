@@ -1,12 +1,16 @@
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
@@ -60,6 +64,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.*;
 
 @RequiresPermissions(level = AccessLevel.VIEW)
@@ -525,6 +530,90 @@ public class PortletAction extends AbstractActionBean {
         updateScript();
     }
 
+    //**************************************************************************
+    // Selection Providers
+    //**************************************************************************
+
+    protected DefaultSelectionProvider createSelectionProvider
+            (String name, int fieldCount, Class[] fieldTypes, Collection<Object[]> objects) {
+        int size = objects.size();
+        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider(name, fieldCount);
+        int i = 0;
+        for (Object[] valueAndLabel : objects) {
+            Object[] values = new Object[fieldCount];
+            String[] labels = new String[fieldCount];
+
+            for (int j = 0; j < fieldCount; j++) {
+                Class valueType = fieldTypes[j];
+                values[j] = OgnlUtils.convertValue(valueAndLabel[j * 2], valueType);
+                labels[j] = OgnlUtils.convertValueToString(valueAndLabel[j*2+1]);
+            }
+
+            boolean active = true;
+            if(valueAndLabel.length > fieldCount) {
+                active = (Boolean) OgnlUtils.convertValue(valueAndLabel[fieldCount], Boolean.class);
+            }
+
+            selectionProvider.appendRow(values, labels, active);
+            i++;
+        }
+        return selectionProvider;
+    }
+
+    protected DefaultSelectionProvider createSelectionProvider(
+            String name,
+            Collection objects,
+            PropertyAccessor[] propertyAccessors,
+            TextFormat[] textFormats
+    ) {
+        int fieldsCount = propertyAccessors.length;
+        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider(name, propertyAccessors.length);
+        int i = 0;
+        for (Object current : objects) {
+            Object[] values = new Object[fieldsCount];
+            String[] labels = new String[fieldsCount];
+            int j = 0;
+            for (PropertyAccessor property : propertyAccessors) {
+                Object value = property.get(current);
+                values[j] = value;
+                if (textFormats == null || textFormats[j] == null) {
+                    String label = OgnlUtils.convertValueToString(value);
+                    labels[j] = label;
+                } else {
+                    TextFormat textFormat = textFormats[j];
+                    labels[j] = textFormat.format(current);
+                }
+                j++;
+            }
+            selectionProvider.appendRow(values, labels, true);
+            i++;
+        }
+        return selectionProvider;
+    }
+
+    protected DefaultSelectionProvider createSelectionProvider
+            (String name, Collection objects, Class objectClass,
+             TextFormat[] textFormats, String[] propertyNames) {
+        ClassAccessor classAccessor =
+                JavaClassAccessor.getClassAccessor(objectClass);
+        PropertyAccessor[] propertyAccessors =
+                new PropertyAccessor[propertyNames.length];
+        for (int i = 0; i < propertyNames.length; i++) {
+            String currentName = propertyNames[i];
+            try {
+                PropertyAccessor propertyAccessor =
+                        classAccessor.getProperty(currentName);
+                propertyAccessors[i] = propertyAccessor;
+            } catch (Throwable e) {
+                String msg = MessageFormat.format(
+                        "Could not access property: {0}", currentName);
+                logger.warn(msg, e);
+                throw new IllegalArgumentException(msg, e);
+            }
+        }
+        return createSelectionProvider(name, objects, propertyAccessors, textFormats);
+    }
+
     //--------------------------------------------------------------------------
     // Page crud
     //--------------------------------------------------------------------------
@@ -770,13 +859,12 @@ public class PortletAction extends AbstractActionBean {
     }
 
     private void prepareNewPageForm() {
-        SelectionProvider classSelectionProvider =
-                DefaultSelectionProvider.create("pageClassName",
-                        new String[] {
-                                CrudPage.class.getName(), ChartPage.class.getName(),
-                                TextPage.class.getName(), JspPage.class.getName(),
-                                /*PageReference.class.getName()*/ },
-                        new String[] { "Crud", "Chart", "Text", "JSP", /*"Reference to another page"*/ });
+        DefaultSelectionProvider classSelectionProvider = new DefaultSelectionProvider("pageClassName");
+        classSelectionProvider.appendRow(CrudPage.class.getName(), "Crud", true);
+        classSelectionProvider.appendRow(ChartPage.class.getName(), "Chart", true);
+        classSelectionProvider.appendRow(TextPage.class.getName(), "Text", true);
+        classSelectionProvider.appendRow(JspPage.class.getName(), "JSP", true);
+        /*PageReference.class.getName(), "Reference to another page"*/
         //root + at least 1 child
         boolean includeSiblingOption = dispatch.getPageInstancePath().length > 2;
         int fieldCount = includeSiblingOption ? 3 : 2;
@@ -790,8 +878,10 @@ public class PortletAction extends AbstractActionBean {
             insertPositions[2] = InsertPosition.SIBLING.name();
             labels[2] = "as a sibling of " + dispatch.getLastPageInstance().getPage().getTitle();
         }
-        SelectionProvider insertPositionSelectionProvider =
-                DefaultSelectionProvider.create("insertPositionName", insertPositions, labels);
+        DefaultSelectionProvider insertPositionSelectionProvider = new DefaultSelectionProvider("insertPositionName");
+        for(int i = 0; i < insertPositions.length; i++) {
+            insertPositionSelectionProvider.appendRow(insertPositions[i], labels[i], true);
+        }
         newPageForm = new FormBuilder(NewPage.class)
                 .configFields(NEW_PAGE_SETUP_FIELDS)
                 .configFieldSetNames("Page setup")
@@ -892,6 +982,10 @@ public class PortletAction extends AbstractActionBean {
         } else {
             groovyScriptFile.delete();
         }
+    }
+
+    public Map getOgnlContext() {
+        return ElementsThreadLocals.getOgnlContext();
     }
 
     public String getScript() {

@@ -32,7 +32,6 @@ import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionModel;
-import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.ArrayUtils;
@@ -85,9 +84,10 @@ public class SelectSearchField extends AbstractSearchField {
             Object[] values = annotation.values();
             String[] labels = annotation.labels();
             assert(values.length == labels.length);
-            SelectionProvider selectionProvider =
-                    DefaultSelectionProvider.create(
-                            accessor.getName(), values, labels);
+            DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider(accessor.getName(), 1);
+            for(int i = 0; i < values.length; i++) {
+                selectionProvider.appendRow(values[i], labels[i], true);
+            }
             selectionModel = selectionProvider.createSelectionModel();
             displayMode = annotation.searchDisplayMode();
         } else {

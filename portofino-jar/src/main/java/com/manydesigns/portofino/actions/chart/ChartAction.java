@@ -263,18 +263,22 @@ public class ChartAction extends PortletAction {
     protected void prepareConfigurationForms() {
         super.prepareConfigurationForms();
         SelectionProvider databaseSelectionProvider =
-                DefaultSelectionProvider.create("database",
+                createSelectionProvider("database",
                         model.getDatabases(),
                         Database.class,
                         null,
-                        "databaseName");
-        SelectionProvider typeSelectionProvider =
-                DefaultSelectionProvider.create("type", chartTypeValues, chartTypeLabels);
+                        new String[] { "databaseName" });
+        DefaultSelectionProvider typeSelectionProvider = new DefaultSelectionProvider("type");
+        for(int i = 0; i < chartTypeValues.length; i++) {
+            typeSelectionProvider.appendRow(chartTypeValues[i], chartTypeLabels[i], true);
+        }
         String[] orientationValues =
                 { ChartPage.Orientation.HORIZONTAL.name(), ChartPage.Orientation.VERTICAL.name() };
         String[] orientationLabels = { "Horizontal", "Vertical" };
-        SelectionProvider orientationSelectionProvider =
-                DefaultSelectionProvider.create("orientation", orientationValues, orientationLabels);
+        DefaultSelectionProvider orientationSelectionProvider = new DefaultSelectionProvider("orientation");
+        for(int i = 0; i < orientationValues.length; i++) {
+            typeSelectionProvider.appendRow(orientationValues[i], orientationLabels[i], true);
+        }
         form = new FormBuilder(ChartPage.class)
                 .configFields(CONFIGURATION_FIELDS)
                 .configFieldSetNames("Chart")

@@ -34,14 +34,10 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SelectionModel;
-import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -77,13 +73,13 @@ public class SelectFieldTest extends AbstractElementsTest {
             {"label1"}
     };
 
-    protected SelectionProvider selectionProvider;
+    protected DefaultSelectionProvider selectionProvider;
     protected SelectionModel selectionModel;
 
-    protected SelectionProvider selectionProvider2;
+    protected DefaultSelectionProvider selectionProvider2;
     protected SelectionModel selectionModel2;
 
-    protected SelectionProvider selectionProvider3;
+    protected DefaultSelectionProvider selectionProvider3;
     protected SelectionModel selectionModel3;
 
     @Override
@@ -92,19 +88,22 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         myText = null;
 
-        selectionProvider = DefaultSelectionProvider.create(
-                "selectionProvider", 1, valuesArray, labelsArray);
+        selectionProvider = new DefaultSelectionProvider("selectionProvider");
+        for(int i = 0; i < valuesArray.length; i++) {
+            selectionProvider.appendRow(valuesArray[i], labelsArray[i], true);
+        }
         selectionModel = selectionProvider.createSelectionModel();
 
-        selectionProvider2 = DefaultSelectionProvider.create(
-                "selectionProvider", 1, valuesArray2, labelsArray2);
+        selectionProvider2 = new DefaultSelectionProvider("selectionProvider");
+        for(int i = 0; i < valuesArray2.length; i++) {
+            selectionProvider2.appendRow(valuesArray2[i], labelsArray2[i], true);
+        }
         selectionModel2 = selectionProvider2.createSelectionModel();
 
-        Collection<Object[]> rows = new ArrayList<Object[]>();
-        rows.add(new Object[] { "value1", "label1", true });
-        rows.add(new Object[] { "value2", "label2", false });
-        selectionProvider3 = DefaultSelectionProvider.create(
-                "selectionProvider", 1, new Class[] { String.class }, rows);
+        selectionProvider3 = new DefaultSelectionProvider("selectionProvider");
+        selectionProvider3.appendRow("value1", "label1", true);
+        selectionProvider3.appendRow("value2", "label2", false);
+
         selectionModel3 = selectionProvider3.createSelectionModel();
     }
 

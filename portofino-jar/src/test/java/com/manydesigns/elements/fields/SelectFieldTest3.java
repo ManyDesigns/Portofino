@@ -31,12 +31,11 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.elements.options.SelectionModel;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.util.Util;
 
 /*
@@ -62,15 +61,17 @@ public class SelectFieldTest3 extends AbstractElementsTest {
             "label3"
     };
 
-    protected SelectionProvider selectionProvider;
+    protected DefaultSelectionProvider selectionProvider;
     protected SelectionModel selectionModel;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
 
-        selectionProvider = DefaultSelectionProvider.create(
-                "selectionProvider", valuesArray, labelsArray);
+        selectionProvider = new DefaultSelectionProvider("selectionProvider");
+        for(int i = 0; i < valuesArray.length; i++) {
+            selectionProvider.appendRow(valuesArray[i], labelsArray[i], true);
+        }
         selectionModel = selectionProvider.createSelectionModel();
     }
 

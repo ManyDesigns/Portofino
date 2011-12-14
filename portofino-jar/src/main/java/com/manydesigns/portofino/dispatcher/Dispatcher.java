@@ -133,13 +133,12 @@ public class Dispatcher {
         Class<?> actionClass = page.getActualActionClass();
         if (!isValidActionClass(actionClass)) {
             actionClass = getScriptActionClass(application, page);
-            page.setActualActionClass(actionClass);
         }
-        if (isValidActionClass(actionClass)) {
-            return (Class<? extends ActionBean>) actionClass;
-        } else {
-            return getDefaultActionClass(page);
+        if (!isValidActionClass(actionClass)) {
+            actionClass = getDefaultActionClass(page);
         }
+        page.setActualActionClass(actionClass);
+        return (Class<? extends ActionBean>) actionClass;
     }
 
     protected static boolean isValidActionClass(Class<?> actionClass) {

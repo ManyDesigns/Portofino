@@ -84,7 +84,7 @@ public class ModelActionResolver extends NameBasedActionResolver {
         if(dispatch != null) {
             Class<? extends ActionBean> actionBeanClass = dispatch.getActionBeanClass();
             if(GroovyObject.class.isAssignableFrom(actionBeanClass)) {
-                synchronized (this) {
+                synchronized (this) { //TODO aggiungere solo se necessario?
                     addActionBean(actionBeanClass);
                 }
             }

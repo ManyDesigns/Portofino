@@ -71,8 +71,10 @@ public class SearchFormCascadeTest  extends AbstractElementsTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        selectionProvider = DefaultSelectionProvider.create(
-                "selectionProvider", 2, valuesArray, labelsArray);
+        selectionProvider = new DefaultSelectionProvider("selectionProvider", 2);
+        for(int i = 0; i < valuesArray.length; i++) {
+            selectionProvider.appendRow(valuesArray[i], labelsArray[i], true);
+        }
 
         form = new SearchFormBuilder(SelectFieldTest2.Bean.class)
                 .configSelectionProvider(selectionProvider, "p1", "p2")

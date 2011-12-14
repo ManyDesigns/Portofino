@@ -158,8 +158,10 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
             logger.debug("Found skin: {}", skinName);
         }
 
-        SelectionProvider skinSelectionProvider =
-                DefaultSelectionProvider.create("skins", skins, skins);
+        DefaultSelectionProvider skinSelectionProvider = new DefaultSelectionProvider("skins");
+        for(String s : skins) {
+            skinSelectionProvider.appendRow(s, s, true);
+        }
 
         return skinSelectionProvider;
     }

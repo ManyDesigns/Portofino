@@ -37,7 +37,6 @@ import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertiesAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
@@ -569,8 +568,10 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 .configFields("databaseName", "schemaName", "tableName")
                 .configMode(mode);
 
-        SelectionProvider selectionProvider = DefaultSelectionProvider
-                .create("databases",databaseNames, databaseNames);
+        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("databases");
+        for(i = 0; i < databaseNames.length; i++) {
+            selectionProvider.appendRow(databaseNames[i], databaseNames[i], true);
+        }
         formBuilder.configSelectionProvider(selectionProvider, "databaseName");
         formBuilder.configPrefix("table_");
         tableForm = formBuilder.build();
@@ -599,11 +600,10 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         formBuilder = new FormBuilder(AnnModel.class)
                 .configFields("columnName", "annotationName").configPrefix("colAnn_")
                 .configMode(mode);
-        String[] anns = new String[annotations.size()];
-        String[] annsImpl = new String[annotationsImpl.size()];
-        SelectionProvider selectionProviderAnns =
-                DefaultSelectionProvider.create("annotations",
-                annotationsImpl.toArray(annsImpl), annotations.toArray(anns));
+        DefaultSelectionProvider selectionProviderAnns = new DefaultSelectionProvider("annotations");
+        for(i = 0; i < annotationsImpl.size(); i++) {
+            selectionProviderAnns.appendRow(annotationsImpl.get(i), annotations.get(i), true);
+        }
         formBuilder.configSelectionProvider(selectionProviderAnns, "annotationName");
         annForm = formBuilder.build();
 
