@@ -108,6 +108,22 @@ public class HibernateConfig {
             configuration.setProperty("hibernate.show_sql",
                     portofinoConfiguration.getString(
                             PortofinoProperties.HIBERNATE_SHOW_SQL));
+            configuration.setProperty("hibernate.connection.provider_class",
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.HIBERNATE_CONNECTION_PROVIDER_CLASS));
+            configuration.setProperty("hibernate.c3p0.min_size",
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.HIBERNATE_C3P0_MIN_SIZE));
+            configuration.setProperty("hibernate.c3p0.max_size",
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.HIBERNATE_C3P0_MAX_SIZE));
+            configuration.setProperty("hibernate.c3p0.timeout",
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.HIBERNATE_C3P0_TIMEOUT));
+            configuration.setProperty("hibernate.c3p0.idle_test_period",
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.HIBERNATE_C3P0_IDLE_TEST_PERIOD));
+
             Mappings mappings = configuration.createMappings();
 
             //Class Mapping

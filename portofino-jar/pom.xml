@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.0.rc2</version>
+        <version>4.0.rc3</version>
     </parent>
     <artifactId>portofino-jar</artifactId>
     <packaging>jar</packaging>
@@ -132,6 +132,11 @@
             <artifactId>hibernate-core</artifactId>
             <version>${hibernate.version}</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <version>${hibernate.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -339,13 +344,15 @@
     <build>
         <resources>
             <resource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-            <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
             </resource>
         </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
     </build>
 </project>

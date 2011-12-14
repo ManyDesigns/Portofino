@@ -6,6 +6,7 @@
     </appender>
 
     <logger name="org.hibernate" level="warn"/>
+    <logger name="org.hibernate.connection.C3P0ConnectionProvider" level="info"/>
     <!--<logger name="com.manydesigns.portofino.dispatcher" level="debug"/>-->
     <logger name="net.sourceforge.stripes.tag.FormTag" level="off"/>
 

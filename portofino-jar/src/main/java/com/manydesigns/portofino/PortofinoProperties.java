@@ -93,6 +93,11 @@ public final class PortofinoProperties {
 
     //Hibernate properties
     public static final String HIBERNATE_SHOW_SQL = "hibernate.show_sql";
+    public static final String HIBERNATE_CONNECTION_PROVIDER_CLASS = "hibernate.connection.provider_class";
+    public static final String HIBERNATE_C3P0_MIN_SIZE = "hibernate.c3p0.min_size";
+    public static final String HIBERNATE_C3P0_MAX_SIZE = "hibernate.c3p0.max_size";
+    public static final String HIBERNATE_C3P0_TIMEOUT = "hibernate.c3p0.timeout";
+    public static final String HIBERNATE_C3P0_IDLE_TEST_PERIOD = "hibernate.c3p0.idle_test_period";
 
 
     private PortofinoProperties() {}
