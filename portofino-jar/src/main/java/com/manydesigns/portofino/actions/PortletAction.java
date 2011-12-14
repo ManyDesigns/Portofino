@@ -692,8 +692,8 @@ public class PortletAction extends AbstractActionBean {
                         new String[] {
                                 CrudPage.class.getName(), ChartPage.class.getName(),
                                 TextPage.class.getName(), JspPage.class.getName(),
-                                PageReference.class.getName() },
-                        new String[] { "Crud", "Chart", "Text", "JSP", "Reference to another page" });
+                                /*PageReference.class.getName()*/ },
+                        new String[] { "Crud", "Chart", "Text", "JSP", /*"Reference to another page"*/ });
         //root + at least 1 child
         boolean includeSiblingOption = dispatch.getPageInstancePath().length > 2;
         int fieldCount = includeSiblingOption ? 3 : 2;
