@@ -224,28 +224,28 @@ public class UserAdminAction extends CrudAction implements AdminAction {
     }
 
     @Override
-    protected String getEditView() {
-        return "/layouts/admin/users/userEdit.jsp";
+    protected Resolution getEditView() {
+        return new ForwardResolution("/layouts/admin/users/userEdit.jsp");
     }
 
     @Override
-    protected String getBulkEditView() {
-        return "/layouts/admin/users/userBulkEdit.jsp";
+    protected Resolution getBulkEditView() {
+        return new ForwardResolution("/layouts/admin/users/userBulkEdit.jsp");
     }
 
     @Override
-    protected String getCreateView() {
-        return "/layouts/admin/users/userCreate.jsp";
+    protected Resolution getCreateView() {
+        return new ForwardResolution("/layouts/admin/users/userCreate.jsp");
     }
 
     @Override
-    protected String getReadView() {
-        return "/layouts/admin/users/userRead.jsp";
+    protected Resolution getReadView() {
+        return forwardToPortletPage("/layouts/admin/users/userRead.jsp");
     }
 
     @Override
-    protected String getSearchView() {
-        return "/layouts/admin/users/userSearch.jsp";
+    protected Resolution getSearchView() {
+        return forwardToPortletPage("/layouts/admin/users/userSearch.jsp");
     }
 
     @Button(list = "contentButtons", key = "commons.returnToPages", order = 1)

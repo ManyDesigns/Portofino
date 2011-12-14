@@ -40,6 +40,9 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -54,6 +57,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
     private SelectField selectField;
     private SelectField selectField2;
+    private SelectField selectField3;
 
     private String[][] valuesArray = {
             {"value1"},
@@ -79,6 +83,9 @@ public class SelectFieldTest extends AbstractElementsTest {
     protected SelectionProvider selectionProvider2;
     protected SelectionModel selectionModel2;
 
+    protected SelectionProvider selectionProvider3;
+    protected SelectionModel selectionModel3;
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -92,6 +99,13 @@ public class SelectFieldTest extends AbstractElementsTest {
         selectionProvider2 = DefaultSelectionProvider.create(
                 "selectionProvider", 1, valuesArray2, labelsArray2);
         selectionModel2 = selectionProvider2.createSelectionModel();
+
+        Collection<Object[]> rows = new ArrayList<Object[]>();
+        rows.add(new Object[] { "value1", "label1", true });
+        rows.add(new Object[] { "value2", "label2", false });
+        selectionProvider3 = DefaultSelectionProvider.create(
+                "selectionProvider", 1, new Class[] { String.class }, rows);
+        selectionModel3 = selectionProvider3.createSelectionModel();
     }
 
     private void setupSelectFields(Mode mode) {
@@ -112,6 +126,9 @@ public class SelectFieldTest extends AbstractElementsTest {
         // impostiamo selectField2
         selectField2 = new SelectField(myPropertyAccessor, mode, null);
         selectField2.setSelectionModel(selectionModel2);
+        // impostiamo selectField3
+        selectField3 = new SelectField(myPropertyAccessor, mode, null);
+        selectField3.setSelectionModel(selectionModel3);
     }
 
     public void testSimple() {
@@ -244,6 +261,27 @@ public class SelectFieldTest extends AbstractElementsTest {
                 "</select></td>", text);
     }
 
+    public void testEditInactiveSelection() {
+        setupSelectFields(Mode.EDIT);
+
+        selectField3.setValue("value2");
+        String text = Util.elementToString(selectField3);
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
+                "</label></th><td><select id=\"myText\" name=\"myText\">" +
+                "<option value=\"\">-- Select my text --</option>" +
+                "<option value=\"value1\">label1</option>" +
+                "<option value=\"value2\" selected=\"selected\">label2</option>" +
+                "</select></td>", text);
+
+        selectField3.setValue("value1");
+        text = Util.elementToString(selectField3);
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
+                "</label></th><td><select id=\"myText\" name=\"myText\">" +
+                "<option value=\"\">-- Select my text --</option>" +
+                "<option value=\"value1\" selected=\"selected\">label1</option>" +
+                "</select></td>", text);
+    }
+
     public void testEditInvalidSelection() {
         setupSelectFields(Mode.EDIT);
 
@@ -291,6 +329,17 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\">label3</div>" +
+                "</td>", text);
+    }
+
+    public void testViewInactiveSelection() {
+        setupSelectFields(Mode.VIEW);
+
+        selectField3.setValue("value2");
+        String text = Util.elementToString(selectField3);
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
+                "</label></th><td>" +
+                "<div class=\"value\" id=\"myText\">label2</div>" +
                 "</td>", text);
     }
 

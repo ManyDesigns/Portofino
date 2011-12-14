@@ -769,43 +769,14 @@ public class PortletAction extends AbstractActionBean {
 
     }
 
-/*
-    //TODO copiare risorse (file)
-    protected class CopyVisitor extends ModelVisitor {
-
-        protected Deque<ModelObject> parents = new LinkedList<ModelObject>();
-
-        public CopyVisitor(ModelObject root) {
-            parents.push(root);
-        }
-
-        @Override
-        public void visitNodeBeforeChildren(ModelObject node) {
-            ModelObject newNode = (ModelObject) ReflectionUtil.newInstance(node.getClass());
-            try {
-                copyModelObject(node, newNode);
-                newNode.afterUnmarshal(null, parents.element());
-                parents.push(newNode);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        @Override
-        public void visitNodeAfterChildren(ModelObject node) {
-            parents.pop();
-        }
-    }
-    */
-
     private void prepareNewPageForm() {
         SelectionProvider classSelectionProvider =
                 DefaultSelectionProvider.create("pageClassName",
                         new String[] {
                                 CrudPage.class.getName(), ChartPage.class.getName(),
                                 TextPage.class.getName(), JspPage.class.getName(),
-                                /*PageReference.class.getName()*/ },
-                        new String[] { "Crud", "Chart", "Text", "JSP", /*"Reference to another page"*/ });
+                                PageReference.class.getName() },
+                        new String[] { "Crud", "Chart", "Text", "JSP", "Reference to another page" });
         //root + at least 1 child
         boolean includeSiblingOption = dispatch.getPageInstancePath().length > 2;
         int fieldCount = includeSiblingOption ? 3 : 2;

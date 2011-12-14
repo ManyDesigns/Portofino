@@ -247,7 +247,6 @@ public class CrudAction extends PortletAction {
                     setupSelectionProvider(null, (DatabaseSelectionProvider) dsp, configuredSPs);
                 } else {
                     logger.error("Unsupported selection provider: " + dsp);
-                    continue;
                 }
             }
         }
@@ -377,7 +376,7 @@ public class CrudAction extends PortletAction {
 //            loadObjects();
             setupTableForm(Mode.VIEW);
 
-            return forwardToPortletPage(getSearchView());
+            return getSearchView();
         } catch(Exception e) {
             logger.warn("Crud not correctly configured", e);
             return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
@@ -394,7 +393,7 @@ public class CrudAction extends PortletAction {
             loadObjects();
             setupTableForm(Mode.VIEW);
             tableForm.setSelectable(false);
-            return new ForwardResolution(getEmbeddedSearchView());
+            return getEmbeddedSearchView();
         } catch(Exception e) {
             logger.error("Crud not correctly configured", e);
             return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
@@ -493,7 +492,7 @@ public class CrudAction extends PortletAction {
 
         setupReturnToParentTarget();
 
-        return forwardToPortletPage(getReadView());
+        return getReadView();
     }
 
     protected void refreshBlobDownloadHref() {
@@ -550,7 +549,7 @@ public class CrudAction extends PortletAction {
         createSetup(object);
         form.readFromObject(object);
 
-        return new ForwardResolution(getCreateView());
+        return getCreateView();
     }
 
     @Button(list = "crud-create", key = "commons.save", order = 1)
@@ -573,7 +572,7 @@ public class CrudAction extends PortletAction {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
                     SessionMessages.addErrorMessage(rootCauseMessage);
-                    return new ForwardResolution(getCreateView());
+                    return getCreateView();
                 }
                 pk = pkHelper.generatePkString(object);
                 String url = dispatch.getOriginalPath() + "/" + pk;
@@ -581,7 +580,7 @@ public class CrudAction extends PortletAction {
             }
         }
 
-        return new ForwardResolution(getCreateView());
+        return getCreateView();
     }
 
     //**************************************************************************
@@ -594,11 +593,7 @@ public class CrudAction extends PortletAction {
         setupForm(Mode.EDIT);
         editSetup(object);
         form.readFromObject(object);
-        return new ForwardResolution(getEditView());
-    }
-
-    protected String getEditView() {
-        return "/layouts/crud/edit.jsp";
+        return getEditView();
     }
 
     @Button(list = "crud-edit", key = "commons.update", order = 1)
@@ -619,14 +614,14 @@ public class CrudAction extends PortletAction {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
                     SessionMessages.addErrorMessage(rootCauseMessage);
-                    return new ForwardResolution(getEditView());
+                    return getEditView();
                 }
                 SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
                 return new RedirectResolution(dispatch.getOriginalPath())
                         .addParameter(SEARCH_STRING_PARAM, searchString);
             }
         }
-        return new ForwardResolution(getEditView());
+        return getEditView();
     }
 
     //**************************************************************************
@@ -652,7 +647,7 @@ public class CrudAction extends PortletAction {
 
         setupForm(Mode.BULK_EDIT);
 
-        return new ForwardResolution(getBulkEditView());
+        return getBulkEditView();
     }
 
     @Button(list = "crud-bulk-edit", key = "commons.update", order = 1)
@@ -1533,24 +1528,28 @@ public class CrudAction extends PortletAction {
     protected void deletePostProcess(Object object) {}
     
 
-    protected String getBulkEditView() {
-        return "/layouts/crud/bulk-edit.jsp";
+    protected Resolution getBulkEditView() {
+        return new ForwardResolution("/layouts/crud/bulk-edit.jsp");
     }
 
-    protected String getCreateView() {
-        return "/layouts/crud/create.jsp";
+    protected Resolution getCreateView() {
+        return new ForwardResolution("/layouts/crud/create.jsp");
     }
 
-    protected String getReadView() {
-        return "/layouts/crud/read.jsp";
+    protected Resolution getEditView() {
+        return new ForwardResolution("/layouts/crud/edit.jsp");
     }
 
-    protected String getSearchView() {
-        return "/layouts/crud/search.jsp";
+    protected Resolution getReadView() {
+        return forwardToPortletPage("/layouts/crud/read.jsp");
     }
 
-    protected String getEmbeddedSearchView() {
-        return "/layouts/crud/embedded-search.jsp";
+    protected Resolution getSearchView() {
+        return forwardToPortletPage("/layouts/crud/search.jsp");
+    }
+
+    protected Resolution getEmbeddedSearchView() {
+        return new ForwardResolution("/layouts/crud/embedded-search.jsp");
     }
 
     //**************************************************************************

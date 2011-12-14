@@ -114,10 +114,10 @@ public class PageReferenceInstance extends PageInstance {
         return wrappedPageInstance.removeChild(page);
     }
 
-    @Override
+    /*@Override
     public String getUrlFragment() {
         return wrappedPageInstance.getUrlFragment();
-    }
+    }*/
 
     @Override
     public Application getApplication() {

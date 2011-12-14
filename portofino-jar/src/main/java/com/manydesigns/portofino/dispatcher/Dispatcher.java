@@ -113,7 +113,7 @@ public class Dispatcher {
         Page page = pageInstance.getPage();
         Class<? extends ActionBean> actionBeanClass = null;
         try {
-            actionBeanClass = getActionBeanClass(page);
+            actionBeanClass = getActionBeanClass(application, page);
         } catch (ClassNotFoundException e) {
             logger.error("Couldn't get action bean class for " + page, e);
         }
@@ -125,13 +125,14 @@ public class Dispatcher {
         return new Dispatch(contextPath, path, actionBeanClass, pageArray);
     }
 
-    public Class<? extends ActionBean> getActionBeanClass(Page page) throws ClassNotFoundException {
+    public static Class<? extends ActionBean> getActionBeanClass(Application application, Page page)
+            throws ClassNotFoundException {
         if(page == null) {
             return null;
         }
         Class<?> actionClass = page.getActualActionClass();
         if (!isValidActionClass(actionClass)) {
-            actionClass = getScriptActionClass(page);
+            actionClass = getScriptActionClass(application, page);
             page.setActualActionClass(actionClass);
         }
         if (isValidActionClass(actionClass)) {
@@ -141,7 +142,7 @@ public class Dispatcher {
         }
     }
 
-    protected boolean isValidActionClass(Class<?> actionClass) {
+    protected static boolean isValidActionClass(Class<?> actionClass) {
         if(actionClass == null) {
             return false;
         }
@@ -152,7 +153,7 @@ public class Dispatcher {
         return true;
     }
 
-    public Class<?> getScriptActionClass(Page page) {
+    public static Class<?> getScriptActionClass(Application application, Page page) {
         try {
             File storageDirFile = application.getAppStorageDir();
             String id = page.getId();

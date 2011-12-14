@@ -108,7 +108,12 @@ public class DefaultSelectionProvider implements SelectionProvider {
                 labels[j] = OgnlUtils.convertValueToString(valueAndLabel[j*2+1]);
             }
 
-            rows[i] = new Row(values, labels, true);
+            boolean active = true;
+            if(valueAndLabel.length > fieldCount) {
+                active = (Boolean) OgnlUtils.convertValue(valueAndLabel[fieldCount], Boolean.class);
+            }
+
+            rows[i] = new Row(values, labels, active);
             i++;
         }
 
