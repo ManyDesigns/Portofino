@@ -27,9 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.liquibase;
+package com.manydesigns.portofino.liquibase.databases;
 
-import liquibase.database.core.DB2Database;
+import com.manydesigns.portofino.liquibase.LiquibaseUtils;
+import liquibase.database.core.SQLiteDatabase;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -37,7 +38,7 @@ import liquibase.database.core.DB2Database;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class PortofinoDB2Database extends DB2Database {
+public class PortofinoSQLiteDatabase extends SQLiteDatabase {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -45,5 +46,4 @@ public class PortofinoDB2Database extends DB2Database {
     public String escapeDatabaseObject(String objectName) {
         return LiquibaseUtils.escapeDatabaseObject(objectName, "\"");
     }
-    
 }

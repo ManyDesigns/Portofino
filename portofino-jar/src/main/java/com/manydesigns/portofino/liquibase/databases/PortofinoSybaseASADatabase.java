@@ -27,9 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.liquibase;
+package com.manydesigns.portofino.liquibase.databases;
 
-import liquibase.database.core.FirebirdDatabase;
+import com.manydesigns.portofino.liquibase.LiquibaseUtils;
+import liquibase.database.core.SybaseASADatabase;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -37,7 +38,7 @@ import liquibase.database.core.FirebirdDatabase;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class PortofinoFirebirdDatabase extends FirebirdDatabase {
+public class PortofinoSybaseASADatabase extends SybaseASADatabase {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 

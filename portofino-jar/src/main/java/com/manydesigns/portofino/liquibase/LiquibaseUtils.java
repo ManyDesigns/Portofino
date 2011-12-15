@@ -29,7 +29,13 @@
 
 package com.manydesigns.portofino.liquibase;
 
+import com.manydesigns.portofino.liquibase.databases.*;
+import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoPostgresCreateDatabaseChangeLogLockTableGenerator;
+import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoPostgresCreateDatabaseChangeLogTableGenerator;
+import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoPostgresLockDatabaseChangeLogGenerator;
+import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoSelectFromDatabaseChangeLogLockGenerator;
 import liquibase.database.DatabaseFactory;
+import liquibase.sqlgenerator.SqlGeneratorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,5 +106,28 @@ public class LiquibaseUtils {
 
         logger.debug("Registering Postgres");
         databaseFactory.register(new PortofinoPostgresDatabase());
+    }
+
+    public static void setupSqlGeneratorFactory() {
+        logger.debug("Setting up Liquibase sql generator factory");
+
+        SqlGeneratorFactory sqlGeneratorFactory =
+                SqlGeneratorFactory.getInstance();
+
+        logger.debug("Registering PortofinoPostgresCreateDatabaseChangeLogTableGenerator");
+        sqlGeneratorFactory.register(
+                new PortofinoPostgresCreateDatabaseChangeLogTableGenerator());
+
+        logger.debug("Registering PortofinoPostgresCreateDatabaseChangeLogLockTableGenerator");
+        sqlGeneratorFactory.register(
+                new PortofinoPostgresCreateDatabaseChangeLogLockTableGenerator());
+
+        logger.debug("Registering PortofinoSelectFromDatabaseChangeLogLockGenerator");
+        sqlGeneratorFactory.register(
+                new PortofinoSelectFromDatabaseChangeLogLockGenerator());
+
+        logger.debug("Registering PortofinoPostgresLockDatabaseChangeLogGenerator");
+        sqlGeneratorFactory.register(
+                new PortofinoPostgresLockDatabaseChangeLogGenerator());
     }
 }

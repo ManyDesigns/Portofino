@@ -1,14 +1,14 @@
 <?xml version="1.0" ?>
 <connections>
     <jdbcConnection
-            databaseName="redmine"
-            driver="org.h2.Driver"
-            url="jdbc:h2:${serverInfo:realPath}/WEB-INF/db/redmine"
-            username="manydesigns"
-            password="manydesigns"
-            includeSchemas="PUBLIC"
-            excludeSchemas=""
-            />
+           databaseName="redmine"
+           driver="org.postgresql.Driver"
+           url="jdbc:postgresql:redmine"
+           username="manydesigns"
+           password="manydesigns"
+           includeSchemas="public"
+           excludeSchemas=""
+           />
     <jdbcConnection
             databaseName="portofino"
             driver="org.h2.Driver"
