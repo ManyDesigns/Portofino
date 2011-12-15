@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.util;
 
 import org.apache.commons.configuration.Configuration;
-import sun.util.ResourceBundleEnumeration;
 
 import java.util.*;
 
@@ -58,9 +57,14 @@ public class ConfigurationResourceBundle extends ResourceBundle {
     }
 
     public Enumeration<String> getKeys() {
-        ResourceBundle parent = this.parent;
-        return new ResourceBundleEnumeration(handleKeySet(),
-                (parent != null) ? parent.getKeys() : null);
+        Set<String> myKeys = handleKeySet();
+        if(parent != null) {
+            Enumeration<String> parentKeysEnum = parent.getKeys();
+            while (parentKeysEnum.hasMoreElements()) {
+                myKeys.add(parentKeysEnum.nextElement());
+            }
+        }
+        return Collections.enumeration(myKeys);
     }
 
     protected Set<String> handleKeySet() {

@@ -701,10 +701,6 @@ public class HibernateApplicationImpl implements Application {
     }
 
     protected String getBundleName(String baseName, Locale locale) {
-        if(locale == Locale.ROOT) {
-            return baseName;
-        }
-
         String language = locale.getLanguage();
         String country = locale.getCountry();
         String variant = locale.getVariant();
