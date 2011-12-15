@@ -20,6 +20,15 @@
             />
     <!--<jdbcConnection
             databaseName="redmine"
+            driver="oracle.jdbc.driver.OracleDriver"
+            url="jdbc:oracle:thin:@192.168.1.8:1521:ORACLE"
+            username="redmine"
+            password="redmine"
+            includeSchemas="redmine"
+            excludeSchemas=""
+            />-->
+    <!--<jdbcConnection
+            databaseName="redmine"
             driver="org.postgresql.Driver"
             url="jdbc:postgresql:redmine"
             username="manydesigns"
