@@ -1,21 +1,12 @@
 <?xml version="1.0" ?>
 <connections>
-    <!--<jdbcConnection
+    <jdbcConnection
             databaseName="redmine"
             driver="org.h2.Driver"
             url="jdbc:h2:${serverInfo:realPath}/WEB-INF/db/redmine"
             username="manydesigns"
             password="manydesigns"
             includeSchemas="PUBLIC"
-            excludeSchemas=""
-            />-->
-    <jdbcConnection
-            databaseName="redmine"
-            driver="org.postgresql.Driver"
-            url="jdbc:postgresql:redmine"
-            username="manydesigns"
-            password="manydesigns"
-            includeSchemas="public"
             excludeSchemas=""
             />
     <jdbcConnection
@@ -28,6 +19,16 @@
             excludeSchemas=""
             />
     <!--<jdbcConnection
+            databaseName="redmine"
+            driver="org.postgresql.Driver"
+            url="jdbc:postgresql:redmine"
+            username="manydesigns"
+            password="manydesigns"
+            includeSchemas="public"
+            excludeSchemas=""
+            />
+    -->
+    <!--<jdbcConnection
             databaseName="portofino"
             driver="com.mysql.jdbc.Driver"
             url="jdbc:mysql://localhost/public"
@@ -35,8 +36,8 @@
             password=""
             includeSchemas="public"
             excludeSchemas=""
-            />
-    <jdbcConnection
+            />-->
+    <!--<jdbcConnection
             databaseName="redmine"
             driver="com.mysql.jdbc.Driver"
             url="jdbc:mysql://localhost/redmine"
