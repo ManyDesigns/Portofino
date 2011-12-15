@@ -536,9 +536,7 @@ public class PortletAction extends AbstractActionBean {
 
     protected DefaultSelectionProvider createSelectionProvider
             (String name, int fieldCount, Class[] fieldTypes, Collection<Object[]> objects) {
-        int size = objects.size();
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider(name, fieldCount);
-        int i = 0;
         for (Object[] valueAndLabel : objects) {
             Object[] values = new Object[fieldCount];
             String[] labels = new String[fieldCount];
@@ -550,12 +548,13 @@ public class PortletAction extends AbstractActionBean {
             }
 
             boolean active = true;
-            if(valueAndLabel.length > fieldCount) {
-                active = (Boolean) OgnlUtils.convertValue(valueAndLabel[fieldCount], Boolean.class);
+            if(valueAndLabel.length > 2 * fieldCount) {
+                active =
+                        valueAndLabel[2 * fieldCount] instanceof Boolean &&
+                        (Boolean) valueAndLabel[2 * fieldCount];
             }
 
             selectionProvider.appendRow(values, labels, active);
-            i++;
         }
         return selectionProvider;
     }
@@ -568,8 +567,19 @@ public class PortletAction extends AbstractActionBean {
     ) {
         int fieldsCount = propertyAccessors.length;
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider(name, propertyAccessors.length);
-        int i = 0;
         for (Object current : objects) {
+            boolean active = true;
+            if(current instanceof Object[]) {
+                Object[] valueAndActive = (Object[]) current;
+                if(valueAndActive.length > 1) {
+                    active = valueAndActive[1] instanceof Boolean && (Boolean) valueAndActive[1];
+                }
+                if(valueAndActive.length > 0) {
+                    current = valueAndActive[0];
+                } else {
+                    throw new IllegalArgumentException("Invalid selection provider query result - sp: " + name);
+                }
+            }
             Object[] values = new Object[fieldsCount];
             String[] labels = new String[fieldsCount];
             int j = 0;
@@ -585,8 +595,7 @@ public class PortletAction extends AbstractActionBean {
                 }
                 j++;
             }
-            selectionProvider.appendRow(values, labels, true);
-            i++;
+            selectionProvider.appendRow(values, labels, active);
         }
         return selectionProvider;
     }

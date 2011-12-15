@@ -241,7 +241,7 @@ public class SelectField extends AbstractField {
 
     public void valueToXhtmlEditDropDown(XhtmlBuffer xb) {
         Object value = selectionModel.getValue(selectionModelIndex);
-        Map<Object, String> options =
+        Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
 
         xb.openElement("select");
@@ -253,13 +253,16 @@ public class SelectField extends AbstractField {
             xb.writeOption("", checked, comboLabel);
         }
 
-        for (Map.Entry<Object,String> option :
+        for (Map.Entry<Object,SelectionModel.Option> option :
                 options.entrySet()) {
+            if(!option.getValue().active) {
+                continue;
+            }
             Object optionValue = option.getKey();
             String optionStringValue =
                     (String) OgnlUtils.convertValue(optionValue, String.class);
             optionStringValue = StringUtils.defaultString(optionStringValue);
-            String optionLabel = option.getValue();
+            String optionLabel = option.getValue().label;
             checked =  (optionValue == value) ||
                        (optionValue != null && optionValue.equals(value));
             xb.writeOption(optionStringValue, checked, optionLabel);
@@ -313,7 +316,7 @@ public class SelectField extends AbstractField {
 
     public void valueToXhtmlEditRadio(XhtmlBuffer xb) {
         Object value = selectionModel.getValue(selectionModelIndex);
-        Map<Object, String> options =
+        Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
 
         xb.openElement("fieldset");
@@ -330,12 +333,15 @@ public class SelectField extends AbstractField {
             counter++;
         }
 
-        for (Map.Entry<Object,String> option :
+        for (Map.Entry<Object,SelectionModel.Option> option :
                 options.entrySet()) {
+            if(!option.getValue().active) {
+                continue;
+            }
             Object optionValue = option.getKey();
             String optionStringValue =
                     (String) OgnlUtils.convertValue(optionValue, String.class);
-            String optionLabel = option.getValue();
+            String optionLabel = option.getValue().label;
             String radioId = id + "_" + counter;
             boolean checked =  optionValue.equals(value);
             writeRadioWithLabel(xb, radioId, optionLabel,
@@ -405,13 +411,11 @@ public class SelectField extends AbstractField {
 
     public String getStringValue() {
         Object value = selectionModel.getValue(selectionModelIndex);
-        Map<Object, String> options =
-                selectionModel.getOptions(selectionModelIndex);
-        return options.get(value);
+        return selectionModel.getOption(selectionModelIndex, value, true);
     }
 
     public String jsonSelectFieldOptions(boolean includeSelectPrompt) {
-        Map<Object, String> options =
+        Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
         // prepariamo Json
         JsonBuffer jb = new JsonBuffer();
@@ -427,11 +431,14 @@ public class SelectField extends AbstractField {
             jb.closeObject();
         }
 
-        for (Map.Entry<Object,String> option : options.entrySet()) {
+        for (Map.Entry<Object,SelectionModel.Option> option : options.entrySet()) {
+            if(!option.getValue().active) {
+                continue;
+            }
             jb.openObject();
             Object optionValue = option.getKey();
             String optionStringValue = OgnlUtils.convertValueToString(optionValue);
-            String optionLabel = option.getValue();
+            String optionLabel = option.getValue().label;
 
             jb.writeKeyValue("v", optionStringValue);
             jb.writeKeyValue("l", optionLabel);
@@ -457,7 +464,7 @@ public class SelectField extends AbstractField {
         selectionModel.setValue(selectionModelIndex, value);
     }
 
-    public Map<Object, String> getOptions() {
+    public Map<Object, SelectionModel.Option> getOptions() {
         return selectionModel.getOptions(selectionModelIndex);
     }
 

@@ -263,21 +263,22 @@ public class SelectFieldTest extends AbstractElementsTest {
     public void testEditInactiveSelection() {
         setupSelectFields(Mode.EDIT);
 
-        selectField3.setValue("value2");
+        selectField3.setValue("value1");
         String text = Util.elementToString(selectField3);
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
+                "</label></th><td><select id=\"myText\" name=\"myText\">" +
+                "<option value=\"\">-- Select my text --</option>" +
+                "<option value=\"value1\" selected=\"selected\">label1</option>" +
+                "</select></td>", text);
+
+        selectionProvider3.ensureActive("value2");
+        selectField3.setValue("value2");
+        text = Util.elementToString(selectField3);
         assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
                 "<option value=\"\">-- Select my text --</option>" +
                 "<option value=\"value1\">label1</option>" +
                 "<option value=\"value2\" selected=\"selected\">label2</option>" +
-                "</select></td>", text);
-
-        selectField3.setValue("value1");
-        text = Util.elementToString(selectField3);
-        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
-                "</label></th><td><select id=\"myText\" name=\"myText\">" +
-                "<option value=\"\">-- Select my text --</option>" +
-                "<option value=\"value1\" selected=\"selected\">label1</option>" +
                 "</select></td>", text);
     }
 
@@ -334,6 +335,7 @@ public class SelectFieldTest extends AbstractElementsTest {
     public void testViewInactiveSelection() {
         setupSelectFields(Mode.VIEW);
 
+        selectionProvider3.ensureActive("value2");
         selectField3.setValue("value2");
         String text = Util.elementToString(selectField3);
         assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +

@@ -39,12 +39,10 @@ import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
@@ -104,7 +102,6 @@ import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.lang.Boolean;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.*;
@@ -224,7 +221,7 @@ public class CrudAction extends PortletAction {
     private void setupSelectionProviders() {
         Set<String> configuredSPs = new HashSet<String>();
         for(SelectionProviderReference ref : crud.getSelectionProviders()) {
-            boolean added = false;
+            boolean added;
             if(ref.getForeignKey() != null) {
                 added = setupSelectionProvider(ref, ref.getForeignKey(), configuredSPs);
             } else if(ref.getSelectionProvider() instanceof DatabaseSelectionProvider) {
@@ -267,8 +264,7 @@ public class CrudAction extends PortletAction {
         int i = 0;
         for (Reference reference : references) {
             Column column = reference.getActualFromColumn();
-            String propertyName = column.getPropertyName();
-            fieldNames[i] = propertyName != null ? propertyName : column.getColumnName();
+            fieldNames[i] = column.getActualPropertyName();
             fieldTypes[i] = column.getActualJavaType();
             i++;
         }
@@ -898,21 +894,6 @@ public class CrudAction extends PortletAction {
                 continue;
             }
             String[] fieldNames = current.getFieldNames();
-            /*
-            //Include only searchable fields
-            List<String> actualFieldNames = new ArrayList<String>();
-            for(PropertyAccessor p : classAccessor.getProperties()) {
-                if(ArrayUtils.contains(fieldNames, p.getName())) {
-                    Searchable searchable = p.getAnnotation(Searchable.class);
-                    if(searchable != null && searchable.value()) {
-                        actualFieldNames.add(p.getName());
-                    }
-                }
-            }
-            if(!actualFieldNames.isEmpty()) {
-                String[] actualFieldNamesArr = actualFieldNames.toArray(new String[actualFieldNames.size()]);
-                searchFormBuilder.configSelectionProvider(selectionProvider, actualFieldNamesArr);
-            }*/
             searchFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
 
@@ -957,6 +938,21 @@ public class CrudAction extends PortletAction {
                 continue;
             }
             String[] fieldNames = current.getFieldNames();
+            Object[] values = new Object[fieldNames.length];
+            boolean valuesRead = true;
+            for(int i = 0; i < fieldNames.length; i++) {
+                String fieldName = fieldNames[i];
+                try {
+                    PropertyAccessor propertyAccessor = classAccessor.getProperty(fieldName);
+                    values[i] = propertyAccessor.get(object);
+                } catch (Exception e) {
+                    logger.error("Couldn't read property " + fieldName, e);
+                    valuesRead = false;
+                }
+            }
+            if(valuesRead) {
+                selectionProvider.ensureActive(values);
+            }
             formBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
 

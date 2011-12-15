@@ -45,4 +45,6 @@ public interface SelectionProvider {
     DisplayMode getDisplayMode();
 
     SelectionModel createSelectionModel();
+
+    void ensureActive(Object... values);
 }

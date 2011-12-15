@@ -283,7 +283,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
         appendRow(new Object[] { value }, new String[] { label }, active);
     }
 
-    public Row ensureActive(Object[] values) {
+    public void ensureActive(Object... values) {
         Row row = null;
         ListIterator<Row> iterator = rows.listIterator();
         while(iterator.hasNext()) {
@@ -307,8 +307,8 @@ public class DefaultSelectionProvider implements SelectionProvider {
                 labels[i] = ObjectUtils.toString(values[i]);
             }
             row = new Row(values, labels, true);
+            rows.add(row);
         }
-        return row;
     }
 
     /*public static SelectionProvider create(String name, Class<? extends Enum> enumeration) {
@@ -336,7 +336,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
         private final Object[] values;
         private final String[] labelSearches;
-        private final Map<Object,String>[] optionsArray;
+        private final Map<Object, Option>[] optionsArray;
 
         private boolean needsValidation;
 
@@ -346,7 +346,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
             //noinspection unchecked
             optionsArray = new Map[fieldCount];
             for (int i = 0; i < fieldCount; i++) {
-                optionsArray[i] = new LinkedHashMap<Object, String>();
+                optionsArray[i] = new LinkedHashMap<Object, Option>();
             }
             needsValidation = true;
         }
@@ -378,9 +378,20 @@ public class DefaultSelectionProvider implements SelectionProvider {
             return labelSearches[index];
         }
 
-        public Map<Object, String> getOptions(int index) {
+        public Map<Object, Option> getOptions(int index) {
             validate();
             return optionsArray[index];
+        }
+
+        public String getOption(int index, Object value, boolean includeInactive) {
+            Map<Object, SelectionModel.Option> options = getOptions(index);
+            SelectionModel.Option option = options.get(value);
+            if(option != null) {
+                if(option.active || includeInactive) {
+                    return option.label;
+                }
+            }
+            return null;
         }
 
         private void validate() {
@@ -413,7 +424,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
                     String labelSearch = labelSearches[j];
 
                     if (matching && matchLabel(cellLabel, labelSearch)) {
-                        optionsArray[j].put(cellValue, cellLabel);
+                        optionsArray[j].put(cellValue, new Option(cellValue, cellLabel, row.isActive()));
                     }
 
                     if (matching && value != null
