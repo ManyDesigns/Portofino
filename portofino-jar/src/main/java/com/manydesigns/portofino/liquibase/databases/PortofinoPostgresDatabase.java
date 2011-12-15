@@ -27,8 +27,9 @@
  *
  */
 
-package com.manydesigns.portofino.liquibase;
+package com.manydesigns.portofino.liquibase.databases;
 
+import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import liquibase.database.core.PostgresDatabase;
 
 /**

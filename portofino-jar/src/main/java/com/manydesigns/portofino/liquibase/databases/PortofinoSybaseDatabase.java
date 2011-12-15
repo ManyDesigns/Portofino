@@ -27,9 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.liquibase;
+package com.manydesigns.portofino.liquibase.databases;
 
-import liquibase.database.core.SybaseASADatabase;
+import com.manydesigns.portofino.liquibase.LiquibaseUtils;
+import liquibase.database.core.SybaseDatabase;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -37,12 +38,12 @@ import liquibase.database.core.SybaseASADatabase;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class PortofinoSybaseASADatabase extends SybaseASADatabase {
+public class PortofinoSybaseDatabase extends SybaseDatabase {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     @Override
     public String escapeDatabaseObject(String objectName) {
-        return LiquibaseUtils.escapeDatabaseObject(objectName, "\"");
+        return LiquibaseUtils.escapeDatabaseObject(objectName, "[", "]");
     }
 }

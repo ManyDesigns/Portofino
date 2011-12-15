@@ -27,10 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.liquibase;
+package com.manydesigns.portofino.liquibase.databases;
 
-import liquibase.database.core.OracleDatabase;
-import liquibase.util.StringUtils;
+import com.manydesigns.portofino.liquibase.LiquibaseUtils;
+import liquibase.database.core.InformixDatabase;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -38,7 +38,7 @@ import liquibase.util.StringUtils;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class PortofinoOracleDatabase extends OracleDatabase {
+public class PortofinoInformixDatabase extends InformixDatabase {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -46,14 +46,4 @@ public class PortofinoOracleDatabase extends OracleDatabase {
     public String escapeDatabaseObject(String objectName) {
         return LiquibaseUtils.escapeDatabaseObject(objectName, "\"");
     }
-
-    @Override
-    public String escapeIndexName(String schemaName, String indexName) {
-        if (StringUtils.trimToNull(schemaName) == null) {
-            return escapeDatabaseObject(indexName);
-        } else {
-            return escapeDatabaseObject(schemaName) + "." + escapeDatabaseObject(indexName);
-        }
-    }
-
 }
