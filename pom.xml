@@ -96,6 +96,7 @@
                         <descriptor>assembly-os-src.xml</descriptor>
                         <descriptor>assembly-os-bin.xml</descriptor>
                         <descriptor>assembly-commercial-bin.xml</descriptor>
+                        <descriptor>assembly-evaluation-bin.xml</descriptor>
                     </descriptors>
                 </configuration>
             </plugin>
