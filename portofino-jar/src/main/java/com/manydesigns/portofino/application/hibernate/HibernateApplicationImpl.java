@@ -54,7 +54,6 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -72,9 +71,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
@@ -615,24 +612,19 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
 
     private void writeToConnectionFile() {
-        OutputStream os = null;
         try {
             File tempFile = File.createTempFile("portofino", "connections.xml");
-            os = new FileOutputStream(tempFile);
 
             JAXBContext jc = JAXBContext.newInstance(Connections.JAXB_CONNECTIONS_PACKAGES);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             m.marshal(connectionProviders, tempFile);
-            os.flush();
 
             moveFileSafely(tempFile, appConnectionsFile.getAbsolutePath());
 
             logger.info("Saved connections to file: {}", appConnectionsFile);
         } catch (Throwable e) {
             logger.error("Cannot save connections to file: " + appConnectionsFile, e);
-        } finally {
-            IOUtils.closeQuietly(os);
         }
     }
 
@@ -641,7 +633,7 @@ public class HibernateApplicationImpl implements Application {
         if(!destination.exists()) {
             FileUtils.moveFile(tempFile, destination);
         } else {
-            File backup = File.createTempFile(destination.getName(), ".backup");
+            File backup = File.createTempFile(destination.getName(), ".backup", destination.getParentFile());
             backup.delete();
             FileUtils.moveFile(destination, backup);
             FileUtils.moveFile(tempFile, destination);
