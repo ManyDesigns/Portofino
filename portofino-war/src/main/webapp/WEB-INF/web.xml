@@ -94,12 +94,16 @@
         </filter-class>
         <init-param>
 			<param-name>ActionResolver.Class</param-name>
-			<param-value>com.manydesigns.portofino.dispatcher.ModelActionResolver</param-value>
+			<param-value>com.manydesigns.portofino.stripes.ModelActionResolver</param-value>
 		</init-param>
         <init-param>
 			<param-name>ActionResolver.Packages</param-name>
 			<param-value>com.manydesigns.portofino.actions</param-value>
 		</init-param>
+        <init-param>
+            <param-name>Extension.Packages</param-name>
+            <param-value>com.manydesigns.portofino.stripes</param-value>
+        </init-param>
         <init-param>
             <param-name>Interceptor.Classes</param-name>
             <param-value>

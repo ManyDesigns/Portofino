@@ -22,7 +22,7 @@ import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.ModelActionResolver;
+import com.manydesigns.portofino.stripes.ModelActionResolver;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;

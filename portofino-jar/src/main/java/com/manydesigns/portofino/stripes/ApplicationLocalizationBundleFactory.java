@@ -27,22 +27,21 @@
 *
 */
 
-package com.manydesigns.portofino.dispatcher;
+package com.manydesigns.portofino.stripes;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ApplicationStarter;
-import groovy.lang.GroovyObject;
-import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.config.Configuration;
-import net.sourceforge.stripes.controller.NameBasedActionResolver;
+import net.sourceforge.stripes.localization.LocalizationBundleFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -50,18 +49,24 @@ import javax.servlet.http.HttpServletRequest;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class ModelActionResolver extends NameBasedActionResolver {
+public class ApplicationLocalizationBundleFactory implements LocalizationBundleFactory {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    private static final Logger logger = LoggerFactory.getLogger(ModelActionResolver.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApplicationLocalizationBundleFactory.class);
 
-    protected Dispatcher dispatcher;
     protected ServletContext servletContext;
+    protected Application application;
 
-    @Override
+    public ResourceBundle getErrorMessageBundle(Locale locale) throws MissingResourceException {
+        return application.getBundle(locale);
+    }
+
+    public ResourceBundle getFormFieldBundle(Locale locale) throws MissingResourceException {
+        return application.getBundle(locale);
+    }
+
     public void init(Configuration configuration) throws Exception {
-        super.init(configuration);
         servletContext = configuration.getServletContext();
         logger.debug("Retrieving application starter");
         ApplicationStarter applicationStarter =
@@ -69,58 +74,10 @@ public class ModelActionResolver extends NameBasedActionResolver {
                         ApplicationAttributes.APPLICATION_STARTER);
 
         logger.debug("Retrieving application");
-        Application application;
         try {
             application = applicationStarter.getApplication();
-            dispatcher = new Dispatcher(application);
         } catch (Exception e) {
             throw new ServletException(e);
-        }
-    }
-
-    @Override
-    public Class<? extends ActionBean> getActionBeanType(String path) {
-        Dispatch dispatch = getDispatch(path);
-        if(dispatch != null) {
-            Class<? extends ActionBean> actionBeanClass = dispatch.getActionBeanClass();
-            if(GroovyObject.class.isAssignableFrom(actionBeanClass)) {
-                synchronized (this) { //TODO aggiungere solo se necessario?
-                    addActionBean(actionBeanClass);
-                }
-            }
-            return actionBeanClass;
-        } else {
-            return super.getActionBeanType(path);
-        }
-    }
-
-    @Override
-    public String getUrlBindingFromPath(String path) {
-        Dispatch dispatch = getDispatch(path);
-        if(dispatch != null) {
-            return path;
-        } else {
-            return super.getUrlBindingFromPath(path);
-        }
-    }
-
-    protected Dispatch getDispatch(String path) {
-        HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-        return dispatcher.createDispatch(request.getContextPath(), path);
-    }
-
-    @Override
-    public synchronized void removeActionBean(Class<? extends ActionBean> clazz) {
-        super.removeActionBean(clazz);
-    }
-
-    @Override
-    public String getUrlBinding(Class<? extends ActionBean> clazz) {
-        if(GroovyObject.class.isAssignableFrom(clazz)) {
-            //Meglio evitare conflitti con action configurate normalmente
-            return super.getUrlBinding(clazz) + "__groovy__";
-        } else {
-            return super.getUrlBinding(clazz);
         }
     }
 }
