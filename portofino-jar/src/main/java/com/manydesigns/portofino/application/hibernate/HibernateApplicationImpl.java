@@ -169,8 +169,9 @@ public class HibernateApplicationImpl implements Application {
         }
 
         logger.info("Updating database definitions");
+        String appsDir = appDir.getParent();
         ResourceAccessor resourceAccessor =
-                new FileSystemResourceAccessor();
+                new FileSystemResourceAccessor(appsDir);
         for (ConnectionProvider current : connectionProviders.getConnections()) {
             String databaseName = current.getDatabaseName();
             String changelogFileName =
@@ -188,7 +189,7 @@ public class HibernateApplicationImpl implements Application {
                 //XXX temporaneo funziona con uno schema solo
                 //lqDatabase.setDefaultSchemaName(current.getIncludeSchemas());
                 Liquibase lq = new Liquibase(
-                        changelogFile.getAbsolutePath(),
+                        appId + File.separator + appDbsDir.getName() + File.separator + changelogFileName,
                         resourceAccessor,
                         lqDatabase);
                 lq.update(null);
