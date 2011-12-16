@@ -62,6 +62,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
@@ -246,6 +247,7 @@ public class HibernateApplicationImpl implements Application {
     }
 
     private synchronized void installDataModel(Model newModel) {
+        Map<String, HibernateDatabaseSetup> oldSetups = setups;
         HashMap<String, HibernateDatabaseSetup> newSetups =
                 new HashMap<String, HibernateDatabaseSetup>();
         for (Database database : newModel.getDatabases()) {
@@ -281,6 +283,23 @@ public class HibernateApplicationImpl implements Application {
         }
         setups = newSetups;
         model = newModel;
+
+        if (oldSetups != null) {
+            logger.info("Cleaning up old setups");
+            for (Map.Entry<String, HibernateDatabaseSetup> current : oldSetups.entrySet()) {
+                String databaseName = current.getKey();
+                logger.info("Cleaning up old setup for: {}", databaseName);
+                HibernateDatabaseSetup hibernateDatabaseSetup =
+                        current.getValue();
+                try {
+                    SessionFactory sessionFactory =
+                            hibernateDatabaseSetup.getSessionFactory();
+                    sessionFactory.close();
+                } catch (Throwable t) {
+                    logger.warn("Cannot close session factory for: " + databaseName, t);
+                }
+            }
+        }
     }
 
     //**************************************************************************
