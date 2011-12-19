@@ -114,6 +114,7 @@ public class HibernateApplicationImpl implements Application {
     protected final File appDbsDir;
     protected final File appModelFile;
     protected final File appScriptsDir;
+    protected final File appTextDir;
     protected final File appStorageDir;
     protected final File appWebDir;
 
@@ -134,6 +135,7 @@ public class HibernateApplicationImpl implements Application {
                                     File appDbsDir,
                                     File appModelFile,
                                     File appScriptsDir,
+                                    File appTextDir,
                                     File appStorageDir,
                                     File appWebDir
     ) {
@@ -146,6 +148,7 @@ public class HibernateApplicationImpl implements Application {
         this.appDbsDir = appDbsDir;
         this.appModelFile = appModelFile;
         this.appScriptsDir = appScriptsDir;
+        this.appTextDir = appTextDir;
         this.appStorageDir = appStorageDir;
         this.appWebDir = appWebDir;
     }
@@ -169,9 +172,9 @@ public class HibernateApplicationImpl implements Application {
         }
 
         logger.info("Updating database definitions");
-        String appsDir = appDir.getParent();
+        File appsDir = appDir.getParentFile();
         ResourceAccessor resourceAccessor =
-                new FileSystemResourceAccessor(appsDir);
+                new FileSystemResourceAccessor(appsDir.getAbsolutePath());
         for (ConnectionProvider current : connectionProviders.getConnections()) {
             String databaseName = current.getDatabaseName();
             String changelogFileName =
@@ -188,8 +191,13 @@ public class HibernateApplicationImpl implements Application {
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
                 //XXX temporaneo funziona con uno schema solo
                 //lqDatabase.setDefaultSchemaName(current.getIncludeSchemas());
+                String relativeChangelogPath = calculateRelativePath(appsDir, changelogFile);
+                if(new File(relativeChangelogPath).isAbsolute()) {
+                    logger.warn("The application dbs dir {} is not inside the apps dir {}; using an absolute path for Liquibase update",
+                            appDbsDir, appsDir);
+                }
                 Liquibase lq = new Liquibase(
-                        appId + File.separator + appDbsDir.getName() + File.separator + changelogFileName,
+                        relativeChangelogPath,
                         resourceAccessor,
                         lqDatabase);
                 lq.update(null);
@@ -200,6 +208,16 @@ public class HibernateApplicationImpl implements Application {
             }
 
         }
+    }
+
+    private String calculateRelativePath(File ancestor, File changelogFile) {
+        String path = changelogFile.getName();
+        File parent = changelogFile.getParentFile();
+        while (parent != null && !parent.equals(ancestor)) {
+            path = parent.getName() + File.separator + path;
+            parent = parent.getParentFile();
+        }
+        return path;
     }
 
     public synchronized void loadXmlModel() {
@@ -699,6 +717,10 @@ public class HibernateApplicationImpl implements Application {
 
     public File getAppScriptsDir() {
         return appScriptsDir;
+    }
+
+    public File getAppTextDir() {
+        return appTextDir;
     }
 
     public File getAppStorageDir() {

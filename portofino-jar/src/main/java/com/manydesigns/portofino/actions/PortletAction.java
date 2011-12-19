@@ -22,7 +22,6 @@ import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.stripes.ModelActionResolver;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
@@ -32,6 +31,7 @@ import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
+import com.manydesigns.portofino.stripes.ModelActionResolver;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import com.manydesigns.portofino.util.ShortNameUtils;
@@ -49,6 +49,7 @@ import org.apache.commons.beanutils.converters.ClassConverter;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -127,7 +128,6 @@ public class PortletAction extends AbstractActionBean {
     //**************************************************************************
 
     protected String script;
-    protected File storageDirFile;
 
     //**************************************************************************
     // Logging
@@ -145,7 +145,6 @@ public class PortletAction extends AbstractActionBean {
 
     @Before
     protected void prepare() {
-        storageDirFile = application.getAppStorageDir();
         dereferencePageInstance();
     }
 
@@ -842,25 +841,24 @@ public class PortletAction extends AbstractActionBean {
                 final String pageId = RandomUtil.createRandomId();
                 page.setId(pageId);
                 File storageDirFile = application.getAppStorageDir();
-                File[] resources = storageDirFile.listFiles(new FilenameFilter() {
-                    public boolean accept(File dir, String name) {
-                        return name.startsWith(oldPageId + ".");
-                    }
-                });
-                for(File res : resources) {
-                    File dest = new File(storageDirFile, pageId + res.getName().substring(oldPageId.length()));
-                    FileInputStream fis = null;
-                    FileOutputStream fos = null;
-                    try {
-                        fis = new FileInputStream(res);
-                        fos = new FileOutputStream(dest);
-                        IOUtils.copy(fis, fos);
-                    } catch (IOException e) {
-                        logger.error("Couldn't copy resource file " + res + " to " + dest, e);
-                    } finally {
-                        IOUtils.closeQuietly(fis);
-                        IOUtils.closeQuietly(fos);
-                    }
+                copyPageFiles(oldPageId, pageId, storageDirFile);
+                File scriptsFile = application.getAppScriptsDir();
+                copyPageFiles(oldPageId, pageId, scriptsFile);
+            }
+        }
+
+        private void copyPageFiles(final String oldPageId, String pageId, File dirFile) {
+            File[] resources = dirFile.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.startsWith(oldPageId + ".");
+                }
+            });
+            for(File res : resources) {
+                File dest = new File(dirFile, pageId + res.getName().substring(oldPageId.length()));
+                try {
+                    FileUtils.copyFile(res, dest);
+                } catch (IOException e) {
+                    logger.error("Couldn't copy resource file " + res + " to " + dest, e);
                 }
             }
         }
@@ -926,7 +924,7 @@ public class PortletAction extends AbstractActionBean {
 
     protected void prepareScript() {
         String pageId = pageInstance.getPage().getId();
-        File file = ScriptingUtil.getGroovyScriptFile(storageDirFile, pageId);
+        File file = ScriptingUtil.getGroovyScriptFile(application.getAppScriptsDir(), pageId);
         if(file.exists()) {
             try {
                 FileReader fr = new FileReader(file);
@@ -957,7 +955,7 @@ public class PortletAction extends AbstractActionBean {
 
     protected void updateScript() {
         File groovyScriptFile =
-                ScriptingUtil.getGroovyScriptFile(storageDirFile, pageInstance.getPage().getId());
+                ScriptingUtil.getGroovyScriptFile(application.getAppScriptsDir(), pageInstance.getPage().getId());
         if(!StringUtils.isBlank(script)) {
             FileWriter fw = null;
             try {

@@ -81,7 +81,6 @@ public class TextAction extends PortletAction {
     //**************************************************************************
 
     public TextPage textPage;
-    public File storageDirFile;
     public File textFile;
 
     public static final Logger logger =
@@ -96,7 +95,6 @@ public class TextAction extends PortletAction {
     public void prepare() {
         super.prepare();
         textPage = (TextPage) pageInstance.getPage();
-        storageDirFile = application.getAppStorageDir();
     }
 
     //**************************************************************************
@@ -120,7 +118,7 @@ public class TextAction extends PortletAction {
 
     protected void loadContent() throws IOException {
         String textCode = textPage.getId();
-        textFile = RandomUtil.getCodeFile(storageDirFile, TEXT_FILE_NAME_PATTERN, textCode);
+        textFile = RandomUtil.getCodeFile(application.getAppTextDir(), TEXT_FILE_NAME_PATTERN, textCode);
         try {
             content = FileUtils.readFileToString(textFile, CONTENT_ENCODING);
         } catch (FileNotFoundException e) {
@@ -136,7 +134,7 @@ public class TextAction extends PortletAction {
         byte[] contentByteArray = content.getBytes(CONTENT_ENCODING);
         String textCode = textPage.getId();
         File dataFile =
-                RandomUtil.getCodeFile(storageDirFile, TEXT_FILE_NAME_PATTERN, textCode);
+                RandomUtil.getCodeFile(application.getAppTextDir(), TEXT_FILE_NAME_PATTERN, textCode);
 
         // copy the data
         long size = IOUtils.copyLarge(
@@ -209,7 +207,7 @@ public class TextAction extends PortletAction {
             InputStream attachmentStream = upload.getInputStream();
             String attachmentId = RandomUtil.createRandomId();
             File dataFile = RandomUtil.getCodeFile(
-                    storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
+                    application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
 
             // copy the data
             IOUtils.copyLarge(attachmentStream, new FileOutputStream(dataFile));
@@ -238,7 +236,7 @@ public class TextAction extends PortletAction {
         try {
             String attachmentId = attachment.getId();
             File file = RandomUtil.getCodeFile(
-                    storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
+                    application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
             InputStream is = new FileInputStream(file);
             Resolution resolution =
                     new StreamingResolution(attachment.getContentType(), is)
@@ -264,7 +262,7 @@ public class TextAction extends PortletAction {
         try {
             String attachmentId = attachment.getId();
             File file = RandomUtil.getCodeFile(
-                    storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
+                    application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
             InputStream is = new FileInputStream(file);
             Resolution resolution =
                     new StreamingResolution(attachment.getContentType(), is)
@@ -305,7 +303,7 @@ public class TextAction extends PortletAction {
                         logger.warn("Ignoring non-existing attachment with code: {}", code);
                         continue;
                     }
-                    File file = RandomUtil.getCodeFile(storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachment.getId());
+                    File file = RandomUtil.getCodeFile(application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachment.getId());
                     if(!FileUtils.deleteQuietly(file)) {
                         logger.warn("File wasn't deleted: {}", file.getAbsolutePath());
                     }

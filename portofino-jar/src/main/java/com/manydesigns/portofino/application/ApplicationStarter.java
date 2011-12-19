@@ -60,6 +60,7 @@ public class ApplicationStarter {
     public static final String APP_DBS_DIR = "dbs";
     public static final String APP_MODEL_FILE = "portofino-model.xml";
     public static final String APP_SCRIPTS_DIR = "scripts";
+    public static final String APP_TEXT_DIR = "text";
     public static final String APP_STORAGE_DIR = "storage";
     public static final String APP_WEB_DIR = "web";
 
@@ -94,6 +95,7 @@ public class ApplicationStarter {
     private File appDbsDir;
     private File appModelFile;
     private File appScriptsDir;
+    private File appTextDir;
     private File appStorageDir;
     private File appWebDir;
 
@@ -239,6 +241,10 @@ public class ApplicationStarter {
         logger.info("Application scripts dir: {}", appScriptsDir.getAbsolutePath());
         result = result && ensureDirectoryExistsAndWritable(appScriptsDir);
 
+        appTextDir = new File(appDir, APP_TEXT_DIR);
+        logger.info("Application text dir: {}", appTextDir.getAbsolutePath());
+        result = result && ensureDirectoryExistsAndWritable(appTextDir);
+
         appStorageDir = new File(appDir, APP_STORAGE_DIR);
         logger.info("Application storage dir: {}", appStorageDir.getAbsolutePath());
         result = result && ensureDirectoryExistsAndWritable(appStorageDir);
@@ -285,7 +291,7 @@ public class ApplicationStarter {
             tmpApplication = new HibernateApplicationImpl(appId,
                     portofinoConfiguration, databasePlatformsManager,
                     appDir, appBlobsDir, appConnectionsFile, appDbsDir,
-                    appModelFile, appScriptsDir, appStorageDir, appWebDir);
+                    appModelFile, appScriptsDir, appTextDir, appStorageDir, appWebDir);
             tmpApplication.loadConnections();
             tmpApplication.loadXmlModel();
         } catch (Throwable e) {

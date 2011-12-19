@@ -154,9 +154,9 @@ public class Dispatcher {
 
     public static Class<?> getScriptActionClass(Application application, Page page) {
         try {
-            File storageDirFile = application.getAppStorageDir();
+            File scriptsDirFile = application.getAppScriptsDir();
             String id = page.getId();
-            return ScriptingUtil.getGroovyClass(storageDirFile, id);
+            return ScriptingUtil.getGroovyClass(scriptsDirFile, id);
         } catch (Exception e) {
             logger.error("Couldn't load script for " + page, e);
             return null;
