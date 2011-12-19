@@ -136,9 +136,9 @@ public class Table implements ModelObject, Annotated {
 
         String baseEntityName;
         if (entityName == null) {
-            baseEntityName = defineEntityName(getTableName());
+            baseEntityName = normalizeName(getTableName());
         } else {
-            baseEntityName = defineEntityName(entityName);
+            baseEntityName = normalizeName(entityName);
         }
 
         String calculatedEntityName = baseEntityName;
@@ -384,7 +384,7 @@ public class Table implements ModelObject, Annotated {
     //|    '0'..'9'
     //;
     //**************************************************************************
-    public static String defineEntityName (String name) {
+    public static String normalizeName(String name) {
         name = StringUtils.replaceChars(name, ".", "_");
         String firstLetter = name.substring(0,1);
         String others = name.substring(1);

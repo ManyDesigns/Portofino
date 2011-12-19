@@ -38,6 +38,7 @@ import junit.framework.TestCase;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class TableTest extends TestCase {
+
     public void testActualEntityNames(){
         Model model = new Model();
         Database db = new Database();
@@ -52,14 +53,14 @@ public class TableTest extends TestCase {
         table.init(model);
 
         assertNotNull(table.getActualEntityName());
-        assertEquals("portofino_meta__ab_____acus$____", table.getActualEntityName());
+        assertEquals("_ab_____acus$____", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
         table = new Table();
         table.setSchema(schema);
         table.setTableName("0DPrpt");
         table.init(model);
-        assertEquals("portofino_meta_0dprpt", table.getActualEntityName());
+        assertEquals("_0dprpt", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
 
@@ -72,7 +73,7 @@ public class TableTest extends TestCase {
         table.setSchema(schema);
         table.setTableName("0DPrpt");
         table.init(model);
-        assertEquals("_1portofino_meta_0dprpt", table.getActualEntityName());
+        assertEquals("_0dprpt", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
         db = new Database();
@@ -84,24 +85,68 @@ public class TableTest extends TestCase {
         table.setSchema(schema);
         table.setTableName("0DPrpt");
         table.init(model);
-        assertEquals("$1portofino_meta_0dprpt", table.getActualEntityName());
+        assertEquals("_0dprpt", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
         db = new Database();
         db.setDatabaseName(".portofino");
         table.setTableName("0DPrpt");
         table.init(model);
-        assertEquals("_portofino_meta_0dprpt", table.getActualEntityName());
+        assertEquals("_0dprpt", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
         table.setTableName("XYZéèçò°àùì");
         table.init(model);
-        assertEquals("_portofino_meta_xyzéèçò_àùì", table.getActualEntityName());
+        assertEquals("xyzéèçò_àùì", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
         table.setTableName("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ");
         table.init(model);
-        assertEquals("_portofino_meta_ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ", table.getActualEntityName());
+        assertEquals("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
+    }
+
+    public void testActualColumnNames() {
+        Model model = new Model();
+        Database db = new Database();
+        db.setDatabaseName("portofino");
+        Schema schema = new Schema();
+        schema.setDatabase(db);
+        db.getSchemas().add(schema);
+        schema.setSchemaName("meta");
+        Table table = new Table();
+        table.setSchema(schema);
+        table.setTableName("ignore");
+        schema.getTables().add(table);
+        Column column = new Column();
+        column.setTable(table);
+        column.setColumnName(" ab!!!..acus$%/()");
+        table.getColumns().add(column);
+        model.getDatabases().add(db);
+        model.init();
+
+        assertNotNull(column.getActualPropertyName());
+        assertEquals("_ab_____acus$____", column.getActualPropertyName());
+
+        table = new Table();
+        table.setSchema(schema);
+        table.setTableName("ignore");
+        column = new Column();
+        column.setTable(table);
+        column.setColumnName("0DPrpt");
+        table.getColumns().add(column);
+        schema.getTables().clear();
+        schema.getTables().add(table);
+        model.init();
+        assertEquals("_0dprpt", column.getActualPropertyName());
+
+        
+        column.setColumnName("XYZéèçò°àùì");
+        model.init();
+        assertEquals("xyzéèçò_àùì", column.getActualPropertyName());
+
+        column.setColumnName("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ");
+        model.init();
+        assertEquals("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ", column.getActualPropertyName());
     }
 }

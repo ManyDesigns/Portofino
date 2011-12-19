@@ -126,9 +126,9 @@ public class Column implements ModelObject, Annotated {
         assert scale != null;
 
         if (propertyName == null) {
-            actualPropertyName = columnName;
+            actualPropertyName = Table.normalizeName(columnName);
         } else {
-            actualPropertyName = propertyName;
+            actualPropertyName = propertyName; //AS do not normalize (can be mixed-case Java properties)
         }
 
         actualJavaType = ReflectionUtil.loadClass(javaType);
