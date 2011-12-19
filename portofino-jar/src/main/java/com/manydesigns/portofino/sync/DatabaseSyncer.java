@@ -30,9 +30,7 @@
 package com.manydesigns.portofino.sync;
 
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.application.hibernate.HibernateConfig;
 import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.Annotated;
@@ -465,34 +463,6 @@ public class DatabaseSyncer {
                 targetColumn.setPropertyName(sourceColumn.getPropertyName());
                 targetColumn.setJavaType(sourceColumn.getJavaType());
                 copyAnnotations(sourceColumn, targetColumn);
-            }
-            if(targetColumn.getJavaType() == null) {
-                Class defaultJavaType = Type.getDefaultJavaType(jdbcType);
-
-                if (defaultJavaType != null) {
-                    targetColumn.setJavaType(defaultJavaType.getName());
-                } else {
-                    logger.error("Cannot find Java type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
-                            new Object[]{targetTable.getTableName(),
-                                    targetColumn.getColumnName(),
-                                    jdbcType,
-                                    typeName
-                            });
-                    continue;
-                }
-
-                boolean hibernateTypeOk =
-                        HibernateConfig.setHibernateType(null, targetColumn, defaultJavaType, jdbcType);
-                if (!hibernateTypeOk) {
-                    logger.error("Cannot find Hibernate type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
-                            new Object[]{targetTable.getTableName(),
-                                    targetColumn.getColumnName(),
-                                    jdbcType,
-                                    typeName
-                            });
-                    continue;
-                }
-
             }
 
             logger.debug("Column creation successfull. Adding column to table.");

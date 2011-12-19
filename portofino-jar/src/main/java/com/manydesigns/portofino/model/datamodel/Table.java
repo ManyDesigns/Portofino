@@ -271,10 +271,6 @@ public class Table implements ModelObject, Annotated {
         return actualEntityName;
     }
 
-    public void setActualEntityName(String actualEntityName) {
-        this.actualEntityName = actualEntityName;
-    }
-
     public List<ForeignKey> getOneToManyRelationships() {
         return oneToManyRelationships;
     }

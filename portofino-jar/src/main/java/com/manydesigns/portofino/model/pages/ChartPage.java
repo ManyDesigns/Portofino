@@ -237,10 +237,6 @@ public class ChartPage extends Page {
         return actualDatabase;
     }
 
-    public void setActualDatabase(Database actualDatabase) {
-        this.actualDatabase = actualDatabase;
-    }
-
     public Class<? extends ChartGenerator> getGeneratorClass() {
         return generatorClass;
     }

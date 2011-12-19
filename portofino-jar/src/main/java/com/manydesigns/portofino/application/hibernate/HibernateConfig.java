@@ -198,8 +198,6 @@ public class HibernateConfig {
         }
     }
 
-
-
     protected RootClass createTableMapping(Mappings mappings,
                                            com.manydesigns.portofino.model.datamodel.Table aTable) {
 
@@ -224,7 +222,26 @@ public class HibernateConfig {
 
         List<com.manydesigns.portofino.model.datamodel.Column> columnList =
                 new ArrayList<com.manydesigns.portofino.model.datamodel.Column>();
-        columnList.addAll(aTable.getColumns());
+
+        for(com.manydesigns.portofino.model.datamodel.Column modelColumn : aTable.getColumns()) {
+            int jdbcType = modelColumn.getJdbcType();
+            Class javaType = modelColumn.getActualJavaType();
+            
+            //First param = null ==> doesn't really set anything, just check
+            boolean hibernateTypeOk =
+                    HibernateConfig.setHibernateType(null, modelColumn, javaType, jdbcType);
+            if (hibernateTypeOk) {
+                columnList.add(modelColumn);
+            } else {
+                logger.error("Cannot find Hibernate type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
+                        new Object[]{
+                                aTable.getTableName(),
+                                modelColumn.getColumnName(),
+                                jdbcType,
+                                javaType.getName()
+                        });
+            }
+        }
 
         //Primary keys
         List<com.manydesigns.portofino.model.datamodel.Column> columnPKList
@@ -774,6 +791,9 @@ public class HibernateConfig {
                                  final int jdbcType) {
         String typeName;
         Properties typeParams = null;
+        if(javaType == null) {
+            return false;
+        }
         if (javaType == Long.class) {
             typeName = Hibernate.LONG.getName();
         } else if (javaType == Short.class) {

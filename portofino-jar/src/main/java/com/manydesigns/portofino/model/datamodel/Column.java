@@ -31,6 +31,7 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
@@ -131,11 +132,22 @@ public class Column implements ModelObject, Annotated {
             actualPropertyName = propertyName; //AS do not normalize (can be mixed-case Java properties)
         }
 
-        actualJavaType = ReflectionUtil.loadClass(javaType);
-        if (actualJavaType == null) {
-            logger.warn("Cannot load column {} of java type: {}", getQualifiedName(), javaType);
+        if(javaType != null) {
+            actualJavaType = ReflectionUtil.loadClass(javaType);
+            if (actualJavaType == null) {
+                logger.warn("Cannot load column {} of java type: {}", getQualifiedName(), javaType);
+            }
+        } else {
+            actualJavaType = Type.getDefaultJavaType(jdbcType);
+            if (actualJavaType == null) {
+                logger.error("Cannot determine default Java type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
+                        new Object[]{table.getTableName(),
+                                getColumnName(),
+                                jdbcType,
+                                javaType
+                        });
+            }
         }
-
     }
 
     public void link(Model model) {}
@@ -245,7 +257,6 @@ public class Column implements ModelObject, Annotated {
         return actualJavaType;
     }
 
-    @Required
     @XmlAttribute(required = false)
     public String getJavaType() {
         return javaType;

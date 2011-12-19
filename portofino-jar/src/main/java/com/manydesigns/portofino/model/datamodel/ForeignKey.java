@@ -215,16 +215,8 @@ public class ForeignKey extends DatabaseSelectionProvider
         return actualManyPropertyName;
     }
 
-    public void setActualManyPropertyName(String actualManyPropertyName) {
-        this.actualManyPropertyName = actualManyPropertyName;
-    }
-
     public String getActualOnePropertyName() {
         return actualOnePropertyName;
-    }
-
-    public void setActualOnePropertyName(String actualOnePropertyName) {
-        this.actualOnePropertyName = actualOnePropertyName;
     }
 
     @Override
