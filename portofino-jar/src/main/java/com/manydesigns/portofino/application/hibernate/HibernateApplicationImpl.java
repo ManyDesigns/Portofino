@@ -208,37 +208,39 @@ public class HibernateApplicationImpl implements Application {
         ResourceAccessor resourceAccessor =
                 new FileSystemResourceAccessor(appsDir.getAbsolutePath());
         for (ConnectionProvider current : connectionProviders) {
-            String databaseName = current.getDatabase().getDatabaseName();
-            String changelogFileName =
-                    MessageFormat.format(
-                            changelogFileNameTemplate, databaseName);
-            File changelogFile =
-                new File(appDbsDir, changelogFileName);
-            logger.info("Running changelog file: {}", changelogFile);
-            Connection connection = null;
-            try {
-                connection = current.acquireConnection();
-                JdbcConnection jdbcConnection = new JdbcConnection(connection);
-                liquibase.database.Database lqDatabase =
-                        DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
-                //XXX temporaneo funziona con uno schema solo
-                //lqDatabase.setDefaultSchemaName(current.getIncludeSchemas());
-                String relativeChangelogPath = calculateRelativePath(appsDir, changelogFile);
-                if(new File(relativeChangelogPath).isAbsolute()) {
-                    logger.warn("The application dbs dir {} is not inside the apps dir {}; using an absolute path for Liquibase update",
-                            appDbsDir, appsDir);
+            Database database = current.getDatabase();
+            String databaseName = database.getDatabaseName();
+            for(Schema schema : database.getSchemas()) {
+                String schemaName = schema.getSchemaName();
+                String changelogFileName =
+                        MessageFormat.format(
+                                changelogFileNameTemplate, databaseName + "-" + schemaName);
+                File changelogFile =
+                    new File(appDbsDir, changelogFileName);
+                logger.info("Running changelog file: {}", changelogFile);
+                Connection connection = null;
+                try {
+                    connection = current.acquireConnection();
+                    JdbcConnection jdbcConnection = new JdbcConnection(connection);
+                    liquibase.database.Database lqDatabase =
+                            DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
+                    lqDatabase.setDefaultSchemaName(schemaName);
+                    String relativeChangelogPath = calculateRelativePath(appsDir, changelogFile);
+                    if(new File(relativeChangelogPath).isAbsolute()) {
+                        logger.warn("The application dbs dir {} is not inside the apps dir {}; using an absolute path for Liquibase update",
+                                appDbsDir, appsDir);
+                    }
+                    Liquibase lq = new Liquibase(
+                            relativeChangelogPath,
+                            resourceAccessor,
+                            lqDatabase);
+                    lq.update(null);
+                } catch (Exception e) {
+                    logger.error("Couldn't update database: " + schemaName, e);
+                } finally {
+                    current.releaseConnection(connection);
                 }
-                Liquibase lq = new Liquibase(
-                        relativeChangelogPath,
-                        resourceAccessor,
-                        lqDatabase);
-                lq.update(null);
-            } catch (Exception e) {
-                logger.error("Couldn't update database: " + databaseName, e);
-            } finally {
-                current.releaseConnection(connection);
             }
-
         }
     }
 
