@@ -27,17 +27,20 @@
  *
  */
 
-package com.manydesigns.portofino.connections;
+package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
-import org.apache.commons.lang.StringUtils;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -45,7 +48,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -53,7 +55,7 @@ import java.util.regex.Pattern;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public abstract class ConnectionProvider {
+public abstract class ConnectionProvider implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -66,19 +68,8 @@ public abstract class ConnectionProvider {
     public final static String STATUS_ERROR = "error";
 
     //**************************************************************************
-    // Fields (detected values)
-    //**************************************************************************
-
-    protected String databaseName;
-    protected String includeSchemas;
-    protected String excludeSchemas;
-
-    //**************************************************************************
     // Fields (initialized and detected values)
     //**************************************************************************
-
-    protected Pattern includeSchemasPattern;
-    protected Pattern excludeSchemasPattern;
 
     protected final List<Type> types;
 
@@ -99,8 +90,7 @@ public abstract class ConnectionProvider {
     protected String status;
     protected String errorMessage;
     protected Date lastTested;
-
-
+    protected Database database;
 
     //**************************************************************************
     // Logging
@@ -124,9 +114,6 @@ public abstract class ConnectionProvider {
     //**************************************************************************
 
     public void reset() {
-        includeSchemasPattern = null;
-        excludeSchemasPattern = null;
-
         types.clear();
 
         databaseProductName = null;
@@ -149,20 +136,9 @@ public abstract class ConnectionProvider {
     }
 
     public void init(DatabasePlatformsManager databasePlatformsManager) {
-        if (StringUtils.isBlank(includeSchemas)) {
-            includeSchemasPattern = null;
-        } else {
-            includeSchemasPattern = Pattern.compile(includeSchemas);
-        }
-
-        if (StringUtils.isBlank(excludeSchemas)) {
-            excludeSchemasPattern = null;
-        } else {
-            excludeSchemasPattern = Pattern.compile(excludeSchemas);
-        }
-
         Connection conn = null;
         ResultSet typeRs = null;
+        String databaseName = getDatabase().getDatabaseName();
         try {
             conn = acquireConnection();
 
@@ -263,41 +239,27 @@ public abstract class ConnectionProvider {
     public abstract Connection acquireConnection() throws Exception;
     public abstract void releaseConnection(Connection conn);
 
+    //**************************************************************************
+    // ModelObject implementation
+    //**************************************************************************
+
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        this.database = (Database) parent;
+    }
+
+    public void init(Model model) {}
+
+    public void link(Model model) {}
+
+    public void visitChildren(ModelVisitor visitor) {}
+
+    public String getQualifiedName() {
+        return null;
+    }
 
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
-
-    @XmlAttribute(required = true)
-    @Updatable(false)
-    @Required
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
-    }
-
-    @XmlAttribute()
-    @FieldSize(100)
-    public String getIncludeSchemas() {
-        return includeSchemas;
-    }
-
-    public void setIncludeSchemas(String includeSchemas) {
-        this.includeSchemas = includeSchemas;
-    }
-
-    @XmlAttribute()
-    @FieldSize(100)
-    public String getExcludeSchemas() {
-        return excludeSchemas;
-    }
-
-    public void setExcludeSchemas(String excludeSchemas) {
-        this.excludeSchemas = excludeSchemas;
-    }
 
     @Status(red={STATUS_ERROR}, amber={STATUS_DISCONNECTED}, green={STATUS_CONNECTED})
     @Updatable(false)
@@ -318,14 +280,6 @@ public abstract class ConnectionProvider {
 
     public DatabasePlatform getDatabasePlatform() {
         return databasePlatform;
-    }
-
-    public Pattern getIncludeSchemasPattern() {
-        return includeSchemasPattern;
-    }
-
-    public Pattern getExcludeSchemasPattern() {
-        return excludeSchemasPattern;
     }
 
     public String getDatabaseProductName() {
@@ -383,9 +337,17 @@ public abstract class ConnectionProvider {
         return JDBCMajorMinorVersion;
     }
 
+    public Database getDatabase() {
+        return database;
+    }
+
     public Type[] getTypes() {
         Type[] result = new Type[types.size()];
         return types.toArray(result);
+    }
+
+    public void setDatabase(Database database) {
+        this.database = database;
     }
 
     private static class TypeComparator implements Comparator<Type> {
@@ -398,10 +360,9 @@ public abstract class ConnectionProvider {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         ConnectionProvider that = (ConnectionProvider) o;
 
-        if (databaseName != null ? !databaseName.equals(that.databaseName) : that.databaseName != null)
+        if (database != null ? !database.equals(that.database) : that.database != null)
             return false;
 
         return true;
@@ -409,6 +370,6 @@ public abstract class ConnectionProvider {
 
     @Override
     public int hashCode() {
-        return databaseName != null ? databaseName.hashCode() : 0;
+        return database != null ? database.hashCode() : 0;
     }
 }

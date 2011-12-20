@@ -292,7 +292,6 @@ public class ApplicationStarter {
                     portofinoConfiguration, databasePlatformsManager,
                     appDir, appBlobsDir, appConnectionsFile, appDbsDir,
                     appModelFile, appScriptsDir, appTextDir, appStorageDir, appWebDir);
-            tmpApplication.loadConnections();
             tmpApplication.loadXmlModel();
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);

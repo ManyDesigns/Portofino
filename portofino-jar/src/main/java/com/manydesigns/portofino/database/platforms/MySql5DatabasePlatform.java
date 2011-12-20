@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.database.platforms;
 
-import com.manydesigns.portofino.connections.ConnectionProvider;
+import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
 import org.apache.commons.dbutils.DbUtils;
 import org.hibernate.dialect.MySQLDialect;
 

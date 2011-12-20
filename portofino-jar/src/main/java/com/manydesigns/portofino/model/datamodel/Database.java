@@ -64,6 +64,8 @@ public class Database implements ModelObject {
     protected String trueString = null;
     protected String falseString = null;
 
+    protected ConnectionProvider connectionProvider;
+
     
     //**************************************************************************
     // Logging
@@ -237,5 +239,17 @@ public class Database implements ModelObject {
 
     public void setFalseString(String falseString) {
         this.falseString = falseString;
+    }
+
+    @XmlElements({
+        @XmlElement(name="jdbcConnection", type=JdbcConnectionProvider.class),
+        @XmlElement(name="jndiConnection", type=JndiConnectionProvider.class)
+    })
+    public ConnectionProvider getConnectionProvider() {
+        return connectionProvider;
+    }
+
+    public void setConnectionProvider(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
     }
 }

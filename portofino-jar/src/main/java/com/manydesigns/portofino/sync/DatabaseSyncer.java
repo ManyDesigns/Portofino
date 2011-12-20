@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.sync;
 
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.Annotated;
@@ -51,8 +50,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -77,7 +74,7 @@ public class DatabaseSyncer {
     }
 
     public Database syncDatabase(Model sourceModel) throws Exception {
-        String databaseName = connectionProvider.getDatabaseName();
+        String databaseName = connectionProvider.getDatabase().getDatabaseName();
         Database targetDatabase = new Database();
         targetDatabase.setDatabaseName(databaseName);
 
@@ -487,36 +484,18 @@ public class DatabaseSyncer {
                                            DatabaseMetaData metadata)
             throws SQLException {
         logger.debug("Searching for schemas in: {}",
-                connectionProvider.getDatabaseName());
+                connectionProvider.getDatabase().getDatabaseName());
 
         List<String> result = new ArrayList<String>();
 
-        Pattern includePattern = connectionProvider.getIncludeSchemasPattern();
-        Pattern excludePattern = connectionProvider.getExcludeSchemasPattern();
-        List<String> schemaNames =
+        List<String> schemaNamesFromDb =
                 connectionProvider.getDatabasePlatform().getSchemaNames(metadata);
-        for(String schemaName : schemaNames) {
+        List<Schema> schemas = connectionProvider.getDatabase().getSchemas();
+        for(Schema schema : schemas) {
+            String schemaName = schema.getSchemaName();
             if (INFORMATION_SCHEMA.equalsIgnoreCase(schemaName)) {
                 logger.info("Skipping information schema: {}", schemaName);
                 continue;
-            }
-            if (includePattern != null) {
-                Matcher includeMatcher = includePattern.matcher(schemaName);
-                if (!includeMatcher.matches()) {
-                    logger.info("Schema '{}' does not match include pattern '{}'. Skipping this schema.",
-                            schemaName,
-                            connectionProvider.getIncludeSchemas());
-                    continue;
-                }
-            }
-            if (excludePattern != null) {
-                Matcher excludeMatcher = excludePattern.matcher(schemaName);
-                if (excludeMatcher.matches()) {
-                    logger.info("Schema '{}' matches exclude pattern '{}'. Skipping this schema.",
-                            schemaName,
-                            connectionProvider.getExcludeSchemas());
-                    continue;
-                }
             }
             logger.info("Found schema: {}", schemaName);
             result.add(schemaName);

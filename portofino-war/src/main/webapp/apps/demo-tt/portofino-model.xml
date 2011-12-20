@@ -2,6 +2,11 @@
 <model>
     <databases>
         <database databaseName="redmine">
+            <jdbcConnection
+                driver="com.mysql.jdbc.Driver"
+                url="jdbc:mysql://localhost/redmine"
+                username="manydesigns"
+                password="" />
             <schemas>
                 <schema schemaName="PUBLIC">
                     <tables>
@@ -1474,6 +1479,11 @@
             </schemas>
         </database>
         <database databaseName="portofino">
+            <jdbcConnection
+                driver="org.h2.Driver"
+                url="jdbc:h2:${serverInfo:realPath}/WEB-INF/db/portofino"
+                username="sa"
+                password="" />
             <schemas>
                 <schema schemaName="PUBLIC">
                     <tables>

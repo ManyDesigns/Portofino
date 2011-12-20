@@ -41,12 +41,13 @@ import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
-import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.connections.JdbcConnectionProvider;
-import com.manydesigns.portofino.connections.JndiConnectionProvider;
+import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
+import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.datamodel.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.model.datamodel.JndiConnectionProvider;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
@@ -265,7 +266,10 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         if (form.validate()) {
             form.writeToObject(connectionProvider);
             //TODO check for duplicate database names
-            application.addConnectionProvider(connectionProvider);
+            Database database = new Database();
+            database.setConnectionProvider(connectionProvider);
+            connectionProvider.setDatabase(database);
+            application.addDatabase(database);
             connectionProvider.init(application.getDatabasePlatformsManager());
             SessionMessages.addInfoMessage("Connection provider created successfully");
             return new RedirectResolution(this.getClass());
@@ -296,7 +300,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         form.readFromRequest(context.getRequest());
         if (form.validate()) {            
             form.writeToObject(connectionProvider);
-            application.updateConnectionProvider(connectionProvider);
+            //application.updateDatabase(connectionProvider);
             connectionProvider.init(application.getDatabasePlatformsManager());
             SessionMessages.addInfoMessage("Connection provider updated successfully");
         }
@@ -315,7 +319,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     @Button(list = "connectionProviders-read", key = "commons.delete", order = 5)
     public Resolution delete(){
         if(null!=databaseName){
-            application.deleteConnectionProvider(databaseName);
+            application.deleteDatabase(databaseName);
             SessionMessages.addInfoMessage(
                     "Connection providers deleted successfully");
         }
@@ -326,7 +330,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     public Resolution bulkDelete() {
 
         if(null!=selection && 0!=selection.length){
-            application.deleteConnectionProvider(selection);
+            application.deleteDatabases(selection);
             SessionMessages.addInfoMessage(
                     "Connection providers deleted successfully");
         } else {

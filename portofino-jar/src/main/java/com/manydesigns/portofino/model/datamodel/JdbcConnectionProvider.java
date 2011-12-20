@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.connections;
+package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.annotations.FieldSize;
 import com.manydesigns.elements.annotations.Label;
@@ -181,7 +181,6 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("databaseName", databaseName)
                 .append("driver", driver)
                 .append("url", url)
                 .append("username", username)

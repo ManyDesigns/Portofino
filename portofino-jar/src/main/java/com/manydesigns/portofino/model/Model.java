@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.pages.RootPage;
 import org.slf4j.Logger;
@@ -67,6 +69,18 @@ public class Model {
 
     public Model() {
         this.databases = new ArrayList<Database>();
+    }
+
+    public void initDatabases(DatabasePlatformsManager databasePlatformsManager) {
+        for(Database database : getDatabases()) {
+            ConnectionProvider connectionProvider = database.getConnectionProvider();
+            if(connectionProvider != null) {
+                connectionProvider.reset();
+                connectionProvider.init(databasePlatformsManager);
+            } else {
+                logger.error("No connection provider specified for {}", database);
+            }
+        }
     }
 
     //**************************************************************************

@@ -32,16 +32,14 @@ package com.manydesigns.portofino.application.hibernate;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.connections.Connections;
+import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
+import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -102,7 +100,7 @@ public class HibernateApplicationImpl implements Application {
 
     protected final org.apache.commons.configuration.Configuration portofinoConfiguration;
     protected final DatabasePlatformsManager databasePlatformsManager;
-    protected Connections connectionProviders;
+    protected List<ConnectionProvider> connectionProviders;
     protected Model model;
     protected Map<String, HibernateDatabaseSetup> setups;
 
@@ -157,26 +155,60 @@ public class HibernateApplicationImpl implements Application {
     // Model loading
     //**************************************************************************
 
-    public void loadConnections() {
-        logger.info("Loading connections from file: {}", appConnectionsFile);
-        try {
-            JAXBContext jc = JAXBContext.newInstance(
-                    Connections.JAXB_CONNECTIONS_PACKAGES);
-            Unmarshaller um = jc.createUnmarshaller();
-            connectionProviders = (Connections) um.unmarshal(appConnectionsFile);
-            connectionProviders.reset();
-            connectionProviders.init(databasePlatformsManager);
-        } catch (Exception e) {
-            logger.error("Cannot load/parse file: " + appConnectionsFile, e);
-            return;
+    private String calculateRelativePath(File ancestor, File changelogFile) {
+        String path = changelogFile.getName();
+        File parent = changelogFile.getParentFile();
+        while (parent != null && !parent.equals(ancestor)) {
+            path = parent.getName() + File.separator + path;
+            parent = parent.getParentFile();
         }
+        return path;
+    }
 
+    public synchronized void loadXmlModel() {
+        logger.info("Loading xml model from file: {}",
+                appModelFile.getAbsolutePath());
+
+        try {
+            JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
+            Unmarshaller um = jc.createUnmarshaller();
+            Model loadedModel = (Model) um.unmarshal(appModelFile);
+            initConnections(loadedModel);
+            boolean syncOnStart = false;
+            if (syncOnStart) {
+                for (ConnectionProvider connectionProvider :
+                        connectionProviders) {
+                    String databaseName = connectionProvider.getDatabase().getDatabaseName();
+                    Database sourceDatabase =
+                            DataModelLogic.findDatabaseByName(loadedModel, databaseName);
+                    DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
+                    Database targetDatabase = dbSyncer.syncDatabase(loadedModel);
+                    loadedModel.getDatabases().remove(sourceDatabase);
+                    loadedModel.getDatabases().add(targetDatabase);
+                }
+            }
+            loadedModel.init();
+            installDataModel(loadedModel);
+        } catch (Exception e) {
+            logger.error("Cannot load/parse model: " + appModelFile, e);
+        }
+    }
+
+    protected void initConnections(Model loadedModel) {
+        loadedModel.initDatabases(databasePlatformsManager);
+        connectionProviders = new ArrayList<ConnectionProvider>();
+        for(Database db : loadedModel.getDatabases()) {
+            ConnectionProvider connectionProvider = db.getConnectionProvider();
+            if(connectionProvider != null) {
+                connectionProviders.add(connectionProvider);
+            }
+        }
         logger.info("Updating database definitions");
         File appsDir = appDir.getParentFile();
         ResourceAccessor resourceAccessor =
                 new FileSystemResourceAccessor(appsDir.getAbsolutePath());
-        for (ConnectionProvider current : connectionProviders.getConnections()) {
-            String databaseName = current.getDatabaseName();
+        for (ConnectionProvider current : connectionProviders) {
+            String databaseName = current.getDatabase().getDatabaseName();
             String changelogFileName =
                     MessageFormat.format(
                             changelogFileNameTemplate, databaseName);
@@ -207,44 +239,6 @@ public class HibernateApplicationImpl implements Application {
                 current.releaseConnection(connection);
             }
 
-        }
-    }
-
-    private String calculateRelativePath(File ancestor, File changelogFile) {
-        String path = changelogFile.getName();
-        File parent = changelogFile.getParentFile();
-        while (parent != null && !parent.equals(ancestor)) {
-            path = parent.getName() + File.separator + path;
-            parent = parent.getParentFile();
-        }
-        return path;
-    }
-
-    public synchronized void loadXmlModel() {
-        logger.info("Loading xml model from file: {}",
-                appModelFile.getAbsolutePath());
-
-        try {
-            JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
-            Unmarshaller um = jc.createUnmarshaller();
-            Model loadedModel = (Model) um.unmarshal(appModelFile);
-            boolean syncOnStart = false;
-            if (syncOnStart) {
-                for (ConnectionProvider connectionProvider :
-                        connectionProviders.getConnections()) {
-                    String databaseName = connectionProvider.getDatabaseName();
-                    Database sourceDatabase =
-                            DataModelLogic.findDatabaseByName(loadedModel, databaseName);
-                    DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
-                    Database targetDatabase = dbSyncer.syncDatabase(loadedModel);
-                    loadedModel.getDatabases().remove(sourceDatabase);
-                    loadedModel.getDatabases().add(targetDatabase);
-                }
-            }
-            loadedModel.init();
-            installDataModel(loadedModel);
-        } catch (Exception e) {
-            logger.error("Cannot load/parse model: " + appModelFile, e);
         }
     }
 
@@ -326,57 +320,58 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
 
     public ConnectionProvider getConnectionProvider(String databaseName) {
-        for (ConnectionProvider current : connectionProviders.getConnections()) {
-            if (current.getDatabaseName().equals(databaseName)) {
+        for (ConnectionProvider current : connectionProviders) {
+            if (current.getDatabase().getDatabaseName().equals(databaseName)) {
                 return current;
             }
         }
         return null;
     }
 
-    public void addConnectionProvider(ConnectionProvider connectionProvider) {
-        logger.info("Adding a new connection Provider: {}", connectionProvider);
-        connectionProviders.getConnections().add(connectionProvider);
-        writeToConnectionFile();
+    public void addDatabase(Database database) {
+        logger.info("Adding a new database: {}", database);
+        model.getDatabases().add(database);
+        connectionProviders.add(database.getConnectionProvider());
+        saveXmlModel();
     }
 
-    public void deleteConnectionProvider(String[] connectionProvider) {
-        logger.info("Deleting connection Provider: {}", connectionProvider);
-        List<ConnectionProvider> toBeRemoved = new ArrayList<ConnectionProvider>();
-        for(String databaseName : connectionProvider){
-            for(ConnectionProvider current : connectionProviders.getConnections()){
+    public void deleteDatabases(String[] databases) {
+        logger.info("Deleting databases: {}", databases);
+        List<Database> toBeRemoved = new ArrayList<Database>();
+        for(String databaseName : databases) {
+            for(Database current : model.getDatabases()){
                 if(current.getDatabaseName().equals(databaseName)){
                     toBeRemoved.add(current);
+                    connectionProviders.remove(current.getConnectionProvider());
                 }
             }
         }
-        connectionProviders.getConnections().removeAll(toBeRemoved);
-        writeToConnectionFile();
+        model.getDatabases().removeAll(toBeRemoved);
+        saveXmlModel();
     }
 
-     public void deleteConnectionProvider(String connectionProvider) {
-        logger.info("Deleting connection Provider: {}", connectionProvider);
-        for(ConnectionProvider current : connectionProviders.getConnections()){
-            if(current.getDatabaseName().equals(connectionProvider)){
-                connectionProviders.getConnections().remove(current);
+     public void deleteDatabase(String databaseName) {
+        logger.info("Deleting database: {}", databaseName);
+        for(Database current : model.getDatabases()){
+            if(current.getDatabaseName().equals(databaseName)){
+                model.getDatabases().remove(current);
+                connectionProviders.remove(current.getConnectionProvider());
                 break;
             }
         }
 
-        writeToConnectionFile();
+        saveXmlModel();
     }
 
-    public void updateConnectionProvider(ConnectionProvider connectionProvider) {
-        logger.info("Updating connection Provider: {}", 
-                connectionProvider.toString());
-        for (ConnectionProvider conn : connectionProviders.getConnections()){
-            if (conn.getDatabaseName().equals(connectionProvider.getDatabaseName())){
-                deleteConnectionProvider(connectionProvider.getDatabaseName());
-                addConnectionProvider(connectionProvider);
+    public void updateDatabase(Database database) {
+        logger.info("Updating database: {}", database);
+        for (Database db : model.getDatabases()){
+            if (db.getDatabaseName().equals(database.getDatabaseName())){
+                deleteDatabase(database.getDatabaseName());
+                addDatabase(db); //TODO salva il modello 2 volte
                 return;
             }
         }
-        writeToConnectionFile();
     }
     
     public org.apache.commons.configuration.Configuration getPortofinoProperties() {
@@ -392,7 +387,7 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
 
     public List<ConnectionProvider> getConnectionProviders() {
-        return connectionProviders.getConnections();
+        return connectionProviders;
     }
 
     public Model getModel() {
@@ -655,23 +650,6 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
     // File Access
     //**************************************************************************
-
-    private void writeToConnectionFile() {
-        try {
-            File tempFile = File.createTempFile("portofino", "connections.xml");
-
-            JAXBContext jc = JAXBContext.newInstance(Connections.JAXB_CONNECTIONS_PACKAGES);
-            Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            m.marshal(connectionProviders, tempFile);
-
-            moveFileSafely(tempFile, appConnectionsFile.getAbsolutePath());
-
-            logger.info("Saved connections to file: {}", appConnectionsFile);
-        } catch (Throwable e) {
-            logger.error("Cannot save connections to file: " + appConnectionsFile, e);
-        }
-    }
 
     protected void moveFileSafely(File tempFile, String fileName) throws IOException {
         File destination = new File(fileName);
