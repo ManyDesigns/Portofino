@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.actions.forms;
 
-import com.manydesigns.elements.annotations.Updatable;
+import com.manydesigns.elements.annotations.*;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.JdbcConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.JndiConnectionProvider;
@@ -70,6 +70,8 @@ public class ConnectionProviderForm {
         return database.getDatabaseName();
     }
 
+    @FieldSize(50)
+    @Required
     public String getDriver() {
         return jdbcConnectionProvider.getDriver();
     }
@@ -78,6 +80,9 @@ public class ConnectionProviderForm {
         jdbcConnectionProvider.setDriver(driver);
     }
 
+    @FieldSize(100)
+    @Required
+    @Label("connection URL")
     public String getUrl() {
         return jdbcConnectionProvider.getUrl();
     }
@@ -94,12 +99,22 @@ public class ConnectionProviderForm {
         jdbcConnectionProvider.setUsername(username);
     }
 
+    @Password
     public String getPassword() {
         return jdbcConnectionProvider.getPassword();
     }
 
     public void setPassword(String password) {
         jdbcConnectionProvider.setPassword(password);
+    }
+
+    @Required
+    public String getJndiResource() {
+        return jndiConnectionProvider.getJndiResource();
+    }
+
+    public void setJndiResource(String jndiResource) {
+        jndiConnectionProvider.setJndiResource(jndiResource);
     }
 
     public String getErrorMessage() {
