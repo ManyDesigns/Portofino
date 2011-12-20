@@ -40,6 +40,7 @@ import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderTableForm;
+import com.manydesigns.portofino.actions.forms.SelectableSchema;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
@@ -47,10 +48,7 @@ import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.DataModelLogic;
-import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
-import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.datamodel.JdbcConnectionProvider;
-import com.manydesigns.portofino.model.datamodel.JndiConnectionProvider;
+import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
@@ -58,6 +56,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,12 +82,14 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     public TableForm tableForm;
     public Form form;
     public Form detectedValuesForm;
+    public TableForm schemasForm;
     public TableForm databasePlatformsTableForm;
 
     public String databaseName;
     public String connectionType;
 
     public String[] selection;
+    protected List<SelectableSchema> selectableSchemas;
 
     //**************************************************************************
     // Injections
@@ -167,6 +169,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
 
         if (ConnectionProvider.STATUS_CONNECTED
                 .equals(connectionProvider.getStatus())) {
+            configureViewSchemas();
             configureDetected();
         }
 
@@ -175,14 +178,14 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
 
     public final static String[] jdbcViewFields = {"databaseName", "driver",
                             "url", "username", "password",
-                            "status", "errorMessage", "lastTested", "schemas"};
+                            "status", "errorMessage", "lastTested"};
 
     public final static String[] jdbcEditFields = {"databaseName", "driver",
                             "url", "username", "password"
                             };
 
     public final static String[] jndiViewFields = {"databaseName", "jndiResource",
-                            "status", "errorMessage", "lastTested", "schemas"};
+                            "status", "errorMessage", "lastTested"};
 
     public final static String[] jndiEditFields = {"databaseName", "jndiResource"};
 
@@ -206,6 +209,18 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
                     .build();
     }
 
+    protected void configureViewSchemas() {
+        List<Schema> schemas = connectionProvider.getDatabase().getSchemas();
+        schemasForm = new TableFormBuilder(Schema.class)
+                .configFields(
+                        "schemaName"
+                        )
+                .configMode(Mode.VIEW)
+                .configNRows(schemas.size())
+                .build();
+        schemasForm.readFromObject(schemas);
+    }
+
     protected void configureDetected() {
         detectedValuesForm = new FormBuilder(JdbcConnectionProvider.class)
                 .configFields(
@@ -220,6 +235,42 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
                 .configMode(Mode.VIEW)
                 .build();
         detectedValuesForm.readFromObject(connectionProvider);
+    }
+
+    protected void configureEditSchemas() {
+        try {
+            Connection conn = connectionProvider.acquireConnection();
+            logger.debug("Reading database metadata");
+            DatabaseMetaData metadata = conn.getMetaData();
+            List<String> schemaNamesFromDb =
+                    connectionProvider.getDatabasePlatform().getSchemaNames(metadata);
+            connectionProvider.releaseConnection(conn);
+
+            List<Schema> selectedSchemas = connectionProvider.getDatabase().getSchemas();
+
+            selectableSchemas = new ArrayList<SelectableSchema>(schemaNamesFromDb.size());
+            for(String schemaName : schemaNamesFromDb) {
+                boolean selected = false;
+                for(Schema schema : selectedSchemas) {
+                    if(schemaName.equalsIgnoreCase(schema.getSchemaName())) {
+                        selected = true;
+                        break;
+                    }
+                }
+                SelectableSchema schema = new SelectableSchema(schemaName, selected);
+                selectableSchemas.add(schema);
+            }
+            schemasForm = new TableFormBuilder(SelectableSchema.class)
+                    .configFields(
+                            "selected", "schemaName"
+                            )
+                    .configMode(Mode.EDIT)
+                    .configNRows(selectableSchemas.size())
+                    .build();
+            schemasForm.readFromObject(selectableSchemas);
+        } catch (Exception e) {
+            logger.error("Coulnd't read schema names from db", e);
+        }
     }
 
     @Button(list = "connectionProviders-read", key = "layouts.admin.connectionProviders.list.test", order = 3)
@@ -302,6 +353,8 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         buildConnectionProviderForm(Mode.EDIT);
         form.readFromObject(connectionProviderForm);
 
+        configureEditSchemas();
+
         return new ForwardResolution("/layouts/admin/connectionProviders/edit.jsp");
     }
 
@@ -309,13 +362,42 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     public Resolution update() {
         connectionProvider = application.getConnectionProvider(databaseName);
         databasePlatform = connectionProvider.getDatabasePlatform();
-        connectionProviderForm = new ConnectionProviderForm(connectionProvider.getDatabase());
+        Database database = connectionProvider.getDatabase();
+        connectionProviderForm = new ConnectionProviderForm(database);
 
         buildConnectionProviderForm(Mode.EDIT);
         form.readFromObject(connectionProviderForm);
 
         form.readFromRequest(context.getRequest());
-        if (form.validate()) {            
+
+        configureEditSchemas();
+        schemasForm.readFromRequest(context.getRequest());
+        if (form.validate() && schemasForm.validate()) {
+            schemasForm.writeToObject(selectableSchemas);
+            List<Schema> selectedSchemas = database.getSchemas();
+            List<String> selectedSchemaNames = new ArrayList<String>(selectedSchemas.size());
+            for(Schema schema : selectedSchemas) {
+                selectedSchemaNames.add(schema.getSchemaName().toLowerCase());
+            }
+            for(SelectableSchema schema : selectableSchemas) {
+                if(schema.selected && !selectedSchemaNames.contains(schema.schemaName.toLowerCase())) {
+                    Schema modelSchema = new Schema();
+                    modelSchema.setSchemaName(schema.schemaName);
+                    modelSchema.setDatabase(database);
+                    database.getSchemas().add(modelSchema);
+                } else if(!schema.selected && selectedSchemaNames.contains(schema.schemaName.toLowerCase())) {
+                    Schema toBeRemoved = null;
+                    for(Schema aSchema : database.getSchemas()) {
+                        if(aSchema.getSchemaName().equalsIgnoreCase(schema.schemaName)) {
+                            toBeRemoved = aSchema;
+                            break;
+                        }
+                    }
+                    if(toBeRemoved != null) {
+                        database.getSchemas().remove(toBeRemoved);
+                    }
+                }
+            }
             form.writeToObject(connectionProviderForm);
             application.saveXmlModel();
             connectionProvider.init(application.getDatabasePlatformsManager());
@@ -407,5 +489,9 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
 
     public void setConnectionType(String connectionType) {
         this.connectionType = connectionType;
+    }
+
+    public TableForm getSchemasForm() {
+        return schemasForm;
     }
 }

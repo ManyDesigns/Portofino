@@ -19,6 +19,11 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>
+        <c:if test="${actionBean.schemasForm != null}">
+            <div class="horizontalSeparator"></div>
+            <h2>Schemas</h2>
+            <mde:write name="actionBean" property="schemasForm"/>
+        </c:if>
         <c:if test="${actionBean.detectedValuesForm != null}">
             <div class="horizontalSeparator"></div>
             <h2><fmt:message key="layouts.admin.connectionProviders.read.detected_values"/></h2>
