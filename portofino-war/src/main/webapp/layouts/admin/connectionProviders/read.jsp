@@ -19,10 +19,13 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>
-        <c:if test="${actionBean.schemasForm != null}">
+        <c:if test="${not empty actionBean.connectionProvider.database.schemas}">
             <div class="horizontalSeparator"></div>
-            <h2>Schemas</h2>
-            <mde:write name="actionBean" property="schemasForm"/>
+            <h2><fmt:message key="layouts.admin.connectionProviders.read.schemas"/></h2>
+            <c:forEach var="schema" items="${actionBean.connectionProvider.database.schemas}"
+                       varStatus="status">
+                <c:out value="${schema.schemaName}" /><c:if test="${!status.last}">, </c:if>
+            </c:forEach>
         </c:if>
         <c:if test="${actionBean.detectedValuesForm != null}">
             <div class="horizontalSeparator"></div>

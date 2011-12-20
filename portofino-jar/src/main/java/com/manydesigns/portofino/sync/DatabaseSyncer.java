@@ -133,6 +133,8 @@ public class DatabaseSyncer {
         } finally {
             connectionProvider.releaseConnection(conn);
         }
+        targetDatabase.setConnectionProvider(connectionProvider);
+        connectionProvider.setDatabase(targetDatabase);
         return targetDatabase;
     }
 

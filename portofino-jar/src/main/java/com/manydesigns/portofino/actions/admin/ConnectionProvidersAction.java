@@ -169,7 +169,6 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
 
         if (ConnectionProvider.STATUS_CONNECTED
                 .equals(connectionProvider.getStatus())) {
-            configureViewSchemas();
             configureDetected();
         }
 
@@ -207,18 +206,6 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
                     .configFields(fields)
                     .configMode(mode)
                     .build();
-    }
-
-    protected void configureViewSchemas() {
-        List<Schema> schemas = connectionProvider.getDatabase().getSchemas();
-        schemasForm = new TableFormBuilder(Schema.class)
-                .configFields(
-                        "schemaName"
-                        )
-                .configMode(Mode.VIEW)
-                .configNRows(schemas.size())
-                .build();
-        schemasForm.readFromObject(schemas);
     }
 
     protected void configureDetected() {
@@ -493,5 +480,9 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
 
     public TableForm getSchemasForm() {
         return schemasForm;
+    }
+
+    public ConnectionProvider getConnectionProvider() {
+        return connectionProvider;
     }
 }

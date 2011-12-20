@@ -43,6 +43,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -56,6 +58,7 @@ import java.util.*;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@XmlAccessorType(XmlAccessType.NONE)
 public abstract class ConnectionProvider implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
@@ -341,13 +344,13 @@ public abstract class ConnectionProvider implements ModelObject {
         return database;
     }
 
+    public void setDatabase(Database database) {
+        this.database = database;
+    }
+
     public Type[] getTypes() {
         Type[] result = new Type[types.size()];
         return types.toArray(result);
-    }
-
-    public void setDatabase(Database database) {
-        this.database = database;
     }
 
     private static class TypeComparator implements Comparator<Type> {
