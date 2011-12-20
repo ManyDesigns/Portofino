@@ -356,11 +356,10 @@ public class HibernateApplicationImpl implements Application {
             if(current.getDatabaseName().equals(databaseName)){
                 model.getDatabases().remove(current);
                 connectionProviders.remove(current.getConnectionProvider());
+                saveXmlModel();
                 break;
             }
         }
-
-        saveXmlModel();
     }
 
     public void updateDatabase(Database database) {

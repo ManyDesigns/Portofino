@@ -38,15 +38,18 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
+import com.manydesigns.portofino.actions.forms.ConnectionProviderTableForm;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
-import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
-import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.datamodel.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.logic.DataModelLogic;
+import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
+import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.datamodel.JdbcConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.JndiConnectionProvider;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
@@ -55,6 +58,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -74,6 +78,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     public DatabasePlatform[] databasePlatforms;
     public DatabasePlatform databasePlatform;
 
+    protected ConnectionProviderForm connectionProviderForm;
     public TableForm tableForm;
     public Form form;
     public Form detectedValuesForm;
@@ -120,7 +125,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
                                 "databaseName=%{databaseName}");
         hrefFormat.setUrl(true);
 
-        tableForm = new TableFormBuilder(ConnectionProvider.class)
+        tableForm = new TableFormBuilder(ConnectionProviderTableForm.class)
                 .configFields("databaseName", "description", "status")
                 .configNRows(connectionProviders.size())
                 .configHrefTextFormat("databaseName", hrefFormat)
@@ -129,7 +134,11 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         tableForm.setSelectable(true);
         tableForm.setKeyGenerator(OgnlTextFormat.create("%{databaseName}"));
 
-        tableForm.readFromObject(connectionProviders);
+        List<ConnectionProviderTableForm> tableFormObj = new ArrayList<ConnectionProviderTableForm>();
+        for(ConnectionProvider connectionProvider : connectionProviders) {
+            tableFormObj.add(new ConnectionProviderTableForm(connectionProvider.getDatabase().getDatabaseName(), connectionProvider.getDescription(), connectionProvider.getStatus()));
+        }
+        tableForm.readFromObject(tableFormObj);
 
         // database platforms
         DatabasePlatformsManager manager =
@@ -151,9 +160,10 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     public Resolution read() {
         connectionProvider = application.getConnectionProvider(databaseName);
         databasePlatform = connectionProvider.getDatabasePlatform();
+        connectionProviderForm = new ConnectionProviderForm(connectionProvider.getDatabase());
 
         buildConnectionProviderForm(Mode.VIEW);
-        form.readFromObject(connectionProvider);
+        form.readFromObject(connectionProviderForm);
 
         if (ConnectionProvider.STATUS_CONNECTED
                 .equals(connectionProvider.getStatus())) {
@@ -165,19 +175,16 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
 
     public final static String[] jdbcViewFields = {"databaseName", "driver",
                             "url", "username", "password",
-                            "includeSchemas", "excludeSchemas",
-                            "status", "errorMessage", "lastTested"};
+                            "status", "errorMessage", "lastTested", "schemas"};
 
     public final static String[] jdbcEditFields = {"databaseName", "driver",
-                            "url", "username", "password",
-                            "includeSchemas", "excludeSchemas"};
+                            "url", "username", "password"
+                            };
 
     public final static String[] jndiViewFields = {"databaseName", "jndiResource",
-                            "includeSchemas", "excludeSchemas",
-                            "status", "errorMessage", "lastTested"};
+                            "status", "errorMessage", "lastTested", "schemas"};
 
-    public final static String[] jndiEditFields = {"databaseName", "jndiResource",
-                            "includeSchemas", "excludeSchemas"};
+    public final static String[] jndiEditFields = {"databaseName", "jndiResource"};
 
     private void buildConnectionProviderForm(Mode mode) {
         String [] fields;
@@ -193,7 +200,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
             throw new InternalError("Unknown connection provider type: " +
                     connectionProvider.getClass().getName());
         }
-        form = new FormBuilder(connectionProvider.getClass())
+        form = new FormBuilder(ConnectionProviderForm.class)
                     .configFields(fields)
                     .configMode(mode)
                     .build();
@@ -245,6 +252,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     }
 
     protected boolean createConnectionProvider() {
+        Database database = new Database();
         if("JDBC".equals(connectionType)) {
             connectionProvider = new JdbcConnectionProvider();
         } else if("JNDI".equals(connectionType)) {
@@ -252,6 +260,9 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         } else {
             return false;
         }
+        database.setConnectionProvider(connectionProvider);
+        connectionProvider.setDatabase(database);
+        connectionProviderForm = new ConnectionProviderForm(database);
         return true;
     }
 
@@ -264,9 +275,13 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
-            form.writeToObject(connectionProvider);
-            //TODO check for duplicate database names
-            Database database = new Database();
+            form.writeToObject(connectionProviderForm);
+            if(DataModelLogic.findDatabaseByName
+                    (application.getModel(), connectionProviderForm.getDatabaseName()) != null) {
+                SessionMessages.addErrorMessage("Another database with the same name already exists");
+                return new ForwardResolution("/layouts/admin/connectionProviders/create.jsp");
+            }
+            Database database = connectionProvider.getDatabase();
             database.setConnectionProvider(connectionProvider);
             connectionProvider.setDatabase(database);
             application.addDatabase(database);
@@ -282,9 +297,10 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     public Resolution edit() {
         connectionProvider = application.getConnectionProvider(databaseName);
         databasePlatform = connectionProvider.getDatabasePlatform();
+        connectionProviderForm = new ConnectionProviderForm(connectionProvider.getDatabase());
 
         buildConnectionProviderForm(Mode.EDIT);
-        form.readFromObject(connectionProvider);
+        form.readFromObject(connectionProviderForm);
 
         return new ForwardResolution("/layouts/admin/connectionProviders/edit.jsp");
     }
@@ -293,14 +309,15 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     public Resolution update() {
         connectionProvider = application.getConnectionProvider(databaseName);
         databasePlatform = connectionProvider.getDatabasePlatform();
+        connectionProviderForm = new ConnectionProviderForm(connectionProvider.getDatabase());
 
         buildConnectionProviderForm(Mode.EDIT);
-        form.readFromObject(connectionProvider);
+        form.readFromObject(connectionProviderForm);
 
         form.readFromRequest(context.getRequest());
         if (form.validate()) {            
-            form.writeToObject(connectionProvider);
-            //application.updateDatabase(connectionProvider);
+            form.writeToObject(connectionProviderForm);
+            application.saveXmlModel();
             connectionProvider.init(application.getDatabasePlatformsManager());
             SessionMessages.addInfoMessage("Connection provider updated successfully");
         }

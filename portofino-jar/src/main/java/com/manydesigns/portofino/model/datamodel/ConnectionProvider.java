@@ -29,7 +29,9 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.annotations.DateFormat;
+import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.Updatable;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
@@ -41,7 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAttribute;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -261,7 +262,6 @@ public abstract class ConnectionProvider implements ModelObject {
     // Getters/setters
     //**************************************************************************
 
-    @Status(red={STATUS_ERROR}, amber={STATUS_DISCONNECTED}, green={STATUS_CONNECTED})
     @Updatable(false)
     public String getStatus() {
         return status;
