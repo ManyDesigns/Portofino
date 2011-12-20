@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.model;
 
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.pages.RootPage;
@@ -71,12 +71,12 @@ public class Model {
         this.databases = new ArrayList<Database>();
     }
 
-    public void initDatabases(DatabasePlatformsManager databasePlatformsManager) {
+    public void initDatabases(Application application) {
         for(Database database : getDatabases()) {
             ConnectionProvider connectionProvider = database.getConnectionProvider();
             if(connectionProvider != null) {
                 connectionProvider.reset();
-                connectionProvider.init(databasePlatformsManager);
+                connectionProvider.init(application);
             } else {
                 logger.error("No connection provider specified for {}", database);
             }

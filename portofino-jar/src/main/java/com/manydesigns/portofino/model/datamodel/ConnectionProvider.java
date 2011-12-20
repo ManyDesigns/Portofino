@@ -32,6 +32,7 @@ package com.manydesigns.portofino.model.datamodel;
 import com.manydesigns.elements.annotations.DateFormat;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Updatable;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
@@ -139,7 +140,8 @@ public abstract class ConnectionProvider implements ModelObject {
         lastTested = null;
     }
 
-    public void init(DatabasePlatformsManager databasePlatformsManager) {
+    public void init(Application application) {
+        DatabasePlatformsManager databasePlatformsManager = application.getDatabasePlatformsManager();
         Connection conn = null;
         ResultSet typeRs = null;
         String databaseName = getDatabase().getDatabaseName();

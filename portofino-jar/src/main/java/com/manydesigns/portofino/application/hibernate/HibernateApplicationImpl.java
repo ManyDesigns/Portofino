@@ -195,7 +195,7 @@ public class HibernateApplicationImpl implements Application {
     }
 
     protected void initConnections(Model loadedModel) {
-        loadedModel.initDatabases(databasePlatformsManager);
+        loadedModel.initDatabases(this);
         connectionProviders = new ArrayList<ConnectionProvider>();
         for(Database db : loadedModel.getDatabases()) {
             ConnectionProvider connectionProvider = db.getConnectionProvider();

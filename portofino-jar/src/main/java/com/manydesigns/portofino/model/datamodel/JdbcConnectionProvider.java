@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
@@ -54,6 +55,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
     public static final String SERVER_INFO_REAL_PATH = "${serverInfo:realPath}";
+    public static final String APP_DIR = "${app}";
 
     //**************************************************************************
     // Fields (configured values)
@@ -89,14 +91,16 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     }
 
     @Override
-    public void init(DatabasePlatformsManager databasePlatformsManager) {
+    public void init(Application application) {
+        DatabasePlatformsManager databasePlatformsManager = application.getDatabasePlatformsManager();
         Configuration portofinoConfiguration =
                 databasePlatformsManager.getPortofinoConfiguration();
         String warRealPath =
                 portofinoConfiguration.getString(
                         PortofinoProperties.WAR_REAL_PATH);
         actualUrl = StringUtils.replace(url, SERVER_INFO_REAL_PATH, warRealPath);
-        super.init(databasePlatformsManager);
+        actualUrl = StringUtils.replace(actualUrl, APP_DIR, application.getAppDir().getAbsolutePath());
+        super.init(application);
     }
 
 

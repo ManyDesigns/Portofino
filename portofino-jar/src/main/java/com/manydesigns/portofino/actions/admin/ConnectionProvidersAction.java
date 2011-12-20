@@ -263,7 +263,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     @Button(list = "connectionProviders-read", key = "layouts.admin.connectionProviders.list.test", order = 3)
     public Resolution test() {
         connectionProvider = application.getConnectionProvider(databaseName);
-        connectionProvider.init(application.getDatabasePlatformsManager());
+        connectionProvider.init(application);
         String status = connectionProvider.getStatus();
         if (ConnectionProvider.STATUS_CONNECTED.equals(status)) {
             SessionMessages.addInfoMessage("Connection tested successfully");
@@ -323,7 +323,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
             database.setConnectionProvider(connectionProvider);
             connectionProvider.setDatabase(database);
             application.addDatabase(database);
-            connectionProvider.init(application.getDatabasePlatformsManager());
+            connectionProvider.init(application);
             SessionMessages.addInfoMessage("Connection provider created successfully");
             return new RedirectResolution(this.getClass());
         } else {
@@ -387,7 +387,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
             }
             form.writeToObject(connectionProviderForm);
             application.saveXmlModel();
-            connectionProvider.init(application.getDatabasePlatformsManager());
+            connectionProvider.init(application);
             SessionMessages.addInfoMessage("Connection provider updated successfully");
         }
         return new RedirectResolution(this.getClass())
