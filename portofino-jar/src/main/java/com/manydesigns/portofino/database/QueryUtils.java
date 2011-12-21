@@ -41,6 +41,12 @@ import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -51,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.io.StringReader;
 import java.sql.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -339,40 +346,39 @@ public class QueryUtils {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
         String formatString = sqlFormat.getFormatString();
         Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
-        boolean formatStringContainsWhere = formatString.toUpperCase().contains(WHERE_STRING);
 
         QueryStringWithParameters criteriaQuery =
                 getQueryStringWithParametersForCriteria(criteria);
         String criteriaQueryString = criteriaQuery.getQueryString();
         Object[] criteriaParameters = criteriaQuery.getParamaters();
 
-        // merge the hql strings
-        int whereIndex = criteriaQueryString.toUpperCase().indexOf(WHERE_STRING);
-        String criteriaWhereClause;
-        if (whereIndex >= 0) {
-            criteriaWhereClause =
-                    criteriaQueryString.substring(
-                            whereIndex + WHERE_STRING.length());
-        } else {
-            criteriaWhereClause = "";
+        CCJSqlParserManager parserManager = new CCJSqlParserManager();
+        PlainSelect parsedQueryString;
+        PlainSelect parsedCriteriaQuery;
+        String queryPrefix = "select * ";
+        try {
+            parsedQueryString =
+                    (PlainSelect) ((Select) parserManager.parse(new StringReader(queryPrefix + formatString)))
+                            .getSelectBody();
+            parsedCriteriaQuery =
+                    (PlainSelect) ((Select) parserManager.parse(new StringReader(queryPrefix + criteriaQueryString)))
+                            .getSelectBody();
+        } catch (JSQLParserException e) {
+            throw new RuntimeException("Couldn't merge query", e);
         }
 
-        String fullQueryString;
-        if (criteriaWhereClause.length() > 0) {
-            if (formatStringContainsWhere) {
-                fullQueryString = MessageFormat.format(
-                        "{0} AND {1}",
-                        formatString,
-                        criteriaWhereClause);
+        Expression whereExpression;
+        if(parsedQueryString.getWhere() != null) {
+            if(parsedCriteriaQuery.getWhere() != null) {
+                whereExpression = new AndExpression(parsedQueryString.getWhere(), parsedCriteriaQuery.getWhere());
             } else {
-                fullQueryString = MessageFormat.format(
-                        "{0} WHERE {1}",
-                        formatString,
-                        criteriaWhereClause);
+                whereExpression = parsedQueryString.getWhere();
             }
         } else {
-            fullQueryString = formatString;
+            whereExpression = parsedCriteriaQuery.getWhere();
         }
+        parsedQueryString.setWhere(whereExpression);
+        String fullQueryString = parsedQueryString.toString().substring(queryPrefix.length());
 
         // merge the parameters
         ArrayList<Object> mergedParametersList = new ArrayList<Object>();

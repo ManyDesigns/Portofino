@@ -66,7 +66,6 @@ public class Crud implements ModelObject {
     protected final Crud parentCrud;
     protected final List<CrudProperty> properties;
     protected final List<Annotation> annotations;
-    protected final List<Button> buttons;
     protected final List<SelectionProviderReference> selectionProviders;
 
     protected String name;
@@ -99,7 +98,6 @@ public class Crud implements ModelObject {
         this.parentCrud = parentCrud;
         properties = new ArrayList<CrudProperty>();
         annotations = new ArrayList<Annotation>();
-        buttons = new ArrayList<Button>();
         selectionProviders = new ArrayList<SelectionProviderReference>();
     }
 
@@ -147,10 +145,6 @@ public class Crud implements ModelObject {
             visitor.visit(annotation);
         }
 
-        for (Button button : buttons) {
-            visitor.visit(button);
-        }
-
         for(SelectionProviderReference ref : selectionProviders) {
             visitor.visit(ref);
         }
@@ -184,12 +178,6 @@ public class Crud implements ModelObject {
         @XmlElement(name="annotation",type=Annotation.class)
     public List<Annotation> getModelAnnotations() {
         return annotations;
-    }
-
-    @XmlElementWrapper(name="buttons")
-    @XmlElement(name="button",type=Button.class)
-    public List<Button> getButtons() {
-        return buttons;
     }
 
     @Identifier
