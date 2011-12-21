@@ -146,6 +146,8 @@ public class CrudAction extends PortletAction {
     public String successReturnUrl;
     public Integer firstResult;
     public Integer maxResults;
+    public String sortProperty;
+    public String sortDirection;
 
     //--------------------------------------------------------------------------
     // UI forms
@@ -1047,6 +1049,14 @@ public class CrudAction extends PortletAction {
             }
             String databaseName = crud.getActualTable().getDatabaseName();
             Session session = application.getSession(databaseName);
+            if(!StringUtils.isBlank(sortProperty) && !StringUtils.isBlank(sortDirection)) {
+                try {
+                    PropertyAccessor orderByProperty = classAccessor.getProperty(sortProperty);
+                    criteria.orderBy(orderByProperty, sortDirection);
+                } catch (NoSuchFieldException e) {
+                    logger.error("Can't order by " + sortProperty + ", property accessor not found", e);
+                }
+            }
             objects = QueryUtils.getObjects(session,
                     crud.getQuery(), criteria, this, firstResult, maxResults);
         } catch (ClassCastException e) {
@@ -1959,6 +1969,22 @@ public class CrudAction extends PortletAction {
 
     public void setMaxResults(Integer maxResults) {
         this.maxResults = maxResults;
+    }
+
+    public String getSortProperty() {
+        return sortProperty;
+    }
+
+    public void setSortProperty(String sortProperty) {
+        this.sortProperty = sortProperty;
+    }
+
+    public String getSortDirection() {
+        return sortDirection;
+    }
+
+    public void setSortDirection(String sortDirection) {
+        this.sortDirection = sortDirection;
     }
 
     public String getPropertyName() {

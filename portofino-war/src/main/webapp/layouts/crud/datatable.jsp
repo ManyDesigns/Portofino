@@ -93,7 +93,7 @@
                     out.print(", label : \"");
                     out.print(StringEscapeUtils.escapeJavaScript(column.getLabel()));
                     out.print("\"");
-                    out.print(", formatter : elementsFormatter");
+                    out.print(", formatter : elementsFormatter, sortable : true");
                     out.print("}");
                 }
             %>
@@ -102,14 +102,14 @@
         var generateRequest = function(oState, oSelf) {
             // Get states or use defaults
             oState = oState || { pagination: null, sortedBy: null };
-            var sort = (oState.sortedBy) ? oState.sortedBy.key : "id";
+            var sort = (oState.sortedBy) ? oState.sortedBy.key : "";
             var dir = (oState.sortedBy && oState.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc";
             var startIndex = (oState.pagination) ? oState.pagination.recordOffset : 0;
             var results = (oState.pagination) ? oState.pagination.rowsPerPage : 10;
 
             // Build custom request
             var url = "&firstResult=" + startIndex +
-                    "&maxResults=10";
+                    "&maxResults=10&sortProperty=" + sort + "&sortDirection=" + dir;
             <c:if test="${not empty actionBean.searchString}">
                 url = url + "&searchString=" + encodeURIComponent(
                     '<%= StringEscapeUtils.escapeJavaScript(actionBean.getSearchString()) %>');

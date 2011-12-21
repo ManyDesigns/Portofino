@@ -45,6 +45,7 @@ import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import org.apache.commons.lang.StringUtils;
@@ -390,6 +391,16 @@ public class QueryUtils {
             whereExpression = parsedCriteriaQuery.getWhere();
         }
         parsedQueryString.setWhere(whereExpression);
+        if(criteria.getOrderBy() != null) {
+            List orderByElements = new ArrayList();
+            OrderByElement orderByElement = new OrderByElement();
+            orderByElement.setAsc(criteria.getOrderBy().isAsc());
+            String propertyName = criteria.getOrderBy().getPropertyAccessor().getName();
+            orderByElement.setExpression(
+                    new net.sf.jsqlparser.schema.Column(new net.sf.jsqlparser.schema.Table(), propertyName));
+            orderByElements.add(orderByElement);
+            parsedQueryString.setOrderByElements(orderByElements);
+        }
         String fullQueryString = parsedQueryString.toString();
         if(fullQueryString.toLowerCase().startsWith(queryPrefix)) {
             fullQueryString = fullQueryString.substring(queryPrefix.length());

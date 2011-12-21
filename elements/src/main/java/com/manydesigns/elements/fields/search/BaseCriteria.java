@@ -45,6 +45,12 @@ public class BaseCriteria extends ArrayList<Criterion> implements Criteria {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     //**************************************************************************
+    // Fields
+    //**************************************************************************
+
+    protected OrderBy orderBy;
+
+    //**************************************************************************
     // Constructors
     //**************************************************************************
 
@@ -116,6 +122,15 @@ public class BaseCriteria extends ArrayList<Criterion> implements Criteria {
     public Criteria isNotNull(PropertyAccessor accessor) {
         add(new IsNotNullCriterion(accessor));
         return this;
+    }
+
+    public Criteria orderBy(PropertyAccessor accessor, String direction) {
+        orderBy = new OrderBy(accessor, direction);
+        return this;
+    }
+
+    public OrderBy getOrderBy() {
+        return orderBy;
     }
 
     //**************************************************************************

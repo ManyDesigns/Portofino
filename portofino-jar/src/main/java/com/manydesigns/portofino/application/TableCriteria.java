@@ -132,4 +132,9 @@ public class TableCriteria extends BaseCriteria {
     public TableCriteria isNotNull(PropertyAccessor accessor) {
         return (TableCriteria)super.isNotNull(accessor);
     }
+
+    @Override
+    public TableCriteria orderBy(PropertyAccessor accessor, String direction) {
+        return (TableCriteria)super.orderBy(accessor, direction);
+    }
 }
