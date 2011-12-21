@@ -356,17 +356,23 @@ public class QueryUtils {
         CCJSqlParserManager parserManager = new CCJSqlParserManager();
         PlainSelect parsedQueryString;
         PlainSelect parsedCriteriaQuery;
-        String queryPrefix = "select * ";
+        String queryPrefix = "select __portofino_fake_select__ ";
         try {
+            if(!formatString.toLowerCase().trim().startsWith("select")) {
+                formatString = queryPrefix + formatString;
+            }
             parsedQueryString =
-                    (PlainSelect) ((Select) parserManager.parse(new StringReader(queryPrefix + formatString)))
+                    (PlainSelect) ((Select) parserManager.parse(new StringReader(formatString)))
                             .getSelectBody();
             if(StringUtils.isEmpty(criteriaQueryString)) {
                 parsedCriteriaQuery = new PlainSelect();
             } else {
+                if(!criteriaQueryString.toLowerCase().trim().startsWith("select")) {
+                    criteriaQueryString = queryPrefix + criteriaQueryString;
+                }
                 parsedCriteriaQuery =
                         (PlainSelect) ((Select) parserManager.parse
-                                (new StringReader(queryPrefix + criteriaQueryString)))
+                                (new StringReader(criteriaQueryString)))
                                 .getSelectBody();
             }
         } catch (JSQLParserException e) {
@@ -384,7 +390,10 @@ public class QueryUtils {
             whereExpression = parsedCriteriaQuery.getWhere();
         }
         parsedQueryString.setWhere(whereExpression);
-        String fullQueryString = parsedQueryString.toString().substring(queryPrefix.length());
+        String fullQueryString = parsedQueryString.toString();
+        if(fullQueryString.toLowerCase().startsWith(queryPrefix)) {
+            fullQueryString = fullQueryString.substring(queryPrefix.length());
+        }
 
         // merge the parameters
         ArrayList<Object> mergedParametersList = new ArrayList<Object>();
